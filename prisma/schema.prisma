@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model SupportRequest {
+  id                 Int      @id @default(autoincrement())
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  referenceNumber    String   @default("")
+  enquiryType        String
+  supportDescription String   @db.Text
+  fullName           String
+  emailAddress       String
+  phoneNumber        String?
+  jobRole            String
+  organisationName   String
+  organisationType   String
+  lcrn               String
+  studyTitle         String?
+  protocolReference  String?
+  cpmsId             String?
+}
+
+model Feedback {
+  id               Int      @id @default(autoincrement())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  referenceNumber  String   @default("")
+  helpfulness      String
+  suggestions      String   @db.Text
+  fullName         String?
+  emailAddress     String?
+  organisationName String?
+}
+
+model DataServiceProviderRequest {
+  id               Int      @id @default(autoincrement())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  referenceNumber  String   @default("")
+  dspName          String   @default("")
+  fullName         String
+  emailAddress     String
+  phoneNumber      String?
+  jobRole          String
+  organisationName String
+  studyDescription String   @db.Text
+}
+
+model FrfTeamRequest {
+  id               Int      @id @default(autoincrement())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  referenceNumber  String   @default("")
+  fullName         String
+  emailAddress     String
+  phoneNumber      String?
+  jobRole          String
+  organisationName String
+  details          String   @db.Text
+}

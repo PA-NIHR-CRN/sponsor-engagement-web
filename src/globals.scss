@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: var(--font-primary), arial, sans-serif;
+    color: var(--text-grey);
+  }
+}
+
+@layer utilities {
+  body:not(.js-enabled) {
+    .js-disabled-show {
+      display: block;
+    }
+    .js-disabled-hide {
+      display: none;
+    }
+  }
+}
+
+// GDS Front-end Overrides
+$govuk-global-styles: true;
+$govuk-new-link-styles: true;
+$govuk-font-family: var(--font-primary), arial, sans-serif;
+$govuk-page-width: 1020px;
+
+@import '~node_modules/govuk-frontend/govuk/all.scss';
+
+@layer utilities {
+  .focusable {
+    outline: $govuk-focus-width solid $govuk-focus-colour;
+    outline-offset: 0;
+    box-shadow: inset 0 0 0 2px;
+  }
+  .focusable-text {
+    @include govuk-focused-text;
+  }
+}
+
+body {
+  margin: 0;
+}
+
+.link--inverse {
+  @include govuk-link-style-inverse;
+}
+
+:root {
+  // NIHR FRF Custom Properties
+
+  // Header
+  --header-bg: #193e72;
+  --header-height: 65px;
+
+  // Nav
+  --nav-bg: #2c3c4e;
+  --nav-height: 298px;
+
+  // Brand Colours
+  --colour-aqua-100: #2ea9b0;
+  --colour-aqua-80: #6fbac0;
+  --colour-aqua-60: #9bcad0;
+  --colour-aqua-40: #c0dee0;
+  --colour-aqua-20: #e0eeef;
+  --colour-coral-140: #b62316;
+  --colour-coral-120: #e64132;
+  --colour-coral-100: #ea5c4e;
+  --colour-coral-80: #ef826e;
+  --colour-coral-60: #f3a591;
+  --colour-coral-40: #f8c5b4;
+  --colour-coral-20: #fbe3d9;
+  --colour-green-140: #37724f;
+  --colour-green-120: #498c64;
+  --colour-green-100: #46a86d;
+  --colour-green-80: #79b889;
+  --colour-green-60: #a0c9a7;
+  --colour-green-40: #c4dec5;
+  --colour-green-20: #e2eee4;
+  --colour-grey-120: #b1b4b6;
+  --colour-grey-100: #acbdc4;
+  --colour-grey-80: #bfcad0;
+  --colour-grey-60: #ced5db;
+  --colour-grey-50: #f3f2f1;
+  --colour-grey-40: #dfe4e7;
+  --colour-grey-30: #eff1f3;
+  --colour-grey-20: #f0f1f5;
+  --colour-grey-10: #f6f7f8;
+  --colour-grey-5: #fcfcfd;
+  --colour-navy-140: #050b15;
+  --colour-navy-120: #11294b;
+  --colour-navy-100: #193e72;
+  --colour-navy-80: #475989;
+  --colour-navy-60: #747ca3;
+  --colour-navy-40: #a3a4c2;
+  --colour-navy-20: #d1d0e0;
+  --colour-orange-100: #f3932f;
+  --colour-orange-80: #f6aa5c;
+  --colour-orange-60: #f9c188;
+  --colour-orange-40: #fcd6b1;
+  --colour-orange-20: #feecd8;
+  --colour-purple-100: #6666ac;
+  --colour-purple-80: #8382be;
+  --colour-purple-60: #a2a0d1;
+  --colour-purple-40: #c0bfe1;
+  --colour-purple-20: #e0dff1;
+  --colour-yellow-140: #fcbc31;
+  --colour-yellow-120: #fcc54a;
+  --colour-yellow-100: #fdd47a;
+  --colour-yellow-80: #ffdc98;
+  --colour-yellow-60: #ffe5b4;
+  --colour-yellow-40: #feeecd;
+  --colour-yellow-20: #fff8e8;
+  --colour-black: #000000;
+  --colour-white: #ffffff;
+  --grey: #dfe4e7;
+  --light-grey: #f0f1f5;
+  --dark-grey: #505a5f;
+  --focus: #ffdd00;
+  --red: #d4351c;
+  --text-grey: #0b0c0c;
+}
