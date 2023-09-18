@@ -20,9 +20,27 @@ TBC
 
 ## Install locally
 
-1. `npm install` to install dependencies
-2. Create a `.env.local` file from the `.env.example` and update its values
-3. `nm run dev` to run the local Next.js server
+1. `npm install` to install dependencies. It is not necessary to perform an install for each app/package individually.
+
+## Run web application (NextJS)
+
+1. From within the `web` app directory, create a `.env.local` file from the `.env.example` and update its values
+2. From within the `web` app directory, do `npm run dev` to run the local Next.js server
+
+## Global commands
+
+These commands should be run from the repository root.
+
+| Command           | Info                                                                |
+| ----------------- | ------------------------------------------------------------------- |
+| `npm run dev`     | This will use the turbo CLI to run the dev command for all apps     |
+| `npm run build`   | This will use the turbo CLI to run the build command for all apps   |
+| `npm run start`   | This will use the turbo CLI to run the start command for all apps   |
+| `npm run lint`    | This will use the turbo CLI to run the lint command for all apps    |
+| `npm run test`    | This will use the turbo CLI to run the test command for all apps    |
+| `npm run test:ci` | This will use the turbo CLI to run the test:ci command for all apps |
+
+Note: global commands can be filtered to specific apps. E.g. `npm run dev -- --filter=web`
 
 ## Environment variables
 
@@ -30,7 +48,7 @@ TBC
 
 ## Database
 
-To generate database migrations + rebuild the local Prisma client run: `npm run migrate:dev`.
+To regenerate the local Prisma client run: `npm run db:generate` from within the `database` package.
 
 ## Emails
 
