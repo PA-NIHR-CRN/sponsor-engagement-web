@@ -1,9 +1,9 @@
 {
   "name": "logger",
   "version": "0.0.0",
+  "main": "./index.ts",
+  "types": "./index.ts",
   "license": "MIT",
-  "main": "./index.tsx",
-  "types": "./index.tsx",
   "scripts": {
     "generate:component": "turbo gen react-component",
     "test": "jest --watch",
