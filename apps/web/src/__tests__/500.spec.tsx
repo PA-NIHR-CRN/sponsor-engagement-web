@@ -1,5 +1,5 @@
-import { render } from '@/config/test-utils'
-import ServiceUnavailable from '@/pages/500'
+import { render } from '@testing-library/react'
+import ServiceUnavailable from '../pages/500'
 
 test('Displays the 500 page', () => {
   const { getByText, getByRole } = render(ServiceUnavailable.getLayout(<ServiceUnavailable />))

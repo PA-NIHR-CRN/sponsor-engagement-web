@@ -1,10 +1,9 @@
 import userEvent from '@testing-library/user-event'
 import mockRouter from 'next-router-mock'
-
-import { act, render, screen, within } from '@/config/test-utils'
-
+import { act, render, screen, within } from '@testing-library/react'
 import { Header } from './Header'
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-return -- no types
 jest.mock('next/router', () => require('next-router-mock'))
 
 test('Displays the header', () => {
@@ -160,8 +159,8 @@ test('Hide the navigation menu when changing page', async () => {
   expect(menu).toBeVisible()
 
   // Simulate route change
-  act(() => {
-    mockRouter.push('/feedback')
+  await act(async () => {
+    await mockRouter.push('/feedback')
   })
 
   expect(menu).not.toBeVisible()

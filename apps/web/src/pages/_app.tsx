@@ -1,11 +1,10 @@
 import '../globals.scss'
 
-import { NextPage } from 'next'
+import type { NextPage } from 'next'
 import type { AppProps } from 'next/app'
 import { DefaultSeo } from 'next-seo'
-import { ReactElement, ReactNode } from 'react'
-
-import { RootLayout } from '@/components/Layout/RootLayout'
+import type { ReactElement, ReactNode } from 'react'
+import { RootLayout } from '../components/Layout/RootLayout'
 
 export type NextPageWithLayout<P = Record<string, unknown>, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement, props: P) => ReactNode
@@ -24,7 +23,7 @@ const App = ({ Component, pageProps }: AppPropsWithLayout) => {
 
   return getLayout(
     <>
-      <DefaultSeo title="Find, Recruit and Follow-up" description="Find, Recruit and Follow-up service." />
+      <DefaultSeo description="Find, Recruit and Follow-up service." title="Find, Recruit and Follow-up" />
       <Component {...pageProps} />
     </>,
     pageProps

@@ -1,7 +1,6 @@
-import { ReactElement } from 'react'
-
-import { Container } from '@/components/Container/Container'
-import { RootLayout } from '@/components/Layout/RootLayout'
+import type { ReactElement } from 'react'
+import { Container } from '../components/Container/Container'
+import { RootLayout } from '../components/Layout/RootLayout'
 
 export default function ServiceUnavailable() {
   return (

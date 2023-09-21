@@ -6,22 +6,20 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { useClickAway } from 'react-use'
 
-import { menu } from '@/constants/menu'
-
 function Logo() {
   return (
     <Link
-      href="/"
-      className={clsx('govuk-header__link', 'inline-block')}
       aria-label="Go to the Find, Recruit and Follow-up homepage"
+      className={clsx('govuk-header__link', 'inline-block')}
+      href="/"
     >
       <span className="govuk-header__logotype">
         <div className="flex items-center gap-2">
           <Image
+            alt="National Institute for Health and Care Research logo"
+            height={18}
             src="/assets/logos/nihr.svg"
             width={154}
-            height={18}
-            alt="National Institute for Health and Care Research logo"
           />
         </div>
       </span>
@@ -33,8 +31,8 @@ function MenuButton({ navOpen }: { navOpen: boolean }) {
   return (
     <div className="flex items-center">
       <Link
-        href="/browse"
         className="js-disabled-show govuk-button govuk-body mb-0 ml-1 hidden items-center justify-end gap-2 bg-white stroke-navy-100 text-navy-100 underline shadow-none focus:bg-[var(--focus)] focus:stroke-black focus:text-black active:top-0"
+        href="/browse"
       >
         Menu
       </Link>
@@ -50,10 +48,11 @@ function MenuButton({ navOpen }: { navOpen: boolean }) {
               'bg-white stroke-navy-100 text-navy-100': !navOpen,
             }
           )}
+          type="button"
         >
           <span>Menu</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12h18M3 6h18M3 18h18" />
+          <svg fill="none" height="24" width="24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 12h18M3 6h18M3 18h18" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
           </svg>
         </button>
       </Collapsible.Trigger>
@@ -64,43 +63,17 @@ function MenuButton({ navOpen }: { navOpen: boolean }) {
 function MenuPanel() {
   return (
     <Collapsible.Content
-      asChild
       aria-labelledby="navigation-menu-heading"
-      id="navigation-menu"
+      asChild
       className={clsx('js-disabled-show min-h-[var(--nav-height)] w-full bg-[var(--nav-bg)] text-white')}
+      id="navigation-menu"
     >
       <nav>
-        <h2 id="navigation-menu-heading" className="govuk-visually-hidden">
+        <h2 className="govuk-visually-hidden" id="navigation-menu-heading">
           Navigation menu
         </h2>
         <div className="govuk-header__container--full-width">
-          <div className="govuk-grid-row py-5 lg:py-8">
-            {menu.map((column, key) => (
-              <div key={key} className="govuk-grid-column-one-quarter-from-desktop mb-5 lg:mb-0">
-                {column.map((item, key) => {
-                  if (!item.link) {
-                    return (
-                      <p key={key} className="govuk-heading-s max-w-[300px] font-normal text-white">
-                        {item.text}
-                      </p>
-                    )
-                  }
-
-                  return (
-                    <div
-                      key={key}
-                      className="mb-5 max-w-[400px] lg:mb-0 [&:not(:last-child)]:lg:min-h-[150px] [&:not(:last-child)]:xl:min-h-[145px]"
-                    >
-                      <Link className="link--inverse govuk-heading-s mb-1 inline-block font-normal" href={item.link}>
-                        {item.text}
-                      </Link>
-                      <p className="govuk-body-s text-white">{item.description}</p>
-                    </div>
-                  )
-                })}
-              </div>
-            ))}
-          </div>
+          <div className="govuk-grid-row py-5 lg:py-8">links</div>
         </div>
       </nav>
     </Collapsible.Content>
@@ -113,20 +86,24 @@ export function Header({ heading }: { heading: string }) {
   const [navOpen, setNavOpen] = useState(false)
 
   // Close menu on route changes
-  useEffect(() => setNavOpen((isOpen) => isOpen && !isOpen), [router.asPath])
+  useEffect(() => {
+    setNavOpen((isOpen) => isOpen && !isOpen)
+  }, [router.asPath])
 
   // Close menu when clicking outside of the header
-  useClickAway(headerRef, () => setNavOpen(false))
+  useClickAway(headerRef, () => {
+    setNavOpen(false)
+  })
 
   return (
     <>
-      <a href="#main-content" className="govuk-skip-link">
+      <a className="govuk-skip-link" href="#main-content">
         Skip to main content
       </a>
-      <Collapsible.Root open={navOpen} onOpenChange={setNavOpen}>
+      <Collapsible.Root onOpenChange={setNavOpen} open={navOpen}>
         <header
-          ref={headerRef}
           className={clsx('govuk-header flex flex-col border-b border-grey-60 bg-[var(--header-bg)]')}
+          ref={headerRef}
           role="banner"
         >
           <div
