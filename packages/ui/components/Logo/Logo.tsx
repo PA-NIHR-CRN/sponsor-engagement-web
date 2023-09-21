@@ -1,6 +1,5 @@
 import clsx from 'clsx'
 import { ElementType, forwardRef, ReactNode } from 'react'
-
 import { PolymorphicComponentPropsWithRef, PolymorphicRef } from 'ui/@types/components'
 
 /**
@@ -61,7 +60,7 @@ export const LogoImage = forwardRef(
     const Component = as || 'img'
 
     return (
-      <span className={clsx('govuk-header__logotype', className)}>
+      <span className="govuk-header__logotype">
         <div className="flex items-center gap-2">
           <Component
             ref={ref}
@@ -69,6 +68,7 @@ export const LogoImage = forwardRef(
             width={154}
             height={18}
             alt="National Institute for Health and Care Research logo"
+            className={className}
             {...props}
           />
         </div>

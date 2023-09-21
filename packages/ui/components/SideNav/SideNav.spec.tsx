@@ -158,6 +158,16 @@ describe('<SideNavPanel>', () => {
     )
     expect(getByRole('section', { name: 'New panel name' })).toBeInTheDocument()
   })
+
+  test('Custom ref', () => {
+    const refMock = jest.fn()
+    const { getByRole } = render(
+      <SideNavProvider>
+        <SideNavPanel ref={refMock}>Links</SideNavPanel>
+      </SideNavProvider>
+    )
+    expect(refMock).toHaveBeenCalledWith(getByRole('navigation', { name: 'Main application links' }))
+  })
 })
 
 describe('<SideNavMain>', () => {
@@ -197,6 +207,16 @@ describe('<SideNavMain>', () => {
     )
     expect(getByRole('section')).toHaveAttribute('id', 'new-id')
   })
+
+  test('Custom ref', () => {
+    const refMock = jest.fn()
+    const { getByRole } = render(
+      <SideNavProvider>
+        <SideNavMain ref={refMock}>Example</SideNavMain>
+      </SideNavProvider>
+    )
+    expect(refMock).toHaveBeenCalledWith(getByRole('main'))
+  })
 })
 
 describe('<SideNavLink>', () => {
@@ -232,5 +252,28 @@ describe('<SideNavLink>', () => {
     )
     expect(getByRole('button', { name: 'Example' })).not.toHaveAttribute('href')
     expect(getByRole('button', { name: 'Example' })).toHaveAttribute('id', 'new-id')
+  })
+
+  test('Custom icon', () => {
+    const { getByRole } = render(
+      <SideNavProvider>
+        <SideNavLink href="/" icon={<span data-testid="custom-icon" />}>
+          Example
+        </SideNavLink>
+      </SideNavProvider>
+    )
+    expect(within(getByRole('link', { name: 'Example' })).getByTestId('custom-icon')).toBeInTheDocument()
+  })
+
+  test('Custom ref', () => {
+    const refMock = jest.fn()
+    const { getByRole } = render(
+      <SideNavProvider>
+        <SideNavLink href="/" ref={refMock}>
+          Example
+        </SideNavLink>
+      </SideNavProvider>
+    )
+    expect(refMock).toHaveBeenCalledWith(getByRole('link', { name: 'Example' }))
   })
 })
