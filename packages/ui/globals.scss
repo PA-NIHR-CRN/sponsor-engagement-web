@@ -25,8 +25,9 @@ $govuk-global-styles: true;
 $govuk-new-link-styles: true;
 $govuk-font-family: var(--font-primary), arial, sans-serif;
 $govuk-page-width: 1020px;
+$govuk-link-colour: #193e72;
 
-@import '~govuk-frontend/govuk/all.scss';
+@import '~node_modules/govuk-frontend/govuk/all.scss';
 
 @layer utilities {
   .focusable {
@@ -47,16 +48,23 @@ body {
   @include govuk-link-style-inverse;
 }
 
+.govuk-skip-link:focus ~ nav {
+  margin-top: 40px;
+  transition: none;
+}
+
 :root {
-  // NIHR FRF Custom Properties
+  // NIHR Custom Properties
+  --colour-primary: #193e72;
 
   // Header
   --header-bg: #193e72;
   --header-height: 65px;
 
-  // Nav
-  --nav-bg: #2c3c4e;
-  --nav-height: 298px;
+  // SideNav
+  --side-nav-bg: #fff;
+  --side-nav-width-collapsed: 50px;
+  --side-nav-width-expanded: 270px;
 
   // Brand Colours
   --colour-aqua-100: #2ea9b0;

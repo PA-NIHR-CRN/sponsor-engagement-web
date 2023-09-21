@@ -41,6 +41,7 @@ module.exports = {
     'import/no-default-export': 'off',
     'import/no-named-as-default': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
+    'react/display-name': 'off',
     'unicorn/filename-case': [
       'error',
       {
