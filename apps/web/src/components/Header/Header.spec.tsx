@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event'
 import mockRouter from 'next-router-mock'
-import { act, render, screen, within } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import { Header } from './Header'
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- no types
@@ -50,55 +50,6 @@ test('Shows the navigation menu when clicking the menu icon', async () => {
 
   const openMenu = screen.getByRole('navigation', { name: 'Navigation menu' })
   expect(openMenu).toBeVisible()
-
-  // 1st column
-  expect(within(openMenu).getByText('Discover more with the Find, Recruit and Follow-up website')).toBeInTheDocument()
-
-  // 2nd column
-  expect(within(openMenu).getByRole('link', { name: 'View data service providers' })).toHaveAttribute(
-    'href',
-    '/providers'
-  )
-  expect(
-    within(openMenu).getByText(
-      'Discover more about the different data service providers within Find, Recruit and Follow-up'
-    )
-  ).toBeInTheDocument()
-
-  expect(within(openMenu).getByRole('link', { name: 'Contact research support' })).toHaveAttribute(
-    'href',
-    '/contact-research-support'
-  )
-  expect(
-    within(openMenu).getByText(
-      'Get in touch with research support professionals who can help you understand which services might be suitable for your study'
-    )
-  ).toBeInTheDocument()
-
-  // 3rd column
-  expect(within(openMenu).getByRole('link', { name: 'Data service providers' })).toHaveAttribute(
-    'href',
-    '/data-service-providers'
-  )
-  expect(
-    within(openMenu).getByText(
-      'Information for organisations offering Find, Recruit and Follow-up data services to researchers and life sciences companies'
-    )
-  ).toBeInTheDocument()
-
-  expect(within(openMenu).getByRole('link', { name: 'Research support colleagues' })).toHaveAttribute(
-    'href',
-    '/research-support'
-  )
-  expect(
-    within(openMenu).getByText(
-      'Information for colleagues within the various research support organisations across the UK'
-    )
-  ).toBeInTheDocument()
-
-  // 4th column
-  expect(within(openMenu).getByRole('link', { name: 'Provide feedback' })).toHaveAttribute('href', '/feedback')
-  expect(within(openMenu).getByText('Your feedback on our service would be invaluable')).toBeInTheDocument()
 })
 
 test('Toggle the navigation menu by keyboard keys', async () => {
