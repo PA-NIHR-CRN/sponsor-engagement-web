@@ -9,11 +9,6 @@
     "test:ci": "turbo run test:ci",
     "prepare": "husky install"
   },
-  "dependencies": {
-    "eslint": "8.41.0",
-    "eslint-config-next": "13.4.4",
-    "eslint-plugin-unused-imports": "^2.0.0"
-  },
   "devDependencies": {
     "@commitlint/cli": "^17.6.5",
     "@commitlint/config-conventional": "^17.6.5",
