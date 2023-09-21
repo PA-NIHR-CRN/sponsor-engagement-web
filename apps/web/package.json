@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "lint:fix": "next lint --fix",
     "test": "jest --watch",
     "test:ci": "jest --ci --coverage",
     "migrate:dev": "dotenv -e .env.local -- npx prisma migrate dev",

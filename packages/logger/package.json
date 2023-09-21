@@ -6,6 +6,7 @@
   "license": "MIT",
   "scripts": {
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "test": "jest --watch",
     "test:ci": "jest --ci --coverage",
     "generate:component": "turbo gen react-component"
