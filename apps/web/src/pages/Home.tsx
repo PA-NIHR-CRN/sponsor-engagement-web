@@ -1,13 +1,10 @@
 import { Button } from 'ui'
-
-import { Container } from '@/components/Container/Container'
+import { Container } from '../components/Container/Container'
 
 export default function Home() {
   return (
-    <>
-      <Container>
-        <Button>Shared button component</Button>
-      </Container>
-    </>
+    <Container>
+      <Button>Shared button component</Button>
+    </Container>
   )
 }

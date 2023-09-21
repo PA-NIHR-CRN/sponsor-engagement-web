@@ -1,5 +1,5 @@
-import { render } from '@/config/test-utils'
-import PageNotFound from '@/pages/404'
+import { render } from '../config/TestUtils'
+import PageNotFound from '../pages/404'
 
 test('Displays the 404 page', () => {
   const { getByText, getByRole } = render(PageNotFound.getLayout(<PageNotFound />))

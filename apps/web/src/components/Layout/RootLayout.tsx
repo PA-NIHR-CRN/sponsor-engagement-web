@@ -1,11 +1,11 @@
 import { Roboto } from 'next/font/google'
-import { ReactNode, useEffect } from 'react'
-
+import type { ReactNode } from 'react'
+import { useEffect } from 'react'
 import { Header } from '../Header/Header'
 
 const primaryFont = Roboto({ weight: ['400', '700'], subsets: ['latin'], display: 'swap', variable: '--font-primary' })
 
-export type RootLayoutProps = {
+export interface RootLayoutProps {
   children: ReactNode
   heading?: string
   backLink?: ReactNode
@@ -20,7 +20,7 @@ export function RootLayout({ children, backLink, heading = 'Find, Recruit and Fo
     <div className={`${primaryFont.variable} font-sans`}>
       <Header heading={heading} />
       {backLink}
-      <main id="main-content" className="govuk-main-wrapper" role="main">
+      <main className="govuk-main-wrapper" id="main-content" role="main">
         {children}
       </main>
     </div>
