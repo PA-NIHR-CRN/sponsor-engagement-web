@@ -1,10 +1,15 @@
 import userEvent from '@testing-library/user-event'
 import { render } from '@testing-library/react'
 import { SideNavProvider } from '@nihr-ui/frontend'
+import { useSession } from 'next-auth/react'
+import { authenticatedSessionMock } from '../../__mocks__/session'
 import { Header } from './Header'
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- no types
 jest.mock('next/router', () => require('next-router-mock'))
+jest.mock('next-auth/react')
+
+jest.mocked(useSession).mockReturnValue(authenticatedSessionMock)
 
 test('Displays the header', () => {
   const { getByText, getByRole, getByAltText } = render(
