@@ -36,7 +36,7 @@ ENV NEXT_PUBLIC_APP_ENV $APP_ENV
 # ARG TURBO_TOKEN
 # ENV TURBO_TOKEN=$TURBO_TOKEN
 
-RUN npx turbo run build --filter=web...
+RUN npm run build --filter=web...
 
 # RUN npx prisma generate
 
