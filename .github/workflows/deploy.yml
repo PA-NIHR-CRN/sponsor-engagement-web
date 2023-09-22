@@ -15,7 +15,23 @@ env:
   AWS_REGION: eu-west-2
 
 jobs:
+  build:
+    name: 'Build'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-node
+      - name: Install
+        run: npm ci --no-audit --no-fund
+      - name: Build
+        run: |
+          touch .env.local
+          echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env.local
+          echo NEXT_PUBLIC_APP_ENV=${{ vars.APP_ENV }} >> .env.local
+          npm run build
+
   deploy-dev:
+    needs: [build]
     environment: DEV
     name: 'Deploy Dev'
     runs-on: ubuntu-latest
