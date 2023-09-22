@@ -1,0 +1,30 @@
+name: 'Build container'
+
+description: 'Builds the docker container and injects build args'
+
+inputs:
+  ecr_repository:
+    required: true
+  ecr_registry:
+    required: true
+  image_name_tag:
+    required: true
+  image_sha_tag:
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REPOSITORY: ${{ inputs.ecr_repository }}
+        ECR_REGISTRY: ${{ inputs.ecr_registry }}
+        IMAGE_NAME_TAG: ${{ inputs.image_name_tag }}
+        IMAGE_SHA_TAG: ${{ inputs.image_sha_tag }}
+      run: |
+        echo "Using registry ${{ env.ECR_REGISTRY }}"
+        echo "Tagging image with ${{ env.IMAGE_NAME_TAG}} and ${{ env.IMAGE_SHA_TAG }}"
+        docker build -f apps/web/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
+        docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
+        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG"

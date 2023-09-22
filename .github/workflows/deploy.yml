@@ -58,19 +58,14 @@ jobs:
       - name: Add Github Actions IP to RDS security group (Dev)
         run: |
           aws ec2 authorize-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
-      - name: Build, tag, and push image to Amazon ECR
-        id: build-image
-        env:
-          ECR_REPOSITORY: crnccd-ecr-dev-se-repository
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_NAME_TAG: se-web
-          IMAGE_SHA_TAG: se-web-${{ github.sha }}
-        run: |
-          echo "Using registry ${{ env.ECR_REGISTRY }}"
-          echo "Tagging image with ${{ env.IMAGE_NAME_TAG}} and ${{ env.IMAGE_SHA_TAG }}"
-          docker build -f apps/web/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
-          docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG"
+
+      - uses: ./.github/actions/build-container
+        with:
+          ecr_repository: crnccd-ecr-dev-se-repository
+          ecr_registry: ${{ steps.login-ecr.outputs.registry }}
+          image_name_tag: se-web
+          image_sha_tag: se-web-${{ github.sha }}
+
       # - name: Run database migrations
       #   run: npm run migrate:deploy
       #   env:
