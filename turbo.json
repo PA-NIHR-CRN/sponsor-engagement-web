@@ -4,16 +4,22 @@
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**/*", ".next/**", "!.next/cache/**"]
+      "outputs": ["dist/**/*", ".next/**", "!.next/cache/**"],
+      "env": ["NEXTAUTH_URL", "AUTH_CLIENT_ID", "AUTH_CLIENT_SECRET", "AUTH_WELL_KNOWN_URL"]
     },
     "lint": {},
     "lint:fix": {},
-    "test": {},
+    "test": {
+      "cache": false,
+      "dotEnv": [".env.local"],
+      "env": ["NEXTAUTH_URL", "AUTH_CLIENT_ID", "AUTH_CLIENT_SECRET", "AUTH_WELL_KNOWN_URL"]
+    },
     "test:ci": {},
     "typecheck": {},
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "env": ["NEXTAUTH_URL", "AUTH_CLIENT_ID", "AUTH_CLIENT_SECRET", "AUTH_WELL_KNOWN_URL"]
     },
     "db:generate": {
       "cache": false

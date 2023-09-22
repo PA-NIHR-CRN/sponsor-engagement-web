@@ -33,6 +33,7 @@
     "handlebars": "^4.7.7",
     "logger": "*",
     "next": "^13.4.19",
+    "next-auth": "^4.23.1",
     "next-seo": "^6.0.0",
     "node-mocks-http": "^1.12.2",
     "react": "^18.2.0",
@@ -58,7 +59,7 @@
     "msw": "^1.2.1",
     "next-router-mock": "^0.9.3",
     "postcss": "^8.4.24",
-    "sass": "^1.62.1",
+    "sass": "^1.68.0",
     "tailwindcss": "^3.3.3",
     "ts-mockery": "^1.2.0"
   }

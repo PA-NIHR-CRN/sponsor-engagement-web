@@ -1,10 +1,29 @@
 import type { ReactElement } from 'react'
 import { Container, StartIcon } from '@nihr-ui/frontend'
+import { useSession, signIn, signOut } from 'next-auth/react'
 import { RootLayout } from '../components/Layout/RootLayout'
 
 export default function Home() {
+  const { data: session } = useSession()
+
   return (
     <Container>
+      {session ? (
+        <>
+          Signed in as {session.user?.email} <br />
+          <button onClick={() => void signOut()} type="button">
+            Sign out
+          </button>
+        </>
+      ) : (
+        <>
+          Not signed in <br />
+          <button onClick={() => void signIn()} type="button">
+            {/* <button type="button" onClick={() => signIn('oidc')}> */}
+            Sign in
+          </button>
+        </>
+      )}
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <h2 className="govuk-heading-l">Assess progress of studies</h2>
@@ -28,6 +47,14 @@ export default function Home() {
       </div>
     </Container>
   )
+
+  // return (
+  //   <>
+  //     <Container>
+  //       <Button>Shared button component</Button>
+  //     </Container>
+  //   </>
+  // )
 }
 
 Home.getLayout = function getLayout(page: ReactElement) {
