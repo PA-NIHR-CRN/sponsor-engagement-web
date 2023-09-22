@@ -10,7 +10,7 @@ import {
   useState,
 } from 'react'
 
-import { PolymorphicComponentPropsWithRef, PolymorphicRef } from 'ui/@types/components'
+import { PolymorphicComponentPropsWithRef, PolymorphicRef } from '@nihr-ui/frontend/@types/components'
 
 import { HomeIcon } from '../Icons/HomeIcon'
 

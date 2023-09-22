@@ -3,8 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import type { ReactNode } from 'react'
 import { useEffect, useState } from 'react'
-import { HomeIcon } from 'ui/components/Icons/HomeIcon'
-import { SideNav } from 'ui/components/SideNav/SideNav'
+import { HomeIcon, SideNav } from '@nihr-ui/frontend'
 import { Header } from '../Header/Header'
 
 const primaryFont = Roboto({ weight: ['400', '700'], subsets: ['latin'], display: 'swap', variable: '--font-primary' })

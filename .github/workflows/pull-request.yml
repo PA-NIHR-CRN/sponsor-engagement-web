@@ -1,0 +1,74 @@
+name: Pull Requests
+
+on:
+  pull_request:
+    branches:
+      - '*'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  # Install dependencies
+  install:
+    name: Install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/install-cache
+      - name: Install
+        run: npm ci --no-audit --no-fund
+
+  # Build project
+  build:
+    name: Build
+    needs: [install]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/install-cache
+      - uses: ./.github/actions/build-cache
+      - name: Build
+        run: |
+          touch .env.local
+          echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env.local
+          echo NEXT_PUBLIC_APP_ENV=${{ vars.APP_ENV }} >> .env.local
+          npm run build
+          # npx prisma generate
+
+  # Code quality checks
+  quality-checks:
+    name: Lint
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/install-cache
+      - uses: ./.github/actions/build-cache
+      - name: Quality check
+        run: npm run lint
+
+  # Unit tests
+  unit-tests:
+    name: Unit tests
+    permissions: write-all
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/install-cache
+      - uses: ./.github/actions/build-cache
+      - name: Unit tests
+        run: npm run test:ci
+      - name: Unit tests coverage comment
+        uses: MishaKav/jest-coverage-comment@main
+        with:
+          title: Unit tests coverage
+          multiple-files: |
+            web, apps/web/coverage/coverage-summary.json
+            ui, packages/ui/coverage/coverage-summary.json

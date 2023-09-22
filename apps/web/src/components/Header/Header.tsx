@@ -1,9 +1,7 @@
 import clsx from 'clsx'
 import Image from 'next/image'
 import { useRef } from 'react'
-import { SettingsIcon } from 'ui/components/Icons/SettingsIcon'
-import { Logo } from 'ui/components/Logo/Logo'
-import { SideNav } from 'ui/components/SideNav/SideNav'
+import { Logo, SideNav, SettingsIcon } from '@nihr-ui/frontend'
 import { HeaderTitle } from './Title'
 
 export function Header({ heading }: { heading: string }) {
