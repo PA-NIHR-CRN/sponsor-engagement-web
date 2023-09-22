@@ -61,6 +61,7 @@ jobs:
 
       - uses: ./.github/actions/build-container
         with:
+          file: apps/web/Dockerfile
           ecr_repository: crnccd-ecr-dev-se-repository
           ecr_registry: ${{ steps.login-ecr.outputs.registry }}
           image_name_tag: se-web
