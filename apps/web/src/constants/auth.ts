@@ -14,6 +14,6 @@ export const AUTH_PROVIDER_NAME = 'OIDC'
 export const AUTH_PROVIDER_TYPE = 'oauth'
 
 /**
- * Identifer of our custom next-auth provider
+ * Signin page that unauthenticated users are redirected to
  */
 export const AUTH_SIGN_IN_PAGE = '/auth/signin'

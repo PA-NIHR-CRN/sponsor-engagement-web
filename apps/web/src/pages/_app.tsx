@@ -19,16 +19,11 @@ type AppPropsWithLayout = AppProps<{
   Component: NextPageWithLayout
 }
 
-const App = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLayout) => {
+function App({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLayout) {
   // Use the layout defined at the page level, if available
   const getLayout = Component.getLayout ?? ((page) => <RootLayout heading={pageProps.heading}>{page}</RootLayout>)
 
-  return getLayout(
-    <SessionProvider session={session}>
-      <Component {...pageProps} />
-    </SessionProvider>,
-    pageProps
-  )
+  return <SessionProvider session={session}>{getLayout(<Component {...pageProps} />, pageProps)}</SessionProvider>
 }
 
 export default App

@@ -25,9 +25,8 @@ const Provider = ({ clientId, clientSecret, wellKnown }: ProviderOptions): OAuth
   profile(profile) {
     return {
       id: String(profile.id),
-      firstName: profile.given_name,
-      lastName: profile.family_name,
-      emailAddress: profile.email,
+      name: `${profile.given_name} ${profile.family_name}`,
+      email: profile.email,
     }
   },
 })
@@ -42,4 +41,5 @@ export const authOptions: AuthOptions = {
     }),
   ],
 }
+
 export default NextAuth(authOptions)

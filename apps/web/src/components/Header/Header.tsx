@@ -2,10 +2,12 @@ import clsx from 'clsx'
 import Image from 'next/image'
 import { useRef } from 'react'
 import { Logo, SideNav, SettingsIcon } from '@nihr-ui/frontend'
+import { useSession } from 'next-auth/react'
 import { HeaderTitle } from './Title'
 
 export function Header({ heading }: { heading: string }) {
   const headerRef = useRef(null)
+  const { data: session } = useSession()
 
   return (
     <>
@@ -26,7 +28,7 @@ export function Header({ heading }: { heading: string }) {
               <Header.Title>{heading}</Header.Title>
             </div>
             <div className="flex items-center justify-center">
-              <span className="hidden text-sm md:block">tom.christian@nihr.ac.uk</span>
+              <span className="hidden text-sm md:block">{session?.user?.email}</span>
               <button
                 aria-controls="menu--1"
                 aria-haspopup="true"
