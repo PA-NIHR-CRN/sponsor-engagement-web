@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event'
 import { render } from '@testing-library/react'
-import { SideNavProvider } from 'ui/components/SideNav/SideNav'
+import { SideNavProvider } from '@nihr-ui/frontend'
 import { Header } from './Header'
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- no types

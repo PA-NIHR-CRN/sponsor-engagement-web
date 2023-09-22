@@ -1,6 +1,5 @@
 import type { ReactElement } from 'react'
-import { Container } from 'ui/components/Container/Container'
-import { StartIcon } from 'ui/components/Icons/StartIcon'
+import { Container, StartIcon } from '@nihr-ui/frontend'
 import { RootLayout } from '../components/Layout/RootLayout'
 
 export default function Home() {

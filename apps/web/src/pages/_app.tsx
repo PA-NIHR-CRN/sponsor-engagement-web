@@ -1,4 +1,4 @@
-import 'ui/globals.scss'
+import '@nihr-ui/frontend/globals.scss'
 
 import type { NextPage } from 'next'
 import type { AppProps } from 'next/app'

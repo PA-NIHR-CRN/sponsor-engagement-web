@@ -17,6 +17,7 @@
     "@hookform/error-message": "^2.0.1",
     "@hookform/resolvers": "^3.1.1",
     "@nihr-ui/configs": "*",
+    "@nihr-ui/frontend": "*",
     "@radix-ui/react-collapsible": "^1.0.2",
     "@types/node": "20.2.5",
     "@types/react": "18.2.7",
@@ -39,7 +40,6 @@
     "react-hook-form": "^7.46.1",
     "react-use": "^17.4.0",
     "react-use-pagination": "^2.0.1",
-    "ui": "*",
     "zod": "^3.21.4"
   },
   "devDependencies": {

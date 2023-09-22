@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import { ElementType, forwardRef, ReactNode } from 'react'
-import { PolymorphicComponentPropsWithRef, PolymorphicRef } from 'ui/@types/components'
+import { PolymorphicComponentPropsWithRef, PolymorphicRef } from '@nihr-ui/frontend/@types/components'
 
 /**
  * LogoLink
