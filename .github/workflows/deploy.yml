@@ -105,6 +105,7 @@ jobs:
           wait-for-service-stability: true
 
   deploy-test:
+    needs: [build]
     # needs: deploy-dev
     environment: TEST
     name: 'Deploy Test'
@@ -178,6 +179,7 @@ jobs:
           wait-for-service-stability: true
 
   deploy-uat:
+    needs: [build]
     # needs: deploy-test
     environment: UAT
     name: 'Deploy Uat'
@@ -251,6 +253,7 @@ jobs:
           wait-for-service-stability: true
 
   deploy-oat:
+    needs: [build]
     # needs: deploy-uat
     environment: OAT
     name: 'Deploy Oat'
