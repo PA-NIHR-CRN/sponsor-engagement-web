@@ -51,7 +51,7 @@ jobs:
         run: |
           echo "Using registry ${{ env.ECR_REGISTRY }}"
           echo "Tagging image with ${{ env.IMAGE_NAME_TAG}} and ${{ env.IMAGE_SHA_TAG }}"
-          docker build --build-arg APP_ENV=${{ vars.APP_ENV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
+          docker build -f apps/web/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG"
       # - name: Run database migrations
