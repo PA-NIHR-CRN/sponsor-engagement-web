@@ -8,11 +8,10 @@ datasource db {
 }
 
 model Study {
-  id                         Int                       @id
+  id                         Int                       @id @default(autoincrement())
   name                       String
-  //cpmsId                     String
+  cpmsId                     Int                       @unique
   status                     String
-  //statusId                   String
   recordStatus               String
   route                      String
   irasId                     String?
@@ -32,11 +31,13 @@ model Study {
   createdAt                  DateTime                  @default(now())
   updatedAt                  DateTime                  @updatedAt
   isDeleted                  Boolean?                  @default(false)
+
+  @@index([cpmsId])
 }
 
 model Organisation {
   id            Int                 @id @default(autoincrement())
-  name          String              @unique
+  name          String
   rtsIdentifier String              @unique
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
@@ -46,7 +47,7 @@ model Organisation {
   studies       StudyOrganisation[]
   fundedStudies StudyFunder[]
 
-  @@index([name])
+  @@index([rtsIdentifier])
 }
 
 model OrganisationRole {
@@ -129,7 +130,7 @@ model StudyEvaluationCategory {
   studyId                Int
   indicatorType          String
   indicatorValue         String
-  sampleSize             Int
+  sampleSize             Int?
   totalRecruitmentToDate Int
   plannedOpeningDate     DateTime?
   plannedClosureDate     DateTime?
@@ -209,12 +210,12 @@ model SysRefAssessmentFurtherInformation {
 
 model SysRefOrganisationRole {
   id            Int                 @id @default(autoincrement())
-  name          String              @unique
+  name          String
   description   String              @db.Text
-  rtsIdentifier String
+  rtsIdentifier String              @unique
   organisations OrganisationRole[]
   studies       StudyOrganisation[]
   isDeleted     Boolean             @default(false)
 
-  @@index([name])
+  @@index([rtsIdentifier])
 }

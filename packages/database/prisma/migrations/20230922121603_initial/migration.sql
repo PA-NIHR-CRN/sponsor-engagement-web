@@ -1,7 +1,8 @@
 -- CreateTable
 CREATE TABLE `Study` (
-    `id` INTEGER NOT NULL,
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
+    `cpmsId` INTEGER NOT NULL,
     `status` VARCHAR(191) NOT NULL,
     `recordStatus` VARCHAR(191) NOT NULL,
     `route` VARCHAR(191) NOT NULL,
@@ -19,6 +20,8 @@ CREATE TABLE `Study` (
     `updatedAt` DATETIME(3) NOT NULL,
     `isDeleted` BOOLEAN NULL DEFAULT false,
 
+    UNIQUE INDEX `Study_cpmsId_key`(`cpmsId`),
+    INDEX `Study_cpmsId_idx`(`cpmsId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -31,9 +34,8 @@ CREATE TABLE `Organisation` (
     `updatedAt` DATETIME(3) NOT NULL,
     `isDeleted` BOOLEAN NULL DEFAULT false,
 
-    UNIQUE INDEX `Organisation_name_key`(`name`),
     UNIQUE INDEX `Organisation_rtsIdentifier_key`(`rtsIdentifier`),
-    INDEX `Organisation_name_idx`(`name`),
+    INDEX `Organisation_rtsIdentifier_idx`(`rtsIdentifier`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -110,17 +112,18 @@ CREATE TABLE `StudyEvaluationCategory` (
     `studyId` INTEGER NOT NULL,
     `indicatorType` VARCHAR(191) NOT NULL,
     `indicatorValue` VARCHAR(191) NOT NULL,
-    `sampleSize` INTEGER NOT NULL,
-    `totalRecruitmentToDate` VARCHAR(191) NOT NULL,
-    `plannedOpeningDate` DATETIME(3) NOT NULL,
-    `plannedClosureDate` DATETIME(3) NOT NULL,
-    `actualOpeningDate` DATETIME(3) NOT NULL,
-    `actualClosureDate` DATETIME(3) NOT NULL,
-    `expectedReopenDate` DATETIME(3) NOT NULL,
+    `sampleSize` INTEGER NULL,
+    `totalRecruitmentToDate` INTEGER NOT NULL,
+    `plannedOpeningDate` DATETIME(3) NULL,
+    `plannedClosureDate` DATETIME(3) NULL,
+    `actualOpeningDate` DATETIME(3) NULL,
+    `actualClosureDate` DATETIME(3) NULL,
+    `expectedReopenDate` DATETIME(3) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
     `isDeleted` BOOLEAN NULL DEFAULT false,
 
+    UNIQUE INDEX `StudyEvaluationCategory_studyId_indicatorType_key`(`studyId`, `indicatorType`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -202,8 +205,8 @@ CREATE TABLE `SysRefOrganisationRole` (
     `rtsIdentifier` VARCHAR(191) NOT NULL,
     `isDeleted` BOOLEAN NOT NULL DEFAULT false,
 
-    UNIQUE INDEX `SysRefOrganisationRole_name_key`(`name`),
-    INDEX `SysRefOrganisationRole_name_idx`(`name`),
+    UNIQUE INDEX `SysRefOrganisationRole_rtsIdentifier_key`(`rtsIdentifier`),
+    INDEX `SysRefOrganisationRole_rtsIdentifier_idx`(`rtsIdentifier`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

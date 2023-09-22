@@ -1,10 +1,6 @@
 import assert from 'assert'
 import axios from 'axios'
-import {
-  Organisation as OrganisationEntity,
-  Prisma,
-  SysRefOrganisationRole as SysRefOrganisationRoleEntity,
-} from 'database'
+import { Organisation as OrganisationEntity, SysRefOrganisationRole as SysRefOrganisationRoleEntity } from 'database'
 import { logger } from 'logger'
 
 import { prismaClient } from './lib/prisma'
@@ -25,7 +21,7 @@ let studies: Study[]
 const createStudies = async () => {
   const studyQueries = studies.map((study) => {
     const studyData = {
-      id: study.Id,
+      cpmsId: study.Id,
       name: study.Name,
       status: study.Status,
       recordStatus: study.StudyRecordStatus,
@@ -44,7 +40,7 @@ const createStudies = async () => {
     }
 
     return prismaClient.study.upsert({
-      where: { id: study.Id },
+      where: { cpmsId: study.Id },
       create: studyData,
       update: studyData,
       include: {
@@ -76,14 +72,15 @@ const createOrganisations = async () => {
 
   const organisationQueries = relatedOrgs.map((org) => {
     const name = getOrganisationName(org)
+    const rtsIdentifier = org.OrganisationRTSIdentifier
 
     const organisationData = {
       name,
-      rtsIdentifier: org.OrganisationRTSIdentifier,
+      rtsIdentifier,
     }
 
     return prismaClient.organisation.upsert({
-      where: { name },
+      where: { rtsIdentifier },
       create: organisationData,
       update: organisationData,
     })
@@ -101,15 +98,16 @@ const createOrganisations = async () => {
 
   const organisationRoleRefQueries = relatedOrgRoles.map((org) => {
     const name = org.OrganisationRole
+    const rtsIdentifier = org.OrganisationRoleRTSIdentifier
 
     const organisationRoleData = {
       name,
       description: '',
-      rtsIdentifier: org.OrganisationRoleRTSIdentifier,
+      rtsIdentifier,
     }
 
     return prismaClient.sysRefOrganisationRole.upsert({
-      where: { name },
+      where: { rtsIdentifier },
       create: organisationRoleData,
       update: organisationRoleData,
     })
@@ -124,18 +122,15 @@ const createOrganisationRelationships = async () => {
   const relatedOrgs = getOrgsUniqueByNameRole(studies)
 
   // Create the array of organisation roles for this batch of studies
-  const organisationRoleInputs = relatedOrgs
-    .map((relatedOrg) => {
-      const organisationId = organisationEnitities.find((org) => org.name === getOrganisationName(relatedOrg))?.id
-      const roleId = organisationRoleEntities.find((ref) => ref.name === relatedOrg.OrganisationRole)?.id
-      if (organisationId && roleId) {
-        return {
-          organisationId,
-          roleId,
-        }
-      }
-    })
-    .filter((input): input is Prisma.OrganisationRoleCreateManyInput => !!input)
+  const organisationRoleInputs = relatedOrgs.map((relatedOrg) => {
+    const organisationId = organisationEnitities.find((org) => org.name === getOrganisationName(relatedOrg))
+      ?.id as number
+    const roleId = organisationRoleEntities.find((ref) => ref.name === relatedOrg.OrganisationRole)?.id as number
+    return {
+      organisationId,
+      roleId,
+    }
+  })
 
   const organisationRolesResult = await prismaClient.organisationRole.createMany({
     data: organisationRoleInputs,
@@ -148,19 +143,18 @@ const createOrganisationRelationships = async () => {
   const studyOrganisationInputs = studies
     .map((study) =>
       study.StudySponsors.map((sponsor) => {
-        const organisationId = organisationEnitities.find((org) => org.name === sponsor.OrganisationName)?.id
-        const organisationRoleId = organisationRoleEntities.find((ref) => ref.name === sponsor.OrganisationRole)?.id
-        if (organisationId && organisationRoleId) {
-          return {
-            studyId: study.Id,
-            organisationId,
-            organisationRoleId,
-          }
+        const studyId = studyEntities.find((studyEntity) => studyEntity.cpmsId === study.Id)?.id as number
+        const organisationId = organisationEnitities.find((org) => org.name === sponsor.OrganisationName)?.id as number
+        const organisationRoleId = organisationRoleEntities.find((ref) => ref.name === sponsor.OrganisationRole)
+          ?.id as number
+        return {
+          studyId,
+          organisationId,
+          organisationRoleId,
         }
       })
     )
     .flat()
-    .filter((input): input is Prisma.StudyOrganisationCreateManyInput => !!input)
 
   const studyOrganisationsResult = await prismaClient.studyOrganisation.createMany({
     data: studyOrganisationInputs,
@@ -173,19 +167,17 @@ const createOrganisationRelationships = async () => {
   const studyFunderInputs = studies
     .map((study) =>
       study.StudyFunders.map((funder) => {
-        const organisationId = organisationEnitities.find((org) => org.name === funder.FunderName)?.id
-        if (organisationId) {
-          return {
-            studyId: study.Id,
-            organisationId,
-            grantCode: funder.GrantCode,
-            fundingStreamName: funder.FundingStreamName || '',
-          }
+        const studyId = studyEntities.find((studyEntity) => studyEntity.cpmsId === study.Id)?.id as number
+        const organisationId = organisationEnitities.find((org) => org.name === funder.FunderName)?.id as number
+        return {
+          studyId,
+          organisationId,
+          grantCode: funder.GrantCode,
+          fundingStreamName: funder.FundingStreamName || '',
         }
       })
     )
     .flat()
-    .filter((input): input is Prisma.StudyFunderCreateManyInput => !!input)
 
   const studyFundersResult = await prismaClient.studyFunder.createMany({
     data: studyFunderInputs,
@@ -197,22 +189,25 @@ const createOrganisationRelationships = async () => {
   // Create the array of evaluation categories for this batch of studies
   const evaluationCategoryInputs = studies
     .map((study) =>
-      study.StudyEvaluationCategories.map((category) => ({
-        studyId: study.Id,
-        indicatorType: category.EvaluationCategoryType,
-        indicatorValue: category.EvaluationCategoryValue,
-        sampleSize: category.SampleSize,
-        totalRecruitmentToDate: category.TotalRecruitmentToDate,
-        plannedOpeningDate: category.PlannedRecruitmentStartDate
-          ? new Date(category.PlannedRecruitmentStartDate)
-          : undefined,
-        plannedClosureDate: category.PlannedRecruitmentEndDate
-          ? new Date(category.PlannedRecruitmentEndDate)
-          : undefined,
-        actualOpeningDate: category.ActualOpeningDate ? new Date(category.ActualOpeningDate) : undefined,
-        actualClosureDate: category.ActualClosedDate ? new Date(category.ActualClosedDate) : undefined,
-        expectedReopenDate: category.ExpectedReopenDate ? new Date(category.ExpectedReopenDate) : undefined,
-      }))
+      study.StudyEvaluationCategories.map((category) => {
+        const studyId = studyEntities.find((studyEntity) => studyEntity.cpmsId === study.Id)?.id as number
+        return {
+          studyId,
+          indicatorType: category.EvaluationCategoryType,
+          indicatorValue: category.EvaluationCategoryValue,
+          sampleSize: category.SampleSize,
+          totalRecruitmentToDate: category.TotalRecruitmentToDate,
+          plannedOpeningDate: category.PlannedRecruitmentStartDate
+            ? new Date(category.PlannedRecruitmentStartDate)
+            : undefined,
+          plannedClosureDate: category.PlannedRecruitmentEndDate
+            ? new Date(category.PlannedRecruitmentEndDate)
+            : undefined,
+          actualOpeningDate: category.ActualOpeningDate ? new Date(category.ActualOpeningDate) : undefined,
+          actualClosureDate: category.ActualClosedDate ? new Date(category.ActualClosedDate) : undefined,
+          expectedReopenDate: category.ExpectedReopenDate ? new Date(category.ExpectedReopenDate) : undefined,
+        }
+      })
     )
     .flat()
 
