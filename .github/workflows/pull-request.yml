@@ -65,9 +65,10 @@ jobs:
       - uses: ./.github/actions/build-cache
       - name: Unit tests
         run: npm run test:ci
-      # - name: Unit tests coverage comment
-      #   uses: MishaKav/jest-coverage-comment@main
-      #   with:
-      #     coverage-summary-path: ./coverage/coverage-summary.json
-      #     junitxml-path: ./junit.xml
-      #     title: Unit tests coverage
+      - name: Unit tests coverage comment
+        uses: MishaKav/jest-coverage-comment@main
+        with:
+          title: Unit tests coverage
+          multiple-files: |
+            web, apps/web/coverage/coverage-summary.json
+            ui, packages/ui/coverage/coverage-summary.json
