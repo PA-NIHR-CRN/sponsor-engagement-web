@@ -1,15 +1,11 @@
 import userEvent from '@testing-library/user-event'
 import { render } from '@testing-library/react'
 import { SideNavProvider } from '@nihr-ui/frontend'
-import { useSession } from 'next-auth/react'
-import { authenticatedSessionMock } from '../../__mocks__/session'
+import { user } from '../../__mocks__/session'
 import { Header } from './Header'
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- no types
 jest.mock('next/router', () => require('next-router-mock'))
-jest.mock('next-auth/react')
-
-jest.mocked(useSession).mockReturnValue(authenticatedSessionMock)
 
 test('Displays the header', () => {
   const { getByText, getByRole, getByAltText } = render(
@@ -37,6 +33,9 @@ test('Displays the header', () => {
 
   // Menu trigger button
   expect(getByRole('button', { name: 'Show navigation menu' })).toBeInTheDocument()
+
+  // Email Address
+  expect(getByText(user.email)).toBeInTheDocument()
 })
 
 test('Clicking the navigation menu button toggles the button an open state', async () => {

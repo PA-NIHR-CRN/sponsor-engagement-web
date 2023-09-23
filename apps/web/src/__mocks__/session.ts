@@ -1,6 +1,6 @@
 import type { SessionContextValue } from 'next-auth/react'
 
-const user = {
+export const user = {
   name: 'Test User',
   email: 'testuser@nihr.ac.uk',
   image: null,
@@ -16,5 +16,11 @@ export const authenticatedSessionMock: SessionContextValue = {
     user,
     expires,
   },
+  update,
+}
+
+export const unauthenticatedSessionMock: SessionContextValue = {
+  status: 'unauthenticated',
+  data: null,
   update,
 }
