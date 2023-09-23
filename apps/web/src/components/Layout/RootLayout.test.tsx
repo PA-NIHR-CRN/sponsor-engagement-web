@@ -1,4 +1,5 @@
 import { render, within } from '@testing-library/react'
+import { user } from '../../__mocks__/session'
 import { RootLayout } from './RootLayout'
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- no types
@@ -6,7 +7,7 @@ jest.mock('next/router', () => require('next-router-mock'))
 
 test('Displays NIHR layout & page content', () => {
   const { getByRole, getByText } = render(
-    <RootLayout heading="Welcome">
+    <RootLayout emailAddress={user.email} heading="Welcome">
       <div>Page content</div>
     </RootLayout>
   )
@@ -24,7 +25,7 @@ test('Displays NIHR layout & page content', () => {
 
 test('Adds a class to the body to detect js is enabled', () => {
   render(
-    <RootLayout>
+    <RootLayout emailAddress={user.email}>
       <h1>Welcome</h1>
     </RootLayout>
   )

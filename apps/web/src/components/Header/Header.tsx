@@ -2,13 +2,16 @@ import clsx from 'clsx'
 import Image from 'next/image'
 import { useRef } from 'react'
 import { Logo, SideNav, SettingsIcon } from '@nihr-ui/frontend'
-import { useSession } from 'next-auth/react'
+import type { User } from 'next-auth'
 import { HeaderTitle } from './Title'
 
-export function Header({ heading }: { heading: string }) {
-  const headerRef = useRef(null)
-  const { data: session } = useSession()
+interface HeaderProps {
+  heading: string
+  emailAddress: User['email']
+}
 
+export function Header({ heading, emailAddress }: HeaderProps) {
+  const headerRef = useRef(null)
   return (
     <>
       <a className="govuk-skip-link" href="#main-content">
@@ -28,7 +31,7 @@ export function Header({ heading }: { heading: string }) {
               <Header.Title>{heading}</Header.Title>
             </div>
             <div className="flex items-center justify-center">
-              <span className="hidden text-sm md:block">{session?.user?.email}</span>
+              {emailAddress ? <span className="hidden text-sm md:block">{emailAddress}</span> : null}
               <button
                 aria-controls="menu--1"
                 aria-haspopup="true"

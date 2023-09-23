@@ -4,13 +4,10 @@ import { SideNavProvider } from '@nihr-ui/frontend'
 import { user } from '../../__mocks__/session'
 import { Header } from './Header'
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return -- no types
-jest.mock('next/router', () => require('next-router-mock'))
-
 test('Displays the header', () => {
   const { getByText, getByRole, getByAltText } = render(
     <SideNavProvider>
-      <Header heading="Test Heading" />
+      <Header emailAddress={user.email} heading="Test Heading" />
     </SideNavProvider>
   )
 
@@ -41,7 +38,7 @@ test('Displays the header', () => {
 test('Clicking the navigation menu button toggles the button an open state', async () => {
   const { getByRole, queryByRole } = render(
     <SideNavProvider>
-      <Header heading="Test Heading" />
+      <Header emailAddress={user.email} heading="Test Heading" />
     </SideNavProvider>
   )
 

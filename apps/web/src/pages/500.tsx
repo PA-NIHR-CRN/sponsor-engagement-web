@@ -18,5 +18,9 @@ export default function ServiceUnavailable() {
 }
 
 ServiceUnavailable.getLayout = function getLayout(page: ReactElement) {
-  return <RootLayout heading="Sorry, there is a problem with the service.">{page}</RootLayout>
+  return (
+    <RootLayout emailAddress={null} heading="Sorry, there is a problem with the service.">
+      {page}
+    </RootLayout>
+  )
 }
