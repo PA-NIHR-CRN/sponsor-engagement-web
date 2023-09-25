@@ -100,12 +100,12 @@ model OrganisationRole {
 
 model User {
   id                    Int                @id @default(autoincrement())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
+  name                  String?
+  email                 String?   @unique
+  emailVerified         DateTime?
+  image                 String?
+  accounts              Account[]
+  sessions              Session[]
   identityGatewayId     String
   registrationToken     String?
   registrationConfirmed Boolean?            @default(false)

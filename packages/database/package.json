@@ -8,6 +8,7 @@
     "build": "tsc",
     "db:generate": "prisma generate",
     "db:push": "prisma db push --skip-generate",
+    "lint": "eslint .",
     "migrate:deploy": "npx prisma migrate deploy",
     "migrate:dev": "npx prisma migrate dev",
     "studio": "npx prisma studio"

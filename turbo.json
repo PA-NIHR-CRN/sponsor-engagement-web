@@ -7,6 +7,7 @@
       "outputs": ["dist/**/*", ".next/**", "!.next/cache/**"],
       "env": ["NEXTAUTH_URL", "AUTH_CLIENT_ID", "AUTH_CLIENT_SECRET", "AUTH_WELL_KNOWN_URL"]
     },
+    "start": {},
     "lint": {},
     "lint:fix": {},
     "test": {
