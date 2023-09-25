@@ -70,5 +70,6 @@ jobs:
         with:
           title: Unit tests coverage
           multiple-files: |
-            web, apps/web/coverage/coverage-summary.json
-            ui, packages/ui/coverage/coverage-summary.json
+            Web App, apps/web/coverage/coverage-summary.json
+            Ingest App, apps/ingest/coverage/coverage-summary.json
+            UI Package, packages/ui/coverage/coverage-summary.json
