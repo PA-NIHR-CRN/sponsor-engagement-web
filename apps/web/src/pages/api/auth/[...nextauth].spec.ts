@@ -41,7 +41,7 @@ describe('Custom OAuth provider is compatible with next-auth', () => {
 })
 
 describe('Session authentication callback', () => {
-  test('retrieves the roles for the authenticated user and forwards it to the session object', async () => {
+  test('retrieves the roles for the authenticated user and forwards it to the returned session object', async () => {
     const session = Mock.of<Session>({
       user: {
         name: 'Tom Christian',
@@ -55,12 +55,10 @@ describe('Session authentication callback', () => {
 
     prismaMock.userRole.findMany.mockResolvedValueOnce([
       Mock.of<UserRole>({
-        id: 1,
         userId: 26,
         roleId: Roles.SponsorContact,
       }),
       Mock.of<UserRole>({
-        id: 2,
         userId: 26,
         roleId: Roles.ContactManager,
       }),

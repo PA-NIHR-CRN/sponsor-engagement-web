@@ -7,7 +7,7 @@ import { HomeIcon, SettingsIcon, SideNav } from '@nihr-ui/frontend'
 import type { Session } from 'next-auth'
 import { Header } from '../Header/Header'
 import { ORGANISATIONS_PAGE } from '../../constants/routes'
-import { isContactManager } from '../../utils/auth'
+import { Roles } from '../../constants/auth'
 
 const primaryFont = Roboto({ weight: ['400', '700'], subsets: ['latin'], display: 'swap', variable: '--font-primary' })
 
@@ -40,7 +40,7 @@ export function RootLayout({ children, backLink, heading = '', user }: RootLayou
           <SideNav.Link as={Link} href="/" icon={<HomeIcon />}>
             Home
           </SideNav.Link>
-          {isContactManager(user?.roles || []) ? (
+          {user?.roles.includes(Roles.ContactManager) ? (
             <SideNav.Link as={Link} href={ORGANISATIONS_PAGE} icon={<SettingsIcon />}>
               Manage sponsor contacts
             </SideNav.Link>

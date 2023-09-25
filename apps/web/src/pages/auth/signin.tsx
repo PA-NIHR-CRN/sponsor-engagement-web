@@ -8,10 +8,11 @@ import { AUTH_PROVIDER_ID } from '@/constants/auth'
 import { authOptions } from '../api/auth/[...nextauth]'
 
 /**
- * Our middleware.ts redirects to this sign in page for unauthenticated users.
+ * Our protected routes redirect to this sign in page for unauthenticated users.
  *
- * This signin page then automatically redirects to the OIDC sign in page or back to our application root depending on authentication status
- * next-auth does not support redirecting to the authentication provider directly from the middleware. (https://github.com/nextauthjs/next-auth/discussions/4511)
+ * This sign in page then automatically performs a client-side redirect to the Identity gateway OR back to our application homepage
+ * next-auth unfortunately does not support redirecting directly to the identity provider server-side (https://github.com/nextauthjs/next-auth/discussions/4511)
+ * For Non-javascript use case, we fallback to a standard form
  */
 export type SigninProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
