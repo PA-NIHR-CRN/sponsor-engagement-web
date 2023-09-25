@@ -17,6 +17,6 @@ export const AUTH_PROVIDER_TYPE = 'oauth'
  * Local roles associated with a user
  */
 export enum Roles {
-  SponsorContact = 2,
-  ContactManager = 3,
+  SponsorContact = 1,
+  ContactManager = 2,
 }

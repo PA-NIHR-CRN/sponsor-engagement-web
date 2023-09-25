@@ -9,10 +9,12 @@ async function main() {
   const roles = await prisma.sysRefRole.createMany({
     data: [
       {
+        id: 1,
         name: 'SponsorContact',
         description: 'Sponsor contact role',
       },
       {
+        id: 2,
         name: 'ContactManager',
         description: 'Contact manager role',
       },
