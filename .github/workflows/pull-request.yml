@@ -36,8 +36,8 @@ jobs:
           touch .env.local
           echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env.local
           echo NEXT_PUBLIC_APP_ENV=${{ vars.APP_ENV }} >> .env.local
+          npm run db:generate
           npm run build
-          # npx prisma generate
 
   # Code quality checks
   quality-checks:

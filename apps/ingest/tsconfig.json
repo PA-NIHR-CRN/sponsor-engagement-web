@@ -1,4 +1,5 @@
 {
+  "extends": "tsconfig/base.json",
   "compilerOptions": {
     "lib": ["ES2019"],
     "module": "CommonJS",
@@ -6,7 +7,6 @@
     "rootDir": "./src",
     "downlevelIteration": true
   },
-  "exclude": ["node_modules"],
-  "extends": "tsconfig/base.json",
-  "include": ["src"]
+  "exclude": ["dist", "build", "node_modules", "**/*.spec.ts", "src/mocks/**/*"],
+  "include": ["src/**/*.ts"]
 }

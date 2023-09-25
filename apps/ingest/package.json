@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "axios": "^1.5.0",
-    "database": "*"
+    "database": "*",
+    "logger": "*"
   },
   "devDependencies": {
     "@types/node": "^15.12.2",
