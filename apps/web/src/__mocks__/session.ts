@@ -1,26 +1,42 @@
-import type { SessionContextValue } from 'next-auth/react'
+import type { Session } from 'next-auth'
+import { Roles } from '../constants/auth'
 
-export const user = {
-  name: 'Test User',
-  email: 'testuser@nihr.ac.uk',
-  image: null,
-} as const
-
-const expires = '123'
-
-const update = jest.fn()
-
-export const authenticatedSessionMock: SessionContextValue = {
-  status: 'authenticated',
-  data: {
-    user,
-    expires,
-  },
-  update,
+const defaults: Omit<Session, 'user'> = {
+  expires: '12345',
 }
 
-export const unauthenticatedSessionMock: SessionContextValue = {
-  status: 'unauthenticated',
-  data: null,
-  update,
+export const userNoRoles: Session = {
+  ...defaults,
+  user: {
+    name: 'Test User',
+    email: 'testuser@nihr.ac.uk',
+    roles: [],
+  },
+}
+
+export const userWithSponsorContactRole: Session = {
+  ...defaults,
+  user: {
+    name: 'Test User',
+    email: 'testuser@nihr.ac.uk',
+    roles: [Roles.SponsorContact],
+  },
+}
+
+export const userWithContactManagerRole: Session = {
+  ...defaults,
+  user: {
+    name: 'Test User',
+    email: 'testuser@nihr.ac.uk',
+    roles: [Roles.ContactManager],
+  },
+}
+
+export const userWithSponsorContactAndContactManagerRoles: Session = {
+  ...defaults,
+  user: {
+    name: 'Test User',
+    email: 'testuser@nihr.ac.uk',
+    roles: [Roles.SponsorContact, Roles.ContactManager],
+  },
 }

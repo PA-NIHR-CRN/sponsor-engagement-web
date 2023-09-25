@@ -1,13 +1,13 @@
 import userEvent from '@testing-library/user-event'
 import { render } from '@testing-library/react'
 import { SideNavProvider } from '@nihr-ui/frontend'
-import { user } from '../../__mocks__/session'
+import { userNoRoles } from '../../__mocks__/session'
 import { Header } from './Header'
 
 test('Displays the header', () => {
   const { getByText, getByRole, getByAltText } = render(
     <SideNavProvider>
-      <Header emailAddress={user.email} heading="Test Heading" />
+      <Header heading="Test Heading" user={userNoRoles.user} />
     </SideNavProvider>
   )
 
@@ -32,13 +32,13 @@ test('Displays the header', () => {
   expect(getByRole('button', { name: 'Show navigation menu' })).toBeInTheDocument()
 
   // Email Address
-  expect(getByText(user.email)).toBeInTheDocument()
+  expect(getByText(userNoRoles.user?.email ?? '')).toBeInTheDocument()
 })
 
 test('Clicking the navigation menu button toggles the button an open state', async () => {
   const { getByRole, queryByRole } = render(
     <SideNavProvider>
-      <Header emailAddress={user.email} heading="Test Heading" />
+      <Header heading="Test Heading" user={userNoRoles.user} />
     </SideNavProvider>
   )
 

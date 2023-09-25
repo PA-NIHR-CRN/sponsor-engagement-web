@@ -3,7 +3,7 @@ import '@nihr-ui/frontend/globals.scss'
 import type { NextPage } from 'next'
 import type { AppProps } from 'next/app'
 import type { ReactElement, ReactNode } from 'react'
-import type { User } from 'next-auth'
+import type { Session } from 'next-auth'
 import { RootLayout } from '../components/Layout/RootLayout'
 
 export type NextPageWithLayout<P = Record<string, unknown>, IP = P> = NextPage<P, IP> & {
@@ -11,7 +11,7 @@ export type NextPageWithLayout<P = Record<string, unknown>, IP = P> = NextPage<P
 }
 
 type AppPropsWithLayout = AppProps<{
-  emailAddress: User['email']
+  user: Session['user']
   heading: string
   page?: string
 }> & {
@@ -19,13 +19,13 @@ type AppPropsWithLayout = AppProps<{
 }
 
 function App({ Component, pageProps }: AppPropsWithLayout) {
-  const { emailAddress } = pageProps
+  const { user } = pageProps
 
   // Use the layout defined at the page level, if available
   const getLayout =
     Component.getLayout ??
     ((page) => (
-      <RootLayout emailAddress={emailAddress} heading={pageProps.heading}>
+      <RootLayout heading={pageProps.heading} user={user}>
         {page}
       </RootLayout>
     ))

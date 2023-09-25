@@ -14,6 +14,9 @@ export const AUTH_PROVIDER_NAME = 'OIDC'
 export const AUTH_PROVIDER_TYPE = 'oauth'
 
 /**
- * Signin page that unauthenticated users are redirected to
+ * Local roles associated with a user
  */
-export const AUTH_SIGN_IN_PAGE = '/auth/signin'
+export enum Roles {
+  SponsorContact = 2,
+  ContactManager = 3,
+}

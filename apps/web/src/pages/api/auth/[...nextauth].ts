@@ -1,18 +1,32 @@
 import type { AuthOptions } from 'next-auth'
 import NextAuth from 'next-auth'
 import type { OAuthConfig, OAuthUserConfig } from 'next-auth/providers'
-import { AUTH_PROVIDER_ID, AUTH_PROVIDER_NAME, AUTH_PROVIDER_TYPE } from '@/constants/auth'
+import { PrismaAdapter } from '@next-auth/prisma-adapter'
+import { AUTH_PROVIDER_ID, AUTH_PROVIDER_NAME, AUTH_PROVIDER_TYPE } from '../../../constants/auth'
+import { prismaClient } from '../../../lib/prisma'
 
-interface Profile {
-  id: string
+interface OAuthProfile {
+  at_hash: string
+  sub: string
+  amr: string[]
+  iss: string
   given_name: string
+  aud: string
+  c_hash: string
+  nbf: number
+  azp: string
+  exp: number
+  iat: number
   family_name: string
   email: string
 }
 
 type ProviderOptions = OAuthUserConfig<'type'> & { wellKnown: string }
 
-const Provider = ({ clientId, clientSecret, wellKnown }: ProviderOptions): OAuthConfig<Profile> => ({
+/**
+ * Custom oauth provider for next-auth
+ */
+const Provider = ({ clientId, clientSecret, wellKnown }: ProviderOptions): OAuthConfig<OAuthProfile> => ({
   id: AUTH_PROVIDER_ID,
   name: AUTH_PROVIDER_NAME,
   type: AUTH_PROVIDER_TYPE,
@@ -24,15 +38,17 @@ const Provider = ({ clientId, clientSecret, wellKnown }: ProviderOptions): OAuth
   checks: ['pkce', 'state'],
   profile(profile) {
     return {
-      id: String(profile.id),
+      id: profile.sub,
       name: `${profile.given_name} ${profile.family_name}`,
       email: profile.email,
+      identityGatewayId: profile.sub,
     }
   },
 })
 
 export const authOptions: AuthOptions = {
   debug: true,
+  adapter: PrismaAdapter(prismaClient),
   providers: [
     Provider({
       clientId: process.env.AUTH_CLIENT_ID,
@@ -40,6 +56,24 @@ export const authOptions: AuthOptions = {
       wellKnown: process.env.AUTH_WELL_KNOWN_URL,
     }),
   ],
+  callbacks: {
+    async session({ session, user }) {
+      // console.log('in: ', session, ' user: ', user)
+      if (!session.user) {
+        return session
+      }
+
+      // When a session is established or checked we can lookup the users' role(s) and forward them inside the user object
+      // https://next-auth.js.org/configuration/callbacks#session-callback
+      const roles = await prismaClient.userRole.findMany({
+        where: { userId: Number(user.id) },
+      })
+
+      session.user.roles = roles.map((role) => role.roleId)
+
+      return session
+    },
+  },
 }
 
 export default NextAuth(authOptions)

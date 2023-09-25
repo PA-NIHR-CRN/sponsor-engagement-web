@@ -21,7 +21,7 @@ export default function PageNotFound() {
 
 PageNotFound.getLayout = function getLayout(page: ReactElement) {
   return (
-    <RootLayout emailAddress={null} heading="Page not found">
+    <RootLayout heading="Page not found" user={null}>
       {page}
     </RootLayout>
   )

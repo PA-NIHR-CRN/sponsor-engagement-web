@@ -2,15 +2,15 @@ import clsx from 'clsx'
 import Image from 'next/image'
 import { useRef } from 'react'
 import { Logo, SideNav, SettingsIcon } from '@nihr-ui/frontend'
-import type { User } from 'next-auth'
+import type { Session } from 'next-auth'
 import { HeaderTitle } from './Title'
 
 interface HeaderProps {
   heading: string
-  emailAddress: User['email']
+  user: Session['user']
 }
 
-export function Header({ heading, emailAddress }: HeaderProps) {
+export function Header({ heading, user }: HeaderProps) {
   const headerRef = useRef(null)
   return (
     <>
@@ -31,7 +31,7 @@ export function Header({ heading, emailAddress }: HeaderProps) {
               <Header.Title>{heading}</Header.Title>
             </div>
             <div className="flex items-center justify-center">
-              {emailAddress ? <span className="hidden text-sm md:block">{emailAddress}</span> : null}
+              {user ? <span className="hidden text-sm md:block">{user.email}</span> : null}
               <button
                 aria-controls="menu--1"
                 aria-haspopup="true"
