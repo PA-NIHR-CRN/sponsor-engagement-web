@@ -4,8 +4,8 @@ import { useRouter } from 'next/router'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { Container } from '@nihr-ui/frontend'
 import { getServerSession } from 'next-auth/next'
-import { AUTH_PROVIDER_ID } from '@/constants/auth'
 import { authOptions } from '../api/auth/[...nextauth]'
+import { AUTH_PROVIDER_ID } from '../../constants/auth'
 
 /**
  * Our protected routes redirect to this sign in page for unauthenticated users.
