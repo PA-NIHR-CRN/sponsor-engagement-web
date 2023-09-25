@@ -1,11 +1,14 @@
 {
   "name": "database",
   "version": "0.0.0",
-  "main": "./index.ts",
-  "types": "./index.ts",
+  "main": "./dist/index.js",
+  "source": "./src/index.ts",
+  "types": "./dist/index.d.ts",
   "scripts": {
+    "build": "tsc",
     "db:generate": "prisma generate",
     "db:push": "prisma db push --skip-generate",
+    "lint": "eslint .",
     "migrate:deploy": "npx prisma migrate deploy",
     "migrate:dev": "dotenv -e .env.local -- npx prisma migrate dev",
     "studio": "npx prisma studio"

@@ -8,6 +8,7 @@
     },
     "lint": {},
     "lint:fix": {},
+    "start": {},
     "test": {},
     "test:ci": {},
     "typecheck": {},

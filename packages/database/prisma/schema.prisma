@@ -8,7 +8,214 @@ datasource db {
 }
 
 model Study {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                         Int                       @id @default(autoincrement())
+  name                       String
+  cpmsId                     Int                       @unique
+  status                     String
+  recordStatus               String
+  route                      String
+  irasId                     String?
+  protocolReferenceNumber    String?
+  sampleSize                 Int?
+  chiefInvestigatorFirstName String?
+  chiefInvestigatorLastName  String?
+  managingSpeciality         String
+  plannedOpeningDate         DateTime?
+  plannedClosureDate         DateTime?
+  actualOpeningDate          DateTime?
+  actualClosureDate          DateTime?
+  assessments                Assessment[]
+  organisations              StudyOrganisation[]
+  funders                    StudyFunder[]
+  evaluationCategory         StudyEvaluationCategory[]
+  createdAt                  DateTime                  @default(now())
+  updatedAt                  DateTime                  @updatedAt
+  isDeleted                  Boolean?                  @default(false)
+
+  @@index([cpmsId])
+}
+
+model Organisation {
+  id            Int                 @id @default(autoincrement())
+  name          String
+  rtsIdentifier String              @unique
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  isDeleted     Boolean?            @default(false)
+  users         UserOrganisation[]
+  roles         OrganisationRole[]
+  studies       StudyOrganisation[]
+  fundedStudies StudyFunder[]
+
+  @@index([rtsIdentifier])
+}
+
+model OrganisationRole {
+  id             Int                    @id @default(autoincrement())
+  organisation   Organisation           @relation(fields: [organisationId], references: [id])
+  organisationId Int
+  role           SysRefOrganisationRole @relation(fields: [roleId], references: [id])
+  roleId         Int
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+  isDeleted      Boolean?               @default(false)
+
+  @@unique([organisationId, roleId])
+}
+
+model User {
+  id                    Int                @id @default(autoincrement())
+  emailAddress          String
+  identityGatewayId     String
+  registrationToken     String
+  registrationConfirmed Boolean            @default(false)
+  isDeleted             Boolean?           @default(false)
+  organisations         UserOrganisation[] @relation(name: "userOrganisation")
+  createdOrganisations  UserOrganisation[] @relation(name: "createdOrganisations")
+  updatedOrganisations  UserOrganisation[] @relation(name: "updatedOrganisations")
+  roles                 UserRole[]         @relation(name: "userRoles")
+  createdRoles          UserRole[]         @relation(name: "createdRoles")
+  updatedRoles          UserRole[]         @relation(name: "updatedRoles")
+  assessments           Assessment[]
+}
+
+model UserRole {
+  id          Int        @id @default(autoincrement())
+  user        User       @relation(name: "userRoles", fields: [userId], references: [id])
+  userId      Int
+  role        SysRefRole @relation(fields: [roleId], references: [id])
+  roleId      Int
+  createdBy   User       @relation(name: "createdRoles", fields: [createdById], references: [id])
+  createdById Int
+  updatedBy   User       @relation(name: "updatedRoles", fields: [updatedById], references: [id])
+  updatedById Int
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  isDeleted   Boolean?   @default(false)
+}
+
+model UserOrganisation {
+  id             Int          @id @default(autoincrement())
+  user           User         @relation(name: "userOrganisation", fields: [userId], references: [id])
+  userId         Int
+  organisation   Organisation @relation(fields: [organisationId], references: [id])
+  organisationId Int
+  createdBy      User         @relation(name: "createdOrganisations", fields: [createdById], references: [id])
+  createdById    Int
+  updatedBy      User         @relation(name: "updatedOrganisations", fields: [updatedById], references: [id])
+  updatedById    Int
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  isDeleted      Boolean?     @default(false)
+}
+
+model StudyOrganisation {
+  id                 Int                    @id @default(autoincrement())
+  study              Study                  @relation(fields: [studyId], references: [id])
+  studyId            Int
+  organisation       Organisation           @relation(fields: [organisationId], references: [id])
+  organisationId     Int
+  organisationRole   SysRefOrganisationRole @relation(fields: [organisationRoleId], references: [id])
+  organisationRoleId Int
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+  isDeleted          Boolean?               @default(false)
+
+  @@unique([studyId, organisationId])
+}
+
+model StudyEvaluationCategory {
+  id                     Int       @id @default(autoincrement())
+  study                  Study     @relation(fields: [studyId], references: [id])
+  studyId                Int
+  indicatorType          String
+  indicatorValue         String
+  sampleSize             Int?
+  totalRecruitmentToDate Int
+  plannedOpeningDate     DateTime?
+  plannedClosureDate     DateTime?
+  actualOpeningDate      DateTime?
+  actualClosureDate      DateTime?
+  expectedReopenDate     DateTime?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+  isDeleted              Boolean?  @default(false)
+
+  @@unique([studyId, indicatorType])
+}
+
+model StudyFunder {
+  id                Int          @id @default(autoincrement())
+  study             Study        @relation(fields: [studyId], references: [id])
+  studyId           Int
+  organisation      Organisation @relation(fields: [organisationId], references: [id])
+  organisationId    Int
+  grantCode         String
+  fundingStreamName String
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  isDeleted         Boolean?     @default(false)
+
+  @@unique([studyId, organisationId])
+}
+
+model Assessment {
+  id                 Int                            @id @default(autoincrement())
+  study              Study                          @relation(fields: [studyId], references: [id])
+  studyId            Int
+  status             SysRefAssessmentStatus         @relation(fields: [statusId], references: [id])
+  statusId           Int
+  furtherInformation AssessmentFurtherInformation[]
+  createdBy          User                           @relation(fields: [createdById], references: [id])
+  createdById        Int
+  createdAt          DateTime                       @default(now())
+  updatedAt          DateTime                       @updatedAt
+  isDeleted          Boolean?                       @default(false)
+}
+
+model AssessmentFurtherInformation {
+  id                     Int                                @id @default(autoincrement())
+  assessment             Assessment                         @relation(fields: [assessmentId], references: [id])
+  assessmentId           Int
+  furtherInformation     SysRefAssessmentFurtherInformation @relation(fields: [furtherInformationId], references: [id])
+  furtherInformationId   Int
+  furtherInformationText String                             @db.Text
+  isDeleted              Boolean?                           @default(false)
+}
+
+model SysRefRole {
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String     @db.Text
+  isDeleted   Boolean    @default(false)
+  users       UserRole[]
+}
+
+model SysRefAssessmentStatus {
+  id          Int          @id @default(autoincrement())
+  name        String
+  description String       @db.Text
+  isDeleted   Boolean      @default(false)
+  assessments Assessment[]
+}
+
+model SysRefAssessmentFurtherInformation {
+  id          Int                            @id @default(autoincrement())
+  name        String
+  description String                         @db.Text
+  sortOrder   Int
+  isDeleted   Boolean                        @default(false)
+  assessments AssessmentFurtherInformation[]
+}
+
+model SysRefOrganisationRole {
+  id            Int                 @id @default(autoincrement())
+  name          String
+  description   String              @db.Text
+  rtsIdentifier String              @unique
+  organisations OrganisationRole[]
+  studies       StudyOrganisation[]
+  isDeleted     Boolean             @default(false)
+
+  @@index([rtsIdentifier])
 }

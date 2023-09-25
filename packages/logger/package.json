@@ -1,11 +1,13 @@
 {
   "name": "logger",
   "version": "0.0.0",
+  "main": "./dist/index.js",
+  "source": "./src/index.ts",
+  "types": "./dist/index.d.ts",
   "license": "MIT",
-  "main": "./index.tsx",
-  "types": "./index.tsx",
   "scripts": {
-    "generate:component": "turbo gen react-component",
+    "build": "tsc",
+    "lint": "eslint .",
     "test": "jest --watch",
     "test:ci": ""
   },
