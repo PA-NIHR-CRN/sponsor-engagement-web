@@ -5,6 +5,7 @@ import type { AdapterUser } from 'next-auth/adapters'
 import type { JWT } from 'next-auth/jwt'
 import type { UserRole } from 'database'
 import { prismaMock } from '../../../__mocks__/prisma'
+import { Roles } from '../../../constants/auth'
 import { authOptions } from './[...nextauth]'
 
 describe('Authentication configuration options', () => {
@@ -47,24 +48,64 @@ describe('Session authentication callback', () => {
         email: 'tom.christian@nihr.ac.uk',
       },
     })
-    const user = Mock.of<AdapterUser>()
+    const user = Mock.of<AdapterUser>({
+      id: '26',
+    })
     const token = Mock.of<JWT>()
 
     prismaMock.userRole.findMany.mockResolvedValueOnce([
       Mock.of<UserRole>({
-        id: 123,
+        id: 1,
+        userId: 26,
+        roleId: Roles.SponsorContact,
+      }),
+      Mock.of<UserRole>({
+        id: 2,
+        userId: 26,
+        roleId: Roles.ContactManager,
       }),
     ])
 
-    await authOptions.callbacks?.session?.({
+    const updatedSession = await authOptions.callbacks?.session?.({
       session,
       user,
       token,
       newSession: false,
       trigger: 'update',
     })
-  })
-  // test('Returns early if no user object exists', () => {
 
-  // })
+    expect(updatedSession).toEqual<Session>(
+      Mock.of<Session>({
+        user: {
+          name: 'Tom Christian',
+          email: 'tom.christian@nihr.ac.uk',
+          roles: [Roles.SponsorContact, Roles.ContactManager],
+        },
+      })
+    )
+  })
+
+  test('exits early if no user object exists', async () => {
+    const session = Mock.of<Session>({
+      user: null,
+    })
+    const user = Mock.of<AdapterUser>()
+    const token = Mock.of<JWT>()
+
+    const updatedSession = await authOptions.callbacks?.session?.({
+      session,
+      user,
+      token,
+      newSession: false,
+      trigger: 'update',
+    })
+
+    expect(prismaMock.userRole.findMany).not.toHaveBeenCalled()
+
+    expect(updatedSession).toEqual<Session>(
+      Mock.of<Session>({
+        user: null,
+      })
+    )
+  })
 })

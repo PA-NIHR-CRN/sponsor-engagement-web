@@ -43,6 +43,7 @@ module.exports = {
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     '@typescript-eslint/no-unsafe-return': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/unbound-method': 'off',
     'react/display-name': 'off',
     'unicorn/filename-case': [
       'error',

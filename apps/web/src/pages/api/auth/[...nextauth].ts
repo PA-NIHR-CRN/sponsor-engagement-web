@@ -58,7 +58,6 @@ export const authOptions: AuthOptions = {
   ],
   callbacks: {
     async session({ session, user }) {
-      // console.log('in: ', session, ' user: ', user)
       if (!session.user) {
         return session
       }
