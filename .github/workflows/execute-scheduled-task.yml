@@ -126,8 +126,7 @@ jobs:
           SUBNET_ID: ${{ secrets.ECS_SUBNET }}
           SECURITY_GROUP_ID: ${{ secrets.ECS_SG }}
         run: |
-          aws ecs run-task --cluster ${{ env.ECS_CLUSTER }} --task-definition ${{ env.TASK_DEFINITION }} --count ${{ env.COUNT }} \
-          --network-configuration "awsvpcConfiguration={subnets=${env.SUBNET_ID},securityGroups=[${env.SECURITY_GROUP_ID}]}"
+          aws ecs run-task --cluster ${{ env.ECS_CLUSTER }} --task-definition ${{ env.TASK_DEFINITION }} --count ${{ env.COUNT }} --network-configuration "awsvpcConfiguration={subnets=${env.SUBNET_ID},securityGroups=[${env.SECURITY_GROUP_ID}]}"
 
   deploy-prod:
     name: "Manually executing ${{ github.event.inputs.appname || 'ingest' }} scheduled task in PROD"
