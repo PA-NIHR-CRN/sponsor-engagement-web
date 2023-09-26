@@ -1,4 +1,4 @@
-name: Manually execute ingest task 
+name: Manually execute scheduled task 
 
 on:
   workflow_dispatch:
@@ -62,7 +62,7 @@ jobs:
         if: env.GITHUB_ACTIONS_ENVIRONMENT == 'dev'
         env:
           ECS_CLUSTER: crnccd-ecs-dev-se-cluster
-          TASK_DEFINTION: crnccd-ecs-dev-se-ingest-task-definition
+          TASK_DEFINTION: crnccd-ecs-dev-se-${{ github.event.inputs.appname}}-task-definition
           COUNT: 1
         run: |
           aws ecs run-task --cluster ${{ env.ECS_CLUSTER }} --task-definition ${{ env.TASK_DEFINITION }} --count ${{ env.COUNT }}
@@ -71,7 +71,7 @@ jobs:
         if: env.GITHUB_ACTIONS_ENVIRONMENT == 'test'
         env:
           ECS_CLUSTER: crnccd-ecs-test-se-cluster
-          TASK_DEFINTION: crnccd-ecs-test-se-ingest-task-definition
+          TASK_DEFINTION: crnccd-ecs-test-se-${{ github.event.inputs.appname}}-task-definition
           COUNT: 1
         run: |
           aws ecs run-task --cluster ${{ env.ECS_CLUSTER }} --task-definition ${{ env.TASK_DEFINITION }} --count ${{ env.COUNT }}
@@ -80,7 +80,7 @@ jobs:
         if: env.GITHUB_ACTIONS_ENVIRONMENT == 'uat'
         env:
           ECS_CLUSTER: crnccs-ecs-uat-se-cluster
-          TASK_DEFINTION: crnccs-ecs-uat-se-ingest-task-definition
+          TASK_DEFINTION: crnccs-ecs-uat-se-${{ github.event.inputs.appname}}-task-definition
           COUNT: 1
         run: |
           aws ecs run-task --cluster ${{ env.ECS_CLUSTER }} --task-definition ${{ env.TASK_DEFINITION }} --count ${{ env.COUNT }}
@@ -89,7 +89,7 @@ jobs:
         if: env.GITHUB_ACTIONS_ENVIRONMENT == 'oat'
         env:
           ECS_CLUSTER: crnccp-ecs-oat-se-cluster
-          TASK_DEFINTION: crnccp-ecs-oat-se-ingest-task-definition
+          TASK_DEFINTION: crnccp-ecs-oat-se-${{ github.event.inputs.appname}}-task-definition
           COUNT: 1
         run: |
           aws ecs run-task --cluster ${{ env.ECS_CLUSTER }} --task-definition ${{ env.TASK_DEFINITION }} --count ${{ env.COUNT }}
@@ -98,7 +98,7 @@ jobs:
         if: env.GITHUB_ACTIONS_ENVIRONMENT == 'prod'
         env:
           ECS_CLUSTER: crnccp-ecs-prod-se-cluster
-          TASK_DEFINTION: crnccp-ecs-prod-se-ingest-task-definition
+          TASK_DEFINTION: crnccp-ecs-prod-se-${{ github.event.inputs.appname}}-task-definition
           COUNT: 1
         run: |
           aws ecs run-task --cluster ${{ env.ECS_CLUSTER }} --task-definition ${{ env.TASK_DEFINITION }} --count ${{ env.COUNT }}
