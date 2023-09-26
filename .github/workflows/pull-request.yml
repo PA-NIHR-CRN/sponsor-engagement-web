@@ -18,8 +18,9 @@ jobs:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/install-cache
+      - uses: ./.github/actions/turbo-cache
       - name: Install
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
   # Build project
   build:
@@ -36,7 +37,7 @@ jobs:
           touch .env.local
           echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env.local
           echo NEXT_PUBLIC_APP_ENV=${{ vars.APP_ENV }} >> .env.local
-          npx turbo run build
+          npx turbo run build --cache-dir=".turbo"
 
   # Code quality checks
   quality-checks:
@@ -49,7 +50,7 @@ jobs:
       - uses: ./.github/actions/install-cache
       - uses: ./.github/actions/build-cache
       - name: Quality check
-        run: npx turbo run lint
+        run: npx turbo run lint --cache-dir=".turbo"
 
   # Unit tests
   unit-tests:
@@ -64,7 +65,7 @@ jobs:
       - uses: ./.github/actions/build-cache
       - name: Unit tests
         run: |
-          npx turbo run test:ci
+          npx turbo run test:ci --cache-dir=".turbo"
       - name: Unit tests coverage comment
         uses: MishaKav/jest-coverage-comment@main
         with:
