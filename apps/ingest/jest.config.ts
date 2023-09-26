@@ -6,6 +6,7 @@ const config: Config = {
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },
+  testPathIgnorePatterns: ['dist', '.vscode'],
 }
 
 module.exports = config
