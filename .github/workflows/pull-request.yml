@@ -32,6 +32,7 @@ jobs:
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/install-cache
       - uses: ./.github/actions/build-cache
+      - uses: ./.github/actions/turbo-cache
       - name: Build
         run: |
           touch .env.local
@@ -49,6 +50,7 @@ jobs:
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/install-cache
       - uses: ./.github/actions/build-cache
+      - uses: ./.github/actions/turbo-cache
       - name: Quality check
         run: npx turbo run lint --cache-dir=".turbo"
 
@@ -63,6 +65,7 @@ jobs:
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/install-cache
       - uses: ./.github/actions/build-cache
+      - uses: ./.github/actions/turbo-cache
       - name: Unit tests
         run: |
           npx turbo run test:ci --cache-dir=".turbo"
