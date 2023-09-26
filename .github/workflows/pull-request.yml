@@ -36,7 +36,7 @@ jobs:
           touch .env.local
           echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env.local
           echo NEXT_PUBLIC_APP_ENV=${{ vars.APP_ENV }} >> .env.local
-          turbo run build
+          npx turbo run build
 
   # Code quality checks
   quality-checks:
@@ -49,7 +49,7 @@ jobs:
       - uses: ./.github/actions/install-cache
       - uses: ./.github/actions/build-cache
       - name: Quality check
-        run: turbo run lint
+        run: npx turbo run lint
 
   # Unit tests
   unit-tests:
@@ -64,7 +64,7 @@ jobs:
       - uses: ./.github/actions/build-cache
       - name: Unit tests
         run: |
-          turbo run test:ci
+          npx turbo run test:ci
       - name: Unit tests coverage comment
         uses: MishaKav/jest-coverage-comment@main
         with:
