@@ -21,7 +21,8 @@
       "env": ["NEXTAUTH_URL", "AUTH_CLIENT_ID", "AUTH_CLIENT_SECRET", "AUTH_WELL_KNOWN_URL"]
     },
     "test:ci": {
-      "dependsOn": ["^db:generate"]
+      "dependsOn": ["^db:generate"],
+      "outputs": ["coverage/**"]
     },
     "typecheck": {},
     "dev": {
