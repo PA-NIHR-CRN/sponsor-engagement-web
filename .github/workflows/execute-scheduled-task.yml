@@ -1,0 +1,104 @@
+name: Manually execute ingest task 
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: Select the environment
+        options:
+        - dev
+        - test
+        - uat
+        - oat
+        - prod
+      appname:
+        type: choice
+        description: Select application
+        options:
+        - ingest
+
+env:
+  AWS_DEFAULT_REGION: eu-west-2
+jobs:
+  deploy:
+    name: "Manually executing ${{ github.event.inputs.appname || 'ingest' }} scheduled task ${{ github.event.inputs.environment || 'dev' }}"
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_ACTIONS_ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
+    steps:
+      # credentials to connect to AWS 
+      - name: Configure AWS credentials (dev/test)
+        uses: aws-actions/configure-aws-credentials@v1
+        if: env.GITHUB_ACTIONS_ENVIRONMENT == 'dev' || env.GITHUB_ACTIONS_ENVIRONMENT == 'test'
+        with:
+          aws-access-key-id: ${{ secrets.NIHR_GITHUB_ACTIONS_IAM_ID }}
+          aws-secret-access-key: ${{ secrets.NIHR_GITHUB_ACTIONS_IAM_SECRET }}
+          aws-region: eu-west-2
+          role-session-name: GitHubActionsDev
+
+      - name: Configure AWS credentials (uat)
+        uses: aws-actions/configure-aws-credentials@v1
+        if: env.GITHUB_ACTIONS_ENVIRONMENT == 'uat'
+        with:
+          aws-access-key-id: ${{ secrets.CRNCC_STAGING_IAM_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.CRNCC_STAGING_IAM_ACCESS_KEY_SECRET }}
+          aws-region: eu-west-2
+          role-session-name: GitHubActionsUat
+
+      - name: Configure AWS credentials (oat/prod)
+        uses: aws-actions/configure-aws-credentials@v1
+        if: env.GITHUB_ACTIONS_ENVIRONMENT == 'oat' || env.GITHUB_ACTIONS_ENVIRONMENT == 'prod'
+        with:
+          aws-access-key-id: ${{ secrets.CRNCC_PROD_IAM_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.CRNCC_PROD_IAM_ACCESS_KEY_SECRET }}
+          aws-region: eu-west-2
+          role-session-name: GitHubActionsOat
+
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: execute ${{ github.event.inputs.appname}} in DEV
+        if: env.GITHUB_ACTIONS_ENVIRONMENT == 'dev'
+        env:
+          ECS_CLUSTER: crnccd-ecs-dev-se-cluster
+          TASK_DEFINTION: crnccd-ecs-dev-se-ingest-task-definition
+          COUNT: 1
+        run: |
+          aws ecs run-task --cluster ${{ env.ECS_CLUSTER }} --task-definition ${{ env.TASK_DEFINITION }} --count ${{ env.COUNT }}
+
+      - name: execute ${{ github.event.inputs.appname}} in TEST
+        if: env.GITHUB_ACTIONS_ENVIRONMENT == 'test'
+        env:
+          ECS_CLUSTER: crnccd-ecs-test-se-cluster
+          TASK_DEFINTION: crnccd-ecs-test-se-ingest-task-definition
+          COUNT: 1
+        run: |
+          aws ecs run-task --cluster ${{ env.ECS_CLUSTER }} --task-definition ${{ env.TASK_DEFINITION }} --count ${{ env.COUNT }}
+
+      - name: execute ${{ github.event.inputs.appname}} in UAT
+        if: env.GITHUB_ACTIONS_ENVIRONMENT == 'uat'
+        env:
+          ECS_CLUSTER: crnccs-ecs-uat-se-cluster
+          TASK_DEFINTION: crnccs-ecs-uat-se-ingest-task-definition
+          COUNT: 1
+        run: |
+          aws ecs run-task --cluster ${{ env.ECS_CLUSTER }} --task-definition ${{ env.TASK_DEFINITION }} --count ${{ env.COUNT }}
+
+      - name: execute ${{ github.event.inputs.appname}} in OAT
+        if: env.GITHUB_ACTIONS_ENVIRONMENT == 'oat'
+        env:
+          ECS_CLUSTER: crnccp-ecs-oat-se-cluster
+          TASK_DEFINTION: crnccp-ecs-oat-se-ingest-task-definition
+          COUNT: 1
+        run: |
+          aws ecs run-task --cluster ${{ env.ECS_CLUSTER }} --task-definition ${{ env.TASK_DEFINITION }} --count ${{ env.COUNT }}
+
+      - name: execute ${{ github.event.inputs.appname}} in PROD
+        if: env.GITHUB_ACTIONS_ENVIRONMENT == 'prod'
+        env:
+          ECS_CLUSTER: crnccp-ecs-prod-se-cluster
+          TASK_DEFINTION: crnccp-ecs-prod-se-ingest-task-definition
+          COUNT: 1
+        run: |
+          aws ecs run-task --cluster ${{ env.ECS_CLUSTER }} --task-definition ${{ env.TASK_DEFINITION }} --count ${{ env.COUNT }}
