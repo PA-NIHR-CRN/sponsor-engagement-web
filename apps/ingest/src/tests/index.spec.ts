@@ -27,23 +27,25 @@ beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
+beforeEach(() => {
+  studyEntities.forEach((entity) => prismaMock.study.upsert.mockResolvedValueOnce(entity))
+  organisationEntities.forEach((entity) => prismaMock.organisation.upsert.mockResolvedValueOnce(entity))
+  organisationRoleEntities.forEach((entity) => prismaMock.sysRefOrganisationRole.upsert.mockResolvedValueOnce(entity))
+
+  prismaMock.organisationRole.createMany.mockResolvedValueOnce({ count: 1 })
+  prismaMock.studyOrganisation.createMany.mockResolvedValueOnce({ count: 1 })
+  prismaMock.studyFunder.createMany.mockResolvedValueOnce({ count: 1 })
+  prismaMock.studyEvaluationCategory.createMany.mockResolvedValueOnce({ count: 1 })
+})
+
 describe('ingest', () => {
   it('should seed the initial studies data', async () => {
-    studyEntities.forEach((entity) => prismaMock.study.upsert.mockResolvedValueOnce(entity))
-    organisationEntities.forEach((entity) => prismaMock.organisation.upsert.mockResolvedValueOnce(entity))
-    organisationRoleEntities.forEach((entity) => prismaMock.sysRefOrganisationRole.upsert.mockResolvedValueOnce(entity))
-
-    prismaMock.organisationRole.createMany.mockResolvedValueOnce({ count: 1 })
-    prismaMock.studyOrganisation.createMany.mockResolvedValueOnce({ count: 1 })
-    prismaMock.studyFunder.createMany.mockResolvedValueOnce({ count: 1 })
-    prismaMock.studyEvaluationCategory.createMany.mockResolvedValueOnce({ count: 1 })
-
     await ingest()
 
-    // Adds studies
     const mockStudy = studies.Result.Studies[0]
+
     const expectedStudyPayload = {
-      id: mockStudy.Id,
+      cpmsId: mockStudy.Id,
       name: mockStudy.Name,
       status: mockStudy.Status,
       recordStatus: mockStudy.StudyRecordStatus,
@@ -60,50 +62,64 @@ describe('ingest', () => {
       actualClosureDate: expect.any(Date),
       isDeleted: false,
     }
-    expect(prismaMock.study.upsert).toHaveBeenCalledTimes(3)
-    expect(prismaMock.study.upsert).toHaveBeenNthCalledWith(
-      1,
-      expect.objectContaining({
-        where: { id: mockStudy.Id },
-        create: expectedStudyPayload,
-        update: expectedStudyPayload,
-      })
-    )
 
-    // Adds organisations
+    expect(prismaMock.study.upsert).toHaveBeenCalledTimes(3)
+
+    const studyUpsert = prismaMock.study.upsert.mock.calls[0][0]
+
+    expect(studyUpsert).toMatchObject({
+      where: { cpmsId: mockStudy.Id },
+      create: expectedStudyPayload,
+      update: expectedStudyPayload,
+    })
+  })
+
+  it('should seed the organisations data', async () => {
     const mockOrganisation = studies.Result.Studies[0].StudySponsors[0]
+
+    await ingest()
+
     const expectedOrganisationPayload = {
       name: mockOrganisation.OrganisationName,
       rtsIdentifier: mockOrganisation.OrganisationRTSIdentifier,
     }
-    expect(prismaMock.organisation.upsert).toHaveBeenCalledTimes(4)
-    expect(prismaMock.organisation.upsert).toHaveBeenNthCalledWith(
-      1,
-      expect.objectContaining({
-        where: { name: mockOrganisation.OrganisationName },
-        create: expectedOrganisationPayload,
-        update: expectedOrganisationPayload,
-      })
-    )
 
-    // Adds organisation role refs
+    const organisationUpsert = prismaMock.organisation.upsert.mock.calls[0][0]
+
+    expect(organisationUpsert).toMatchObject({
+      where: { rtsIdentifier: mockOrganisation.OrganisationRTSIdentifier },
+      create: expectedOrganisationPayload,
+      update: expectedOrganisationPayload,
+    })
+  })
+
+  it('should seed the organisation role refs', async () => {
+    const mockOrganisation = studies.Result.Studies[0].StudySponsors[0]
+
+    await ingest()
+
     const expectedOrganisationRoleRefPayload = {
       name: mockOrganisation.OrganisationRole,
       description: expect.any(String),
       rtsIdentifier: mockOrganisation.OrganisationRoleRTSIdentifier,
     }
-    expect(prismaMock.sysRefOrganisationRole.upsert).toHaveBeenCalledTimes(2)
-    expect(prismaMock.sysRefOrganisationRole.upsert).toHaveBeenNthCalledWith(
-      1,
-      expect.objectContaining({
-        where: { name: mockOrganisation.OrganisationRole },
-        create: expectedOrganisationRoleRefPayload,
-        update: expectedOrganisationRoleRefPayload,
-      })
-    )
 
-    // Adds organisation roles
+    expect(prismaMock.sysRefOrganisationRole.upsert).toHaveBeenCalledTimes(2)
+
+    const organisationRoleRefUpsert = prismaMock.sysRefOrganisationRole.upsert.mock.calls[0][0]
+
+    expect(organisationRoleRefUpsert).toMatchObject({
+      where: { rtsIdentifier: mockOrganisation.OrganisationRoleRTSIdentifier },
+      create: expectedOrganisationRoleRefPayload,
+      update: expectedOrganisationRoleRefPayload,
+    })
+  })
+
+  it('should seed the organisation roles', async () => {
+    await ingest()
+
     expect(prismaMock.organisationRole.createMany).toHaveBeenCalledTimes(1)
+
     expect(prismaMock.organisationRole.createMany).toHaveBeenCalledWith({
       data: expect.arrayContaining([
         expect.objectContaining({
@@ -113,26 +129,34 @@ describe('ingest', () => {
       ]),
       skipDuplicates: true,
     })
+  })
 
-    // Adds study organisations
+  it('should seed the study organisations', async () => {
+    await ingest()
+
     expect(prismaMock.studyOrganisation.createMany).toHaveBeenCalledTimes(1)
+
     expect(prismaMock.studyOrganisation.createMany).toHaveBeenCalledWith({
       data: expect.arrayContaining([
         expect.objectContaining({
-          studyId: 622,
+          studyId: 123,
           organisationId: 12345,
           organisationRoleId: 12345,
         }),
       ]),
       skipDuplicates: true,
     })
+  })
 
-    // Adds study funders
+  it('should seed the study funders', async () => {
+    await ingest()
+
     expect(prismaMock.studyFunder.createMany).toHaveBeenCalledTimes(1)
+
     expect(prismaMock.studyFunder.createMany).toHaveBeenCalledWith({
       data: expect.arrayContaining([
         expect.objectContaining({
-          studyId: 622,
+          studyId: 123,
           organisationId: 12345,
           grantCode: 'Test Grant Code',
           fundingStreamName: 'Test Funding Stream',
@@ -140,13 +164,17 @@ describe('ingest', () => {
       ]),
       skipDuplicates: true,
     })
+  })
 
-    // Adds study evaluation categories
+  it('should seed the study evaluation categories', async () => {
+    await ingest()
+
     expect(prismaMock.studyEvaluationCategory.createMany).toHaveBeenCalledTimes(1)
+
     expect(prismaMock.studyEvaluationCategory.createMany).toHaveBeenCalledWith({
       data: expect.arrayContaining([
         expect.objectContaining({
-          studyId: 622,
+          studyId: 123,
           indicatorType: 'Recruitment concerns',
           indicatorValue: 'Recruitment target met',
           sampleSize: 444,

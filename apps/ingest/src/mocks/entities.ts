@@ -7,7 +7,8 @@ import studies from './studies.json'
 
 export const studyEntities = studies.Result.Studies.map((study) =>
   Mock.of<StudyWithRelations>({
-    id: study.Id,
+    id: 123,
+    cpmsId: study.Id,
     name: study.Name,
     organisations: study.StudySponsors.map((org) => ({
       organisation: { name: org.OrganisationName, id: 12345 },

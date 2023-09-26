@@ -64,7 +64,9 @@ jobs:
       - uses: ./.github/actions/install-cache
       - uses: ./.github/actions/build-cache
       - name: Unit tests
-        run: npm run test:ci
+        run: |
+          npm run db:generate
+          npm run test:ci
       - name: Unit tests coverage comment
         uses: MishaKav/jest-coverage-comment@main
         with:
