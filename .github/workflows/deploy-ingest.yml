@@ -78,7 +78,7 @@ jobs:
         id: task-def
         env:
           ECS_TASK_DEFINITION: ./task-definition.json
-          CONTAINER_NAME: crnccd-ecs-dev-se-container
+          CONTAINER_NAME: crnccd-ecs-dev-se-ingest-container
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
@@ -151,7 +151,7 @@ jobs:
         id: task-def
         env:
           ECS_TASK_DEFINITION: ./task-definition.json
-          CONTAINER_NAME: crnccd-ecs-test-se-container
+          CONTAINER_NAME: crnccd-ecs-test-se-ingest-container
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
@@ -224,7 +224,7 @@ jobs:
         id: task-def
         env:
           ECS_TASK_DEFINITION: ./task-definition.json
-          CONTAINER_NAME: crnccs-ecs-uat-se-container
+          CONTAINER_NAME: crnccs-ecs-uat-se-ingest-container
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
@@ -297,7 +297,7 @@ jobs:
         id: task-def
         env:
           ECS_TASK_DEFINITION: ./task-definition.json
-          CONTAINER_NAME: crnccp-ecs-oat-se-container
+          CONTAINER_NAME: crnccp-ecs-oat-se-ingest-container
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
@@ -370,7 +370,7 @@ jobs:
         id: task-def
         env:
           ECS_TASK_DEFINITION: ./task-definition.json
-          CONTAINER_NAME: crnccp-ecs-prod-se-container
+          CONTAINER_NAME: crnccp-ecs-prod-se-ingest-container
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
