@@ -23,9 +23,12 @@ module.exports = {
   settings: {
     'import/resolver': {
       typescript: {
-        project,
+        project: ['packages/*/tsconfig.json', 'apps/*/tsconfig.json'],
       },
     },
   },
   ignorePatterns: ['node_modules/', 'dist/'],
+  rules: {
+    '@typescript-eslint/explicit-function-return-type': 'off',
+  },
 }

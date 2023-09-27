@@ -1,15 +1,13 @@
 import userEvent from '@testing-library/user-event'
 import { render } from '@testing-library/react'
 import { SideNavProvider } from '@nihr-ui/frontend'
+import { userNoRoles } from '../../__mocks__/session'
 import { Header } from './Header'
-
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return -- no types
-jest.mock('next/router', () => require('next-router-mock'))
 
 test('Displays the header', () => {
   const { getByText, getByRole, getByAltText } = render(
     <SideNavProvider>
-      <Header heading="Test Heading" />
+      <Header heading="Test Heading" user={userNoRoles.user} />
     </SideNavProvider>
   )
 
@@ -32,12 +30,15 @@ test('Displays the header', () => {
 
   // Menu trigger button
   expect(getByRole('button', { name: 'Show navigation menu' })).toBeInTheDocument()
+
+  // Email Address
+  expect(getByText(userNoRoles.user?.email ?? '')).toBeInTheDocument()
 })
 
 test('Clicking the navigation menu button toggles the button an open state', async () => {
   const { getByRole, queryByRole } = render(
     <SideNavProvider>
-      <Header heading="Test Heading" />
+      <Header heading="Test Heading" user={userNoRoles.user} />
     </SideNavProvider>
   )
 

@@ -31,7 +31,7 @@ module.exports = {
   settings: {
     'import/resolver': {
       typescript: {
-        project,
+        project: ['packages/*/tsconfig.json', 'apps/*/tsconfig.json'],
       },
     },
   },
@@ -40,7 +40,10 @@ module.exports = {
   rules: {
     'import/no-default-export': 'off',
     'import/no-named-as-default': 'off',
+    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
+    '@typescript-eslint/no-unsafe-return': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/unbound-method': 'off',
     'react/display-name': 'off',
     'unicorn/filename-case': [
       'error',
