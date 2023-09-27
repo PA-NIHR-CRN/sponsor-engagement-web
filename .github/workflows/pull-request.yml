@@ -18,8 +18,9 @@ jobs:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/install-cache
+      - uses: ./.github/actions/turbo-cache
       - name: Install
-        run: npm ci --no-audit --no-fund
+        run: npm install --no-audit --no-fund
 
   # Build project
   build:
@@ -31,13 +32,13 @@ jobs:
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/install-cache
       - uses: ./.github/actions/build-cache
+      - uses: ./.github/actions/turbo-cache
       - name: Build
         run: |
           touch .env.local
           echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env.local
           echo NEXT_PUBLIC_APP_ENV=${{ vars.APP_ENV }} >> .env.local
-          npm run db:generate
-          npm run build
+          npx turbo run build --cache-dir=".turbo"
 
   # Code quality checks
   quality-checks:
@@ -49,8 +50,9 @@ jobs:
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/install-cache
       - uses: ./.github/actions/build-cache
+      - uses: ./.github/actions/turbo-cache
       - name: Quality check
-        run: npm run lint
+        run: npx turbo run lint --cache-dir=".turbo"
 
   # Unit tests
   unit-tests:
@@ -63,14 +65,15 @@ jobs:
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/install-cache
       - uses: ./.github/actions/build-cache
+      - uses: ./.github/actions/turbo-cache
       - name: Unit tests
         run: |
-          npm run db:generate
-          npm run test:ci
+          npx turbo run test:ci --cache-dir=".turbo"
       - name: Unit tests coverage comment
         uses: MishaKav/jest-coverage-comment@main
         with:
           title: Unit tests coverage
           multiple-files: |
-            web, apps/web/coverage/coverage-summary.json
-            ui, packages/ui/coverage/coverage-summary.json
+            Web App, apps/web/coverage/coverage-summary.json
+            Ingest App, apps/ingest/coverage/coverage-summary.json
+            UI Package, packages/ui/coverage/coverage-summary.json

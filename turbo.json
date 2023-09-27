@@ -3,24 +3,35 @@
   "globalDependencies": ["**/.env.*local"],
   "pipeline": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**/*", ".next/**", "!.next/cache/**"]
+      "dependsOn": ["^build", "^db:generate"],
+      "outputs": ["dist/**/*", ".next/**", "!.next/cache/**"],
+      "env": ["NEXTAUTH_URL", "AUTH_CLIENT_ID", "AUTH_CLIENT_SECRET", "AUTH_WELL_KNOWN_URL"]
     },
-    "lint": {},
-    "lint:fix": {},
     "start": {},
-    "test": {},
-    "test:ci": {},
+    "lint": {
+      "dependsOn": ["^db:generate"]
+    },
+    "lint:fix": {
+      "dependsOn": ["^db:generate"]
+    },
+    "test": {
+      "cache": false,
+      "dependsOn": ["^db:generate"],
+      "dotEnv": [".env.local"],
+      "env": ["NEXTAUTH_URL", "AUTH_CLIENT_ID", "AUTH_CLIENT_SECRET", "AUTH_WELL_KNOWN_URL"]
+    },
+    "test:ci": {
+      "dependsOn": ["^db:generate"],
+      "outputs": ["coverage/**"]
+    },
     "typecheck": {},
     "dev": {
       "cache": false,
-      "persistent": true
+      "dependsOn": ["^db:generate"],
+      "persistent": true,
+      "env": ["NEXTAUTH_URL", "AUTH_CLIENT_ID", "AUTH_CLIENT_SECRET", "AUTH_WELL_KNOWN_URL"]
     },
-    "db:generate": {
-      "cache": false
-    },
-    "db:push": {
-      "cache": false
-    }
+    "db:generate": {},
+    "db:push": {}
   }
 }
