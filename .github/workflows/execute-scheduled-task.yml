@@ -39,32 +39,17 @@ jobs:
 
       - name: Update CloudWatch Event Rule
         run: |
-          aws events put-rule --name crnccd-ecs-dev-se-ingest-cw-event-rule --schedule-expression "rate(1 minute)"
-          aws events enable-rule --name crnccd-ecs-dev-se-ingest-cw-event-rule
+          aws events put-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "rate(1 minute)"
+          aws events enable-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname}}-cw-event-rule
 
-      - name: Trigger ECS Task
+      - name: Wait for 90 seconds
         run: |
-          # Use the AWS CLI to trigger the ECS task
-
-      - name: Wait for 2 Minute
-        run: |
-          sleep 120
+          sleep 90
 
       - name: Restore Original Schedule
         run: |
-          aws events put-rule --name crnccd-ecs-dev-se-ingest-cw-event-rule --schedule-expression "cron(0 20 * * ? *)"
-          aws events enable-rule --name crnccd-ecs-dev-se-ingest-cw-event-rule
-
-
-      # - name: execute ${{ github.event.inputs.appname}} in DEV
-      #   env:
-      #     ECS_CLUSTER: crnccd-ecs-dev-se-cluster
-      #     TASK_DEFINITION: crnccd-ecs-dev-se-${{ github.event.inputs.appname}}-task-definition
-      #     COUNT: 1
-      #     SUBNET_ID: ${{ secrets.ECS_SUBNET }}
-      #     SECURITY_GROUP_ID: ${{ secrets.ECS_SG }}
-      #   run: |
-      #     aws ecs run-task --cluster ${{ env.ECS_CLUSTER }} --task-definition ${{ env.TASK_DEFINITION }} --count ${{ env.COUNT }} --network-configuration "awsvpcConfiguration={subnets=${{ env.SUBNET_ID }},securityGroups=[${{ env.SECURITY_GROUP_ID }}]}"
+          aws events put-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 20 * * ? *)"
+          aws events enable-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname}}-cw-event-rule
 
   deploy-test:
     name: "Manually executing ${{ github.event.inputs.appname || 'ingest' }} scheduled task in TEST"
@@ -82,16 +67,19 @@ jobs:
           aws-region: eu-west-2
           role-session-name: GitHubActionsTest
 
-      - name: execute ${{ github.event.inputs.appname}} in TEST
-        env:
-          ECS_CLUSTER: crnccd-ecs-test-se-cluster
-          TASK_DEFINITION: crnccd-ecs-test-se-${{ github.event.inputs.appname}}-task-definition
-          COUNT: 1
-          SUBNET_ID: ${{ secrets.ECS_SUBNET }}
-          SECURITY_GROUP_ID: ${{ secrets.ECS_SG }}
+      - name: Update CloudWatch Event Rule
         run: |
-          aws ecs run-task --cluster ${{ env.ECS_CLUSTER }} --task-definition ${{ env.TASK_DEFINITION }} --count ${{ env.COUNT }} \
-          --network-configuration "awsvpcConfiguration={subnets=${env.SUBNET_ID},securityGroups=[${env.SECURITY_GROUP_ID}]}"
+          aws events put-rule --name crnccd-ecs-test-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "rate(1 minute)"
+          aws events enable-rule --name crnccd-ecs-test-se-${{ github.event.inputs.appname}}-cw-event-rule
+
+      - name: Wait for 90 seconds
+        run: |
+          sleep 90
+
+      - name: Restore Original Schedule
+        run: |
+          aws events put-rule --name crnccd-ecs-test-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 20 * * ? *)"
+          aws events enable-rule --name crnccd-ecs-test-se-${{ github.event.inputs.appname}}-cw-event-rule
 
   deploy-uat:
     name: "Manually executing ${{ github.event.inputs.appname || 'ingest' }} scheduled task in UAT"
@@ -109,16 +97,20 @@ jobs:
           aws-region: eu-west-2
           role-session-name: GitHubActionsUat
 
-      - name: execute ${{ github.event.inputs.appname}} in UAT
-        env:
-          ECS_CLUSTER: crnccs-ecs-uat-se-cluster
-          TASK_DEFINITION: crnccs-ecs-uat-se-${{ github.event.inputs.appname}}-task-definition
-          COUNT: 1
-          SUBNET_ID: ${{ secrets.ECS_SUBNET }}
-          SECURITY_GROUP_ID: ${{ secrets.ECS_SG }}
+      - name: Update CloudWatch Event Rule
         run: |
-          aws ecs run-task --cluster ${{ env.ECS_CLUSTER }} --task-definition ${{ env.TASK_DEFINITION }} --count ${{ env.COUNT }} \
-          --network-configuration "awsvpcConfiguration={subnets=${env.SUBNET_ID},securityGroups=[${env.SECURITY_GROUP_ID}]}"
+          aws events put-rule --name crnccs-ecs-uat-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "rate(1 minute)"
+          aws events enable-rule --name crnccs-ecs-uat-se-${{ github.event.inputs.appname}}-cw-event-rule
+
+      - name: Wait for 90 seconds
+        run: |
+          sleep 90
+
+      - name: Restore Original Schedule
+        run: |
+          aws events put-rule --name crnccs-ecs-uat-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 20 * * ? *)"
+          aws events enable-rule --name crnccs-ecs-uat-se-${{ github.event.inputs.appname}}-cw-event-rule
+
 
   deploy-oat:
     name: "Manually executing ${{ github.event.inputs.appname || 'ingest' }} scheduled task in OAT"
@@ -136,15 +128,20 @@ jobs:
           aws-region: eu-west-2
           role-session-name: GitHubActionsOat
 
-      - name: execute ${{ github.event.inputs.appname}} in OAT
-        env:
-          ECS_CLUSTER: crnccp-ecs-oat-se-cluster
-          TASK_DEFINITION: crnccp-ecs-oat-se-${{ github.event.inputs.appname}}-task-definition
-          COUNT: 1
-          SUBNET_ID: ${{ secrets.ECS_SUBNET }}
-          SECURITY_GROUP_ID: ${{ secrets.ECS_SG }}
+      - name: Update CloudWatch Event Rule
         run: |
-          aws ecs run-task --cluster ${{ env.ECS_CLUSTER }} --task-definition ${{ env.TASK_DEFINITION }} --count ${{ env.COUNT }} --network-configuration "awsvpcConfiguration={subnets=${env.SUBNET_ID},securityGroups=[${env.SECURITY_GROUP_ID}]}"
+          aws events put-rule --name crnccp-ecs-oat-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "rate(1 minute)"
+          aws events enable-rule --name crnccp-ecs-oat-se-${{ github.event.inputs.appname}}-cw-event-rule
+
+      - name: Wait for 90 seconds
+        run: |
+          sleep 90
+
+      - name: Restore Original Schedule
+        run: |
+          aws events put-rule --name crnccp-ecs-oat-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 20 * * ? *)"
+          aws events enable-rule --name crnccp-ecs-oat-se-${{ github.event.inputs.appname}}-cw-event-rule
+
 
   deploy-prod:
     name: "Manually executing ${{ github.event.inputs.appname || 'ingest' }} scheduled task in PROD"
@@ -162,13 +159,16 @@ jobs:
           aws-region: eu-west-2
           role-session-name: GitHubActionsProd
 
-      - name: execute ${{ github.event.inputs.appname}} in PROD
-        env:
-          ECS_CLUSTER: crnccp-ecs-prod-se-cluster
-          TASK_DEFINITION: crnccp-ecs-prod-se-${{ github.event.inputs.appname}}-task-definition
-          COUNT: 1
-          SUBNET_ID: ${{ secrets.ECS_SUBNET }}
-          SECURITY_GROUP_ID: ${{ secrets.ECS_SG }}
+      - name: Update CloudWatch Event Rule
         run: |
-          aws ecs run-task --cluster ${{ env.ECS_CLUSTER }} --task-definition ${{ env.TASK_DEFINITION }} --count ${{ env.COUNT }} \
-          --network-configuration "awsvpcConfiguration={subnets=${env.SUBNET_ID},securityGroups=[${env.SECURITY_GROUP_ID}]}"
+          aws events put-rule --name crnccp-ecs-prod-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "rate(1 minute)"
+          aws events enable-rule --name crnccp-ecs-prod-se-${{ github.event.inputs.appname}}-cw-event-rule
+
+      - name: Wait for 90 seconds
+        run: |
+          sleep 90
+
+      - name: Restore Original Schedule
+        run: |
+          aws events put-rule --name crnccp-ecs-prod-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 20 * * ? *)"
+          aws events enable-rule --name crnccp-ecs-prod-se-${{ github.event.inputs.appname}}-cw-event-rule
