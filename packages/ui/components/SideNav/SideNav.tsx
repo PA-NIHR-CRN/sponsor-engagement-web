@@ -229,7 +229,7 @@ export const SideNavLink = forwardRef(
         ref={ref}
         href={href}
         className={clsx(
-          'navigation-link navigation-link--active govuk-!-padding-left-3 govuk-!-padding-right-3 govuk-!-padding-top-3 govuk-!-padding-bottom-3 govuk-link govuk-link--no-visited-state flex items-center text-sm no-underline hover:underline',
+          'text-[var(--colour-cobalt)] navigation-link navigation-link--active govuk-!-padding-left-3 govuk-!-padding-right-3 govuk-!-padding-top-3 govuk-!-padding-bottom-3 govuk-link govuk-link--no-visited-state flex items-center text-sm no-underline hover:underline',
           { 'w-[calc(var(--side-nav-width-expanded) - 1.5rem)]': open },
           className
         )}
