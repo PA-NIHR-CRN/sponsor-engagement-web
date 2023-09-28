@@ -25,7 +25,7 @@ $govuk-global-styles: true;
 $govuk-new-link-styles: true;
 $govuk-font-family: var(--font-primary), arial, sans-serif;
 $govuk-page-width: 1020px;
-$govuk-link-colour: #193e72;
+$govuk-link-colour: var(--colour-blue);
 
 @import '~node_modules/govuk-frontend/govuk/all.scss';
 
@@ -55,7 +55,8 @@ body {
 
 :root {
   // NIHR Custom Properties
-  --colour-primary: #193e72;
+  --colour-cobalt: #193e72;
+  --colour-blue: #1d70b8;
 
   // Header
   --header-bg: #193e72;
