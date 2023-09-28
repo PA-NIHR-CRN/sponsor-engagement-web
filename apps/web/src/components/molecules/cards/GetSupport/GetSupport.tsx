@@ -1,4 +1,5 @@
-import { Button, StartIcon } from '@nihr-ui/frontend'
+import { StartIcon } from '@nihr-ui/frontend'
+import Link from 'next/link'
 import { Card } from '../../../atoms'
 
 export function GetSupport() {
@@ -8,9 +9,9 @@ export function GetSupport() {
       <p className="govuk-body">
         Sponsors or their delegates can get NIHR CRN support with their research study at any time.
       </p>
-      <Button className="govuk-button--start govuk-!-margin-bottom-0">
+      <Link className="govuk-button govuk-button--start govuk-!-margin-bottom-0" href="/">
         Get support <StartIcon />
-      </Button>
+      </Link>
     </Card>
   )
 }
