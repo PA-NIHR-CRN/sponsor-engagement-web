@@ -5,11 +5,13 @@ import { getServerSession } from 'next-auth/next'
 import { RootLayout } from '../../components/Layout/RootLayout'
 import { authOptions } from '../api/auth/[...nextauth]'
 import { SIGN_IN_PAGE } from '../../constants/routes'
-import { GetSupport, StudyList } from '../../components/molecules'
+import { GetSupport, StudyList, Pagination, Sort } from '../../components/molecules'
+import { PER_PAGE } from '../../constants'
+import { pluraliseStudy } from '../../utils/pluralise'
 
 export type StudiesProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function Studies() {
+export default function Studies({ meta: { totalItems, initialPage, initialPageSize } }: StudiesProps) {
   return (
     <Container>
       <div className="govuk-grid-row">
@@ -43,7 +45,22 @@ export default function Studies() {
         </div>
       </div>
 
-      <ul className="govuk-list govuk-list--spaced">
+      {/* Sort bar */}
+      <div className="flex-wrap items-center justify-between gap-3 md:flex govuk-!-margin-bottom-4">
+        <p className="govuk-heading-s mb-0 whitespace-nowrap">{`${totalItems} ${pluraliseStudy(
+          totalItems
+        )} found (4 due for assessment)`}</p>
+        <div className="govuk-form-group mt-2 items-center justify-end md:my-0 md:flex">
+          {/* Show filters */}
+          {/* <div>{showFiltersButton()}</div> */}
+          {/* Sort by */}
+          <div className="items-center whitespace-nowrap md:flex">
+            <Sort defaultOrder="updated" form="filters-form" />
+          </div>
+        </div>
+      </div>
+
+      <ol aria-label="Studies" className="govuk-list govuk-list--spaced">
         <li>
           <StudyList
             assessmentDue
@@ -70,7 +87,14 @@ export default function Studies() {
             trackStatusHref="/"
           />
         </li>
-      </ul>
+      </ol>
+
+      <Pagination
+        className="justify-center"
+        initialPage={initialPage}
+        initialPageSize={initialPageSize}
+        totalItems={totalItems}
+      />
     </Container>
   )
 }
@@ -95,9 +119,22 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       }
     }
 
+    if (session.user?.roles.length === 0) {
+      return {
+        redirect: {
+          destination: '/',
+        },
+      }
+    }
+
     return {
       props: {
         user: session.user,
+        meta: {
+          initialPage: 0,
+          initialPageSize: PER_PAGE,
+          totalItems: 30,
+        },
       },
     }
   } catch (error) {
