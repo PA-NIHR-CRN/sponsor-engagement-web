@@ -4,7 +4,7 @@ const config: PlaywrightTestConfig = {
   testDir: './qa/tests/features',
   outputDir: './qa/test-results',
   testMatch: /features/,
-  testIgnore: '**/src/**',
+  testIgnore: '**/apps/**',
   reporter: [
     ['list', { printSteps: true }],
     ['html', { outputFolder: './qa/test-report' }],
@@ -15,21 +15,21 @@ const config: PlaywrightTestConfig = {
   retries: 2,
   projects: [
     {
-      name: 'FindRecruitFollow',
+      name: 'SponsorEngagement',
       testIgnore: '**/accessibilityTests/**',
       use: {
         trace: 'on',
         baseURL: `${process.env.BASE_URL}`,
-        headless: true,
+        headless: false,
         screenshot: 'on',
-        storageState: 'qa/utils/cookieAccept.json',
+        // storageState: 'qa/utils/cookieAccept.json',
         launchOptions: {
           slowMo: 0,
         },
       },
     },
     {
-      name: 'FRF Firefox',
+      name: 'SE Firefox',
       testIgnore: '**/tests/**',
       use: {
         ...devices['Desktop Firefox'],
@@ -43,7 +43,7 @@ const config: PlaywrightTestConfig = {
       },
     },
     {
-      name: 'FRF Safari',
+      name: 'SE Safari',
       testIgnore: '**/tests/**',
       use: {
         ...devices['Desktop Safari'],
@@ -57,7 +57,7 @@ const config: PlaywrightTestConfig = {
       },
     },
     {
-      name: 'FRF Microsoft Edge',
+      name: 'SE Microsoft Edge',
       testIgnore: '**/tests/**',
       use: {
         ...devices['Desktop Edge'],
@@ -72,7 +72,7 @@ const config: PlaywrightTestConfig = {
       },
     },
     {
-      name: 'FRF Google Chrome',
+      name: 'SE Google Chrome',
       testIgnore: '**/tests/**',
       use: {
         ...devices['Desktop Chrome'],
@@ -87,7 +87,7 @@ const config: PlaywrightTestConfig = {
       },
     },
     {
-      name: 'FRF Mobile Chrome',
+      name: 'SE Mobile Chrome',
       testIgnore: '**/tests/**',
       use: {
         ...devices['Pixel 5'],
@@ -101,7 +101,7 @@ const config: PlaywrightTestConfig = {
       },
     },
     {
-      name: 'FRF Mobile Safari',
+      name: 'SE Mobile Safari',
       testIgnore: '**/tests/**',
       use: {
         ...devices['iPhone 13'],

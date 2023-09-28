@@ -1,0 +1,111 @@
+# Set and Check values in Repo secrets
+name: Sponsor Engagement E2E Tests
+on:
+  schedule:
+  # Run at 08:15 (UTC) Mon-Fri (09:15 during BST)
+  - cron: '15 08 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      publish-report:
+        description: 'Do you want to upload test report to GitHub Pages?
+          Note - Current report will be overwritten!
+          Accepts true or false'
+        options: ['true', 'false']
+        required: true
+        default: 'true'
+      test-tag:
+        description: "Select which Tests you want to run using @<tag name>.
+          For example: @se_21, @se_21_contact_manager.
+          To run all tests leave as default 'all'"
+        required: true
+        default: "all"
+jobs:
+  e2e-test:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 16
+    - name: Install dependencies
+      run: npm ci
+    - name: Install Playwright
+      run: npx playwright install --with-deps
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1-node16
+      with:
+        aws-access-key-id: ${{ secrets.NIHR_GITHUB_ACTIONS_IAM_ID }}
+        aws-secret-access-key: ${{ secrets.NIHR_GITHUB_ACTIONS_IAM_SECRET }}
+        aws-region: eu-west-2
+    - name: Get Github Actions Runner Public IP
+      id: ip
+      uses: haythem/public-ip@v1.3
+    - name: Add Github Actions IP to LB security group (Test)
+      run: |
+          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.LB_SG_TEST }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 443, "ToPort": 443, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for SE automation test run"}]}]'
+    - name: Run All SE E2E Tests
+      if: github.event.inputs.test-tag == '' || github.event.inputs.test-tag == 'all'
+      run: npx playwright test
+    - name: Run Tag Specific SE E2E Tests
+      if: github.event.inputs.test-tag != '' && github.event.inputs.test-tag != 'all'
+      run: npx playwright test --grep ${{ github.event.inputs.test-tag }}
+    - name: Remove Github Actions IP from LB security group (Test)
+      run: |
+          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.LB_SG_TEST }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 443, "ToPort": 443, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for SE automation test run"}]}]'
+    - name: Upload HTML Report as artifact
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-report
+        path: qa/test-report/
+        retention-days: 3
+    - name: 'Download HTML Report Artifact'
+      uses: actions/download-artifact@v3
+      id: download
+      if: github.event.inputs.publish-report != 'false' && always()
+
+    - name: Publish to GH Pages
+      if: github.event.inputs.publish-report != 'false' && always()
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        folder: ${{steps.download.outputs.download-path}}/qa/test-report/
+        branch: gh-pages
+# Add in slack once webhook is setup for SE channel
+  # send-slack-message-failure:
+  #   name: Send slack message failure
+  #   needs: [e2e-test]
+  #   runs-on: ubuntu-latest
+  #   if: failure()
+  #   steps:
+  #     - uses: technote-space/workflow-conclusion-action@v3
+  #     - name: "Set Env Message to TEST"
+  #       run: |
+  #         echo "ENV_MSG=TEST" >> "$GITHUB_ENV"
+  #     - name: Slack Notify
+  #       if: github.ref == 'refs/heads/main'
+  #       uses: rtCamp/action-slack-notify@v2.2.0
+  #       env:
+  #         SLACK_WEBHOOK: ${{ secrets.SE_SLACK_WEBHOOK }}
+  #         SLACK_COLOR: "failure"
+  #         SLACK_MESSAGE: "SE E2E Regression Tests Failed in ${{ env.ENV_MSG }}! :face_with_thermometer:"
+  #         SLACK_TITLE: "Sponsor Engagement E2E UI Tests - ENV:${{ env.ENV_MSG }} : FAILURE :x:"
+
+  # send-slack-message-success:
+  #   name: Send slack message success
+  #   needs: [e2e-test]
+  #   runs-on: ubuntu-latest
+  #   if: success()
+  #   steps:
+  #     - uses: technote-space/workflow-conclusion-action@v3
+  #     - name: "Set Env Message to TEST"
+  #       run: |
+  #         echo "ENV_MSG=TEST" >> "$GITHUB_ENV"
+  #     - name: Slack Notify
+  #       if: github.ref == 'refs/heads/main'
+  #       uses: rtCamp/action-slack-notify@v2.2.0
+  #       env:
+  #         SLACK_WEBHOOK: ${{ secrets.SE_SLACK_WEBHOOK }}
+  #         SLACK_COLOR: "success"
+  #         SLACK_MESSAGE: "SE E2E Regression Tests Passed in ${{ env.ENV_MSG }}! :partying_face:"
+  #         SLACK_TITLE: "Sponsor Engagement E2E UI Tests - ENV:${{ env.ENV_MSG }} : SUCCESS :tick:"
