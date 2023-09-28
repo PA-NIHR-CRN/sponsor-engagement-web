@@ -2,6 +2,7 @@ import type { ReactElement } from 'react'
 import { AlertIcon, Container, Details } from '@nihr-ui/frontend'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { getServerSession } from 'next-auth/next'
+import { NextSeo } from 'next-seo'
 import { RootLayout } from '../../components/Layout/RootLayout'
 import { authOptions } from '../api/auth/[...nextauth]'
 import { SIGN_IN_PAGE } from '../../constants/routes'
@@ -12,8 +13,16 @@ import { pluraliseStudy } from '../../utils/pluralise'
 export type StudiesProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
 export default function Studies({ meta: { totalItems, initialPage, initialPageSize } }: StudiesProps) {
+  const titleResultsText =
+    totalItems === 0
+      ? `(no matching search results)`
+      : `(${totalItems} ${pluraliseStudy(totalItems)}, page ${initialPage + 1} of ${Math.ceil(
+          totalItems / initialPageSize
+        )})`
+
   return (
     <Container>
+      <NextSeo title={`List of studies ${titleResultsText} - Assess My Study`} />
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">Assess progress of studies</h2>

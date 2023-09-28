@@ -2,15 +2,14 @@ import type { GetServerSidePropsContext } from 'next'
 import { Mock } from 'ts-mockery'
 import { getServerSession } from 'next-auth/next'
 import { render, within } from '@testing-library/react'
+import { NextSeo } from 'next-seo'
 import type { StudiesProps } from '../pages/studies'
 import Studies, { getServerSideProps } from '../pages/studies'
 import { userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
 import { SIGN_IN_PAGE } from '../constants/routes'
 
 jest.mock('next-auth/next')
-jest.mock('../pages/api/auth/[...nextauth]', () => ({
-  '@auth/prisma-adapter': jest.fn(),
-}))
+jest.mock('next-seo')
 
 describe('getServerSideProps', () => {
   const getServerSessionMock = jest.mocked(getServerSession)
@@ -51,6 +50,9 @@ describe('Studies page', () => {
     }
 
     const { getByRole, getByText } = render(Studies.getLayout(<Studies {...props} />, { ...props }))
+
+    // SEO
+    expect(NextSeo).toHaveBeenCalledWith({ title: 'List of studies (30 studies, page 1 of 3) - Assess My Study' }, {})
 
     // Title
     expect(getByRole('heading', { level: 2, name: 'Assess progress of studies' })).toBeInTheDocument()
