@@ -5,7 +5,7 @@
   "reporters": ["default", "jest-junit"],
   "testPathIgnorePatterns": [".vscode"],
   "coverageReporters": ["json-summary", "text", "html", "lcov"],
-  "coveragePathIgnorePatterns": ["node_modules", "components/Icons"],
+  "coveragePathIgnorePatterns": ["node_modules"],
   "coverageThreshold": {
     "global": {
       "lines": 87,
