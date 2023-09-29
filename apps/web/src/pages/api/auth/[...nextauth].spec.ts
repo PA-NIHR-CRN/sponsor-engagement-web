@@ -75,6 +75,7 @@ describe('Session authentication callback', () => {
     expect(updatedSession).toEqual<Session>(
       Mock.of<Session>({
         user: {
+          id: 26,
           name: 'Tom Christian',
           email: 'tom.christian@nihr.ac.uk',
           roles: [Roles.SponsorContact, Roles.ContactManager],

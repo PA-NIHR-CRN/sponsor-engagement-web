@@ -9,7 +9,7 @@ const createJestConfig = nextJest({
 const customJestConfig: Config = {
   verbose: true,
   setupFiles: ['<rootDir>/src/config/jest/jest.env.js'],
-  setupFilesAfterEnv: ['<rootDir>/src/config/jest/jest.setup.js'],
+  setupFilesAfterEnv: ['<rootDir>/src/config/jest/jest.setup.js', '<rootDir>/src/__mocks__/prisma.ts'],
   moduleNameMapper: {
     // Handle module aliases (this will be automatically configured for you soon)
     '^@/components/(.*)$': '<rootDir>/src/components/$1',
