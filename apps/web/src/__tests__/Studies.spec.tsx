@@ -65,6 +65,14 @@ describe('Studies page', () => {
             },
           },
         ],
+        evaluationCategories: [
+          {
+            indicatorType: 'Milestone missed',
+            updatedAt: new Date('2001-01-01'),
+            createdAt: new Date('2001-01-01'),
+          },
+        ],
+        assessments: [{ status: { name: 'Off Track' } }],
       })
     )
 
@@ -125,9 +133,23 @@ describe('Studies page', () => {
     expect(screen.getByRole<HTMLOptionElement>('option', { name: 'Recently updated' }).selected).toBe(true)
 
     // Study results list
-    expect(within(screen.getByRole('list', { name: 'Studies' })).getAllByRole('listitem')).toHaveLength(
-      mockStudies.length
-    )
+    const studies = within(screen.getByRole('list', { name: 'Studies' })).getAllByRole('listitem')
+
+    expect(studies).toHaveLength(mockStudies.length)
+
+    const withinFirstStudy = within(studies[0])
+
+    // Study title
+    expect(withinFirstStudy.getByText('Test Study')).toBeInTheDocument()
+
+    // Study organisation
+    expect(withinFirstStudy.getByText('Test Organisation')).toBeInTheDocument()
+
+    // Study indicators
+    expect(withinFirstStudy.getByText('Milestone missed')).toBeInTheDocument()
+
+    // Study assessment status
+    expect(withinFirstStudy.getByText('Off Track')).toBeInTheDocument()
 
     // Pagination
     const pagination = screen.getByRole('navigation', { name: 'results' })

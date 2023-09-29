@@ -8,18 +8,18 @@ datasource db {
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             Int
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?  @db.Text
-  session_state      String?
+  id                String  @id @default(cuid())
+  userId            Int
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -62,7 +62,7 @@ model Study {
   assessments                Assessment[]
   organisations              StudyOrganisation[]
   funders                    StudyFunder[]
-  evaluationCategory         StudyEvaluationCategory[]
+  evaluationCategories       StudyEvaluationCategory[]
   createdAt                  DateTime                  @default(now())
   updatedAt                  DateTime                  @updatedAt
   isDeleted                  Boolean?                  @default(false)
@@ -101,14 +101,14 @@ model OrganisationRole {
 model User {
   id                    Int                @id @default(autoincrement())
   name                  String?
-  email                 String?   @unique
+  email                 String?            @unique
   emailVerified         DateTime?
   image                 String?
   accounts              Account[]
   sessions              Session[]
   identityGatewayId     String
   registrationToken     String?
-  registrationConfirmed Boolean?            @default(false)
+  registrationConfirmed Boolean?           @default(false)
   isDeleted             Boolean?           @default(false)
   organisations         UserOrganisation[] @relation(name: "userOrganisation")
   createdOrganisations  UserOrganisation[] @relation(name: "createdOrganisations")

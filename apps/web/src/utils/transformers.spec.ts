@@ -20,6 +20,14 @@ describe('transformStudies', () => {
             },
           },
         ],
+        evaluationCategories: [
+          {
+            indicatorType: 'Milestone missed',
+            updatedAt: new Date('2001-01-01'),
+            createdAt: new Date('2001-01-01'),
+          },
+        ],
+        assessments: [{ status: { name: 'On Track' } }],
       }),
     ]
 
@@ -32,6 +40,20 @@ describe('transformStudies', () => {
             name: 'Org 1',
             roleName: 'Role 1',
             roleIdentifier: 'RoleIdentifier1',
+          },
+        ],
+        assessments: [
+          {
+            status: {
+              name: 'On Track',
+            },
+            createdAt: '29 September 2023',
+            updatedAt: '29 September 2023',
+          },
+        ],
+        evaluationCategories: [
+          {
+            indicatorType: 'Milestone missed',
           },
         ],
       },

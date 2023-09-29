@@ -24,6 +24,24 @@ async function main() {
 
   logger.trace('Roles created', roles)
 
+  const assessmentStatuses = await prisma.sysRefAssessmentStatus.createMany({
+    data: [
+      {
+        id: 1,
+        name: 'On Track',
+        description: 'Study is currently on track',
+      },
+      {
+        id: 2,
+        name: 'Off Track',
+        description: 'Study is currently off track',
+      },
+    ],
+    skipDuplicates: true,
+  })
+
+  logger.trace('Assessment statuses created', assessmentStatuses)
+
   logger.info('Database seed end')
 }
 main()
