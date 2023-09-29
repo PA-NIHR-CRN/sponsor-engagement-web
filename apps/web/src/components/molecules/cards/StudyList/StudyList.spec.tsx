@@ -10,9 +10,9 @@ describe('StudyList Component', () => {
     shortTitleHref: '/study/xyz',
     lastAsessmentDate: '2023-09-30',
     assessmentHref: '/assessment/xyz',
-    trackStatus: 'On',
+    trackStatus: 'On track',
     trackStatusHref: '/track/on',
-    indication: 'Indication ABC',
+    indications: ['Indication ABC'],
   }
 
   test('renders with default props', () => {

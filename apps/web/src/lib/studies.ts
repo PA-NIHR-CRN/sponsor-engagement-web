@@ -14,7 +14,7 @@ export const getUserStudies = async (userId: number, currentPage: number, pageSi
     where: {
       organisations: {
         some: {
-          id: {
+          organisationId: {
             in: userOrgs.map((org) => org.organisationId),
           },
           organisationRole: {
@@ -29,12 +29,24 @@ export const getUserStudies = async (userId: number, currentPage: number, pageSi
         },
       },
     },
-    include: {
+    select: {
+      id: true,
+      name: true,
       organisations: {
         include: {
           organisation: true,
           organisationRole: true,
         },
+      },
+      evaluationCategories: true,
+      assessments: {
+        include: {
+          status: true,
+        },
+        orderBy: {
+          createdAt: 'desc' as const,
+        },
+        take: 1,
       },
     },
   }

@@ -79,12 +79,12 @@ export default function Studies({ studies, meta: { totalItems, initialPage, init
             <StudyList
               assessmentDue
               assessmentHref="/"
-              indication="Recruitment concerns"
-              lastAsessmentDate="5 May 2023"
+              indications={study.evaluationCategories.map((evalCategory) => evalCategory.indicatorType)}
+              lastAsessmentDate={study.assessments[0]?.updatedAt}
               shortTitle={study.name}
               shortTitleHref="/"
               sponsorName={study.organisations[0].name}
-              trackStatus="Off"
+              trackStatus={study.assessments[0]?.status.name}
               trackStatusHref="/"
             />
           </li>

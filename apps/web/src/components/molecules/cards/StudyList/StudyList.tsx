@@ -5,12 +5,12 @@ export interface StudyListProps {
   sponsorName: string
   shortTitle: string
   shortTitleHref: string
-  lastAsessmentDate: string
   assessmentHref: string
+  lastAsessmentDate?: string
   assessmentDue?: boolean
-  trackStatus: 'On' | 'Off'
-  trackStatusHref: string
-  indication: string
+  trackStatus?: string
+  trackStatusHref?: string
+  indications?: string[]
 }
 
 export function StudyList({
@@ -22,7 +22,7 @@ export function StudyList({
   trackStatus,
   trackStatusHref,
   lastAsessmentDate,
-  indication,
+  indications,
 }: StudyListProps) {
   return (
     <Card>
@@ -45,16 +45,24 @@ export function StudyList({
         <div className="lg:min-w-[320px]">
           <strong className="govuk-heading-s govuk-!-margin-bottom-0">Last sponsor assessment</strong>
           <p className="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
-            <Link className="govuk-link--no-visited-state" href={trackStatusHref}>
-              {trackStatus} track
-            </Link>{' '}
-            on {lastAsessmentDate}
+            {trackStatus && trackStatusHref ? (
+              <>
+                <Link className="govuk-link--no-visited-state" href={trackStatusHref}>
+                  {trackStatus}
+                </Link>{' '}
+                on {lastAsessmentDate}
+              </>
+            ) : (
+              'None'
+            )}
           </p>
         </div>
 
         <div className="lg:min-w-[320px]">
           <strong className="govuk-heading-s govuk-!-margin-bottom-0">Study data indicates</strong>
-          <p className="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">{indication}</p>
+          <p className="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
+            {indications?.length ? indications.join(', ') : 'No concerns'}
+          </p>
         </div>
 
         <div className="text-right lg:w-full">

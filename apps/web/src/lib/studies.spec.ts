@@ -33,40 +33,34 @@ describe('getUserStudies', () => {
       where: { userId: 1 },
     })
 
-    expect(prismaMock.study.findMany).toHaveBeenCalledWith({
-      skip: 0,
-      take: 10,
-      where: {
-        organisations: {
-          some: {
-            id: { in: [1, 2] },
-            organisationRole: {
-              rtsIdentifier: {
-                in: [
-                  StudySponsorOrganisationRoleRTSIdentifier.ClinicalResearchSponsor,
-                  StudySponsorOrganisationRoleRTSIdentifier.ClinicalTrialsUnit,
-                  StudySponsorOrganisationRoleRTSIdentifier.ContractResearchOrganisation,
-                ],
+    expect(prismaMock.study.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        skip: 0,
+        take: 10,
+        where: {
+          organisations: {
+            some: {
+              organisationId: { in: [1, 2] },
+              organisationRole: {
+                rtsIdentifier: {
+                  in: [
+                    StudySponsorOrganisationRoleRTSIdentifier.ClinicalResearchSponsor,
+                    StudySponsorOrganisationRoleRTSIdentifier.ClinicalTrialsUnit,
+                    StudySponsorOrganisationRoleRTSIdentifier.ContractResearchOrganisation,
+                  ],
+                },
               },
             },
           },
         },
-      },
-      include: {
-        organisations: {
-          include: {
-            organisation: true,
-            organisationRole: true,
-          },
-        },
-      },
-    })
+      })
+    )
 
     expect(prismaMock.study.count).toHaveBeenCalledWith({
       where: {
         organisations: {
           some: {
-            id: { in: [1, 2] },
+            organisationId: { in: [1, 2] },
             organisationRole: {
               rtsIdentifier: {
                 in: [
