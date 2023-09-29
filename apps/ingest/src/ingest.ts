@@ -4,11 +4,11 @@ import { Organisation as OrganisationEntity, SysRefOrganisationRole as SysRefOrg
 import { logger } from 'logger'
 
 import { prismaClient } from './lib/prisma'
-import { Study, StudyRecordStatus, StudyStatus, StudyWithRelations } from './types'
+import { Study, StudyRecordStatus, StudyStatus, StudyWithRelationships } from './types'
 import { getOrganisationName, getOrgsUniqueByName, getOrgsUniqueByNameRole, getOrgsUniqueByRole } from './utils'
 
 // Entities related to the current batch of studies
-let studyEntities: StudyWithRelations[] = []
+let studyEntities: StudyWithRelationships[] = []
 let organisationEnitities: OrganisationEntity[] = []
 let organisationRoleEntities: SysRefOrganisationRoleEntity[] = []
 

@@ -1,5 +1,6 @@
 import {
   Organisation as OrganisationEntity,
+  Prisma,
   Study as StudyEntity,
   StudyFunder as StudyFunderEntity,
   StudyOrganisation as StudyOrganisationEntity,
@@ -22,32 +23,20 @@ export enum StudyStatus {
   InSetupPermissionReceived = 'STDY_STS_CPMS_IN_STP_NHS_PERM_REC@2.16.840.1.113883.2.1.3.8.5.2.4.68',
 }
 
-export type StudyOrganisationWithRelations = StudyOrganisationEntity & {
-  organisation: OrganisationEntity
-}
-
-export type StudyFunderWithRelations = StudyFunderEntity & {
-  organisation: OrganisationEntity
-}
-
-export type StudyWithRelations = StudyEntity & {
-  organisations: StudyOrganisationWithRelations[]
-  funders: StudyFunderWithRelations[]
-}
-
-export interface Pokedex {
-  Version: string
-  StatusCode: number
-  Result: PokedexResult
-}
-
-export interface PokedexResult {
-  Studies: Study[]
-  TotalRecords: number
-  PageSize: number
-  CurrentPageNumber: number
-  Result: ResultResult
-}
+export type StudyWithRelationships = Prisma.StudyGetPayload<{
+  include: {
+    organisations: {
+      include: {
+        organisation: true
+      }
+    }
+    funders: {
+      include: {
+        organisation: true
+      }
+    }
+  }
+}>
 
 export interface ResultResult {
   Result: string
@@ -177,7 +166,7 @@ export enum StudySponsorOrganisationRole {
 }
 
 export enum StudySponsorOrganisationRoleRTSIdentifier {
-  Cro216840111388321385111107 = 'CRO@2.16.840.1.113883.2.1.3.8.5.11.1.107',
-  Crspnsr21684011138835110 = 'CRSPNSR@2.16.840.1.113883.5.110',
-  MNGCtu216840111388321385111107 = 'MNG_CTU@2.16.840.1.113883.2.1.3.8.5.11.1.107',
+  ContractResearchOrganisation = 'CRO@2.16.840.1.113883.2.1.3.8.5.11.1.107',
+  ClinicalResearchSponsor = 'CRSPNSR@2.16.840.1.113883.5.110',
+  ClinicalTrialsUnit = 'MNG_CTU@2.16.840.1.113883.2.1.3.8.5.11.1.107',
 }

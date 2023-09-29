@@ -9,10 +9,12 @@ import { SIGN_IN_PAGE } from '../../constants/routes'
 import { GetSupport, StudyList, Pagination, Sort } from '../../components/molecules'
 import { PER_PAGE } from '../../constants'
 import { pluraliseStudy } from '../../utils/pluralise'
+import { getUserStudies } from '../../lib/studies'
+import { transformStudies } from '../../utils/transformers'
 
 export type StudiesProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function Studies({ meta: { totalItems, initialPage, initialPageSize } }: StudiesProps) {
+export default function Studies({ studies, meta: { totalItems, initialPage, initialPageSize } }: StudiesProps) {
   const titleResultsText =
     totalItems === 0
       ? `(no matching search results)`
@@ -29,7 +31,9 @@ export default function Studies({ meta: { totalItems, initialPage, initialPageSi
 
           <div className="flex items-center gap-2 govuk-!-margin-bottom-4">
             <AlertIcon />{' '}
-            <strong className="govuk-heading-s govuk-!-margin-bottom-0">There are 4 studies to assess</strong>
+            <strong className="govuk-heading-s govuk-!-margin-bottom-0">
+              There are {totalItems} studies to assess
+            </strong>
           </div>
 
           <p className="govuk-body">
@@ -58,7 +62,7 @@ export default function Studies({ meta: { totalItems, initialPage, initialPageSi
       <div className="flex-wrap items-center justify-between gap-3 md:flex govuk-!-margin-bottom-4">
         <p className="govuk-heading-s mb-0 whitespace-nowrap">{`${totalItems} ${pluraliseStudy(
           totalItems
-        )} found (4 due for assessment)`}</p>
+        )} found (${totalItems} due for assessment)`}</p>
         <div className="govuk-form-group mt-2 items-center justify-end md:my-0 md:flex">
           {/* Show filters */}
           {/* <div>{showFiltersButton()}</div> */}
@@ -70,32 +74,21 @@ export default function Studies({ meta: { totalItems, initialPage, initialPageSi
       </div>
 
       <ol aria-label="Studies" className="govuk-list govuk-list--spaced">
-        <li>
-          <StudyList
-            assessmentDue
-            assessmentHref="/"
-            indication="Recruitment concerns"
-            lastAsessmentDate="5 May 2023"
-            shortTitle="Endothelial senescence in chronic lung disease"
-            shortTitleHref="/"
-            sponsorName="AstraZenica"
-            trackStatus="Off"
-            trackStatusHref="/"
-          />
-        </li>
-        <li>
-          <StudyList
-            assessmentDue
-            assessmentHref="/"
-            indication="No concerns"
-            lastAsessmentDate="8 May 2023"
-            shortTitle="A Study to Evaluate the Safety, Tolerability and Immunogenicity of Tau Targeted Vaccines in Participants With Early Alzheimer's Disease"
-            shortTitleHref="/"
-            sponsorName="Pfizer"
-            trackStatus="On"
-            trackStatusHref="/"
-          />
-        </li>
+        {studies.map((study) => (
+          <li key={study.id}>
+            <StudyList
+              assessmentDue
+              assessmentHref="/"
+              indication="Recruitment concerns"
+              lastAsessmentDate="5 May 2023"
+              shortTitle={study.name}
+              shortTitleHref="/"
+              sponsorName={study.organisations[0].name}
+              trackStatus="Off"
+              trackStatusHref="/"
+            />
+          </li>
+        ))}
       </ol>
 
       <Pagination
@@ -120,7 +113,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   try {
     const session = await getServerSession(context.req, context.res, authOptions)
 
-    if (!session) {
+    if (!session?.user) {
       return {
         redirect: {
           destination: SIGN_IN_PAGE,
@@ -128,7 +121,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       }
     }
 
-    if (session.user?.roles.length === 0) {
+    if (session.user.roles.length === 0) {
       return {
         redirect: {
           destination: '/',
@@ -136,14 +129,17 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       }
     }
 
+    const studies = await getUserStudies(session.user.id, Number(context.query.page) || 1, PER_PAGE)
+
     return {
       props: {
         user: session.user,
         meta: {
           initialPage: 0,
           initialPageSize: PER_PAGE,
-          totalItems: 30,
+          totalItems: studies.pagination.total,
         },
+        studies: transformStudies(studies.data),
       },
     }
   } catch (error) {

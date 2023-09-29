@@ -1,12 +1,16 @@
 import type { GetServerSidePropsContext } from 'next'
 import { Mock } from 'ts-mockery'
 import { getServerSession } from 'next-auth/next'
-import { render, within } from '@testing-library/react'
+import { render, within, screen } from '@testing-library/react'
 import { NextSeo } from 'next-seo'
+import type { UserOrganisation } from 'database'
+import { simpleFaker } from '@faker-js/faker'
 import type { StudiesProps } from '../pages/studies'
 import Studies, { getServerSideProps } from '../pages/studies'
 import { userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
 import { SIGN_IN_PAGE } from '../constants/routes'
+import { prismaMock } from '../__mocks__/prisma'
+import type { StudyWithRelationships } from '../utils/transformers'
 
 jest.mock('next-auth/next')
 jest.mock('next-seo')
@@ -41,60 +45,92 @@ describe('Studies page', () => {
   jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRole)
 
   test('Default layout', async () => {
-    // TODO: mock api response here
+    prismaMock.userOrganisation.findMany.mockResolvedValueOnce([
+      Mock.of<UserOrganisation>({ organisationId: simpleFaker.number.int() }),
+    ])
 
-    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {} })
+    const mockStudies = Array.from(Array(15)).map(() =>
+      Mock.of<StudyWithRelationships>({
+        id: simpleFaker.number.int(),
+        name: 'Test Study',
+        organisations: [
+          {
+            organisation: {
+              id: simpleFaker.number.int(),
+              name: 'Test Organisation',
+            },
+            organisationRole: {
+              id: simpleFaker.number.int(),
+              name: 'Test Organisation Role',
+            },
+          },
+        ],
+      })
+    )
+
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudies.length])
+
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: {} })
 
     const { props } = (await getServerSideProps(context)) as {
       props: StudiesProps
     }
 
-    const { getByRole, getByText } = render(Studies.getLayout(<Studies {...props} />, { ...props }))
+    render(Studies.getLayout(<Studies {...props} />, { ...props }))
 
     // SEO
-    expect(NextSeo).toHaveBeenCalledWith({ title: 'List of studies (30 studies, page 1 of 3) - Assess My Study' }, {})
+    expect(NextSeo).toHaveBeenCalledWith(
+      { title: `List of studies (${mockStudies.length} studies, page 1 of 2) - Assess My Study` },
+      {}
+    )
 
     // Title
-    expect(getByRole('heading', { level: 2, name: 'Assess progress of studies' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: 'Assess progress of studies' })).toBeInTheDocument()
 
     // Total studies needing assessment
-    expect(getByText('There are 4 studies to assess')).toBeInTheDocument()
+    expect(screen.getByText(`There are ${mockStudies.length} studies to assess`)).toBeInTheDocument()
 
     // Description
     expect(
-      getByText(
+      screen.getByText(
         'The NIHR CRN tracks the progress of research studies in its portfolio using data provided by study teams. Sponsors or their delegates need to assess if studies are on or off track and if any NIHR CRN support is needed.'
       )
     ).toBeInTheDocument()
 
     // Hint collapsible
-    expect(getByText('Why am I being asked to assess studies?')).toBeInTheDocument()
+    expect(screen.getByText('Why am I being asked to assess studies?')).toBeInTheDocument()
     expect(
-      getByText('NIHR CRN asks sponsors or their delegates to review and assess study progress for UK sites when:')
+      screen.getByText(
+        'NIHR CRN asks sponsors or their delegates to review and assess study progress for UK sites when:'
+      )
     ).toBeInTheDocument()
-    expect(getByText('A study falls behind the agreed milestones in the UK')).toBeInTheDocument()
-    expect(getByText('A study is not recruiting to target in the UK')).toBeInTheDocument()
-    expect(getByText('the last progress assessment from the sponsor is over 3 months old')).toBeInTheDocument()
+    expect(screen.getByText('A study falls behind the agreed milestones in the UK')).toBeInTheDocument()
+    expect(screen.getByText('A study is not recruiting to target in the UK')).toBeInTheDocument()
+    expect(screen.getByText('the last progress assessment from the sponsor is over 3 months old')).toBeInTheDocument()
 
     // Support
-    expect(getByRole('heading', { level: 3, name: 'Get NIHR CRN support' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 3, name: 'Get NIHR CRN support' })).toBeInTheDocument()
     expect(
-      getByText('Sponsors or their delegates can get NIHR CRN support with their research study at any time.')
+      screen.getByText('Sponsors or their delegates can get NIHR CRN support with their research study at any time.')
     ).toBeInTheDocument()
-    expect(getByRole('link', { name: 'Get support' })).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link', { name: 'Get support' })).toHaveAttribute('href', '/')
 
     // Study results title
-    expect(getByText('30 studies found (4 due for assessment)')).toBeInTheDocument()
+    expect(
+      screen.getByText(`${mockStudies.length} studies found (${mockStudies.length} due for assessment)`)
+    ).toBeInTheDocument()
 
     // Sort
-    expect(getByRole('combobox', { name: 'Sort by' })).toBeInTheDocument()
-    expect((getByRole('option', { name: 'Recently updated' }) as HTMLOptionElement).selected).toBe(true)
+    expect(screen.getByRole('combobox', { name: 'Sort by' })).toBeInTheDocument()
+    expect(screen.getByRole<HTMLOptionElement>('option', { name: 'Recently updated' }).selected).toBe(true)
 
     // Study results list
-    expect(within(getByRole('list', { name: 'Studies' })).getAllByRole('listitem')).toHaveLength(2)
+    expect(within(screen.getByRole('list', { name: 'Studies' })).getAllByRole('listitem')).toHaveLength(
+      mockStudies.length
+    )
 
     // Pagination
-    const pagination = getByRole('navigation', { name: 'results' })
+    const pagination = screen.getByRole('navigation', { name: 'results' })
     expect(pagination).toBeInTheDocument()
     expect(within(pagination).queryByRole('link', { name: 'Previous' })).not.toBeInTheDocument()
     expect(within(pagination).getByRole('link', { name: 'Page 1' })).toHaveAttribute('href', '/?page=1')
