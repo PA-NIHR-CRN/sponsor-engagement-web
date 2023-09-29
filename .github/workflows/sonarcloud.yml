@@ -1,0 +1,30 @@
+name: Sonarcloud
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+
+jobs:
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/install-cache
+      - name: Install
+        run: npm ci --no-audit --no-fund
+      - name: Test and coverage
+        run: npx jest --coverage --outputFile="${GITHUB_WORKSPACE}/coverage/lcov.info"
+
+      - name: SonarCloud analysis
+        run: |
+          npx sonar-scanner \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+          -Dsonar.projectKey=PA-NIHR-CRN_sponsor-engagement-web \
+          -Dsonar.javascript.lcov.reportPaths="${GITHUB_WORKSPACE}/coverage/lcov.info"
