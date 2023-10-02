@@ -7,6 +7,9 @@ declare module 'next-auth' {
    */
   interface Session {
     user: {
+      /** Primary key ID associated with the users local account. */
+      id: number
+
       /** Full name associated with a users IDG account. */
       name: string
 

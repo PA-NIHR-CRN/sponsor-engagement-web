@@ -1,12 +1,12 @@
 import { Organisation as OrganisationEntity, SysRefOrganisationRole as SysRefOrganisationRoleEntity } from 'database'
 import { Mock } from 'ts-mockery'
 
-import { Study, StudyWithRelations } from '../types'
+import { Study, StudyWithRelationships } from '../types'
 import { getOrganisationName, getOrgsUniqueByName, getOrgsUniqueByRole } from '../utils'
 import studies from './studies.json'
 
 export const studyEntities = studies.Result.Studies.map((study) =>
-  Mock.of<StudyWithRelations>({
+  Mock.of<StudyWithRelationships>({
     id: 123,
     cpmsId: study.Id,
     name: study.Name,

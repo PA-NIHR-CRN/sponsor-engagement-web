@@ -62,11 +62,13 @@ export const authOptions: AuthOptions = {
         return session
       }
 
+      const userId = Number(user.id)
+
+      session.user.id = userId
+
       // When a session is established or checked we can lookup the users' role(s) and forward them inside the user object
       // https://next-auth.js.org/configuration/callbacks#session-callback
-      const roles = await prismaClient.userRole.findMany({
-        where: { userId: Number(user.id) },
-      })
+      const roles = await prismaClient.userRole.findMany({ where: { userId } })
 
       session.user.roles = roles.map((role) => role.roleId)
 
