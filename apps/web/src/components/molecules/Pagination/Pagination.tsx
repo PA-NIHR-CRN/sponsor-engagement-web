@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { usePagination } from 'react-use-pagination'
+import { generateTruncatedPagination } from '../../../utils/pagination'
 
 interface PaginationProps {
   initialPage: number
@@ -24,7 +25,7 @@ export function Pagination({ initialPage, initialPageSize, totalItems, className
   /* Ensure client-side state is kept in sync with the URL */
   useEffect(() => {
     if (router.query.page) {
-      setPage(Number(router.query.page) - 1)
+      setPage(Number(router.query.page) - 1) // Subtract 1 for zero array indexing
       return
     }
     setPage(0)
@@ -32,6 +33,8 @@ export function Pagination({ initialPage, initialPageSize, totalItems, className
 
   /* Skip rendering if there's no content to show */
   if (totalItems === 0) return null
+
+  const pages = generateTruncatedPagination(totalPages, currentPage + 1)
 
   return (
     <nav aria-label="results" className={clsx('govuk-pagination', className)} role="navigation">
@@ -61,20 +64,21 @@ export function Pagination({ initialPage, initialPageSize, totalItems, className
           </Link>
         </div>
       ) : null}
-
       <ul className="govuk-pagination__list">
-        {Array(totalPages)
-          .fill(null)
-          .map((_, index) => {
-            const page = index + 1
-            const active = index === currentPage
-            return (
-              <li
-                className={clsx('govuk-pagination__item', {
-                  'govuk-pagination__item--current': active,
-                })}
-                key={index}
-              >
+        {pages.map((page, index) => {
+          const active = Number(page) - 1 === currentPage
+          return (
+            <li
+              className={clsx('govuk-pagination__item', {
+                'govuk-pagination__item--current': active,
+                'govuk-pagination__item--ellipses': page === '...',
+              })}
+              // eslint-disable-next-line react/no-array-index-key -- no unique key available
+              key={index}
+            >
+              {page === '...' ? (
+                '⋯'
+              ) : (
                 <Link
                   aria-current={active ? 'page' : undefined}
                   aria-label={`Page ${page}`}
@@ -84,16 +88,16 @@ export function Pagination({ initialPage, initialPageSize, totalItems, className
                     query: { ...router.query, page },
                   }}
                   onClick={() => {
-                    setPage(index)
+                    setPage(Number(page) - 1)
                   }}
                 >
                   {page}
                 </Link>
-              </li>
-            )
-          })}
+              )}
+            </li>
+          )
+        })}
       </ul>
-
       {nextEnabled ? (
         <div className="govuk-pagination__next">
           <Link

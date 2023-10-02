@@ -88,7 +88,7 @@ describe('Studies page', () => {
 
     // SEO
     expect(NextSeo).toHaveBeenCalledWith(
-      { title: `List of studies (${mockStudies.length} studies, page 1 of 2) - Assess My Study` },
+      { title: `Study Progress Review - Search results (${mockStudies.length} studies, page 1 of 2)` },
       {}
     )
 
