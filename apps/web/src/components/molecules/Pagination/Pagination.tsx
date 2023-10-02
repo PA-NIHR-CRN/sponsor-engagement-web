@@ -25,7 +25,7 @@ export function Pagination({ initialPage, initialPageSize, totalItems, className
   /* Ensure client-side state is kept in sync with the URL */
   useEffect(() => {
     if (router.query.page) {
-      setPage(Number(router.query.page) - 1)
+      setPage(Number(router.query.page) - 1) // Subtract 1 for zero array indexing
       return
     }
     setPage(0)
