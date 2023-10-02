@@ -8,6 +8,7 @@ const defaults: Omit<Session, 'user'> = {
 export const userNoRoles: Session = {
   ...defaults,
   user: {
+    id: 123,
     name: 'Test User',
     email: 'testuser@nihr.ac.uk',
     roles: [],
@@ -17,6 +18,7 @@ export const userNoRoles: Session = {
 export const userWithSponsorContactRole: Session = {
   ...defaults,
   user: {
+    id: 123,
     name: 'Test User',
     email: 'testuser@nihr.ac.uk',
     roles: [Roles.SponsorContact],
@@ -26,6 +28,7 @@ export const userWithSponsorContactRole: Session = {
 export const userWithContactManagerRole: Session = {
   ...defaults,
   user: {
+    id: 123,
     name: 'Test User',
     email: 'testuser@nihr.ac.uk',
     roles: [Roles.ContactManager],
@@ -35,6 +38,7 @@ export const userWithContactManagerRole: Session = {
 export const userWithSponsorContactAndContactManagerRoles: Session = {
   ...defaults,
   user: {
+    id: 123,
     name: 'Test User',
     email: 'testuser@nihr.ac.uk',
     roles: [Roles.SponsorContact, Roles.ContactManager],
