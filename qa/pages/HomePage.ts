@@ -16,7 +16,6 @@ export default class HomePage {
   //Page Methods
   async goto() {
     await this.page.goto('')
-    await this.page.pause()
   }
 
   async assertOnHomePage() {

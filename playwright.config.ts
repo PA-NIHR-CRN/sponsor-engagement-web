@@ -20,7 +20,7 @@ const config: PlaywrightTestConfig = {
       use: {
         trace: 'on',
         baseURL: `${process.env.BASE_URL}`,
-        headless: false,
+        headless: true,
         screenshot: 'on',
         // storageState: 'qa/utils/cookieAccept.json',
         launchOptions: {

@@ -1,9 +1,9 @@
 # Set and Check values in Repo secrets
 name: Sponsor Engagement E2E Tests
 on:
-  schedule:
-  # Run at 08:15 (UTC) Mon-Fri (09:15 during BST)
-  - cron: '15 08 * * 1-5'
+  # schedule:
+  # # Run at 08:15 (UTC) Mon-Fri (09:15 during BST)
+  # - cron: '15 08 * * 1-5'
   workflow_dispatch:
     inputs:
       publish-report:
