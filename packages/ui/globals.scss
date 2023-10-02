@@ -42,6 +42,8 @@ $govuk-link-colour: var(--colour-blue);
 
 body {
   margin: 0;
+  // Allows the side to stretch 100% of the viewport height (inc below the fold)
+  position: relative;
 }
 
 .link--inverse {
