@@ -24,7 +24,7 @@ export default function Studies({ studies, meta: { totalItems, initialPage, init
 
   return (
     <Container>
-      <NextSeo title={`List of studies ${titleResultsText} - Assess My Study`} />
+      <NextSeo title={`Study Progress Review - Search results ${titleResultsText}`} />
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">Assess progress of studies</h2>

@@ -23,11 +23,11 @@ describe('transformStudies', () => {
         evaluationCategories: [
           {
             indicatorType: 'Milestone missed',
-            updatedAt: new Date('2001-01-01'),
-            createdAt: new Date('2001-01-01'),
           },
         ],
-        assessments: [{ status: { name: 'On Track' } }],
+        assessments: [
+          { status: { name: 'On Track' }, updatedAt: new Date('2001-01-01'), createdAt: new Date('2001-01-01') },
+        ],
       }),
     ]
 
@@ -47,8 +47,8 @@ describe('transformStudies', () => {
             status: {
               name: 'On Track',
             },
-            createdAt: '29 September 2023',
-            updatedAt: '29 September 2023',
+            createdAt: '1 January 2001',
+            updatedAt: '1 January 2001',
           },
         ],
         evaluationCategories: [
