@@ -7,6 +7,7 @@ export default function PageNotFound() {
     <Container>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
+          <h2 className="govuk-heading-l">Page not found</h2>
           <p className="govuk-body">If you typed the web address, check it is correct.</p>
           <p className="govuk-body">If you pasted the web address, check you copied the entire address.</p>
           <p className="govuk-body">
@@ -20,9 +21,5 @@ export default function PageNotFound() {
 }
 
 PageNotFound.getLayout = function getLayout(page: ReactElement) {
-  return (
-    <RootLayout heading="Page not found" user={null}>
-      {page}
-    </RootLayout>
-  )
+  return <RootLayout user={null}>{page}</RootLayout>
 }

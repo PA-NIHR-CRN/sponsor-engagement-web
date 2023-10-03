@@ -25,8 +25,8 @@ export default function Studies({ studies, meta: { totalItems, initialPage, init
   return (
     <Container>
       <NextSeo title={`Study Progress Review - Search results ${titleResultsText}`} />
-      <div className="govuk-grid-row">
-        <div className="govuk-grid-column-two-thirds">
+      <div className="lg:flex lg:gap-6">
+        <div className="w-full">
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">Assess progress of studies</h2>
 
           <div className="flex items-center gap-2 govuk-!-margin-bottom-4">
@@ -52,61 +52,57 @@ export default function Studies({ studies, meta: { totalItems, initialPage, init
               </li>
             </ul>
           </Details>
+
+          {/* Sort bar */}
+          <div className="flex-wrap items-center justify-between gap-3 md:flex govuk-!-margin-bottom-4">
+            <p className="govuk-heading-s mb-0 whitespace-nowrap">{`${totalItems} ${pluraliseStudy(
+              totalItems
+            )} found (${totalItems} due for assessment)`}</p>
+            <div className="govuk-form-group mt-2 items-center justify-end md:my-0 md:flex">
+              {/* Show filters */}
+              {/* <div>{showFiltersButton()}</div> */}
+              {/* Sort by */}
+              <div className="items-center whitespace-nowrap md:flex">
+                <Sort defaultOrder="updated" form="filters-form" />
+              </div>
+            </div>
+          </div>
+
+          <ol aria-label="Studies" className="govuk-list govuk-list--spaced">
+            {studies.map((study) => (
+              <li key={study.id}>
+                <StudyList
+                  assessmentDue
+                  assessmentHref="/"
+                  indications={study.evaluationCategories.map((evalCategory) => evalCategory.indicatorType)}
+                  lastAsessmentDate={study.assessments[0]?.updatedAt}
+                  shortTitle={study.name}
+                  shortTitleHref="/"
+                  sponsorName={study.organisations[0].name}
+                  trackStatus={study.assessments[0]?.status.name}
+                  trackStatusHref="/"
+                />
+              </li>
+            ))}
+          </ol>
+
+          <Pagination
+            className="justify-center"
+            initialPage={initialPage}
+            initialPageSize={initialPageSize}
+            totalItems={totalItems}
+          />
         </div>
-        <div className="govuk-grid-column-one-third">
+        <div className="lg:min-w-[300px] lg:max-w-[300px]">
           <GetSupport />
         </div>
       </div>
-
-      {/* Sort bar */}
-      <div className="flex-wrap items-center justify-between gap-3 md:flex govuk-!-margin-bottom-4">
-        <p className="govuk-heading-s mb-0 whitespace-nowrap">{`${totalItems} ${pluraliseStudy(
-          totalItems
-        )} found (${totalItems} due for assessment)`}</p>
-        <div className="govuk-form-group mt-2 items-center justify-end md:my-0 md:flex">
-          {/* Show filters */}
-          {/* <div>{showFiltersButton()}</div> */}
-          {/* Sort by */}
-          <div className="items-center whitespace-nowrap md:flex">
-            <Sort defaultOrder="updated" form="filters-form" />
-          </div>
-        </div>
-      </div>
-
-      <ol aria-label="Studies" className="govuk-list govuk-list--spaced">
-        {studies.map((study) => (
-          <li key={study.id}>
-            <StudyList
-              assessmentDue
-              assessmentHref="/"
-              indications={study.evaluationCategories.map((evalCategory) => evalCategory.indicatorType)}
-              lastAsessmentDate={study.assessments[0]?.updatedAt}
-              shortTitle={study.name}
-              shortTitleHref="/"
-              sponsorName={study.organisations[0].name}
-              trackStatus={study.assessments[0]?.status.name}
-              trackStatusHref="/"
-            />
-          </li>
-        ))}
-      </ol>
-
-      <Pagination
-        className="justify-center"
-        initialPage={initialPage}
-        initialPageSize={initialPageSize}
-        totalItems={totalItems}
-      />
     </Container>
   )
 }
 
 Studies.getLayout = function getLayout(page: ReactElement, { user }: StudiesProps) {
-  return (
-    <RootLayout heading="Assess progress of studies" user={user}>
-      {page}
-    </RootLayout>
-  )
+  return <RootLayout user={user}>{page}</RootLayout>
 }
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {

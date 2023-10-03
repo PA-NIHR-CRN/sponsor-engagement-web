@@ -4,9 +4,9 @@
 export const PER_PAGE = 10
 
 /**
- * Page title prefix to appear on the browser tab
+ * Ser title prefix to appear on the browser tab
  */
-export const PAGE_TITLE = 'Sponsor Engagement'
+export const SERVICE_NAME = 'Assess progress of studies'
 
 /**
  * Date format to use across FRF
