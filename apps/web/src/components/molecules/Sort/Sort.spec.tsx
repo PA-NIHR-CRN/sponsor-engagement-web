@@ -18,18 +18,13 @@ test('Sorting', async () => {
   const select = screen.getByRole('combobox', { name: 'Sort by' })
   const options = screen.getAllByRole('option')
 
-  expect(options.map((option) => option.textContent)).toEqual([
-    'Alphabetical (ascending)',
-    'Alphabetical (descending)',
-    'Recently updated',
-    'Recently published',
-  ])
+  expect(options.map((option) => option.textContent)).toEqual(['Due assessment', 'Last Assessment Date'])
 
   // Default sort order is set
-  expect((options[2] as HTMLOptionElement).selected).toBe(true)
+  expect((options[0] as HTMLOptionElement).selected).toBe(true)
 
   // Change sort order via selecting an option
-  await userEvent.selectOptions(select, 'Alphabetical (descending)')
+  await userEvent.selectOptions(select, 'Last Assessment Date')
   expect((options[1] as HTMLOptionElement).selected).toBe(true)
   expect(onSubmitSpy).toHaveBeenCalled()
 

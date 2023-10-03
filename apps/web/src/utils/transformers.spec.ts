@@ -9,6 +9,7 @@ describe('transformStudies', () => {
       Mock.of<StudyWithRelationships>({
         id: 1,
         name: 'Study 1',
+        isDueAssessment: true,
         organisations: [
           {
             organisation: {
@@ -35,6 +36,7 @@ describe('transformStudies', () => {
       {
         id: 1,
         name: 'Study 1',
+        isDueAssessment: true,
         organisations: [
           {
             name: 'Org 1',

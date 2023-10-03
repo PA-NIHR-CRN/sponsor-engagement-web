@@ -49,10 +49,11 @@ describe('Studies page', () => {
       Mock.of<UserOrganisation>({ organisationId: simpleFaker.number.int() }),
     ])
 
-    const mockStudies = Array.from(Array(15)).map(() =>
+    const mockStudies = Array.from(Array(15)).map((_, index) =>
       Mock.of<StudyWithRelationships>({
         id: simpleFaker.number.int(),
         name: 'Test Study',
+        isDueAssessment: index === 0,
         organisations: [
           {
             organisation: {
@@ -76,7 +77,7 @@ describe('Studies page', () => {
       })
     )
 
-    prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudies.length])
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudies.length, 3])
 
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: {} })
 
@@ -96,7 +97,7 @@ describe('Studies page', () => {
     expect(screen.getByRole('heading', { level: 2, name: 'Assess progress of studies' })).toBeInTheDocument()
 
     // Total studies needing assessment
-    expect(screen.getByText(`There are ${mockStudies.length} studies to assess`)).toBeInTheDocument()
+    expect(screen.getByText(`There are 3 studies to assess`)).toBeInTheDocument()
 
     // Description
     expect(
@@ -124,13 +125,11 @@ describe('Studies page', () => {
     expect(screen.getByRole('link', { name: 'Get support' })).toHaveAttribute('href', '/')
 
     // Study results title
-    expect(
-      screen.getByText(`${mockStudies.length} studies found (${mockStudies.length} due for assessment)`)
-    ).toBeInTheDocument()
+    expect(screen.getByText(`${mockStudies.length} studies found (3 due for assessment)`)).toBeInTheDocument()
 
     // Sort
     expect(screen.getByRole('combobox', { name: 'Sort by' })).toBeInTheDocument()
-    expect(screen.getByRole<HTMLOptionElement>('option', { name: 'Recently updated' }).selected).toBe(true)
+    expect(screen.getByRole<HTMLOptionElement>('option', { name: 'Due assessment' }).selected).toBe(true)
 
     // Study results list
     const studies = within(screen.getByRole('list', { name: 'Studies' })).getAllByRole('listitem')
@@ -138,12 +137,17 @@ describe('Studies page', () => {
     expect(studies).toHaveLength(mockStudies.length)
 
     const withinFirstStudy = within(studies[0])
+    const withinSecondStudy = within(studies[1])
 
     // Study title
     expect(withinFirstStudy.getByText('Test Study')).toBeInTheDocument()
 
     // Study organisation
     expect(withinFirstStudy.getByText('Test Organisation')).toBeInTheDocument()
+
+    // Study due assessment
+    expect(withinFirstStudy.getByText('Due')).toBeInTheDocument()
+    expect(withinSecondStudy.queryByText('Due')).not.toBeInTheDocument()
 
     // Study indicators
     expect(withinFirstStudy.getByText('Milestone missed')).toBeInTheDocument()

@@ -65,6 +65,7 @@ model Study {
   evaluationCategories       StudyEvaluationCategory[]
   createdAt                  DateTime                  @default(now())
   updatedAt                  DateTime                  @updatedAt
+  isDueAssessment            Boolean?                  @default(false)
   isDeleted                  Boolean?                  @default(false)
 
   @@index([cpmsId])

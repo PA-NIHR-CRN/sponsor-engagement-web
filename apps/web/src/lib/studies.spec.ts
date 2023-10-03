@@ -11,20 +11,23 @@ describe('getUserStudies', () => {
   ]
   const mockStudies = [Mock.of<Study>({ id: 1, name: 'Study 1' }), Mock.of<Study>({ id: 2, name: 'Study 2' })]
   const mockStudyCount = 2
+  const mockStudyDueAssessmentCount = 1
 
   it('should return studies and pagination information', async () => {
     prismaMock.userOrganisation.findMany.mockResolvedValueOnce(mockUserOrganisations)
 
     prismaMock.study.findMany.mockResolvedValueOnce(mockStudies)
     prismaMock.study.count.mockResolvedValueOnce(mockStudyCount)
+    prismaMock.study.count.mockResolvedValueOnce(mockStudyDueAssessmentCount)
 
-    prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudyCount])
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudyCount, mockStudyDueAssessmentCount])
 
     const result = await getUserStudies(1, 1, 10)
 
     expect(result).toEqual({
       pagination: {
         total: mockStudyCount,
+        totalDue: mockStudyDueAssessmentCount,
       },
       data: mockStudies,
     })

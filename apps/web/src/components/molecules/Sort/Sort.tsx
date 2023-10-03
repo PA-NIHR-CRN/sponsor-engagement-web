@@ -21,10 +21,8 @@ export function Sort({ form, defaultOrder }: SortProps) {
         name="order"
         onChange={() => sortButtonRef.current?.click()}
       >
-        <option value="a-z">Alphabetical (ascending)</option>
-        <option value="z-a">Alphabetical (descending)</option>
-        <option value="updated">Recently updated</option>
-        <option value="published">Recently published</option>
+        <option value="due-assessment">Due assessment</option>
+        <option value="last-assessment">Last Assessment Date</option>
       </select>
       <button
         className="govuk-button govuk-button--secondary mb-0 ml-3 [.js-enabled_&]:hidden"

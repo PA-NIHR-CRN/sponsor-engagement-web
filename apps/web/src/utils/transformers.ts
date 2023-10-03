@@ -5,6 +5,7 @@ export type StudyWithRelationships = Prisma.StudyGetPayload<{
   select: {
     id: true
     name: true
+    isDueAssessment: true
     organisations: {
       include: {
         organisation: true
@@ -24,6 +25,7 @@ export const transformStudies = (studies: StudyWithRelationships[]) =>
   studies.map((study) => ({
     id: study.id,
     name: study.name,
+    isDueAssessment: study.isDueAssessment,
     organisations: study.organisations.map((studyOrg) => ({
       name: studyOrg.organisation.name,
       roleName: studyOrg.organisationRole.name,
