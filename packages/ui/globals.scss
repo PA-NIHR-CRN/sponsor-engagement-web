@@ -40,14 +40,11 @@ $govuk-link-colour: var(--colour-blue);
   }
 }
 
-html,
-body {
-  // Allows the side to stretch 100% of the viewport height (inc below the fold)
-  height: 100%;
-}
-
 body {
   margin: 0;
+  // Allows the side to stretch 100% of the viewport height (inc below the fold)
+  position: relative;
+  height: 100%;
 }
 
 .link--inverse {
