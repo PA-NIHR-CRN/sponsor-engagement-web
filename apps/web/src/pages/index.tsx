@@ -23,11 +23,7 @@ export default function Home() {
 }
 
 Home.getLayout = function getLayout(page: ReactElement, { user }: HomeProps) {
-  return (
-    <RootLayout heading="" user={user}>
-      {page}
-    </RootLayout>
-  )
+  return <RootLayout user={user}>{page}</RootLayout>
 }
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {

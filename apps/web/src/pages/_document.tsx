@@ -1,6 +1,6 @@
 import { Head, Html, Main, NextScript } from 'next/document'
 import { NextSeo } from 'next-seo'
-import { PAGE_TITLE } from '../constants'
+import { SERVICE_NAME } from '../constants'
 
 export default function Document() {
   return (
@@ -11,7 +11,7 @@ export default function Document() {
         <link href="/assets/images/govuk-apple-touch-icon-167x167.png" rel="apple-touch-icon" sizes="167x167" />
         <link href="/assets/images/govuk-apple-touch-icon-180x180.png" rel="apple-touch-icon" sizes="180x180" />
       </Head>
-      <NextSeo title={PAGE_TITLE} />
+      <NextSeo title={SERVICE_NAME} />
       <body>
         <Main />
         <NextScript />

@@ -22,11 +22,7 @@ export default function Organisations() {
 }
 
 Organisations.getLayout = function getLayout(page: ReactElement, { user }: OrganisationsProps) {
-  return (
-    <RootLayout heading="Contact management" user={user}>
-      {page}
-    </RootLayout>
-  )
+  return <RootLayout user={user}>{page}</RootLayout>
 }
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {

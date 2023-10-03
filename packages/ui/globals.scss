@@ -24,7 +24,7 @@
 $govuk-global-styles: true;
 $govuk-new-link-styles: true;
 $govuk-font-family: var(--font-primary), arial, sans-serif;
-$govuk-page-width: 1020px;
+$govuk-page-width: 1280px;
 $govuk-link-colour: var(--colour-blue);
 
 @import '~node_modules/govuk-frontend/govuk/all.scss';
@@ -44,6 +44,7 @@ body {
   margin: 0;
   // Allows the side to stretch 100% of the viewport height (inc below the fold)
   position: relative;
+  height: 100%;
 }
 
 .link--inverse {
