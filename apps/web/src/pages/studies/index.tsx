@@ -14,7 +14,10 @@ import { transformStudies } from '../../utils/transformers'
 
 export type StudiesProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function Studies({ studies, meta: { totalItems, initialPage, initialPageSize } }: StudiesProps) {
+export default function Studies({
+  studies,
+  meta: { totalItems, totalItemsDue, initialPage, initialPageSize },
+}: StudiesProps) {
   const titleResultsText =
     totalItems === 0
       ? `(no matching search results)`
@@ -32,7 +35,7 @@ export default function Studies({ studies, meta: { totalItems, initialPage, init
           <div className="flex items-center gap-2 govuk-!-margin-bottom-4">
             <AlertIcon />{' '}
             <strong className="govuk-heading-s govuk-!-margin-bottom-0">
-              There are {totalItems} studies to assess
+              There are {totalItemsDue} studies to assess
             </strong>
           </div>
 
@@ -57,7 +60,7 @@ export default function Studies({ studies, meta: { totalItems, initialPage, init
           <div className="flex-wrap items-center justify-between gap-3 md:flex govuk-!-margin-bottom-4">
             <p className="govuk-heading-s mb-0 whitespace-nowrap">{`${totalItems} ${pluraliseStudy(
               totalItems
-            )} found (${totalItems} due for assessment)`}</p>
+            )} found (${totalItemsDue} due for assessment)`}</p>
             <div className="govuk-form-group mt-2 items-center justify-end md:my-0 md:flex">
               {/* Show filters */}
               {/* <div>{showFiltersButton()}</div> */}
@@ -72,7 +75,7 @@ export default function Studies({ studies, meta: { totalItems, initialPage, init
             {studies.map((study) => (
               <li key={study.id}>
                 <StudyList
-                  assessmentDue
+                  assessmentDue={Boolean(study.isDueAssessment)}
                   assessmentHref="/"
                   indications={study.evaluationCategories.map((evalCategory) => evalCategory.indicatorType)}
                   lastAsessmentDate={study.assessments[0]?.updatedAt}
@@ -134,6 +137,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
           initialPage: 0,
           initialPageSize: PER_PAGE,
           totalItems: studies.pagination.total,
+          totalItemsDue: studies.pagination.totalDue,
         },
         studies: transformStudies(studies.data),
       },

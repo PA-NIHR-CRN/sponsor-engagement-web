@@ -2,6 +2,7 @@ import assert from 'assert'
 import axios from 'axios'
 import { Organisation as OrganisationEntity, SysRefOrganisationRole as SysRefOrganisationRoleEntity } from 'database'
 import { logger } from 'logger'
+import dayjs from 'dayjs'
 
 import { prismaClient } from './lib/prisma'
 import { Study, StudyRecordStatus, StudyStatus, StudyWithRelationships } from './types'
@@ -36,6 +37,7 @@ const createStudies = async () => {
       plannedClosureDate: study.PlannedRecruitmentEndDate ? new Date(study.PlannedRecruitmentEndDate) : undefined,
       actualOpeningDate: study.ActualOpeningDate ? new Date(study.ActualOpeningDate) : undefined,
       actualClosureDate: study.ActualClosureDate ? new Date(study.ActualClosureDate) : undefined,
+      isDueAssessment: false,
       isDeleted: false,
     }
 
@@ -219,6 +221,29 @@ const createOrganisationRelationships = async () => {
   logger.info(`Added ${evaluationCategoriesResult.count} study evaluation categories`)
 }
 
+const setAssessmentDue = async () => {
+  const assessmentDueResult = await prismaClient.study.updateMany({
+    data: {
+      isDueAssessment: true,
+    },
+    where: {
+      id: { in: studyEntities.map((study) => study.id) },
+      evaluationCategories: {
+        some: {},
+      },
+      assessments: {
+        every: {
+          updatedAt: {
+            lte: dayjs().subtract(3, 'month').toDate(),
+          },
+        },
+      },
+    },
+  })
+
+  logger.info(`Flagged ${assessmentDueResult.count} studies as being due assessment`)
+}
+
 const fetchStudies = async function* (url: string, username: string, password: string) {
   const pageSize = 1000
   let pageNumber = 1
@@ -271,5 +296,6 @@ export const ingest = async () => {
     await createStudies()
     await createOrganisations()
     await createOrganisationRelationships()
+    await setAssessmentDue()
   }
 }

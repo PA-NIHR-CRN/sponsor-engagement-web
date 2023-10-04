@@ -36,6 +36,7 @@ beforeEach(() => {
   prismaMock.studyOrganisation.createMany.mockResolvedValueOnce({ count: 1 })
   prismaMock.studyFunder.createMany.mockResolvedValueOnce({ count: 1 })
   prismaMock.studyEvaluationCategory.createMany.mockResolvedValueOnce({ count: 1 })
+  prismaMock.study.updateMany.mockResolvedValueOnce({ count: 1 })
 })
 
 describe('ingest', () => {
@@ -187,6 +188,31 @@ describe('ingest', () => {
         }),
       ]),
       skipDuplicates: true,
+    })
+  })
+
+  it('should update the study `isDueAssessment` flag', async () => {
+    await ingest()
+
+    expect(prismaMock.study.updateMany).toHaveBeenCalledTimes(1)
+
+    expect(prismaMock.study.updateMany).toHaveBeenCalledWith({
+      data: {
+        isDueAssessment: true,
+      },
+      where: {
+        id: { in: [123, 123, 123] },
+        evaluationCategories: {
+          some: {},
+        },
+        assessments: {
+          every: {
+            updatedAt: {
+              lte: expect.any(Date),
+            },
+          },
+        },
+      },
     })
   })
 })
