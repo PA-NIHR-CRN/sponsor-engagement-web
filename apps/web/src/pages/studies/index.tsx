@@ -10,7 +10,7 @@ import { GetSupport, StudyList, Pagination, Sort } from '../../components/molecu
 import { PER_PAGE } from '../../constants'
 import { pluraliseStudy } from '../../utils/pluralise'
 import { getUserStudies } from '../../lib/studies'
-import { transformStudies } from '../../utils/transformers'
+import { formatDate } from '../../utils/date'
 
 export type StudiesProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
@@ -78,10 +78,10 @@ export default function Studies({
                   assessmentDue={Boolean(study.isDueAssessment)}
                   assessmentHref="/"
                   indications={study.evaluationCategories.map((evalCategory) => evalCategory.indicatorType)}
-                  lastAsessmentDate={study.assessments[0]?.updatedAt}
+                  lastAsessmentDate={formatDate(study.assessments[0]?.updatedAt)}
                   shortTitle={study.name}
-                  shortTitleHref="/"
-                  sponsorName={study.organisations[0].name}
+                  shortTitleHref={`/studies/${study.id}`}
+                  sponsorName={study.organisations[0].organisation.name}
                   trackStatus={study.assessments[0]?.status.name}
                   trackStatusHref="/"
                 />
@@ -139,7 +139,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
           totalItems: studies.pagination.total,
           totalItemsDue: studies.pagination.totalDue,
         },
-        studies: transformStudies(studies.data),
+        studies: studies.data,
       },
     }
   } catch (error) {

@@ -12,4 +12,6 @@ const nextConfig = {
   transpilePackages: ['ui', 'database'],
 }
 
-module.exports = nextConfig
+const { withSuperjson } = require('next-superjson')
+
+module.exports = withSuperjson()(nextConfig)
