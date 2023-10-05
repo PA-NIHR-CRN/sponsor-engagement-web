@@ -10,7 +10,6 @@ import Studies, { getServerSideProps } from '../pages/studies'
 import { userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
 import { SIGN_IN_PAGE } from '../constants/routes'
 import { prismaMock } from '../__mocks__/prisma'
-import type { StudyWithRelationships } from '../utils/transformers'
 
 jest.mock('next-auth/next')
 jest.mock('next-seo')
@@ -49,33 +48,31 @@ describe('Studies page', () => {
       Mock.of<UserOrganisation>({ organisationId: simpleFaker.number.int() }),
     ])
 
-    const mockStudies = Array.from(Array(15)).map((_, index) =>
-      Mock.of<StudyWithRelationships>({
-        id: simpleFaker.number.int(),
-        name: 'Test Study',
-        isDueAssessment: index === 0,
-        organisations: [
-          {
-            organisation: {
-              id: simpleFaker.number.int(),
-              name: 'Test Organisation',
-            },
-            organisationRole: {
-              id: simpleFaker.number.int(),
-              name: 'Test Organisation Role',
-            },
+    const mockStudies = Array.from(Array(15)).map((_, index) => ({
+      id: simpleFaker.number.int(),
+      name: 'Test Study',
+      isDueAssessment: index === 0,
+      organisations: [
+        {
+          organisation: {
+            id: simpleFaker.number.int(),
+            name: 'Test Organisation',
           },
-        ],
-        evaluationCategories: [
-          {
-            indicatorType: 'Milestone missed',
-            updatedAt: new Date('2001-01-01'),
-            createdAt: new Date('2001-01-01'),
+          organisationRole: {
+            id: simpleFaker.number.int(),
+            name: 'Test Organisation Role',
           },
-        ],
-        assessments: [{ status: { name: 'Off Track' } }],
-      })
-    )
+        },
+      ],
+      evaluationCategories: [
+        {
+          indicatorType: 'Milestone missed',
+          updatedAt: new Date('2001-01-01'),
+          createdAt: new Date('2001-01-01'),
+        },
+      ],
+      assessments: [{ status: { name: 'Off Track' } }],
+    }))
 
     prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudies.length, 3])
 
