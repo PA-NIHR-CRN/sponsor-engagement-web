@@ -2,7 +2,7 @@ import { Mock } from 'ts-mockery'
 import type { Study, UserOrganisation } from 'database'
 import { prismaMock } from '../__mocks__/prisma'
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
-import { getUserStudies } from './studies'
+import { getStudyById, getUserStudies } from './studies'
 
 describe('getUserStudies', () => {
   const mockUserOrganisations = [
@@ -77,5 +77,16 @@ describe('getUserStudies', () => {
         },
       },
     })
+  })
+})
+
+describe('getStudyById', () => {
+  it('should return a study with the given id', async () => {
+    prismaMock.study.findFirst.mockResolvedValueOnce(Mock.of<Study>({ id: 1, name: 'Study 1' }))
+
+    const study = await getStudyById(1)
+
+    expect(study?.id).toEqual(1)
+    expect(study?.name).toEqual('Study 1')
   })
 })
