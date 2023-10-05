@@ -1,6 +1,28 @@
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
 import { Prisma, prismaClient } from './prisma'
 
+export const getStudyById = async (studyId: number) => {
+  return prismaClient.study.findFirst({
+    where: {
+      id: studyId,
+    },
+    include: {
+      organisations: {
+        include: {
+          organisation: true,
+          organisationRole: true,
+        },
+      },
+      evaluationCategories: true,
+      assessments: {
+        include: {
+          status: true,
+        },
+      },
+    },
+  })
+}
+
 export const getUserStudies = async (userId: number, currentPage: number, pageSize: number) => {
   const userOrgs = await prismaClient.userOrganisation.findMany({
     where: {
