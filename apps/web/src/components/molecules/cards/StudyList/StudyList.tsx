@@ -29,7 +29,7 @@ export function StudyList({
       {assessmentDue ? <span className="govuk-tag govuk-tag--red absolute top-0 right-0">Due</span> : null}
 
       <div className="md:max-w-[calc(100%-50px)]">
-        <div className="text-dark-grey govuk-!-margin-bottom-1 max-w-[calc(100%-45px)] lg:max-w-auto govuk-body-s">
+        <div className="text-darkGrey govuk-!-margin-bottom-1 max-w-[calc(100%-45px)] lg:max-w-auto govuk-body-s">
           {sponsorName}
         </div>
 
