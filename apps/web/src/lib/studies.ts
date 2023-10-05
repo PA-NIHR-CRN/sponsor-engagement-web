@@ -1,7 +1,7 @@
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
 import { Prisma, prismaClient } from './prisma'
 
-export const getStudyById = async (studyId: number) => {
+export const getStudyById = (studyId: number) => {
   return prismaClient.study.findFirst({
     where: {
       id: studyId,

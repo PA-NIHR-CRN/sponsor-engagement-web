@@ -11,8 +11,7 @@ import { RootLayout } from '../../../components/Layout/RootLayout'
 import { authOptions } from '../../api/auth/[...nextauth]'
 import { SIGN_IN_PAGE } from '../../../constants/routes'
 import { GetSupport } from '../../../components/molecules'
-import { PER_PAGE } from '../../../constants'
-import { getUserStudies } from '../../../lib/studies'
+import { getStudyById } from '../../../lib/studies'
 import { Checkbox, CheckboxGroup, Fieldset, Form, Radio, RadioGroup } from '../../../components/atoms'
 import type { AssessmentInputs } from '../../../utils/schemas/assessment.schema'
 import { assessmentSchema } from '../../../utils/schemas/assessment.schema'
@@ -22,7 +21,7 @@ import { TEXTAREA_MAX_CHARACTERS } from '../../../constants/forms'
 
 export type AssessmentProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function Assessment({ statuses, furtherInformation }: AssessmentProps) {
+export default function Assessment({ study, statuses, furtherInformation }: AssessmentProps) {
   const { register, formState, setError, watch, handleSubmit } = useForm<AssessmentInputs>({
     resolver: zodResolver(assessmentSchema),
     // defaultValues: getValuesFromSearchParams(feedbackSchema, query),
@@ -51,12 +50,11 @@ export default function Assessment({ statuses, furtherInformation }: AssessmentP
             CRN support with this study you will need to request this separately.
           </p>
 
-          <div className="text-darkGrey govuk-!-margin-bottom-0 govuk-body-s">Pfizer</div>
+          <div className="text-darkGrey govuk-!-margin-bottom-0 govuk-body-s">
+            {study.organisations[0].organisation.name}
+          </div>
 
-          <h3 className="govuk-heading-m govuk-!-margin-bottom-3">
-            A Study to Evaluate the Safety, Tolerability and Immunogenicity of Tau Targeted Vaccines in Participants
-            With Early Alzheimers Disease
-          </h3>
+          <h3 className="govuk-heading-m govuk-!-margin-bottom-3">{study.name}</h3>
 
           <Form
             action="/api/forms/assessment"
@@ -155,28 +153,27 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       throw new Error('Cannot assess a study if no study id exists!')
     }
 
-    // console.log('context', context)
+    const [study, statusRefData, furtherInformationRefData] = await prismaClient.$transaction([
+      getStudyById(Number(studyId)),
+      prismaClient.sysRefAssessmentStatus.findMany(),
+      prismaClient.sysRefAssessmentFurtherInformation.findMany({
+        orderBy: [{ sortOrder: 'asc' }],
+        where: {
+          isDeleted: false,
+        },
+      }),
+    ])
 
-    const studies = await getUserStudies(session.user.id, Number(context.query.page) || 1, PER_PAGE)
+    if (!study) {
+      throw new Error('Missing study data')
+    }
 
-    const statusRefData = await prismaClient.sysRefAssessmentStatus.findMany()
-
-    const furtherInformationRefData = await prismaClient.sysRefAssessmentFurtherInformation.findMany({
-      orderBy: [{ sortOrder: 'asc' }],
-    })
-
-    // console.log('studies', studies)
     return {
       props: {
         user: session.user,
+        study,
         statuses: statusRefData.map(({ id, name, description }) => ({ id, name, description })),
         furtherInformation: furtherInformationRefData.map(({ id, name }) => ({ id, name })),
-        meta: {
-          initialPage: 0,
-          initialPageSize: PER_PAGE,
-          totalItems: studies.pagination.total,
-        },
-        studies: studies.data,
       },
     }
   } catch (error) {
