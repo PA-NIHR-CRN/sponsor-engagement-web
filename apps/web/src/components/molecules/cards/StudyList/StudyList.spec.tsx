@@ -9,7 +9,7 @@ describe('StudyList Component', () => {
     shortTitle: 'Study XYZ',
     shortTitleHref: '/study/xyz',
     lastAsessmentDate: '2023-09-30',
-    assessmentHref: '/assessment/xyz',
+    assessmentHref: '/assessments/xyz',
     trackStatus: 'On track',
     trackStatusHref: '/track/on',
     indications: ['Indication ABC'],

@@ -4,9 +4,9 @@ import { logger } from 'logger'
 const prisma = new PrismaClient()
 
 async function main() {
-  logger.info('Database seed start')
+  logger.info('⧗ Database seed start ✓')
 
-  const roles = await prisma.sysRefRole.createMany({
+  await prisma.sysRefRole.createMany({
     data: [
       {
         id: 1,
@@ -22,27 +22,53 @@ async function main() {
     skipDuplicates: true,
   })
 
-  logger.trace('Roles created', roles)
+  logger.info('→ Roles created ✓')
 
-  const assessmentStatuses = await prisma.sysRefAssessmentStatus.createMany({
+  await prisma.sysRefAssessmentStatus.createMany({
     data: [
       {
         id: 1,
-        name: 'On Track',
-        description: 'Study is currently on track',
+        name: 'On track',
+        description: 'The sponsor or delegate is satisfied the study is progressing as planned.',
       },
       {
         id: 2,
-        name: 'Off Track',
-        description: 'Study is currently off track',
+        name: 'Off track',
+        description:
+          'The sponsor or delegate has some concerns about the study and is taking action where appropriate.',
       },
     ],
     skipDuplicates: true,
   })
 
-  logger.trace('Assessment statuses created', assessmentStatuses)
+  logger.info('→ Assessment statuses created ✓')
 
-  logger.info('Database seed end')
+  const assessmentFurtherInformationFields = [
+    'Study no longer going ahead in the UK [withdrawn during setup]',
+    'Waiting for HRA or MHRA approvals',
+    'Waiting for site approval or activation',
+    'In process of seeking an extension or protocol amendment',
+    'Work in progress with CRN to update key milestones and recruitment activity',
+    'In discussion with stakeholders to agree next steps',
+    'No recruitment expected within the last 90 days, in line with the study plan',
+    'Study closed to recruitment, in follow up',
+    'Follow up complete or none required',
+    'Work in progress to close study in the UK',
+  ]
+
+  await prisma.sysRefAssessmentFurtherInformation.createMany({
+    data: assessmentFurtherInformationFields.map((name, index) => ({
+      id: index + 1,
+      name,
+      sortOrder: index + 1,
+      description: '',
+    })),
+    skipDuplicates: true,
+  })
+
+  logger.info('→ Assessment further information created ✓')
+
+  logger.info('✓ Database seed end')
 }
 main()
   .then(async () => {

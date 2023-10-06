@@ -49,7 +49,7 @@ describe('Studies page', () => {
     ])
 
     const mockStudies = Array.from(Array(15)).map((_, index) => ({
-      id: simpleFaker.number.int(),
+      id: index === 0 ? 'mocked-id' : simpleFaker.number.int(),
       name: 'Test Study',
       isDueAssessment: index === 0,
       organisations: [
@@ -151,6 +151,12 @@ describe('Studies page', () => {
 
     // Study assessment status
     expect(withinFirstStudy.getByText('Off Track')).toBeInTheDocument()
+
+    // Study assessment CTA
+    expect(withinFirstStudy.getByRole('link', { name: 'Assess' })).toHaveAttribute(
+      'href',
+      '/assessments/mocked-id?returnUrl=studies'
+    )
 
     // Pagination
     const pagination = screen.getByRole('navigation', { name: 'results' })
