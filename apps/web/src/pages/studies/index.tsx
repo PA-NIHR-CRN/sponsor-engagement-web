@@ -76,7 +76,7 @@ export default function Studies({
               <li key={study.id}>
                 <StudyList
                   assessmentDue={Boolean(study.isDueAssessment)}
-                  assessmentHref={`/assessment/${study.id}`}
+                  assessmentHref={`/assessments/${study.id}`}
                   indications={study.evaluationCategories.map((evalCategory) => evalCategory.indicatorType)}
                   lastAsessmentDate={formatDate(study.assessments[0]?.updatedAt)}
                   shortTitle={study.name}
