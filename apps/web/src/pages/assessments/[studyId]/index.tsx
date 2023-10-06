@@ -21,7 +21,7 @@ import { TEXTAREA_MAX_CHARACTERS } from '../../../constants/forms'
 
 export type AssessmentProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function Assessment({ study, statuses, furtherInformation }: AssessmentProps) {
+export default function Assessment({ study, statuses, furtherInformation, returnUrl }: AssessmentProps) {
   const { register, formState, setError, watch, handleSubmit } = useForm<AssessmentInputs>({
     resolver: zodResolver(assessmentSchema),
     // defaultValues: getValuesFromSearchParams(feedbackSchema, query),
@@ -108,7 +108,7 @@ export default function Assessment({ study, statuses, furtherInformation }: Asse
                 <button className={clsx('govuk-button', { 'pointer-events-none': formState.isLoading })} type="submit">
                   Submit assessment
                 </button>
-                <Link className="govuk-button govuk-button--secondary" href="/">
+                <Link className="govuk-button govuk-button--secondary" href={returnUrl}>
                   Cancel
                 </Link>
               </div>
@@ -174,6 +174,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         study,
         statuses: statusRefData.map(({ id, name, description }) => ({ id, name, description })),
         furtherInformation: furtherInformationRefData.map(({ id, name }) => ({ id, name })),
+        returnUrl: context.query.returnUrl === 'studies' ? '/studies' : `/studies/${study.id}`,
       },
     }
   } catch (error) {

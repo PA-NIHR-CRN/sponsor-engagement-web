@@ -153,7 +153,10 @@ describe('Studies page', () => {
     expect(withinFirstStudy.getByText('Off Track')).toBeInTheDocument()
 
     // Study assessment CTA
-    expect(withinFirstStudy.getByRole('link', { name: 'Assess' })).toHaveAttribute('href', '/assessments/mocked-id')
+    expect(withinFirstStudy.getByRole('link', { name: 'Assess' })).toHaveAttribute(
+      'href',
+      '/assessments/mocked-id?returnUrl=studies'
+    )
 
     // Pagination
     const pagination = screen.getByRole('navigation', { name: 'results' })
