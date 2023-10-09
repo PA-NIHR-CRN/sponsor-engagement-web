@@ -5,6 +5,7 @@ import { render, within, screen } from '@testing-library/react'
 import { NextSeo } from 'next-seo'
 import type { Prisma } from 'database'
 import { simpleFaker } from '@faker-js/faker'
+import userEvent from '@testing-library/user-event'
 import type { AssessmentProps } from '../pages/assessments/[studyId]'
 import Assessment, { getServerSideProps } from '../pages/assessments/[studyId]'
 import { userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
@@ -41,64 +42,75 @@ describe('getServerSideProps', () => {
   })
 })
 
+type StudyWithRelations = Prisma.StudyGetPayload<{
+  include: {
+    organisations: {
+      include: {
+        organisation: true
+        organisationRole: true
+      }
+    }
+    evaluationCategories: true
+    assessments: {
+      include: {
+        status: true
+        createdBy: true
+        furtherInformation: true
+      }
+    }
+  }
+}>
+
+const mockedStudyId = 99
+const study = Mock.of<StudyWithRelations>({
+  id: mockedStudyId,
+  name: 'Test Study',
+  isDueAssessment: true,
+  createdAt: new Date('2001-01-01'),
+  organisations: [
+    {
+      organisation: {
+        id: simpleFaker.number.int(),
+        name: 'Test Organisation',
+      },
+      organisationRole: {
+        id: simpleFaker.number.int(),
+        name: 'Test Organisation Role',
+      },
+    },
+  ],
+  evaluationCategories: [
+    {
+      indicatorType: 'Milestone missed',
+      updatedAt: new Date('2001-01-01'),
+      createdAt: new Date('2001-01-01'),
+    },
+  ],
+  assessments: [
+    {
+      status: { name: 'Off track' },
+      createdBy: {
+        email: 'mockeduser@nihr.ac.uk',
+      },
+      furtherInformation: [
+        {
+          furtherInformationText: 'hi',
+        },
+      ],
+      updatedAt: new Date('2001-01-01'),
+      createdAt: new Date('2001-01-01'),
+    },
+  ],
+})
+
 describe('Assess progress of a study', () => {
   jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRole)
 
-  const mockedStudyId = 99
-  let study
-
-  beforeEach(() => {
-    prismaMock.sysRefAssessmentStatus.findMany.mockResolvedValueOnce(sysRefAssessmentStatus)
-
-    prismaMock.sysRefAssessmentFurtherInformation.findMany.mockResolvedValueOnce(sysRefAssessmentFurtherInformation)
-
-    study = Mock.of<
-      Prisma.StudyGetPayload<{
-        include: {
-          organisations: {
-            include: {
-              organisation: true
-              organisationRole: true
-            }
-          }
-          evaluationCategories: true
-          assessments: {
-            include: {
-              status: true
-            }
-          }
-        }
-      }>
-    >({
-      id: mockedStudyId,
-      name: 'Test Study',
-      isDueAssessment: true,
-      organisations: [
-        {
-          organisation: {
-            id: simpleFaker.number.int(),
-            name: 'Test Organisation',
-          },
-          organisationRole: {
-            id: simpleFaker.number.int(),
-            name: 'Test Organisation Role',
-          },
-        },
-      ],
-      evaluationCategories: [
-        {
-          indicatorType: 'Milestone missed',
-          updatedAt: new Date('2001-01-01'),
-          createdAt: new Date('2001-01-01'),
-        },
-      ],
-      assessments: [{ status: { name: 'Off Track' } }],
-    })
-
-    prismaMock.$transaction.mockResolvedValueOnce([study, sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
-  })
-
   test('Default layout', async () => {
+    prismaMock.sysRefAssessmentStatus.findMany.mockResolvedValueOnce(sysRefAssessmentStatus)
+    prismaMock.sysRefAssessmentFurtherInformation.findMany.mockResolvedValueOnce(sysRefAssessmentFurtherInformation)
+    prismaMock.$transaction.mockResolvedValueOnce([study, sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
+
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: String(mockedStudyId) } })
 
     const { props } = (await getServerSideProps(context)) as {
@@ -133,6 +145,18 @@ describe('Assess progress of a study', () => {
     // Study title
     expect(screen.getByRole('heading', { level: 3, name: 'Test Study' })).toBeInTheDocument()
 
+    // Study details accordion
+    expect(screen.getByRole('button', { name: 'Show study details', expanded: false })).toBeInTheDocument()
+
+    // Last sponsor assessment
+    expect(screen.getByRole('heading', { level: 3, name: 'Last sponsor assessment' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', {
+        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        expanded: false,
+      })
+    ).toBeInTheDocument()
+
     // Form Input - Status
     const statusFieldset = screen.getByRole('group', { name: 'Is this study progressing as planned?' })
 
@@ -166,6 +190,10 @@ describe('Assess progress of a study', () => {
   })
 
   test('Cancel button redirects back to the studies page if access from the list', async () => {
+    prismaMock.sysRefAssessmentStatus.findMany.mockResolvedValueOnce(sysRefAssessmentStatus)
+    prismaMock.sysRefAssessmentFurtherInformation.findMany.mockResolvedValueOnce(sysRefAssessmentFurtherInformation)
+    prismaMock.$transaction.mockResolvedValueOnce([study, sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
+
     const context = Mock.of<GetServerSidePropsContext>({
       req: {},
       res: {},
@@ -180,5 +208,102 @@ describe('Assess progress of a study', () => {
 
     // Cancel CTA
     expect(screen.getByRole('link', { name: 'Cancel' })).toHaveAttribute('href', `/studies`)
+  })
+
+  test('No previous assessments', async () => {
+    prismaMock.$transaction.mockResolvedValueOnce([
+      {
+        ...study,
+        assessments: [],
+      },
+      sysRefAssessmentStatus,
+      sysRefAssessmentFurtherInformation,
+    ])
+
+    const context = Mock.of<GetServerSidePropsContext>({
+      req: {},
+      res: {},
+      query: { studyId: String(mockedStudyId), returnUrl: 'studies' },
+    })
+
+    const { props } = (await getServerSideProps(context)) as {
+      props: AssessmentProps
+    }
+
+    render(Assessment.getLayout(<Assessment {...props} />, { ...props }))
+
+    expect(screen.getByRole('heading', { level: 3, name: 'Last sponsor assessment' })).toBeInTheDocument()
+
+    expect(
+      screen.queryByRole('button', {
+        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        expanded: false,
+      })
+    ).not.toBeInTheDocument()
+
+    expect(screen.getByText('This study has not had any assessments provided')).toBeInTheDocument()
+  })
+})
+
+describe('Expanding the show study details accordion', () => {
+  test('Shows more information about the study', async () => {
+    prismaMock.sysRefAssessmentStatus.findMany.mockResolvedValueOnce(sysRefAssessmentStatus)
+    prismaMock.sysRefAssessmentFurtherInformation.findMany.mockResolvedValueOnce(sysRefAssessmentFurtherInformation)
+    prismaMock.$transaction.mockResolvedValueOnce([study, sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
+
+    const context = Mock.of<GetServerSidePropsContext>({
+      req: {},
+      res: {},
+      query: { studyId: String(mockedStudyId) },
+    })
+
+    const { props } = (await getServerSideProps(context)) as {
+      props: AssessmentProps
+    }
+
+    render(Assessment.getLayout(<Assessment {...props} />, { ...props }))
+
+    // Expand accordion
+    await userEvent.click(screen.getByRole('button', { name: 'Show study details', expanded: false }))
+
+    expect(screen.getByRole('button', { name: 'Show study details', expanded: true })).toBeInTheDocument()
+    expect(screen.getByText('todo')).toBeInTheDocument()
+  })
+})
+
+describe('Expanding last sponsor assessment accordion', () => {
+  test('Shows further information', async () => {
+    prismaMock.sysRefAssessmentStatus.findMany.mockResolvedValueOnce(sysRefAssessmentStatus)
+    prismaMock.sysRefAssessmentFurtherInformation.findMany.mockResolvedValueOnce(sysRefAssessmentFurtherInformation)
+    prismaMock.$transaction.mockResolvedValueOnce([study, sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
+
+    const context = Mock.of<GetServerSidePropsContext>({
+      req: {},
+      res: {},
+      query: { studyId: String(mockedStudyId) },
+    })
+
+    const { props } = (await getServerSideProps(context)) as {
+      props: AssessmentProps
+    }
+
+    render(Assessment.getLayout(<Assessment {...props} />, { ...props }))
+
+    // Expand accordion
+    await userEvent.click(
+      screen.getByRole('button', {
+        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        expanded: false,
+      })
+    )
+
+    expect(
+      screen.getByRole('button', {
+        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        expanded: true,
+      })
+    ).toBeInTheDocument()
+
+    expect(screen.getByText('hi')).toBeInTheDocument()
   })
 })

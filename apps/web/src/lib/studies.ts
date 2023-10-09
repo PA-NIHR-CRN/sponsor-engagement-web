@@ -17,6 +17,8 @@ export const getStudyById = (studyId: number) => {
       assessments: {
         include: {
           status: true,
+          createdBy: true,
+          furtherInformation: true,
         },
       },
     },
