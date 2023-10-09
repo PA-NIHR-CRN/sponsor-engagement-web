@@ -19,6 +19,11 @@ export const getStudyById = (studyId: number) => {
           status: true,
         },
       },
+      funders: {
+        include: {
+          organisation: true,
+        },
+      },
     },
   })
 }
