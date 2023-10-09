@@ -171,7 +171,7 @@ describe('Study page', () => {
     expect(screen.queryByText('Due')).not.toBeInTheDocument()
 
     expect(screen.getByText(/You can review the progress of this study at any time./)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'NIHR CRN support' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'NIHR CRN support' })).toHaveAttribute('href', '/')
 
     // Progress summary
     expect(screen.getByRole('heading', { name: 'Progress Summary', level: 3 })).toBeInTheDocument()

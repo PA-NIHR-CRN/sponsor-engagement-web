@@ -20,9 +20,7 @@ export default function Study({ study }: StudyProps) {
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
           <h2 className="govuk-heading-l govuk-!-margin-bottom-1">{study.name}</h2>
-          <span className="govuk-body-m mb-0 text-darkGrey" data-testid="organisation-name">
-            {study.organisations[0].organisation.name}
-          </span>
+          <span className="govuk-body-m mb-0 text-darkGrey">{study.organisations[0].organisation.name}</span>
 
           <div className="flex items-center govuk-!-margin-bottom-4 govuk-!-margin-top-4 gap-6">
             <Link className="govuk-button w-auto govuk-!-margin-bottom-0" href={`/assessments/${study.id}`}>
