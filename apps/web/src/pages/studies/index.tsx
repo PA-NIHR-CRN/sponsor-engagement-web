@@ -9,7 +9,7 @@ import { SIGN_IN_PAGE } from '../../constants/routes'
 import { GetSupport, StudyList, Pagination, Sort } from '../../components/molecules'
 import { PER_PAGE } from '../../constants'
 import { pluraliseStudy } from '../../utils/pluralise'
-import { getUserStudies } from '../../lib/studies'
+import { getStudiesForOrgs } from '../../lib/studies'
 import { formatDate } from '../../utils/date'
 
 export type StudiesProps = InferGetServerSidePropsType<typeof getServerSideProps>
@@ -128,7 +128,9 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       }
     }
 
-    const studies = await getUserStudies(session.user.id, Number(context.query.page) || 1, PER_PAGE)
+    const userOrganisationIds = session.user.organisations.map((org) => org.id)
+
+    const studies = await getStudiesForOrgs(userOrganisationIds, Number(context.query.page) || 1, PER_PAGE)
 
     return {
       props: {

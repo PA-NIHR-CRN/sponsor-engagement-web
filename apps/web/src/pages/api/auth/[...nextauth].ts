@@ -4,6 +4,7 @@ import type { OAuthConfig, OAuthUserConfig } from 'next-auth/providers'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import { AUTH_PROVIDER_ID, AUTH_PROVIDER_NAME, AUTH_PROVIDER_TYPE } from '../../../constants/auth'
 import { prismaClient } from '../../../lib/prisma'
+import { getUserOrganisations } from '../../../lib/organisations'
 
 interface OAuthProfile {
   at_hash: string
@@ -71,6 +72,8 @@ export const authOptions: AuthOptions = {
       const roles = await prismaClient.userRole.findMany({ where: { userId } })
 
       session.user.roles = roles.map((role) => role.roleId)
+
+      session.user.organisations = await getUserOrganisations(userId)
 
       return session
     },

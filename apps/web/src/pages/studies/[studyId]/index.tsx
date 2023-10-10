@@ -1,15 +1,13 @@
 import type { ReactElement } from 'react'
 import { Container, Table } from '@nihr-ui/frontend'
-import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { getServerSession } from 'next-auth/next'
+import type { InferGetServerSidePropsType } from 'next'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
-import { RootLayout } from '../../components/Layout/RootLayout'
-import { authOptions } from '../api/auth/[...nextauth]'
-import { SIGN_IN_PAGE } from '../../constants/routes'
-import { GetSupport } from '../../components/molecules'
-import { getStudyById } from '../../lib/studies'
-import { formatDate } from '../../utils/date'
+import { RootLayout } from '../../../components/Layout/RootLayout'
+import { GetSupport } from '../../../components/molecules'
+import { getStudyById } from '../../../lib/studies'
+import { formatDate } from '../../../utils/date'
+import { withServerSideProps } from '../../../utils/withServerSideProps'
 
 export type StudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
@@ -20,9 +18,7 @@ export default function Study({ study }: StudyProps) {
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
           <h2 className="govuk-heading-l govuk-!-margin-bottom-1">{study.name}</h2>
-          <span className="govuk-body-m mb-0 text-darkGrey" data-testid="organisation-name">
-            {study.organisations[0].organisation.name}
-          </span>
+          <span className="govuk-body-m mb-0 text-darkGrey">{study.organisations[0].organisation.name}</span>
 
           <div className="flex items-center govuk-!-margin-bottom-4 govuk-!-margin-top-4 gap-6">
             <Link className="govuk-button w-auto govuk-!-margin-bottom-0" href={`/assessments/${study.id}`}>
@@ -181,59 +177,33 @@ Study.getLayout = function getLayout(page: ReactElement, { user }: StudyProps) {
   return <RootLayout user={user}>{page}</RootLayout>
 }
 
-// TODO!: authenticate user can access study
+export const getServerSideProps = withServerSideProps(async (context, session) => {
+  const studyId = Number(context.query.studyId)
 
-export const getServerSideProps = async (context: GetServerSidePropsContext) => {
-  try {
-    const session = await getServerSession(context.req, context.res, authOptions)
-
-    if (!session?.user) {
-      return {
-        redirect: {
-          destination: SIGN_IN_PAGE,
-        },
-      }
-    }
-
-    if (session.user.roles.length === 0) {
-      return {
-        redirect: {
-          destination: '/',
-        },
-      }
-    }
-
-    const studyId = context.query.id
-
-    if (!studyId) {
-      return {
-        redirect: {
-          destination: '/404',
-        },
-      }
-    }
-
-    const study = await getStudyById(Number(studyId))
-
-    if (!study) {
-      return {
-        redirect: {
-          destination: '/404',
-        },
-      }
-    }
-
-    return {
-      props: {
-        user: session.user,
-        study,
-      },
-    }
-  } catch (error) {
+  if (!studyId) {
     return {
       redirect: {
-        destination: '/500',
+        destination: '/404',
       },
     }
   }
-}
+
+  const userOrganisationIds = session.user?.organisations.map((org) => org.id)
+
+  const study = await getStudyById(studyId, userOrganisationIds)
+
+  if (!study) {
+    return {
+      redirect: {
+        destination: '/404',
+      },
+    }
+  }
+
+  return {
+    props: {
+      user: session.user,
+      study,
+    },
+  }
+})

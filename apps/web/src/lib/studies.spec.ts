@@ -1,28 +1,24 @@
 import { Mock } from 'ts-mockery'
-import type { Study, UserOrganisation } from 'database'
+import type { Study } from 'database'
 import { prismaMock } from '../__mocks__/prisma'
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
-import { getStudyById, getUserStudies } from './studies'
+import { getStudyById, getStudiesForOrgs } from './studies'
 
-describe('getUserStudies', () => {
-  const mockUserOrganisations = [
-    Mock.of<UserOrganisation>({ organisationId: 1 }),
-    Mock.of<UserOrganisation>({ organisationId: 2 }),
-  ]
+describe('getStudiesForOrgs', () => {
   const mockStudies = [Mock.of<Study>({ id: 1, name: 'Study 1' }), Mock.of<Study>({ id: 2, name: 'Study 2' })]
   const mockStudyCount = 2
   const mockStudyDueAssessmentCount = 1
 
   it('should return studies and pagination information', async () => {
-    prismaMock.userOrganisation.findMany.mockResolvedValueOnce(mockUserOrganisations)
-
     prismaMock.study.findMany.mockResolvedValueOnce(mockStudies)
     prismaMock.study.count.mockResolvedValueOnce(mockStudyCount)
     prismaMock.study.count.mockResolvedValueOnce(mockStudyDueAssessmentCount)
 
     prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudyCount, mockStudyDueAssessmentCount])
 
-    const result = await getUserStudies(1, 1, 10)
+    const userOrganisationIds = [1, 2]
+
+    const result = await getStudiesForOrgs(userOrganisationIds, 1, 10)
 
     expect(result).toEqual({
       pagination: {
@@ -32,10 +28,6 @@ describe('getUserStudies', () => {
       data: mockStudies,
     })
 
-    expect(prismaMock.userOrganisation.findMany).toHaveBeenCalledWith({
-      where: { userId: 1 },
-    })
-
     expect(prismaMock.study.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         skip: 0,
@@ -43,7 +35,7 @@ describe('getUserStudies', () => {
         where: {
           organisations: {
             some: {
-              organisationId: { in: [1, 2] },
+              organisationId: { in: userOrganisationIds },
               organisationRole: {
                 rtsIdentifier: {
                   in: [
@@ -84,7 +76,22 @@ describe('getStudyById', () => {
   it('should return a study with the given id', async () => {
     prismaMock.study.findFirst.mockResolvedValueOnce(Mock.of<Study>({ id: 1, name: 'Study 1' }))
 
-    const study = await getStudyById(1)
+    const userOrganisationIds = [1, 2]
+
+    const study = await getStudyById(1, userOrganisationIds)
+
+    expect(prismaMock.study.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          id: 1,
+          organisations: {
+            some: {
+              organisationId: { in: userOrganisationIds },
+            },
+          },
+        },
+      })
+    )
 
     expect(study?.id).toEqual(1)
     expect(study?.name).toEqual('Study 1')
