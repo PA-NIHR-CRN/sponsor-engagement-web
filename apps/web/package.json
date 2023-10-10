@@ -46,7 +46,7 @@
     "react-use": "^17.4.0",
     "react-use-pagination": "^2.0.1",
     "superjson": "^1.13.3",
-    "zod": "^3.21.4"
+    "zod": "^3.22.3"
   },
   "devDependencies": {
     "@faker-js/faker": "^8.1.0",
