@@ -218,9 +218,9 @@ model AssessmentFurtherInformation {
   id                     Int                                @id @default(autoincrement())
   assessment             Assessment                         @relation(fields: [assessmentId], references: [id])
   assessmentId           Int
-  furtherInformation     SysRefAssessmentFurtherInformation @relation(fields: [furtherInformationId], references: [id])
-  furtherInformationId   Int
-  furtherInformationText String                             @db.Text
+  furtherInformation     SysRefAssessmentFurtherInformation? @relation(fields: [furtherInformationId], references: [id])
+  furtherInformationId   Int?
+  furtherInformationText String?                             @db.Text
   isDeleted              Boolean?                           @default(false)
 }
 

@@ -18,7 +18,7 @@ jest.mock('next-seo')
 
 describe('getServerSideProps', () => {
   const getServerSessionMock = jest.mocked(getServerSession)
-  const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {} })
+  const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
 
   test('redirects to sign in page when there is no user session', async () => {
     getServerSessionMock.mockResolvedValueOnce(null)
@@ -40,6 +40,30 @@ describe('getServerSideProps', () => {
       },
     })
   })
+
+  test('redirects to 404 page if no study id provided', async () => {
+    getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+
+    const result = await getServerSideProps({ ...context, query: { studyId: undefined } })
+    expect(result).toEqual({
+      redirect: {
+        destination: '/404',
+      },
+    })
+  })
+
+  test('redirects to 404 page if no study found', async () => {
+    getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+
+    prismaMock.$transaction.mockResolvedValueOnce([])
+
+    const result = await getServerSideProps(context)
+    expect(result).toEqual({
+      redirect: {
+        destination: '/404',
+      },
+    })
+  })
 })
 
 type StudyWithRelations = Prisma.StudyGetPayload<{
@@ -55,7 +79,11 @@ type StudyWithRelations = Prisma.StudyGetPayload<{
       include: {
         status: true
         createdBy: true
-        furtherInformation: true
+        furtherInformation: {
+          include: {
+            furtherInformation: true
+          }
+        }
       }
     }
   }
@@ -94,7 +122,22 @@ const study = Mock.of<StudyWithRelations>({
       },
       furtherInformation: [
         {
-          furtherInformationText: 'hi',
+          furtherInformation: {
+            name: 'Mocked list item 1',
+          },
+        },
+        {
+          furtherInformation: {
+            name: 'Mocked list item 2',
+          },
+        },
+        {
+          furtherInformation: {
+            name: 'Mocked list item 3',
+          },
+        },
+        {
+          furtherInformationText: 'Testing some further information',
         },
       ],
       updatedAt: new Date('2001-01-01'),
@@ -304,6 +347,12 @@ describe('Expanding last sponsor assessment accordion', () => {
       })
     ).toBeInTheDocument()
 
-    expect(screen.getByText('hi')).toBeInTheDocument()
+    const list = screen.getByRole('list', { name: 'Further information' })
+    expect(within(list).getAllByRole('listitem')).toHaveLength(3)
+    expect(within(list).getByText('Mocked list item 1')).toBeInTheDocument()
+    expect(within(list).getByText('Mocked list item 2')).toBeInTheDocument()
+    expect(within(list).getByText('Mocked list item 3')).toBeInTheDocument()
+
+    expect(screen.getByText('Testing some further information')).toBeInTheDocument()
   })
 })

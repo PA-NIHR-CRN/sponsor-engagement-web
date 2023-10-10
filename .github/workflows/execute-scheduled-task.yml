@@ -48,7 +48,7 @@ jobs:
 
       - name: Restore Original Schedule
         run: |
-          aws events put-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 20 * * ? *)"
+          aws events put-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 18 * * ? *)"
           aws events enable-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname}}-cw-event-rule
 
   deploy-test:
@@ -78,7 +78,7 @@ jobs:
 
       - name: Restore Original Schedule
         run: |
-          aws events put-rule --name crnccd-ecs-test-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 20 * * ? *)"
+          aws events put-rule --name crnccd-ecs-test-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 18 * * ? *)"
           aws events enable-rule --name crnccd-ecs-test-se-${{ github.event.inputs.appname}}-cw-event-rule
 
   deploy-uat:
@@ -108,7 +108,7 @@ jobs:
 
       - name: Restore Original Schedule
         run: |
-          aws events put-rule --name crnccs-ecs-uat-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 20 * * ? *)"
+          aws events put-rule --name crnccs-ecs-uat-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 18 * * ? *)"
           aws events enable-rule --name crnccs-ecs-uat-se-${{ github.event.inputs.appname}}-cw-event-rule
 
 
@@ -139,7 +139,7 @@ jobs:
 
       - name: Restore Original Schedule
         run: |
-          aws events put-rule --name crnccp-ecs-oat-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 20 * * ? *)"
+          aws events put-rule --name crnccp-ecs-oat-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 18 * * ? *)"
           aws events enable-rule --name crnccp-ecs-oat-se-${{ github.event.inputs.appname}}-cw-event-rule
 
 
@@ -170,5 +170,5 @@ jobs:
 
       - name: Restore Original Schedule
         run: |
-          aws events put-rule --name crnccp-ecs-prod-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 20 * * ? *)"
+          aws events put-rule --name crnccp-ecs-prod-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 18 * * ? *)"
           aws events enable-rule --name crnccp-ecs-prod-se-${{ github.event.inputs.appname}}-cw-event-rule
