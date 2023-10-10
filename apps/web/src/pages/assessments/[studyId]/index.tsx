@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react'
-import { Container } from '@nihr-ui/frontend'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Container } from '@nihr-ui/frontend'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { getServerSession } from 'next-auth/next'
@@ -18,10 +18,17 @@ import { assessmentSchema } from '../../../utils/schemas/assessment.schema'
 import { prismaClient } from '../../../lib/prisma'
 import { Textarea } from '../../../components/atoms/Form/Textarea/Textarea'
 import { TEXTAREA_MAX_CHARACTERS } from '../../../constants/forms'
+import { formatDate } from '../../../utils/date'
 
 export type AssessmentProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function Assessment({ study, statuses, furtherInformation, returnUrl }: AssessmentProps) {
+export default function Assessment({
+  study,
+  statuses,
+  furtherInformation,
+  returnUrl,
+  lastAssessment,
+}: AssessmentProps) {
   const { register, formState, setError, watch, handleSubmit } = useForm<AssessmentInputs>({
     resolver: zodResolver(assessmentSchema),
     // defaultValues: getValuesFromSearchParams(feedbackSchema, query),
@@ -55,6 +62,34 @@ export default function Assessment({ study, statuses, furtherInformation, return
           </div>
 
           <h3 className="govuk-heading-m govuk-!-margin-bottom-3">{study.name}</h3>
+
+          <Accordion className="w-full govuk-!-margin-bottom-3" type="multiple">
+            <AccordionItem className="border-none" value="details-1">
+              <AccordionTrigger>Show study details</AccordionTrigger>
+              <AccordionContent>todo</AccordionContent>
+            </AccordionItem>
+          </Accordion>
+
+          <h3 className="govuk-heading-m govuk-!-margin-bottom-3">Last sponsor assessment</h3>
+
+          {lastAssessment ? (
+            <Accordion className="w-full govuk-!-margin-bottom-4" type="multiple">
+              <AccordionItem value="assessment-1">
+                <AccordionTrigger
+                  sideContent={
+                    <span>
+                      <strong>{lastAssessment.status}</strong> assessed by {lastAssessment.createdBy}
+                    </span>
+                  }
+                >
+                  {lastAssessment.createdAt}
+                </AccordionTrigger>
+                <AccordionContent indent>{lastAssessment.furtherInformation}</AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          ) : (
+            <p className="govuk-body">This study has not had any assessments provided</p>
+          )}
 
           <Form
             action="/api/forms/assessment"
@@ -168,6 +203,16 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       throw new Error('Missing study data')
     }
 
+    const lastAssessment =
+      study.assessments.length > 0
+        ? {
+            status: study.assessments[0].status.name,
+            createdAt: formatDate(study.assessments[0].createdAt),
+            createdBy: study.assessments[0].createdBy.email,
+            furtherInformation: study.assessments[0].furtherInformation[0]?.furtherInformationText,
+          }
+        : null
+
     return {
       props: {
         user: session.user,
@@ -175,6 +220,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         statuses: statusRefData.map(({ id, name, description }) => ({ id, name, description })),
         furtherInformation: furtherInformationRefData.map(({ id, name }) => ({ id, name })),
         returnUrl: context.query.returnUrl === 'studies' ? '/studies' : `/studies/${study.id}`,
+        lastAssessment,
       },
     }
   } catch (error) {
