@@ -12,15 +12,14 @@ export enum StudyRecordStatus {
 }
 
 export enum StudyStatus {
+  InSetup = 'STDY_STS_CPMS_IN_STP@2.16.840.1.113883.2.1.3.8.5.2.4.68',
+  InSetupPendingApproval = 'STDY_STS_CPMS_STP_PNDNG_APP@2.16.840.1.113883.2.1.3.8.5.2.4.68',
+  InSetupApprovalReceived = 'STDY_STS_CPMS_IN_STP_APP_REC@2.16.840.1.113883.2.1.3.8.5.2.4.68',
   OpenToRecruitment = 'STDY_STS_CPMS_OPN_TO_RCRTMNT@2.16.840.1.113883.2.1.3.8.5.2.4.68',
   OpenActivelyRecruiting = 'STDY_STS_CPMS_OPN_ACTVLY_RECRTG@2.16.840.1.113883.2.1.3.8.5.2.4.68',
   ClosedInFollowUp = 'STDY_STS_CPMS_CLD_FLW_UP@2.16.840.1.113883.2.1.3.8.5.2.4.68',
   SuspendedOpenRecruitment = 'STDY_STS_CPMS_SPNDED_OPN_TO_RCRTMNT@2.16.840.1.113883.2.1.3.8.5.2.4.68',
   SuspendedActivelyRecruiting = 'STDY_STS_CPMS_SPNDED_OPN_ACTVLY_RECRTG@2.16.840.1.113883.2.1.3.8.5.2.4.68',
-  InSetupPendingApplication = 'STDY_STS_CPMS_STP_PNDNG_APP@2.16.840.1.113883.2.1.3.8.5.2.4.68',
-  InSetupPendingNHSPerm = 'STDY_STS_CPMS_STP_PNDNG_NHS_PERM@2.16.840.1.113883.2.1.3.8.5.2.4.68',
-  InSetupRecruiting = 'STDY_STS_CPMS_IN_STP_APP_REC@2.16.840.1.113883.2.1.3.8.5.2.4.68',
-  InSetupPermissionReceived = 'STDY_STS_CPMS_IN_STP_NHS_PERM_REC@2.16.840.1.113883.2.1.3.8.5.2.4.68',
 }
 
 export type StudyWithRelationships = Prisma.StudyGetPayload<{
