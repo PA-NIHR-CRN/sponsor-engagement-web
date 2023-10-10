@@ -79,7 +79,11 @@ type StudyWithRelations = Prisma.StudyGetPayload<{
       include: {
         status: true
         createdBy: true
-        furtherInformation: true
+        furtherInformation: {
+          include: {
+            furtherInformation: true
+          }
+        }
       }
     }
   }
@@ -118,7 +122,22 @@ const study = Mock.of<StudyWithRelations>({
       },
       furtherInformation: [
         {
-          furtherInformationText: 'hi',
+          furtherInformation: {
+            name: 'Mocked list item 1',
+          },
+        },
+        {
+          furtherInformation: {
+            name: 'Mocked list item 2',
+          },
+        },
+        {
+          furtherInformation: {
+            name: 'Mocked list item 3',
+          },
+        },
+        {
+          furtherInformationText: 'Testing some further information',
         },
       ],
       updatedAt: new Date('2001-01-01'),
@@ -328,6 +347,12 @@ describe('Expanding last sponsor assessment accordion', () => {
       })
     ).toBeInTheDocument()
 
-    expect(screen.getByText('hi')).toBeInTheDocument()
+    const list = screen.getByRole('list', { name: 'Further information' })
+    expect(within(list).getAllByRole('listitem')).toHaveLength(3)
+    expect(within(list).getByText('Mocked list item 1')).toBeInTheDocument()
+    expect(within(list).getByText('Mocked list item 2')).toBeInTheDocument()
+    expect(within(list).getByText('Mocked list item 3')).toBeInTheDocument()
+
+    expect(screen.getByText('Testing some further information')).toBeInTheDocument()
   })
 })

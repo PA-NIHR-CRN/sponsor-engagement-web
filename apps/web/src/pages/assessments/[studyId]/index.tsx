@@ -82,7 +82,14 @@ export default function Assessment({
                 >
                   {lastAssessment.createdAt}
                 </AccordionTrigger>
-                <AccordionContent indent>{lastAssessment.furtherInformation}</AccordionContent>
+                <AccordionContent indent>
+                  <ul aria-label="Further information" className="govuk-list govuk-list--bullet govuk-body-s">
+                    {lastAssessment.furtherInformation.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                  <p className="govuk-body-s govuk-!-margin-bottom-0">{lastAssessment.furtherInformationText}</p>
+                </AccordionContent>
               </AccordionItem>
             </Accordion>
           ) : (
@@ -198,7 +205,12 @@ export const getServerSideProps = withServerSideProps(async (context, session) =
           status: study.assessments[0].status.name,
           createdAt: formatDate(study.assessments[0].createdAt),
           createdBy: study.assessments[0].createdBy.email,
-          furtherInformation: study.assessments[0].furtherInformation[0]?.furtherInformationText,
+          furtherInformation: study.assessments[0].furtherInformation
+            .filter(({ furtherInformationText }) => !furtherInformationText)
+            .map(({ furtherInformation }) => furtherInformation?.name),
+          furtherInformationText: study.assessments[0].furtherInformation.find(({ furtherInformationText }) =>
+            Boolean(furtherInformationText)
+          )?.furtherInformationText,
         }
       : null
 
