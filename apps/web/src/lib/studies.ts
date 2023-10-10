@@ -1,10 +1,22 @@
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
 import { Prisma, prismaClient } from './prisma'
 
-export const getStudyById = (studyId: number) => {
+export const getStudyById = (studyId: number, organisationIds?: number[]) => {
   return prismaClient.study.findFirst({
     where: {
       id: studyId,
+      ...(organisationIds && {
+        organisations: {
+          some: {
+            organisationId: {
+              in: organisationIds,
+            },
+          },
+        },
+      }),
+    },
+    orderBy: {
+      createdAt: 'asc',
     },
     include: {
       organisations: {
@@ -18,7 +30,14 @@ export const getStudyById = (studyId: number) => {
         include: {
           status: true,
           createdBy: true,
-          furtherInformation: true,
+          furtherInformation: {
+            include: {
+              furtherInformation: true,
+            },
+            orderBy: {
+              furtherInformationId: 'asc',
+            },
+          },
         },
       },
       funders: {
@@ -30,22 +49,14 @@ export const getStudyById = (studyId: number) => {
   })
 }
 
-export const getUserStudies = async (userId: number, currentPage: number, pageSize: number) => {
-  const userOrgs = await prismaClient.userOrganisation.findMany({
-    where: {
-      userId,
-    },
-  })
-
+export const getStudiesForOrgs = async (organisationIds: number[], currentPage: number, pageSize: number) => {
   const query = {
     skip: currentPage * pageSize - pageSize,
     take: pageSize,
     where: {
       organisations: {
         some: {
-          organisationId: {
-            in: userOrgs.map((org) => org.organisationId),
-          },
+          organisationId: { in: organisationIds },
           organisationRole: {
             rtsIdentifier: {
               in: [

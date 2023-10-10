@@ -32,7 +32,7 @@ const createStudies = async () => {
       sampleSize: study.SampleSize,
       chiefInvestigatorFirstName: study.ChiefInvestigatorFirstName,
       chiefInvestigatorLastName: study.ChiefInvestigatorLastName,
-      managingSpeciality: study.ManagingSpecialty,
+      managingSpeciality: study.ManagingSpecialty ?? '',
       plannedOpeningDate: study.PlannedRecruitmentStartDate ? new Date(study.PlannedRecruitmentStartDate) : undefined,
       plannedClosureDate: study.PlannedRecruitmentEndDate ? new Date(study.PlannedRecruitmentEndDate) : undefined,
       actualOpeningDate: study.ActualOpeningDate ? new Date(study.ActualOpeningDate) : undefined,
@@ -248,9 +248,9 @@ const fetchStudies = async function* (url: string, username: string, password: s
   const pageSize = 1000
   let pageNumber = 1
   let totalStudies = 0
-  while (totalStudies === 0 || pageNumber * pageSize < totalStudies) {
+  while (totalStudies === 0 || pageNumber * pageSize < totalStudies + pageSize) {
     try {
-      logger.info(`Request studies page: ${pageNumber}`)
+      logger.info(`Request studies page: ${pageNumber} (total ${totalStudies})`)
       const { data } = await axios.get(url, {
         headers: {
           username: username,
@@ -260,15 +260,14 @@ const fetchStudies = async function* (url: string, username: string, password: s
           pageSize: 1000,
           pageNumber,
           studyStatus: [
-            StudyStatus.OpenActivelyRecruiting,
+            StudyStatus.InSetup,
+            StudyStatus.InSetupPendingApproval,
+            StudyStatus.InSetupApprovalReceived,
             StudyStatus.OpenToRecruitment,
+            StudyStatus.OpenActivelyRecruiting,
             StudyStatus.ClosedInFollowUp,
-            StudyStatus.SuspendedActivelyRecruiting,
             StudyStatus.SuspendedOpenRecruitment,
-            StudyStatus.InSetupRecruiting,
-            StudyStatus.InSetupPermissionReceived,
-            StudyStatus.InSetupPendingApplication,
-            StudyStatus.InSetupPendingNHSPerm,
+            StudyStatus.SuspendedActivelyRecruiting,
           ],
           studyRecordStatus: [StudyRecordStatus.Live, StudyRecordStatus.LiveChangesPendingApproval],
         },

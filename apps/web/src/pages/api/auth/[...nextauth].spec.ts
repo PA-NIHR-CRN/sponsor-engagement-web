@@ -3,7 +3,7 @@ import { Mock } from 'ts-mockery'
 import type { Session } from 'next-auth'
 import type { AdapterUser } from 'next-auth/adapters'
 import type { JWT } from 'next-auth/jwt'
-import type { UserRole } from 'database'
+import type { UserOrganisation, UserRole } from 'database'
 import { prismaMock } from '../../../__mocks__/prisma'
 import { Roles } from '../../../constants/auth'
 import { authOptions } from './[...nextauth]'
@@ -64,6 +64,10 @@ describe('Session authentication callback', () => {
       }),
     ])
 
+    const mockUserOrganisation = Mock.of<UserOrganisation>({ organisationId: 123 })
+
+    prismaMock.userOrganisation.findMany.mockResolvedValueOnce([mockUserOrganisation])
+
     const updatedSession = await authOptions.callbacks?.session?.({
       session,
       user,
@@ -79,6 +83,7 @@ describe('Session authentication callback', () => {
           name: 'Tom Christian',
           email: 'tom.christian@nihr.ac.uk',
           roles: [Roles.SponsorContact, Roles.ContactManager],
+          organisations: [mockUserOrganisation],
         },
       })
     )

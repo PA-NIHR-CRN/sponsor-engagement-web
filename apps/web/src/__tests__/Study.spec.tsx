@@ -5,8 +5,8 @@ import { render, screen, within } from '@testing-library/react'
 import { NextSeo } from 'next-seo'
 import type { Prisma } from 'database'
 import { simpleFaker } from '@faker-js/faker'
-import type { StudyProps } from '../pages/studies/[...id]'
-import Study, { getServerSideProps } from '../pages/studies/[...id]'
+import type { StudyProps } from '../pages/studies/[studyId]'
+import Study, { getServerSideProps } from '../pages/studies/[studyId]'
 import { userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
 import { SIGN_IN_PAGE } from '../constants/routes'
 import { prismaMock } from '../__mocks__/prisma'
@@ -52,7 +52,7 @@ describe('getServerSideProps', () => {
   })
 
   test('redirects to 404 page if no study found', async () => {
-    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { id: '123' } })
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
     getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
     prismaMock.study.findFirst.mockResolvedValueOnce(null)
 
@@ -145,7 +145,7 @@ describe('Study page', () => {
   test('Default layout', async () => {
     prismaMock.study.findFirst.mockResolvedValueOnce(mockStudy)
 
-    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { id: '123' } })
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
 
     const { props } = (await getServerSideProps(context)) as {
       props: StudyProps
@@ -171,7 +171,7 @@ describe('Study page', () => {
     expect(screen.queryByText('Due')).not.toBeInTheDocument()
 
     expect(screen.getByText(/You can review the progress of this study at any time./)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'NIHR CRN support' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'NIHR CRN support' })).toHaveAttribute('href', '/')
 
     // Progress summary
     expect(screen.getByRole('heading', { name: 'Progress Summary', level: 3 })).toBeInTheDocument()
@@ -260,7 +260,7 @@ describe('Study page', () => {
   test('Due assessment', async () => {
     prismaMock.study.findFirst.mockResolvedValueOnce({ ...mockStudy, isDueAssessment: true })
 
-    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { id: '123' } })
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
 
     const { props } = (await getServerSideProps(context)) as {
       props: StudyProps
@@ -277,7 +277,7 @@ describe('Study page', () => {
       Mock.of<StudyWithRelations>({ ...mockStudy, evaluationCategories: [] })
     )
 
-    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { id: '123' } })
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
 
     const { props } = (await getServerSideProps(context)) as {
       props: StudyProps
@@ -291,7 +291,7 @@ describe('Study page', () => {
   test('Non-commercial study', async () => {
     prismaMock.study.findFirst.mockResolvedValueOnce({ ...mockStudy, route: 'Non-commercial' })
 
-    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { id: '123' } })
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
 
     const { props } = (await getServerSideProps(context)) as {
       props: StudyProps
