@@ -1,15 +1,12 @@
 import type { ReactElement } from 'react'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Container } from '@nihr-ui/frontend'
 import { zodResolver } from '@hookform/resolvers/zod'
-import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { getServerSession } from 'next-auth/next'
+import type { InferGetServerSidePropsType } from 'next'
 import { NextSeo } from 'next-seo'
 import { useForm } from 'react-hook-form'
 import clsx from 'clsx'
 import Link from 'next/link'
 import { RootLayout } from '../../../components/Layout/RootLayout'
-import { authOptions } from '../../api/auth/[...nextauth]'
-import { SIGN_IN_PAGE } from '../../../constants/routes'
 import { GetSupport } from '../../../components/molecules'
 import { getStudyById } from '../../../lib/studies'
 import { Checkbox, CheckboxGroup, Fieldset, Form, Radio, RadioGroup } from '../../../components/atoms'
@@ -19,6 +16,7 @@ import { prismaClient } from '../../../lib/prisma'
 import { Textarea } from '../../../components/atoms/Form/Textarea/Textarea'
 import { TEXTAREA_MAX_CHARACTERS } from '../../../constants/forms'
 import { formatDate } from '../../../utils/date'
+import { withServerSideProps } from '../../../utils/withServerSideProps'
 
 export type AssessmentProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
@@ -162,72 +160,56 @@ Assessment.getLayout = function getLayout(page: ReactElement, { user }: Assessme
   return <RootLayout user={user}>{page}</RootLayout>
 }
 
-export const getServerSideProps = async (context: GetServerSidePropsContext) => {
-  try {
-    const session = await getServerSession(context.req, context.res, authOptions)
+export const getServerSideProps = withServerSideProps(async (context, session) => {
+  const studyId = context.query.studyId
 
-    if (!session?.user) {
-      return {
-        redirect: {
-          destination: SIGN_IN_PAGE,
-        },
-      }
-    }
-
-    if (session.user.roles.length === 0) {
-      return {
-        redirect: {
-          destination: '/',
-        },
-      }
-    }
-
-    const studyId = context.query.studyId
-
-    if (!studyId) {
-      throw new Error('Cannot assess a study if no study id exists!')
-    }
-
-    const [study, statusRefData, furtherInformationRefData] = await prismaClient.$transaction([
-      getStudyById(Number(studyId)),
-      prismaClient.sysRefAssessmentStatus.findMany(),
-      prismaClient.sysRefAssessmentFurtherInformation.findMany({
-        orderBy: [{ sortOrder: 'asc' }],
-        where: {
-          isDeleted: false,
-        },
-      }),
-    ])
-
-    if (!study) {
-      throw new Error('Missing study data')
-    }
-
-    const lastAssessment =
-      study.assessments.length > 0
-        ? {
-            status: study.assessments[0].status.name,
-            createdAt: formatDate(study.assessments[0].createdAt),
-            createdBy: study.assessments[0].createdBy.email,
-            furtherInformation: study.assessments[0].furtherInformation[0]?.furtherInformationText,
-          }
-        : null
-
-    return {
-      props: {
-        user: session.user,
-        study,
-        statuses: statusRefData.map(({ id, name, description }) => ({ id, name, description })),
-        furtherInformation: furtherInformationRefData.map(({ id, name }) => ({ id, name })),
-        returnUrl: context.query.returnUrl === 'studies' ? '/studies' : `/studies/${study.id}`,
-        lastAssessment,
-      },
-    }
-  } catch (error) {
+  if (!studyId) {
     return {
       redirect: {
-        destination: '/500',
+        destination: '/404',
       },
     }
   }
-}
+
+  const userOrganisationIds = session.user?.organisations.map((org) => org.id)
+
+  const [study, statusRefData, furtherInformationRefData] = await prismaClient.$transaction([
+    getStudyById(Number(studyId), userOrganisationIds),
+    prismaClient.sysRefAssessmentStatus.findMany(),
+    prismaClient.sysRefAssessmentFurtherInformation.findMany({
+      orderBy: [{ sortOrder: 'asc' }],
+      where: {
+        isDeleted: false,
+      },
+    }),
+  ])
+
+  if (!study) {
+    return {
+      redirect: {
+        destination: '/404',
+      },
+    }
+  }
+
+  const lastAssessment =
+    study.assessments.length > 0
+      ? {
+          status: study.assessments[0].status.name,
+          createdAt: formatDate(study.assessments[0].createdAt),
+          createdBy: study.assessments[0].createdBy.email,
+          furtherInformation: study.assessments[0].furtherInformation[0]?.furtherInformationText,
+        }
+      : null
+
+  return {
+    props: {
+      user: session.user,
+      study,
+      statuses: statusRefData.map(({ id, name, description }) => ({ id, name, description })),
+      furtherInformation: furtherInformationRefData.map(({ id, name }) => ({ id, name })),
+      returnUrl: context.query.returnUrl === 'studies' ? '/studies' : `/studies/${study.id}`,
+      lastAssessment,
+    },
+  }
+})
