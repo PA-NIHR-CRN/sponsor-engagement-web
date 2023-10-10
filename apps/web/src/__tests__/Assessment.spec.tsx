@@ -18,7 +18,7 @@ jest.mock('next-seo')
 
 describe('getServerSideProps', () => {
   const getServerSessionMock = jest.mocked(getServerSession)
-  const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {} })
+  const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
 
   test('redirects to sign in page when there is no user session', async () => {
     getServerSessionMock.mockResolvedValueOnce(null)
@@ -37,6 +37,30 @@ describe('getServerSideProps', () => {
     expect(result).toEqual({
       redirect: {
         destination: '/',
+      },
+    })
+  })
+
+  test('redirects to 404 page if no study id provided', async () => {
+    getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+
+    const result = await getServerSideProps({ ...context, query: { studyId: undefined } })
+    expect(result).toEqual({
+      redirect: {
+        destination: '/404',
+      },
+    })
+  })
+
+  test('redirects to 404 page if no study found', async () => {
+    getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+
+    prismaMock.$transaction.mockResolvedValueOnce([])
+
+    const result = await getServerSideProps(context)
+    expect(result).toEqual({
+      redirect: {
+        destination: '/404',
       },
     })
   })
