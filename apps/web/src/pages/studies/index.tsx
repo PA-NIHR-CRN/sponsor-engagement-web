@@ -128,7 +128,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       }
     }
 
-    const userOrganisationIds = session.user.organisations.map((org) => org.id)
+    const userOrganisationIds = session.user.organisations.map((userOrg) => userOrg.organisationId)
 
     const studies = await getStudiesForOrgs(userOrganisationIds, Number(context.query.page) || 1, PER_PAGE)
 

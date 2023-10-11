@@ -178,7 +178,7 @@ export const getServerSideProps = withServerSideProps(async (context, session) =
     }
   }
 
-  const userOrganisationIds = session.user?.organisations.map((org) => org.id)
+  const userOrganisationIds = session.user?.organisations.map((userOrg) => userOrg.organisationId)
 
   const [study, statusRefData, furtherInformationRefData] = await prismaClient.$transaction([
     getStudyById(Number(studyId), userOrganisationIds),
