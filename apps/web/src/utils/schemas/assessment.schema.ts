@@ -20,7 +20,8 @@ export const assessmentSchema = z
         }),
       })
       .array()
-      .nonempty(),
+      .nonempty()
+      .or(z.boolean()),
 
     furtherInformationText: z
       .string()

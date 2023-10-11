@@ -147,6 +147,7 @@ export default function Assessment({
                 defaultValue=""
                 errors={errors}
                 label="Is there any additional information that would help NIHR CRN understand this progress assessment?"
+                required={false}
                 {...register('furtherInformation')}
               >
                 {furtherInformation.map(({ id, name }) => (

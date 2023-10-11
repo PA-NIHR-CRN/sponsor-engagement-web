@@ -389,10 +389,9 @@ describe('Form submission failures', () => {
       'href',
       '#status'
     )
-    expect(within(alert).getByRole('link', { name: 'Select any additional further information' })).toHaveAttribute(
-      'href',
-      '#furtherInformation'
-    )
+    expect(
+      within(alert).queryByRole('link', { name: 'Select any additional further information' })
+    ).not.toBeInTheDocument()
 
     // Field errors
     expect(screen.getByRole('group', { name: 'Is this study progressing as planned?' })).toHaveAccessibleErrorMessage(
@@ -402,7 +401,7 @@ describe('Form submission failures', () => {
       screen.getByRole('group', {
         name: 'Is there any additional information that would help NIHR CRN understand this progress assessment?',
       })
-    ).toHaveAccessibleErrorMessage('Error: Select any additional further information')
+    ).not.toHaveAccessibleErrorMessage()
     expect(screen.getByLabelText('Further information (optional)')).not.toHaveAccessibleErrorMessage()
   })
 
