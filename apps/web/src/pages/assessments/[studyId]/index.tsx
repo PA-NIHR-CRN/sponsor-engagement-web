@@ -1,15 +1,16 @@
-import type { ReactElement } from 'react'
+import { useCallback, type ReactElement } from 'react'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Container } from '@nihr-ui/frontend'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { InferGetServerSidePropsType } from 'next'
 import { NextSeo } from 'next-seo'
+import type { FieldError } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 import clsx from 'clsx'
 import Link from 'next/link'
 import { RootLayout } from '../../../components/Layout/RootLayout'
 import { GetSupport } from '../../../components/molecules'
 import { getStudyById } from '../../../lib/studies'
-import { Checkbox, CheckboxGroup, Fieldset, Form, Radio, RadioGroup } from '../../../components/atoms'
+import { Checkbox, CheckboxGroup, ErrorSummary, Fieldset, Form, Radio, RadioGroup } from '../../../components/atoms'
 import type { AssessmentInputs } from '../../../utils/schemas/assessment.schema'
 import { assessmentSchema } from '../../../utils/schemas/assessment.schema'
 import { prismaClient } from '../../../lib/prisma'
@@ -17,10 +18,13 @@ import { Textarea } from '../../../components/atoms/Form/Textarea/Textarea'
 import { TEXTAREA_MAX_CHARACTERS } from '../../../constants/forms'
 import { formatDate } from '../../../utils/date'
 import { withServerSideProps } from '../../../utils/withServerSideProps'
+import { getValuesFromSearchParams } from '../../../utils/form'
+import { useFormErrorHydration } from '../../../hooks/useFormErrorHydration'
 
 export type AssessmentProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
 export default function Assessment({
+  query,
   study,
   statuses,
   furtherInformation,
@@ -29,10 +33,24 @@ export default function Assessment({
 }: AssessmentProps) {
   const { register, formState, setError, watch, handleSubmit } = useForm<AssessmentInputs>({
     resolver: zodResolver(assessmentSchema),
-    // defaultValues: getValuesFromSearchParams(feedbackSchema, query),
+    defaultValues: {
+      ...getValuesFromSearchParams(assessmentSchema, query),
+      studyId: String(study.id),
+    },
   })
 
-  const errors = {}
+  const handleFoundError = useCallback(
+    (field: keyof AssessmentInputs, error: FieldError) => {
+      setError(field, error)
+    },
+    [setError]
+  )
+
+  const { errors } = useFormErrorHydration<AssessmentInputs>({
+    schema: assessmentSchema,
+    formState,
+    onFoundError: handleFoundError,
+  })
 
   // Watch & update the character count for the "Support summary" textarea
   const furtherInformationText = watch('furtherInformationText') ?? ''
@@ -97,7 +115,7 @@ export default function Assessment({
           )}
 
           <Form
-            action="/api/forms/assessment"
+            action={`/api/forms/assessment?returnUrl=${returnUrl}`}
             handleSubmit={handleSubmit}
             method="post"
             onError={(message: string) => {
@@ -107,12 +125,14 @@ export default function Assessment({
               })
             }}
           >
-            {/* <ErrorSummary errors={errors} /> */}
+            <ErrorSummary errors={errors} />
+
+            <input type="hidden" {...register('studyId')} defaultValue={defaultValues?.studyId} />
 
             <Fieldset>
               {/* Status */}
               <RadioGroup
-                defaultValue=""
+                defaultValue={defaultValues?.status}
                 errors={errors}
                 label="Is this study progressing as planned?"
                 {...register('status')}
@@ -148,7 +168,7 @@ export default function Assessment({
                 <button className={clsx('govuk-button', { 'pointer-events-none': formState.isLoading })} type="submit">
                   Submit assessment
                 </button>
-                <Link className="govuk-button govuk-button--secondary" href={returnUrl}>
+                <Link className="govuk-button govuk-button--secondary" href={`/${returnUrl}`}>
                   Cancel
                 </Link>
               </div>
@@ -216,11 +236,12 @@ export const getServerSideProps = withServerSideProps(async (context, session) =
 
   return {
     props: {
+      query: context.query,
       user: session.user,
       study,
       statuses: statusRefData.map(({ id, name, description }) => ({ id, name, description })),
       furtherInformation: furtherInformationRefData.map(({ id, name }) => ({ id, name })),
-      returnUrl: context.query.returnUrl === 'studies' ? '/studies' : `/studies/${study.id}`,
+      returnUrl: context.query.returnUrl === 'studies' ? 'studies' : `studies/${study.id}`,
       lastAssessment,
     },
   }

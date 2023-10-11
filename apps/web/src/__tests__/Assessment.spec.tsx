@@ -6,6 +6,7 @@ import { NextSeo } from 'next-seo'
 import type { Prisma } from 'database'
 import { simpleFaker } from '@faker-js/faker'
 import userEvent from '@testing-library/user-event'
+import mockRouter from 'next-router-mock'
 import type { AssessmentProps } from '../pages/assessments/[studyId]'
 import Assessment, { getServerSideProps } from '../pages/assessments/[studyId]'
 import { userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
@@ -15,6 +16,7 @@ import { sysRefAssessmentFurtherInformation, sysRefAssessmentStatus } from '../_
 
 jest.mock('next-auth/next')
 jest.mock('next-seo')
+jest.mock('axios')
 
 describe('getServerSideProps', () => {
   const getServerSessionMock = jest.mocked(getServerSession)
@@ -354,5 +356,125 @@ describe('Expanding last sponsor assessment accordion', () => {
     expect(within(list).getByText('Mocked list item 3')).toBeInTheDocument()
 
     expect(screen.getByText('Testing some further information')).toBeInTheDocument()
+  })
+})
+
+describe('Form submission failures', () => {
+  beforeEach(() => {
+    console.error = jest.fn()
+    void mockRouter.push('/assessments/123')
+    jest.clearAllMocks()
+  })
+
+  test('Client side validation errors', async () => {
+    prismaMock.sysRefAssessmentStatus.findMany.mockResolvedValueOnce(sysRefAssessmentStatus)
+    prismaMock.sysRefAssessmentFurtherInformation.findMany.mockResolvedValueOnce(sysRefAssessmentFurtherInformation)
+    prismaMock.$transaction.mockResolvedValueOnce([study, sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
+
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: String(mockedStudyId) } })
+
+    const { props } = (await getServerSideProps(context)) as {
+      props: AssessmentProps
+    }
+
+    render(Assessment.getLayout(<Assessment {...props} />, { ...props }))
+
+    expect(screen.getByRole('heading', { name: 'Assess progress of a study', level: 2 })).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Submit assessment' }))
+
+    // Summary errors
+    const alert = screen.getByRole('alert', { name: 'There is a problem' })
+    expect(within(alert).getByRole('link', { name: 'Select how the study is progressing' })).toHaveAttribute(
+      'href',
+      '#status'
+    )
+    expect(within(alert).getByRole('link', { name: 'Select any additional further information' })).toHaveAttribute(
+      'href',
+      '#furtherInformation'
+    )
+
+    // Field errors
+    expect(screen.getByRole('group', { name: 'Is this study progressing as planned?' })).toHaveAccessibleErrorMessage(
+      'Error: Select how the study is progressing'
+    )
+    expect(
+      screen.getByRole('group', {
+        name: 'Is there any additional information that would help NIHR CRN understand this progress assessment?',
+      })
+    ).toHaveAccessibleErrorMessage('Error: Select any additional further information')
+    expect(screen.getByLabelText('Further information (optional)')).not.toHaveAccessibleErrorMessage()
+  })
+
+  test('Server side field validation errors', async () => {
+    void mockRouter.push('?statusError=Select+how+the+study+is+progressing')
+
+    prismaMock.sysRefAssessmentStatus.findMany.mockResolvedValueOnce(sysRefAssessmentStatus)
+    prismaMock.sysRefAssessmentFurtherInformation.findMany.mockResolvedValueOnce(sysRefAssessmentFurtherInformation)
+    prismaMock.$transaction.mockResolvedValueOnce([study, sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
+
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: String(mockedStudyId) } })
+
+    const { props } = (await getServerSideProps(context)) as {
+      props: AssessmentProps
+    }
+
+    render(Assessment.getLayout(<Assessment {...props} />, { ...props }))
+
+    expect(screen.getByRole('heading', { name: 'Assess progress of a study', level: 2 })).toBeInTheDocument()
+
+    // Summary errors
+    const alert = screen.getByRole('alert', { name: 'There is a problem' })
+    expect(within(alert).getByRole('link', { name: 'Select how the study is progressing' })).toHaveAttribute(
+      'href',
+      '#status'
+    )
+    expect(
+      within(alert).queryByRole('link', { name: 'Select any additional further information' })
+    ).not.toBeInTheDocument()
+
+    // Field errors
+    expect(screen.getByRole('group', { name: 'Is this study progressing as planned?' })).toHaveAccessibleErrorMessage(
+      'Error: Select how the study is progressing'
+    )
+    expect(
+      screen.getByRole('group', {
+        name: 'Is there any additional information that would help NIHR CRN understand this progress assessment?',
+      })
+    ).not.toHaveAccessibleErrorMessage()
+    expect(screen.getByLabelText('Further information (optional)')).not.toHaveAccessibleErrorMessage()
+  })
+
+  test('Fatal server error shows an error at the top of the page', async () => {
+    prismaMock.sysRefAssessmentStatus.findMany.mockResolvedValueOnce(sysRefAssessmentStatus)
+    prismaMock.sysRefAssessmentFurtherInformation.findMany.mockResolvedValueOnce(sysRefAssessmentFurtherInformation)
+    prismaMock.$transaction.mockResolvedValueOnce([study, sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
+
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: String(mockedStudyId) } })
+
+    const { props } = (await getServerSideProps(context)) as {
+      props: AssessmentProps
+    }
+
+    render(Assessment.getLayout(<Assessment {...props} />, { ...props }))
+
+    expect(screen.getByRole('heading', { name: 'Assess progress of a study', level: 2 })).toBeInTheDocument()
+
+    // Status
+    await userEvent.click(screen.getByLabelText('On track'))
+
+    // Further information
+    await userEvent.click(screen.getByLabelText('Study no longer going ahead in the UK [withdrawn during setup]'))
+    await userEvent.click(screen.getByLabelText('Waiting for site approval or activation'))
+    await userEvent.click(screen.getByLabelText('Follow up complete or none required'))
+
+    await userEvent.click(screen.getByRole('button', { name: 'Submit assessment' }))
+
+    expect(mockRouter.asPath).toBe('/assessments/123?fatal=1')
+
+    const alert = screen.getByRole('alert')
+    expect(
+      within(alert).getByText('An unexpected error occured whilst processing the form, please try again later.')
+    ).toBeInTheDocument()
   })
 })

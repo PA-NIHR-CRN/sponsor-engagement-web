@@ -5,7 +5,9 @@ export type AssessmentInputs = z.infer<typeof assessmentSchema>
 
 export const assessmentSchema = z
   .object({
-    status: z.enum(['On track', 'Off track'], {
+    studyId: z.string(),
+
+    status: z.string({
       errorMap: () => ({
         message: 'Select how the study is progressing',
       }),

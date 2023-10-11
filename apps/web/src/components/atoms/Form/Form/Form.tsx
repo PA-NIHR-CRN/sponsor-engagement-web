@@ -61,7 +61,6 @@ export function Form<T extends FieldValues>({ action, method, children, onError,
   }
 
   const onInvalid = () => {
-    // eslint-disable-next-line no-console -- temporary until logger is fixed
     console.error('Form submission failed')
   }
 
