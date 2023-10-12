@@ -10,10 +10,6 @@ describe('getStudiesForOrgs', () => {
   const mockStudyDueAssessmentCount = 1
 
   it('should return studies and pagination information', async () => {
-    prismaMock.study.findMany.mockResolvedValueOnce(mockStudies)
-    prismaMock.study.count.mockResolvedValueOnce(mockStudyCount)
-    prismaMock.study.count.mockResolvedValueOnce(mockStudyDueAssessmentCount)
-
     prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudyCount, mockStudyDueAssessmentCount])
 
     const userOrganisationIds = [1, 2]

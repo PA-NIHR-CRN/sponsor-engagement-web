@@ -3,7 +3,6 @@ import { Mock } from 'ts-mockery'
 import { getServerSession } from 'next-auth/next'
 import { render, within, screen } from '@testing-library/react'
 import { NextSeo } from 'next-seo'
-import type { UserOrganisation } from 'database'
 import { simpleFaker } from '@faker-js/faker'
 import type { StudiesProps } from '../pages/studies'
 import Studies, { getServerSideProps } from '../pages/studies'
@@ -44,10 +43,6 @@ describe('Studies page', () => {
   jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRole)
 
   test('Default layout', async () => {
-    prismaMock.userOrganisation.findMany.mockResolvedValueOnce([
-      Mock.of<UserOrganisation>({ organisationId: simpleFaker.number.int() }),
-    ])
-
     const mockStudies = Array.from(Array(15)).map((_, index) => ({
       id: index === 0 ? 'mocked-id' : simpleFaker.number.int(),
       name: 'Test Study',

@@ -152,8 +152,6 @@ describe('Assess progress of a study', () => {
   jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRole)
 
   test('Default layout', async () => {
-    prismaMock.sysRefAssessmentStatus.findMany.mockResolvedValueOnce(sysRefAssessmentStatus)
-    prismaMock.sysRefAssessmentFurtherInformation.findMany.mockResolvedValueOnce(sysRefAssessmentFurtherInformation)
     prismaMock.$transaction.mockResolvedValueOnce([study, sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
 
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: String(mockedStudyId) } })
@@ -235,8 +233,6 @@ describe('Assess progress of a study', () => {
   })
 
   test('Cancel button redirects back to the studies page if access from the list', async () => {
-    prismaMock.sysRefAssessmentStatus.findMany.mockResolvedValueOnce(sysRefAssessmentStatus)
-    prismaMock.sysRefAssessmentFurtherInformation.findMany.mockResolvedValueOnce(sysRefAssessmentFurtherInformation)
     prismaMock.$transaction.mockResolvedValueOnce([study, sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
 
     const context = Mock.of<GetServerSidePropsContext>({
@@ -292,8 +288,6 @@ describe('Assess progress of a study', () => {
 
 describe('Expanding the show study details accordion', () => {
   test('Shows more information about the study', async () => {
-    prismaMock.sysRefAssessmentStatus.findMany.mockResolvedValueOnce(sysRefAssessmentStatus)
-    prismaMock.sysRefAssessmentFurtherInformation.findMany.mockResolvedValueOnce(sysRefAssessmentFurtherInformation)
     prismaMock.$transaction.mockResolvedValueOnce([study, sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
 
     const context = Mock.of<GetServerSidePropsContext>({
@@ -318,8 +312,6 @@ describe('Expanding the show study details accordion', () => {
 
 describe('Expanding last sponsor assessment accordion', () => {
   test('Shows further information', async () => {
-    prismaMock.sysRefAssessmentStatus.findMany.mockResolvedValueOnce(sysRefAssessmentStatus)
-    prismaMock.sysRefAssessmentFurtherInformation.findMany.mockResolvedValueOnce(sysRefAssessmentFurtherInformation)
     prismaMock.$transaction.mockResolvedValueOnce([study, sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
 
     const context = Mock.of<GetServerSidePropsContext>({
@@ -367,8 +359,6 @@ describe('Form submission failures', () => {
   })
 
   test('Client side validation errors', async () => {
-    prismaMock.sysRefAssessmentStatus.findMany.mockResolvedValueOnce(sysRefAssessmentStatus)
-    prismaMock.sysRefAssessmentFurtherInformation.findMany.mockResolvedValueOnce(sysRefAssessmentFurtherInformation)
     prismaMock.$transaction.mockResolvedValueOnce([study, sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
 
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: String(mockedStudyId) } })
@@ -408,8 +398,6 @@ describe('Form submission failures', () => {
   test('Server side field validation errors', async () => {
     void mockRouter.push('?statusError=Select+how+the+study+is+progressing')
 
-    prismaMock.sysRefAssessmentStatus.findMany.mockResolvedValueOnce(sysRefAssessmentStatus)
-    prismaMock.sysRefAssessmentFurtherInformation.findMany.mockResolvedValueOnce(sysRefAssessmentFurtherInformation)
     prismaMock.$transaction.mockResolvedValueOnce([study, sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
 
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: String(mockedStudyId) } })
@@ -445,8 +433,6 @@ describe('Form submission failures', () => {
   })
 
   test('Fatal server error shows an error at the top of the page', async () => {
-    prismaMock.sysRefAssessmentStatus.findMany.mockResolvedValueOnce(sysRefAssessmentStatus)
-    prismaMock.sysRefAssessmentFurtherInformation.findMany.mockResolvedValueOnce(sysRefAssessmentFurtherInformation)
     prismaMock.$transaction.mockResolvedValueOnce([study, sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
 
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: String(mockedStudyId) } })
