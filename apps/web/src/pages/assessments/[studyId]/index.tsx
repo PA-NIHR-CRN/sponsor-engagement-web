@@ -101,11 +101,13 @@ export default function Assessment({
                   {lastAssessment.createdAt}
                 </AccordionTrigger>
                 <AccordionContent indent>
-                  <ul aria-label="Further information" className="govuk-list govuk-list--bullet govuk-body-s">
-                    {lastAssessment.furtherInformation.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
+                  {lastAssessment.furtherInformation.length ? (
+                    <ul aria-label="Further information" className="govuk-list govuk-list--bullet govuk-body-s">
+                      {lastAssessment.furtherInformation.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  ) : null}
                   <p className="govuk-body-s govuk-!-margin-bottom-0">{lastAssessment.furtherInformationText}</p>
                 </AccordionContent>
               </AccordionItem>

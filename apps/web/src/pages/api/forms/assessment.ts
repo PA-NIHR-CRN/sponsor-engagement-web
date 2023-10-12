@@ -1,25 +1,77 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest } from 'next'
 import { ZodError } from 'zod'
+import type { Prisma } from 'database'
 import type { AssessmentInputs } from '../../../utils/schemas'
 import { assessmentSchema } from '../../../utils/schemas'
+import { prismaClient } from '../../../lib/prisma'
+import { withApiHandler } from '../../../utils/withApiHandler'
 
 interface ExtendedNextApiRequest extends NextApiRequest {
   body: AssessmentInputs
 }
 
-export default function handler(req: ExtendedNextApiRequest, res: NextApiResponse) {
+export default withApiHandler<ExtendedNextApiRequest>(async (req, res, session) => {
   try {
     if (req.method !== 'POST') {
       throw new Error('Wrong method')
     }
 
-    const { studyId } = assessmentSchema.parse(req.body)
+    const { studyId, status, furtherInformation, furtherInformationText } = assessmentSchema.parse(req.body)
 
-    if (String(req.query.returnUrl).includes(studyId)) {
-      return res.redirect(302, `/studies/${studyId}`)
+    const furtherInformationInputs: Prisma.AssessmentFurtherInformationUncheckedCreateWithoutAssessmentInput[] = []
+
+    // Create a furtherInformation record for each selected checkbox
+    if (Array.isArray(furtherInformation)) {
+      for (const id of furtherInformation) {
+        furtherInformationInputs.push({
+          furtherInformationId: Number(id),
+        })
+      }
     }
-    return res.redirect(302, `/studies`)
+
+    // Create a record for the furtherInformation text field
+    if (furtherInformationText) {
+      furtherInformationInputs.push({
+        furtherInformationText,
+      })
+    }
+
+    const assessmentResult = await prismaClient.assessment.create({
+      data: {
+        createdById: session.user.id,
+        studyId: Number(studyId),
+        statusId: Number(status),
+        furtherInformation: {
+          createMany: {
+            data: furtherInformationInputs,
+          },
+        },
+      },
+    })
+
+    console.info(`Added assessment with id: ${assessmentResult.id}`)
+
+    const studyResult = await prismaClient.study.update({
+      where: {
+        id: Number(studyId),
+      },
+      data: {
+        isDueAssessment: false,
+      },
+    })
+
+    console.info(`Updated study with id: ${studyResult.id}`)
+
+    // Redireect back to study detail page
+    if (String(req.query.returnUrl).includes(studyId)) {
+      return res.redirect(302, `/studies/${studyId}?success=1`)
+    }
+
+    // Otherwise, redirect back to studies list page
+    return res.redirect(302, `/studies?success=1`)
   } catch (error) {
+    console.error(error)
+
     const studyId = req.body.studyId
 
     if (error instanceof ZodError) {
@@ -45,8 +97,6 @@ export default function handler(req: ExtendedNextApiRequest, res: NextApiRespons
       return res.redirect(302, `/assessments/${studyId}/?${searchParams.toString()}`)
     }
 
-    console.error(error)
-
     const searchParams = new URLSearchParams({
       fatal: '1',
       returnUrl: String(req.query.returnUrl),
@@ -54,4 +104,4 @@ export default function handler(req: ExtendedNextApiRequest, res: NextApiRespons
 
     return res.redirect(302, `/assessments/${studyId}/?${searchParams.toString()}`)
   }
-}
+})

@@ -16,7 +16,7 @@ export const getStudyById = (studyId: number, organisationIds?: number[]) => {
       }),
     },
     orderBy: {
-      createdAt: 'asc',
+      createdAt: 'desc',
     },
     include: {
       organisations: {
@@ -38,6 +38,9 @@ export const getStudyById = (studyId: number, organisationIds?: number[]) => {
               furtherInformationId: 'asc',
             },
           },
+        },
+        orderBy: {
+          createdAt: 'desc',
         },
       },
       funders: {

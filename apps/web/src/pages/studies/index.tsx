@@ -1,8 +1,10 @@
 import type { ReactElement } from 'react'
-import { AlertIcon, Container, Details } from '@nihr-ui/frontend'
+import { AlertIcon, Container, Details, NotificationBanner } from '@nihr-ui/frontend'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { NextSeo } from 'next-seo'
+import { useRouter } from 'next/router'
+import Link from 'next/link'
 import { RootLayout } from '../../components/Layout/RootLayout'
 import { authOptions } from '../api/auth/[...nextauth]'
 import { SIGN_IN_PAGE } from '../../constants/routes'
@@ -12,12 +14,25 @@ import { pluraliseStudy } from '../../utils/pluralise'
 import { getStudiesForOrgs } from '../../lib/studies'
 import { formatDate } from '../../utils/date'
 
+const renderNotificationBanner = (success: boolean) =>
+  success ? (
+    <NotificationBanner heading="The study assessment was successfully saved" success>
+      Get{' '}
+      <Link className="govuk-notification-banner__link" href="/">
+        NIHR CRN support
+      </Link>{' '}
+      for this study.
+    </NotificationBanner>
+  ) : null
+
 export type StudiesProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
 export default function Studies({
   studies,
   meta: { totalItems, totalItemsDue, initialPage, initialPageSize },
 }: StudiesProps) {
+  const router = useRouter()
+
   const titleResultsText =
     totalItems === 0
       ? `(no matching search results)`
@@ -30,6 +45,8 @@ export default function Studies({
       <NextSeo title={`Study Progress Review - Search results ${titleResultsText}`} />
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
+          {renderNotificationBanner(Boolean(router.query.success))}
+
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">Assess progress of studies</h2>
 
           <div className="flex items-center gap-2 govuk-!-margin-bottom-4">
