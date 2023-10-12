@@ -12,7 +12,6 @@ jest.mock('next/router', () => ({
 jest.mock('axios')
 // jest.mock('@/lib/logger')
 
-// eslint-disable-next-line no-console -- expected
 console.error = jest.fn()
 
 afterEach(() => {
