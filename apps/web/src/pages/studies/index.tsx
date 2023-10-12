@@ -21,7 +21,7 @@ export default function Studies({
   const titleResultsText =
     totalItems === 0
       ? `(no matching search results)`
-      : `(${totalItems} ${pluraliseStudy(totalItems)}, page ${initialPage + 1} of ${Math.ceil(
+      : `(${totalItems} ${pluraliseStudy(totalItems)}, page ${initialPage} of ${Math.ceil(
           totalItems / initialPageSize
         )})`
 
@@ -130,13 +130,15 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
     const userOrganisationIds = session.user.organisations.map((userOrg) => userOrg.organisationId)
 
-    const studies = await getStudiesForOrgs(userOrganisationIds, Number(context.query.page) || 1, PER_PAGE)
+    const initialPage = Number(context.query.page) || 1
+
+    const studies = await getStudiesForOrgs(userOrganisationIds, initialPage, PER_PAGE)
 
     return {
       props: {
         user: session.user,
         meta: {
-          initialPage: 0,
+          initialPage,
           initialPageSize: PER_PAGE,
           totalItems: studies.pagination.total,
           totalItemsDue: studies.pagination.totalDue,
