@@ -67,10 +67,10 @@ jobs:
           docker build -f apps/ingest/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG"
-      # - name: Run database migrations
-      #   run: npm run migrate:deploy
-      #   env:
-      #     DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Run database migrations
+        run: npm run migrate:deploy
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
       - name: Generate task definition file from container
         run: |
           aws ecs describe-task-definition --task-definition crnccd-ecs-dev-se-ingest-task-definition --query taskDefinition | jq 'del(.registeredAt,.registeredBy)' > ./task-definition.json
@@ -140,10 +140,10 @@ jobs:
           docker build -f apps/ingest/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG"
-      # - name: Run database migrations
-      #   run: npm run migrate:deploy
-      #   env:
-      #     DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Run database migrations
+        run: npm run migrate:deploy
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
       - name: Generate task definition file from container
         run: |
           aws ecs describe-task-definition --task-definition crnccd-ecs-test-se-ingest-task-definition --query taskDefinition | jq 'del(.registeredAt,.registeredBy)' > ./task-definition.json
@@ -213,10 +213,10 @@ jobs:
           docker build -f apps/ingest/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG"
-      # - name: Run database migrations
-      #   run: npm run migrate:deploy
-      #   env:
-      #     DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Run database migrations
+        run: npm run migrate:deploy
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
       - name: Generate task definition file from container
         run: |
           aws ecs describe-task-definition --task-definition crnccs-ecs-uat-se-ingest-task-definition --query taskDefinition | jq 'del(.registeredAt,.registeredBy)' > ./task-definition.json
@@ -286,10 +286,10 @@ jobs:
           docker build -f apps/ingest/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG"
-      # - name: Run database migrations
-      #   run: npm run migrate:deploy
-      #   env:
-      #     DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Run database migrations
+        run: npm run migrate:deploy
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
       - name: Generate task definition file from container
         run: |
           aws ecs describe-task-definition --task-definition crnccp-ecs-oat-se-ingest-task-definition --query taskDefinition | jq 'del(.registeredAt,.registeredBy)' > ./task-definition.json
@@ -359,10 +359,10 @@ jobs:
           docker build -f apps/ingest/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG"
-      # - name: Run database migrations
-      #   run: npm run migrate:deploy
-      #   env:
-      #     DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Run database migrations
+        run: npm run migrate:deploy
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
       - name: Generate task definition file from container
         run: |
           aws ecs describe-task-definition --task-definition crnccp-ecs-prod-se-ingest-task-definition --query taskDefinition | jq 'del(.registeredAt,.registeredBy)' > ./task-definition.json
