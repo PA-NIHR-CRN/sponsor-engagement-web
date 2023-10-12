@@ -31,8 +31,8 @@ export function Pagination({ initialPage, initialPageSize, totalItems, className
     setPage(0)
   }, [router.query.page, setPage])
 
-  /* Skip rendering if there's no content to show */
-  if (totalItems === 0) return null
+  /* Skip rendering if there's only one page */
+  if (totalItems <= initialPageSize) return null
 
   const pages = generateTruncatedPagination(totalPages, currentPage + 1)
 

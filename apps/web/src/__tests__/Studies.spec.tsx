@@ -39,36 +39,36 @@ describe('getServerSideProps', () => {
   })
 })
 
+const mockStudies = Array.from(Array(15)).map((_, index) => ({
+  id: index === 0 ? 'mocked-id' : simpleFaker.number.int(),
+  name: 'Test Study',
+  isDueAssessment: index === 0,
+  organisations: [
+    {
+      organisation: {
+        id: simpleFaker.number.int(),
+        name: 'Test Organisation',
+      },
+      organisationRole: {
+        id: simpleFaker.number.int(),
+        name: 'Test Organisation Role',
+      },
+    },
+  ],
+  evaluationCategories: [
+    {
+      indicatorType: 'Milestone missed',
+      updatedAt: new Date('2001-01-01'),
+      createdAt: new Date('2001-01-01'),
+    },
+  ],
+  assessments: [{ status: { name: 'Off Track' } }],
+}))
+
 describe('Studies page', () => {
   jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRole)
 
   test('Default layout', async () => {
-    const mockStudies = Array.from(Array(15)).map((_, index) => ({
-      id: index === 0 ? 'mocked-id' : simpleFaker.number.int(),
-      name: 'Test Study',
-      isDueAssessment: index === 0,
-      organisations: [
-        {
-          organisation: {
-            id: simpleFaker.number.int(),
-            name: 'Test Organisation',
-          },
-          organisationRole: {
-            id: simpleFaker.number.int(),
-            name: 'Test Organisation Role',
-          },
-        },
-      ],
-      evaluationCategories: [
-        {
-          indicatorType: 'Milestone missed',
-          updatedAt: new Date('2001-01-01'),
-          createdAt: new Date('2001-01-01'),
-        },
-      ],
-      assessments: [{ status: { name: 'Off Track' } }],
-    }))
-
     prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudies.length, 3])
 
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: {} })
@@ -160,6 +160,24 @@ describe('Studies page', () => {
     expect(within(pagination).getByRole('link', { name: 'Page 1' })).toHaveAttribute('href', '/?page=1')
     expect(within(pagination).getByRole('link', { name: 'Page 2' })).toHaveAttribute('href', '/?page=2')
     expect(within(pagination).getByRole('link', { name: 'Next' })).toHaveAttribute('href', '/?page=2')
+  })
+
+  test('Changing page', async () => {
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudies.length, 3])
+
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { page: '2' } })
+
+    const { props } = (await getServerSideProps(context)) as {
+      props: StudiesProps
+    }
+
+    render(Studies.getLayout(<Studies {...props} />, { ...props }))
+
+    // SEO
+    expect(NextSeo).toHaveBeenCalledWith(
+      { title: `Study Progress Review - Search results (${mockStudies.length} studies, page 2 of 2)` },
+      {}
+    )
   })
 })
 
