@@ -11,6 +11,7 @@ import { PER_PAGE } from '../../constants'
 import { pluraliseStudy } from '../../utils/pluralise'
 import { getStudiesForOrgs } from '../../lib/studies'
 import { formatDate } from '../../utils/date'
+import { isClinicalResearchSponsor } from '../../lib/organisations'
 
 export type StudiesProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
@@ -72,21 +73,25 @@ export default function Studies({
           </div>
 
           <ol aria-label="Studies" className="govuk-list govuk-list--spaced">
-            {studies.map((study) => (
-              <li key={study.id}>
-                <StudyList
-                  assessmentDue={Boolean(study.isDueAssessment)}
-                  assessmentHref={`/assessments/${study.id}?returnUrl=studies`}
-                  indications={study.evaluationCategories.map((evalCategory) => evalCategory.indicatorType)}
-                  lastAsessmentDate={formatDate(study.assessments[0]?.updatedAt)}
-                  shortTitle={study.name}
-                  shortTitleHref={`/studies/${study.id}`}
-                  sponsorName={study.organisations[0].organisation.name}
-                  trackStatus={study.assessments[0]?.status.name}
-                  trackStatusHref="/"
-                />
-              </li>
-            ))}
+            {studies.map((study) => {
+              const sponsorOrg = study.organisations.find((org) => isClinicalResearchSponsor(org))
+              const supportOrg = study.organisations.find((org) => !isClinicalResearchSponsor(org))
+              return (
+                <li key={study.id}>
+                  <StudyList
+                    assessmentDue={Boolean(study.isDueAssessment)}
+                    assessmentHref={`/assessments/${study.id}?returnUrl=studies`}
+                    indications={study.evaluationCategories.map((evalCategory) => evalCategory.indicatorType)}
+                    lastAsessmentDate={formatDate(study.assessments[0]?.updatedAt)}
+                    shortTitle={study.name}
+                    shortTitleHref={`/studies/${study.id}`}
+                    sponsorOrgName={sponsorOrg?.organisation.name}
+                    supportOrgName={supportOrg?.organisation.name}
+                    trackStatus={study.assessments[0]?.status.name}
+                  />
+                </li>
+              )
+            })}
           </ol>
 
           <Pagination
