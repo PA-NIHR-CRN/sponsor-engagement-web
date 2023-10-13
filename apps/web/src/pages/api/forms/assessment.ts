@@ -6,7 +6,7 @@ import { assessmentSchema } from '../../../utils/schemas'
 import { prismaClient } from '../../../lib/prisma'
 import { withApiHandler } from '../../../utils/withApiHandler'
 
-interface ExtendedNextApiRequest extends NextApiRequest {
+export interface ExtendedNextApiRequest extends NextApiRequest {
   body: AssessmentInputs
 }
 
@@ -62,7 +62,7 @@ export default withApiHandler<ExtendedNextApiRequest>(async (req, res, session) 
 
     console.info(`Updated study with id: ${studyResult.id}`)
 
-    // Redireect back to study detail page
+    // Redirect back to study detail page
     if (String(req.query.returnUrl).includes(studyId)) {
       return res.redirect(302, `/studies/${studyId}?success=1`)
     }
@@ -91,16 +91,16 @@ export default withApiHandler<ExtendedNextApiRequest>(async (req, res, session) 
 
       const searchParams = new URLSearchParams({
         ...fieldErrors,
-        returnUrl: String(req.query.returnUrl),
       })
+      if (req.query.returnUrl) searchParams.append('returnUrl', String(req.query.returnUrl))
 
       return res.redirect(302, `/assessments/${studyId}/?${searchParams.toString()}`)
     }
 
     const searchParams = new URLSearchParams({
       fatal: '1',
-      returnUrl: String(req.query.returnUrl),
     })
+    if (req.query.returnUrl) searchParams.append('returnUrl', String(req.query.returnUrl))
 
     return res.redirect(302, `/assessments/${studyId}/?${searchParams.toString()}`)
   }

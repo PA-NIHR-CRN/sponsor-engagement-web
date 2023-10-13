@@ -5,6 +5,7 @@ import { render, screen, within } from '@testing-library/react'
 import { NextSeo } from 'next-seo'
 import type { Prisma } from 'database'
 import { simpleFaker } from '@faker-js/faker'
+import mockRouter from 'next-router-mock'
 import type { StudyProps } from '../pages/studies/[studyId]'
 import Study, { getServerSideProps } from '../pages/studies/[studyId]'
 import { userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
@@ -303,5 +304,30 @@ describe('Study page', () => {
     expect(screen.queryByText('Total network recruitment to date')).not.toBeInTheDocument()
     expect(screen.getByText('UK recruitment target')).toBeInTheDocument()
     expect(screen.getByText('Total UK recruitment to date')).toBeInTheDocument()
+  })
+
+  test('Success banner shows after redirection from the assessment form', async () => {
+    prismaMock.study.findFirst.mockResolvedValueOnce(mockStudy)
+
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
+
+    const { props } = (await getServerSideProps(context)) as {
+      props: StudyProps
+    }
+
+    await mockRouter.push('?success=1')
+
+    render(Study.getLayout(<Study {...props} />, { ...props }))
+
+    // Title
+    expect(screen.getByRole('heading', { level: 2, name: mockStudy.name })).toBeInTheDocument()
+
+    // Banner
+    const banner = screen.getByRole('alert', { name: 'Success' })
+    expect(within(banner).getByText('The study assessment was successfully saved')).toBeInTheDocument()
+    expect(within(banner).getByRole('link', { name: 'NIHR CRN support' })).toHaveAttribute('href', '/')
+    expect(within(banner).getByRole('link', { name: 'NIHR CRN support' }).parentElement).toHaveTextContent(
+      'Get NIHR CRN support for this study.'
+    )
   })
 })
