@@ -32,6 +32,6 @@
       "env": ["NODE_ENV", "NEXTAUTH_URL", "AUTH_CLIENT_ID", "AUTH_CLIENT_SECRET", "AUTH_WELL_KNOWN_URL"]
     },
     "db:generate": { "cache": false },
-    "db:push": {}
+    "migrate:deploy": { "cache": false }
   }
 }
