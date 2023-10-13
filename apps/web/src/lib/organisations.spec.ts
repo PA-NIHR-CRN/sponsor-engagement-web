@@ -1,7 +1,7 @@
 import { Mock } from 'ts-mockery'
 import type { UserOrganisation } from 'database'
 import { prismaMock } from '../__mocks__/prisma'
-import { getUserOrganisations } from './organisations'
+import { getUserOrganisations, isClinicalResearchSponsor, type StudyOrganisationWithRelations } from './organisations'
 
 describe('getUserOrganisations', () => {
   it('returns organisations for the user', async () => {
@@ -18,5 +18,34 @@ describe('getUserOrganisations', () => {
     )
 
     expect(userOrgs).toStrictEqual([mockUserOrganisation])
+  })
+})
+
+describe('isClinicalResearchSponsor', () => {
+  const mockClinicalResearchSponsor = Mock.of<StudyOrganisationWithRelations>({
+    organisation: {
+      id: 123,
+      name: 'Test Clinical Research Sponsor',
+    },
+    organisationRole: {
+      id: 123,
+      name: 'Clinical Research Sponsor',
+    },
+  })
+
+  const mockContactResearchOrganisation = Mock.of<StudyOrganisationWithRelations>({
+    organisation: {
+      id: 123,
+      name: 'Test Contract Research Organisation',
+    },
+    organisationRole: {
+      id: 123,
+      name: 'Contract Research Organisation',
+    },
+  })
+
+  it('returns true if the organisation is a Clinical Research Sponsor', () => {
+    expect(isClinicalResearchSponsor(mockClinicalResearchSponsor)).toBe(true)
+    expect(isClinicalResearchSponsor(mockContactResearchOrganisation)).toBe(false)
   })
 })

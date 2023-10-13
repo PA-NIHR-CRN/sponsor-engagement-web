@@ -48,11 +48,21 @@ const mockStudies = Array.from(Array(15)).map((_, index) => ({
     {
       organisation: {
         id: simpleFaker.number.int(),
-        name: 'Test Organisation',
+        name: 'Test Clinical Research Sponsor',
       },
       organisationRole: {
         id: simpleFaker.number.int(),
-        name: 'Test Organisation Role',
+        name: 'Clinical Research Sponsor',
+      },
+    },
+    {
+      organisation: {
+        id: simpleFaker.number.int(),
+        name: 'Test Contract Research Organisation',
+      },
+      organisationRole: {
+        id: simpleFaker.number.int(),
+        name: 'Contract Research Organisation',
       },
     },
   ],
@@ -63,7 +73,7 @@ const mockStudies = Array.from(Array(15)).map((_, index) => ({
       createdAt: new Date('2001-01-01'),
     },
   ],
-  assessments: [{ status: { name: 'Off Track' } }],
+  assessments: [{ status: { name: 'Off Track' }, updatedAt: new Date('2001-01-01') }],
 }))
 
 describe('Studies page', () => {
@@ -77,7 +87,6 @@ describe('Studies page', () => {
     const { props } = (await getServerSideProps(context)) as {
       props: StudiesProps
     }
-
     render(Studies.getLayout(<Studies {...props} />, { ...props }))
 
     // SEO
@@ -136,7 +145,9 @@ describe('Studies page', () => {
     expect(withinFirstStudy.getByText('Test Study')).toBeInTheDocument()
 
     // Study organisation
-    expect(withinFirstStudy.getByText('Test Organisation')).toBeInTheDocument()
+    expect(
+      withinFirstStudy.getByText('Test Clinical Research Sponsor (Test Contract Research Organisation)')
+    ).toBeInTheDocument()
 
     // Study due assessment
     expect(withinFirstStudy.getByText('Due')).toBeInTheDocument()
@@ -146,7 +157,7 @@ describe('Studies page', () => {
     expect(withinFirstStudy.getByText('Milestone missed')).toBeInTheDocument()
 
     // Study assessment status
-    expect(withinFirstStudy.getByText('Off Track')).toBeInTheDocument()
+    expect(withinFirstStudy.getByText('Off Track on 1 January 2001')).toBeInTheDocument()
 
     // Study assessment CTA
     expect(withinFirstStudy.getByRole('link', { name: 'Assess' })).toHaveAttribute(
