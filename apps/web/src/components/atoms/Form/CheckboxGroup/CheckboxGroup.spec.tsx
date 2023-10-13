@@ -7,7 +7,7 @@ test('Renders correctly without errors or hint', () => {
   const label = 'Radio Group Label'
   const name = 'radioGroup'
   const errors: FieldErrors = {}
-  const defaultValue = 'option2'
+  const defaultValue = ['option2']
 
   const { getByLabelText, getByRole } = render(
     <CheckboxGroup defaultValue={defaultValue} errors={errors} label={label} name={name}>
@@ -40,7 +40,7 @@ test('Renders correctly with errors and hint', () => {
     },
   }
   const hint = 'Radio group hint'
-  const defaultValue = 'option3'
+  const defaultValue = ['option3']
 
   const { getByLabelText, getByText, getByRole } = render(
     <CheckboxGroup defaultValue={defaultValue} errors={errors} hint={hint} label={label} name={name}>
