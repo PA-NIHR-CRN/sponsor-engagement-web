@@ -17,7 +17,17 @@ export function hasErrorsInSearchParams(schema: Schemas, searchParams: ParsedUrl
 export function getValuesFromSearchParams(schema: Schemas, searchParams: ParsedUrlQuery) {
   return Object.fromEntries(
     Object.keys(schema.shape).map((field) => {
-      if (searchParams[field]) return [field, searchParams[field]]
+      const value = searchParams[field]
+
+      if (value) {
+        // Checkbox groups return a comma delimited list of values
+        if (value.includes(',')) {
+          return [field, String(searchParams[field]).split(',')]
+        }
+        // Everything else just returns a value
+        return [field, value]
+      }
+
       return [field, undefined]
     })
   )

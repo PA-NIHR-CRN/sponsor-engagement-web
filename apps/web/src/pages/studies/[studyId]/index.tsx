@@ -1,23 +1,40 @@
 import type { ReactElement } from 'react'
-import { Container, Table } from '@nihr-ui/frontend'
+import { Container, NotificationBanner, Table } from '@nihr-ui/frontend'
 import type { InferGetServerSidePropsType } from 'next'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { RootLayout } from '../../../components/Layout/RootLayout'
 import { GetSupport } from '../../../components/molecules'
 import { getStudyById } from '../../../lib/studies'
 import { formatDate } from '../../../utils/date'
 import { withServerSideProps } from '../../../utils/withServerSideProps'
 
+const renderNotificationBanner = (success: boolean) =>
+  success ? (
+    <NotificationBanner heading="The study assessment was successfully saved" success>
+      Get{' '}
+      <Link className="govuk-notification-banner__link" href="/">
+        NIHR CRN support
+      </Link>{' '}
+      for this study.
+    </NotificationBanner>
+  ) : null
+
 export type StudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
 export default function Study({ study }: StudyProps) {
+  const router = useRouter()
+
   return (
     <Container>
       <NextSeo title={`Study Progress Review - ${study.name}`} />
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
+          {renderNotificationBanner(Boolean(router.query.success))}
+
           <h2 className="govuk-heading-l govuk-!-margin-bottom-1">{study.name}</h2>
+
           <span className="govuk-body-m mb-0 text-darkGrey">{study.organisations[0].organisation.name}</span>
 
           <div className="flex items-center govuk-!-margin-bottom-4 govuk-!-margin-top-4 gap-6">

@@ -13,7 +13,7 @@ interface CheckboxGroupProps {
   hint?: ReactNode
   required?: boolean
   errors: FieldErrors
-  defaultValue: string | undefined
+  defaultValue: (string | undefined)[]
 }
 
 export const CheckboxGroup = forwardRef<HTMLInputElement, CheckboxGroupProps>(
@@ -51,7 +51,7 @@ export const CheckboxGroup = forwardRef<HTMLInputElement, CheckboxGroupProps>(
                       [`${rest.name}-${index}`]: index > 0,
                     }),
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- temp fix
-                    defaultChecked: defaultValue === child.props.value,
+                    defaultChecked: defaultValue.includes(child.props.value as string),
                     'aria-required': required,
                     'aria-invalid': error ? 'true' : 'false',
                     'aria-errormessage': clsx({
