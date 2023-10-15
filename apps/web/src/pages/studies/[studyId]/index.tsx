@@ -39,7 +39,7 @@ export default function Study({ study }: StudyProps) {
 
           <div className="flex items-center govuk-!-margin-bottom-4 govuk-!-margin-top-4 gap-6">
             <Link className="govuk-button w-auto govuk-!-margin-bottom-0" href={`/assessments/${study.id}`}>
-              Assess study
+              Assess
             </Link>
             {Boolean(study.isDueAssessment) && (
               <div>
@@ -83,11 +83,11 @@ export default function Study({ study }: StudyProps) {
                 <Table.Cell>{study.actualOpeningDate ? formatDate(study.actualOpeningDate) : '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.CellHeader>Planned closure date</Table.CellHeader>
+                <Table.CellHeader>Planned closure to recruitment date</Table.CellHeader>
                 <Table.Cell>{study.plannedClosureDate ? formatDate(study.plannedClosureDate) : '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.CellHeader>Actual closure date</Table.CellHeader>
+                <Table.CellHeader>Actual closure to recruitment date</Table.CellHeader>
                 <Table.Cell>{study.actualClosureDate ? formatDate(study.actualClosureDate) : '-'}</Table.Cell>
               </Table.Row>
               {study.status === 'Suspended' && Boolean(study.evaluationCategories.length) && (
