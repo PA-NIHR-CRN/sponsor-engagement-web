@@ -164,7 +164,7 @@ describe('Study page', () => {
     expect(screen.getByText('Test Organisation', { selector: 'span' })).toBeInTheDocument()
 
     // Assess study
-    expect(screen.getByRole('link', { name: 'Assess study' })).toHaveProperty(
+    expect(screen.getByRole('link', { name: 'Assess' })).toHaveProperty(
       'href',
       `http://localhost/assessments/${mockStudy.id}`
     )
@@ -186,8 +186,8 @@ describe('Study page', () => {
       'Study data indicates',
       'Planned opening date',
       'Actual opening date',
-      'Planned closure date',
-      'Actual closure date',
+      'Planned closure to recruitment date',
+      'Actual closure to recruitment date',
       'Estimated reopening date',
       'Network recruitment target',
       'Total network recruitment to date',
