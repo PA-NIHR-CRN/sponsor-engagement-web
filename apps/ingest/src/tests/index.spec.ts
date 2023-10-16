@@ -1,6 +1,6 @@
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
-
+import { logger } from 'logger'
 import { ingest } from '../ingest'
 import { organisationEntities, organisationRoleEntities, studyEntities } from '../mocks/entities'
 import { prismaMock } from '../mocks/prisma'
@@ -214,5 +214,25 @@ describe('ingest', () => {
         },
       },
     })
+  })
+
+  it('should handle errors when fetching studies', async () => {
+    const errorResponse = {
+      StatusCode: 500,
+      ErrorMessage: 'Internal API exception',
+    }
+
+    server.use(
+      rest.get(API_URL, async (_, res, ctx) => {
+        return res(ctx.status(500), ctx.json(errorResponse))
+      })
+    )
+
+    await ingest()
+
+    expect(prismaMock.study.updateMany).not.toHaveBeenCalled()
+
+    expect(logger.error).toHaveBeenCalledWith(expect.any(Object), 'Error fetching studies data')
+    expect(logger.error).toHaveBeenCalledWith(errorResponse, 'Error response')
   })
 })
