@@ -9,6 +9,6 @@ export const PER_PAGE = 10
 export const SERVICE_NAME = 'Assess progress of studies'
 
 /**
- * Date format to use across FRF
+ * Date format to use across the site
  */
 export const DATE_FORMAT = 'D MMMM YYYY'
