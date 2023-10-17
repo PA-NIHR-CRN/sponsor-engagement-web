@@ -18,7 +18,7 @@ assert(IDG_API_PASSWORD)
 
 const api = rateLimit(
   axios.create({
-    baseURL: process.env.IDG_API_URL,
+    baseURL: IDG_API_URL,
     auth: {
       username: IDG_API_USERNAME,
       password: IDG_API_PASSWORD,
@@ -76,7 +76,18 @@ const seedContacts = async <T extends Row>(fileName: string, headers: SponsorHea
     )
   })
 
-  const dbUser = await prisma.user.findFirst({ where: { email: 'dale.christian@nihr.ac.uk' } })
+  const dbUser = await prisma.user.upsert({
+    where: {
+      email: 'administrator@nihr.ac.uk',
+    },
+    update: {},
+    create: {
+      email: 'administrator@nihr.ac.uk',
+      name: 'Administrator',
+      identityGatewayId: '',
+    },
+  })
+
   const sponsorContactRole = await prisma.sysRefRole.findFirst({ where: { name: 'SponsorContact' } })
 
   assert(dbUser)
