@@ -275,9 +275,12 @@ const fetchStudies = async function* (url: string, username: string, password: s
       totalStudies = data.Result.TotalRecords
       ++pageNumber
       yield data.Result.Studies as Study[]
-    } catch (e) {
-      logger.error(`Error fetching studies data`, e)
-      yield []
+    } catch (error) {
+      logger.error(error, 'Error fetching studies data')
+      if (axios.isAxiosError(error)) {
+        logger.error(error.response?.data, 'Error response')
+      }
+      return
     }
   }
 }
