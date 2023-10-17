@@ -7,7 +7,7 @@ type TableCellHeaderProps = {
 
 export const TableCellHeader = React.forwardRef<HTMLTableCellElement, TableCellHeaderProps>(
   ({ className, column, ...props }, ref) => (
-    <th ref={ref} className={clsx('govuk-table__header pl-3', className)} scope={column ? 'col' : 'row'} {...props} />
+    <th ref={ref} className={clsx('govuk-table__header', className)} scope={column ? 'col' : 'row'} {...props} />
   )
 )
 TableCellHeader.displayName = 'TableCellHeader'

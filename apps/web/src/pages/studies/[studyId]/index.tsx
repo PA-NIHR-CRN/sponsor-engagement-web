@@ -160,15 +160,9 @@ export default function Study({ study }: StudyProps) {
             <Table.Caption className="govuk-visually-hidden">Study funders</Table.Caption>
             <Table.Header className="bg-grey-50">
               <Table.Row>
-                <Table.CellHeader className="border-b-0" column>
-                  Funder
-                </Table.CellHeader>
-                <Table.CellHeader className="border-b-0" column>
-                  Funding stream
-                </Table.CellHeader>
-                <Table.CellHeader className="border-b-0" column>
-                  Grant code
-                </Table.CellHeader>
+                <Table.CellHeader column>Funder</Table.CellHeader>
+                <Table.CellHeader column>Funding stream</Table.CellHeader>
+                <Table.CellHeader column>Grant code</Table.CellHeader>
               </Table.Row>
             </Table.Header>
             <Table.Body>
