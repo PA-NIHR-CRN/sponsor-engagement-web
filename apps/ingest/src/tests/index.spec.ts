@@ -202,6 +202,9 @@ describe('ingest', () => {
       },
       where: {
         id: { in: [123, 123, 123] },
+        actualOpeningDate: {
+          lte: expect.any(Date),
+        },
         evaluationCategories: {
           some: {},
         },
