@@ -14,7 +14,12 @@ describe('getStudiesForOrgs', () => {
 
     const userOrganisationIds = [1, 2]
 
-    const result = await getStudiesForOrgs(userOrganisationIds, 1, 10)
+    const result = await getStudiesForOrgs({
+      organisationIds: userOrganisationIds,
+      pageSize: 10,
+      currentPage: 1,
+      searchTerm: null,
+    })
 
     expect(result).toEqual({
       pagination: {
@@ -49,6 +54,80 @@ describe('getStudiesForOrgs', () => {
 
     expect(prismaMock.study.count).toHaveBeenCalledWith({
       where: {
+        organisations: {
+          some: {
+            organisationId: { in: [1, 2] },
+            organisationRole: {
+              rtsIdentifier: {
+                in: [
+                  StudySponsorOrganisationRoleRTSIdentifier.ClinicalResearchSponsor,
+                  StudySponsorOrganisationRoleRTSIdentifier.ClinicalTrialsUnit,
+                  StudySponsorOrganisationRoleRTSIdentifier.ContractResearchOrganisation,
+                ],
+              },
+            },
+          },
+        },
+      },
+    })
+  })
+
+  it('should query studies by study title, irasId and protocolReferenceNumber when a search term is provided', async () => {
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudyCount, mockStudyDueAssessmentCount])
+
+    const userOrganisationIds = [1, 2]
+    const searchTerm = 'test-study'
+
+    const result = await getStudiesForOrgs({
+      organisationIds: userOrganisationIds,
+      pageSize: 10,
+      currentPage: 1,
+      searchTerm,
+    })
+
+    expect(result).toEqual({
+      pagination: {
+        total: mockStudyCount,
+        totalDue: mockStudyDueAssessmentCount,
+      },
+      data: mockStudies,
+    })
+
+    expect(prismaMock.study.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        skip: 0,
+        take: 10,
+        where: {
+          OR: [
+            { name: { contains: 'test-study' } },
+            { irasId: { contains: 'test-study' } },
+            { protocolReferenceNumber: { contains: 'test-study' } },
+          ],
+          organisations: {
+            some: {
+              organisationId: { in: userOrganisationIds },
+              organisationRole: {
+                rtsIdentifier: {
+                  in: [
+                    StudySponsorOrganisationRoleRTSIdentifier.ClinicalResearchSponsor,
+                    StudySponsorOrganisationRoleRTSIdentifier.ClinicalTrialsUnit,
+                    StudySponsorOrganisationRoleRTSIdentifier.ContractResearchOrganisation,
+                  ],
+                },
+              },
+            },
+          },
+        },
+      })
+    )
+
+    expect(prismaMock.study.count).toHaveBeenCalledWith({
+      where: {
+        OR: [
+          { name: { contains: 'test-study' } },
+          { irasId: { contains: 'test-study' } },
+          { protocolReferenceNumber: { contains: 'test-study' } },
+        ],
         organisations: {
           some: {
             organisationId: { in: [1, 2] },

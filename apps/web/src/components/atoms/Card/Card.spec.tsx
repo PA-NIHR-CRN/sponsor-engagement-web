@@ -43,4 +43,10 @@ describe('Card Component', () => {
     const cardElement = container.firstChild as HTMLElement
     expect(cardElement).toHaveClass('custom-class')
   })
+
+  test('applies custom html attributes', () => {
+    const { container } = render(<Card {...defaultProps} id="custom-id" />)
+    const cardElement = container.firstChild as HTMLElement
+    expect(cardElement).toHaveAttribute('id', 'custom-id')
+  })
 })
