@@ -59,11 +59,6 @@ test('Default input states are correct in relation to the currently enabled filt
   expect(screen.getByLabelText('Search study title, protocol number or IRAS ID')).toHaveValue('Test search')
 })
 
-test.skip('Allows clearing all filters', () => {
-  render(<Filters {...defaultProps} />)
-  expect(screen.getByRole('link', { name: 'Clear all filters' })).toHaveAttribute('href', '/providers')
-})
-
 test('Clears the search query after the search input is emptied', async () => {
   const onFilterChangeSpy = jest.fn()
 
