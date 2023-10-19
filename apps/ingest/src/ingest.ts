@@ -222,19 +222,21 @@ const createOrganisationRelationships = async () => {
 }
 
 const setAssessmentDue = async () => {
+  const threeMonthsAgo = dayjs().subtract(3, 'month').toDate()
   const assessmentDueResult = await prismaClient.study.updateMany({
     data: {
       isDueAssessment: true,
     },
     where: {
       id: { in: studyEntities.map((study) => study.id) },
+      actualOpeningDate: { lte: threeMonthsAgo },
       evaluationCategories: {
         some: {},
       },
       assessments: {
         every: {
           updatedAt: {
-            lte: dayjs().subtract(3, 'month').toDate(),
+            lte: threeMonthsAgo,
           },
         },
       },
