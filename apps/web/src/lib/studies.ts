@@ -52,11 +52,40 @@ export const getStudyById = (studyId: number, organisationIds?: number[]) => {
   })
 }
 
-export const getStudiesForOrgs = async (organisationIds: number[], currentPage: number, pageSize: number) => {
+export const getStudiesForOrgs = async ({
+  organisationIds,
+  currentPage,
+  pageSize,
+  searchTerm,
+}: {
+  organisationIds: number[]
+  currentPage: number
+  pageSize: number
+  searchTerm: string | null
+}) => {
   const query = {
     skip: currentPage * pageSize - pageSize,
     take: pageSize,
     where: {
+      ...(searchTerm && {
+        OR: [
+          {
+            name: {
+              contains: searchTerm,
+            },
+          },
+          {
+            irasId: {
+              contains: searchTerm,
+            },
+          },
+          {
+            protocolReferenceNumber: {
+              contains: searchTerm,
+            },
+          },
+        ],
+      }),
       organisations: {
         some: {
           organisationId: { in: organisationIds },

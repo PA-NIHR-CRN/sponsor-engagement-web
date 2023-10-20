@@ -5,15 +5,20 @@ import { getServerSession } from 'next-auth/next'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
+import Skeleton from 'react-loading-skeleton'
 import { RootLayout } from '../../components/Layout/RootLayout'
 import { authOptions } from '../api/auth/[...nextauth]'
 import { SIGN_IN_PAGE } from '../../constants/routes'
-import { GetSupport, StudyList, Pagination, Sort } from '../../components/molecules'
+import { GetSupport, StudyList, Pagination, Sort, Filters, SelectedFilters } from '../../components/molecules'
 import { PER_PAGE } from '../../constants'
 import { pluraliseStudy } from '../../utils/pluralise'
 import { getStudiesForOrgs } from '../../lib/studies'
 import { formatDate } from '../../utils/date'
 import { isClinicalResearchSponsor } from '../../lib/organisations'
+import { useStudies } from '../../hooks/useStudies'
+import { getFiltersFromQuery } from '../../utils/filters'
+import { Card } from '../../components/atoms'
+import 'react-loading-skeleton/dist/skeleton.css'
 
 const renderNotificationBanner = (success: boolean) =>
   success ? (
@@ -31,8 +36,11 @@ export type StudiesProps = InferGetServerSidePropsType<typeof getServerSideProps
 export default function Studies({
   studies,
   meta: { totalItems, totalItemsDue, initialPage, initialPageSize },
+  filters,
 }: StudiesProps) {
   const router = useRouter()
+
+  const { isLoading, handleFilterChange } = useStudies()
 
   const titleResultsText =
     totalItems === 0
@@ -74,6 +82,13 @@ export default function Studies({
             </ul>
           </Details>
 
+          {/* Search/Filter bar */}
+          <div>
+            <Filters filters={filters} onFilterChange={handleFilterChange} />
+          </div>
+
+          <SelectedFilters filters={filters} isLoading={isLoading} />
+
           {/* Sort bar */}
           <div className="flex-wrap items-center justify-between gap-3 md:flex govuk-!-margin-bottom-4">
             <p className="govuk-heading-s mb-0 whitespace-nowrap">{`${totalItems} ${pluraliseStudy(
@@ -89,34 +104,57 @@ export default function Studies({
             </div>
           </div>
 
-          <ol aria-label="Studies" className="govuk-list govuk-list--spaced">
-            {studies.map((study) => {
-              const sponsorOrg = study.organisations.find((org) => isClinicalResearchSponsor(org))
-              const supportOrg = study.organisations.find((org) => !isClinicalResearchSponsor(org))
-              return (
-                <li key={study.id}>
-                  <StudyList
-                    assessmentDue={Boolean(study.isDueAssessment)}
-                    assessmentHref={`/assessments/${study.id}?returnUrl=studies`}
-                    indications={study.evaluationCategories.map((evalCategory) => evalCategory.indicatorType)}
-                    lastAsessmentDate={formatDate(study.assessments[0]?.updatedAt)}
-                    shortTitle={study.name}
-                    shortTitleHref={`/studies/${study.id}`}
-                    sponsorOrgName={sponsorOrg?.organisation.name}
-                    supportOrgName={supportOrg?.organisation.name}
-                    trackStatus={study.assessments[0]?.status.name}
-                  />
-                </li>
-              )
-            })}
-          </ol>
+          {isLoading ? (
+            <Skeleton
+              baseColor="var(--colour-grey-10)"
+              borderRadius={0}
+              className="govuk-!-margin-bottom-3"
+              containerTestId="study-skeleton"
+              count={5}
+              height={152}
+              style={{ lineHeight: 'inherit' }}
+              width="100%"
+            />
+          ) : (
+            <>
+              {studies.length > 0 ? (
+                <>
+                  <ol aria-label="Studies" className="govuk-list govuk-list--spaced">
+                    {studies.map((study) => {
+                      const sponsorOrg = study.organisations.find((org) => isClinicalResearchSponsor(org))
+                      const supportOrg = study.organisations.find((org) => !isClinicalResearchSponsor(org))
+                      return (
+                        <li key={study.id}>
+                          <StudyList
+                            assessmentDue={Boolean(study.isDueAssessment)}
+                            assessmentHref={`/assessments/${study.id}?returnUrl=studies`}
+                            indications={study.evaluationCategories.map((evalCategory) => evalCategory.indicatorType)}
+                            lastAsessmentDate={formatDate(study.assessments[0]?.updatedAt)}
+                            shortTitle={study.name}
+                            shortTitleHref={`/studies/${study.id}`}
+                            sponsorOrgName={sponsorOrg?.organisation.name}
+                            supportOrgName={supportOrg?.organisation.name}
+                            trackStatus={study.assessments[0]?.status.name}
+                          />
+                        </li>
+                      )
+                    })}
+                  </ol>
 
-          <Pagination
-            className="justify-center"
-            initialPage={initialPage}
-            initialPageSize={initialPageSize}
-            totalItems={totalItems}
-          />
+                  <Pagination
+                    className="justify-center"
+                    initialPage={initialPage}
+                    initialPageSize={initialPageSize}
+                    totalItems={totalItems}
+                  />
+                </>
+              ) : (
+                <Card className="text-center bg-white" filled>
+                  No studies found
+                </Card>
+              )}
+            </>
+          )}
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
           <GetSupport />
@@ -150,11 +188,24 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       }
     }
 
-    const userOrganisationIds = session.user.organisations.map((userOrg) => userOrg.organisationId)
+    const organisationIds = session.user.organisations.map((userOrg) => userOrg.organisationId)
 
-    const initialPage = Number(context.query.page) || 1
+    const searchParams = new URLSearchParams({
+      q: context.query.q ? String(context.query.q) : '',
+      page: context.query.page ? String(context.query.page) : '1',
+    })
 
-    const studies = await getStudiesForOrgs(userOrganisationIds, initialPage, PER_PAGE)
+    const initialPage = Number(searchParams.get('page'))
+    const searchTerm = searchParams.get('q')
+
+    const studies = await getStudiesForOrgs({
+      organisationIds,
+      searchTerm,
+      currentPage: initialPage,
+      pageSize: PER_PAGE,
+    })
+
+    const filters = getFiltersFromQuery(context.query)
 
     return {
       props: {
@@ -166,9 +217,11 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
           totalItemsDue: studies.pagination.totalDue,
         },
         studies: studies.data,
+        filters,
       },
     }
   } catch (error) {
+    console.error('error', error)
     return {
       redirect: {
         destination: '/500',

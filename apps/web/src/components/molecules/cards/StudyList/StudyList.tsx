@@ -37,7 +37,7 @@ export function StudyList({
         </div>
 
         <Link
-          className="govuk-link--no-visited-state govuk-heading-s govuk-!-margin-bottom-4 govuk-!-padding-top-0"
+          className="govuk-link--no-visited-state govuk-heading-s govuk-!-margin-bottom-4 govuk-!-padding-top-0 inline-block"
           href={shortTitleHref}
         >
           {shortTitle}
