@@ -3,9 +3,7 @@ import { useRouter } from 'next/router'
 import type { ReactNode } from 'react'
 import type { FieldValues, FormProps as HookFormProps, UseFormHandleSubmit } from 'react-hook-form'
 import type { NextApiResponse } from 'next'
-import { logger } from '@nihr-ui/logger'
 import { FORM_ERRORS } from '../../../../constants/forms'
-// import { logger } from '@/lib/logger'
 
 interface FormProps<T extends FieldValues> {
   action: string
@@ -62,7 +60,7 @@ export function Form<T extends FieldValues>({ action, method, children, onError,
   }
 
   const onInvalid = () => {
-    logger.error('Form submission failed')
+    console.error('Form submission failed')
   }
 
   return (
