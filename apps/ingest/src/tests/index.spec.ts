@@ -1,12 +1,12 @@
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
-import { logger } from 'logger'
+import { logger } from '@nihr-ui/logger'
 import { ingest } from '../ingest'
 import { organisationEntities, organisationRoleEntities, studyEntities } from '../mocks/entities'
 import { prismaMock } from '../mocks/prisma'
 import studies from '../mocks/studies.json'
 
-jest.mock('logger')
+jest.mock('@nihr-ui/logger')
 
 const API_URL = 'https://dev.cpmsapi.nihr.ac.uk/api/v1/study-summaries'
 

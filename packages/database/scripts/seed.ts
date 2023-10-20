@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import { logger } from 'logger'
+import { logger } from '@nihr-ui/logger'
 
 const prisma = new PrismaClient()
 

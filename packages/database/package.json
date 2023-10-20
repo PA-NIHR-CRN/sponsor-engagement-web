@@ -16,10 +16,10 @@
     "studio": "npx prisma studio"
   },
   "dependencies": {
+    "@nihr-ui/logger": "*",
     "@prisma/client": "latest",
     "axios": "^1.5.1",
-    "axios-rate-limit": "^1.3.0",
-    "logger": "*"
+    "axios-rate-limit": "^1.3.0"
   },
   "devDependencies": {
     "@types/node": "^20.6.5",

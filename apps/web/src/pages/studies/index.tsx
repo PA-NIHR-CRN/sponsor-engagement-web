@@ -6,6 +6,7 @@ import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import Skeleton from 'react-loading-skeleton'
+import { logger } from '@nihr-ui/logger'
 import { RootLayout } from '../../components/Layout/RootLayout'
 import { authOptions } from '../api/auth/[...nextauth]'
 import { SIGN_IN_PAGE } from '../../constants/routes'
@@ -221,7 +222,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       },
     }
   } catch (error) {
-    console.error('error', error)
+    logger.error('error', error)
     return {
       redirect: {
         destination: '/500',

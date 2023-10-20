@@ -56,6 +56,5 @@ module.exports = {
         ignore: ['\\.spec\\.ts$', '\\.spec\\.tsx$'],
       },
     ],
-    'no-console': 'off',
   },
 }
