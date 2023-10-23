@@ -12,6 +12,7 @@
     "migrate:deploy": "npx prisma migrate deploy",
     "migrate:dev": "npx prisma migrate dev",
     "seed": "ts-node scripts/seed.ts",
+    "seed:assessments": "ts-node scripts/seed-assessments/seed-assessments.ts",
     "seed:contacts": "ts-node scripts/seed-contacts/seed-contacts.ts",
     "studio": "npx prisma studio"
   },

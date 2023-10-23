@@ -4,7 +4,8 @@
     "lib": ["ES2015"],
     "module": "CommonJS",
     "outDir": "./dist",
-    "rootDir": "."
+    "rootDir": ".",
+    "downlevelIteration": true
   },
   "exclude": ["dist", "build", "node_modules", "**/*.spec.ts"],
   "include": ["**/*.ts"]
