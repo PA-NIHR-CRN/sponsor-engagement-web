@@ -1,5 +1,4 @@
 import { test } from '../../../hooks/CustomFixtures'
-import { cpmsDatabaseReq } from '../../../utils/dbConfig'
 
 test.describe('Log in as a Sponsor Contact - @se_21', () => {
   test('As a Sponsor Contact upon Login I am taken to the Studies Page - @se_21_login_sponsor_contact', async ({
@@ -33,7 +32,6 @@ test.describe('Log in as a Sponsor Contact - @se_21', () => {
     studiesPage,
   }) => {
     await test.step('Given I have navigated to the Home Page', async () => {
-      console.log((await cpmsDatabaseReq()).recordset)
       await commonItemsPage.goto()
     })
     await test.step('And I have been be re-directed to the Login Page', async () => {
