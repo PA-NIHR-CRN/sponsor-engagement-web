@@ -1,23 +1,35 @@
 import AxeBuilder from '@axe-core/playwright'
 import { test as base } from '@playwright/test'
 
-import HomePage from '../pages/HomePage'
+import CommonItemsPage from '../pages/CommonItemsPage'
 import LoginPage from '../pages/LoginPage'
+import StudiesPage from '../pages/StudiesPage'
+import ContactsPage from '../pages/ContactsPage'
 
 type CustomFixtures = {
-  homePage: HomePage
+  commonItemsPage: CommonItemsPage
   loginPage: LoginPage
+  studiesPage: StudiesPage
+  contactsPage: ContactsPage
 
   makeAxeBuilder: () => AxeBuilder
 }
 
 export const test = base.extend<CustomFixtures>({
-  homePage: async ({ page }, use) => {
-    await use(new HomePage(page))
+  commonItemsPage: async ({ page }, use) => {
+    await use(new CommonItemsPage(page))
   },
 
   loginPage: async ({ page }, use) => {
     await use(new LoginPage(page))
+  },
+
+  studiesPage: async ({ page }, use) => {
+    await use(new StudiesPage(page))
+  },
+
+  contactsPage: async ({ page }, use) => {
+    await use(new ContactsPage(page))
   },
 
   makeAxeBuilder: async ({ page }, use) => {

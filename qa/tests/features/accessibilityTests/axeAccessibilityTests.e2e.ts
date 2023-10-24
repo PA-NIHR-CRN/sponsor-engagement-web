@@ -1,15 +1,15 @@
 import { expect, test } from '../../../hooks/CustomFixtures'
 
 test.describe('Accessibility Tests - @accessibility', () => {
-  test('Scan Home Page with AXE Tool access_Home', async ({ homePage, makeAxeBuilder }, testInfo) => {
+  test('Scan Study List Page with AXE Tool @access_studyList', async ({ studiesPage, makeAxeBuilder }, testInfo) => {
     const axeScanner = makeAxeBuilder()
     let axeScanResults = await axeScanner.analyze()
-    await test.step('Given I have navigated to the Home Page', async () => {
-      await homePage.goto()
-      await homePage.assertOnHomePage()
+    await test.step('Given I have navigated to the Studies Page', async () => {
+      await studiesPage.goto()
+      await studiesPage.assertOnStudiesPage()
     })
 
-    await test.step('When I scan the Home Page for Accessibility Errors', async () => {
+    await test.step('When I scan the Study List Page for Accessibility Errors', async () => {
       axeScanResults = await axeScanner
         .options({ reporter: 'v2' })
         .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
