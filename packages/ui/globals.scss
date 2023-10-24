@@ -49,6 +49,10 @@ body {
   height: 100%;
 }
 
+.govuk-table {
+  @include govuk-font($size: 16);
+}
+
 .link--inverse {
   @include govuk-link-style-inverse;
 }

@@ -15,9 +15,11 @@ export const getStudyById = (studyId: number, organisationIds?: number[]) => {
         },
       }),
     },
-    orderBy: {
-      createdAt: 'desc',
-    },
+    orderBy: [
+      {
+        createdAt: Prisma.SortOrder.desc,
+      },
+    ],
     include: {
       organisations: {
         include: {
@@ -35,13 +37,15 @@ export const getStudyById = (studyId: number, organisationIds?: number[]) => {
               furtherInformation: true,
             },
             orderBy: {
-              furtherInformationId: 'asc',
+              furtherInformationId: Prisma.SortOrder.asc,
             },
           },
         },
-        orderBy: {
-          createdAt: 'desc',
-        },
+        orderBy: [
+          {
+            createdAt: Prisma.SortOrder.desc,
+          },
+        ],
       },
       funders: {
         include: {

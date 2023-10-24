@@ -12,3 +12,8 @@ export const SERVICE_NAME = 'Assess progress of studies'
  * Date format to use across the site
  */
 export const DATE_FORMAT = 'D MMMM YYYY'
+
+/**
+ * Date format to with three letter month
+ */
+export const DATE_FORMAT_SHORT = 'DD MMM YYYY'

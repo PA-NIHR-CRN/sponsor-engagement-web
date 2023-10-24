@@ -118,27 +118,32 @@ const study = Mock.of<StudyWithRelations>({
   ],
   assessments: [
     {
+      id: 1,
       status: { name: 'Off track' },
       createdBy: {
         email: 'mockeduser@nihr.ac.uk',
       },
       furtherInformation: [
         {
+          id: 1,
           furtherInformation: {
             name: 'Mocked list item 1',
           },
         },
         {
+          id: 2,
           furtherInformation: {
             name: 'Mocked list item 2',
           },
         },
         {
+          id: 3,
           furtherInformation: {
             name: 'Mocked list item 3',
           },
         },
         {
+          id: 4,
           furtherInformationText: 'Testing some further information',
         },
       ],
@@ -195,7 +200,7 @@ describe('Assess progress of a study', () => {
     expect(screen.getByRole('heading', { level: 3, name: 'Last sponsor assessment' })).toBeInTheDocument()
     expect(
       screen.getByRole('button', {
-        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
         expanded: false,
       })
     ).toBeInTheDocument()
@@ -277,7 +282,7 @@ describe('Assess progress of a study', () => {
 
     expect(
       screen.queryByRole('button', {
-        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
         expanded: false,
       })
     ).not.toBeInTheDocument()
@@ -329,14 +334,14 @@ describe('Expanding last sponsor assessment accordion', () => {
     // Expand accordion
     await userEvent.click(
       screen.getByRole('button', {
-        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
         expanded: false,
       })
     )
 
     expect(
       screen.getByRole('button', {
-        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
         expanded: true,
       })
     ).toBeInTheDocument()

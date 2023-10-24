@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form'
 import clsx from 'clsx'
 import Link from 'next/link'
 import { RootLayout } from '../../../components/Layout/RootLayout'
-import { GetSupport } from '../../../components/molecules'
+import { AssessmentHistory, GetSupport, getAssessmentHistoryFromStudy } from '../../../components/molecules'
 import { getStudyById } from '../../../lib/studies'
 import { Checkbox, CheckboxGroup, ErrorSummary, Fieldset, Form, Radio, RadioGroup } from '../../../components/atoms'
 import type { AssessmentInputs } from '../../../utils/schemas/assessment.schema'
@@ -16,7 +16,6 @@ import { assessmentSchema } from '../../../utils/schemas/assessment.schema'
 import { prismaClient } from '../../../lib/prisma'
 import { Textarea } from '../../../components/atoms/Form/Textarea/Textarea'
 import { TEXTAREA_MAX_CHARACTERS } from '../../../constants/forms'
-import { formatDate } from '../../../utils/date'
 import { withServerSideProps } from '../../../utils/withServerSideProps'
 import { getValuesFromSearchParams } from '../../../utils/form'
 import { useFormErrorHydration } from '../../../hooks/useFormErrorHydration'
@@ -29,7 +28,7 @@ export default function Assessment({
   statuses,
   furtherInformation,
   returnUrl,
-  lastAssessment,
+  assessments,
 }: AssessmentProps) {
   const { register, formState, setError, watch, handleSubmit } = useForm<AssessmentInputs>({
     resolver: zodResolver(assessmentSchema),
@@ -86,35 +85,10 @@ export default function Assessment({
             </AccordionItem>
           </Accordion>
 
-          <h3 className="govuk-heading-m govuk-!-margin-bottom-3">Last sponsor assessment</h3>
-
-          {lastAssessment ? (
-            <Accordion className="w-full govuk-!-margin-bottom-4" type="multiple">
-              <AccordionItem value="assessment-1">
-                <AccordionTrigger
-                  sideContent={
-                    <span>
-                      <strong>{lastAssessment.status}</strong> assessed by {lastAssessment.createdBy}
-                    </span>
-                  }
-                >
-                  {lastAssessment.createdAt}
-                </AccordionTrigger>
-                <AccordionContent indent>
-                  {lastAssessment.furtherInformation.length ? (
-                    <ul aria-label="Further information" className="govuk-list govuk-list--bullet govuk-body-s">
-                      {lastAssessment.furtherInformation.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                  ) : null}
-                  <p className="govuk-body-s govuk-!-margin-bottom-0">{lastAssessment.furtherInformationText}</p>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          ) : (
-            <p className="govuk-body">This study has not had any assessments provided</p>
-          )}
+          <AssessmentHistory
+            assessments={assessments.length > 0 ? [assessments[0]] : []}
+            heading="Last sponsor assessment"
+          />
 
           <Form
             action={`/api/forms/assessment?returnUrl=${returnUrl}`}
@@ -226,30 +200,15 @@ export const getServerSideProps = withServerSideProps(async (context, session) =
     }
   }
 
-  const lastAssessment =
-    study.assessments.length > 0
-      ? {
-          status: study.assessments[0].status.name,
-          createdAt: formatDate(study.assessments[0].createdAt),
-          createdBy: study.assessments[0].createdBy.email,
-          furtherInformation: study.assessments[0].furtherInformation
-            .filter(({ furtherInformationText }) => !furtherInformationText)
-            .map(({ furtherInformation }) => furtherInformation?.name),
-          furtherInformationText: study.assessments[0].furtherInformation.find(({ furtherInformationText }) =>
-            Boolean(furtherInformationText)
-          )?.furtherInformationText,
-        }
-      : null
-
   return {
     props: {
       query: context.query,
       user: session.user,
       study,
+      assessments: getAssessmentHistoryFromStudy(study),
       statuses: statusRefData.map(({ id, name, description }) => ({ id, name, description })),
       furtherInformation: furtherInformationRefData.map(({ id, name }) => ({ id, name })),
       returnUrl: context.query.returnUrl === 'studies' ? 'studies' : `studies/${study.id}`,
-      lastAssessment,
     },
   }
 })
