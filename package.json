@@ -18,12 +18,14 @@
     "typecheck": "turbo run typecheck"
   },
   "dependencies": {
-    "@axe-core/playwright": "^4.7.3"
+    "@axe-core/playwright": "^4.7.3",
+    "mssql": "^10.0.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.6.5",
     "@commitlint/config-conventional": "^17.6.5",
     "@playwright/test": "^1.38.1",
+    "@types/mssql": "^9.1.2",
     "eslint": "^8.49.0",
     "eslint-plugin-unused-imports": "^3.0.0",
     "husky": "^8.0.0",
