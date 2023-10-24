@@ -9,6 +9,13 @@ test('No results', () => {
   expect(pagination).not.toBeInTheDocument()
 })
 
+test('One page', () => {
+  render(<Pagination initialPage={0} initialPageSize={5} totalItems={5} />)
+
+  const pagination = screen.queryByRole('navigation', { name: 'results' })
+  expect(pagination).not.toBeInTheDocument()
+})
+
 test('No page set - defaults to first page', async () => {
   await mockRouter.push('')
 

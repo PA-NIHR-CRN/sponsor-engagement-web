@@ -5,11 +5,11 @@ import { StudyList } from './StudyList'
 
 describe('StudyList Component', () => {
   const defaultProps: StudyListProps = {
-    sponsorName: 'Sponsor ABC',
+    sponsorOrgName: 'Sponsor ABC',
     shortTitle: 'Study XYZ',
     shortTitleHref: '/study/xyz',
     lastAsessmentDate: '2023-09-30',
-    assessmentHref: '/assessment/xyz',
+    assessmentHref: '/assessments/xyz',
     trackStatus: 'On track',
     trackStatusHref: '/track/on',
     indications: ['Indication ABC'],
@@ -57,7 +57,7 @@ describe('StudyList Component', () => {
   test('renders with different sponsorName and shortTitle', () => {
     const props: StudyListProps = {
       ...defaultProps,
-      sponsorName: 'New Sponsor',
+      sponsorOrgName: 'New Sponsor',
       shortTitle: 'New Study',
     }
     render(<StudyList {...props} />)
@@ -68,5 +68,15 @@ describe('StudyList Component', () => {
 
     expect(sponsorNameElement).toBeInTheDocument()
     expect(shortTitleElement).toBeInTheDocument()
+  })
+
+  test('renders support organisation (i.e. CTU or CRO) name when provided', () => {
+    const props: StudyListProps = {
+      ...defaultProps,
+      supportOrgName: 'Support Org ABC',
+    }
+    render(<StudyList {...props} />)
+
+    expect(screen.getByText('Sponsor ABC (Support Org ABC)')).toBeInTheDocument()
   })
 })

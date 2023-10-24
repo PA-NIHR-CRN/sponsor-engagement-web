@@ -1,6 +1,6 @@
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
-
+import { logger } from 'logger'
 import { ingest } from '../ingest'
 import { organisationEntities, organisationRoleEntities, studyEntities } from '../mocks/entities'
 import { prismaMock } from '../mocks/prisma'
@@ -36,6 +36,7 @@ beforeEach(() => {
   prismaMock.studyOrganisation.createMany.mockResolvedValueOnce({ count: 1 })
   prismaMock.studyFunder.createMany.mockResolvedValueOnce({ count: 1 })
   prismaMock.studyEvaluationCategory.createMany.mockResolvedValueOnce({ count: 1 })
+  prismaMock.study.updateMany.mockResolvedValueOnce({ count: 1 })
 })
 
 describe('ingest', () => {
@@ -188,5 +189,53 @@ describe('ingest', () => {
       ]),
       skipDuplicates: true,
     })
+  })
+
+  it('should update the study `isDueAssessment` flag', async () => {
+    await ingest()
+
+    expect(prismaMock.study.updateMany).toHaveBeenCalledTimes(1)
+
+    expect(prismaMock.study.updateMany).toHaveBeenCalledWith({
+      data: {
+        isDueAssessment: true,
+      },
+      where: {
+        id: { in: [123, 123, 123] },
+        actualOpeningDate: {
+          lte: expect.any(Date),
+        },
+        evaluationCategories: {
+          some: {},
+        },
+        assessments: {
+          every: {
+            updatedAt: {
+              lte: expect.any(Date),
+            },
+          },
+        },
+      },
+    })
+  })
+
+  it('should handle errors when fetching studies', async () => {
+    const errorResponse = {
+      StatusCode: 500,
+      ErrorMessage: 'Internal API exception',
+    }
+
+    server.use(
+      rest.get(API_URL, async (_, res, ctx) => {
+        return res(ctx.status(500), ctx.json(errorResponse))
+      })
+    )
+
+    await ingest()
+
+    expect(prismaMock.study.updateMany).not.toHaveBeenCalled()
+
+    expect(logger.error).toHaveBeenCalledWith(expect.any(Object), 'Error fetching studies data')
+    expect(logger.error).toHaveBeenCalledWith(errorResponse, 'Error response')
   })
 })

@@ -44,6 +44,7 @@ module.exports = {
     '@typescript-eslint/no-unsafe-return': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/unbound-method': 'off',
+    '@typescript-eslint/non-nullable-type-assertion-style': 'off',
     'react/display-name': 'off',
     'unicorn/filename-case': [
       'error',
@@ -55,5 +56,6 @@ module.exports = {
         ignore: ['\\.spec\\.ts$', '\\.spec\\.tsx$'],
       },
     ],
+    'no-console': 'off',
   },
 }

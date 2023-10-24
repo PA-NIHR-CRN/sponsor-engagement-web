@@ -2,7 +2,8 @@ import Link from 'next/link'
 import { Card } from '../../../atoms'
 
 export interface StudyListProps {
-  sponsorName: string
+  sponsorOrgName?: string
+  supportOrgName?: string
   shortTitle: string
   shortTitleHref: string
   assessmentHref: string
@@ -14,7 +15,8 @@ export interface StudyListProps {
 }
 
 export function StudyList({
-  sponsorName,
+  sponsorOrgName,
+  supportOrgName,
   shortTitle,
   shortTitleHref,
   assessmentHref,
@@ -29,12 +31,13 @@ export function StudyList({
       {assessmentDue ? <span className="govuk-tag govuk-tag--red absolute top-0 right-0">Due</span> : null}
 
       <div className="md:max-w-[calc(100%-50px)]">
-        <div className="text-dark-grey govuk-!-margin-bottom-1 max-w-[calc(100%-45px)] lg:max-w-auto govuk-body-s">
-          {sponsorName}
+        <div className="text-darkGrey govuk-!-margin-bottom-1 max-w-[calc(100%-45px)] lg:max-w-auto govuk-body-s">
+          {sponsorOrgName ?? '-'}
+          {Boolean(supportOrgName) && ` (${supportOrgName})`}
         </div>
 
         <Link
-          className="govuk-link--no-visited-state govuk-heading-s govuk-!-margin-bottom-4 govuk-!-padding-top-0"
+          className="govuk-link--no-visited-state govuk-heading-s govuk-!-margin-bottom-4 govuk-!-padding-top-0 inline-block"
           href={shortTitleHref}
         >
           {shortTitle}
@@ -45,11 +48,15 @@ export function StudyList({
         <div className="lg:min-w-[320px]">
           <strong className="govuk-heading-s govuk-!-margin-bottom-0">Last sponsor assessment</strong>
           <p className="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
-            {trackStatus && trackStatusHref ? (
+            {trackStatus ? (
               <>
-                <Link className="govuk-link--no-visited-state" href={trackStatusHref}>
-                  {trackStatus}
-                </Link>{' '}
+                {trackStatusHref ? (
+                  <Link className="govuk-link--no-visited-state" href={trackStatusHref}>
+                    {trackStatus}
+                  </Link>
+                ) : (
+                  trackStatus
+                )}{' '}
                 on {lastAsessmentDate}
               </>
             ) : (

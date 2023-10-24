@@ -2,6 +2,7 @@ import assert from 'assert'
 import axios from 'axios'
 import { Organisation as OrganisationEntity, SysRefOrganisationRole as SysRefOrganisationRoleEntity } from 'database'
 import { logger } from 'logger'
+import dayjs from 'dayjs'
 
 import { prismaClient } from './lib/prisma'
 import { Study, StudyRecordStatus, StudyStatus, StudyWithRelationships } from './types'
@@ -31,11 +32,12 @@ const createStudies = async () => {
       sampleSize: study.SampleSize,
       chiefInvestigatorFirstName: study.ChiefInvestigatorFirstName,
       chiefInvestigatorLastName: study.ChiefInvestigatorLastName,
-      managingSpeciality: study.ManagingSpecialty,
+      managingSpeciality: study.ManagingSpecialty ?? '',
       plannedOpeningDate: study.PlannedRecruitmentStartDate ? new Date(study.PlannedRecruitmentStartDate) : undefined,
       plannedClosureDate: study.PlannedRecruitmentEndDate ? new Date(study.PlannedRecruitmentEndDate) : undefined,
       actualOpeningDate: study.ActualOpeningDate ? new Date(study.ActualOpeningDate) : undefined,
       actualClosureDate: study.ActualClosureDate ? new Date(study.ActualClosureDate) : undefined,
+      isDueAssessment: false,
       isDeleted: false,
     }
 
@@ -219,13 +221,38 @@ const createOrganisationRelationships = async () => {
   logger.info(`Added ${evaluationCategoriesResult.count} study evaluation categories`)
 }
 
+const setAssessmentDue = async () => {
+  const threeMonthsAgo = dayjs().subtract(3, 'month').toDate()
+  const assessmentDueResult = await prismaClient.study.updateMany({
+    data: {
+      isDueAssessment: true,
+    },
+    where: {
+      id: { in: studyEntities.map((study) => study.id) },
+      actualOpeningDate: { lte: threeMonthsAgo },
+      evaluationCategories: {
+        some: {},
+      },
+      assessments: {
+        every: {
+          updatedAt: {
+            lte: threeMonthsAgo,
+          },
+        },
+      },
+    },
+  })
+
+  logger.info(`Flagged ${assessmentDueResult.count} studies as being due assessment`)
+}
+
 const fetchStudies = async function* (url: string, username: string, password: string) {
   const pageSize = 1000
   let pageNumber = 1
   let totalStudies = 0
-  while (totalStudies === 0 || pageNumber * pageSize < totalStudies) {
+  while (totalStudies === 0 || pageNumber * pageSize < totalStudies + pageSize) {
     try {
-      logger.info(`Request studies page: ${pageNumber}`)
+      logger.info(`Request studies page: ${pageNumber} (total ${totalStudies})`)
       const { data } = await axios.get(url, {
         headers: {
           username: username,
@@ -235,15 +262,14 @@ const fetchStudies = async function* (url: string, username: string, password: s
           pageSize: 1000,
           pageNumber,
           studyStatus: [
-            StudyStatus.OpenActivelyRecruiting,
+            StudyStatus.InSetup,
+            StudyStatus.InSetupPendingApproval,
+            StudyStatus.InSetupApprovalReceived,
             StudyStatus.OpenToRecruitment,
+            StudyStatus.OpenActivelyRecruiting,
             StudyStatus.ClosedInFollowUp,
-            StudyStatus.SuspendedActivelyRecruiting,
             StudyStatus.SuspendedOpenRecruitment,
-            StudyStatus.InSetupRecruiting,
-            StudyStatus.InSetupPermissionReceived,
-            StudyStatus.InSetupPendingApplication,
-            StudyStatus.InSetupPendingNHSPerm,
+            StudyStatus.SuspendedActivelyRecruiting,
           ],
           studyRecordStatus: [StudyRecordStatus.Live, StudyRecordStatus.LiveChangesPendingApproval],
         },
@@ -251,9 +277,12 @@ const fetchStudies = async function* (url: string, username: string, password: s
       totalStudies = data.Result.TotalRecords
       ++pageNumber
       yield data.Result.Studies as Study[]
-    } catch (e) {
-      logger.error(`Error fetching studies data`, e)
-      yield []
+    } catch (error) {
+      logger.error(error, 'Error fetching studies data')
+      if (axios.isAxiosError(error)) {
+        logger.error(error.response?.data, 'Error response')
+      }
+      return
     }
   }
 }
@@ -271,5 +300,6 @@ export const ingest = async () => {
     await createStudies()
     await createOrganisations()
     await createOrganisationRelationships()
+    await setAssessmentDue()
   }
 }

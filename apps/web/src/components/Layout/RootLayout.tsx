@@ -8,6 +8,7 @@ import type { Session } from 'next-auth'
 import { Header } from '../Header/Header'
 import { ORGANISATIONS_PAGE } from '../../constants/routes'
 import { Roles } from '../../constants/auth'
+import { SERVICE_NAME } from '../../constants'
 
 const primaryFont = Roboto({ weight: ['400', '700'], subsets: ['latin'], display: 'swap', variable: '--font-primary' })
 
@@ -18,7 +19,7 @@ export interface RootLayoutProps {
   user: Session['user']
 }
 
-export function RootLayout({ children, backLink, heading = '', user }: RootLayoutProps) {
+export function RootLayout({ children, backLink, heading = SERVICE_NAME, user }: RootLayoutProps) {
   const router = useRouter()
   const [sideNavOpen, setSideNavOpen] = useState(false)
 

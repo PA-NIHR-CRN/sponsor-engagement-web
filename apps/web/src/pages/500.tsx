@@ -7,10 +7,8 @@ export default function ServiceUnavailable() {
     <Container>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <p className="govuk-body">
-            Please try again later or contact the Find, Recruit and Follow-up Central Team on{' '}
-            <a href="mailto:frfteam@nihr.ac.uk">frfteam@nihr.ac.uk</a>.
-          </p>
+          <h2 className="govuk-heading-l">Sorry, there is a problem with the service</h2>
+          <p className="govuk-body">Please contact crn.servicedesk@nihr.ac.uk for further assistance.</p>
         </div>
       </div>
     </Container>
@@ -18,9 +16,5 @@ export default function ServiceUnavailable() {
 }
 
 ServiceUnavailable.getLayout = function getLayout(page: ReactElement) {
-  return (
-    <RootLayout heading="Sorry, there is a problem with the service." user={null}>
-      {page}
-    </RootLayout>
-  )
+  return <RootLayout user={null}>{page}</RootLayout>
 }

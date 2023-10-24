@@ -4,11 +4,16 @@
 export const PER_PAGE = 10
 
 /**
- * Page title prefix to appear on the browser tab
+ * Ser title prefix to appear on the browser tab
  */
-export const PAGE_TITLE = 'Sponsor Engagement'
+export const SERVICE_NAME = 'Assess progress of studies'
 
 /**
- * Date format to use across FRF
+ * Date format to use across the site
  */
 export const DATE_FORMAT = 'D MMMM YYYY'
+
+/**
+ * Date format to with three letter month
+ */
+export const DATE_FORMAT_SHORT = 'DD MMM YYYY'
