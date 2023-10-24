@@ -339,7 +339,6 @@ describe('Study page', () => {
     expect(
       screen.queryByRole('button', {
         name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
-        expanded: false,
       })
     ).not.toBeInTheDocument()
 
