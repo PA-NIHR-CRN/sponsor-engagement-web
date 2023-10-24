@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import { Mock } from 'ts-mockery'
 import type { getStudyById } from '../../../lib/studies'
 import type { AssessmentHistoryProps } from './AssessmentHistory'
-import { AssessmentHistory, getAssessmentHistoryFromStudy } from './AssessmentHistory' // Adjust the import path as needed
+import { AssessmentHistory, getAssessmentHistoryFromStudy } from './AssessmentHistory'
 
 type Study = NonNullable<Awaited<ReturnType<typeof getStudyById>>>
 type Assessments = AssessmentHistoryProps['assessments']
