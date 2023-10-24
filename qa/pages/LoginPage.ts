@@ -28,6 +28,7 @@ export default class LoginPage {
     expect(this.page.url()).toContain('test.id.nihr.ac.uk/authenticationendpoint/login')
   }
 
+  //passwords set in .github/workflows/playwright.yml using GitHub secrets, hardcode when running locally
   async loginWithUserCreds(user: string) {
     let username = ''
     let password = ''

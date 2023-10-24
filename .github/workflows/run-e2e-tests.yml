@@ -50,6 +50,8 @@ jobs:
       env:
           CPMS_TEST_DB_PASSWORD: ${{ secrets.CPMS_TEST_DB_PASSWORD }}
           CPMS_TEST_DB_SERVER: ${{ secrets.CPMS_TEST_DB_SERVER }}
+          SE_TEST_DB_PASSWORD: ${{ secrets.SE_TEST_DB_PASSWORD }}
+          SE_TEST_DB_HOST: ${{ secrets.SE_TEST_DB_HOST }}
           SPONSOR_CONTACT_PASS: ${{ secrets.SPONSOR_CONTACT_PASS }}
           SPONSOR_CONTACT_MANAGER_PASS: ${{ secrets.SPONSOR_CONTACT_MANAGER_PASS }}
           CONTACT_MANAGER_PASS: ${{ secrets.CONTACT_MANAGER_PASS }}
