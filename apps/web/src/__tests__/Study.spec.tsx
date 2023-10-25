@@ -98,7 +98,8 @@ type StudyWithRelations = Prisma.StudyGetPayload<{
 
 const mockStudy = Mock.of<StudyWithRelations>({
   id: 123,
-  title: 'Test Study',
+  title: 'Test Study Long Title',
+  shortTitle: 'Test Study Short Title',
   isDueAssessment: false,
   cpmsId: 1234567,
   studyStatus: 'Suspended',
@@ -197,10 +198,10 @@ describe('Study page', () => {
     render(Study.getLayout(<Study {...props} />, { ...props }))
 
     // SEO
-    expect(NextSeo).toHaveBeenCalledWith({ title: `Study Progress Review - ${mockStudy.title}` }, {})
+    expect(NextSeo).toHaveBeenCalledWith({ title: `Study Progress Review - ${mockStudy.shortTitle}` }, {})
 
     // Title
-    expect(screen.getByRole('heading', { level: 2, name: mockStudy.title })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: mockStudy.shortTitle })).toBeInTheDocument()
 
     // Organisation
     expect(screen.getByText('Test Organisation', { selector: 'span' })).toBeInTheDocument()
@@ -393,7 +394,7 @@ describe('Study page', () => {
     render(Study.getLayout(<Study {...props} />, { ...props }))
 
     // Title
-    expect(screen.getByRole('heading', { level: 2, name: mockStudy.title })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: mockStudy.shortTitle })).toBeInTheDocument()
 
     // Banner
     const banner = screen.getByRole('alert', { name: 'Success' })
