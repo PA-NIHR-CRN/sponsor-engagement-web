@@ -6,6 +6,7 @@ import { NextSeo } from 'next-seo'
 import type { Prisma } from 'database'
 import { simpleFaker } from '@faker-js/faker'
 import mockRouter from 'next-router-mock'
+import userEvent from '@testing-library/user-event'
 import type { StudyProps } from '../pages/studies/[studyId]'
 import Study, { getServerSideProps } from '../pages/studies/[studyId]'
 import { userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
@@ -84,6 +85,12 @@ type StudyWithRelations = Prisma.StudyGetPayload<{
     assessments: {
       include: {
         status: true
+        createdBy: true
+        furtherInformation: {
+          include: {
+            furtherInformation: true
+          }
+        }
       }
     }
   }
@@ -138,7 +145,41 @@ const mockStudy = Mock.of<StudyWithRelations>({
       totalRecruitmentToDate: 999,
     },
   ],
-  assessments: [{ status: { name: 'Off Track' } }],
+  assessments: [
+    {
+      id: 1,
+      status: { name: 'Off track' },
+      createdBy: {
+        email: 'mockeduser@nihr.ac.uk',
+      },
+      furtherInformation: [
+        {
+          id: 1,
+          furtherInformation: {
+            name: 'Mocked list item 1',
+          },
+        },
+        {
+          id: 2,
+          furtherInformation: {
+            name: 'Mocked list item 2',
+          },
+        },
+        {
+          id: 3,
+          furtherInformation: {
+            name: 'Mocked list item 3',
+          },
+        },
+        {
+          id: 4,
+          furtherInformationText: 'Testing some further information',
+        },
+      ],
+      updatedAt: new Date('2001-01-01'),
+      createdAt: new Date('2001-01-01'),
+    },
+  ],
 })
 
 describe('Study page', () => {
@@ -207,8 +248,17 @@ describe('Study page', () => {
       `${mockStudy.evaluationCategories[0].totalRecruitmentToDate}`,
     ])
 
+    // Sponsor assessment history
+    expect(screen.getByRole('heading', { name: 'Sponsor assessment history', level: 3 })).toBeInTheDocument()
+
     // About this study
     expect(screen.getByRole('heading', { name: 'About this study', level: 3 })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', {
+        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        expanded: true,
+      })
+    ).toBeInTheDocument()
 
     const aboutStudyTable = screen.getByRole('table', { name: 'About this study' })
 
@@ -274,6 +324,28 @@ describe('Study page', () => {
     expect(screen.getByText('This study needs a new sponsor assessment.')).toBeInTheDocument()
   })
 
+  test('No previous assessments', async () => {
+    prismaMock.study.findFirst.mockResolvedValueOnce(Mock.of<StudyWithRelations>({ ...mockStudy, assessments: [] }))
+
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
+
+    const { props } = (await getServerSideProps(context)) as {
+      props: StudyProps
+    }
+
+    render(Study.getLayout(<Study {...props} />, { ...props }))
+
+    expect(screen.getByRole('heading', { level: 3, name: 'Sponsor assessment history' })).toBeInTheDocument()
+
+    expect(
+      screen.queryByRole('button', {
+        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+      })
+    ).not.toBeInTheDocument()
+
+    expect(screen.getByText('This study has not had any assessments provided')).toBeInTheDocument()
+  })
+
   test('No evaluation categories', async () => {
     prismaMock.study.findFirst.mockResolvedValueOnce(
       Mock.of<StudyWithRelations>({ ...mockStudy, evaluationCategories: [] })
@@ -330,5 +402,87 @@ describe('Study page', () => {
     expect(within(banner).getByRole('link', { name: 'NIHR CRN support' }).parentElement).toHaveTextContent(
       'Get NIHR CRN support for this study.'
     )
+  })
+})
+
+describe('Sponsor assessment history accordion', () => {
+  test('Defaults the first item open', async () => {
+    prismaMock.study.findFirst.mockResolvedValueOnce(mockStudy)
+
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
+
+    const { props } = (await getServerSideProps(context)) as {
+      props: StudyProps
+    }
+
+    render(Study.getLayout(<Study {...props} />, { ...props }))
+
+    expect(
+      screen.getByRole('button', {
+        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        expanded: true,
+      })
+    )
+
+    expect(
+      screen.getByRole('region', {
+        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+      })
+    ).toHaveAttribute('data-state', 'open')
+  })
+
+  test('Collapsing & re-expanding the first item', async () => {
+    prismaMock.study.findFirst.mockResolvedValueOnce(mockStudy)
+
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
+
+    const { props } = (await getServerSideProps(context)) as {
+      props: StudyProps
+    }
+
+    render(Study.getLayout(<Study {...props} />, { ...props }))
+
+    // Collapse accordion
+    await userEvent.click(
+      screen.getByRole('button', {
+        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        expanded: true,
+      })
+    )
+
+    expect(
+      screen.getByRole('button', {
+        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        expanded: false,
+      })
+    ).toBeInTheDocument()
+
+    expect(
+      screen.queryByRole('region', {
+        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+      })
+    ).not.toBeInTheDocument()
+
+    // Expand accordion
+    await userEvent.click(
+      screen.getByRole('button', {
+        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        expanded: false,
+      })
+    )
+
+    expect(
+      screen.getByRole('region', {
+        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+      })
+    ).toHaveAttribute('data-state', 'open')
+
+    const list = screen.getByRole('list', { name: 'Further information' })
+    expect(within(list).getAllByRole('listitem')).toHaveLength(3)
+    expect(within(list).getByText('Mocked list item 1')).toBeInTheDocument()
+    expect(within(list).getByText('Mocked list item 2')).toBeInTheDocument()
+    expect(within(list).getByText('Mocked list item 3')).toBeInTheDocument()
+
+    expect(screen.getByText('Testing some further information')).toBeInTheDocument()
   })
 })

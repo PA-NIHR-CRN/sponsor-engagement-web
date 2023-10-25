@@ -5,7 +5,7 @@ import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { RootLayout } from '../../../components/Layout/RootLayout'
-import { GetSupport } from '../../../components/molecules'
+import { AssessmentHistory, GetSupport, getAssessmentHistoryFromStudy } from '../../../components/molecules'
 import { getStudyById } from '../../../lib/studies'
 import { formatDate } from '../../../utils/date'
 import { withServerSideProps } from '../../../utils/withServerSideProps'
@@ -23,7 +23,7 @@ const renderNotificationBanner = (success: boolean) =>
 
 export type StudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function Study({ study }: StudyProps) {
+export default function Study({ study, assessments }: StudyProps) {
   const router = useRouter()
 
   return (
@@ -110,6 +110,9 @@ export default function Study({ study }: StudyProps) {
               </Table.Row>
             </Table.Body>
           </Table>
+
+          {/* Sponsor assessment history */}
+          <AssessmentHistory assessments={assessments} firstItemExpanded heading="Sponsor assessment history" />
 
           {/* About this study */}
           <h3 className="govuk-heading-m govuk-!-margin-bottom-3">About this study</h3>
@@ -214,6 +217,7 @@ export const getServerSideProps = withServerSideProps(async (context, session) =
   return {
     props: {
       user: session.user,
+      assessments: getAssessmentHistoryFromStudy(study),
       study,
     },
   }

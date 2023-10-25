@@ -184,7 +184,7 @@ model StudyEvaluationCategory {
   updatedAt              DateTime  @updatedAt
   isDeleted              Boolean?  @default(false)
 
-  @@unique([studyId, indicatorType])
+  @@unique([studyId, indicatorValue])
 }
 
 model StudyFunder {
