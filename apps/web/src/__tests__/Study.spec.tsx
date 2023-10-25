@@ -69,6 +69,7 @@ describe('getServerSideProps', () => {
 
 type StudyWithRelations = Prisma.StudyGetPayload<{
   include: {
+    title: true
     organisations: {
       include: {
         organisation: true
@@ -97,10 +98,10 @@ type StudyWithRelations = Prisma.StudyGetPayload<{
 
 const mockStudy = Mock.of<StudyWithRelations>({
   id: 123,
-  name: 'Test Study',
+  title: 'Test Study',
   isDueAssessment: false,
   cpmsId: 1234567,
-  status: 'Suspended',
+  studyStatus: 'Suspended',
   recordStatus: 'Test record status',
   route: 'Commercial',
   irasId: '12345',
@@ -196,10 +197,10 @@ describe('Study page', () => {
     render(Study.getLayout(<Study {...props} />, { ...props }))
 
     // SEO
-    expect(NextSeo).toHaveBeenCalledWith({ title: `Study Progress Review - ${mockStudy.name}` }, {})
+    expect(NextSeo).toHaveBeenCalledWith({ title: `Study Progress Review - ${mockStudy.title}` }, {})
 
     // Title
-    expect(screen.getByRole('heading', { level: 2, name: mockStudy.name })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: mockStudy.title })).toBeInTheDocument()
 
     // Organisation
     expect(screen.getByText('Test Organisation', { selector: 'span' })).toBeInTheDocument()
@@ -236,7 +237,7 @@ describe('Study page', () => {
 
     const progressRows = within(progressSummaryTable).getAllByRole('row')
     expect(progressRows.map((row) => within(row).getByRole('cell').textContent)).toEqual([
-      mockStudy.status,
+      mockStudy.studyStatus,
       mockStudy.evaluationCategories[0].indicatorValue,
       '1 January 2001',
       '1 January 2001',
@@ -275,7 +276,7 @@ describe('Study page', () => {
 
     const aboutRows = within(aboutStudyTable).getAllByRole('row')
     expect(aboutRows.map((row) => within(row).getByRole('cell').textContent)).toEqual([
-      mockStudy.name,
+      mockStudy.title,
       mockStudy.route,
       mockStudy.organisations[0].organisation.name,
       mockStudy.protocolReferenceNumber,
@@ -392,7 +393,7 @@ describe('Study page', () => {
     render(Study.getLayout(<Study {...props} />, { ...props }))
 
     // Title
-    expect(screen.getByRole('heading', { level: 2, name: mockStudy.name })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: mockStudy.title })).toBeInTheDocument()
 
     // Banner
     const banner = screen.getByRole('alert', { name: 'Success' })

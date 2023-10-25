@@ -23,8 +23,9 @@ const createStudies = async () => {
   const studyQueries = studies.map((study) => {
     const studyData = {
       cpmsId: study.Id,
-      name: study.Name,
-      status: study.Status,
+      title: study.Title,
+      shortTitle: study.ShortName,
+      studyStatus: study.StudyStatus,
       recordStatus: study.StudyRecordStatus,
       route: study.StudyRoute,
       irasId: study.IrasId,
@@ -33,6 +34,7 @@ const createStudies = async () => {
       chiefInvestigatorFirstName: study.ChiefInvestigatorFirstName,
       chiefInvestigatorLastName: study.ChiefInvestigatorLastName,
       managingSpeciality: study.ManagingSpecialty ?? '',
+      totalRecruitmentToDate: study.TotalRecruitmentToDate,
       plannedOpeningDate: study.PlannedRecruitmentStartDate ? new Date(study.PlannedRecruitmentStartDate) : undefined,
       plannedClosureDate: study.PlannedRecruitmentEndDate ? new Date(study.PlannedRecruitmentEndDate) : undefined,
       actualOpeningDate: study.ActualOpeningDate ? new Date(study.ActualOpeningDate) : undefined,
@@ -206,7 +208,7 @@ const createOrganisationRelationships = async () => {
             ? new Date(category.PlannedRecruitmentEndDate)
             : undefined,
           actualOpeningDate: category.ActualOpeningDate ? new Date(category.ActualOpeningDate) : undefined,
-          actualClosureDate: category.ActualClosedDate ? new Date(category.ActualClosedDate) : undefined,
+          actualClosureDate: category.ActualClosureDate ? new Date(category.ActualClosureDate) : undefined,
           expectedReopenDate: category.ExpectedReopenDate ? new Date(category.ExpectedReopenDate) : undefined,
         }
       })
