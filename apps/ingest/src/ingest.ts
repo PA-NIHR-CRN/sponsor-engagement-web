@@ -101,7 +101,7 @@ const createOrganisations = async () => {
   logger.info(`Found ${relatedOrgRoles.length} related organisation roles`)
 
   const organisationRoleRefQueries = relatedOrgRoles.map((org) => {
-    const name = org.OrganisationRole
+    const name = org.OrganisationRole.trim()
     const rtsIdentifier = org.OrganisationRoleRTSIdentifier
 
     const organisationRoleData = {
