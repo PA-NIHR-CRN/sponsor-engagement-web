@@ -15,7 +15,7 @@ on:
         default: 'true'
       test-tag:
         description: "Select which Tests you want to run using @<tag name>.
-          For example: @se_21, @se_21_contact_manager.
+          For example: @se_21, @se_21_login_contact_manager.
           To run all tests leave as default 'all'"
         required: true
         default: "all"
