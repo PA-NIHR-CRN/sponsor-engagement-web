@@ -70,7 +70,12 @@ export const getStudiesForOrgs = async ({
       ...(searchTerm && {
         OR: [
           {
-            name: {
+            title: {
+              contains: searchTerm,
+            },
+          },
+          {
+            shortTitle: {
               contains: searchTerm,
             },
           },
@@ -103,7 +108,8 @@ export const getStudiesForOrgs = async ({
     },
     select: {
       id: true,
-      name: true,
+      title: true,
+      shortTitle: true,
       isDueAssessment: true,
       organisations: {
         include: {

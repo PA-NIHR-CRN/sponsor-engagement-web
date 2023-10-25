@@ -5,7 +5,7 @@ import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
 import { getStudyById, getStudiesForOrgs } from './studies'
 
 describe('getStudiesForOrgs', () => {
-  const mockStudies = [Mock.of<Study>({ id: 1, name: 'Study 1' }), Mock.of<Study>({ id: 2, name: 'Study 2' })]
+  const mockStudies = [Mock.of<Study>({ id: 1, title: 'Study 1' }), Mock.of<Study>({ id: 2, title: 'Study 2' })]
   const mockStudyCount = 2
   const mockStudyDueAssessmentCount = 1
 
@@ -72,7 +72,7 @@ describe('getStudiesForOrgs', () => {
     })
   })
 
-  it('should query studies by study title, irasId and protocolReferenceNumber when a search term is provided', async () => {
+  it('should query studies by study title, shortTitle, irasId and protocolReferenceNumber when a search term is provided', async () => {
     prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudyCount, mockStudyDueAssessmentCount])
 
     const userOrganisationIds = [1, 2]
@@ -99,9 +99,10 @@ describe('getStudiesForOrgs', () => {
         take: 10,
         where: {
           OR: [
-            { name: { contains: 'test-study' } },
-            { irasId: { contains: 'test-study' } },
-            { protocolReferenceNumber: { contains: 'test-study' } },
+            { title: { contains: searchTerm } },
+            { shortTitle: { contains: searchTerm } },
+            { irasId: { contains: searchTerm } },
+            { protocolReferenceNumber: { contains: searchTerm } },
           ],
           organisations: {
             some: {
@@ -124,9 +125,10 @@ describe('getStudiesForOrgs', () => {
     expect(prismaMock.study.count).toHaveBeenCalledWith({
       where: {
         OR: [
-          { name: { contains: 'test-study' } },
-          { irasId: { contains: 'test-study' } },
-          { protocolReferenceNumber: { contains: 'test-study' } },
+          { title: { contains: searchTerm } },
+          { shortTitle: { contains: searchTerm } },
+          { irasId: { contains: searchTerm } },
+          { protocolReferenceNumber: { contains: searchTerm } },
         ],
         organisations: {
           some: {
@@ -149,7 +151,7 @@ describe('getStudiesForOrgs', () => {
 
 describe('getStudyById', () => {
   it('should return a study with the given id', async () => {
-    prismaMock.study.findFirst.mockResolvedValueOnce(Mock.of<Study>({ id: 1, name: 'Study 1' }))
+    prismaMock.study.findFirst.mockResolvedValueOnce(Mock.of<Study>({ id: 1, title: 'Study 1' }))
 
     const userOrganisationIds = [1, 2]
 
@@ -169,6 +171,6 @@ describe('getStudyById', () => {
     )
 
     expect(study?.id).toEqual(1)
-    expect(study?.name).toEqual('Study 1')
+    expect(study?.title).toEqual('Study 1')
   })
 })

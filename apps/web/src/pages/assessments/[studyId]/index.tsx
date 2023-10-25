@@ -77,7 +77,7 @@ export default function Assessment({
             {study.organisations[0].organisation.name}
           </div>
 
-          <h3 className="govuk-heading-m govuk-!-margin-bottom-3">{study.name}</h3>
+          <h3 className="govuk-heading-m govuk-!-margin-bottom-3">{study.title}</h3>
 
           <Accordion className="w-full govuk-!-margin-bottom-3" type="multiple">
             <AccordionItem className="border-none" value="details-1">

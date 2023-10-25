@@ -28,12 +28,12 @@ export default function Study({ study }: StudyProps) {
 
   return (
     <Container>
-      <NextSeo title={`Study Progress Review - ${study.name}`} />
+      <NextSeo title={`Study Progress Review - ${study.title}`} />
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
           {renderNotificationBanner(Boolean(router.query.success))}
 
-          <h2 className="govuk-heading-l govuk-!-margin-bottom-1">{study.name}</h2>
+          <h2 className="govuk-heading-l govuk-!-margin-bottom-1">{study.title}</h2>
 
           <span className="govuk-body-m mb-0 text-darkGrey">{study.organisations[0].organisation.name}</span>
 
@@ -64,7 +64,7 @@ export default function Study({ study }: StudyProps) {
             <Table.Body>
               <Table.Row>
                 <Table.CellHeader>Study Status</Table.CellHeader>
-                <Table.Cell>{study.status}</Table.Cell>
+                <Table.Cell>{study.studyStatus}</Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.CellHeader>Study data indicates</Table.CellHeader>
@@ -90,7 +90,7 @@ export default function Study({ study }: StudyProps) {
                 <Table.CellHeader>Actual closure to recruitment date</Table.CellHeader>
                 <Table.Cell>{study.actualClosureDate ? formatDate(study.actualClosureDate) : '-'}</Table.Cell>
               </Table.Row>
-              {study.status === 'Suspended' && Boolean(study.evaluationCategories.length) && (
+              {study.studyStatus === 'Suspended' && Boolean(study.evaluationCategories.length) && (
                 <Table.Row>
                   <Table.CellHeader>Estimated reopening date</Table.CellHeader>
                   <Table.Cell>{formatDate(study.evaluationCategories[0].expectedReopenDate ?? '-')}</Table.Cell>
@@ -117,35 +117,35 @@ export default function Study({ study }: StudyProps) {
             <Table.Caption className="govuk-visually-hidden">About this study</Table.Caption>
             <Table.Body>
               <Table.Row>
-                <Table.CellHeader>Study long title</Table.CellHeader>
-                <Table.Cell>{study.name}</Table.Cell>
+                <Table.CellHeader className="w-1/3">Study long title</Table.CellHeader>
+                <Table.Cell>{study.title}</Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.CellHeader>Study route</Table.CellHeader>
+                <Table.CellHeader className="w-1/3">Study route</Table.CellHeader>
                 <Table.Cell>{study.route}</Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.CellHeader>Sponsor</Table.CellHeader>
+                <Table.CellHeader className="w-1/3">Sponsor</Table.CellHeader>
                 <Table.Cell>{study.organisations.map((org) => org.organisation.name).join(', ')}</Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.CellHeader>Sponsor protocol</Table.CellHeader>
+                <Table.CellHeader className="w-1/3">Sponsor protocol</Table.CellHeader>
                 <Table.Cell>{study.protocolReferenceNumber ?? '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.CellHeader>IRAS ID</Table.CellHeader>
+                <Table.CellHeader className="w-1/3">IRAS ID</Table.CellHeader>
                 <Table.Cell>{study.irasId ?? '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.CellHeader>CPMS ID</Table.CellHeader>
+                <Table.CellHeader className="w-1/3">CPMS ID</Table.CellHeader>
                 <Table.Cell>{study.cpmsId}</Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.CellHeader>Managing specialty</Table.CellHeader>
+                <Table.CellHeader className="w-1/3">Managing specialty</Table.CellHeader>
                 <Table.Cell>{study.managingSpeciality}</Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.CellHeader>Chief investigator</Table.CellHeader>
+                <Table.CellHeader className="w-1/3">Chief investigator</Table.CellHeader>
                 <Table.Cell>
                   {study.chiefInvestigatorFirstName
                     ? `${study.chiefInvestigatorFirstName} ${study.chiefInvestigatorLastName}`

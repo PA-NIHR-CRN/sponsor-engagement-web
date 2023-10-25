@@ -94,7 +94,7 @@ type StudyWithRelations = Prisma.StudyGetPayload<{
 const mockedStudyId = 99
 const study = Mock.of<StudyWithRelations>({
   id: mockedStudyId,
-  name: 'Test Study',
+  title: 'Test Study',
   isDueAssessment: true,
   createdAt: new Date('2001-01-01'),
   organisations: [
