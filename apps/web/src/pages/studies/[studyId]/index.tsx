@@ -28,12 +28,12 @@ export default function Study({ study, assessments }: StudyProps) {
 
   return (
     <Container>
-      <NextSeo title={`Study Progress Review - ${study.title}`} />
+      <NextSeo title={`Study Progress Review - ${study.shortTitle}`} />
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
           {renderNotificationBanner(Boolean(router.query.success))}
 
-          <h2 className="govuk-heading-l govuk-!-margin-bottom-1">{study.title}</h2>
+          <h2 className="govuk-heading-l govuk-!-margin-bottom-1">{study.shortTitle}</h2>
 
           <span className="govuk-body-m mb-0 text-darkGrey">{study.organisations[0].organisation.name}</span>
 
