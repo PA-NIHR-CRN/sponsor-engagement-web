@@ -56,7 +56,7 @@ describe('getServerSideProps', () => {
   test('redirects to 404 page if no study found', async () => {
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
     getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
-    prismaMock.study.findFirst.mockResolvedValueOnce(null)
+    prismaMock.$transaction.mockResolvedValueOnce([])
 
     const result = await getServerSideProps(context)
     expect(result).toEqual({
@@ -187,7 +187,7 @@ describe('Study page', () => {
   jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRole)
 
   test('Default layout', async () => {
-    prismaMock.study.findFirst.mockResolvedValueOnce(mockStudy)
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudy])
 
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
 
@@ -201,7 +201,9 @@ describe('Study page', () => {
     expect(NextSeo).toHaveBeenCalledWith({ title: `Study Progress Review - ${mockStudy.shortTitle}` }, {})
 
     // Title
-    expect(screen.getByRole('heading', { level: 2, name: mockStudy.shortTitle })).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { level: 2, name: `Study short title: ${mockStudy.shortTitle}` })
+    ).toBeInTheDocument()
 
     // Organisation
     expect(screen.getByText('Test Organisation', { selector: 'span' })).toBeInTheDocument()
@@ -265,12 +267,11 @@ describe('Study page', () => {
 
     const aboutHeaders = within(aboutStudyTable).getAllByRole('rowheader')
     expect(aboutHeaders.map((header) => header.textContent)).toEqual([
-      'Study long title',
-      'Study route',
-      'Sponsor',
-      'Sponsor protocol',
+      'Study full title',
+      'Protocol reference number',
       'IRAS ID',
       'CPMS ID',
+      'Sponsor',
       'Managing specialty',
       'Chief investigator',
     ])
@@ -278,11 +279,10 @@ describe('Study page', () => {
     const aboutRows = within(aboutStudyTable).getAllByRole('row')
     expect(aboutRows.map((row) => within(row).getByRole('cell').textContent)).toEqual([
       mockStudy.title,
-      mockStudy.route,
-      mockStudy.organisations[0].organisation.name,
       mockStudy.protocolReferenceNumber,
       mockStudy.irasId,
       `${mockStudy.cpmsId}`,
+      mockStudy.organisations[0].organisation.name,
       mockStudy.managingSpeciality,
       `${mockStudy.chiefInvestigatorFirstName} ${mockStudy.chiefInvestigatorLastName}`,
     ])
@@ -311,7 +311,7 @@ describe('Study page', () => {
   })
 
   test('Due assessment', async () => {
-    prismaMock.study.findFirst.mockResolvedValueOnce({ ...mockStudy, isDueAssessment: true })
+    prismaMock.$transaction.mockResolvedValueOnce([{ ...mockStudy, isDueAssessment: true }])
 
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
 
@@ -326,7 +326,7 @@ describe('Study page', () => {
   })
 
   test('No previous assessments', async () => {
-    prismaMock.study.findFirst.mockResolvedValueOnce(Mock.of<StudyWithRelations>({ ...mockStudy, assessments: [] }))
+    prismaMock.$transaction.mockResolvedValueOnce([Mock.of<StudyWithRelations>({ ...mockStudy, assessments: [] })])
 
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
 
@@ -348,9 +348,9 @@ describe('Study page', () => {
   })
 
   test('No evaluation categories', async () => {
-    prismaMock.study.findFirst.mockResolvedValueOnce(
-      Mock.of<StudyWithRelations>({ ...mockStudy, evaluationCategories: [] })
-    )
+    prismaMock.$transaction.mockResolvedValueOnce([
+      Mock.of<StudyWithRelations>({ ...mockStudy, evaluationCategories: [] }),
+    ])
 
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
 
@@ -364,8 +364,7 @@ describe('Study page', () => {
   })
 
   test('Non-commercial study', async () => {
-    prismaMock.study.findFirst.mockResolvedValueOnce({ ...mockStudy, route: 'Non-commercial' })
-
+    prismaMock.$transaction.mockResolvedValueOnce([{ ...mockStudy, route: 'Non-commercial' }])
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
 
     const { props } = (await getServerSideProps(context)) as {
@@ -381,7 +380,7 @@ describe('Study page', () => {
   })
 
   test('Success banner shows after redirection from the assessment form', async () => {
-    prismaMock.study.findFirst.mockResolvedValueOnce(mockStudy)
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudy])
 
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
 
@@ -394,7 +393,9 @@ describe('Study page', () => {
     render(Study.getLayout(<Study {...props} />, { ...props }))
 
     // Title
-    expect(screen.getByRole('heading', { level: 2, name: mockStudy.shortTitle })).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { level: 2, name: `Study short title: ${mockStudy.shortTitle}` })
+    ).toBeInTheDocument()
 
     // Banner
     const banner = screen.getByRole('alert', { name: 'Success' })
@@ -408,7 +409,7 @@ describe('Study page', () => {
 
 describe('Sponsor assessment history accordion', () => {
   test('Defaults the first item open', async () => {
-    prismaMock.study.findFirst.mockResolvedValueOnce(mockStudy)
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudy])
 
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
 
@@ -433,7 +434,7 @@ describe('Sponsor assessment history accordion', () => {
   })
 
   test('Collapsing & re-expanding the first item', async () => {
-    prismaMock.study.findFirst.mockResolvedValueOnce(mockStudy)
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudy])
 
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
 

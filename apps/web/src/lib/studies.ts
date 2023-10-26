@@ -1,8 +1,8 @@
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
 import { Prisma, prismaClient } from './prisma'
 
-export const getStudyById = (studyId: number, organisationIds?: number[]) => {
-  return prismaClient.study.findFirst({
+export const getStudyById = async (studyId: number, organisationIds?: number[]) => {
+  const query = {
     where: {
       id: studyId,
       ...(organisationIds && {
@@ -53,7 +53,29 @@ export const getStudyById = (studyId: number, organisationIds?: number[]) => {
         },
       },
     },
-  })
+  }
+
+  const [study] = await prismaClient.$transaction([prismaClient.study.findFirst(query)])
+
+  if (!study) {
+    return {
+      data: study,
+    }
+  }
+
+  // Map organisation roles along with the name of the organisation to quickly check for a CTO / CRO if applicable
+  const organisationsByRole = Object.fromEntries(
+    study.organisations.map((organisation) => {
+      return [organisation.organisationRole.name, organisation.organisation.name]
+    })
+  )
+
+  return {
+    data: {
+      ...study,
+      organisationsByRole,
+    },
+  }
 }
 
 export const getStudiesForOrgs = async ({

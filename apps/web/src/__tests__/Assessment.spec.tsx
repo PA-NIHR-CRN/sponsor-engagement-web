@@ -58,6 +58,7 @@ describe('getServerSideProps', () => {
     getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
 
     prismaMock.$transaction.mockResolvedValueOnce([])
+    prismaMock.$transaction.mockResolvedValueOnce([])
 
     const result = await getServerSideProps(context)
     expect(result).toEqual({
@@ -95,8 +96,10 @@ const mockedStudyId = 99
 const study = Mock.of<StudyWithRelations>({
   id: mockedStudyId,
   title: 'Test Study',
+  cpmsId: 12345,
   isDueAssessment: true,
   createdAt: new Date('2001-01-01'),
+  managingSpeciality: 'Cancer',
   organisations: [
     {
       organisation: {
@@ -157,7 +160,8 @@ describe('Assess progress of a study', () => {
   jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRole)
 
   test('Default layout', async () => {
-    prismaMock.$transaction.mockResolvedValueOnce([study, sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
+    prismaMock.$transaction.mockResolvedValueOnce([study])
+    prismaMock.$transaction.mockResolvedValueOnce([sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
 
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: String(mockedStudyId) } })
 
@@ -191,7 +195,7 @@ describe('Assess progress of a study', () => {
     expect(screen.getByText('Test Organisation')).toBeInTheDocument()
 
     // Study title
-    expect(screen.getByRole('heading', { level: 3, name: 'Test Study' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 3, name: 'Study title: Test Study' })).toBeInTheDocument()
 
     // Study details accordion
     expect(screen.getByRole('button', { name: 'Show study details', expanded: false })).toBeInTheDocument()
@@ -238,7 +242,8 @@ describe('Assess progress of a study', () => {
   })
 
   test('Cancel button redirects back to the studies page if access from the list', async () => {
-    prismaMock.$transaction.mockResolvedValueOnce([study, sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
+    prismaMock.$transaction.mockResolvedValueOnce([study])
+    prismaMock.$transaction.mockResolvedValueOnce([sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
 
     const context = Mock.of<GetServerSidePropsContext>({
       req: {},
@@ -262,9 +267,8 @@ describe('Assess progress of a study', () => {
         ...study,
         assessments: [],
       },
-      sysRefAssessmentStatus,
-      sysRefAssessmentFurtherInformation,
     ])
+    prismaMock.$transaction.mockResolvedValueOnce([sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
 
     const context = Mock.of<GetServerSidePropsContext>({
       req: {},
@@ -293,7 +297,8 @@ describe('Assess progress of a study', () => {
 
 describe('Expanding the show study details accordion', () => {
   test('Shows more information about the study', async () => {
-    prismaMock.$transaction.mockResolvedValueOnce([study, sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
+    prismaMock.$transaction.mockResolvedValueOnce([study])
+    prismaMock.$transaction.mockResolvedValueOnce([sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
 
     const context = Mock.of<GetServerSidePropsContext>({
       req: {},
@@ -311,13 +316,38 @@ describe('Expanding the show study details accordion', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Show study details', expanded: false }))
 
     expect(screen.getByRole('button', { name: 'Show study details', expanded: true })).toBeInTheDocument()
-    expect(screen.getByText('todo')).toBeInTheDocument()
+
+    const table = screen.getByRole('table', { name: 'About this study' })
+    expect(table).toBeInTheDocument()
+
+    const aboutHeaders = within(table).getAllByRole('rowheader')
+    expect(aboutHeaders.map((header) => header.textContent)).toEqual([
+      'Study full title',
+      'Protocol reference number',
+      'IRAS ID',
+      'CPMS ID',
+      'Sponsor',
+      'Managing specialty',
+      'Chief investigator',
+    ])
+
+    const aboutRows = within(table).getAllByRole('row')
+    expect(aboutRows.map((row) => within(row).getByRole('cell').textContent)).toEqual([
+      study.title,
+      'None available',
+      'None available',
+      `${study.cpmsId}`,
+      study.organisations[0].organisation.name,
+      study.managingSpeciality,
+      'None available',
+    ])
   })
 })
 
 describe('Expanding last sponsor assessment accordion', () => {
   test('Shows further information', async () => {
-    prismaMock.$transaction.mockResolvedValueOnce([study, sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
+    prismaMock.$transaction.mockResolvedValueOnce([study])
+    prismaMock.$transaction.mockResolvedValueOnce([sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
 
     const context = Mock.of<GetServerSidePropsContext>({
       req: {},
@@ -364,7 +394,8 @@ describe('Form submission failures', () => {
   })
 
   test('Client side validation errors', async () => {
-    prismaMock.$transaction.mockResolvedValueOnce([study, sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
+    prismaMock.$transaction.mockResolvedValueOnce([study])
+    prismaMock.$transaction.mockResolvedValueOnce([sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
 
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: String(mockedStudyId) } })
 
@@ -403,7 +434,8 @@ describe('Form submission failures', () => {
   test('Server side field validation errors', async () => {
     void mockRouter.push('?statusError=Select+how+the+study+is+progressing')
 
-    prismaMock.$transaction.mockResolvedValueOnce([study, sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
+    prismaMock.$transaction.mockResolvedValueOnce([study])
+    prismaMock.$transaction.mockResolvedValueOnce([sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
 
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: String(mockedStudyId) } })
 
@@ -438,7 +470,8 @@ describe('Form submission failures', () => {
   })
 
   test('Fatal server error shows an error at the top of the page', async () => {
-    prismaMock.$transaction.mockResolvedValueOnce([study, sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
+    prismaMock.$transaction.mockResolvedValueOnce([study])
+    prismaMock.$transaction.mockResolvedValueOnce([sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
 
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: String(mockedStudyId) } })
 
