@@ -5,7 +5,7 @@ import { logger } from 'logger'
 import dayjs from 'dayjs'
 
 import { prismaClient } from './lib/prisma'
-import { Study, StudyRecordStatus, StudyStatus, StudyWithRelationships } from './types'
+import { Study, StudyRecordStatus, StudySponsor, StudyStatus, StudyWithRelationships } from './types'
 import { getOrganisationName, getOrgsUniqueByName, getOrgsUniqueByNameRole, getOrgsUniqueByRole } from './utils'
 
 // Entities related to the current batch of studies
@@ -101,7 +101,7 @@ const createOrganisations = async () => {
   logger.info(`Found ${relatedOrgRoles.length} related organisation roles`)
 
   const organisationRoleRefQueries = relatedOrgRoles.map((org) => {
-    const name = org.OrganisationRole.trim()
+    const name = org.OrganisationRole
     const rtsIdentifier = org.OrganisationRoleRTSIdentifier
 
     const organisationRoleData = {
@@ -297,7 +297,18 @@ export const ingest = async () => {
   assert(API_PASSWORD)
 
   for await (const studyRecords of fetchStudies(API_URL, API_USERNAME, API_PASSWORD)) {
-    studies = studyRecords.filter((study) => !!study.QualificationDate)
+    studies = studyRecords
+      .filter((study) => !!study.QualificationDate)
+      .map((study) => ({
+        ...study,
+        StudySponsors: study.StudySponsors.map(
+          (sponsor) =>
+            ({
+              ...sponsor,
+              OrganisationRole: sponsor.OrganisationRole.trim(),
+            } as StudySponsor)
+        ),
+      }))
 
     await createStudies()
     await createOrganisations()
