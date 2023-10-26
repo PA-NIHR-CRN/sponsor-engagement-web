@@ -49,7 +49,7 @@
         "StudySponsors": [
           {
             "OrganisationName": "Medical Research Council",
-            "OrganisationRole": "Clinical Research Sponsor ",
+            "OrganisationRole": "Clinical Research Sponsor",
             "OrganisationRTSIdentifier": "MRC@2.16.840.1.113883.2.1.3.8.2",
             "OrganisationRoleRTSIdentifier": "CRSPNSR@2.16.840.1.113883.5.110"
           }
@@ -96,7 +96,7 @@
         "StudySponsors": [
           {
             "OrganisationName": "Medical Research Council",
-            "OrganisationRole": "Clinical Research Sponsor ",
+            "OrganisationRole": "Clinical Research Sponsor",
             "OrganisationRTSIdentifier": "MRC@2.16.840.1.113883.2.1.3.8.2",
             "OrganisationRoleRTSIdentifier": "CRSPNSR@2.16.840.1.113883.5.110"
           }
@@ -159,7 +159,7 @@
         "StudySponsors": [
           {
             "OrganisationName": "Cancer Research UK",
-            "OrganisationRole": "Clinical Research Sponsor ",
+            "OrganisationRole": "Clinical Research Sponsor",
             "OrganisationRTSIdentifier": "1089464@2.16.840.1.113883.2.1.3.8.2.10",
             "OrganisationRoleRTSIdentifier": "CRSPNSR@2.16.840.1.113883.5.110"
           }
