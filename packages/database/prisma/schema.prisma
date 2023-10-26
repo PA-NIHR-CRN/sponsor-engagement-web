@@ -44,7 +44,7 @@ model VerificationToken {
 
 model Study {
   id                         Int                       @id @default(autoincrement())
-  title                      String
+  title                      String                    @db.Text
   shortTitle                 String
   cpmsId                     Int                       @unique
   studyStatus                String
