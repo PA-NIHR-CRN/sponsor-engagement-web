@@ -110,6 +110,7 @@ const mockStudy = Mock.of<StudyWithRelations>({
   plannedClosureDate: new Date('2001-01-01'),
   actualOpeningDate: new Date('2001-01-01'),
   actualClosureDate: new Date('2001-01-01'),
+  totalRecruitmentToDate: 999,
   organisations: [
     {
       organisation: {
@@ -128,7 +129,6 @@ const mockStudy = Mock.of<StudyWithRelations>({
       updatedAt: new Date('2001-01-01'),
       createdAt: new Date('2001-01-01'),
       expectedReopenDate: new Date('2001-01-01'),
-      totalRecruitmentToDate: 999,
     },
   ],
   assessments: [
@@ -233,7 +233,7 @@ describe('Study page', () => {
       '1 January 2001',
       '1 January 2001',
       `${mockStudy.sampleSize}`,
-      `${mockStudy.evaluationCategories[0].totalRecruitmentToDate}`,
+      `${mockStudy.totalRecruitmentToDate}`,
     ])
 
     // Sponsor assessment history

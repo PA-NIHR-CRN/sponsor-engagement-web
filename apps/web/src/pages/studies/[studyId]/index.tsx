@@ -117,7 +117,7 @@ export default function Study({ study, assessments }: StudyProps) {
                 <Table.CellHeader>
                   Total {study.route === 'Commercial' ? 'network' : 'UK'} recruitment to date
                 </Table.CellHeader>
-                <Table.Cell>{study.evaluationCategories[0]?.totalRecruitmentToDate ?? '-'}</Table.Cell>
+                <Table.Cell>{study.totalRecruitmentToDate ?? '-'}</Table.Cell>
               </Table.Row>
             </Table.Body>
           </Table>
