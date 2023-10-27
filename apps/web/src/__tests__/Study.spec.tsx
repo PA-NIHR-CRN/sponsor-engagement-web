@@ -333,6 +333,37 @@ describe('Study page', () => {
     expect(screen.getByText('This study is progressing as planned')).toBeInTheDocument()
   })
 
+  test('Suspended study with no estimated reopen date', async () => {
+    prismaMock.$transaction.mockResolvedValueOnce([
+      Mock.of<StudyWithRelations>({
+        ...mockStudy,
+        studyStatus: 'Suspended',
+        evaluationCategories: [
+          {
+            indicatorValue: 'Milestone missed',
+            updatedAt: new Date('2001-01-01'),
+            createdAt: new Date('2001-01-01'),
+            expectedReopenDate: null,
+          },
+        ],
+      }),
+    ])
+
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
+
+    const { props } = (await getServerSideProps(context)) as {
+      props: StudyProps
+    }
+
+    render(Study.getLayout(<Study {...props} />, { ...props }))
+
+    const summaryTable = screen.getByRole('table', { name: 'Progress summary' })
+
+    const rowHeader = within(summaryTable).getByRole('rowheader', { name: 'Estimated reopening date' })
+    expect(rowHeader).toBeInTheDocument()
+    expect(rowHeader.nextSibling).toHaveTextContent('-')
+  })
+
   test('Non-commercial study', async () => {
     prismaMock.$transaction.mockResolvedValueOnce([{ ...mockStudy, route: 'Non-commercial' }])
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
