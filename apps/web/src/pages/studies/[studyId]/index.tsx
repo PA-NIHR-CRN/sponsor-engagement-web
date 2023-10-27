@@ -74,11 +74,11 @@ export default function Study({ study, assessments }: StudyProps) {
             <Table.Caption className="govuk-visually-hidden">Progress summary</Table.Caption>
             <Table.Body>
               <Table.Row>
-                <Table.CellHeader>Study Status</Table.CellHeader>
+                <Table.CellHeader className="w-1/3">Study Status</Table.CellHeader>
                 <Table.Cell>{study.studyStatus}</Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.CellHeader>Study data indicates</Table.CellHeader>
+                <Table.CellHeader className="w-1/3">Study data indicates</Table.CellHeader>
                 <Table.Cell>
                   {study.evaluationCategories.length
                     ? study.evaluationCategories.map((evalCategory) => evalCategory.indicatorValue).join(', ')
@@ -86,38 +86,42 @@ export default function Study({ study, assessments }: StudyProps) {
                 </Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.CellHeader>Planned opening date</Table.CellHeader>
+                <Table.CellHeader className="w-1/3">Planned opening date</Table.CellHeader>
                 <Table.Cell>{study.plannedOpeningDate ? formatDate(study.plannedOpeningDate) : '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.CellHeader>Actual opening date</Table.CellHeader>
+                <Table.CellHeader className="w-1/3">Actual opening date</Table.CellHeader>
                 <Table.Cell>{study.actualOpeningDate ? formatDate(study.actualOpeningDate) : '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.CellHeader>Planned closure to recruitment date</Table.CellHeader>
+                <Table.CellHeader className="w-1/3">Planned closure to recruitment date</Table.CellHeader>
                 <Table.Cell>{study.plannedClosureDate ? formatDate(study.plannedClosureDate) : '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.CellHeader>Actual closure to recruitment date</Table.CellHeader>
+                <Table.CellHeader className="w-1/3">Actual closure to recruitment date</Table.CellHeader>
                 <Table.Cell>{study.actualClosureDate ? formatDate(study.actualClosureDate) : '-'}</Table.Cell>
               </Table.Row>
               {study.studyStatus === 'Suspended' && Boolean(study.evaluationCategories.length) && (
                 <Table.Row>
-                  <Table.CellHeader>Estimated reopening date</Table.CellHeader>
-                  <Table.Cell>{formatDate(study.evaluationCategories[0].expectedReopenDate ?? '-')}</Table.Cell>
+                  <Table.CellHeader className="w-1/3">Estimated reopening date</Table.CellHeader>
+                  <Table.Cell>
+                    {study.evaluationCategories[0].expectedReopenDate
+                      ? formatDate(study.evaluationCategories[0].expectedReopenDate)
+                      : '-'}
+                  </Table.Cell>
                 </Table.Row>
               )}
               <Table.Row>
-                <Table.CellHeader>
+                <Table.CellHeader className="w-1/3">
                   {study.route === 'Commercial' ? 'Network' : 'UK'} recruitment target
                 </Table.CellHeader>
                 <Table.Cell>{study.sampleSize ?? '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.CellHeader>
+                <Table.CellHeader className="w-1/3">
                   Total {study.route === 'Commercial' ? 'network' : 'UK'} recruitment to date
                 </Table.CellHeader>
-                <Table.Cell>{study.evaluationCategories[0]?.totalRecruitmentToDate ?? '-'}</Table.Cell>
+                <Table.Cell>{study.totalRecruitmentToDate ?? '-'}</Table.Cell>
               </Table.Row>
             </Table.Body>
           </Table>
