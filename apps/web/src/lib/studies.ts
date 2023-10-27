@@ -47,11 +47,6 @@ export const getStudyById = async (studyId: number, organisationIds?: number[]) 
           },
         ],
       },
-      funders: {
-        include: {
-          organisation: true,
-        },
-      },
     },
   }
 

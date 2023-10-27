@@ -128,33 +128,6 @@ export default function Study({ study, assessments }: StudyProps) {
           {/* About this study */}
           <h3 className="govuk-heading-m govuk-!-margin-bottom-3">About this study</h3>
           <StudyDetails study={study} />
-
-          {/* Study funders */}
-          <Table>
-            <Table.Caption className="govuk-visually-hidden">Study funders</Table.Caption>
-            <Table.Header>
-              <Table.Row>
-                <Table.CellHeader className="w-1/3" column>
-                  Funder
-                </Table.CellHeader>
-                <Table.CellHeader className="w-1/3" column>
-                  Funding stream
-                </Table.CellHeader>
-                <Table.CellHeader className="w-1/3" column>
-                  Grant code
-                </Table.CellHeader>
-              </Table.Row>
-            </Table.Header>
-            <Table.Body>
-              {study.funders.map((funder) => (
-                <Table.Row key={funder.organisation.id}>
-                  <Table.Cell>{funder.organisation.name}</Table.Cell>
-                  <Table.Cell>{funder.fundingStreamName}</Table.Cell>
-                  <Table.Cell>{funder.grantCode}</Table.Cell>
-                </Table.Row>
-              ))}
-            </Table.Body>
-          </Table>
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
           <GetSupport />

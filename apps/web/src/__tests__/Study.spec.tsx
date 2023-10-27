@@ -77,11 +77,6 @@ type StudyWithRelations = Prisma.StudyGetPayload<{
       }
     }
     evaluationCategories: true
-    funders: {
-      include: {
-        organisation: true
-      }
-    }
     assessments: {
       include: {
         status: true
@@ -125,16 +120,6 @@ const mockStudy = Mock.of<StudyWithRelations>({
         id: simpleFaker.number.int(),
         name: 'Test Organisation Role',
       },
-    },
-  ],
-  funders: [
-    {
-      organisation: {
-        name: 'Test Funder',
-        id: 12345,
-      },
-      fundingStreamName: 'Test funding stream',
-      grantCode: 'Test grant code',
     },
   ],
   evaluationCategories: [
@@ -285,21 +270,6 @@ describe('Study page', () => {
       mockStudy.organisations[0].organisation.name,
       mockStudy.managingSpeciality,
       `${mockStudy.chiefInvestigatorFirstName} ${mockStudy.chiefInvestigatorLastName}`,
-    ])
-
-    // Study funders
-    const studyFundersTable = screen.getByRole('table', { name: 'Study funders' })
-
-    const funderHeaders = within(studyFundersTable).getAllByRole('columnheader')
-    expect(funderHeaders.map((header) => header.textContent)).toEqual(['Funder', 'Funding stream', 'Grant code'])
-
-    const funderCells = within(studyFundersTable)
-      .getAllByRole('cell')
-      .map((cell) => cell.textContent)
-    expect(funderCells).toEqual([
-      mockStudy.funders[0].organisation.name,
-      mockStudy.funders[0].fundingStreamName,
-      mockStudy.funders[0].grantCode,
     ])
 
     // Support
