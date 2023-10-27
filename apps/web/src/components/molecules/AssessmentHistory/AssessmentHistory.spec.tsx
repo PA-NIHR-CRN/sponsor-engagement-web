@@ -1,11 +1,9 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 import { Mock } from 'ts-mockery'
-import type { getStudyById } from '../../../lib/studies'
-import type { AssessmentHistoryProps } from './AssessmentHistory'
+import type { AssessmentHistoryProps, Study } from './AssessmentHistory'
 import { AssessmentHistory, getAssessmentHistoryFromStudy } from './AssessmentHistory'
 
-type Study = NonNullable<Awaited<ReturnType<typeof getStudyById>>>
 type Assessments = AssessmentHistoryProps['assessments']
 
 describe('Assessment History', () => {
@@ -72,11 +70,6 @@ describe('Assessment History', () => {
 })
 
 describe('getAssessmentHistoryFromStudy', () => {
-  test('returns empty array when study is null', () => {
-    const result = getAssessmentHistoryFromStudy(null)
-    expect(result).toEqual([])
-  })
-
   test('returns empty array when study has no assessments', () => {
     const studyWithNoAssessments = Mock.of<Study>({
       assessments: [],

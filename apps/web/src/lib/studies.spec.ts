@@ -1,5 +1,5 @@
 import { Mock } from 'ts-mockery'
-import type { Study } from 'database'
+import type { Prisma, Study } from 'database'
 import { prismaMock } from '../__mocks__/prisma'
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
 import { getStudyById, getStudiesForOrgs } from './studies'
@@ -150,12 +150,37 @@ describe('getStudiesForOrgs', () => {
 })
 
 describe('getStudyById', () => {
-  it('should return a study with the given id', async () => {
-    prismaMock.study.findFirst.mockResolvedValueOnce(Mock.of<Study>({ id: 1, title: 'Study 1' }))
+  const mockStudy = Mock.of<
+    Prisma.StudyGetPayload<{
+      include: {
+        title: true
+        organisations: {
+          include: {
+            organisation: true
+            organisationRole: true
+          }
+        }
+      }
+    }>
+  >({
+    id: 1,
+    title: 'Study 1',
+    organisations: [],
+  })
+
+  it('returns a study with the given id', async () => {
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudy])
 
     const userOrganisationIds = [1, 2]
 
-    const study = await getStudyById(1, userOrganisationIds)
+    const result = await getStudyById(1, userOrganisationIds)
+
+    expect(result).toEqual({
+      data: {
+        ...mockStudy,
+        organisationsByRole: {},
+      },
+    })
 
     expect(prismaMock.study.findFirst).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -170,7 +195,38 @@ describe('getStudyById', () => {
       })
     )
 
-    expect(study?.id).toEqual(1)
-    expect(study?.title).toEqual('Study 1')
+    expect(result.data?.id).toEqual(1)
+    expect(result.data?.title).toEqual('Study 1')
+  })
+
+  it('maps organisation roles to organisation name', async () => {
+    const mockStudyWithOrgs = {
+      ...mockStudy,
+      organisations: [
+        {
+          organisation: {
+            name: 'Pfizer clinical trials',
+          },
+          organisationRole: {
+            name: 'Managing Clinical Trials Unit',
+          },
+        },
+      ],
+    }
+
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithOrgs])
+
+    const userOrganisationIds = [1, 2]
+
+    const result = await getStudyById(1, userOrganisationIds)
+
+    expect(result).toEqual({
+      data: {
+        ...mockStudyWithOrgs,
+        organisationsByRole: {
+          'Managing Clinical Trials Unit': 'Pfizer clinical trials',
+        },
+      },
+    })
   })
 })

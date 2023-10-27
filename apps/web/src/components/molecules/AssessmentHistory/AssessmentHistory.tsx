@@ -9,8 +9,10 @@ export interface AssessmentHistoryProps {
   firstItemExpanded?: boolean
 }
 
-export function getAssessmentHistoryFromStudy(study: Awaited<ReturnType<typeof getStudyById>>) {
-  if (!study || study.assessments.length === 0) return []
+export type Study = NonNullable<Awaited<ReturnType<typeof getStudyById>>['data']>
+
+export function getAssessmentHistoryFromStudy(study: Study) {
+  if (study.assessments.length === 0) return []
 
   return study.assessments.map(({ status, createdAt, createdBy, furtherInformation, id }) => ({
     id,
@@ -70,7 +72,7 @@ export function AssessmentHistory({ heading, assessments, firstItemExpanded }: A
           ))}
         </div>
       ) : (
-        <p className="govuk-body">This study has not had any assessments provided</p>
+        <p className="govuk-body-s">This study has not had any assessments provided</p>
       )}
     </>
   )
