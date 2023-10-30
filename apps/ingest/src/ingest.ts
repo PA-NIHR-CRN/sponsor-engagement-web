@@ -237,7 +237,7 @@ const setAssessmentDue = async () => {
       },
       assessments: {
         every: {
-          updatedAt: {
+          createdAt: {
             lte: threeMonthsAgo,
           },
         },
