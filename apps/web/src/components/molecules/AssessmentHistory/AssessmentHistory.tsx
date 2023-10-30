@@ -38,8 +38,7 @@ export function AssessmentHistory({ heading, assessments, firstItemExpanded }: A
               className="w-full"
               defaultValue={
                 firstItemExpanded &&
-                Boolean(assessments[0].furtherInformation.length) &&
-                Boolean(assessments[0].furtherInformationText)
+                (Boolean(assessments[0].furtherInformation.length) || Boolean(assessments[0].furtherInformationText))
                   ? [String(assessments[0].id)]
                   : []
               }
