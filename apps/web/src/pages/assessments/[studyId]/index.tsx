@@ -8,7 +8,12 @@ import { useForm } from 'react-hook-form'
 import clsx from 'clsx'
 import Link from 'next/link'
 import { RootLayout } from '../../../components/Layout/RootLayout'
-import { AssessmentHistory, GetSupport, getAssessmentHistoryFromStudy } from '../../../components/molecules'
+import {
+  AssessmentHistory,
+  GetSupport,
+  StudyDetails,
+  getAssessmentHistoryFromStudy,
+} from '../../../components/molecules'
 import { getStudyById } from '../../../lib/studies'
 import { Checkbox, CheckboxGroup, ErrorSummary, Fieldset, Form, Radio, RadioGroup } from '../../../components/atoms'
 import type { AssessmentInputs } from '../../../utils/schemas/assessment.schema'
@@ -67,21 +72,27 @@ export default function Assessment({
         <div className="w-full">
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">Assess progress of a study</h2>
 
-          <p className="govuk-body">
+          <p className="govuk-body govuk-!-margin-bottom-6">
             You will need to assess if the study is on or off track and if any action is being taken. If you need NIHR
             CRN support with this study you will need to request this separately.
           </p>
 
           <div className="text-darkGrey govuk-!-margin-bottom-0 govuk-body-s">
+            <span className="govuk-visually-hidden">Study sponsor: </span>
             {study.organisations[0].organisation.name}
           </div>
 
-          <h3 className="govuk-heading-m govuk-!-margin-bottom-3">{study.title}</h3>
+          <h3 className="govuk-heading-m govuk-!-margin-bottom-1">
+            <span className="govuk-visually-hidden">Study title: </span>
+            {study.title}
+          </h3>
 
           <Accordion className="w-full govuk-!-margin-bottom-3" type="multiple">
             <AccordionItem className="border-none" value="details-1">
               <AccordionTrigger>Show study details</AccordionTrigger>
-              <AccordionContent>todo</AccordionContent>
+              <AccordionContent>
+                <StudyDetails study={study} />
+              </AccordionContent>
             </AccordionItem>
           </Accordion>
 
@@ -181,8 +192,9 @@ export const getServerSideProps = withServerSideProps(async (context, session) =
 
   const userOrganisationIds = session.user?.organisations.map((userOrg) => userOrg.organisationId)
 
-  const [study, statusRefData, furtherInformationRefData] = await prismaClient.$transaction([
-    getStudyById(Number(studyId), userOrganisationIds),
+  const { data: study } = await getStudyById(Number(studyId), userOrganisationIds)
+
+  const [statusRefData, furtherInformationRefData] = await prismaClient.$transaction([
     prismaClient.sysRefAssessmentStatus.findMany(),
     prismaClient.sysRefAssessmentFurtherInformation.findMany({
       orderBy: [{ sortOrder: 'asc' }],
