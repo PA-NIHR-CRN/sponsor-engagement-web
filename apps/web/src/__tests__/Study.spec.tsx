@@ -110,6 +110,7 @@ const mockStudy = Mock.of<StudyWithRelations>({
   plannedClosureDate: new Date('2001-01-01'),
   actualOpeningDate: new Date('2001-01-01'),
   actualClosureDate: new Date('2001-01-01'),
+  totalRecruitmentToDate: 999,
   organisations: [
     {
       organisation: {
@@ -128,7 +129,6 @@ const mockStudy = Mock.of<StudyWithRelations>({
       updatedAt: new Date('2001-01-01'),
       createdAt: new Date('2001-01-01'),
       expectedReopenDate: new Date('2001-01-01'),
-      totalRecruitmentToDate: 999,
     },
   ],
   assessments: [
@@ -233,7 +233,7 @@ describe('Study page', () => {
       '1 January 2001',
       '1 January 2001',
       `${mockStudy.sampleSize}`,
-      `${mockStudy.evaluationCategories[0].totalRecruitmentToDate}`,
+      `${mockStudy.totalRecruitmentToDate}`,
     ])
 
     // Sponsor assessment history
@@ -243,7 +243,7 @@ describe('Study page', () => {
     expect(screen.getByRole('heading', { name: 'About this study', level: 3 })).toBeInTheDocument()
     expect(
       screen.getByRole('button', {
-        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
         expanded: true,
       })
     ).toBeInTheDocument()
@@ -310,7 +310,7 @@ describe('Study page', () => {
 
     expect(
       screen.queryByRole('button', {
-        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
       })
     ).not.toBeInTheDocument()
 
@@ -331,6 +331,37 @@ describe('Study page', () => {
     render(Study.getLayout(<Study {...props} />, { ...props }))
 
     expect(screen.getByText('This study is progressing as planned')).toBeInTheDocument()
+  })
+
+  test('Suspended study with no estimated reopen date', async () => {
+    prismaMock.$transaction.mockResolvedValueOnce([
+      Mock.of<StudyWithRelations>({
+        ...mockStudy,
+        studyStatus: 'Suspended',
+        evaluationCategories: [
+          {
+            indicatorValue: 'Milestone missed',
+            updatedAt: new Date('2001-01-01'),
+            createdAt: new Date('2001-01-01'),
+            expectedReopenDate: null,
+          },
+        ],
+      }),
+    ])
+
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
+
+    const { props } = (await getServerSideProps(context)) as {
+      props: StudyProps
+    }
+
+    render(Study.getLayout(<Study {...props} />, { ...props }))
+
+    const summaryTable = screen.getByRole('table', { name: 'Progress summary' })
+
+    const rowHeader = within(summaryTable).getByRole('rowheader', { name: 'Estimated reopening date' })
+    expect(rowHeader).toBeInTheDocument()
+    expect(rowHeader.nextSibling).toHaveTextContent('-')
   })
 
   test('Non-commercial study', async () => {
@@ -391,14 +422,14 @@ describe('Sponsor assessment history accordion', () => {
 
     expect(
       screen.getByRole('button', {
-        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
         expanded: true,
       })
     )
 
     expect(
       screen.getByRole('region', {
-        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
       })
     ).toHaveAttribute('data-state', 'open')
   })
@@ -417,35 +448,35 @@ describe('Sponsor assessment history accordion', () => {
     // Collapse accordion
     await userEvent.click(
       screen.getByRole('button', {
-        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
         expanded: true,
       })
     )
 
     expect(
       screen.getByRole('button', {
-        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
         expanded: false,
       })
     ).toBeInTheDocument()
 
     expect(
       screen.queryByRole('region', {
-        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
       })
     ).not.toBeInTheDocument()
 
     // Expand accordion
     await userEvent.click(
       screen.getByRole('button', {
-        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
         expanded: false,
       })
     )
 
     expect(
       screen.getByRole('region', {
-        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
       })
     ).toHaveAttribute('data-state', 'open')
 

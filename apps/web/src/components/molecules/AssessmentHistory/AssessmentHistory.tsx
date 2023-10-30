@@ -17,7 +17,7 @@ export function getAssessmentHistoryFromStudy(study: Study) {
   return study.assessments.map(({ status, createdAt, createdBy, furtherInformation, id }) => ({
     id,
     status: status.name,
-    createdAt: formatDate(createdAt, 'short'),
+    createdAt: formatDate(createdAt),
     createdBy: createdBy.email,
     furtherInformation: furtherInformation
       .filter(({ furtherInformationText }) => !furtherInformationText)
@@ -36,7 +36,13 @@ export function AssessmentHistory({ heading, assessments, firstItemExpanded }: A
           {assessments.map((assessment) => (
             <Accordion
               className="w-full"
-              defaultValue={firstItemExpanded ? [String(assessments[0].id)] : []}
+              defaultValue={
+                firstItemExpanded &&
+                Boolean(assessments[0].furtherInformation.length) &&
+                Boolean(assessments[0].furtherInformationText)
+                  ? [String(assessments[0].id)]
+                  : []
+              }
               key={assessment.id}
               type="multiple"
             >

@@ -61,11 +61,37 @@ describe('Assessment History', () => {
   test('default the first assessment expanded', () => {
     render(<AssessmentHistory assessments={sampleAssessments} firstItemExpanded heading="Assessment History" />)
 
+    expect(
+      screen.getByRole('button', {
+        name: `${sampleAssessments[0].createdAt} ${sampleAssessments[0].status} assessed by ${sampleAssessments[0].createdBy}`,
+      })
+    ).toHaveAttribute('aria-expanded', 'true')
+
     expect(screen.getByText('Info 1')).toBeInTheDocument()
     expect(screen.getByText('Info 2')).toBeInTheDocument()
     expect(screen.getByText('Additional Info Text')).toBeInTheDocument()
 
     expect(screen.queryByText('Info 3')).not.toBeInTheDocument()
+  })
+
+  test('default the first assessment expanded with no further information', () => {
+    render(
+      <AssessmentHistory
+        assessments={sampleAssessments.map((item) => ({
+          ...item,
+          furtherInformation: [],
+          furtherInformationText: undefined,
+        }))}
+        firstItemExpanded
+        heading="Assessment History"
+      />
+    )
+
+    expect(
+      screen.getByRole('button', {
+        name: `${sampleAssessments[0].createdAt} ${sampleAssessments[0].status} assessed by ${sampleAssessments[0].createdBy}`,
+      })
+    ).toHaveAttribute('aria-expanded', 'false')
   })
 })
 
@@ -109,7 +135,7 @@ describe('getAssessmentHistoryFromStudy', () => {
       {
         id: 1,
         status: 'On track',
-        createdAt: '01 Jan 2001',
+        createdAt: '1 January 2001',
         createdBy: 'user@example.com',
         furtherInformation: ['Info 2'],
         furtherInformationText: 'Info 1',
@@ -117,7 +143,7 @@ describe('getAssessmentHistoryFromStudy', () => {
       {
         id: 2,
         status: 'Off track',
-        createdAt: '05 Jan 2001',
+        createdAt: '5 January 2001',
         createdBy: 'another@example.com',
         furtherInformation: [],
         furtherInformationText: undefined,
