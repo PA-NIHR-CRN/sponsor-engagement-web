@@ -204,7 +204,7 @@ describe('Assess progress of a study', () => {
     expect(screen.getByRole('heading', { level: 3, name: 'Last sponsor assessment' })).toBeInTheDocument()
     expect(
       screen.getByRole('button', {
-        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
         expanded: false,
       })
     ).toBeInTheDocument()
@@ -286,7 +286,7 @@ describe('Assess progress of a study', () => {
 
     expect(
       screen.queryByRole('button', {
-        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
         expanded: false,
       })
     ).not.toBeInTheDocument()
@@ -364,14 +364,14 @@ describe('Expanding last sponsor assessment accordion', () => {
     // Expand accordion
     await userEvent.click(
       screen.getByRole('button', {
-        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
         expanded: false,
       })
     )
 
     expect(
       screen.getByRole('button', {
-        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
         expanded: true,
       })
     ).toBeInTheDocument()
