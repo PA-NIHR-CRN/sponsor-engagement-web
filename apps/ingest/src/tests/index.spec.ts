@@ -205,7 +205,7 @@ describe('ingest', () => {
         },
         assessments: {
           every: {
-            updatedAt: {
+            createdAt: {
               lte: expect.any(Date),
             },
           },
