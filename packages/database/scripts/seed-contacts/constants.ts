@@ -128,3 +128,5 @@ export const contactHeaders = [
   'Contact 6',
   'Contact 7',
 ]
+
+export const reportHeaders = ['Organisation Name', 'Organisation Role', 'RTS Identifier', ...contactHeaders]
