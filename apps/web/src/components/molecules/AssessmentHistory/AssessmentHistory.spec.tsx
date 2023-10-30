@@ -74,7 +74,44 @@ describe('Assessment History', () => {
     expect(screen.queryByText('Info 3')).not.toBeInTheDocument()
   })
 
-  test('default the first assessment expanded with no further information', () => {
+  test('default the first assessment expanded with only further information and no further information text', () => {
+    render(
+      <AssessmentHistory
+        assessments={sampleAssessments.map((item) => ({
+          ...item,
+          furtherInformationText: undefined,
+        }))}
+        firstItemExpanded
+        heading="Assessment History"
+      />
+    )
+    expect(
+      screen.getByRole('button', {
+        name: `${sampleAssessments[0].createdAt} ${sampleAssessments[0].status} assessed by ${sampleAssessments[0].createdBy}`,
+      })
+    ).toHaveAttribute('aria-expanded', 'true')
+  })
+
+  test('default the first assessment expanded with only further information text and no further information', () => {
+    render(
+      <AssessmentHistory
+        assessments={sampleAssessments.map((item) => ({
+          ...item,
+          furtherInformation: [],
+          furtherInformationText: 'hello',
+        }))}
+        firstItemExpanded
+        heading="Assessment History"
+      />
+    )
+    expect(
+      screen.getByRole('button', {
+        name: `${sampleAssessments[0].createdAt} ${sampleAssessments[0].status} assessed by ${sampleAssessments[0].createdBy}`,
+      })
+    ).toHaveAttribute('aria-expanded', 'true')
+  })
+
+  test('do not default the first assessment expanded with no further information or further information text', () => {
     render(
       <AssessmentHistory
         assessments={sampleAssessments.map((item) => ({
