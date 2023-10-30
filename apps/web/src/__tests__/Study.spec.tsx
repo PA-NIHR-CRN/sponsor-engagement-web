@@ -243,7 +243,7 @@ describe('Study page', () => {
     expect(screen.getByRole('heading', { name: 'About this study', level: 3 })).toBeInTheDocument()
     expect(
       screen.getByRole('button', {
-        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
         expanded: true,
       })
     ).toBeInTheDocument()
@@ -310,7 +310,7 @@ describe('Study page', () => {
 
     expect(
       screen.queryByRole('button', {
-        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
       })
     ).not.toBeInTheDocument()
 
@@ -422,14 +422,14 @@ describe('Sponsor assessment history accordion', () => {
 
     expect(
       screen.getByRole('button', {
-        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
         expanded: true,
       })
     )
 
     expect(
       screen.getByRole('region', {
-        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
       })
     ).toHaveAttribute('data-state', 'open')
   })
@@ -448,35 +448,35 @@ describe('Sponsor assessment history accordion', () => {
     // Collapse accordion
     await userEvent.click(
       screen.getByRole('button', {
-        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
         expanded: true,
       })
     )
 
     expect(
       screen.getByRole('button', {
-        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
         expanded: false,
       })
     ).toBeInTheDocument()
 
     expect(
       screen.queryByRole('region', {
-        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
       })
     ).not.toBeInTheDocument()
 
     // Expand accordion
     await userEvent.click(
       screen.getByRole('button', {
-        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
         expanded: false,
       })
     )
 
     expect(
       screen.getByRole('region', {
-        name: '01 Jan 2001 Off track assessed by mockeduser@nihr.ac.uk',
+        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
       })
     ).toHaveAttribute('data-state', 'open')
 
