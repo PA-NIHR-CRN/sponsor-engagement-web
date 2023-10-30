@@ -109,7 +109,7 @@ describe('getAssessmentHistoryFromStudy', () => {
       {
         id: 1,
         status: 'On track',
-        createdAt: '01 Jan 2001',
+        createdAt: '1 January 2001',
         createdBy: 'user@example.com',
         furtherInformation: ['Info 2'],
         furtherInformationText: 'Info 1',
@@ -117,7 +117,7 @@ describe('getAssessmentHistoryFromStudy', () => {
       {
         id: 2,
         status: 'Off track',
-        createdAt: '05 Jan 2001',
+        createdAt: '5 January 2001',
         createdBy: 'another@example.com',
         furtherInformation: [],
         furtherInformationText: undefined,

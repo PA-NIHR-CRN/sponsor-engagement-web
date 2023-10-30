@@ -17,7 +17,7 @@ export function getAssessmentHistoryFromStudy(study: Study) {
   return study.assessments.map(({ status, createdAt, createdBy, furtherInformation, id }) => ({
     id,
     status: status.name,
-    createdAt: formatDate(createdAt, 'short'),
+    createdAt: formatDate(createdAt),
     createdBy: createdBy.email,
     furtherInformation: furtherInformation
       .filter(({ furtherInformationText }) => !furtherInformationText)
