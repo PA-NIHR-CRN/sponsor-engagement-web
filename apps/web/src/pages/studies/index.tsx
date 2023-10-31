@@ -129,7 +129,7 @@ export default function Studies({
                             assessmentDue={Boolean(study.isDueAssessment)}
                             assessmentHref={`/assessments/${study.id}?returnUrl=studies`}
                             indications={study.evaluationCategories.map((evalCategory) => evalCategory.indicatorType)}
-                            lastAsessmentDate={formatDate(study.assessments[0]?.updatedAt)}
+                            lastAsessmentDate={formatDate(study.assessments[0]?.createdAt)}
                             shortTitle={study.shortTitle}
                             shortTitleHref={`/studies/${study.id}`}
                             sponsorOrgName={sponsorOrg?.organisation.name}
