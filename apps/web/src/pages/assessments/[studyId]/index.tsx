@@ -10,7 +10,7 @@ import Link from 'next/link'
 import { RootLayout } from '../../../components/Layout/RootLayout'
 import {
   AssessmentHistory,
-  GetSupport,
+  RequestSupport,
   StudyDetails,
   getAssessmentHistoryFromStudy,
 } from '../../../components/molecules'
@@ -168,7 +168,7 @@ export default function Assessment({
           </Form>
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
-          <GetSupport />
+          <RequestSupport />
         </div>
       </div>
     </Container>
