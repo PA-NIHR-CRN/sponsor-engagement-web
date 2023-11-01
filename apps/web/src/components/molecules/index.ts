@@ -1,4 +1,4 @@
-export * from './cards/GetSupport/GetSupport'
+export * from './cards/RequestSupport/RequestSupport'
 export * from './cards/StudyList/StudyList'
 export * from './Pagination/Pagination'
 export * from './Sort/Sort'
