@@ -4,7 +4,7 @@ import type { InferGetServerSidePropsType } from 'next'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { RootLayout } from '../../../components/Layout/RootLayout'
+import { RootLayout } from '../../../components/organisms'
 import {
   AssessmentHistory,
   RequestSupport,
