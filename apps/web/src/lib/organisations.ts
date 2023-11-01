@@ -43,13 +43,9 @@ export const getStudyOrganisations = async ({
     orderBy: [{ name: Prisma.SortOrder.asc }],
     where: {
       ...(searchTerm && {
-        OR: [
-          {
-            name: {
-              contains: searchTerm,
-            },
-          },
-        ],
+        name: {
+          contains: searchTerm,
+        },
       }),
       studies: {
         some: {},
