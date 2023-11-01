@@ -273,11 +273,13 @@ describe('Study page', () => {
     ])
 
     // Support
-    expect(screen.getByRole('heading', { level: 3, name: 'Get NIHR CRN support' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 3, name: 'Request NIHR CRN support' })).toBeInTheDocument()
     expect(
-      screen.getByText('Sponsors or their delegates can get NIHR CRN support with their research study at any time.')
+      screen.getByText(
+        'Sponsors or their delegates can request NIHR CRN support with their research study at any time.'
+      )
     ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Get support' })).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link', { name: 'Request support' })).toHaveAttribute('href', '/')
   })
 
   test('Due assessment', async () => {
@@ -403,7 +405,7 @@ describe('Study page', () => {
     expect(within(banner).getByText('The study assessment was successfully saved')).toBeInTheDocument()
     expect(within(banner).getByRole('link', { name: 'NIHR CRN support' })).toHaveAttribute('href', '/')
     expect(within(banner).getByRole('link', { name: 'NIHR CRN support' }).parentElement).toHaveTextContent(
-      'Get NIHR CRN support for this study.'
+      'Request NIHR CRN support for this study.'
     )
   })
 })

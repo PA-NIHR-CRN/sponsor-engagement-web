@@ -185,11 +185,13 @@ describe('Assess progress of a study', () => {
     ).toBeInTheDocument()
 
     // Support
-    expect(screen.getByRole('heading', { level: 3, name: 'Get NIHR CRN support' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 3, name: 'Request NIHR CRN support' })).toBeInTheDocument()
     expect(
-      screen.getByText('Sponsors or their delegates can get NIHR CRN support with their research study at any time.')
+      screen.getByText(
+        'Sponsors or their delegates can request NIHR CRN support with their research study at any time.'
+      )
     ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Get support' })).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link', { name: 'Request support' })).toHaveAttribute('href', '/')
 
     // Study sponsor
     expect(screen.getByText('Test Organisation')).toBeInTheDocument()

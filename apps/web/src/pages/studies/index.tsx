@@ -9,7 +9,7 @@ import Skeleton from 'react-loading-skeleton'
 import { RootLayout } from '../../components/Layout/RootLayout'
 import { authOptions } from '../api/auth/[...nextauth]'
 import { SIGN_IN_PAGE } from '../../constants/routes'
-import { GetSupport, StudyList, Pagination, Sort, Filters, SelectedFilters } from '../../components/molecules'
+import { RequestSupport, StudyList, Pagination, Sort, Filters, SelectedFilters } from '../../components/molecules'
 import { PER_PAGE } from '../../constants'
 import { pluraliseStudy } from '../../utils/pluralise'
 import { getStudiesForOrgs } from '../../lib/studies'
@@ -23,7 +23,7 @@ import 'react-loading-skeleton/dist/skeleton.css'
 const renderNotificationBanner = (success: boolean) =>
   success ? (
     <NotificationBanner heading="The study assessment was successfully saved" success>
-      Get{' '}
+      Request{' '}
       <Link className="govuk-notification-banner__link" href="/">
         NIHR CRN support
       </Link>{' '}
@@ -157,7 +157,7 @@ export default function Studies({
           )}
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
-          <GetSupport />
+          <RequestSupport />
         </div>
       </div>
     </Container>

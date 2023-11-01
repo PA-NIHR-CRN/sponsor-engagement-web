@@ -7,7 +7,7 @@ import { useRouter } from 'next/router'
 import { RootLayout } from '../../../components/Layout/RootLayout'
 import {
   AssessmentHistory,
-  GetSupport,
+  RequestSupport,
   StudyDetails,
   getAssessmentHistoryFromStudy,
 } from '../../../components/molecules'
@@ -18,7 +18,7 @@ import { withServerSideProps } from '../../../utils/withServerSideProps'
 const renderNotificationBanner = (success: boolean) =>
   success ? (
     <NotificationBanner heading="The study assessment was successfully saved" success>
-      Get{' '}
+      Request{' '}
       <Link className="govuk-notification-banner__link" href="/">
         NIHR CRN support
       </Link>{' '}
@@ -134,7 +134,7 @@ export default function Study({ study, assessments }: StudyProps) {
           <StudyDetails study={study} />
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
-          <GetSupport />
+          <RequestSupport />
         </div>
       </div>
     </Container>
