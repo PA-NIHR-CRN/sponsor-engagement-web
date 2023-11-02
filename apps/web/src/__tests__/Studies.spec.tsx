@@ -178,6 +178,36 @@ describe('Studies page', () => {
     expect(within(pagination).getByRole('link', { name: 'Next' })).toHaveAttribute('href', '/?page=2')
   })
 
+  test('No studies found', async () => {
+    prismaMock.$transaction.mockResolvedValueOnce([[], 0, 0])
+
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: {} })
+
+    const { props } = (await getServerSideProps(context)) as {
+      props: StudiesProps
+    }
+
+    render(Studies.getLayout(<Studies {...props} />, { ...props }))
+
+    // SEO
+    expect(NextSeo).toHaveBeenCalledWith(
+      {
+        title: `Study Progress Review - Search results (no matching search results)`,
+      },
+      {}
+    )
+
+    // Study results title
+    expect(screen.getByText(`0 studies found (0 due for assessment)`)).toBeInTheDocument()
+
+    // Show message instead of the table
+    expect(screen.getByText('No studies found')).toBeInTheDocument()
+
+    // Hide pagination
+    const pagination = screen.queryByRole('navigation', { name: 'results' })
+    expect(pagination).not.toBeInTheDocument()
+  })
+
   test('Changing page', async () => {
     prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudies.length, 3])
 
@@ -220,8 +250,26 @@ describe('Studies page', () => {
       'Request NIHR CRN support for this study.'
     )
   })
-})
 
-// describe('Studies page searching', () => {})
-// describe('Studies page filtering', () => {})
-// describe('Studies page sorting', () => {})
+  test('Selected filters', async () => {
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudies.length, 3])
+
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { q: 'test search' } })
+
+    const { props } = (await getServerSideProps(context)) as {
+      props: StudiesProps
+    }
+
+    await mockRouter.push('')
+
+    render(Studies.getLayout(<Studies {...props} />, { ...props }))
+
+    expect(screen.getByLabelText('Search study title, protocol number or IRAS ID')).toHaveValue('test search')
+
+    expect(screen.getByText('Selected filters')).toBeInTheDocument()
+
+    expect(screen.getByRole('link', { name: 'Clear filter: test search' })).toHaveAttribute('href', '/')
+
+    expect(screen.getByRole('link', { name: 'Clear all filters' })).toHaveAttribute('href', '/')
+  })
+})

@@ -1,6 +1,6 @@
+import { Container } from '@nihr-ui/frontend'
 import type { ReactElement } from 'react'
-import { Container } from '../components/Container/Container'
-import { RootLayout } from '../components/Layout/RootLayout'
+import { RootLayout } from '../components/organisms'
 
 export default function ServiceUnavailable() {
   return (

@@ -7,7 +7,7 @@ import type { FieldError } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 import clsx from 'clsx'
 import Link from 'next/link'
-import { RootLayout } from '../../../components/Layout/RootLayout'
+import { RootLayout } from '../../../components/organisms'
 import {
   AssessmentHistory,
   RequestSupport,
