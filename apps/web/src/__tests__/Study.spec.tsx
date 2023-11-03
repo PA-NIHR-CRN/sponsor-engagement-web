@@ -9,7 +9,7 @@ import mockRouter from 'next-router-mock'
 import userEvent from '@testing-library/user-event'
 import type { StudyProps } from '../pages/studies/[studyId]'
 import Study, { getServerSideProps } from '../pages/studies/[studyId]'
-import { userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
+import { userWithContactManagerRole, userWithSponsorContactRole } from '../__mocks__/session'
 import { SIGN_IN_PAGE } from '../constants/routes'
 import { prismaMock } from '../__mocks__/prisma'
 
@@ -29,9 +29,9 @@ describe('getServerSideProps', () => {
     })
   })
 
-  test('redirects back to the homepage for users without any roles', async () => {
+  test('redirects back to the homepage for users without sponsor contact role', async () => {
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {} })
-    getServerSessionMock.mockResolvedValueOnce(userNoRoles)
+    getServerSessionMock.mockResolvedValueOnce(userWithContactManagerRole)
 
     const result = await getServerSideProps(context)
     expect(result).toEqual({

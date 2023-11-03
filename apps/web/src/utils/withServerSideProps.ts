@@ -3,9 +3,10 @@ import type { Session } from 'next-auth'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../pages/api/auth/[...nextauth]'
 import { SIGN_IN_PAGE } from '../constants/routes'
+import { Roles } from '../constants'
 
 export const withServerSideProps =
-  <R>(getServerSideProps: (context: GetServerSidePropsContext, session: Session) => R) =>
+  <R>(role: Roles, getServerSideProps: (context: GetServerSidePropsContext, session: Session) => R) =>
   async (context: GetServerSidePropsContext) => {
     try {
       const session = await getServerSession(context.req, context.res, authOptions)
@@ -18,7 +19,15 @@ export const withServerSideProps =
         }
       }
 
-      if (session.user.roles.length === 0 || session.user.organisations.length === 0) {
+      if (!session.user.roles.includes(role)) {
+        return {
+          redirect: {
+            destination: '/',
+          },
+        }
+      }
+
+      if (role === Roles.SponsorContact && session.user.organisations.length === 0) {
         return {
           redirect: {
             destination: '/',

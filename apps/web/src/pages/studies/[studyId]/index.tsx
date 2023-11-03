@@ -14,6 +14,7 @@ import {
 import { getStudyById } from '../../../lib/studies'
 import { formatDate } from '../../../utils/date'
 import { withServerSideProps } from '../../../utils/withServerSideProps'
+import { Roles } from '../../../constants'
 
 const renderNotificationBanner = (success: boolean) =>
   success ? (
@@ -145,7 +146,7 @@ Study.getLayout = function getLayout(page: ReactElement, { user }: StudyProps) {
   return <RootLayout user={user}>{page}</RootLayout>
 }
 
-export const getServerSideProps = withServerSideProps(async (context, session) => {
+export const getServerSideProps = withServerSideProps(Roles.SponsorContact, async (context, session) => {
   const studyId = Number(context.query.studyId)
 
   if (!studyId) {

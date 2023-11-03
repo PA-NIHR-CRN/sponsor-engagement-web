@@ -14,7 +14,7 @@ import {
   SelectedFilters,
   StudiesListSkeleton,
 } from '../../components/molecules'
-import { STUDIES_PER_PAGE } from '../../constants'
+import { Roles, STUDIES_PER_PAGE } from '../../constants'
 import { pluraliseStudy } from '../../utils/pluralise'
 import { getStudiesForOrgs } from '../../lib/studies'
 import { formatDate } from '../../utils/date'
@@ -167,7 +167,7 @@ Studies.getLayout = function getLayout(page: ReactElement, { user }: StudiesProp
   return <RootLayout user={user}>{page}</RootLayout>
 }
 
-export const getServerSideProps = withServerSideProps(async (context, session) => {
+export const getServerSideProps = withServerSideProps(Roles.SponsorContact, async (context, session) => {
   try {
     const organisationIds = session.user?.organisations.map((userOrg) => userOrg.organisationId) || []
 
