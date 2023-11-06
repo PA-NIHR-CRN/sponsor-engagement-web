@@ -69,6 +69,7 @@ model Study {
   updatedAt                  DateTime                  @updatedAt
   isDueAssessment            Boolean?                  @default(false)
   isDeleted                  Boolean?                  @default(false)
+  isTempDeleted              Boolean?                  @default(false)
 
   @@index([cpmsId])
 }
@@ -80,6 +81,7 @@ model Organisation {
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
   isDeleted     Boolean?            @default(false)
+  isTempDeleted Boolean?            @default(false)
   users         UserOrganisation[]
   roles         OrganisationRole[]
   studies       StudyOrganisation[]
@@ -97,6 +99,7 @@ model OrganisationRole {
   createdAt      DateTime               @default(now())
   updatedAt      DateTime               @updatedAt
   isDeleted      Boolean?               @default(false)
+  isTempDeleted  Boolean?               @default(false)
 
   @@unique([organisationId, roleId])
 }
@@ -167,6 +170,7 @@ model StudyOrganisation {
   createdAt          DateTime               @default(now())
   updatedAt          DateTime               @updatedAt
   isDeleted          Boolean?               @default(false)
+  isTempDeleted      Boolean?               @default(false)
 
   @@unique([studyId, organisationId])
 }
@@ -187,6 +191,7 @@ model StudyEvaluationCategory {
   createdAt              DateTime  @default(now())
   updatedAt              DateTime  @updatedAt
   isDeleted              Boolean?  @default(false)
+  isTempDeleted          Boolean?  @default(false)
 
   @@unique([studyId, indicatorValue])
 }

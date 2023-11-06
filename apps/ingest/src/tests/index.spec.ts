@@ -27,7 +27,6 @@ beforeEach(() => {
 
   prismaMock.organisationRole.createMany.mockResolvedValueOnce({ count: 1 })
   prismaMock.studyOrganisation.createMany.mockResolvedValueOnce({ count: 1 })
-  prismaMock.studyFunder.createMany.mockResolvedValueOnce({ count: 1 })
   prismaMock.studyEvaluationCategory.createMany.mockResolvedValueOnce({ count: 1 })
   prismaMock.study.updateMany.mockResolvedValueOnce({ count: 1 })
 })
@@ -138,24 +137,6 @@ describe('ingest', () => {
           studyId: 123,
           organisationId: 12345,
           organisationRoleId: 12345,
-        }),
-      ]),
-      skipDuplicates: true,
-    })
-  })
-
-  it('should seed the study funders', async () => {
-    await ingest()
-
-    expect(prismaMock.studyFunder.createMany).toHaveBeenCalledTimes(1)
-
-    expect(prismaMock.studyFunder.createMany).toHaveBeenCalledWith({
-      data: expect.arrayContaining([
-        expect.objectContaining({
-          studyId: 123,
-          organisationId: 12345,
-          grantCode: 'Test Grant Code',
-          fundingStreamName: 'Test Funding Stream',
         }),
       ]),
       skipDuplicates: true,

@@ -11,11 +11,7 @@ import { getOrganisationName, getOrgsUniqueByName, getOrgsUniqueByNameRole, getO
 // Entities related to the current batch of studies
 let studyEntities: StudyWithRelationships[] = []
 let organisationEnitities: OrganisationEntity[] = []
-let organisationRoleEntities: SysRefOrganisationRoleEntity[] = []
-
-// Running cache of all entity IDs
-const allStudyIds: number[] = []
-const allOrganisationIds: number[] = []
+let organisationRoleRefEntities: SysRefOrganisationRoleEntity[] = []
 
 let studies: Study[]
 
@@ -41,6 +37,7 @@ const createStudies = async () => {
       actualClosureDate: study.ActualClosureDate ? new Date(study.ActualClosureDate) : undefined,
       isDueAssessment: false,
       isDeleted: false,
+      isTempDeleted: false,
     }
 
     return prismaClient.study.upsert({
@@ -51,11 +48,7 @@ const createStudies = async () => {
         organisations: {
           include: {
             organisation: true,
-          },
-        },
-        funders: {
-          include: {
-            organisation: true,
+            organisationRole: true,
           },
         },
       },
@@ -63,8 +56,6 @@ const createStudies = async () => {
   })
 
   studyEntities = await Promise.all(studyQueries)
-
-  allStudyIds.push(...studyEntities.map((study) => study.id))
 
   logger.info(`Finished adding/updating studies`)
 }
@@ -81,6 +72,8 @@ const createOrganisations = async () => {
     const organisationData = {
       name,
       rtsIdentifier,
+      isDeleted: false,
+      isTempDeleted: false,
     }
 
     return prismaClient.organisation.upsert({
@@ -91,8 +84,6 @@ const createOrganisations = async () => {
   })
 
   organisationEnitities = await Promise.all(organisationQueries)
-
-  allOrganisationIds.push(...organisationEnitities.map((org) => org.id))
 
   logger.info(`Finished adding/updating organisations`)
 
@@ -117,7 +108,7 @@ const createOrganisations = async () => {
     })
   })
 
-  organisationRoleEntities = await Promise.all(organisationRoleRefQueries)
+  organisationRoleRefEntities = await Promise.all(organisationRoleRefQueries)
 
   logger.info(`Finished adding/updating organisation role refs`)
 }
@@ -125,77 +116,103 @@ const createOrganisations = async () => {
 const createOrganisationRelationships = async () => {
   const relatedOrgs = getOrgsUniqueByNameRole(studies)
 
-  // Create the array of organisation roles for this batch of studies
+  // OrganisationRole
+
   const organisationRoleInputs = relatedOrgs.map((relatedOrg) => {
     const organisationId = organisationEnitities.find((org) => org.name === getOrganisationName(relatedOrg))
       ?.id as number
-    const roleId = organisationRoleEntities.find((ref) => ref.name === relatedOrg.OrganisationRole)?.id as number
-    return {
+    const roleId = organisationRoleRefEntities.find((ref) => ref.name === relatedOrg.OrganisationRole)?.id as number
+
+    const organisationRoleData = {
       organisationId,
       roleId,
+      isDeleted: false,
+      isTempDeleted: false,
     }
+
+    return prismaClient.organisationRole.upsert({
+      where: {
+        organisationId_roleId: {
+          organisationId,
+          roleId,
+        },
+      },
+      create: organisationRoleData,
+      update: organisationRoleData,
+    })
   })
 
-  const organisationRolesResult = await prismaClient.organisationRole.createMany({
-    data: organisationRoleInputs,
-    skipDuplicates: true,
+  await Promise.all(organisationRoleInputs)
+
+  logger.info(`Added organisation roles`)
+}
+
+const createStudyRelationships = async () => {
+  const studyEntityIds = studyEntities.map((study) => study.id)
+
+  // StudyOrganisation
+
+  await prismaClient.studyOrganisation.updateMany({
+    where: { studyId: { in: studyEntityIds } },
+    data: { isTempDeleted: true },
   })
 
-  logger.info(`Added ${organisationRolesResult.count} organisation roles`)
-
-  // Create the array of study organisations for this batch of studies
   const studyOrganisationInputs = studies
     .map((study) =>
       study.StudySponsors.map((sponsor) => {
         const studyId = studyEntities.find((studyEntity) => studyEntity.cpmsId === study.Id)?.id as number
         const organisationId = organisationEnitities.find((org) => org.name === sponsor.OrganisationName)?.id as number
-        const organisationRoleId = organisationRoleEntities.find((ref) => ref.name === sponsor.OrganisationRole)
+        const organisationRoleId = organisationRoleRefEntities.find((ref) => ref.name === sponsor.OrganisationRole)
           ?.id as number
-        return {
+
+        const studyOrganisationData = {
           studyId,
           organisationId,
           organisationRoleId,
+          isDeleted: false,
+          isTempDeleted: false,
         }
+
+        return prismaClient.studyOrganisation.upsert({
+          where: {
+            studyId_organisationId: {
+              studyId,
+              organisationId,
+            },
+          },
+          create: studyOrganisationData,
+          update: studyOrganisationData,
+        })
       })
     )
     .flat()
 
-  const studyOrganisationsResult = await prismaClient.studyOrganisation.createMany({
-    data: studyOrganisationInputs,
-    skipDuplicates: true,
+  await Promise.all(studyOrganisationInputs)
+
+  logger.info(`Added study organisations`)
+
+  const { count: deletedStudyOrgsCount } = await prismaClient.studyOrganisation.updateMany({
+    where: { isTempDeleted: true },
+    data: { isDeleted: true, isTempDeleted: false },
   })
 
-  logger.info(`Added ${studyOrganisationsResult.count} study organisations`)
+  if (deletedStudyOrgsCount > 0) {
+    logger.info('Flagged %s study organisations as deleted', deletedStudyOrgsCount)
+  }
 
-  // Create the array of study funders for this batch of studies
-  const studyFunderInputs = studies
-    .map((study) =>
-      study.StudyFunders.map((funder) => {
-        const studyId = studyEntities.find((studyEntity) => studyEntity.cpmsId === study.Id)?.id as number
-        const organisationId = organisationEnitities.find((org) => org.name === funder.FunderName)?.id as number
-        return {
-          studyId,
-          organisationId,
-          grantCode: funder.GrantCode,
-          fundingStreamName: funder.FundingStreamName || '',
-        }
-      })
-    )
-    .flat()
+  // StudyEvaluationCategory
 
-  const studyFundersResult = await prismaClient.studyFunder.createMany({
-    data: studyFunderInputs,
-    skipDuplicates: true,
+  await prismaClient.studyEvaluationCategory.updateMany({
+    where: { studyId: { in: studyEntityIds } },
+    data: { isTempDeleted: true },
   })
 
-  logger.info(`Added ${studyFundersResult.count} study funders`)
-
-  // Create the array of evaluation categories for this batch of studies
   const evaluationCategoryInputs = studies
     .map((study) =>
       study.StudyEvaluationCategories.map((category) => {
         const studyId = studyEntities.find((studyEntity) => studyEntity.cpmsId === study.Id)?.id as number
-        return {
+
+        const evaluationCategoryData = {
           studyId,
           indicatorType: category.EvaluationCategoryType,
           indicatorValue: category.EvaluationCategoryValue,
@@ -210,17 +227,36 @@ const createOrganisationRelationships = async () => {
           actualOpeningDate: category.ActualOpeningDate ? new Date(category.ActualOpeningDate) : undefined,
           actualClosureDate: category.ActualClosureDate ? new Date(category.ActualClosureDate) : undefined,
           expectedReopenDate: category.ExpectedReopenDate ? new Date(category.ExpectedReopenDate) : undefined,
+          isDeleted: false,
+          isTempDeleted: false,
         }
+
+        return prismaClient.studyEvaluationCategory.upsert({
+          where: {
+            studyId_indicatorValue: {
+              studyId,
+              indicatorValue: evaluationCategoryData.indicatorValue,
+            },
+          },
+          create: evaluationCategoryData,
+          update: evaluationCategoryData,
+        })
       })
     )
     .flat()
 
-  const evaluationCategoriesResult = await prismaClient.studyEvaluationCategory.createMany({
-    data: evaluationCategoryInputs,
-    skipDuplicates: true,
+  await Promise.all(evaluationCategoryInputs)
+
+  logger.info(`Added study evaluation categories`)
+
+  const { count: deletedEvalCategoriesCount } = await prismaClient.studyEvaluationCategory.updateMany({
+    where: { isTempDeleted: true },
+    data: { isDeleted: true, isTempDeleted: false },
   })
 
-  logger.info(`Added ${evaluationCategoriesResult.count} study evaluation categories`)
+  if (deletedEvalCategoriesCount > 0) {
+    logger.info('Flagged %s study evaluation categories as deleted', deletedEvalCategoriesCount)
+  }
 }
 
 const setAssessmentDue = async () => {
@@ -296,6 +332,10 @@ export const ingest = async () => {
   assert(API_USERNAME)
   assert(API_PASSWORD)
 
+  await prismaClient.study.updateMany({ data: { isTempDeleted: true } })
+  await prismaClient.organisation.updateMany({ data: { isTempDeleted: true } })
+  await prismaClient.organisationRole.updateMany({ data: { isTempDeleted: true } })
+
   for await (const studyRecords of fetchStudies(API_URL, API_USERNAME, API_PASSWORD)) {
     studies = studyRecords
       .filter((study) => !!study.QualificationDate)
@@ -305,6 +345,7 @@ export const ingest = async () => {
           (sponsor) =>
             ({
               ...sponsor,
+              // Trim OrganisationRole to remove whitespace in reference data
               OrganisationRole: sponsor.OrganisationRole.trim(),
             } as StudySponsor)
         ),
@@ -313,6 +354,52 @@ export const ingest = async () => {
     await createStudies()
     await createOrganisations()
     await createOrganisationRelationships()
+    await createStudyRelationships()
     await setAssessmentDue()
+  }
+
+  const { count: deletedStudiesCount } = await prismaClient.study.updateMany({
+    where: { isTempDeleted: true },
+    data: { isDeleted: true, isTempDeleted: false },
+  })
+
+  const { count: deletedOrgsCount } = await prismaClient.organisation.updateMany({
+    where: { isTempDeleted: true },
+    data: { isDeleted: true, isTempDeleted: false },
+  })
+
+  const { count: deletedOrgRolesCount } = await prismaClient.organisationRole.updateMany({
+    where: { OR: [{ isTempDeleted: true }, { organisation: { isDeleted: true } }] },
+    data: { isDeleted: true, isTempDeleted: false },
+  })
+
+  const { count: deletedStudyOrgsCount } = await prismaClient.studyOrganisation.updateMany({
+    where: { study: { isDeleted: true } },
+    data: { isDeleted: true, isTempDeleted: false },
+  })
+
+  const { count: deletedEvalCategoriesCount } = await prismaClient.studyEvaluationCategory.updateMany({
+    where: { study: { isDeleted: true } },
+    data: { isDeleted: true, isTempDeleted: false },
+  })
+
+  if (deletedStudiesCount > 0) {
+    logger.info('Flagged %s studies as deleted', deletedStudiesCount)
+  }
+
+  if (deletedOrgsCount > 0) {
+    logger.info('Flagged %s organisations as deleted', deletedOrgsCount)
+  }
+
+  if (deletedOrgRolesCount > 0) {
+    logger.info('Flagged %s organisation roles as deleted', deletedOrgRolesCount)
+  }
+
+  if (deletedStudyOrgsCount > 0) {
+    logger.info('Flagged %s study organisations as deleted', deletedStudyOrgsCount)
+  }
+
+  if (deletedEvalCategoriesCount > 0) {
+    logger.info('Flagged %s study evaluation categories as deleted', deletedEvalCategoriesCount)
   }
 }
