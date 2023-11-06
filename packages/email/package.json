@@ -1,0 +1,21 @@
+{
+  "name": "email",
+  "version": "0.0.0",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "source": "./src/index.ts",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint .",
+    "test": "jest --watch",
+    "test:ci": "jest --ci --coverage"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1488.0",
+    "handlebars": "^4.7.8",
+    "logger": "*",
+    "pino": "^8.14.1",
+    "pino-pretty": "^10.0.1"
+  }
+}
