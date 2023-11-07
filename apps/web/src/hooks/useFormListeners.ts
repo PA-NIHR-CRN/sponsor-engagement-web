@@ -1,19 +1,22 @@
 import type { ParsedUrlQueryInput } from 'node:querystring'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
-export const useStudies = () => {
+export const useFormListeners = () => {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleRouteChangeStart = (newUrl: string) => {
-    const url = new URL(`${window.location.origin}${newUrl}`)
-    if (url.pathname.endsWith('/studies')) setIsLoading(true)
-  }
+  const handleRouteChangeStart = useCallback(
+    (newUrl: string) => {
+      const url = new URL(`${window.location.origin}${newUrl}`)
+      if (url.pathname.endsWith(router.pathname)) setIsLoading(true)
+    },
+    [router.pathname]
+  )
 
-  const handleRouteChangeComplete = () => {
+  const handleRouteChangeComplete = useCallback(() => {
     setIsLoading(false)
-  }
+  }, [])
 
   const handleFilterChange = (formValues: Record<string, unknown>) => {
     // Avoid multiple submissions
@@ -23,7 +26,7 @@ export const useStudies = () => {
 
     void router.push(
       {
-        pathname: '/studies',
+        pathname: router.pathname,
         query: formValues as ParsedUrlQueryInput,
       },
       undefined,
@@ -38,7 +41,7 @@ export const useStudies = () => {
       router.events.off('routeChangeStart', handleRouteChangeStart)
       router.events.off('routeChangeComplete', handleRouteChangeComplete)
     }
-  }, [router])
+  }, [router, handleRouteChangeStart, handleRouteChangeComplete])
 
   return { isLoading, handleFilterChange }
 }

@@ -1,11 +1,11 @@
 import { Mock } from 'ts-mockery'
-import type { Study } from 'database'
+import type { Prisma, Study } from 'database'
 import { prismaMock } from '../__mocks__/prisma'
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
 import { getStudyById, getStudiesForOrgs } from './studies'
 
 describe('getStudiesForOrgs', () => {
-  const mockStudies = [Mock.of<Study>({ id: 1, name: 'Study 1' }), Mock.of<Study>({ id: 2, name: 'Study 2' })]
+  const mockStudies = [Mock.of<Study>({ id: 1, title: 'Study 1' }), Mock.of<Study>({ id: 2, title: 'Study 2' })]
   const mockStudyCount = 2
   const mockStudyDueAssessmentCount = 1
 
@@ -72,7 +72,7 @@ describe('getStudiesForOrgs', () => {
     })
   })
 
-  it('should query studies by study title, irasId and protocolReferenceNumber when a search term is provided', async () => {
+  it('should query studies by study title, shortTitle, irasId and protocolReferenceNumber when a search term is provided', async () => {
     prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudyCount, mockStudyDueAssessmentCount])
 
     const userOrganisationIds = [1, 2]
@@ -99,9 +99,10 @@ describe('getStudiesForOrgs', () => {
         take: 10,
         where: {
           OR: [
-            { name: { contains: 'test-study' } },
-            { irasId: { contains: 'test-study' } },
-            { protocolReferenceNumber: { contains: 'test-study' } },
+            { title: { contains: searchTerm } },
+            { shortTitle: { contains: searchTerm } },
+            { irasId: { contains: searchTerm } },
+            { protocolReferenceNumber: { contains: searchTerm } },
           ],
           organisations: {
             some: {
@@ -124,9 +125,10 @@ describe('getStudiesForOrgs', () => {
     expect(prismaMock.study.count).toHaveBeenCalledWith({
       where: {
         OR: [
-          { name: { contains: 'test-study' } },
-          { irasId: { contains: 'test-study' } },
-          { protocolReferenceNumber: { contains: 'test-study' } },
+          { title: { contains: searchTerm } },
+          { shortTitle: { contains: searchTerm } },
+          { irasId: { contains: searchTerm } },
+          { protocolReferenceNumber: { contains: searchTerm } },
         ],
         organisations: {
           some: {
@@ -148,12 +150,37 @@ describe('getStudiesForOrgs', () => {
 })
 
 describe('getStudyById', () => {
-  it('should return a study with the given id', async () => {
-    prismaMock.study.findFirst.mockResolvedValueOnce(Mock.of<Study>({ id: 1, name: 'Study 1' }))
+  const mockStudy = Mock.of<
+    Prisma.StudyGetPayload<{
+      include: {
+        title: true
+        organisations: {
+          include: {
+            organisation: true
+            organisationRole: true
+          }
+        }
+      }
+    }>
+  >({
+    id: 1,
+    title: 'Study 1',
+    organisations: [],
+  })
+
+  it('returns a study with the given id', async () => {
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudy])
 
     const userOrganisationIds = [1, 2]
 
-    const study = await getStudyById(1, userOrganisationIds)
+    const result = await getStudyById(1, userOrganisationIds)
+
+    expect(result).toEqual({
+      data: {
+        ...mockStudy,
+        organisationsByRole: {},
+      },
+    })
 
     expect(prismaMock.study.findFirst).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -168,7 +195,38 @@ describe('getStudyById', () => {
       })
     )
 
-    expect(study?.id).toEqual(1)
-    expect(study?.name).toEqual('Study 1')
+    expect(result.data?.id).toEqual(1)
+    expect(result.data?.title).toEqual('Study 1')
+  })
+
+  it('maps organisation roles to organisation name', async () => {
+    const mockStudyWithOrgs = {
+      ...mockStudy,
+      organisations: [
+        {
+          organisation: {
+            name: 'Pfizer clinical trials',
+          },
+          organisationRole: {
+            name: 'Managing Clinical Trials Unit',
+          },
+        },
+      ],
+    }
+
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithOrgs])
+
+    const userOrganisationIds = [1, 2]
+
+    const result = await getStudyById(1, userOrganisationIds)
+
+    expect(result).toEqual({
+      data: {
+        ...mockStudyWithOrgs,
+        organisationsByRole: {
+          'Managing Clinical Trials Unit': 'Pfizer clinical trials',
+        },
+      },
+    })
   })
 })

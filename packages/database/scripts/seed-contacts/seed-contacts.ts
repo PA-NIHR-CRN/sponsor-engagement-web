@@ -2,11 +2,12 @@ import path from 'node:path'
 import * as fs from 'node:fs'
 import assert from 'node:assert'
 import axios from 'axios'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, type Prisma } from '@prisma/client'
 import { logger } from '@nihr-ui/logger'
 import { parse } from 'csv-parse'
+import { stringify } from 'csv-stringify/sync'
 import rateLimit from 'axios-rate-limit'
-import { contactHeaders, ctuHeaders, croHeaders, sponsorHeaders } from './constants'
+import { contactHeaders, ctuHeaders, croHeaders, sponsorHeaders, reportHeaders } from './constants'
 
 const prisma = new PrismaClient()
 
@@ -53,7 +54,12 @@ const isSponsor = (row: Row): row is Sponsor => 'Sponsor' in row
 const isCRO = (row: Row): row is CRO => 'CRO' in row
 const isCTU = (row: Row): row is CTU => 'CTU' in row
 
-const seenContacts: string[] = []
+const skippedOrganisations: {
+  name: string
+  role: string
+  rtsIdentifier: string
+  contacts: string[]
+}[] = []
 
 const seedContacts = async <T extends Row>(fileName: string, headers: SponsorHeaders | CROHeaders | CTUHeaders) => {
   logger.info(`⧗ Contacts seed start (${fileName.toUpperCase()}) ✓`)
@@ -105,22 +111,20 @@ const seedContacts = async <T extends Row>(fileName: string, headers: SponsorHea
       name = row.CTU
     }
 
-    const organisation = await prisma.organisation.findFirst({ where: { rtsIdentifier } })
-
-    if (!organisation) {
-      logger.warn(`Organisation not found: ${name} (${rtsIdentifier})`)
-      return
-    }
-
     // Get contacts for sponsor
     const contacts = headers
       .filter((header) => contactHeaders.includes(header))
-      .map((header) => row[header as keyof T])
+      .map((header) => row[header as keyof T] as string)
       .filter(Boolean)
-      .filter((email) => !seenContacts.includes(email as string))
-      .filter((email, index, arr) => arr.indexOf(email) === index) as string[]
+      .map((email) => email.trim().toLowerCase())
+      .filter((email, index, arr) => arr.indexOf(email) === index)
 
-    seenContacts.push(...contacts)
+    const organisation = await prisma.organisation.findFirst({ where: { rtsIdentifier } })
+
+    if (!organisation) {
+      skippedOrganisations.push({ name, rtsIdentifier, role: fileName.toUpperCase(), contacts })
+      return
+    }
 
     const identityGatewayIds = await Promise.all(
       contacts.map(async (email) => {
@@ -141,25 +145,31 @@ const seedContacts = async <T extends Row>(fileName: string, headers: SponsorHea
       })
     )
 
+    const users: Prisma.UserGetPayload<undefined>[] = []
+
     // Add/update user
     const upserts = contacts.map((email, index) => {
       const userData = {
         email,
         identityGatewayId: identityGatewayIds[index],
         organisations: {
-          create: {
-            organisation: {
-              connect: { rtsIdentifier },
+          createMany: {
+            data: {
+              organisationId: organisation.id,
+              createdById: dbUser.id,
+              updatedById: dbUser.id,
             },
-            createdBy: { connect: { id: dbUser.id } },
-            updatedBy: { connect: { id: dbUser.id } },
+            skipDuplicates: true,
           },
         },
         roles: {
-          create: {
-            role: { connect: { id: sponsorContactRole.id } },
-            createdBy: { connect: { id: dbUser.id } },
-            updatedBy: { connect: { id: dbUser.id } },
+          createMany: {
+            data: {
+              roleId: sponsorContactRole.id,
+              createdById: dbUser.id,
+              updatedById: dbUser.id,
+            },
+            skipDuplicates: true,
           },
         },
       }
@@ -170,7 +180,10 @@ const seedContacts = async <T extends Row>(fileName: string, headers: SponsorHea
       })
     })
 
-    const users = await prisma.$transaction(upserts)
+    // Processing serially to avoid unique index collisions
+    for await (const user of upserts) {
+      users.push(user)
+    }
 
     return prisma.account.createMany({
       data: users.map((user) => ({
@@ -189,9 +202,24 @@ const seedContacts = async <T extends Row>(fileName: string, headers: SponsorHea
 }
 
 async function main() {
-  await seedContacts('sponsors', sponsorHeaders)
+  await seedContacts('sponsor', sponsorHeaders)
   await seedContacts('cro', croHeaders)
   await seedContacts('ctu', ctuHeaders)
+
+  const reportPath = path.resolve(__dirname, `../../csv/reports/contacts_migration.csv`)
+
+  fs.writeFileSync(
+    reportPath,
+    stringify([
+      reportHeaders,
+      ...skippedOrganisations.map(({ name, role, rtsIdentifier, contacts }) => [
+        name,
+        role,
+        rtsIdentifier,
+        ...contacts,
+      ]),
+    ])
+  )
 }
 
 main()

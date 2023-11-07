@@ -12,14 +12,7 @@ const API_URL = 'https://dev.cpmsapi.nihr.ac.uk/api/v1/study-summaries'
 
 const server = setupServer(
   rest.get(API_URL, async (_, res, ctx) => {
-    return res(
-      ctx.json({
-        Result: {
-          ...studies.Result,
-          Studies: studies.Result.Studies.slice(0, 3),
-        },
-      })
-    )
+    return res(ctx.json(studies))
   })
 )
 
@@ -47,8 +40,9 @@ describe('ingest', () => {
 
     const expectedStudyPayload = {
       cpmsId: mockStudy.Id,
-      name: mockStudy.Name,
-      status: mockStudy.Status,
+      title: mockStudy.Title,
+      shortTitle: mockStudy.ShortName,
+      studyStatus: mockStudy.StudyStatus,
       recordStatus: mockStudy.StudyRecordStatus,
       route: mockStudy.StudyRoute,
       irasId: mockStudy.IrasId,
@@ -57,6 +51,7 @@ describe('ingest', () => {
       chiefInvestigatorFirstName: mockStudy.ChiefInvestigatorFirstName,
       chiefInvestigatorLastName: mockStudy.ChiefInvestigatorLastName,
       managingSpeciality: mockStudy.ManagingSpecialty,
+      totalRecruitmentToDate: mockStudy.TotalRecruitmentToDate,
       plannedOpeningDate: expect.any(Date),
       plannedClosureDate: expect.any(Date),
       actualOpeningDate: expect.any(Date),
@@ -202,19 +197,24 @@ describe('ingest', () => {
       },
       where: {
         id: { in: [123, 123, 123] },
-        actualOpeningDate: {
-          lte: expect.any(Date),
-        },
         evaluationCategories: {
           some: {},
         },
         assessments: {
           every: {
-            updatedAt: {
+            createdAt: {
               lte: expect.any(Date),
             },
           },
         },
+        OR: [
+          { actualOpeningDate: null },
+          {
+            actualOpeningDate: {
+              lte: expect.any(Date),
+            },
+          },
+        ],
       },
     })
   })

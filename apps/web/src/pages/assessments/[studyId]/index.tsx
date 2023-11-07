@@ -7,8 +7,13 @@ import type { FieldError } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 import clsx from 'clsx'
 import Link from 'next/link'
-import { RootLayout } from '../../../components/Layout/RootLayout'
-import { GetSupport } from '../../../components/molecules'
+import { RootLayout } from '../../../components/organisms'
+import {
+  AssessmentHistory,
+  RequestSupport,
+  StudyDetails,
+  getAssessmentHistoryFromStudy,
+} from '../../../components/molecules'
 import { getStudyById } from '../../../lib/studies'
 import { Checkbox, CheckboxGroup, ErrorSummary, Fieldset, Form, Radio, RadioGroup } from '../../../components/atoms'
 import type { AssessmentInputs } from '../../../utils/schemas/assessment.schema'
@@ -16,10 +21,10 @@ import { assessmentSchema } from '../../../utils/schemas/assessment.schema'
 import { prismaClient } from '../../../lib/prisma'
 import { Textarea } from '../../../components/atoms/Form/Textarea/Textarea'
 import { TEXTAREA_MAX_CHARACTERS } from '../../../constants/forms'
-import { formatDate } from '../../../utils/date'
 import { withServerSideProps } from '../../../utils/withServerSideProps'
 import { getValuesFromSearchParams } from '../../../utils/form'
 import { useFormErrorHydration } from '../../../hooks/useFormErrorHydration'
+import { Roles } from '../../../constants'
 
 export type AssessmentProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
@@ -29,7 +34,7 @@ export default function Assessment({
   statuses,
   furtherInformation,
   returnUrl,
-  lastAssessment,
+  assessments,
 }: AssessmentProps) {
   const { register, formState, setError, watch, handleSubmit } = useForm<AssessmentInputs>({
     resolver: zodResolver(assessmentSchema),
@@ -68,53 +73,34 @@ export default function Assessment({
         <div className="w-full">
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">Assess progress of a study</h2>
 
-          <p className="govuk-body">
+          <p className="govuk-body govuk-!-margin-bottom-6">
             You will need to assess if the study is on or off track and if any action is being taken. If you need NIHR
             CRN support with this study you will need to request this separately.
           </p>
 
           <div className="text-darkGrey govuk-!-margin-bottom-0 govuk-body-s">
+            <span className="govuk-visually-hidden">Study sponsor: </span>
             {study.organisations[0].organisation.name}
           </div>
 
-          <h3 className="govuk-heading-m govuk-!-margin-bottom-3">{study.name}</h3>
+          <h3 className="govuk-heading-m govuk-!-margin-bottom-1">
+            <span className="govuk-visually-hidden">Study title: </span>
+            {study.title}
+          </h3>
 
           <Accordion className="w-full govuk-!-margin-bottom-3" type="multiple">
             <AccordionItem className="border-none" value="details-1">
               <AccordionTrigger>Show study details</AccordionTrigger>
-              <AccordionContent>todo</AccordionContent>
+              <AccordionContent>
+                <StudyDetails study={study} />
+              </AccordionContent>
             </AccordionItem>
           </Accordion>
 
-          <h3 className="govuk-heading-m govuk-!-margin-bottom-3">Last sponsor assessment</h3>
-
-          {lastAssessment ? (
-            <Accordion className="w-full govuk-!-margin-bottom-4" type="multiple">
-              <AccordionItem value="assessment-1">
-                <AccordionTrigger
-                  sideContent={
-                    <span>
-                      <strong>{lastAssessment.status}</strong> assessed by {lastAssessment.createdBy}
-                    </span>
-                  }
-                >
-                  {lastAssessment.createdAt}
-                </AccordionTrigger>
-                <AccordionContent indent>
-                  {lastAssessment.furtherInformation.length ? (
-                    <ul aria-label="Further information" className="govuk-list govuk-list--bullet govuk-body-s">
-                      {lastAssessment.furtherInformation.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                  ) : null}
-                  <p className="govuk-body-s govuk-!-margin-bottom-0">{lastAssessment.furtherInformationText}</p>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          ) : (
-            <p className="govuk-body">This study has not had any assessments provided</p>
-          )}
+          <AssessmentHistory
+            assessments={assessments.length > 0 ? [assessments[0]] : []}
+            heading="Last sponsor assessment"
+          />
 
           <Form
             action={`/api/forms/assessment?returnUrl=${returnUrl}`}
@@ -183,7 +169,7 @@ export default function Assessment({
           </Form>
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
-          <GetSupport />
+          <RequestSupport />
         </div>
       </div>
     </Container>
@@ -194,7 +180,7 @@ Assessment.getLayout = function getLayout(page: ReactElement, { user }: Assessme
   return <RootLayout user={user}>{page}</RootLayout>
 }
 
-export const getServerSideProps = withServerSideProps(async (context, session) => {
+export const getServerSideProps = withServerSideProps(Roles.SponsorContact, async (context, session) => {
   const studyId = context.query.studyId
 
   if (!studyId) {
@@ -207,8 +193,9 @@ export const getServerSideProps = withServerSideProps(async (context, session) =
 
   const userOrganisationIds = session.user?.organisations.map((userOrg) => userOrg.organisationId)
 
-  const [study, statusRefData, furtherInformationRefData] = await prismaClient.$transaction([
-    getStudyById(Number(studyId), userOrganisationIds),
+  const { data: study } = await getStudyById(Number(studyId), userOrganisationIds)
+
+  const [statusRefData, furtherInformationRefData] = await prismaClient.$transaction([
     prismaClient.sysRefAssessmentStatus.findMany(),
     prismaClient.sysRefAssessmentFurtherInformation.findMany({
       orderBy: [{ sortOrder: 'asc' }],
@@ -226,30 +213,15 @@ export const getServerSideProps = withServerSideProps(async (context, session) =
     }
   }
 
-  const lastAssessment =
-    study.assessments.length > 0
-      ? {
-          status: study.assessments[0].status.name,
-          createdAt: formatDate(study.assessments[0].createdAt),
-          createdBy: study.assessments[0].createdBy.email,
-          furtherInformation: study.assessments[0].furtherInformation
-            .filter(({ furtherInformationText }) => !furtherInformationText)
-            .map(({ furtherInformation }) => furtherInformation?.name),
-          furtherInformationText: study.assessments[0].furtherInformation.find(({ furtherInformationText }) =>
-            Boolean(furtherInformationText)
-          )?.furtherInformationText,
-        }
-      : null
-
   return {
     props: {
       query: context.query,
       user: session.user,
       study,
+      assessments: getAssessmentHistoryFromStudy(study),
       statuses: statusRefData.map(({ id, name, description }) => ({ id, name, description })),
       furtherInformation: furtherInformationRefData.map(({ id, name }) => ({ id, name })),
       returnUrl: context.query.returnUrl === 'studies' ? 'studies' : `studies/${study.id}`,
-      lastAssessment,
     },
   }
 })

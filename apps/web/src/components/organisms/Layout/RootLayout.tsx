@@ -5,10 +5,10 @@ import type { ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 import { HomeIcon, SettingsIcon, SideNav } from '@nihr-ui/frontend'
 import type { Session } from 'next-auth'
-import { Header } from '../Header/Header'
-import { ORGANISATIONS_PAGE } from '../../constants/routes'
-import { Roles } from '../../constants/auth'
-import { SERVICE_NAME } from '../../constants'
+import { ORGANISATIONS_PAGE } from '../../../constants/routes'
+import { Roles } from '../../../constants/auth'
+import { SERVICE_NAME } from '../../../constants'
+import { Header } from '../../molecules'
 
 const primaryFont = Roboto({ weight: ['400', '700'], subsets: ['latin'], display: 'swap', variable: '--font-primary' })
 

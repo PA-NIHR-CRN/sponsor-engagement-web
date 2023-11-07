@@ -9,7 +9,8 @@ export const studyEntities = studies.Result.Studies.map((study) =>
   Mock.of<StudyWithRelationships>({
     id: 123,
     cpmsId: study.Id,
-    name: study.Name,
+    title: study.Title,
+    shortTitle: study.ShortName,
     organisations: study.StudySponsors.map((org) => ({
       organisation: { name: org.OrganisationName, id: 12345 },
     })),

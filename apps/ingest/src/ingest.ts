@@ -5,7 +5,7 @@ import { logger } from '@nihr-ui/logger'
 import dayjs from 'dayjs'
 
 import { prismaClient } from './lib/prisma'
-import { Study, StudyRecordStatus, StudyStatus, StudyWithRelationships } from './types'
+import { Study, StudyRecordStatus, StudySponsor, StudyStatus, StudyWithRelationships } from './types'
 import { getOrganisationName, getOrgsUniqueByName, getOrgsUniqueByNameRole, getOrgsUniqueByRole } from './utils'
 
 // Entities related to the current batch of studies
@@ -23,8 +23,9 @@ const createStudies = async () => {
   const studyQueries = studies.map((study) => {
     const studyData = {
       cpmsId: study.Id,
-      name: study.Name,
-      status: study.Status,
+      title: study.Title,
+      shortTitle: study.ShortName,
+      studyStatus: study.StudyStatus,
       recordStatus: study.StudyRecordStatus,
       route: study.StudyRoute,
       irasId: study.IrasId,
@@ -33,6 +34,7 @@ const createStudies = async () => {
       chiefInvestigatorFirstName: study.ChiefInvestigatorFirstName,
       chiefInvestigatorLastName: study.ChiefInvestigatorLastName,
       managingSpeciality: study.ManagingSpecialty ?? '',
+      totalRecruitmentToDate: study.TotalRecruitmentToDate,
       plannedOpeningDate: study.PlannedRecruitmentStartDate ? new Date(study.PlannedRecruitmentStartDate) : undefined,
       plannedClosureDate: study.PlannedRecruitmentEndDate ? new Date(study.PlannedRecruitmentEndDate) : undefined,
       actualOpeningDate: study.ActualOpeningDate ? new Date(study.ActualOpeningDate) : undefined,
@@ -206,7 +208,7 @@ const createOrganisationRelationships = async () => {
             ? new Date(category.PlannedRecruitmentEndDate)
             : undefined,
           actualOpeningDate: category.ActualOpeningDate ? new Date(category.ActualOpeningDate) : undefined,
-          actualClosureDate: category.ActualClosedDate ? new Date(category.ActualClosedDate) : undefined,
+          actualClosureDate: category.ActualClosureDate ? new Date(category.ActualClosureDate) : undefined,
           expectedReopenDate: category.ExpectedReopenDate ? new Date(category.ExpectedReopenDate) : undefined,
         }
       })
@@ -229,17 +231,17 @@ const setAssessmentDue = async () => {
     },
     where: {
       id: { in: studyEntities.map((study) => study.id) },
-      actualOpeningDate: { lte: threeMonthsAgo },
       evaluationCategories: {
         some: {},
       },
       assessments: {
         every: {
-          updatedAt: {
+          createdAt: {
             lte: threeMonthsAgo,
           },
         },
       },
+      OR: [{ actualOpeningDate: null }, { actualOpeningDate: { lte: threeMonthsAgo } }],
     },
   })
 
@@ -295,7 +297,18 @@ export const ingest = async () => {
   assert(API_PASSWORD)
 
   for await (const studyRecords of fetchStudies(API_URL, API_USERNAME, API_PASSWORD)) {
-    studies = studyRecords.filter((study) => !!study.QualificationDate)
+    studies = studyRecords
+      .filter((study) => !!study.QualificationDate)
+      .map((study) => ({
+        ...study,
+        StudySponsors: study.StudySponsors.map(
+          (sponsor) =>
+            ({
+              ...sponsor,
+              OrganisationRole: sponsor.OrganisationRole.trim(),
+            } as StudySponsor)
+        ),
+      }))
 
     await createStudies()
     await createOrganisations()

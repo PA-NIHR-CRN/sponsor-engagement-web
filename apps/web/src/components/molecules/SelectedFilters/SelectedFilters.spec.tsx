@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import mockRouter from 'next-router-mock'
 import type { Filters } from '../../../@types/filters'
+import { STUDIES_PAGE } from '../../../constants/routes'
 import { SelectedFilters } from './SelectedFilters'
 
 test('Displays selected filters with correct links', () => {
@@ -9,6 +10,8 @@ test('Displays selected filters with correct links', () => {
     order: 'a-z',
     q: 'test',
   }
+
+  void mockRouter.push(STUDIES_PAGE)
 
   mockRouter.query = {
     page: '2',

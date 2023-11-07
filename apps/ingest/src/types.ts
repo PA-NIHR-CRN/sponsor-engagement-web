@@ -46,8 +46,9 @@ export interface ResultResult {
 
 export interface Study {
   Id: number
-  Name: string
-  Status: Status
+  ShortName: string
+  Title: string
+  StudyStatus: Status
   StudyRecordStatus: StudyRecordStatus
   StudyRoute: StudyRoute
   IrasId: null | string
@@ -57,6 +58,7 @@ export interface Study {
   ChiefInvestigatorLastName: null | string
   ManagingSpecialty: ManagingSpecialty
   QualificationDate: null | string
+  TotalRecruitmentToDate: number | null
   PlannedRecruitmentStartDate: null | string
   PlannedRecruitmentEndDate: null | string
   ActualOpeningDate: null | string
@@ -115,7 +117,7 @@ export interface StudyEvaluationCategory {
   PlannedRecruitmentStartDate: string | null
   PlannedRecruitmentEndDate: string | null
   ActualOpeningDate: string | null
-  ActualClosedDate: string | null
+  ActualClosureDate: string | null
   ExpectedReopenDate: string | null
 }
 

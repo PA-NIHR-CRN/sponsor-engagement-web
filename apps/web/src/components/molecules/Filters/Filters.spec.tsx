@@ -1,12 +1,18 @@
 import userEvent from '@testing-library/user-event'
 import { render, screen } from '@testing-library/react'
+import mockRouter from 'next-router-mock'
 import { STUDIES_PAGE } from '../../../constants/routes'
 import type { FiltersProps } from './Filters'
 import { Filters } from './Filters'
 
 const defaultProps: FiltersProps = {
   filters: { page: 1 },
+  searchLabel: 'Search study title, protocol number or IRAS ID',
 }
+
+beforeEach(() => {
+  void mockRouter.push(STUDIES_PAGE)
+})
 
 test('Allows searching by keyword', async () => {
   const onFilterChangeSpy = jest.fn()
@@ -18,7 +24,7 @@ test('Allows searching by keyword', async () => {
   expect(form).toHaveAttribute('action', STUDIES_PAGE)
   expect(form).toHaveAttribute('id', 'filters-form')
 
-  const input = screen.getByLabelText('Search study title, protocol number or IRAS ID')
+  const input = screen.getByLabelText(defaultProps.searchLabel)
   const submitBtn = screen.getByRole('button', { name: 'Search' })
 
   await userEvent.type(input, 'Test search')
@@ -36,7 +42,7 @@ test('Allows users with JavaScript to apply filters', async () => {
 
   render(<Filters {...defaultProps} onFilterChange={onFilterChangeSpy} />)
 
-  const input = screen.getByLabelText('Search study title, protocol number or IRAS ID')
+  const input = screen.getByLabelText(defaultProps.searchLabel)
   await userEvent.type(input, 'Test search')
   await userEvent.keyboard('{Enter}')
 
@@ -56,7 +62,7 @@ test('Default input states are correct in relation to the currently enabled filt
   )
 
   // Keyword input has correct default value
-  expect(screen.getByLabelText('Search study title, protocol number or IRAS ID')).toHaveValue('Test search')
+  expect(screen.getByLabelText(defaultProps.searchLabel)).toHaveValue('Test search')
 })
 
 test('Clears the search query after the search input is emptied', async () => {
@@ -73,7 +79,7 @@ test('Clears the search query after the search input is emptied', async () => {
     />
   )
 
-  await userEvent.clear(screen.getByLabelText('Search study title, protocol number or IRAS ID'))
+  await userEvent.clear(screen.getByLabelText(defaultProps.searchLabel))
 
   expect(onFilterChangeSpy).toHaveBeenLastCalledWith({ q: '' })
 })

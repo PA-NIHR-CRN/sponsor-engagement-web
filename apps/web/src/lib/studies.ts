@@ -1,8 +1,8 @@
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
 import { Prisma, prismaClient } from './prisma'
 
-export const getStudyById = (studyId: number, organisationIds?: number[]) => {
-  return prismaClient.study.findFirst({
+export const getStudyById = async (studyId: number, organisationIds?: number[]) => {
+  const query = {
     where: {
       id: studyId,
       ...(organisationIds && {
@@ -15,9 +15,11 @@ export const getStudyById = (studyId: number, organisationIds?: number[]) => {
         },
       }),
     },
-    orderBy: {
-      createdAt: 'desc',
-    },
+    orderBy: [
+      {
+        createdAt: Prisma.SortOrder.desc,
+      },
+    ],
     include: {
       organisations: {
         include: {
@@ -35,21 +37,40 @@ export const getStudyById = (studyId: number, organisationIds?: number[]) => {
               furtherInformation: true,
             },
             orderBy: {
-              furtherInformationId: 'asc',
+              furtherInformationId: Prisma.SortOrder.asc,
             },
           },
         },
-        orderBy: {
-          createdAt: 'desc',
-        },
-      },
-      funders: {
-        include: {
-          organisation: true,
-        },
+        orderBy: [
+          {
+            createdAt: Prisma.SortOrder.desc,
+          },
+        ],
       },
     },
-  })
+  }
+
+  const [study] = await prismaClient.$transaction([prismaClient.study.findFirst(query)])
+
+  if (!study) {
+    return {
+      data: study,
+    }
+  }
+
+  // Map organisation roles along with the name of the organisation to quickly check for a CTO / CRO if applicable
+  const organisationsByRole = Object.fromEntries(
+    study.organisations.map((organisation) => {
+      return [organisation.organisationRole.name, organisation.organisation.name]
+    })
+  )
+
+  return {
+    data: {
+      ...study,
+      organisationsByRole,
+    },
+  }
 }
 
 export const getStudiesForOrgs = async ({
@@ -70,7 +91,12 @@ export const getStudiesForOrgs = async ({
       ...(searchTerm && {
         OR: [
           {
-            name: {
+            title: {
+              contains: searchTerm,
+            },
+          },
+          {
+            shortTitle: {
               contains: searchTerm,
             },
           },
@@ -103,7 +129,8 @@ export const getStudiesForOrgs = async ({
     },
     select: {
       id: true,
-      name: true,
+      title: true,
+      shortTitle: true,
       isDueAssessment: true,
       organisations: {
         include: {

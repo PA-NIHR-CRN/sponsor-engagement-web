@@ -44,9 +44,10 @@ model VerificationToken {
 
 model Study {
   id                         Int                       @id @default(autoincrement())
-  name                       String
+  title                      String                    @db.Text
+  shortTitle                 String
   cpmsId                     Int                       @unique
-  status                     String
+  studyStatus                String
   recordStatus               String
   route                      String
   irasId                     String?
@@ -59,6 +60,7 @@ model Study {
   plannedClosureDate         DateTime?
   actualOpeningDate          DateTime?
   actualClosureDate          DateTime?
+  totalRecruitmentToDate     Int?
   assessments                Assessment[]
   organisations              StudyOrganisation[]
   funders                    StudyFunder[]
@@ -133,6 +135,8 @@ model UserRole {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   isDeleted   Boolean?   @default(false)
+
+  @@unique([userId, roleId])
 }
 
 model UserOrganisation {
@@ -148,6 +152,8 @@ model UserOrganisation {
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   isDeleted      Boolean?     @default(false)
+
+  @@unique([userId, organisationId])
 }
 
 model StudyOrganisation {
@@ -182,7 +188,7 @@ model StudyEvaluationCategory {
   updatedAt              DateTime  @updatedAt
   isDeleted              Boolean?  @default(false)
 
-  @@unique([studyId, indicatorType])
+  @@unique([studyId, indicatorValue])
 }
 
 model StudyFunder {
@@ -215,13 +221,13 @@ model Assessment {
 }
 
 model AssessmentFurtherInformation {
-  id                     Int                                @id @default(autoincrement())
-  assessment             Assessment                         @relation(fields: [assessmentId], references: [id])
+  id                     Int                                 @id @default(autoincrement())
+  assessment             Assessment                          @relation(fields: [assessmentId], references: [id])
   assessmentId           Int
   furtherInformation     SysRefAssessmentFurtherInformation? @relation(fields: [furtherInformationId], references: [id])
   furtherInformationId   Int?
   furtherInformationText String?                             @db.Text
-  isDeleted              Boolean?                           @default(false)
+  isDeleted              Boolean?                            @default(false)
 }
 
 model SysRefRole {
