@@ -5,7 +5,7 @@ import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { withServerSideProps } from '../../utils/withServerSideProps'
 import { getStudyOrganisations } from '../../lib/organisations'
-import { ORGANISATIONS_PER_PAGE } from '../../constants'
+import { ORGANISATIONS_PER_PAGE, Roles } from '../../constants'
 import { pluraliseOrganisation } from '../../utils/pluralise'
 import { Filters, OrganisationsListSkeleton, Pagination, SelectedFilters, Sort } from '../../components/molecules'
 import { Card } from '../../components/atoms'
@@ -126,7 +126,7 @@ Organisations.getLayout = function getLayout(page: ReactElement, { user }: Organ
   return <RootLayout user={user}>{page}</RootLayout>
 }
 
-export const getServerSideProps = withServerSideProps(async (context, session) => {
+export const getServerSideProps = withServerSideProps(Roles.ContactManager, async (context, session) => {
   try {
     const searchParams = new URLSearchParams({
       q: context.query.q ? String(context.query.q) : '',

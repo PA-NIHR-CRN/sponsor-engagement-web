@@ -11,6 +11,9 @@ export const organisationRoleShortName = {
   'Managing Clinical Trials Unit': 'CTO',
 } as const
 
+export const isClinicalResearchSponsor = (studyOrg: StudyOrganisationWithRelations) =>
+  studyOrg.organisationRole.name === 'Clinical Research Sponsor'
+
 export const getUserOrganisations = async (userId: number) => {
   return prismaClient.userOrganisation.findMany({
     where: {
@@ -71,5 +74,33 @@ export const getStudyOrganisations = async ({
   }
 }
 
-export const isClinicalResearchSponsor = (studyOrg: StudyOrganisationWithRelations) =>
-  studyOrg.organisationRole.name === 'Clinical Research Sponsor'
+const organisationByIdRelations = {
+  include: {
+    roles: { include: { role: true } },
+    users: {
+      include: {
+        user: true,
+      },
+    },
+  },
+}
+
+export type OrganisationWithRelations = Prisma.OrganisationGetPayload<typeof organisationByIdRelations>
+
+export const getOrganisationById = async (organisationId: number) => {
+  const query = {
+    where: {
+      id: organisationId,
+    },
+    ...organisationByIdRelations,
+  }
+
+  const organisation = await prismaClient.organisation.findFirst(query)
+
+  if (!organisation) return null
+
+  return {
+    ...organisation,
+    roles: organisation.roles.map(({ role }) => organisationRoleShortName[role.name]).filter(Boolean),
+  }
+}
