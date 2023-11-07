@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type { AuthOptions, Session } from 'next-auth'
 import { getServerSession } from 'next-auth'
+import { logger } from '@nihr-ui/logger'
 import { authOptions } from '../pages/api/auth/[...nextauth]'
 import { SIGN_IN_PAGE } from '../constants/routes'
 import { AuthError } from './auth'
@@ -27,7 +28,7 @@ export const withApiHandler =
 
       return handler(req, res, session)
     } catch (error) {
-      console.error(error)
+      logger.error(error)
       if (error instanceof AuthError) {
         return res.redirect(302, SIGN_IN_PAGE)
       }

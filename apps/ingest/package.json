@@ -11,10 +11,10 @@
     "test:ci": "jest --ci --coverage"
   },
   "dependencies": {
+    "@nihr-ui/logger": "*",
     "axios": "^1.5.0",
     "database": "*",
-    "dayjs": "^1.11.10",
-    "logger": "*"
+    "dayjs": "^1.11.10"
   },
   "devDependencies": {
     "@types/node": "^15.12.2",

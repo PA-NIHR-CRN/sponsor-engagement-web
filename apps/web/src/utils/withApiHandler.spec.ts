@@ -1,10 +1,12 @@
 import { getServerSession } from 'next-auth/next'
 import { Mock } from 'ts-mockery'
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { logger } from '@nihr-ui/logger'
 import { userNoOrgs, userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
 import { withApiHandler } from './withApiHandler'
 
 jest.mock('next-auth/next')
+jest.mock('@nihr-ui/logger')
 
 const redirectMock = jest.fn()
 
@@ -13,7 +15,7 @@ const mockResponse = Mock.of<NextApiResponse>({ redirect: redirectMock })
 
 describe('withApiHandler', () => {
   beforeEach(() => {
-    console.error = jest.fn()
+    logger.error = jest.fn()
     jest.clearAllMocks()
   })
 

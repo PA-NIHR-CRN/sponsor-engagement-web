@@ -1,7 +1,7 @@
 import assert from 'assert'
 import axios from 'axios'
 import { Organisation as OrganisationEntity, SysRefOrganisationRole as SysRefOrganisationRoleEntity } from 'database'
-import { logger } from 'logger'
+import { logger } from '@nihr-ui/logger'
 import dayjs from 'dayjs'
 
 import { prismaClient } from './lib/prisma'

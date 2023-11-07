@@ -1,7 +1,6 @@
 import { render } from '@testing-library/react'
 import React from 'react'
-import { FieldErrors } from 'react-hook-form'
-
+import type { FieldErrors } from 'react-hook-form'
 import { TextInput } from './TextInput'
 
 test('renders correctly without errors or hint', () => {
@@ -11,7 +10,7 @@ test('renders correctly without errors or hint', () => {
   const defaultValue = ''
 
   const { getByLabelText, queryByRole } = render(
-    <TextInput label={label} name={name} errors={errors} defaultValue={defaultValue} />
+    <TextInput defaultValue={defaultValue} errors={errors} label={label} name={name} />
   )
 
   const inputElement = getByLabelText(label)
@@ -37,7 +36,7 @@ test('renders correctly with errors and hint', () => {
   const defaultValue = ''
 
   const { getByLabelText, getByText } = render(
-    <TextInput label={label} name={name} errors={errors} hint={hint} defaultValue={defaultValue} />
+    <TextInput defaultValue={defaultValue} errors={errors} hint={hint} label={label} name={name} />
   )
 
   const inputElement = getByLabelText(label)
