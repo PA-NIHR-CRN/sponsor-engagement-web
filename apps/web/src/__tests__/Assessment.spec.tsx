@@ -7,6 +7,7 @@ import type { Prisma } from 'database'
 import { simpleFaker } from '@faker-js/faker'
 import userEvent from '@testing-library/user-event'
 import mockRouter from 'next-router-mock'
+import { logger } from '@nihr-ui/logger'
 import type { AssessmentProps } from '../pages/assessments/[studyId]'
 import Assessment, { getServerSideProps } from '../pages/assessments/[studyId]'
 import { userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
@@ -17,6 +18,7 @@ import { sysRefAssessmentFurtherInformation, sysRefAssessmentStatus } from '../_
 jest.mock('next-auth/next')
 jest.mock('next-seo')
 jest.mock('axios')
+jest.mock('@nihr-ui/logger')
 
 describe('getServerSideProps', () => {
   const getServerSessionMock = jest.mocked(getServerSession)
@@ -390,7 +392,7 @@ describe('Expanding last sponsor assessment accordion', () => {
 
 describe('Form submission failures', () => {
   beforeEach(() => {
-    console.error = jest.fn()
+    logger.error = jest.fn()
     void mockRouter.push('/assessments/123')
     jest.clearAllMocks()
   })

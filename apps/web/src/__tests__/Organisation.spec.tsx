@@ -99,6 +99,10 @@ const mockOrganisation = Mock.of<OrganisationWithRelations>({
   ],
 })
 
+beforeEach(() => {
+  console.error = jest.fn()
+})
+
 describe('Organisation page', () => {
   jest.mocked(getServerSession).mockResolvedValue(userWithContactManagerRole)
 

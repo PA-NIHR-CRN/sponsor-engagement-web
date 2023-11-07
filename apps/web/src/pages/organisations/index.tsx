@@ -3,6 +3,7 @@ import { Container, Table } from '@nihr-ui/frontend'
 import type { InferGetServerSidePropsType } from 'next'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
+import { logger } from '@nihr-ui/logger'
 import { withServerSideProps } from '../../utils/withServerSideProps'
 import { getStudyOrganisations } from '../../lib/organisations'
 import { ORGANISATIONS_PER_PAGE, Roles } from '../../constants'
@@ -157,7 +158,7 @@ export const getServerSideProps = withServerSideProps(Roles.ContactManager, asyn
       },
     }
   } catch (error) {
-    console.log(error)
+    logger.error(error)
     return {
       redirect: {
         destination: '/500',
