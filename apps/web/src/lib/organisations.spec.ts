@@ -1,7 +1,8 @@
 import { Mock } from 'ts-mockery'
 import type { UserOrganisation } from 'database'
 import { prismaMock } from '../__mocks__/prisma'
-import { getUserOrganisations, isClinicalResearchSponsor, type StudyOrganisationWithRelations } from './organisations'
+import { getOrganisationById, getUserOrganisations, isClinicalResearchSponsor } from './organisations'
+import type { OrganisationWithRelations, StudyOrganisationWithRelations } from './organisations'
 
 describe('getUserOrganisations', () => {
   it('returns organisations for the user', async () => {
@@ -18,6 +19,38 @@ describe('getUserOrganisations', () => {
     )
 
     expect(userOrgs).toStrictEqual([mockUserOrganisation])
+  })
+})
+
+describe('getOrganisationById', () => {
+  it('returns an organisation by its id', async () => {
+    const mockOrganisation = Mock.of<OrganisationWithRelations>({
+      id: 123,
+      roles: [
+        {
+          role: {
+            name: 'Clinical Research Sponsor',
+          },
+        },
+        {
+          role: {
+            name: 'Contract Research Organisation',
+          },
+        },
+      ],
+    })
+
+    prismaMock.organisation.findFirst.mockResolvedValueOnce(mockOrganisation)
+
+    const organisation = await getOrganisationById(123)
+
+    expect(prismaMock.organisation.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 123 },
+      })
+    )
+
+    expect(organisation).toStrictEqual({ ...mockOrganisation, roles: ['Sponsor', 'CRO'] })
   })
 })
 

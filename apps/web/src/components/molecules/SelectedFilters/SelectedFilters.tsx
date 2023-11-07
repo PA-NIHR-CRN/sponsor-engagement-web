@@ -6,7 +6,6 @@ import type { ReactNode } from 'react'
 import { CrossIcon } from '@nihr-ui/frontend'
 import type { FilterKey, FilterValue, Filters } from '../../../@types/filters'
 import { SELECTABLE_FILTERS } from '../../../constants'
-import { STUDIES_PAGE } from '../../../constants/routes'
 
 export interface SelectedFiltersProps {
   filters: Filters
@@ -30,13 +29,13 @@ const omitFilter = (name: string, query: ParsedUrlQuery, value?: string) => {
 }
 
 function SelectedFilter({ children, name, value }: { name: string; value?: string; children: ReactNode }) {
-  const router = useRouter()
+  const { query, pathname } = useRouter()
 
   return (
     <li>
       <Link
         className="govuk-button govuk-button--secondary text-sm focus:focusable group mb-0 inline-flex items-center border py-[7px] px-2 text-black no-underline focus:focus:outline-none group-[.isLoading]/selected:pointer-events-none group-[.isLoading]/selected:opacity-50"
-        href={{ pathname: STUDIES_PAGE, query: omitFilter(name, router.query, value) }}
+        href={{ pathname, query: omitFilter(name, query, value) }}
         scroll={false}
       >
         <span className="govuk-visually-hidden">Clear filter:&nbsp;</span>
@@ -66,6 +65,8 @@ const renderSelectedFilters = (name: FilterKey, value: FilterValue, index: numbe
 }
 
 export function SelectedFilters({ filters, isLoading }: SelectedFiltersProps) {
+  const { pathname } = useRouter()
+
   if (!anyFiltersActive(filters)) return null
 
   return (
@@ -90,7 +91,7 @@ export function SelectedFilters({ filters, isLoading }: SelectedFiltersProps) {
           .map((filter, i) => renderSelectedFilters(filter as keyof Filters, filters[filter as keyof Filters], i))}
       </ul>
       <div className="order-2 ml-auto whitespace-nowrap pl-1 md:order-3">
-        <Link className="govuk-link--no-visited-state govuk-body-s mb-0" href={STUDIES_PAGE} scroll={false}>
+        <Link className="govuk-link--no-visited-state govuk-body-s mb-0" href={pathname} scroll={false}>
           Clear all filters
         </Link>
       </div>

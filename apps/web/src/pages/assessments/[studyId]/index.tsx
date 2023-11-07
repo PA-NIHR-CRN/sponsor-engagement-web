@@ -7,7 +7,7 @@ import type { FieldError } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 import clsx from 'clsx'
 import Link from 'next/link'
-import { RootLayout } from '../../../components/Layout/RootLayout'
+import { RootLayout } from '../../../components/organisms'
 import {
   AssessmentHistory,
   RequestSupport,
@@ -24,6 +24,7 @@ import { TEXTAREA_MAX_CHARACTERS } from '../../../constants/forms'
 import { withServerSideProps } from '../../../utils/withServerSideProps'
 import { getValuesFromSearchParams } from '../../../utils/form'
 import { useFormErrorHydration } from '../../../hooks/useFormErrorHydration'
+import { Roles } from '../../../constants'
 
 export type AssessmentProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
@@ -179,7 +180,7 @@ Assessment.getLayout = function getLayout(page: ReactElement, { user }: Assessme
   return <RootLayout user={user}>{page}</RootLayout>
 }
 
-export const getServerSideProps = withServerSideProps(async (context, session) => {
+export const getServerSideProps = withServerSideProps(Roles.SponsorContact, async (context, session) => {
   const studyId = context.query.studyId
 
   if (!studyId) {
