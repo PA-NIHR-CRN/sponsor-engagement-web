@@ -231,7 +231,6 @@ const setAssessmentDue = async () => {
     },
     where: {
       id: { in: studyEntities.map((study) => study.id) },
-      actualOpeningDate: { lte: threeMonthsAgo },
       evaluationCategories: {
         some: {},
       },
@@ -242,6 +241,7 @@ const setAssessmentDue = async () => {
           },
         },
       },
+      OR: [{ actualOpeningDate: null }, { actualOpeningDate: { lte: threeMonthsAgo } }],
     },
   })
 

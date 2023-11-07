@@ -7,7 +7,7 @@ import { simpleFaker } from '@faker-js/faker'
 import mockRouter from 'next-router-mock'
 import type { StudiesProps } from '../pages/studies'
 import Studies, { getServerSideProps } from '../pages/studies'
-import { userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
+import { userWithContactManagerRole, userWithSponsorContactRole } from '../__mocks__/session'
 import { SIGN_IN_PAGE } from '../constants/routes'
 import { prismaMock } from '../__mocks__/prisma'
 
@@ -28,8 +28,8 @@ describe('getServerSideProps', () => {
     })
   })
 
-  test('redirects back to the homepage for users without any roles', async () => {
-    getServerSessionMock.mockResolvedValueOnce(userNoRoles)
+  test('redirects back to the homepage for users without sponsor contact role', async () => {
+    getServerSessionMock.mockResolvedValueOnce(userWithContactManagerRole)
 
     const result = await getServerSideProps(context)
     expect(result).toEqual({
@@ -73,7 +73,9 @@ const mockStudies = Array.from(Array(15)).map((_, index) => ({
       createdAt: new Date('2001-01-01'),
     },
   ],
-  assessments: [{ status: { name: 'Off Track' }, updatedAt: new Date('2001-01-01') }],
+  assessments: [
+    { status: { name: 'Off Track' }, updatedAt: new Date('2001-01-02'), createdAt: new Date('2001-01-01') },
+  ],
 }))
 
 describe('Studies page', () => {
@@ -120,11 +122,13 @@ describe('Studies page', () => {
     expect(screen.getByText('the last progress assessment from the sponsor is over 3 months old')).toBeInTheDocument()
 
     // Support
-    expect(screen.getByRole('heading', { level: 3, name: 'Get NIHR CRN support' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 3, name: 'Request NIHR CRN support' })).toBeInTheDocument()
     expect(
-      screen.getByText('Sponsors or their delegates can get NIHR CRN support with their research study at any time.')
+      screen.getByText(
+        'Sponsors or their delegates can request NIHR CRN support with their research study at any time.'
+      )
     ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Get support' })).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link', { name: 'Request support' })).toHaveAttribute('href', '/')
 
     // Study results title
     expect(screen.getByText(`${mockStudies.length} studies found (3 due for assessment)`)).toBeInTheDocument()
@@ -174,6 +178,36 @@ describe('Studies page', () => {
     expect(within(pagination).getByRole('link', { name: 'Next' })).toHaveAttribute('href', '/?page=2')
   })
 
+  test('No studies found', async () => {
+    prismaMock.$transaction.mockResolvedValueOnce([[], 0, 0])
+
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: {} })
+
+    const { props } = (await getServerSideProps(context)) as {
+      props: StudiesProps
+    }
+
+    render(Studies.getLayout(<Studies {...props} />, { ...props }))
+
+    // SEO
+    expect(NextSeo).toHaveBeenCalledWith(
+      {
+        title: `Study Progress Review - Search results (no matching search results)`,
+      },
+      {}
+    )
+
+    // Study results title
+    expect(screen.getByText(`0 studies found (0 due for assessment)`)).toBeInTheDocument()
+
+    // Show message instead of the table
+    expect(screen.getByText('No studies found')).toBeInTheDocument()
+
+    // Hide pagination
+    const pagination = screen.queryByRole('navigation', { name: 'results' })
+    expect(pagination).not.toBeInTheDocument()
+  })
+
   test('Changing page', async () => {
     prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudies.length, 3])
 
@@ -213,11 +247,29 @@ describe('Studies page', () => {
     expect(within(banner).getByText('The study assessment was successfully saved')).toBeInTheDocument()
     expect(within(banner).getByRole('link', { name: 'NIHR CRN support' })).toHaveAttribute('href', '/')
     expect(within(banner).getByRole('link', { name: 'NIHR CRN support' }).parentElement).toHaveTextContent(
-      'Get NIHR CRN support for this study.'
+      'Request NIHR CRN support for this study.'
     )
   })
-})
 
-// describe('Studies page searching', () => {})
-// describe('Studies page filtering', () => {})
-// describe('Studies page sorting', () => {})
+  test('Selected filters', async () => {
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudies.length, 3])
+
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { q: 'test search' } })
+
+    const { props } = (await getServerSideProps(context)) as {
+      props: StudiesProps
+    }
+
+    await mockRouter.push('')
+
+    render(Studies.getLayout(<Studies {...props} />, { ...props }))
+
+    expect(screen.getByLabelText('Search study title, protocol number or IRAS ID')).toHaveValue('test search')
+
+    expect(screen.getByText('Selected filters')).toBeInTheDocument()
+
+    expect(screen.getByRole('link', { name: 'Clear filter: test search' })).toHaveAttribute('href', '/')
+
+    expect(screen.getByRole('link', { name: 'Clear all filters' })).toHaveAttribute('href', '/')
+  })
+})

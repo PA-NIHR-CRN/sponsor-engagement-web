@@ -4,21 +4,22 @@ import type { InferGetServerSidePropsType } from 'next'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { RootLayout } from '../../../components/Layout/RootLayout'
+import { RootLayout } from '../../../components/organisms'
 import {
   AssessmentHistory,
-  GetSupport,
+  RequestSupport,
   StudyDetails,
   getAssessmentHistoryFromStudy,
 } from '../../../components/molecules'
 import { getStudyById } from '../../../lib/studies'
 import { formatDate } from '../../../utils/date'
 import { withServerSideProps } from '../../../utils/withServerSideProps'
+import { Roles } from '../../../constants'
 
 const renderNotificationBanner = (success: boolean) =>
   success ? (
     <NotificationBanner heading="The study assessment was successfully saved" success>
-      Get{' '}
+      Request{' '}
       <Link className="govuk-notification-banner__link" href="/">
         NIHR CRN support
       </Link>{' '}
@@ -134,7 +135,7 @@ export default function Study({ study, assessments }: StudyProps) {
           <StudyDetails study={study} />
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
-          <GetSupport />
+          <RequestSupport />
         </div>
       </div>
     </Container>
@@ -145,7 +146,7 @@ Study.getLayout = function getLayout(page: ReactElement, { user }: StudyProps) {
   return <RootLayout user={user}>{page}</RootLayout>
 }
 
-export const getServerSideProps = withServerSideProps(async (context, session) => {
+export const getServerSideProps = withServerSideProps(Roles.SponsorContact, async (context, session) => {
   const studyId = Number(context.query.studyId)
 
   if (!studyId) {

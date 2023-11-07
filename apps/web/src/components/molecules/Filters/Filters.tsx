@@ -2,21 +2,23 @@ import clsx from 'clsx'
 import { useEffect, useRef, useState } from 'react'
 import SearchIcon from '@nihr-ui/frontend/components/Icons/SearchIcon'
 import { Button } from '@nihr-ui/frontend'
+import { useRouter } from 'next/router'
 import { Card } from '../../atoms'
 import type { Filters } from '../../../@types/filters'
-import { STUDIES_PAGE } from '../../../constants/routes'
 import type { OnFilterChange } from './useFilters'
 import { useFilters } from './useFilters'
 
 export interface FiltersProps {
   filters: Filters
   onFilterChange?: OnFilterChange
+  searchLabel: string
 }
 
-export function Filters({ filters, onFilterChange }: FiltersProps) {
+export function Filters({ filters, onFilterChange, searchLabel }: FiltersProps) {
   const formRef = useRef(null)
   const { onChange, onSubmit } = useFilters(formRef, onFilterChange)
   const [searchInputText, setSearchInputText] = useState(filters.q ?? '')
+  const { pathname } = useRouter()
 
   useEffect(() => {
     if (!filters.q) setSearchInputText('')
@@ -28,7 +30,7 @@ export function Filters({ filters, onFilterChange }: FiltersProps) {
         Filter by
       </h2>
       <form
-        action={STUDIES_PAGE}
+        action={pathname}
         aria-labelledby="filter-by"
         className=""
         id="filters-form"
@@ -40,7 +42,7 @@ export function Filters({ filters, onFilterChange }: FiltersProps) {
         {/* Keyword */}
         <div className="govuk-form-group mb-3">
           <label className="govuk-label mb-2" htmlFor="keyword">
-            Search study title, protocol number or IRAS ID
+            {searchLabel}
           </label>
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-one-half-from-desktop">
