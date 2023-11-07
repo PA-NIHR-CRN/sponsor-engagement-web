@@ -1,5 +1,5 @@
 {
-  "name": "email",
+  "name": "@nihr-ui/email",
   "version": "0.0.0",
   "license": "MIT",
   "main": "./dist/index.js",
@@ -12,9 +12,9 @@
     "test:ci": "jest --ci --coverage"
   },
   "dependencies": {
+    "@nihr-ui/logger": "*",
     "aws-sdk": "^2.1488.0",
     "handlebars": "^4.7.8",
-    "logger": "*",
     "pino": "^8.14.1",
     "pino-pretty": "^10.0.1"
   }

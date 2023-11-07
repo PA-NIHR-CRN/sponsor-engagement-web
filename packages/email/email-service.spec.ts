@@ -2,13 +2,13 @@ import * as fs from 'node:fs'
 import path from 'node:path'
 import { SES } from 'aws-sdk'
 import handlebars from 'handlebars'
-import { logger } from 'logger'
+import { logger } from '@nihr-ui/logger'
 import { EmailService, type EmailArgs } from './email-service'
 
 // Mock dependencies
 jest.mock('aws-sdk')
 jest.mock('node:fs')
-jest.mock('logger')
+jest.mock('@nihr-ui/logger')
 
 describe('EmailService', () => {
   let sesClientMock: jest.Mocked<SES>

@@ -2,7 +2,7 @@ import * as fs from 'node:fs'
 import path from 'node:path'
 import type { SES } from 'aws-sdk'
 import handlebars from 'handlebars'
-import { logger } from 'logger'
+import { logger } from '@nihr-ui/logger'
 import { EMAIL_CHARSET, EMAIL_FROM_ADDRESS } from './constants'
 
 handlebars.registerHelper('eq', (a, b) => a === b)
