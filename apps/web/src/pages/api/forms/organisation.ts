@@ -109,7 +109,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
         }
       })
 
-      delete fieldErrors.studyId
+      delete fieldErrors.organisationId
 
       const searchParams = new URLSearchParams({ ...fieldErrors })
 

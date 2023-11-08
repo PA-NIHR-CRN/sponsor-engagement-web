@@ -204,7 +204,7 @@ describe('Failed organisation sponsor contact invitation', () => {
     const res = await testHandler(api, { method: 'POST', body: bodyWithValidationIssue })
 
     expect(res.statusCode).toBe(302)
-    expect(res._getRedirectUrl()).toBe(`/organisations/123/?emailAddressError=Required&organisationId=123`)
+    expect(res._getRedirectUrl()).toBe(`/organisations/123/?emailAddressError=Required`)
     expect(logger.error).toHaveBeenCalledWith(
       new ZodError([
         {
