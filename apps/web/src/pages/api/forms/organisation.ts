@@ -84,6 +84,8 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
     // Otherwise, redirect back to studies list page
     return res.redirect(302, `/organisations/${organisationId}?success=1`)
   } catch (error) {
+    logger.error(error)
+
     const organisationId = req.body.organisationId
 
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -113,8 +115,6 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
 
       return res.redirect(302, `/organisations/${organisationId}/?${searchParams.toString()}`)
     }
-
-    logger.error(error)
 
     const searchParams = new URLSearchParams({ fatal: '1' })
 
