@@ -3,7 +3,6 @@ import { useRouter } from 'next/router'
 import type { ReactNode } from 'react'
 import type { FieldValues, FormProps as HookFormProps, UseFormHandleSubmit } from 'react-hook-form'
 import type { NextApiResponse } from 'next'
-import { logger } from '@nihr-ui/logger'
 import { FORM_ERRORS } from '../../../../constants/forms'
 
 interface FormProps<T extends FieldValues> {
@@ -60,9 +59,9 @@ export function Form<T extends FieldValues>({ action, method, children, onError,
       void router.replace(`${redirectUrl.pathname}${redirectUrl.search}`)
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        logger.info(`Form component failed to submit due to ${error.message}`)
+        console.info(`Form component failed to submit due to ${error.message}`)
       } else {
-        logger.info(error)
+        console.info(error)
       }
       redirectToFatalError()
     }

@@ -81,7 +81,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
       },
     })
 
-    // Otherwise, redirect back to studies list page
+    // Otherwise, redirect back to org page
     return res.redirect(302, `/organisations/${organisationId}?success=1`)
   } catch (error) {
     logger.error(error)
