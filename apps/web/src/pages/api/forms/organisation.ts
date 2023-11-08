@@ -4,7 +4,7 @@ import { logger } from '@nihr-ui/logger'
 import type { OrganisationAddInputs } from '../../../utils/schemas'
 import { organisationAddSchema } from '../../../utils/schemas'
 import { withApiHandler } from '../../../utils/withApiHandler'
-import { getOrganisationById, organisationRoleShortName } from '../../../lib/organisations'
+import { getOrganisationById } from '../../../lib/organisations'
 import { Prisma, prismaClient } from '../../../lib/prisma'
 import { Roles } from '../../../constants'
 
@@ -26,36 +26,21 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
       throw new Error('No organisation found')
     }
 
-    const { roles } = organisation
+    // Get the sponsor contact sysref id from the database
+    const { id: roleId } = await prismaClient.sysRefRole.findFirstOrThrow({
+      where: {
+        name: 'SponsorContact',
+        isDeleted: false,
+      },
+    })
 
-    // Add a Sponsor contact role to the org if not already present
-    if (!roles.includes(organisationRoleShortName['Clinical Research Sponsor'])) {
-      const sponsorRoleSysRef = await prismaClient.sysRefOrganisationRole.findFirstOrThrow({
-        where: { name: 'Clinical Research Sponsor' },
-      })
+    const {
+      user: { id: contactManagerUserId },
+    } = session
 
-      await prismaClient.organisation.update({
-        where: {
-          id: Number(organisationId),
-        },
-        data: {
-          roles: {
-            create: {
-              role: {
-                connect: sponsorRoleSysRef,
-              },
-            },
-          },
-        },
-      })
-
-      logger.info(`Added sponsor contact role to org ${organisationId}`)
-    }
-
-    // Add new user to org
-    const createdBy = { connect: { id: session.user.id } }
-    const updatedBy = { connect: { id: session.user.id } }
-
+    // Add user to organisation
+    // If a user does not exist, create the user
+    // If a user is not assigned the sponsor contact role, assign it
     await prismaClient.organisation.update({
       where: {
         id: Number(organisationId),
@@ -63,13 +48,22 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
       data: {
         users: {
           create: {
-            createdBy,
-            updatedBy,
+            createdBy: { connect: { id: contactManagerUserId } },
+            updatedBy: { connect: { id: contactManagerUserId } },
             user: {
               connectOrCreate: {
                 create: {
                   email: emailAddress,
                   identityGatewayId: '',
+                  roles: {
+                    createMany: {
+                      data: {
+                        roleId,
+                        createdById: contactManagerUserId,
+                        updatedById: contactManagerUserId,
+                      },
+                    },
+                  },
                 },
                 where: {
                   email: emailAddress,

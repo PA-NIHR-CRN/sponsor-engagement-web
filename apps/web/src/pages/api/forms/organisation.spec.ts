@@ -30,19 +30,15 @@ const testHandler = async (handler: typeof api, options: RequestOptions) => {
 
 describe('Successful organisation sponsor contact invitation', () => {
   const body: OrganisationAddInputs = {
-    organisationId: '123',
+    organisationId: '321',
     emailAddress: 'tom.christian@nihr.ac.uk',
   }
 
-  const findSysRefOrgRoleResponse = Mock.of<SysRefOrganisationRole>({
-    id: 123,
-    name: 'Clinical Research Sponsor',
+  const findSysRefRoleResponse = Mock.of<SysRefOrganisationRole>({
+    id: 999,
+    name: 'SponsorContact',
   })
   const findOrgResponse = Mock.of<OrganisationWithRelations>({ id: 2, roles: [] })
-  const findOrgWithSponsorRoleResponse = Mock.of<OrganisationWithRelations>({
-    id: 2,
-    roles: [{ role: { name: 'Clinical Research Sponsor' } }],
-  })
   const updateOrgResponse = Mock.of<OrganisationWithRelations>({ id: 2, roles: [] })
 
   beforeEach(() => {
@@ -51,73 +47,20 @@ describe('Successful organisation sponsor contact invitation', () => {
   })
 
   test('Invites the provided contact', async () => {
-    jest.mocked(prismaClient.organisation.findFirst).mockResolvedValueOnce(findOrgWithSponsorRoleResponse)
-
-    const findSysRefOrgRoleMock = jest
-      .mocked(prismaClient.sysRefOrganisationRole.findFirstOrThrow)
-      .mockResolvedValueOnce(findSysRefOrgRoleResponse)
-    const updateOrgMock = jest.mocked(prismaClient.organisation.update).mockResolvedValueOnce(updateOrgResponse)
-
-    const res = await testHandler(api, { method: 'POST', body })
-
-    // Do not attempt to add sponsor role if already present
-    expect(findSysRefOrgRoleMock).not.toHaveBeenCalled()
-
-    // Org is updated
-    expect(updateOrgMock).toHaveBeenCalledWith({
-      where: { id: 123 },
-      data: {
-        users: {
-          create: {
-            createdBy: { connect: { id: userWithContactManagerRole.user?.id } },
-            updatedBy: { connect: { id: userWithContactManagerRole.user?.id } },
-            user: {
-              connectOrCreate: {
-                create: {
-                  email: body.emailAddress,
-                  identityGatewayId: '',
-                },
-                where: {
-                  email: body.emailAddress,
-                },
-              },
-            },
-          },
-        },
-      },
-    })
-
-    // Redirect back to organisation page
-    expect(res.statusCode).toBe(302)
-    expect(res._getRedirectUrl()).toBe('/organisations/123?success=1')
-  })
-
-  test('Invites the provided contact and updates the organisation to include a sponsor role when not already present', async () => {
     jest.mocked(prismaClient.organisation.findFirst).mockResolvedValueOnce(findOrgResponse)
-    jest.mocked(prismaClient.sysRefOrganisationRole.findFirstOrThrow).mockResolvedValueOnce(findSysRefOrgRoleResponse)
 
+    const findSysRefRoleMock = jest
+      .mocked(prismaClient.sysRefRole.findFirstOrThrow)
+      .mockResolvedValueOnce(findSysRefRoleResponse)
     const updateOrgMock = jest.mocked(prismaClient.organisation.update).mockResolvedValueOnce(updateOrgResponse)
 
     const res = await testHandler(api, { method: 'POST', body })
 
+    expect(findSysRefRoleMock).toHaveBeenCalledWith({ where: { isDeleted: false, name: 'SponsorContact' } })
+
     // Org is updated
     expect(updateOrgMock).toHaveBeenCalledWith({
-      where: { id: 123 },
-      data: {
-        roles: {
-          create: {
-            role: {
-              connect: findSysRefOrgRoleResponse,
-            },
-          },
-        },
-      },
-    })
-
-    expect(logger.info).toHaveBeenCalledWith(`Added sponsor contact role to org 123`)
-
-    expect(updateOrgMock).toHaveBeenCalledWith({
-      where: { id: 123 },
+      where: { id: Number(body.organisationId) },
       data: {
         users: {
           create: {
@@ -128,6 +71,15 @@ describe('Successful organisation sponsor contact invitation', () => {
                 create: {
                   email: body.emailAddress,
                   identityGatewayId: '',
+                  roles: {
+                    createMany: {
+                      data: {
+                        roleId: findSysRefRoleResponse.id,
+                        createdById: userWithContactManagerRole.user?.id,
+                        updatedById: userWithContactManagerRole.user?.id,
+                      },
+                    },
+                  },
                 },
                 where: {
                   email: body.emailAddress,
@@ -141,7 +93,7 @@ describe('Successful organisation sponsor contact invitation', () => {
 
     // Redirect back to organisation page
     expect(res.statusCode).toBe(302)
-    expect(res._getRedirectUrl()).toBe('/organisations/123?success=1')
+    expect(res._getRedirectUrl()).toBe(`/organisations/${body.organisationId}?success=1`)
   })
 })
 
