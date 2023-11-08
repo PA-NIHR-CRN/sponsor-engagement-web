@@ -58,7 +58,7 @@ export const getStudyById = async (studyId: number, organisationIds?: number[]) 
     }
   }
 
-  // Map organisation roles along with the name of the organisation to quickly check for a CTO / CRO if applicable
+  // Map organisation roles along with the name of the organisation to quickly check for a CTU / CRO if applicable
   const organisationsByRole = Object.fromEntries(
     study.organisations.map((organisation) => {
       return [organisation.organisationRole.name, organisation.organisation.name]
