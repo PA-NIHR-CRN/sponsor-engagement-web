@@ -2,9 +2,15 @@ import { rest } from 'msw'
 import { setupServer } from 'msw/node'
 import { logger } from '@nihr-ui/logger'
 import { ingest } from '../ingest'
-import { organisationEntities, organisationRoleEntities, studyEntities } from '../mocks/entities'
+import {
+  organisationEntities,
+  organisationRoleEntities,
+  organisationRoleRefEntities,
+  studyEntities,
+} from '../mocks/entities'
 import { prismaMock } from '../mocks/prisma'
 import studies from '../mocks/studies.json'
+import { prismaClient } from '../lib/prisma'
 
 jest.mock('@nihr-ui/logger')
 
@@ -23,13 +29,19 @@ afterAll(() => server.close())
 beforeEach(() => {
   studyEntities.forEach((entity) => prismaMock.study.upsert.mockResolvedValueOnce(entity))
   organisationEntities.forEach((entity) => prismaMock.organisation.upsert.mockResolvedValueOnce(entity))
-  organisationRoleEntities.forEach((entity) => prismaMock.sysRefOrganisationRole.upsert.mockResolvedValueOnce(entity))
+  organisationRoleRefEntities.forEach((entity) =>
+    prismaMock.sysRefOrganisationRole.upsert.mockResolvedValueOnce(entity)
+  )
 
   prismaMock.organisationRole.createMany.mockResolvedValueOnce({ count: 1 })
   prismaMock.studyOrganisation.createMany.mockResolvedValueOnce({ count: 1 })
   prismaMock.studyFunder.createMany.mockResolvedValueOnce({ count: 1 })
   prismaMock.studyEvaluationCategory.createMany.mockResolvedValueOnce({ count: 1 })
   prismaMock.study.updateMany.mockResolvedValueOnce({ count: 1 })
+
+  prismaMock.study.findMany.mockResolvedValueOnce(studyEntities)
+  prismaMock.organisation.findMany.mockResolvedValueOnce(organisationEntities)
+  prismaMock.organisationRole.findMany.mockResolvedValueOnce(organisationRoleEntities)
 })
 
 describe('ingest', () => {
@@ -78,6 +90,7 @@ describe('ingest', () => {
     const expectedOrganisationPayload = {
       name: mockOrganisation.OrganisationName,
       rtsIdentifier: mockOrganisation.OrganisationRTSIdentifier,
+      isDeleted: false,
     }
 
     const organisationUpsert = prismaMock.organisation.upsert.mock.calls[0][0]
@@ -98,6 +111,7 @@ describe('ingest', () => {
       name: mockOrganisation.OrganisationRole,
       description: expect.any(String),
       rtsIdentifier: mockOrganisation.OrganisationRoleRTSIdentifier,
+      isDeleted: false,
     }
 
     expect(prismaMock.sysRefOrganisationRole.upsert).toHaveBeenCalledTimes(2)
@@ -119,8 +133,8 @@ describe('ingest', () => {
     expect(prismaMock.organisationRole.createMany).toHaveBeenCalledWith({
       data: expect.arrayContaining([
         expect.objectContaining({
-          organisationId: 12345,
-          roleId: 12345,
+          organisationId: organisationEntities[0].id,
+          roleId: organisationRoleRefEntities[0].id,
         }),
       ]),
       skipDuplicates: true,
@@ -135,9 +149,9 @@ describe('ingest', () => {
     expect(prismaMock.studyOrganisation.createMany).toHaveBeenCalledWith({
       data: expect.arrayContaining([
         expect.objectContaining({
-          studyId: 123,
-          organisationId: 12345,
-          organisationRoleId: 12345,
+          studyId: studyEntities[0].id,
+          organisationId: organisationEntities[0].id,
+          organisationRoleId: organisationRoleRefEntities[0].id,
         }),
       ]),
       skipDuplicates: true,
@@ -152,8 +166,8 @@ describe('ingest', () => {
     expect(prismaMock.studyFunder.createMany).toHaveBeenCalledWith({
       data: expect.arrayContaining([
         expect.objectContaining({
-          studyId: 123,
-          organisationId: 12345,
+          studyId: studyEntities[0].id,
+          organisationId: organisationEntities[0].id,
           grantCode: 'Test Grant Code',
           fundingStreamName: 'Test Funding Stream',
         }),
@@ -170,7 +184,7 @@ describe('ingest', () => {
     expect(prismaMock.studyEvaluationCategory.createMany).toHaveBeenCalledWith({
       data: expect.arrayContaining([
         expect.objectContaining({
-          studyId: 123,
+          studyId: studyEntities[0].id,
           indicatorType: 'Recruitment concerns',
           indicatorValue: 'Recruitment target met',
           sampleSize: 444,
@@ -196,7 +210,7 @@ describe('ingest', () => {
         isDueAssessment: true,
       },
       where: {
-        id: { in: [123, 123, 123] },
+        id: { in: studyEntities.map(({ id }) => id) },
         evaluationCategories: {
           some: {},
         },
@@ -237,5 +251,124 @@ describe('ingest', () => {
 
     expect(logger.error).toHaveBeenCalledWith(expect.any(Object), 'Error fetching studies data')
     expect(logger.error).toHaveBeenCalledWith(errorResponse, 'Error response')
+  })
+
+  it('should set studies no longer returned by the API as deleted', async () => {
+    server.use(
+      rest.get(API_URL, async (_, res, ctx) => {
+        return res(ctx.json({ ...studies, Result: { Studies: studies.Result.Studies.slice(0, -1) } }))
+      })
+    )
+
+    await ingest()
+
+    expect(prismaMock.study.updateMany).toHaveBeenCalledWith({
+      where: { id: { in: [studyEntities[studyEntities.length - 1].id] } },
+      data: { isDeleted: true },
+    })
+  })
+
+  it('should set organisations no longer returned by the API as deleted', async () => {
+    server.use(
+      rest.get(API_URL, async (_, res, ctx) => {
+        return res(ctx.json({ ...studies, Result: { Studies: studies.Result.Studies.slice(0, -1) } }))
+      })
+    )
+
+    await ingest()
+
+    expect(prismaMock.organisation.updateMany).toHaveBeenCalledWith({
+      where: {
+        id: { in: [organisationEntities[organisationEntities.length - 1].id] },
+      },
+      data: { isDeleted: true },
+    })
+  })
+
+  it('should set organisation roles no longer returned by the API as deleted', async () => {
+    server.use(
+      rest.get(API_URL, async (_, res, ctx) => {
+        return res(ctx.json({ ...studies, Result: { Studies: studies.Result.Studies.slice(0, -1) } }))
+      })
+    )
+
+    prismaMock.$transaction.mockImplementationOnce((ops: any) => Promise.all(ops))
+
+    await ingest()
+
+    // Sets all existing organisation roles to be isDeleted = false
+    expect(prismaMock.organisationRole.updateMany).toHaveBeenCalledWith({ data: { isDeleted: false } })
+
+    // Sets organisation roles not seen during ingest as isDeleted = true
+    expect(prismaMock.organisationRole.updateMany).toHaveBeenCalledWith({
+      where: { id: { in: organisationRoleEntities.slice(-2).map(({ id }) => id) } },
+      data: { isDeleted: true },
+    })
+  })
+
+  it('should set study organisations no longer returned by the API as deleted', async () => {
+    server.use(
+      rest.get(API_URL, async (_, res, ctx) => {
+        const studyResults = studies.Result.Studies
+        const lastStudy = studyResults[studyResults.length - 1]
+        return res(
+          ctx.json({
+            ...studies,
+            Result: {
+              Studies: [...studyResults.slice(0, -1), { ...lastStudy, StudySponsors: [] }],
+            },
+          })
+        )
+      })
+    )
+
+    prismaMock.$transaction.mockImplementationOnce((ops: any) => Promise.all(ops))
+
+    await ingest()
+
+    // Sets all existing study organisations to be isDeleted = false
+    expect(prismaMock.studyOrganisation.updateMany).toHaveBeenCalledWith({
+      where: { studyId: { in: studyEntities.map(({ id }) => id) } },
+      data: { isDeleted: false },
+    })
+
+    // Sets study organisations not seen during ingest as isDeleted = true
+    expect(prismaMock.studyOrganisation.updateMany).toHaveBeenCalledWith({
+      where: { id: { in: studyEntities[studyEntities.length - 1].organisations.map(({ id }) => id) } },
+      data: { isDeleted: true },
+    })
+  })
+
+  it('should set study evaluation categories no longer returned by the API as deleted', async () => {
+    server.use(
+      rest.get(API_URL, async (_, res, ctx) => {
+        const studyResults = studies.Result.Studies
+        const lastStudy = studyResults[studyResults.length - 1]
+        return res(
+          ctx.json({
+            ...studies,
+            Result: {
+              Studies: [...studyResults.slice(0, -1), { ...lastStudy, StudyEvaluationCategories: [] }],
+            },
+          })
+        )
+      })
+    )
+
+    prismaMock.$transaction.mockImplementationOnce((ops: any) => Promise.all(ops))
+
+    await ingest()
+
+    // Sets all existing evaluation categories to be isDeleted = false
+    expect(prismaMock.studyEvaluationCategory.updateMany).toHaveBeenCalledWith({
+      where: { studyId: { in: studyEntities.map(({ id }) => id) } },
+      data: { isDeleted: false },
+    })
+
+    // Sets evaluation categories not seen during ingest as isDeleted = true
+    expect(prismaMock.studyEvaluationCategory.updateMany).toHaveBeenCalledWith({
+      where: { id: { in: studyEntities[studyEntities.length - 1].evaluationCategories.map(({ id }) => id) } },
+      data: { isDeleted: true },
+    })
   })
 })
