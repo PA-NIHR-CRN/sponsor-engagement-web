@@ -6,12 +6,13 @@ import type { AssessmentInputs } from '../../../utils/schemas'
 import { assessmentSchema } from '../../../utils/schemas'
 import { prismaClient } from '../../../lib/prisma'
 import { withApiHandler } from '../../../utils/withApiHandler'
+import { Roles } from '../../../constants'
 
 export interface ExtendedNextApiRequest extends NextApiRequest {
   body: AssessmentInputs
 }
 
-export default withApiHandler<ExtendedNextApiRequest>(async (req, res, session) => {
+export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, async (req, res, session) => {
   try {
     if (req.method !== 'POST') {
       throw new Error('Wrong method')

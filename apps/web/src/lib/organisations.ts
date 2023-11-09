@@ -8,7 +8,7 @@ export type StudyOrganisationWithRelations = Prisma.StudyOrganisationGetPayload<
 export const organisationRoleShortName = {
   'Clinical Research Sponsor': 'Sponsor',
   'Contract Research Organisation': 'CRO',
-  'Managing Clinical Trials Unit': 'CTO',
+  'Managing Clinical Trials Unit': 'CTU',
 } as const
 
 export const isClinicalResearchSponsor = (studyOrg: StudyOrganisationWithRelations) =>
@@ -91,6 +91,7 @@ export const getOrganisationById = async (organisationId: number) => {
   const query = {
     where: {
       id: organisationId,
+      isDeleted: false,
     },
     ...organisationByIdRelations,
   }

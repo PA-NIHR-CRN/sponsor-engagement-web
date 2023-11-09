@@ -3,6 +3,9 @@ import { Mock } from 'ts-mockery'
 import { getServerSession } from 'next-auth/next'
 import { render, screen, within } from '@testing-library/react'
 import { NextSeo } from 'next-seo'
+import { logger } from '@nihr-ui/logger'
+import mockRouter from 'next-router-mock'
+import userEvent from '@testing-library/user-event'
 import type { OrganisationProps } from '../pages/organisations/[organisationId]'
 import Organisation, { getServerSideProps } from '../pages/organisations/[organisationId]'
 import { userWithContactManagerRole, userWithSponsorContactRole } from '../__mocks__/session'
@@ -10,6 +13,7 @@ import { SIGN_IN_PAGE } from '../constants/routes'
 import { prismaMock } from '../__mocks__/prisma'
 import type { OrganisationWithRelations } from '../lib/organisations'
 
+jest.mock('@nihr-ui/logger')
 jest.mock('next-auth/next')
 jest.mock('next-seo')
 
@@ -194,5 +198,103 @@ describe('Organisation page', () => {
     expect(screen.queryByRole('table', { name: 'Organisation contacts' })).not.toBeInTheDocument()
 
     expect(screen.getByText('No contacts associated with this organisation')).toBeInTheDocument()
+  })
+})
+
+describe('Form submission failures', () => {
+  jest.mocked(getServerSession).mockResolvedValue(userWithContactManagerRole)
+
+  beforeEach(() => {
+    logger.error = jest.fn()
+    void mockRouter.push('/organisations/123')
+    jest.clearAllMocks()
+  })
+
+  test('Client side validation errors', async () => {
+    prismaMock.organisation.findFirst.mockResolvedValueOnce(mockOrganisation)
+
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { organisationId: '123' } })
+
+    const { props } = (await getServerSideProps(context)) as {
+      props: OrganisationProps
+    }
+
+    render(Organisation.getLayout(<Organisation {...props} />, { ...props }))
+
+    expect(
+      screen.getByRole('heading', { level: 2, name: `Organisation name: ${mockOrganisation.name}` })
+    ).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Send invite' }))
+
+    // Summary errors
+    const alert = screen.getByRole('alert', { name: 'There is a problem' })
+    expect(within(alert).getByRole('link', { name: 'Enter a valid email address' })).toHaveAttribute(
+      'href',
+      '#emailAddress'
+    )
+
+    // Field errors
+    expect(screen.getByRole('textbox', { name: 'Email address' })).toHaveAccessibleErrorMessage(
+      'Error: Enter a valid email address'
+    )
+  })
+
+  test('Server side field validation errors', async () => {
+    void mockRouter.push('?emailAddressError=Enter+a+valid+email+address')
+
+    prismaMock.organisation.findFirst.mockResolvedValueOnce(mockOrganisation)
+
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { organisationId: '123' } })
+
+    const { props } = (await getServerSideProps(context)) as {
+      props: OrganisationProps
+    }
+
+    render(Organisation.getLayout(<Organisation {...props} />, { ...props }))
+
+    expect(
+      screen.getByRole('heading', { level: 2, name: `Organisation name: ${mockOrganisation.name}` })
+    ).toBeInTheDocument()
+
+    // Summary errors
+    const alert = screen.getByRole('alert', { name: 'There is a problem' })
+    expect(within(alert).getByRole('link', { name: 'Enter a valid email address' })).toHaveAttribute(
+      'href',
+      '#emailAddress'
+    )
+
+    // Field errors
+    expect(screen.getByRole('textbox', { name: 'Email address' })).toHaveAccessibleErrorMessage(
+      'Error: Enter a valid email address'
+    )
+  })
+
+  test('Fatal server error shows an error at the top of the page', async () => {
+    prismaMock.organisation.findFirst.mockResolvedValueOnce(mockOrganisation)
+
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { organisationId: '123' } })
+
+    const { props } = (await getServerSideProps(context)) as {
+      props: OrganisationProps
+    }
+
+    render(Organisation.getLayout(<Organisation {...props} />, { ...props }))
+
+    expect(
+      screen.getByRole('heading', { level: 2, name: `Organisation name: ${mockOrganisation.name}` })
+    ).toBeInTheDocument()
+
+    // Email address
+    await userEvent.type(screen.getByLabelText('Email address'), 'testuser@nihr.ac.uk')
+
+    await userEvent.click(screen.getByRole('button', { name: 'Send invite' }))
+
+    const alert = await screen.findByRole('alert')
+    expect(
+      within(alert).getByText('An unexpected error occured whilst processing the form, please try again later.')
+    ).toBeInTheDocument()
+
+    expect(mockRouter.asPath).toBe('/organisations/123?fatal=1')
   })
 })

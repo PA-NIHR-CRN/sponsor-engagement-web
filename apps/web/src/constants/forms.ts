@@ -4,8 +4,9 @@
 export const TEXTAREA_MAX_CHARACTERS = 400
 
 /**
- * Max amount of words for a textarea
+ * Error messaging for different form submission failures
  */
 export const FORM_ERRORS = {
-  fatal: 'An unexpected error occured whilst processing the form, please try again later.',
-} as const
+  1: 'An unexpected error occured whilst processing the form, please try again later.',
+  2: 'A contact with this email address has already been assigned to this organisation',
+} as Record<number, string>
