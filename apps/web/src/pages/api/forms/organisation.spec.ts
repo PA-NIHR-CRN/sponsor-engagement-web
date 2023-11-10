@@ -19,6 +19,9 @@ import api from './organisation'
 jest.mock('next-auth/next')
 jest.mock('@nihr-ui/logger')
 jest.mock('@nihr-ui/email')
+jest.mock('node:crypto', () => ({
+  randomBytes: () => 'mocked-token',
+}))
 
 type ApiRequest = ExtendedNextApiRequest
 type ApiResponse = NextApiResponse
@@ -96,8 +99,8 @@ describe('Successful organisation sponsor contact invitation', () => {
                   email: body.emailAddress,
                   identityGatewayId: '',
                   registrationConfirmed: false,
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- valid any
-                  registrationToken: expect.any(String),
+
+                  registrationToken: 'mocked-token',
                   roles: {
                     createMany: {
                       data: {
@@ -124,8 +127,8 @@ describe('Successful organisation sponsor contact invitation', () => {
       templateData: {
         crnLink: EXTERNAL_CRN_URL,
         organisationName: updateOrgResponse.name,
-        requestSupportLink: 'http://localhost:undefined/',
-        signInLink: 'http://localhost:undefined/auth/signin',
+        requestSupportLink: 'http://localhost:3000/',
+        signInLink: 'http://localhost:3000/auth/signin?registrationToken=mocked-token',
       },
       templateName: 'contact-assigned',
       to: body.emailAddress,

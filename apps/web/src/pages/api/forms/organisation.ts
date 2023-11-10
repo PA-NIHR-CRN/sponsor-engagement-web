@@ -42,6 +42,8 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
       user: { id: contactManagerUserId },
     } = session
 
+    const registrationToken = crypto.randomBytes(24).toString('hex')
+
     // Add user to organisation
     const { name: organisationName, users } = await prismaClient.organisation.update({
       where: {
@@ -65,7 +67,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
                 create: {
                   email: emailAddress,
                   identityGatewayId: '',
-                  registrationToken: crypto.randomBytes(24).toString('hex'),
+                  registrationToken,
                   registrationConfirmed: false,
                   roles: {
                     // If a user is not assigned the sponsor contact role, assign it
@@ -89,8 +91,8 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
     })
 
     const isNewUser = users.some((user) => {
-      const { email, registrationConfirmed, registrationToken } = user.user
-      return email === emailAddress && Boolean(registrationToken) && registrationConfirmed === false
+      const { email, registrationConfirmed, registrationToken: token } = user.user
+      return email === emailAddress && Boolean(token) && registrationConfirmed === false
     })
 
     if (isNewUser) {
@@ -101,7 +103,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
         templateData: {
           organisationName,
           crnLink: EXTERNAL_CRN_URL,
-          signInLink: getAbsoluteUrl(SIGN_IN_PAGE),
+          signInLink: getAbsoluteUrl(`${SIGN_IN_PAGE}?registrationToken=${registrationToken}`),
           requestSupportLink: getAbsoluteUrl(SUPPORT_PAGE),
         },
       })
