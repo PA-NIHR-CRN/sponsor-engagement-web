@@ -14,7 +14,7 @@ export const STUDIES_PAGE = '/studies'
 export const ORGANISATIONS_PAGE = '/organisations'
 
 /**
- * Error page for page not found
+ * Support page
  */
 export const SUPPORT_PAGE = '/'
 
