@@ -20,12 +20,18 @@ export class EmailService {
   sendEmail = async (data: EmailArgs) => {
     const { subject, to, templateName, templateData } = data
 
-    const htmlSource = fs.readFileSync(path.resolve(process.cwd(), `src/templates/emails/${templateName}.html.hbs`), {
-      encoding: EMAIL_CHARSET,
-    })
-    const textSource = fs.readFileSync(path.resolve(process.cwd(), `src/templates/emails/${templateName}.text.hbs`), {
-      encoding: EMAIL_CHARSET,
-    })
+    const htmlSource = fs.readFileSync(
+      path.resolve(process.cwd(), `../../packages/email/templates/${templateName}.html.hbs`),
+      {
+        encoding: EMAIL_CHARSET,
+      }
+    )
+    const textSource = fs.readFileSync(
+      path.resolve(process.cwd(), `../../packages/email/templates/${templateName}.text.hbs`),
+      {
+        encoding: EMAIL_CHARSET,
+      }
+    )
     const htmlBody = handlebars.compile(htmlSource)(templateData)
     const textBody = handlebars.compile(textSource)(templateData)
 
