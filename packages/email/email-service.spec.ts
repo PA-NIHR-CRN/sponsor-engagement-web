@@ -51,12 +51,12 @@ describe('EmailService', () => {
     expect(readFileSyncMock).toHaveBeenCalledTimes(2)
     expect(readFileSyncMock).toHaveBeenNthCalledWith(
       1,
-      path.resolve(process.cwd(), 'src/templates/emails/contact-assigned.html.hbs'),
+      path.resolve(process.cwd(), '../../packages/email/templates/contact-assigned.html.hbs'),
       { encoding: 'utf-8' }
     )
     expect(readFileSyncMock).toHaveBeenNthCalledWith(
       2,
-      path.resolve(process.cwd(), 'src/templates/emails/contact-assigned.text.hbs'),
+      path.resolve(process.cwd(), '../../packages/email/templates/contact-assigned.text.hbs'),
       { encoding: 'utf-8' }
     )
 
