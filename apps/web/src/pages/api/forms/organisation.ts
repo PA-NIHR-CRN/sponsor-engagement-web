@@ -1,12 +1,16 @@
+import crypto from 'node:crypto'
 import type { NextApiRequest } from 'next'
 import { ZodError } from 'zod'
 import { logger } from '@nihr-ui/logger'
+import { emailService } from '@nihr-ui/email'
 import type { OrganisationAddInputs } from '../../../utils/schemas'
 import { organisationAddSchema } from '../../../utils/schemas'
 import { withApiHandler } from '../../../utils/withApiHandler'
 import { getOrganisationById } from '../../../lib/organisations'
 import { Prisma, prismaClient } from '../../../lib/prisma'
 import { Roles } from '../../../constants'
+import { EXTERNAL_CRN_URL, SIGN_IN_PAGE, SUPPORT_PAGE } from '../../../constants/routes'
+import { getAbsoluteUrl } from '../../../utils/email'
 
 export interface ExtendedNextApiRequest extends NextApiRequest {
   body: OrganisationAddInputs
@@ -39,11 +43,16 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
     } = session
 
     // Add user to organisation
-    // If a user does not exist, create the user
-    // If a user is not assigned the sponsor contact role, assign it
-    await prismaClient.organisation.update({
+    const { name: organisationName, users } = await prismaClient.organisation.update({
       where: {
         id: Number(organisationId),
+      },
+      include: {
+        users: {
+          include: {
+            user: true,
+          },
+        },
       },
       data: {
         users: {
@@ -52,10 +61,14 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
             updatedBy: { connect: { id: contactManagerUserId } },
             user: {
               connectOrCreate: {
+                // If a user does not exist, create the user and set a registration token
                 create: {
                   email: emailAddress,
                   identityGatewayId: '',
+                  registrationToken: crypto.randomBytes(24).toString('hex'),
+                  registrationConfirmed: false,
                   roles: {
+                    // If a user is not assigned the sponsor contact role, assign it
                     createMany: {
                       data: {
                         roleId,
@@ -75,7 +88,25 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
       },
     })
 
-    // Otherwise, redirect back to org page
+    const isNewUser = users.some((user) => {
+      const { email, registrationConfirmed, registrationToken } = user.user
+      return email === emailAddress && Boolean(registrationToken) && registrationConfirmed === false
+    })
+
+    if (isNewUser) {
+      await emailService.sendEmail({
+        to: emailAddress,
+        subject: 'NIHR CRN has invited you to review and assess research studies',
+        templateName: 'contact-assigned',
+        templateData: {
+          organisationName,
+          crnLink: EXTERNAL_CRN_URL,
+          signInLink: getAbsoluteUrl(SIGN_IN_PAGE),
+          requestSupportLink: getAbsoluteUrl(SUPPORT_PAGE),
+        },
+      })
+    }
+
     return res.redirect(302, `/organisations/${organisationId}?success=1`)
   } catch (error) {
     logger.error(error)

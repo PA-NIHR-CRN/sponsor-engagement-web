@@ -6,17 +6,19 @@ import type { NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
 import { ZodError } from 'zod'
 import { logger } from '@nihr-ui/logger'
+import { emailService } from '@nihr-ui/email'
 import { prismaClient } from '../../../lib/prisma'
 import type { OrganisationAddInputs } from '../../../utils/schemas'
 import { userNoRoles, userWithContactManagerRole } from '../../../__mocks__/session'
 import { AuthError } from '../../../utils/auth'
-import { SIGN_IN_PAGE } from '../../../constants/routes'
+import { EXTERNAL_CRN_URL, SIGN_IN_PAGE } from '../../../constants/routes'
 import type { OrganisationWithRelations } from '../../../lib/organisations'
 import type { ExtendedNextApiRequest } from './organisation'
 import api from './organisation'
 
 jest.mock('next-auth/next')
 jest.mock('@nihr-ui/logger')
+jest.mock('@nihr-ui/email')
 
 type ApiRequest = ExtendedNextApiRequest
 type ApiResponse = NextApiResponse
@@ -39,14 +41,29 @@ describe('Successful organisation sponsor contact invitation', () => {
     name: 'SponsorContact',
   })
   const findOrgResponse = Mock.of<OrganisationWithRelations>({ id: 2, roles: [] })
-  const updateOrgResponse = Mock.of<OrganisationWithRelations>({ id: 2, roles: [] })
 
   beforeEach(() => {
+    jest.clearAllMocks()
     jest.mocked(getServerSession).mockResolvedValueOnce(userWithContactManagerRole)
     logger.info = jest.fn()
   })
 
-  test('Invites the provided contact', async () => {
+  test('New user', async () => {
+    const updateOrgResponse = Mock.of<OrganisationWithRelations>({
+      id: 2,
+      roles: [],
+      name: 'Mock org name',
+      users: [
+        {
+          user: {
+            email: body.emailAddress,
+            registrationConfirmed: false,
+            registrationToken: 'mock-token',
+          },
+        },
+      ],
+    })
+
     jest.mocked(prismaClient.organisation.findFirst).mockResolvedValueOnce(findOrgResponse)
 
     const findSysRefRoleMock = jest
@@ -61,6 +78,13 @@ describe('Successful organisation sponsor contact invitation', () => {
     // Org is updated
     expect(updateOrgMock).toHaveBeenCalledWith({
       where: { id: Number(body.organisationId) },
+      include: {
+        users: {
+          include: {
+            user: true,
+          },
+        },
+      },
       data: {
         users: {
           create: {
@@ -71,6 +95,9 @@ describe('Successful organisation sponsor contact invitation', () => {
                 create: {
                   email: body.emailAddress,
                   identityGatewayId: '',
+                  registrationConfirmed: false,
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- valid any
+                  registrationToken: expect.any(String),
                   roles: {
                     createMany: {
                       data: {
@@ -90,6 +117,97 @@ describe('Successful organisation sponsor contact invitation', () => {
         },
       },
     })
+
+    // Send email
+    expect(emailService.sendEmail).toHaveBeenCalledWith({
+      subject: 'NIHR CRN has invited you to review and assess research studies',
+      templateData: {
+        crnLink: EXTERNAL_CRN_URL,
+        organisationName: updateOrgResponse.name,
+        requestSupportLink: 'http://localhost:undefined/',
+        signInLink: 'http://localhost:undefined/auth/signin',
+      },
+      templateName: 'contact-assigned',
+      to: body.emailAddress,
+    })
+
+    // Redirect back to organisation page
+    expect(res.statusCode).toBe(302)
+    expect(res._getRedirectUrl()).toBe(`/organisations/${body.organisationId}?success=1`)
+  })
+
+  test('Existing user', async () => {
+    const updateOrgResponse = Mock.of<OrganisationWithRelations>({
+      id: 2,
+      roles: [],
+      name: 'Mock org name',
+      users: [
+        {
+          user: {
+            email: body.emailAddress,
+            registrationConfirmed: false,
+            registrationToken: null,
+          },
+        },
+      ],
+    })
+
+    jest.mocked(prismaClient.organisation.findFirst).mockResolvedValueOnce(findOrgResponse)
+
+    const findSysRefRoleMock = jest
+      .mocked(prismaClient.sysRefRole.findFirstOrThrow)
+      .mockResolvedValueOnce(findSysRefRoleResponse)
+    const updateOrgMock = jest.mocked(prismaClient.organisation.update).mockResolvedValueOnce(updateOrgResponse)
+
+    const res = await testHandler(api, { method: 'POST', body })
+
+    expect(findSysRefRoleMock).toHaveBeenCalledWith({ where: { isDeleted: false, name: 'SponsorContact' } })
+
+    // Org is updated
+    expect(updateOrgMock).toHaveBeenCalledWith({
+      where: { id: Number(body.organisationId) },
+      include: {
+        users: {
+          include: {
+            user: true,
+          },
+        },
+      },
+      data: {
+        users: {
+          create: {
+            createdBy: { connect: { id: userWithContactManagerRole.user?.id } },
+            updatedBy: { connect: { id: userWithContactManagerRole.user?.id } },
+            user: {
+              connectOrCreate: {
+                create: {
+                  email: body.emailAddress,
+                  identityGatewayId: '',
+                  registrationConfirmed: false,
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- valid any
+                  registrationToken: expect.any(String),
+                  roles: {
+                    createMany: {
+                      data: {
+                        roleId: findSysRefRoleResponse.id,
+                        createdById: userWithContactManagerRole.user?.id,
+                        updatedById: userWithContactManagerRole.user?.id,
+                      },
+                    },
+                  },
+                },
+                where: {
+                  email: body.emailAddress,
+                },
+              },
+            },
+          },
+        },
+      },
+    })
+
+    // Send email
+    expect(emailService.sendEmail).not.toHaveBeenCalled()
 
     // Redirect back to organisation page
     expect(res.statusCode).toBe(302)
