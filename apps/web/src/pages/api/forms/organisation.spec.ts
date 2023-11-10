@@ -187,7 +187,7 @@ describe('Successful organisation sponsor contact invitation', () => {
                   email: body.emailAddress,
                   identityGatewayId: '',
                   registrationConfirmed: false,
-                  registrationToken: 'mock-token',
+                  registrationToken: 'mocked-token',
                   roles: {
                     createMany: {
                       data: {
