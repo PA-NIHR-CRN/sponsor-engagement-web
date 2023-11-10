@@ -187,8 +187,7 @@ describe('Successful organisation sponsor contact invitation', () => {
                   email: body.emailAddress,
                   identityGatewayId: '',
                   registrationConfirmed: false,
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- valid any
-                  registrationToken: expect.any(String),
+                  registrationToken: 'mock-token',
                   roles: {
                     createMany: {
                       data: {
