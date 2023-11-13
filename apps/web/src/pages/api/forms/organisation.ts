@@ -143,6 +143,11 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
       return res.redirect(302, `/organisations/${organisationId}/?${searchParams.toString()}`)
     }
 
+    if ((error as Error).stack?.includes('MessageRejected')) {
+      const searchParams = new URLSearchParams({ fatal: '3' })
+      return res.redirect(302, `/organisations/${organisationId}/?${searchParams.toString()}`)
+    }
+
     const searchParams = new URLSearchParams({ fatal: '1' })
 
     return res.redirect(302, `/organisations/${organisationId}/?${searchParams.toString()}`)
