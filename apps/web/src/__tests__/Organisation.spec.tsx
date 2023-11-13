@@ -169,7 +169,7 @@ describe('Organisation page', () => {
       '1 January 2001',
       'Remove',
       'test2@test2.com',
-      'Pending',
+      '1 January 2001',
       'Remove',
     ])
 
@@ -194,6 +194,24 @@ describe('Organisation page', () => {
     expect(screen.queryByRole('table', { name: 'Organisation contacts' })).not.toBeInTheDocument()
 
     expect(screen.getByText('No contacts associated with this organisation')).toBeInTheDocument()
+  })
+
+  test('Success banner shows after adding a contact', async () => {
+    prismaMock.organisation.findFirst.mockResolvedValueOnce(mockOrganisation)
+
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { organisationId: '123' } })
+
+    await mockRouter.push('?success=1')
+
+    const { props } = (await getServerSideProps(context)) as {
+      props: OrganisationProps
+    }
+
+    render(Organisation.getLayout(<Organisation {...props} />, { ...props }))
+
+    // Banner
+    const banner = screen.getByRole('alert', { name: 'Success' })
+    expect(within(banner).getByText('A new contact was added for this organisation')).toBeInTheDocument()
   })
 })
 

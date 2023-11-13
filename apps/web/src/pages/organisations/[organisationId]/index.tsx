@@ -25,7 +25,7 @@ export type OrganisationProps = InferGetServerSidePropsType<typeof getServerSide
 const renderNotificationBanner = (success: boolean) =>
   success ? (
     <NotificationBanner heading="Contact added" success>
-      New contacts are shown as pending until they sign into this service for the first time.
+      A new contact was added for this organisation
     </NotificationBanner>
   ) : null
 
@@ -93,7 +93,7 @@ export default function Organisation({ organisation, query }: OrganisationProps)
           {organisation.users.map((user) => (
             <Table.Row key={user.id}>
               <Table.Cell>{user.user.email}</Table.Cell>
-              <Table.Cell>{user.user.registrationConfirmed ? formatDate(user.createdAt) : 'Pending'}</Table.Cell>
+              <Table.Cell>{formatDate(user.createdAt)}</Table.Cell>
               <Table.Cell>
                 <Link href="#">Remove</Link>
               </Table.Cell>
