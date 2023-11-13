@@ -95,19 +95,17 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
       return email === emailAddress && Boolean(token) && registrationConfirmed === false
     })
 
-    if (isNewUser) {
-      await emailService.sendEmail({
-        to: emailAddress,
-        subject: 'NIHR CRN has invited you to review and assess research studies',
-        templateName: 'contact-assigned',
-        templateData: {
-          organisationName,
-          crnLink: EXTERNAL_CRN_URL,
-          signInLink: getAbsoluteUrl(`${SIGN_IN_PAGE}?registrationToken=${registrationToken}`),
-          requestSupportLink: getAbsoluteUrl(SUPPORT_PAGE),
-        },
-      })
-    }
+    await emailService.sendEmail({
+      to: emailAddress,
+      subject: 'NIHR CRN has invited you to review and assess research studies',
+      templateName: 'contact-assigned',
+      templateData: {
+        organisationName,
+        crnLink: EXTERNAL_CRN_URL,
+        signInLink: getAbsoluteUrl(`${SIGN_IN_PAGE}${isNewUser ? `?registrationToken=${registrationToken}` : ``}`),
+        requestSupportLink: getAbsoluteUrl(SUPPORT_PAGE),
+      },
+    })
 
     return res.redirect(302, `/organisations/${organisationId}?success=1`)
   } catch (error) {

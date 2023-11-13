@@ -501,7 +501,7 @@ describe('Form submission failures', () => {
 
     const alert = screen.getByRole('alert')
     expect(
-      within(alert).getByText('An unexpected error occured whilst processing the form, please try again later.')
+      within(alert).getByText('An unexpected error occurred whilst processing the form, please try again later.')
     ).toBeInTheDocument()
   })
 })

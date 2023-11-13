@@ -209,7 +209,17 @@ describe('Successful organisation sponsor contact invitation', () => {
     })
 
     // Send email
-    expect(emailService.sendEmail).not.toHaveBeenCalled()
+    expect(emailService.sendEmail).toHaveBeenCalledWith({
+      subject: 'NIHR CRN has invited you to review and assess research studies',
+      templateData: {
+        crnLink: EXTERNAL_CRN_URL,
+        organisationName: updateOrgResponse.name,
+        requestSupportLink: 'http://localhost:3000/',
+        signInLink: 'http://localhost:3000/auth/signin',
+      },
+      templateName: 'contact-assigned',
+      to: body.emailAddress,
+    })
 
     // Redirect back to organisation page
     expect(res.statusCode).toBe(302)

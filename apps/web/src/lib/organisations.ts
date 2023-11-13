@@ -81,6 +81,9 @@ const organisationByIdRelations = {
       include: {
         user: true,
       },
+      orderBy: {
+        createdAt: Prisma.SortOrder.desc,
+      },
     },
   },
 }
