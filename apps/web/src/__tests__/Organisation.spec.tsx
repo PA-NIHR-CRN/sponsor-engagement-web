@@ -292,7 +292,7 @@ describe('Form submission failures', () => {
 
     const alert = await screen.findByRole('alert')
     expect(
-      within(alert).getByText('An unexpected error occured whilst processing the form, please try again later.')
+      within(alert).getByText('An unexpected error occurred whilst processing the form, please try again later.')
     ).toBeInTheDocument()
 
     expect(mockRouter.asPath).toBe('/organisations/123?fatal=1')
