@@ -145,7 +145,7 @@ describe('Organisation page', () => {
 
     expect(
       screen.getByText(
-        /Invite new sponsor contacts to set up an NIHR Identity Gateway account so they can access this service./
+        /Invite new sponsor contacts to this organisation, allowing them to view all studies for this organisation and provide assessments. If the user has not accessed the tool previously, they will be asked to set up an NIHR Identity Gateway account so they can access this service./
       )
     ).toBeInTheDocument()
 
