@@ -245,12 +245,12 @@ describe('ingest', () => {
       })
     )
 
-    await ingest()
+    await expect(ingest()).rejects.toThrow('Request failed with status code 500')
 
     expect(prismaMock.study.updateMany).not.toHaveBeenCalled()
 
-    expect(logger.error).toHaveBeenCalledWith(expect.any(Object), 'Error fetching studies data')
-    expect(logger.error).toHaveBeenCalledWith(errorResponse, 'Error response')
+    expect(logger.error).toHaveBeenCalledWith('Error occurred while fetching study data')
+    expect(logger.error).toHaveBeenCalledWith('Error response data: %s', errorResponse)
   })
 
   it('should set studies no longer returned by the API as deleted', async () => {
@@ -296,12 +296,17 @@ describe('ingest', () => {
 
     await ingest()
 
+    const expectedDeletedEntityIds = organisationRoleEntities.slice(-2).map(({ id }) => id)
+
     // Sets all existing organisation roles to be isDeleted = false
-    expect(prismaMock.organisationRole.updateMany).toHaveBeenCalledWith({ data: { isDeleted: false } })
+    expect(prismaMock.organisationRole.updateMany).toHaveBeenCalledWith({
+      where: { NOT: { id: { in: expectedDeletedEntityIds } } },
+      data: { isDeleted: false },
+    })
 
     // Sets organisation roles not seen during ingest as isDeleted = true
     expect(prismaMock.organisationRole.updateMany).toHaveBeenCalledWith({
-      where: { id: { in: organisationRoleEntities.slice(-2).map(({ id }) => id) } },
+      where: { id: { in: expectedDeletedEntityIds }, isDeleted: false },
       data: { isDeleted: true },
     })
   })
@@ -326,15 +331,17 @@ describe('ingest', () => {
 
     await ingest()
 
+    const expectedDeletedStudyOrgIds = studyEntities[studyEntities.length - 1].organisations.map(({ id }) => id)
+
     // Sets all existing study organisations to be isDeleted = false
     expect(prismaMock.studyOrganisation.updateMany).toHaveBeenCalledWith({
-      where: { studyId: { in: studyEntities.map(({ id }) => id) } },
+      where: { studyId: { in: studyEntities.map(({ id }) => id) }, NOT: { id: { in: expectedDeletedStudyOrgIds } } },
       data: { isDeleted: false },
     })
 
     // Sets study organisations not seen during ingest as isDeleted = true
     expect(prismaMock.studyOrganisation.updateMany).toHaveBeenCalledWith({
-      where: { id: { in: studyEntities[studyEntities.length - 1].organisations.map(({ id }) => id) } },
+      where: { id: { in: expectedDeletedStudyOrgIds }, isDeleted: false },
       data: { isDeleted: true },
     })
   })
@@ -359,15 +366,22 @@ describe('ingest', () => {
 
     await ingest()
 
+    const expectedDeletedEvalCategoryIds = studyEntities[studyEntities.length - 1].evaluationCategories.map(
+      ({ id }) => id
+    )
+
     // Sets all existing evaluation categories to be isDeleted = false
     expect(prismaMock.studyEvaluationCategory.updateMany).toHaveBeenCalledWith({
-      where: { studyId: { in: studyEntities.map(({ id }) => id) } },
+      where: {
+        studyId: { in: studyEntities.map(({ id }) => id) },
+        NOT: { id: { in: expectedDeletedEvalCategoryIds } },
+      },
       data: { isDeleted: false },
     })
 
     // Sets evaluation categories not seen during ingest as isDeleted = true
     expect(prismaMock.studyEvaluationCategory.updateMany).toHaveBeenCalledWith({
-      where: { id: { in: studyEntities[studyEntities.length - 1].evaluationCategories.map(({ id }) => id) } },
+      where: { id: { in: expectedDeletedEvalCategoryIds }, isDeleted: false },
       data: { isDeleted: true },
     })
   })

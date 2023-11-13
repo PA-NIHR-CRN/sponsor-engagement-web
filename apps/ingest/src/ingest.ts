@@ -202,11 +202,11 @@ const createStudyRelationships = async () => {
 
   await prismaClient.$transaction([
     prismaClient.studyOrganisation.updateMany({
-      where: { studyId: { in: studyEntityIds } },
+      where: { studyId: { in: studyEntityIds }, NOT: { id: { in: deletedStudyOrganisationIds } } },
       data: { isDeleted: false },
     }),
     prismaClient.studyOrganisation.updateMany({
-      where: { id: { in: deletedStudyOrganisationIds } },
+      where: { id: { in: deletedStudyOrganisationIds }, isDeleted: false },
       data: { isDeleted: true },
     }),
   ])
@@ -286,11 +286,11 @@ const createStudyRelationships = async () => {
 
   await prismaClient.$transaction([
     prismaClient.studyEvaluationCategory.updateMany({
-      where: { studyId: { in: studyEntityIds } },
+      where: { studyId: { in: studyEntityIds }, NOT: { id: { in: deletedEvaluationCategoryIds } } },
       data: { isDeleted: false },
     }),
     prismaClient.studyEvaluationCategory.updateMany({
-      where: { id: { in: deletedEvaluationCategoryIds } },
+      where: { id: { in: deletedEvaluationCategoryIds }, isDeleted: false },
       data: { isDeleted: true },
     }),
   ])
@@ -357,11 +357,11 @@ const fetchStudies = async function* (url: string, username: string, password: s
       ++pageNumber
       yield data.Result.Studies as Study[]
     } catch (error) {
-      logger.error(error, 'Error fetching studies data')
+      logger.error('Error occurred while fetching study data')
       if (axios.isAxiosError(error)) {
-        logger.error(error.response?.data, 'Error response')
+        logger.error('Error response data: %s', error.response?.data)
       }
-      yield null
+      throw error
     }
   }
 }
@@ -369,6 +369,7 @@ const fetchStudies = async function* (url: string, username: string, password: s
 const deleteStudies = async () => {
   const currentStudies = await prismaClient.study.findMany({
     select: { id: true },
+    where: { isDeleted: false },
   })
 
   const deletedStudyIds = currentStudies.filter(({ id }) => !allStudyIds.includes(id)).map(({ id }) => id)
@@ -382,6 +383,7 @@ const deleteStudies = async () => {
 const deleteOrganisations = async () => {
   const currentOrganisations = await prismaClient.organisation.findMany({
     select: { id: true },
+    where: { isDeleted: false },
   })
 
   const deletedOrgIds = currentOrganisations.filter(({ id }) => !allOrganisationIds.includes(id)).map(({ id }) => id)
@@ -409,11 +411,19 @@ const deleteOrganisationRoles = async () => {
     .map(Number)
 
   await prismaClient.$transaction([
-    prismaClient.organisationRole.updateMany({ data: { isDeleted: false } }),
-    prismaClient.organisationRole.updateMany({ where: { id: { in: deletedOrgRoleIds } }, data: { isDeleted: true } }),
+    prismaClient.organisationRole.updateMany({
+      where: { NOT: { id: { in: deletedOrgRoleIds } } },
+      data: { isDeleted: false },
+    }),
+    prismaClient.organisationRole.updateMany({
+      where: { id: { in: deletedOrgRoleIds }, isDeleted: false },
+      data: { isDeleted: true },
+    }),
   ])
 
-  logger.info('Flagged %s organisation roles as deleted', deletedOrgRoleIds.length)
+  if (deletedOrgRoleIds.length > 0) {
+    logger.info('Flagged %s organisation roles as deleted', deletedOrgRoleIds.length)
+  }
 }
 
 export const ingest = async () => {
@@ -428,8 +438,6 @@ export const ingest = async () => {
   allOrganisationRoleIds = []
 
   for await (const studyRecords of fetchStudies(API_URL, API_USERNAME, API_PASSWORD)) {
-    if (!studyRecords) return
-
     studies = studyRecords
       .filter((study) => !!study.QualificationDate)
       .map((study) => ({
