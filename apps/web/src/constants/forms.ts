@@ -8,6 +8,6 @@ export const TEXTAREA_MAX_CHARACTERS = 400
  */
 export const FORM_ERRORS = {
   1: 'An unexpected error occurred whilst processing the form, please try again later.',
-  2: 'A contact with this email address has already been assigned to this organisation',
-  3: 'User has been assigned to the organisation, but the invite email has not been sent as the email is not in the allowed list for testing',
+  2: 'The email address you have entered already exists for a user assigned to this organisation, so the user has not been added',
+  3: "The user has been assigned to the organisation, but the invite email has not been sent as the user's email domain is not in the allowed list for testing",
 } as Record<number, string>

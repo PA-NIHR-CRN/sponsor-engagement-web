@@ -129,10 +129,7 @@ export default function Organisation({ organisation, query }: OrganisationProps)
 
           <h3 className="govuk-heading-m p-0 govuk-!-margin-bottom-4">Add or remove sponsor contacts</h3>
 
-          <p>
-            Invite new sponsor contacts to set up an NIHR Identity Gateway account so they can access this service. New
-            contacts are shown as pending until they sign into this service for the first time.
-          </p>
+          <p>Invite new sponsor contacts to set up an NIHR Identity Gateway account so they can access this service.</p>
 
           {/* Invite form */}
           <Form
