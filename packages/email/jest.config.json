@@ -1,6 +1,7 @@
 {
   "verbose": true,
   "testEnvironment": "jest-environment-jsdom",
+  "setupFiles": ["<rootDir>/jest.env.js"],
   "setupFilesAfterEnv": ["@testing-library/jest-dom/extend-expect"],
   "reporters": ["default", "jest-junit"],
   "testPathIgnorePatterns": [".vscode"],
