@@ -136,14 +136,10 @@ describe('Organisation page', () => {
     const organisationDetailsTable = screen.getByRole('table', { name: 'Organisation details' })
 
     const progressHeaders = within(organisationDetailsTable).getAllByRole('rowheader')
-    expect(progressHeaders.map((header) => header.textContent)).toEqual(['Organisation ID', 'Type', 'Role'])
+    expect(progressHeaders.map((header) => header.textContent)).toEqual(['Organisation ID', 'Role'])
 
     const progressRows = within(organisationDetailsTable).getAllByRole('row')
-    expect(progressRows.map((row) => within(row).getByRole('cell').textContent)).toEqual([
-      '123',
-      'Commercial',
-      'Sponsor, CRO',
-    ])
+    expect(progressRows.map((row) => within(row).getByRole('cell').textContent)).toEqual(['123', 'Sponsor, CRO'])
 
     expect(screen.getByRole('heading', { name: 'Add or remove sponsor contacts', level: 3 })).toBeInTheDocument()
 

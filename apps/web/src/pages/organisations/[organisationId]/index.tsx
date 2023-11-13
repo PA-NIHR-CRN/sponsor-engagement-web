@@ -65,10 +65,6 @@ export default function Organisation({ organisation, query }: OrganisationProps)
             <Table.Cell>{organisation.id}</Table.Cell>
           </Table.Row>
           <Table.Row>
-            <Table.CellHeader className="w-1/3">Type</Table.CellHeader>
-            <Table.Cell>{organisation.roles.includes('CRO') ? 'Commercial' : 'Non-commercal'}</Table.Cell>
-          </Table.Row>
-          <Table.Row>
             <Table.CellHeader className="w-1/3">Role</Table.CellHeader>
             <Table.Cell>{organisation.roles.join(', ')}</Table.Cell>
           </Table.Row>
