@@ -62,7 +62,7 @@ export default function Organisation({ organisation, query }: OrganisationProps)
         <Table.Body>
           <Table.Row>
             <Table.CellHeader className="w-1/3">Organisation ID</Table.CellHeader>
-            <Table.Cell>{organisation.id}</Table.Cell>
+            <Table.Cell>{organisation.rtsIdentifier}</Table.Cell>
           </Table.Row>
           <Table.Row>
             <Table.CellHeader className="w-1/3">Role</Table.CellHeader>

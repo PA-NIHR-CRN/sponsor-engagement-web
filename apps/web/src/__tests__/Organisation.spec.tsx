@@ -70,6 +70,7 @@ describe('getServerSideProps', () => {
 
 const mockOrganisation = Mock.of<OrganisationWithRelations>({
   id: 123,
+  rtsIdentifier: "rts-123",
   name: 'Test organisation',
   roles: [
     {
@@ -139,7 +140,7 @@ describe('Organisation page', () => {
     expect(progressHeaders.map((header) => header.textContent)).toEqual(['Organisation ID', 'Role'])
 
     const progressRows = within(organisationDetailsTable).getAllByRole('row')
-    expect(progressRows.map((row) => within(row).getByRole('cell').textContent)).toEqual(['123', 'Sponsor, CRO'])
+    expect(progressRows.map((row) => within(row).getByRole('cell').textContent)).toEqual(['rts-123', 'Sponsor, CRO'])
 
     expect(screen.getByRole('heading', { name: 'Add or remove sponsor contacts', level: 3 })).toBeInTheDocument()
 
