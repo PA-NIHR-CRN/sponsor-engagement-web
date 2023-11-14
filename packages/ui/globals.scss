@@ -27,7 +27,7 @@ $govuk-font-family: var(--font-primary), arial, sans-serif;
 $govuk-page-width: 1280px;
 $govuk-link-colour: var(--colour-blue);
 
-@import '~node_modules/govuk-frontend/govuk/all.scss';
+@import '../../node_modules/govuk-frontend/govuk/all.scss';
 
 @layer utilities {
   .focusable {

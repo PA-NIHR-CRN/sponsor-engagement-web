@@ -25,6 +25,7 @@ const formState: FormState<FieldValues> = {
   isValidating: false,
   isDirty: false,
   isLoading: false,
+  disabled: false,
 }
 
 describe('useFormErrorHydration', () => {

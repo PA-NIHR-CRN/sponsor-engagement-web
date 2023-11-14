@@ -15,6 +15,10 @@ jest.mock('@nihr-ui/logger')
 
 logger.error = jest.fn()
 
+beforeEach(() => {
+  console.error = jest.fn()
+})
+
 afterEach(() => {
   jest.clearAllMocks()
 })
@@ -106,7 +110,7 @@ test('Handles failures due to an api request error', async () => {
   expect(axiosPostMock).toHaveBeenCalledWith('/submit', { fullName: 'John' })
 
   // Verify that router functions were not called
-  expect(routerReplaceMock).toHaveBeenCalledWith('mock-url?fatal=1')
+  expect(routerReplaceMock).toHaveBeenCalledWith('http://localhost/mock-url?fatal=1')
   expect(routerPushMock).not.toHaveBeenCalled()
   expect(onError).toHaveBeenCalled()
 })

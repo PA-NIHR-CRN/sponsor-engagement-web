@@ -1,65 +1,108 @@
-import type { ReactElement } from 'react'
-import { Container, Table } from '@nihr-ui/frontend'
+import { useCallback, type ReactElement } from 'react'
+import { Container, NotificationBanner, Table } from '@nihr-ui/frontend'
 import type { InferGetServerSidePropsType } from 'next'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import clsx from 'clsx'
+import type { FieldError } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useRouter } from 'next/router'
 import { getOrganisationById } from '../../../lib/organisations'
 import { withServerSideProps } from '../../../utils/withServerSideProps'
 import { formatDate } from '../../../utils/date'
 import { RootLayout } from '../../../components/organisms'
 import { TextInput } from '../../../components/atoms/Form/TextInput/TextInput'
 import { Roles } from '../../../constants'
+import { ErrorSummary, Form } from '../../../components/atoms'
+import type { OrganisationAddInputs } from '../../../utils/schemas'
+import { organisationAddSchema } from '../../../utils/schemas'
+import { getValuesFromSearchParams } from '../../../utils/form'
+import { useFormErrorHydration } from '../../../hooks/useFormErrorHydration'
 
 export type OrganisationProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function Organisation({ organisation }: OrganisationProps) {
-  const renderDetails = () => (
-    <Table className="govuk-!-margin-top-3">
-      <Table.Caption className="govuk-visually-hidden">Organisation details</Table.Caption>
-      <Table.Body>
-        <Table.Row>
-          <Table.CellHeader className="w-1/3">Organisation ID</Table.CellHeader>
-          <Table.Cell>{organisation.id}</Table.Cell>
-        </Table.Row>
-        <Table.Row>
-          <Table.CellHeader className="w-1/3">Type</Table.CellHeader>
-          <Table.Cell>{organisation.roles.includes('CRO') ? 'Commercial' : 'Non-commercal'}</Table.Cell>
-        </Table.Row>
-        <Table.Row>
-          <Table.CellHeader className="w-1/3">Role</Table.CellHeader>
-          <Table.Cell>{organisation.roles.join(', ')}</Table.Cell>
-        </Table.Row>
-      </Table.Body>
-    </Table>
+const renderNotificationBanner = (success: boolean) =>
+  success ? (
+    <NotificationBanner heading="Contact added" success>
+      A new contact was added for this organisation
+    </NotificationBanner>
+  ) : null
+
+export default function Organisation({ organisation, query }: OrganisationProps) {
+  const router = useRouter()
+
+  const { register, formState, setError, handleSubmit } = useForm<OrganisationAddInputs>({
+    resolver: zodResolver(organisationAddSchema),
+    defaultValues: {
+      ...getValuesFromSearchParams(organisationAddSchema, query),
+      organisationId: String(organisation.id),
+    },
+  })
+
+  const handleFoundError = useCallback(
+    (field: keyof OrganisationAddInputs, error: FieldError) => {
+      setError(field, error)
+    },
+    [setError]
   )
 
-  const renderContactList = () => (
-    <Table>
-      <Table.Caption className="govuk-visually-hidden">Organisation contacts</Table.Caption>
-      <Table.Header>
-        <Table.Row>
-          <Table.CellHeader className="w-1/3" column>
-            Contact email
-          </Table.CellHeader>
-          <Table.CellHeader className="w-1/3" column>
-            Date added
-          </Table.CellHeader>
-          <Table.Cell className="w-1/3" />
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        {organisation.users.map((user) => (
-          <Table.Row key={user.id}>
-            <Table.Cell>{user.user.email}</Table.Cell>
-            <Table.Cell>{user.user.registrationConfirmed ? formatDate(user.createdAt) : 'Pending'}</Table.Cell>
-            <Table.Cell>
-              <Link href="#">Remove</Link>
-            </Table.Cell>
+  const { errors } = useFormErrorHydration<OrganisationAddInputs>({
+    schema: organisationAddSchema,
+    formState,
+    onFoundError: handleFoundError,
+  })
+
+  const { defaultValues } = formState
+
+  const renderDetails = useCallback(
+    () => (
+      <Table className="govuk-!-margin-top-3">
+        <Table.Caption className="govuk-visually-hidden">Organisation details</Table.Caption>
+        <Table.Body>
+          <Table.Row>
+            <Table.CellHeader className="w-1/3">Organisation ID</Table.CellHeader>
+            <Table.Cell>{organisation.id}</Table.Cell>
           </Table.Row>
-        ))}
-      </Table.Body>
-    </Table>
+          <Table.Row>
+            <Table.CellHeader className="w-1/3">Role</Table.CellHeader>
+            <Table.Cell>{organisation.roles.join(', ')}</Table.Cell>
+          </Table.Row>
+        </Table.Body>
+      </Table>
+    ),
+    [organisation.roles, organisation.id]
+  )
+
+  const renderContactList = useCallback(
+    () => (
+      <Table>
+        <Table.Caption className="govuk-visually-hidden">Organisation contacts</Table.Caption>
+        <Table.Header>
+          <Table.Row>
+            <Table.CellHeader className="w-1/3" column>
+              Contact email
+            </Table.CellHeader>
+            <Table.CellHeader className="w-1/3" column>
+              Date added
+            </Table.CellHeader>
+            <Table.Cell className="w-1/3" />
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {organisation.users.map((user) => (
+            <Table.Row key={user.id}>
+              <Table.Cell>{user.user.email}</Table.Cell>
+              <Table.Cell>{formatDate(user.createdAt)}</Table.Cell>
+              <Table.Cell>
+                <Link href="#">Remove</Link>
+              </Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table>
+    ),
+    [organisation.users]
   )
 
   return (
@@ -67,6 +110,8 @@ export default function Organisation({ organisation }: OrganisationProps) {
       <NextSeo title={`Manage organisation contacts - ${organisation.name}`} />
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
+          {renderNotificationBanner(Boolean(router.query.success))}
+
           {/* Organisation name */}
           <h2 className="govuk-heading-l govuk-!-margin-bottom-1">
             <span className="govuk-visually-hidden">Organisation name: </span>
@@ -85,22 +130,43 @@ export default function Organisation({ organisation }: OrganisationProps) {
           <h3 className="govuk-heading-m p-0 govuk-!-margin-bottom-4">Add or remove sponsor contacts</h3>
 
           <p>
-            Invite new sponsor contacts to set up an NIHR Identity Gateway account so they can access this service. New
-            contacts are shown as pending until they sign into this service for the first time.
+            Invite new sponsor contacts to this organisation, allowing them to view all studies for this organisation
+            and provide assessments. If the user has not accessed the tool previously, they will be asked to set up an
+            NIHR Identity Gateway account so they can access this service.
           </p>
 
           {/* Invite form */}
-          <form className="w-full">
-            <label className="govuk-label govuk-label--s govuk-!-margin-bottom-2" htmlFor="email" id="email-label">
-              Email address
-            </label>
-            <div className="flex gap-4">
-              <TextInput className="min-w-[295px]" name="email" />
-              <button className={clsx('govuk-button', { 'pointer-events-none': false })} type="submit">
-                Send invite
-              </button>
+          <Form
+            action="/api/forms/organisation"
+            handleSubmit={handleSubmit}
+            method="post"
+            onError={(message: string) => {
+              setError('root.serverError', {
+                type: '400',
+                message,
+              })
+            }}
+          >
+            <ErrorSummary errors={errors} />
+
+            <input type="hidden" {...register('organisationId')} defaultValue={defaultValues?.organisationId} />
+
+            <div className="sm:flex sm:gap-x-4 items-end">
+              <TextInput
+                className="govuk-input--width-20 flex-grow"
+                defaultValue={defaultValues?.emailAddress}
+                errors={errors}
+                label="Email address"
+                {...register('emailAddress')}
+              />
+
+              <div className="govuk-button-group">
+                <button className={clsx('govuk-button', { 'pointer-events-none': formState.isLoading })} type="submit">
+                  Send invite
+                </button>
+              </div>
             </div>
-          </form>
+          </Form>
 
           {/* Organisation contacts */}
           {organisation.users.length > 0 ? renderContactList() : <p>No contacts associated with this organisation</p>}
@@ -137,6 +203,7 @@ export const getServerSideProps = withServerSideProps(Roles.ContactManager, asyn
 
   return {
     props: {
+      query: context.query,
       user: session.user,
       organisation,
     },

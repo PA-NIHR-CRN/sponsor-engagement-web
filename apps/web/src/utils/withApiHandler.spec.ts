@@ -3,6 +3,7 @@ import { Mock } from 'ts-mockery'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { logger } from '@nihr-ui/logger'
 import { userNoOrgs, userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
+import { Roles } from '../constants'
 import { withApiHandler } from './withApiHandler'
 
 jest.mock('next-auth/next')
@@ -23,7 +24,7 @@ describe('withApiHandler', () => {
     const getServerSessionMock = jest.mocked(getServerSession)
     getServerSessionMock.mockResolvedValueOnce(null)
 
-    await withApiHandler(jest.fn())(mockRequest, mockResponse)
+    await withApiHandler(Roles.ContactManager, jest.fn())(mockRequest, mockResponse)
     expect(redirectMock).toHaveBeenCalledWith(302, '/auth/signin')
   })
 
@@ -31,7 +32,7 @@ describe('withApiHandler', () => {
     const getServerSessionMock = jest.mocked(getServerSession)
     getServerSessionMock.mockResolvedValueOnce(userNoRoles)
 
-    await withApiHandler(jest.fn())(mockRequest, mockResponse)
+    await withApiHandler(Roles.ContactManager, jest.fn())(mockRequest, mockResponse)
     expect(redirectMock).toHaveBeenCalledWith(302, '/500')
   })
 
@@ -39,7 +40,7 @@ describe('withApiHandler', () => {
     const getServerSessionMock = jest.mocked(getServerSession)
     getServerSessionMock.mockResolvedValueOnce(userNoOrgs)
 
-    await withApiHandler(jest.fn())(mockRequest, mockResponse)
+    await withApiHandler(Roles.ContactManager, jest.fn())(mockRequest, mockResponse)
     expect(redirectMock).toHaveBeenCalledWith(302, '/500')
   })
 
@@ -48,7 +49,7 @@ describe('withApiHandler', () => {
     getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
 
     const handler = jest.fn()
-    await withApiHandler(handler)(mockRequest, mockResponse)
+    await withApiHandler(Roles.SponsorContact, handler)(mockRequest, mockResponse)
 
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith(mockRequest, mockResponse, userWithSponsorContactRole)

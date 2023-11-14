@@ -124,7 +124,7 @@ describe('Organisations page', () => {
       'Organisation',
       'Organisation name:Org name 1Organisation role:Sponsor',
       'Organisation name:Org name 2Organisation role:CRO',
-      'Organisation name:Org name 3Organisation role:CTO',
+      'Organisation name:Org name 3Organisation role:CTU',
     ])
 
     expect(rows.map((row) => row.lastChild?.textContent)).toEqual([
@@ -240,7 +240,7 @@ describe('Organisations page', () => {
     const table = within(screen.getByRole('table', { name: 'Manage sponsor organisations' }))
     expect(
       table.getByRole('row', {
-        name: 'Organisation name: Test Org Organisation role: Sponsor, CTO Manage Test Org sponsor contacts',
+        name: 'Organisation name: Test Org Organisation role: Sponsor, CTU Manage Test Org sponsor contacts',
       })
     ).toBeInTheDocument()
   })

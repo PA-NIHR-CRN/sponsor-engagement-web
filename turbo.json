@@ -5,7 +5,15 @@
     "build": {
       "dependsOn": ["^build", "db:generate"],
       "outputs": ["dist/**/*", ".next/**", "!.next/cache/**"],
-      "env": ["NODE_ENV", "NEXTAUTH_URL", "AUTH_CLIENT_ID", "AUTH_CLIENT_SECRET", "AUTH_WELL_KNOWN_URL"]
+      "env": [
+        "NODE_ENV",
+        "NEXTAUTH_URL",
+        "AUTH_CLIENT_ID",
+        "AUTH_CLIENT_SECRET",
+        "AUTH_WELL_KNOWN_URL",
+        "NEXT_PUBLIC_APP_ENV",
+        "PORT"
+      ]
     },
     "start": {},
     "lint": {
@@ -18,7 +26,15 @@
       "cache": false,
       "dependsOn": ["db:generate"],
       "dotEnv": [".env.local"],
-      "env": ["NODE_ENV", "NEXTAUTH_URL", "AUTH_CLIENT_ID", "AUTH_CLIENT_SECRET", "AUTH_WELL_KNOWN_URL"]
+      "env": [
+        "NODE_ENV",
+        "NEXTAUTH_URL",
+        "AUTH_CLIENT_ID",
+        "AUTH_CLIENT_SECRET",
+        "AUTH_WELL_KNOWN_URL",
+        "NEXT_PUBLIC_APP_ENV",
+        "PORT"
+      ]
     },
     "test:ci": {
       "dependsOn": ["db:generate"],
@@ -29,7 +45,15 @@
       "cache": false,
       "dependsOn": ["db:generate"],
       "persistent": true,
-      "env": ["NODE_ENV", "NEXTAUTH_URL", "AUTH_CLIENT_ID", "AUTH_CLIENT_SECRET", "AUTH_WELL_KNOWN_URL"]
+      "env": [
+        "NODE_ENV",
+        "NEXTAUTH_URL",
+        "AUTH_CLIENT_ID",
+        "AUTH_CLIENT_SECRET",
+        "AUTH_WELL_KNOWN_URL",
+        "NEXT_PUBLIC_APP_ENV",
+        "PORT"
+      ]
     },
     "db:generate": { "cache": false },
     "migrate:deploy": { "cache": false }
