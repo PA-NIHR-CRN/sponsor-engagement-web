@@ -200,7 +200,7 @@ const createStudyRelationships = async () => {
     )
     .flat()
 
-  await prismaClient.$transaction([
+  const [, { count: deletedStudyOrgCount }] = await prismaClient.$transaction([
     prismaClient.studyOrganisation.updateMany({
       where: { studyId: { in: studyEntityIds }, NOT: { id: { in: deletedStudyOrganisationIds } } },
       data: { isDeleted: false },
@@ -211,8 +211,8 @@ const createStudyRelationships = async () => {
     }),
   ])
 
-  if (deletedStudyOrganisationIds.length > 0) {
-    logger.info('Flagged %s study organisations as deleted', deletedStudyOrganisationIds.length)
+  if (deletedStudyOrgCount > 0) {
+    logger.info('Flagged %s study organisations as deleted', deletedStudyOrgCount)
   }
 
   // Add study funders
@@ -284,7 +284,7 @@ const createStudyRelationships = async () => {
     )
     .flat()
 
-  await prismaClient.$transaction([
+  const [, { count: deletedEvalCategoryCount }] = await prismaClient.$transaction([
     prismaClient.studyEvaluationCategory.updateMany({
       where: { studyId: { in: studyEntityIds }, NOT: { id: { in: deletedEvaluationCategoryIds } } },
       data: { isDeleted: false },
@@ -295,8 +295,8 @@ const createStudyRelationships = async () => {
     }),
   ])
 
-  if (deletedEvaluationCategoryIds.length > 0) {
-    logger.info('Flagged %s study evaluation categories as deleted', deletedEvaluationCategoryIds.length)
+  if (deletedEvalCategoryCount > 0) {
+    logger.info('Flagged %s study evaluation categories as deleted', deletedEvalCategoryCount)
   }
 }
 
@@ -410,7 +410,7 @@ const deleteOrganisationRoles = async () => {
     })
     .map(Number)
 
-  await prismaClient.$transaction([
+  const [, { count: deletedOrgRoleCount }] = await prismaClient.$transaction([
     prismaClient.organisationRole.updateMany({
       where: { NOT: { id: { in: deletedOrgRoleIds } } },
       data: { isDeleted: false },
@@ -421,8 +421,8 @@ const deleteOrganisationRoles = async () => {
     }),
   ])
 
-  if (deletedOrgRoleIds.length > 0) {
-    logger.info('Flagged %s organisation roles as deleted', deletedOrgRoleIds.length)
+  if (deletedOrgRoleCount > 0) {
+    logger.info('Flagged %s organisation roles as deleted', deletedOrgRoleCount)
   }
 }
 

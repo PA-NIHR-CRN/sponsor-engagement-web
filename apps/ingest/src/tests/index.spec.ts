@@ -42,6 +42,11 @@ beforeEach(() => {
   prismaMock.study.findMany.mockResolvedValueOnce(studyEntities)
   prismaMock.organisation.findMany.mockResolvedValueOnce(organisationEntities)
   prismaMock.organisationRole.findMany.mockResolvedValueOnce(organisationRoleEntities)
+
+  prismaMock.$transaction.mockImplementation(async (ops: any) => {
+    await Promise.all(ops)
+    return ops.map(() => ({}))
+  })
 })
 
 describe('ingest', () => {
@@ -292,8 +297,6 @@ describe('ingest', () => {
       })
     )
 
-    prismaMock.$transaction.mockImplementationOnce((ops: any) => Promise.all(ops))
-
     await ingest()
 
     const expectedDeletedEntityIds = organisationRoleEntities.slice(-2).map(({ id }) => id)
@@ -327,8 +330,6 @@ describe('ingest', () => {
       })
     )
 
-    prismaMock.$transaction.mockImplementationOnce((ops: any) => Promise.all(ops))
-
     await ingest()
 
     const expectedDeletedStudyOrgIds = studyEntities[studyEntities.length - 1].organisations.map(({ id }) => id)
@@ -361,8 +362,6 @@ describe('ingest', () => {
         )
       })
     )
-
-    prismaMock.$transaction.mockImplementationOnce((ops: any) => Promise.all(ops))
 
     await ingest()
 
