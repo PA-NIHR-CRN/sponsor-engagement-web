@@ -2,7 +2,7 @@ import { getServerSession } from 'next-auth/next'
 import { Mock } from 'ts-mockery'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { logger } from '@nihr-ui/logger'
-import { userNoOrgs, userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
+import { userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
 import { Roles } from '../constants'
 import { withApiHandler } from './withApiHandler'
 
@@ -31,14 +31,6 @@ describe('withApiHandler', () => {
   test('redirects to a 500 page for a user with no roles', async () => {
     const getServerSessionMock = jest.mocked(getServerSession)
     getServerSessionMock.mockResolvedValueOnce(userNoRoles)
-
-    await withApiHandler(Roles.ContactManager, jest.fn())(mockRequest, mockResponse)
-    expect(redirectMock).toHaveBeenCalledWith(302, '/500')
-  })
-
-  test('redirects to a 500 page for a user with no organisations', async () => {
-    const getServerSessionMock = jest.mocked(getServerSession)
-    getServerSessionMock.mockResolvedValueOnce(userNoOrgs)
 
     await withApiHandler(Roles.ContactManager, jest.fn())(mockRequest, mockResponse)
     expect(redirectMock).toHaveBeenCalledWith(302, '/500')

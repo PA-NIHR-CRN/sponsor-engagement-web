@@ -15,10 +15,6 @@ jest.mock('@nihr-ui/logger')
 
 logger.error = jest.fn()
 
-beforeEach(() => {
-  console.error = jest.fn()
-})
-
 afterEach(() => {
   jest.clearAllMocks()
 })

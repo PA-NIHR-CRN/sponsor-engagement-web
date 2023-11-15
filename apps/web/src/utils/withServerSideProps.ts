@@ -27,14 +27,6 @@ export const withServerSideProps =
         }
       }
 
-      if (role === Roles.SponsorContact && session.user.organisations.length === 0) {
-        return {
-          redirect: {
-            destination: '/',
-          },
-        }
-      }
-
       return getServerSideProps(context, session)
     } catch (error) {
       return {

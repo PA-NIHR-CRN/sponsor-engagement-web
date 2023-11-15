@@ -28,10 +28,6 @@ export const withApiHandler =
         throw new Error('No role found for user')
       }
 
-      if (session.user.organisations.length === 0) {
-        throw new Error('No organisations found for user')
-      }
-
       return handler(req, res, session)
     } catch (error) {
       logger.error(error)
