@@ -1,17 +1,35 @@
 import { StartIcon } from '@nihr-ui/frontend'
 import Link from 'next/link'
 import { Card } from '../../../atoms'
+import { getAbsoluteUrl } from '../../../../utils/email'
+import { SUPPORT_PAGE } from '../../../../constants/routes'
 
-export function RequestSupport() {
+interface RequestSupportProps {
+  showCallToAction?: boolean
+}
+
+export function RequestSupport({ showCallToAction = false }: RequestSupportProps) {
   return (
     <Card className="lg:sticky lg:top-4" filled padding={4}>
       <h3 className="govuk-heading-m">Request NIHR CRN support</h3>
-      <p className="govuk-body">
-        Sponsors or their delegates can request NIHR CRN support with their research study at any time.
-      </p>
-      <Link className="govuk-button govuk-button--start govuk-!-margin-bottom-0" href="/">
-        Request support <StartIcon />
-      </Link>
+      {showCallToAction ? (
+        <>
+          <p className="govuk-body">
+            Sponsors or their delegates can request NIHR CRN support with their research study at any time.
+          </p>
+          <Link
+            className="govuk-button govuk-button--start govuk-!-margin-bottom-0"
+            href={getAbsoluteUrl(SUPPORT_PAGE)}
+          >
+            Request support <StartIcon />
+          </Link>
+        </>
+      ) : (
+        <p className="govuk-body">
+          Sponsors or their delegates can request NIHR CRN support with their research study at any time. Click into
+          your study for study level support guidance.
+        </p>
+      )}
     </Card>
   )
 }

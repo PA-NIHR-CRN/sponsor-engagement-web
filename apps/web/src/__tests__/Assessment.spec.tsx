@@ -11,7 +11,7 @@ import { logger } from '@nihr-ui/logger'
 import type { AssessmentProps } from '../pages/assessments/[studyId]'
 import Assessment, { getServerSideProps } from '../pages/assessments/[studyId]'
 import { userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
-import { SIGN_IN_PAGE } from '../constants/routes'
+import { SIGN_IN_PAGE, SUPPORT_PAGE } from '../constants/routes'
 import { prismaMock } from '../__mocks__/prisma'
 import { sysRefAssessmentFurtherInformation, sysRefAssessmentStatus } from '../__mocks__/sysRefData'
 
@@ -193,7 +193,10 @@ describe('Assess progress of a study', () => {
         'Sponsors or their delegates can request NIHR CRN support with their research study at any time.'
       )
     ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Request support' })).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link', { name: 'Request support' })).toHaveAttribute(
+      'href',
+      `http://localhost:3000${SUPPORT_PAGE}`
+    )
 
     // Study sponsor
     expect(screen.getByText('Test Organisation')).toBeInTheDocument()
