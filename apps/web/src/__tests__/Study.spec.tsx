@@ -178,6 +178,8 @@ describe('Study page', () => {
   test('Default layout', async () => {
     prismaMock.$transaction.mockResolvedValueOnce([mockStudy])
 
+    await mockRouter.push('/study/123')
+
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
 
     const { props } = (await getServerSideProps(context)) as {
@@ -206,7 +208,10 @@ describe('Study page', () => {
     expect(screen.queryByText('Due')).not.toBeInTheDocument()
 
     expect(screen.getByText(/You can review the progress of this study at any time./)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'NIHR CRN support' })).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link', { name: 'NIHR CRN support' })).toHaveAttribute(
+      'href',
+      `${SUPPORT_PAGE}?returnPath=/study/123`
+    )
 
     // Progress summary
     expect(screen.getByRole('heading', { name: 'Progress Summary', level: 3 })).toBeInTheDocument()
@@ -285,7 +290,7 @@ describe('Study page', () => {
     ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Request support' })).toHaveAttribute(
       'href',
-      `http://localhost:3000${SUPPORT_PAGE}`
+      `${SUPPORT_PAGE}?returnPath=/study/123`
     )
   })
 
@@ -410,7 +415,7 @@ describe('Study page', () => {
     // Banner
     const banner = screen.getByRole('alert', { name: 'Success' })
     expect(within(banner).getByText('The study assessment was successfully saved')).toBeInTheDocument()
-    expect(within(banner).getByRole('link', { name: 'NIHR CRN support' })).toHaveAttribute('href', '/')
+    expect(within(banner).getByRole('link', { name: 'NIHR CRN support' })).toHaveAttribute('href', SUPPORT_PAGE)
     expect(within(banner).getByRole('link', { name: 'NIHR CRN support' }).parentElement).toHaveTextContent(
       'Request NIHR CRN support for this study.'
     )

@@ -8,7 +8,7 @@ import mockRouter from 'next-router-mock'
 import type { StudiesProps } from '../pages/studies'
 import Studies, { getServerSideProps } from '../pages/studies'
 import { userWithContactManagerRole, userWithSponsorContactRole } from '../__mocks__/session'
-import { SIGN_IN_PAGE } from '../constants/routes'
+import { SIGN_IN_PAGE, SUPPORT_PAGE } from '../constants/routes'
 import { prismaMock } from '../__mocks__/prisma'
 
 jest.mock('next-auth/next')
@@ -244,7 +244,7 @@ describe('Studies page', () => {
     // Banner
     const banner = screen.getByRole('alert', { name: 'Success' })
     expect(within(banner).getByText('The study assessment was successfully saved')).toBeInTheDocument()
-    expect(within(banner).getByRole('link', { name: 'NIHR CRN support' })).toHaveAttribute('href', '/')
+    expect(within(banner).getByRole('link', { name: 'NIHR CRN support' })).toHaveAttribute('href', SUPPORT_PAGE)
     expect(within(banner).getByRole('link', { name: 'NIHR CRN support' }).parentElement).toHaveTextContent(
       'Request NIHR CRN support for this study.'
     )

@@ -6,10 +6,10 @@ import type { GetServerSidePropsContext } from 'next'
 import { RootLayout } from '../../components/organisms'
 
 export interface RequestSupportProps {
-  referer?: string
+  returnPath?: string
 }
 
-export default function RequestSupport({ referer }: RequestSupportProps) {
+export default function RequestSupport({ returnPath }: RequestSupportProps) {
   return (
     <Container>
       <NextSeo title="Request NIHR CRN support" />
@@ -47,8 +47,8 @@ export default function RequestSupport({ referer }: RequestSupportProps) {
             </li>
             <li>Support to overcome barriers, challenges or other types of requests</li>
           </ul>
-          {referer ? (
-            <Link className="govuk-button govuk-!-margin-top-2" href={referer}>
+          {returnPath ? (
+            <Link className="govuk-button govuk-!-margin-top-2" href={returnPath}>
               Return to previous page
             </Link>
           ) : null}
@@ -62,10 +62,10 @@ RequestSupport.getLayout = function getLayout(page: ReactElement) {
   return <RootLayout user={null}>{page}</RootLayout>
 }
 
-export const getServerSideProps = ({ req }: GetServerSidePropsContext) => {
+export const getServerSideProps = ({ query }: GetServerSidePropsContext) => {
   return {
     props: {
-      referer: req.headers.referer,
+      returnPath: query.returnPath,
     },
   }
 }

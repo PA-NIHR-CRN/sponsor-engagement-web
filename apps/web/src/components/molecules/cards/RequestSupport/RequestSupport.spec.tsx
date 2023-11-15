@@ -1,5 +1,6 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
+import mockRouter from 'next-router-mock'
 import { SUPPORT_PAGE } from '../../../../constants/routes'
 import { RequestSupport } from './RequestSupport'
 
@@ -18,7 +19,9 @@ describe('RequestSupport Component', () => {
     expect(screen.queryByRole('link', { name: 'Request support' })).not.toBeInTheDocument()
   })
 
-  test('renders a card with a call to action', () => {
+  test('renders a card with a call to action', async () => {
+    await mockRouter.push('/study/123')
+
     render(<RequestSupport showCallToAction />)
 
     const headingElement = screen.getByText('Request NIHR CRN support')
@@ -30,7 +33,7 @@ describe('RequestSupport Component', () => {
     expect(descriptionElement).toBeInTheDocument()
 
     const linkElement = screen.getByRole('link', { name: 'Request support' })
-    expect(linkElement).toHaveAttribute('href', `http://localhost:3000${SUPPORT_PAGE}`)
+    expect(linkElement).toHaveAttribute('href', `${SUPPORT_PAGE}?returnPath=/study/123`)
 
     const startIconElement = screen.getByTestId('start-icon')
     expect(startIconElement).toHaveAttribute('aria-hidden', 'true')

@@ -71,7 +71,7 @@ export default function Organisation({ organisation, query }: OrganisationProps)
         </Table.Body>
       </Table>
     ),
-    [organisation.roles, organisation.id]
+    [organisation.roles, organisation.rtsIdentifier]
   )
 
   const renderContactList = useCallback(

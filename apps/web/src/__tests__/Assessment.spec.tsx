@@ -165,6 +165,8 @@ describe('Assess progress of a study', () => {
     prismaMock.$transaction.mockResolvedValueOnce([study])
     prismaMock.$transaction.mockResolvedValueOnce([sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
 
+    await mockRouter.push('/assessments/123')
+
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: String(mockedStudyId) } })
 
     const { props } = (await getServerSideProps(context)) as {
@@ -195,7 +197,7 @@ describe('Assess progress of a study', () => {
     ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Request support' })).toHaveAttribute(
       'href',
-      `http://localhost:3000${SUPPORT_PAGE}`
+      `${SUPPORT_PAGE}?returnPath=/assessments/123`
     )
 
     // Study sponsor
