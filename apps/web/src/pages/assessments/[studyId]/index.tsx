@@ -169,7 +169,7 @@ export default function Assessment({
           </Form>
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
-          <RequestSupport />
+          <RequestSupport showCallToAction />
         </div>
       </div>
     </Container>

@@ -1,10 +1,25 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
+import { SUPPORT_PAGE } from '../../../../constants/routes'
 import { RequestSupport } from './RequestSupport'
 
 describe('RequestSupport Component', () => {
-  test('renders a card with expected content', () => {
+  test('renders a card without a call to action', () => {
     render(<RequestSupport />)
+
+    const headingElement = screen.getByText('Request NIHR CRN support')
+    const descriptionElement = screen.getByText(
+      'Sponsors or their delegates can request NIHR CRN support with their research study at any time. Click into your study for study level support guidance.'
+    )
+
+    expect(headingElement).toBeInTheDocument()
+    expect(descriptionElement).toBeInTheDocument()
+
+    expect(screen.queryByRole('link', { name: 'Request support' })).not.toBeInTheDocument()
+  })
+
+  test('renders a card with a call to action', () => {
+    render(<RequestSupport showCallToAction />)
 
     const headingElement = screen.getByText('Request NIHR CRN support')
     const descriptionElement = screen.getByText(
@@ -13,15 +28,11 @@ describe('RequestSupport Component', () => {
 
     expect(headingElement).toBeInTheDocument()
     expect(descriptionElement).toBeInTheDocument()
-  })
 
-  test('renders a "Request support" button with a StartIcon', () => {
-    render(<RequestSupport />)
+    const linkElement = screen.getByRole('link', { name: 'Request support' })
+    expect(linkElement).toHaveAttribute('href', `http://localhost:3000${SUPPORT_PAGE}`)
 
-    const buttonElement = screen.getByText('Request support')
     const startIconElement = screen.getByTestId('start-icon')
-
-    expect(buttonElement).toBeInTheDocument()
     expect(startIconElement).toHaveAttribute('aria-hidden', 'true')
   })
 })

@@ -10,7 +10,7 @@ import userEvent from '@testing-library/user-event'
 import type { StudyProps } from '../pages/studies/[studyId]'
 import Study, { getServerSideProps } from '../pages/studies/[studyId]'
 import { userWithContactManagerRole, userWithSponsorContactRole } from '../__mocks__/session'
-import { SIGN_IN_PAGE } from '../constants/routes'
+import { SIGN_IN_PAGE, SUPPORT_PAGE } from '../constants/routes'
 import { prismaMock } from '../__mocks__/prisma'
 
 jest.mock('next-auth/next')
@@ -283,7 +283,10 @@ describe('Study page', () => {
         'Sponsors or their delegates can request NIHR CRN support with their research study at any time.'
       )
     ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Request support' })).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link', { name: 'Request support' })).toHaveAttribute(
+      'href',
+      `http://localhost:3000${SUPPORT_PAGE}`
+    )
   })
 
   test('Due assessment', async () => {

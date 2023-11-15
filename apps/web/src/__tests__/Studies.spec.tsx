@@ -125,10 +125,9 @@ describe('Studies page', () => {
     expect(screen.getByRole('heading', { level: 3, name: 'Request NIHR CRN support' })).toBeInTheDocument()
     expect(
       screen.getByText(
-        'Sponsors or their delegates can request NIHR CRN support with their research study at any time.'
+        'Sponsors or their delegates can request NIHR CRN support with their research study at any time. Click into your study for study level support guidance.'
       )
     ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Request support' })).toHaveAttribute('href', '/')
 
     // Study results title
     expect(screen.getByText(`${mockStudies.length} studies found (3 due for assessment)`)).toBeInTheDocument()
