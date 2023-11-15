@@ -33,7 +33,7 @@ describe('RequestSupport Component', () => {
     expect(descriptionElement).toBeInTheDocument()
 
     const linkElement = screen.getByRole('link', { name: 'Request support' })
-    expect(linkElement).toHaveAttribute('href', `http://localhost:3000${SUPPORT_PAGE}?returnPath=/study/123`)
+    expect(linkElement).toHaveAttribute('href', `${SUPPORT_PAGE}?returnPath=/study/123`)
 
     const startIconElement = screen.getByTestId('start-icon')
     expect(startIconElement).toHaveAttribute('aria-hidden', 'true')

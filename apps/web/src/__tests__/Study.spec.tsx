@@ -290,7 +290,7 @@ describe('Study page', () => {
     ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Request support' })).toHaveAttribute(
       'href',
-      `http://localhost:3000${SUPPORT_PAGE}?returnPath=/study/123`
+      `${SUPPORT_PAGE}?returnPath=/study/123`
     )
   })
 

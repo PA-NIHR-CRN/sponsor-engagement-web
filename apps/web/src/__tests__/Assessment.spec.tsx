@@ -197,7 +197,7 @@ describe('Assess progress of a study', () => {
     ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Request support' })).toHaveAttribute(
       'href',
-      `http://localhost:3000${SUPPORT_PAGE}?returnPath=/assessments/123`
+      `${SUPPORT_PAGE}?returnPath=/assessments/123`
     )
 
     // Study sponsor
