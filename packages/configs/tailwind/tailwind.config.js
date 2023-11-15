@@ -113,6 +113,7 @@ module.exports = {
     extend: {},
   },
   plugins: [
+    require('tailwindcss-animate'),
     plugin(function ({ addVariant }) {
       addVariant('js', 'body.js-enabled &')
       addVariant('no-js', 'body:not(.js-enabled) &')

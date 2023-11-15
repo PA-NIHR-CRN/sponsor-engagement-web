@@ -10,7 +10,12 @@ import { Roles } from '../../../constants/auth'
 import { SERVICE_NAME } from '../../../constants'
 import { Header } from '../../molecules'
 
-const primaryFont = Roboto({ weight: ['400', '700'], subsets: ['latin'], display: 'swap', variable: '--font-primary' })
+export const primaryFont = Roboto({
+  weight: ['400', '700'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-primary',
+})
 
 export interface RootLayoutProps {
   children: ReactNode

@@ -1,5 +1,6 @@
 export * from './components/Accordion/Accordion'
 export * from './components/Button/Button'
+export * from './components/Dropdown/Dropdown'
 export * from './components/Details/Details'
 export * from './components/Container/Container'
 export * from './components/Icons'

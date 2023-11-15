@@ -1,8 +1,17 @@
 import clsx from 'clsx'
 import Image from 'next/image'
 import { useRef } from 'react'
-import { Logo, SideNav, SettingsIcon } from '@nihr-ui/frontend'
+import {
+  Logo,
+  SideNav,
+  SettingsIcon,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@nihr-ui/frontend'
 import type { Session } from 'next-auth'
+import Link from 'next/link'
 import { HeaderTitle } from './Title'
 
 interface HeaderProps {
@@ -32,16 +41,34 @@ export function Header({ heading, user }: HeaderProps) {
             </div>
             <div className="flex items-center justify-center">
               {user ? <span className="hidden text-sm md:block">{user.email}</span> : null}
-              <button
-                aria-controls="menu--1"
-                aria-haspopup="true"
-                aria-label="Settings menu"
-                className="ml-3 hidden text-white md:block"
-                id="menu-button--menu"
-                type="button"
-              >
-                <SettingsIcon />
-              </button>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    aria-controls="menu--1"
+                    aria-haspopup="true"
+                    aria-label="Settings menu"
+                    className="ml-3 hidden text-white md:block focusable no-js:hidden"
+                    type="button"
+                  >
+                    <span className="govuk-visually-hidden">Settings menu</span>
+                    <SettingsIcon />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem asChild>
+                    <Link className="govuk-link--no-visited-state" href="/auth/signout">
+                      Logout
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* No JavaScript fallback */}
+              <Link className="govuk-link--inverse js:hidden govuk-!-margin-left-4" href="/auth/signout">
+                Logout
+              </Link>
+
               <Logo.Link>
                 <Logo.Image as={Image} src="/assets/logos/nihr.svg" />
               </Logo.Link>
