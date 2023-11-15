@@ -15,12 +15,13 @@ import { getStudyById } from '../../../lib/studies'
 import { formatDate } from '../../../utils/date'
 import { withServerSideProps } from '../../../utils/withServerSideProps'
 import { Roles } from '../../../constants'
+import { SUPPORT_PAGE } from '../../../constants/routes'
 
 const renderNotificationBanner = (success: boolean) =>
   success ? (
     <NotificationBanner heading="The study assessment was successfully saved" success>
       Request{' '}
-      <Link className="govuk-notification-banner__link" href="/">
+      <Link className="govuk-notification-banner__link" href={SUPPORT_PAGE}>
         NIHR CRN support
       </Link>{' '}
       for this study.
@@ -63,7 +64,8 @@ export default function Study({ study, assessments }: StudyProps) {
 
           <p>
             You can review the progress of this study at any time. You will need to assess if the study is on or off
-            track and if any <Link href="/">NIHR CRN support</Link> is needed.
+            track and if any <Link href={`${SUPPORT_PAGE}?returnPath=${router.asPath}`}>NIHR CRN support</Link> is
+            needed.
           </p>
 
           {/* Progress summary */}

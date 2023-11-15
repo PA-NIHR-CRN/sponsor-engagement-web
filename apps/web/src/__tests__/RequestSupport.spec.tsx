@@ -33,9 +33,9 @@ describe('RequestSupport Component', () => {
   })
 
   it('renders link to previous page', () => {
-    render(<RequestSupport referer="http://localhost/study/123" />)
+    render(<RequestSupport returnPath="/study/123" />)
     const link = screen.getByRole('link', { name: /Return to previous page/i })
-    expect(link).toHaveAttribute('href', 'http://localhost/study/123')
+    expect(link).toHaveAttribute('href', '/study/123')
   })
 
   it('does not render link to previous page if no referer', () => {
