@@ -43,17 +43,9 @@ export function Header({ heading, user }: HeaderProps) {
               {user ? <span className="hidden text-sm md:block">{user.email}</span> : null}
 
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    aria-controls="menu--1"
-                    aria-haspopup="true"
-                    aria-label="Settings menu"
-                    className="ml-3 hidden text-white md:block focusable no-js:hidden"
-                    type="button"
-                  >
-                    <span className="govuk-visually-hidden">Settings menu</span>
-                    <SettingsIcon />
-                  </button>
+                <DropdownMenuTrigger className="ml-3 hidden text-white md:block focusable no-js:hidden">
+                  <span className="govuk-visually-hidden">Settings menu</span>
+                  <SettingsIcon />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   <DropdownMenuItem asChild>
