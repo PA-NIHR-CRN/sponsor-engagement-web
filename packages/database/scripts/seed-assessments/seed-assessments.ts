@@ -57,7 +57,7 @@ const seedAssessments = async () => {
     const uniqueContacts = [...new Set(assessments.map((assessment) => assessment.createdBy))] as string[] // Cast to keep eslint happy
 
     const { count } = await prisma.user.createMany({
-      data: uniqueContacts.map((email) => ({ email, identityGatewayId: '' })),
+      data: uniqueContacts.map((email) => ({ email })),
       skipDuplicates: true,
     })
 

@@ -90,7 +90,6 @@ const seedContacts = async <T extends Row>(fileName: string, headers: SponsorHea
     create: {
       email: 'administrator@nihr.ac.uk',
       name: 'Administrator',
-      identityGatewayId: '',
     },
   })
 
