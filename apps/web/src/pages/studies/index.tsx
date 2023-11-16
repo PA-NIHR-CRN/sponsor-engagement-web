@@ -24,12 +24,13 @@ import { useFormListeners } from '../../hooks/useFormListeners'
 import { getFiltersFromQuery } from '../../utils/filters'
 import { Card } from '../../components/atoms'
 import { withServerSideProps } from '../../utils/withServerSideProps'
+import { SUPPORT_PAGE } from '../../constants/routes'
 
 const renderNotificationBanner = (success: boolean) =>
   success ? (
     <NotificationBanner heading="The study assessment was successfully saved" success>
       Request{' '}
-      <Link className="govuk-notification-banner__link" href="/">
+      <Link className="govuk-notification-banner__link" href={SUPPORT_PAGE}>
         NIHR CRN support
       </Link>{' '}
       for this study.

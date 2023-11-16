@@ -16,7 +16,7 @@ export const ORGANISATIONS_PAGE = '/organisations'
 /**
  * Support page
  */
-export const SUPPORT_PAGE = '/'
+export const SUPPORT_PAGE = '/request-support'
 
 /**
  * Error page for internal server errors
