@@ -48,6 +48,7 @@ describe('getStudiesForOrgs', () => {
               },
             },
           },
+          isDeleted: false,
         },
       })
     )
@@ -68,6 +69,7 @@ describe('getStudiesForOrgs', () => {
             },
           },
         },
+        isDeleted: false,
       },
     })
   })
@@ -118,6 +120,7 @@ describe('getStudiesForOrgs', () => {
               },
             },
           },
+          isDeleted: false,
         },
       })
     )
@@ -144,6 +147,7 @@ describe('getStudiesForOrgs', () => {
             },
           },
         },
+        isDeleted: false,
       },
     })
   })

@@ -27,12 +27,16 @@ export type StudyWithRelationships = Prisma.StudyGetPayload<{
     organisations: {
       include: {
         organisation: true
+        organisationRole: true
       }
     }
     funders: {
       include: {
         organisation: true
       }
+    }
+    evaluationCategories: {
+      select: { id: true; indicatorValue: true }
     }
   }
 }>

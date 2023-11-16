@@ -11,7 +11,7 @@ import { prismaClient } from '../../../lib/prisma'
 import type { OrganisationAddInputs } from '../../../utils/schemas'
 import { userNoRoles, userWithContactManagerRole } from '../../../__mocks__/session'
 import { AuthError } from '../../../utils/auth'
-import { EXTERNAL_CRN_URL, SIGN_IN_PAGE } from '../../../constants/routes'
+import { EXTERNAL_CRN_URL, SIGN_IN_PAGE, SUPPORT_PAGE } from '../../../constants/routes'
 import type { OrganisationWithRelations } from '../../../lib/organisations'
 import type { ExtendedNextApiRequest } from './organisation'
 import api from './organisation'
@@ -127,7 +127,7 @@ describe('Successful organisation sponsor contact invitation', () => {
       templateData: {
         crnLink: EXTERNAL_CRN_URL,
         organisationName: updateOrgResponse.name,
-        requestSupportLink: 'http://localhost:3000/',
+        requestSupportLink: `http://localhost:3000${SUPPORT_PAGE}`,
         signInLink: 'http://localhost:3000/auth/signin?registrationToken=mocked-token',
       },
       templateName: 'contact-assigned',
@@ -214,7 +214,7 @@ describe('Successful organisation sponsor contact invitation', () => {
       templateData: {
         crnLink: EXTERNAL_CRN_URL,
         organisationName: updateOrgResponse.name,
-        requestSupportLink: 'http://localhost:3000/',
+        requestSupportLink: `http://localhost:3000${SUPPORT_PAGE}`,
         signInLink: 'http://localhost:3000/auth/signin',
       },
       templateName: 'contact-assigned',

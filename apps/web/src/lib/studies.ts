@@ -88,6 +88,7 @@ export const getStudiesForOrgs = async ({
     skip: currentPage * pageSize - pageSize,
     take: pageSize,
     where: {
+      isDeleted: false,
       ...(searchTerm && {
         OR: [
           {
