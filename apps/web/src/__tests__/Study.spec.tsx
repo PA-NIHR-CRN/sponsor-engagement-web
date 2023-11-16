@@ -169,10 +169,6 @@ const mockStudy = Mock.of<StudyWithRelations>({
 })
 
 describe('Study page', () => {
-  beforeEach(() => {
-    console.error = jest.fn()
-  })
-
   jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRole)
 
   test('Default layout', async () => {
@@ -423,10 +419,6 @@ describe('Study page', () => {
 })
 
 describe('Sponsor assessment history accordion', () => {
-  beforeEach(() => {
-    console.error = jest.fn()
-  })
-
   test('Defaults the first item open', async () => {
     prismaMock.$transaction.mockResolvedValueOnce([mockStudy])
 

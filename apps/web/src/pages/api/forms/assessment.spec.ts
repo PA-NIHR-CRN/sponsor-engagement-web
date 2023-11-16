@@ -165,17 +165,6 @@ describe('Failed study assessment submission', () => {
     expect(logger.error).toHaveBeenCalledWith(new Error('No role found for user'))
   })
 
-  test('User without an organisation redirects to error page', async () => {
-    jest.mocked(getServerSession).mockResolvedValueOnce({
-      ...userWithSponsorContactRole,
-      user: { ...userWithSponsorContactRole.user, organisations: [] },
-    })
-    const res = await testHandler(api, { method: 'POST', body, query: {} })
-    expect(res.statusCode).toBe(302)
-    expect(res._getRedirectUrl()).toBe(`/500`)
-    expect(logger.error).toHaveBeenCalledWith(new Error('No organisations found for user'))
-  })
-
   test('Wrong http method redirects back to the form with a fatal error', async () => {
     jest.mocked(getServerSession).mockResolvedValueOnce(userWithSponsorContactRole)
     const res = await testHandler(api, { method: 'GET', body, query: {} })
