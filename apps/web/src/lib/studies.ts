@@ -11,6 +11,7 @@ export const getStudyById = async (studyId: number, organisationIds?: number[]) 
             organisationId: {
               in: organisationIds,
             },
+            isDeleted: false,
           },
         },
       }),
