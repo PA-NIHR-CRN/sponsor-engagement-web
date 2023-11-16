@@ -4,7 +4,7 @@ import type { NextPage } from 'next'
 import type { AppProps } from 'next/app'
 import type { ReactElement, ReactNode } from 'react'
 import type { Session } from 'next-auth'
-import { RootLayout } from '../components/organisms'
+import { RootLayout, primaryFont } from '../components/organisms'
 
 export type NextPageWithLayout<P = Record<string, unknown>, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement, props: P) => ReactNode
@@ -30,7 +30,17 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
       </RootLayout>
     ))
 
-  return getLayout(<Component {...pageProps} />, pageProps)
+  return (
+    <>
+      <style global jsx>
+        {`
+        html {
+          font-family: ${primaryFont.style.fontFamily};
+        `}
+      </style>
+      {getLayout(<Component {...pageProps} />, pageProps)}
+    </>
+  )
 }
 
 export default App

@@ -97,9 +97,7 @@ describe('Successful organisation sponsor contact invitation', () => {
               connectOrCreate: {
                 create: {
                   email: body.emailAddress,
-                  identityGatewayId: '',
                   registrationConfirmed: false,
-
                   registrationToken: 'mocked-token',
                   roles: {
                     createMany: {
@@ -185,7 +183,6 @@ describe('Successful organisation sponsor contact invitation', () => {
               connectOrCreate: {
                 create: {
                   email: body.emailAddress,
-                  identityGatewayId: '',
                   registrationConfirmed: false,
                   registrationToken: 'mocked-token',
                   roles: {

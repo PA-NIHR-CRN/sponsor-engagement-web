@@ -49,7 +49,7 @@ const Provider = ({ clientId, clientSecret, wellKnown }: ProviderOptions): OAuth
 })
 
 export const authOptions: AuthOptions = {
-  debug: true,
+  debug: process.env.APP_ENV !== 'prod',
   adapter: PrismaAdapter(prismaClient),
   providers: [
     Provider({

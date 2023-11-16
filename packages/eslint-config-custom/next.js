@@ -46,6 +46,7 @@ module.exports = {
     '@typescript-eslint/unbound-method': 'off',
     '@typescript-eslint/non-nullable-type-assertion-style': 'off',
     'react/display-name': 'off',
+    'react/no-unknown-property': ['error', { ignore: ['jsx', 'global'] }],
     'unicorn/filename-case': [
       'error',
       {
