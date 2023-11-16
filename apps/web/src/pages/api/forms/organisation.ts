@@ -66,7 +66,6 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
                 // If a user does not exist, create the user and set a registration token
                 create: {
                   email: emailAddress,
-                  identityGatewayId: '',
                   registrationToken,
                   registrationConfirmed: false,
                   roles: {

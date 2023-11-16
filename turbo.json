@@ -6,6 +6,7 @@
       "dependsOn": ["^build", "db:generate"],
       "outputs": ["dist/**/*", ".next/**", "!.next/cache/**"],
       "env": [
+        "APP_ENV",
         "NODE_ENV",
         "NEXTAUTH_URL",
         "AUTH_CLIENT_ID",
@@ -27,6 +28,7 @@
       "dependsOn": ["db:generate"],
       "dotEnv": [".env.local"],
       "env": [
+        "APP_ENV",
         "NODE_ENV",
         "NEXTAUTH_URL",
         "AUTH_CLIENT_ID",
@@ -46,6 +48,7 @@
       "dependsOn": ["db:generate"],
       "persistent": true,
       "env": [
+        "APP_ENV",
         "NODE_ENV",
         "NEXTAUTH_URL",
         "AUTH_CLIENT_ID",

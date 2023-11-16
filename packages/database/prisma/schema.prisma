@@ -12,7 +12,7 @@ model Account {
   userId            Int
   type              String
   provider          String
-  providerAccountId String
+  providerAccountId String?
   refresh_token     String? @db.Text
   access_token      String? @db.Text
   expires_at        Int?
@@ -109,7 +109,7 @@ model User {
   image                 String?
   accounts              Account[]
   sessions              Session[]
-  identityGatewayId     String
+  identityGatewayId     String?
   registrationToken     String?
   registrationConfirmed Boolean?           @default(false)
   isDeleted             Boolean?           @default(false)
