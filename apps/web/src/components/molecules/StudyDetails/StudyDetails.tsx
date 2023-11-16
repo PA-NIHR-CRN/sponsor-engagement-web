@@ -28,7 +28,7 @@ export function StudyDetails({ study }: StudyDetailsProps) {
         </Table.Row>
         <Table.Row>
           <Table.CellHeader className="w-1/3">Sponsor</Table.CellHeader>
-          <Table.Cell>{study.organisations[0].organisation.name}</Table.Cell>
+          <Table.Cell>{study.organisationsByRole['Clinical Research Sponsor']}</Table.Cell>
         </Table.Row>
         {study.organisationsByRole['Managing Clinical Trials Unit'] ? (
           <Table.Row>

@@ -110,7 +110,7 @@ const study = Mock.of<StudyWithRelations>({
       },
       organisationRole: {
         id: simpleFaker.number.int(),
-        name: 'Test Organisation Role',
+        name: 'Clinical Research Sponsor',
       },
     },
   ],

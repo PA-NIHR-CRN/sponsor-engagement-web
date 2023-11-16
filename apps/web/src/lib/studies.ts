@@ -22,12 +22,19 @@ export const getStudyById = async (studyId: number, organisationIds?: number[]) 
     ],
     include: {
       organisations: {
+        where: {
+          isDeleted: false,
+        },
         include: {
           organisation: true,
           organisationRole: true,
         },
       },
-      evaluationCategories: true,
+      evaluationCategories: {
+        where: {
+          isDeleted: false,
+        },
+      },
       assessments: {
         include: {
           status: true,
@@ -125,6 +132,7 @@ export const getStudiesForOrgs = async ({
               ],
             },
           },
+          isDeleted: false,
         },
       },
     },
@@ -134,12 +142,19 @@ export const getStudiesForOrgs = async ({
       shortTitle: true,
       isDueAssessment: true,
       organisations: {
+        where: {
+          isDeleted: false,
+        },
         include: {
           organisation: true,
           organisationRole: true,
         },
       },
-      evaluationCategories: true,
+      evaluationCategories: {
+        where: {
+          isDeleted: false,
+        },
+      },
       assessments: {
         include: {
           status: true,

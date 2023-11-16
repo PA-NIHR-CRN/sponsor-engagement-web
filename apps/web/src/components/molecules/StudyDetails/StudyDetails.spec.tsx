@@ -13,6 +13,7 @@ describe('StudyDetails Component', () => {
       cpmsId: 12345,
       organisations: [{ organisation: { name: 'Sponsor Org' } }],
       organisationsByRole: {
+        'Clinical Research Sponsor': 'Sponsor Org',
         'Managing Clinical Trials Unit': 'CTU Org',
         'Contract Research Organisation': 'CRO Org',
       },
@@ -63,7 +64,9 @@ describe('StudyDetails Component', () => {
         irasId: null,
         cpmsId: 12345,
         organisations: [{ organisation: { name: 'Sponsor Org' } }],
-        organisationsByRole: {},
+        organisationsByRole: {
+          'Clinical Research Sponsor': 'Sponsor Org',
+        },
         managingSpeciality: 'Specialty Name',
         chiefInvestigatorFirstName: null,
         chiefInvestigatorLastName: null,
