@@ -197,6 +197,7 @@ describe('getStudyById', () => {
           organisations: {
             some: {
               organisationId: { in: userOrganisationIds },
+              isDeleted: false,
             },
           },
         },
