@@ -70,7 +70,7 @@ describe('getServerSideProps', () => {
 
 const mockOrganisation = Mock.of<OrganisationWithRelations>({
   id: 123,
-  rtsIdentifier: "rts-123",
+  rtsIdentifier: 'rts-123',
   name: 'Test organisation',
   roles: [
     {
@@ -102,10 +102,6 @@ const mockOrganisation = Mock.of<OrganisationWithRelations>({
       createdAt: new Date('2001-01-01'),
     },
   ],
-})
-
-beforeEach(() => {
-  console.error = jest.fn()
 })
 
 describe('Organisation page', () => {
