@@ -80,7 +80,7 @@ export default function Assessment({
 
           <div className="text-darkGrey govuk-!-margin-bottom-0 govuk-body-s">
             <span className="govuk-visually-hidden">Study sponsor: </span>
-            {study.organisations[0].organisation.name}
+            {study.organisationsByRole['Clinical Research Sponsor']}
           </div>
 
           <h3 className="govuk-heading-m govuk-!-margin-bottom-1">
