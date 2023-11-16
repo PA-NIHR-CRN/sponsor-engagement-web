@@ -28,18 +28,18 @@ export function StudyDetails({ study }: StudyDetailsProps) {
         </Table.Row>
         <Table.Row>
           <Table.CellHeader className="w-1/3">Sponsor</Table.CellHeader>
-          <Table.Cell>{study.organisationsByRole['Clinical Research Sponsor']}</Table.Cell>
+          <Table.Cell>{study.organisationsByRole.Sponsor}</Table.Cell>
         </Table.Row>
-        {study.organisationsByRole['Managing Clinical Trials Unit'] ? (
+        {study.organisationsByRole.CTU ? (
           <Table.Row>
             <Table.CellHeader className="w-1/3">CTU</Table.CellHeader>
-            <Table.Cell>{study.organisationsByRole['Managing Clinical Trials Unit']}</Table.Cell>
+            <Table.Cell>{study.organisationsByRole.CTU}</Table.Cell>
           </Table.Row>
         ) : null}
-        {study.organisationsByRole['Contract Research Organisation'] ? (
+        {study.organisationsByRole.CRO ? (
           <Table.Row>
             <Table.CellHeader className="w-1/3">CRO</Table.CellHeader>
-            <Table.Cell>{study.organisationsByRole['Contract Research Organisation']}</Table.Cell>
+            <Table.Cell>{study.organisationsByRole.CRO}</Table.Cell>
           </Table.Row>
         ) : null}
         <Table.Row>

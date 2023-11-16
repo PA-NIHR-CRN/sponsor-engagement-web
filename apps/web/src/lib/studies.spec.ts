@@ -194,6 +194,7 @@ describe('getStudyById', () => {
       expect.objectContaining({
         where: {
           id: 1,
+          isDeleted: false,
           organisations: {
             some: {
               organisationId: { in: userOrganisationIds },
@@ -233,7 +234,7 @@ describe('getStudyById', () => {
       data: {
         ...mockStudyWithOrgs,
         organisationsByRole: {
-          'Managing Clinical Trials Unit': 'Pfizer clinical trials',
+          CTU: 'Pfizer clinical trials',
         },
       },
     })
