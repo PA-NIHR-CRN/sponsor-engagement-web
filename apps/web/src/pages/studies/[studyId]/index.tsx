@@ -47,7 +47,7 @@ export default function Study({ study, assessments }: StudyProps) {
 
           <span className="govuk-body-m mb-0 text-darkGrey">
             <span className="govuk-visually-hidden">Study sponsor: </span>
-            {study.organisations[0].organisation.name}
+            {study.organisationsByRole['Clinical Research Sponsor']}
           </span>
 
           <div className="flex items-center govuk-!-margin-bottom-4 govuk-!-margin-top-4 gap-6">
