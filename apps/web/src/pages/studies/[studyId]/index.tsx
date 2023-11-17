@@ -33,6 +33,10 @@ export type StudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 export default function Study({ study, assessments }: StudyProps) {
   const router = useRouter()
 
+  const { organisationsByRole } = study
+
+  const supportOrgName = organisationsByRole.CRO ?? organisationsByRole.CTU
+
   return (
     <Container>
       <NextSeo title={`Study Progress Review - ${study.shortTitle}`} />
@@ -47,7 +51,8 @@ export default function Study({ study, assessments }: StudyProps) {
 
           <span className="govuk-body-m mb-0 text-darkGrey">
             <span className="govuk-visually-hidden">Study sponsor: </span>
-            {study.organisationsByRole['Clinical Research Sponsor']}
+            {organisationsByRole.Sponsor}
+            {Boolean(supportOrgName) && ` (${supportOrgName})`}
           </span>
 
           <div className="flex items-center govuk-!-margin-bottom-4 govuk-!-margin-top-4 gap-6">

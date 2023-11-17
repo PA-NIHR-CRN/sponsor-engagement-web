@@ -1,10 +1,12 @@
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
+import { organisationRoleShortName, type OrganisationRoleShortName } from './organisations'
 import { Prisma, prismaClient } from './prisma'
 
 export const getStudyById = async (studyId: number, organisationIds?: number[]) => {
   const query = {
     where: {
       id: studyId,
+      isDeleted: false,
       ...(organisationIds && {
         organisations: {
           some: {
@@ -69,9 +71,9 @@ export const getStudyById = async (studyId: number, organisationIds?: number[]) 
   // Map organisation roles along with the name of the organisation to quickly check for a CTU / CRO if applicable
   const organisationsByRole = Object.fromEntries(
     study.organisations.map((organisation) => {
-      return [organisation.organisationRole.name, organisation.organisation.name]
+      return [organisationRoleShortName[organisation.organisationRole.name], organisation.organisation.name]
     })
-  )
+  ) as Partial<Record<OrganisationRoleShortName, string>>
 
   return {
     data: {
