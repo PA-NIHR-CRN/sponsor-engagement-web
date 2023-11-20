@@ -8,3 +8,11 @@ export const organisationAddSchema = z
     emailAddress: z.string().email('Enter a valid email address').min(1, { message: 'Enter an email address' }),
   })
   .required()
+
+export type OrganisationRemoveContactInputs = z.infer<typeof organisationRemoveContactSchema>
+
+export const organisationRemoveContactSchema = z
+  .object({
+    userOrganisationId: z.string(),
+  })
+  .required()

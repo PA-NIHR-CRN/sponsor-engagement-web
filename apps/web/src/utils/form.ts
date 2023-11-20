@@ -1,8 +1,8 @@
 import type { ParsedUrlQuery } from 'node:querystring'
 import type { FieldError, FieldErrors } from 'react-hook-form'
-import type { assessmentSchema, organisationAddSchema } from './schemas'
+import type { assessmentSchema, organisationAddSchema, organisationRemoveContactSchema } from './schemas'
 
-export type Schemas = typeof assessmentSchema | typeof organisationAddSchema
+export type Schemas = typeof assessmentSchema | typeof organisationAddSchema | typeof organisationRemoveContactSchema
 
 /**
  * Checks if there's any form errors present in the URL searchParams for a given schema

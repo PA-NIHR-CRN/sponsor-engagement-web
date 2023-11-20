@@ -22,12 +22,11 @@ import { useFormErrorHydration } from '../../../hooks/useFormErrorHydration'
 
 export type OrganisationProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-const renderNotificationBanner = (success: boolean) =>
-  success ? (
-    <NotificationBanner heading="Contact added" success>
-      A new contact was added for this organisation
-    </NotificationBanner>
-  ) : null
+const renderNotificationBanner = (successType: number) => (
+  <NotificationBanner heading={`Contact ${successType === 1 ? 'added' : 'removed'}`} success>
+    A {successType === 1 && 'new '}contact was {successType === 1 ? 'added' : 'removed'} for this organisation
+  </NotificationBanner>
+)
 
 export default function Organisation({ organisation, query }: OrganisationProps) {
   const router = useRouter()
@@ -86,7 +85,9 @@ export default function Organisation({ organisation, query }: OrganisationProps)
             <Table.CellHeader className="w-1/3" column>
               Date added
             </Table.CellHeader>
-            <Table.Cell className="w-1/3" />
+            <Table.CellHeader className="w-1/3" column>
+              Actions
+            </Table.CellHeader>
           </Table.Row>
         </Table.Header>
         <Table.Body>
@@ -95,7 +96,7 @@ export default function Organisation({ organisation, query }: OrganisationProps)
               <Table.Cell>{user.user.email}</Table.Cell>
               <Table.Cell>{formatDate(user.createdAt)}</Table.Cell>
               <Table.Cell>
-                <Link href="#">Remove</Link>
+                <Link href={`/organisations/remove-contact/${user.id}`}>Remove</Link>
               </Table.Cell>
             </Table.Row>
           ))}
@@ -110,7 +111,7 @@ export default function Organisation({ organisation, query }: OrganisationProps)
       <NextSeo title={`Manage organisation contacts - ${organisation.name}`} />
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
-          {renderNotificationBanner(Boolean(router.query.success))}
+          {Boolean(router.query.success) && renderNotificationBanner(Number(router.query.success))}
 
           {/* Organisation name */}
           <h2 className="govuk-heading-l govuk-!-margin-bottom-1">
