@@ -181,7 +181,8 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
       // User found
       if (totalResults > 0 && Resources) {
-        const identityGatewayId = Resources.find((resource) => Boolean(resource.id))?.id
+        // IDG uses the userName for the identity provider id and not the id...
+        const identityGatewayId = Resources.find((resource) => Boolean(resource.userName))?.userName
 
         logger.info('Found IDG account matching email')
 
