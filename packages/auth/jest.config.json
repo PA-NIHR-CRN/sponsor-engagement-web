@@ -1,0 +1,22 @@
+{
+  "verbose": true,
+  "testEnvironment": "jest-environment-jsdom",
+  "setupFiles": ["<rootDir>/jest.env.js"],
+  "setupFilesAfterEnv": ["@testing-library/jest-dom/extend-expect"],
+  "reporters": ["default", "jest-junit"],
+  "testPathIgnorePatterns": [".vscode"],
+  "coverageReporters": ["json-summary", "text", "html", "lcov"],
+  "coveragePathIgnorePatterns": ["node_modules", "index.ts"],
+  "coverageThreshold": {
+    "global": {
+      "lines": 90,
+      "functions": 75,
+      "branches": 90,
+      "statements": 90
+    }
+  },
+  "collectCoverageFrom": ["**/*.ts"],
+  "transform": {
+    "^.+\\.tsx?$": ["ts-jest", { "tsconfig": "<rootDir>/tsconfig.json" }]
+  }
+}

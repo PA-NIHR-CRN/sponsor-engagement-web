@@ -19,6 +19,16 @@ export const ORGANISATIONS_PAGE = '/organisations'
 export const SUPPORT_PAGE = '/request-support'
 
 /**
+ * Registration page where we'll determine if a user needs to signup for an IDG account based on their registrationToken
+ */
+export const REGISTRATION_PAGE = '/register'
+
+/**
+ * Registration confirmation page where users will be redirected to after successful registration
+ */
+export const REGISTRATION_CONFIRMATION_PAGE = '/register/confirmation'
+
+/**
  * Error page for internal server errors
  */
 export const ERROR_PAGE_500 = '/500'

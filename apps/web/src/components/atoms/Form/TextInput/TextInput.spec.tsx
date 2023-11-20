@@ -51,3 +51,14 @@ test('renders correctly with errors and hint', () => {
   const hintElement = getByText(hint)
   expect(hintElement).toBeInTheDocument()
 })
+
+test('renders with custom attributes', () => {
+  const label = 'Input Label'
+  const name = 'inputName'
+
+  const { getByLabelText } = render(<TextInput label={label} name={name} type="password" />)
+
+  const inputElement = getByLabelText(label)
+  expect(inputElement).toBeInTheDocument()
+  expect(inputElement).toHaveAttribute('type', 'password')
+})
