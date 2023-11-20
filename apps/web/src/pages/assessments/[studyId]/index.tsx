@@ -66,6 +66,10 @@ export default function Assessment({
 
   const { defaultValues } = formState
 
+  const { organisationsByRole } = study
+
+  const supportOrgName = organisationsByRole.CRO ?? organisationsByRole.CTU
+
   return (
     <Container>
       <NextSeo title="Study Progress Review - Assess progress of study" />
@@ -80,7 +84,8 @@ export default function Assessment({
 
           <div className="text-darkGrey govuk-!-margin-bottom-0 govuk-body-s">
             <span className="govuk-visually-hidden">Study sponsor: </span>
-            {study.organisationsByRole['Clinical Research Sponsor']}
+            {organisationsByRole.Sponsor}
+            {Boolean(supportOrgName) && ` (${supportOrgName})`}
           </div>
 
           <h3 className="govuk-heading-m govuk-!-margin-bottom-1">
