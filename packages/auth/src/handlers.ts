@@ -1,17 +1,25 @@
 import axios from 'axios'
 import type { ZodType, z } from 'zod'
+import rateLimit from 'axios-rate-limit'
 import type { createUserRequestSchema, getUserRequestSchema } from './schemas'
 import { getUserResponseSchema, createUserResponseSchema } from './schemas'
 
 const { IDG_API_URL, IDG_API_USERNAME, IDG_API_PASSWORD } = process.env
 
-const api = axios.create({
-  baseURL: IDG_API_URL,
-  auth: {
-    username: IDG_API_USERNAME || '',
-    password: IDG_API_PASSWORD || '',
-  },
-})
+const api = rateLimit(
+  axios.create({
+    baseURL: IDG_API_URL,
+    auth: {
+      username: IDG_API_USERNAME || '',
+      password: IDG_API_PASSWORD || '',
+    },
+  }),
+  {
+    maxRequests: 5,
+    perMilliseconds: 1000,
+    maxRPS: 5,
+  }
+)
 
 type Infer<T extends ZodType> = z.infer<T>
 
