@@ -67,7 +67,7 @@ export default function RemoveContact({ userOrganisation }: RemoveContactProps) 
               })
             }}
           >
-            <input type="hidden" {...register('userOrganisationId')} />
+            <input defaultValue={userOrganisation.id} type="hidden" {...register('userOrganisationId')} />
             <div className="govuk-button-group flex-col sm:gap-2 justify-start">
               <Button
                 className={clsx('govuk-button', { 'pointer-events-none': formState.isLoading })}
