@@ -4,6 +4,10 @@ export type StudyOrganisationWithRelations = Prisma.StudyOrganisationGetPayload<
   include: { organisation: true; organisationRole: true }
 }>
 
+type OrganisationRoleShortNameMap = typeof organisationRoleShortName
+
+export type OrganisationRoleShortName = OrganisationRoleShortNameMap[keyof OrganisationRoleShortNameMap]
+
 // Organisation role mappings formatted for the UI
 export const organisationRoleShortName = {
   'Clinical Research Sponsor': 'Sponsor',
