@@ -55,7 +55,10 @@
         "AUTH_CLIENT_SECRET",
         "AUTH_WELL_KNOWN_URL",
         "NEXT_PUBLIC_APP_ENV",
-        "PORT"
+        "PORT",
+        "IDG_API_URL",
+        "IDG_API_USERNAME",
+        "IDG_API_PASSWORD"
       ]
     },
     "db:generate": { "cache": false },

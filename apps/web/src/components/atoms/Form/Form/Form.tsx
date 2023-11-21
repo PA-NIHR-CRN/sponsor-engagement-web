@@ -57,7 +57,7 @@ export function Form<T extends FieldValues>({ action, method, children, onError,
       }
 
       // Misc error redirect
-      void router.replace(`${redirectUrl.pathname}${redirectUrl.search}`)
+      void router.replace(`${redirectUrl.pathname}${redirectUrl.search}`, undefined, { shallow: true })
     } catch (error) {
       if (axios.isAxiosError(error)) {
         logger.info(`Form component failed to submit due to ${error.message}`)
@@ -69,7 +69,7 @@ export function Form<T extends FieldValues>({ action, method, children, onError,
   }
 
   const onInvalid = () => {
-    void router.replace(new URL(router.asPath, document.location.href).pathname)
+    void router.replace(new URL(router.asPath, document.location.href).pathname, undefined, { shallow: true })
     logger.error('Form submission failed')
   }
 

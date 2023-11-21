@@ -4,7 +4,7 @@ import { forwardRef } from 'react'
 import type { FieldErrors } from 'react-hook-form'
 import { ErrorInline } from '../ErrorInline/ErrorInline'
 
-interface TextInputProps {
+interface TextInputProps extends React.HTMLProps<HTMLInputElement> {
   name: string
   label?: string
   hint?: ReactNode
