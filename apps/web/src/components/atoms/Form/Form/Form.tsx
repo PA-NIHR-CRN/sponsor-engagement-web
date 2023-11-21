@@ -60,9 +60,9 @@ export function Form<T extends FieldValues>({ action, method, children, onError,
       void router.replace(`${redirectUrl.pathname}${redirectUrl.search}`, undefined, { shallow: true })
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.info(`Form component failed to submit due to ${error.message}`)
+        logger.info(`Form component failed to submit due to ${error.message}`)
       } else {
-        console.info(error)
+        logger.info(error)
       }
       redirectToFatalError()
     }
