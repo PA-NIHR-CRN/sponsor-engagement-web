@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "tsc",
+    "build": "tsup",
     "clean": "rm -rf dist",
     "dev": "nodemon --exec \"node -r esbuild-register ./src/index.ts\" -e .ts",
     "start": "node -r esbuild-register ./src/index.ts",
@@ -26,6 +26,18 @@
     "ts-jest": "^29.1.1",
     "ts-mockery": "^1.2.0",
     "tsconfig": "*",
+    "tsup": "^8.0.1",
     "typescript": "^4.5.3"
+  },
+  "tsup": {
+    "entry": [
+      "src/index.ts"
+    ],
+    "noExternal": [
+      "@nihr-ui/logger"
+    ],
+    "splitting": false,
+    "sourcemap": true,
+    "clean": true
   }
 }
