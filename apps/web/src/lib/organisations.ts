@@ -83,6 +83,9 @@ const organisationByIdRelations = {
   include: {
     roles: { include: { role: true } },
     users: {
+      where: {
+        isDeleted: false,
+      },
       include: {
         user: true,
       },
@@ -112,4 +115,27 @@ export const getOrganisationById = async (organisationId: number) => {
     ...organisation,
     roles: organisation.roles.map(({ role }) => organisationRoleShortName[role.name]).filter(Boolean),
   }
+}
+
+const userOrganisationByIdRelations = {
+  include: {
+    organisation: true,
+    user: true,
+  },
+}
+
+export type UserOrganisationWithRelations = Prisma.UserOrganisationGetPayload<typeof userOrganisationByIdRelations>
+
+export const getUserOrganisationById = async (userOrganisationId: number) => {
+  const query = {
+    where: {
+      id: userOrganisationId,
+      isDeleted: false,
+    },
+    ...userOrganisationByIdRelations,
+  }
+
+  const userOrganisation = await prismaClient.userOrganisation.findFirst(query)
+
+  return userOrganisation
 }

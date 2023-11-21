@@ -154,14 +154,13 @@ describe('Organisation page', () => {
     const contactsTable = screen.getByRole('table', { name: 'Organisation contacts' })
 
     const contactHeaders = within(contactsTable).getAllByRole('columnheader')
-    expect(contactHeaders.map((header) => header.textContent)).toEqual(['Contact email', 'Date added'])
+    expect(contactHeaders.map((header) => header.textContent)).toEqual(['Contact email', 'Date added', 'Actions'])
 
     const contactCells = within(contactsTable)
       .getAllByRole('cell')
       .map((cell) => cell.textContent)
 
     expect(contactCells).toEqual([
-      '', // Empty header cell
       'test1@test1.com',
       '1 January 2001',
       'Remove',
@@ -171,8 +170,8 @@ describe('Organisation page', () => {
     ])
 
     const removeLinks = within(contactsTable).getAllByRole('link', { name: 'Remove' })
-    expect(removeLinks[0]).toHaveAttribute('href', '#')
-    expect(removeLinks[1]).toHaveAttribute('href', '#')
+    expect(removeLinks[0]).toHaveAttribute('href', '/organisations/remove-contact/1')
+    expect(removeLinks[1]).toHaveAttribute('href', '/organisations/remove-contact/2')
   })
 
   test('No contacts', async () => {
@@ -209,6 +208,24 @@ describe('Organisation page', () => {
     // Banner
     const banner = screen.getByRole('alert', { name: 'Success' })
     expect(within(banner).getByText('A new contact was added for this organisation')).toBeInTheDocument()
+  })
+
+  test('Success banner shows after removing a contact', async () => {
+    prismaMock.organisation.findFirst.mockResolvedValueOnce(mockOrganisation)
+
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { organisationId: '123' } })
+
+    await mockRouter.push('?success=2')
+
+    const { props } = (await getServerSideProps(context)) as {
+      props: OrganisationProps
+    }
+
+    render(Organisation.getLayout(<Organisation {...props} />, { ...props }))
+
+    // Banner
+    const banner = screen.getByRole('alert', { name: 'Success' })
+    expect(within(banner).getByText('A contact was removed for this organisation')).toBeInTheDocument()
   })
 })
 
