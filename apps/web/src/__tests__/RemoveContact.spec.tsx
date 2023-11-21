@@ -18,6 +18,11 @@ jest.mock('@nihr-ui/logger')
 jest.mock('next-auth/next')
 jest.mock('next-seo')
 jest.mock('axios')
+jest.mock('axios-rate-limit')
+
+afterAll(() => {
+  jest.autoMockOff()
+})
 
 describe('getServerSideProps', () => {
   const getServerSessionMock = jest.mocked(getServerSession)
