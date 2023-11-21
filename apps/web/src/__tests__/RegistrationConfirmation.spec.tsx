@@ -5,7 +5,7 @@ import { render, screen, within } from '@testing-library/react'
 import { logger } from '@nihr-ui/logger'
 import RegistrationConfirmation, { getServerSideProps } from '../pages/register/confirmation'
 import { userNoRoles } from '../__mocks__/session'
-import { ERROR_PAGE_500, SIGN_IN_PAGE, STUDIES_PAGE } from '../constants/routes'
+import { ERROR_PAGE_500, SIGN_IN_PAGE } from '../constants/routes'
 
 jest.mock('@nihr-ui/logger')
 jest.mock('next-auth/next')
@@ -18,7 +18,7 @@ describe('getServerSideProps', () => {
     const result = await getServerSideProps(context)
     expect(result).toEqual({
       redirect: {
-        destination: STUDIES_PAGE,
+        destination: '/',
       },
     })
   })

@@ -9,7 +9,7 @@ export type Schemas = typeof assessmentSchema | typeof organisationAddSchema | t
  * Checks if there's any form errors present in the URL searchParams for a given schema
  */
 export function hasErrorsInSearchParams(schema: Schemas, searchParams: ParsedUrlQuery) {
-  const shape = schema instanceof Zod.ZodEffects ? schema._def.schema : schema.shape
+  const shape = schema instanceof Zod.ZodEffects ? schema._def.schema.shape : schema.shape
 
   return Object.keys(shape).some((field) => searchParams[`${field}Error`])
 }
@@ -18,7 +18,7 @@ export function hasErrorsInSearchParams(schema: Schemas, searchParams: ParsedUrl
  * Extracts the persisted form values state from the URL searchParams for a given schema
  */
 export function getValuesFromSearchParams(schema: Schemas, searchParams: ParsedUrlQuery) {
-  const shape = schema instanceof Zod.ZodEffects ? schema._def.schema : schema.shape
+  const shape = schema instanceof Zod.ZodEffects ? schema._def.schema.shape : schema.shape
 
   return Object.fromEntries(
     Object.keys(shape).map((field) => {
@@ -42,7 +42,7 @@ export function getValuesFromSearchParams(schema: Schemas, searchParams: ParsedU
  * Extracts the persisted form error state from the URL searchParams for a given schema
  */
 export function getErrorsFromSearchParams(schema: Schemas, searchParams: ParsedUrlQuery) {
-  const shape = schema instanceof Zod.ZodEffects ? schema._def.schema : schema.shape
+  const shape = schema instanceof Zod.ZodEffects ? schema._def.schema.shape : schema.shape
 
   const keys = Object.keys(shape)
 

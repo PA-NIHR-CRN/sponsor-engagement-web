@@ -5,7 +5,7 @@ import { getServerSession } from 'next-auth/next'
 import { logger } from '@nihr-ui/logger'
 import Link from 'next/link'
 import { RootLayout } from '../../../components/organisms'
-import { ERROR_PAGE_500, SIGN_IN_PAGE, STUDIES_PAGE } from '../../../constants/routes'
+import { ERROR_PAGE_500, SIGN_IN_PAGE } from '../../../constants/routes'
 import { authOptions } from '../../api/auth/[...nextauth]'
 
 export type RegisterConfirmationProps = InferGetServerSidePropsType<typeof getServerSideProps>
@@ -36,11 +36,11 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   try {
     const session = await getServerSession(context.req, context.res, authOptions)
 
-    // If already signed in, redirect to studies
+    // If already signed in, redirect to homepage
     if (session) {
       return {
         redirect: {
-          destination: STUDIES_PAGE,
+          destination: '/',
         },
       }
     }

@@ -9,8 +9,9 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import clsx from 'clsx'
 import { authService } from '@nihr-ui/auth'
+import { NextSeo } from 'next-seo'
 import { RootLayout } from '../../components/organisms'
-import { ERROR_PAGE_500, STUDIES_PAGE, REGISTRATION_CONFIRMATION_PAGE } from '../../constants/routes'
+import { ERROR_PAGE_500, REGISTRATION_CONFIRMATION_PAGE } from '../../constants/routes'
 import { authOptions } from '../api/auth/[...nextauth]'
 import { prismaClient } from '../../lib/prisma'
 import { getValuesFromSearchParams } from '../../utils/form'
@@ -48,6 +49,7 @@ export default function Register({ query, registrationToken }: RegisterProps) {
 
   return (
     <Container>
+      <NextSeo title="Review progress of research studies - complete registration" />
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <h2 className="govuk-heading-l">Review progress of research studies - complete registration</h2>
@@ -133,11 +135,11 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
     const session = await getServerSession(context.req, context.res, authOptions)
 
-    // If already signed in, redirect to studies
+    // If already signed in, redirect to homepage
     if (session) {
       return {
         redirect: {
-          destination: STUDIES_PAGE,
+          destination: '/',
         },
       }
     }
