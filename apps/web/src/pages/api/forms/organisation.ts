@@ -129,6 +129,8 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
       return email === emailAddress && Boolean(token) && registrationConfirmed === false
     })
 
+    const savedRegistrationToken = users.find((user) => user.user.email === emailAddress)?.user.registrationToken
+
     await emailService.sendEmail({
       to: emailAddress,
       subject: 'NIHR CRN has invited you to review and assess research studies',
@@ -136,7 +138,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
       templateData: {
         organisationName,
         crnLink: EXTERNAL_CRN_URL,
-        signInLink: getAbsoluteUrl(`${SIGN_IN_PAGE}${isNewUser ? `?registrationToken=${registrationToken}` : ``}`),
+        signInLink: getAbsoluteUrl(`${SIGN_IN_PAGE}${isNewUser ? `?registrationToken=${savedRegistrationToken}` : ``}`),
         requestSupportLink: getAbsoluteUrl(SUPPORT_PAGE),
       },
     })
