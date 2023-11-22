@@ -48,9 +48,11 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     const session = await getServerSession(context.req, context.res, authOptions)
 
     if (context.query.registrationToken) {
+      const registrationToken = context.query.registrationToken as string
+      const params = new URLSearchParams({ registrationToken })
       return {
         redirect: {
-          destination: REGISTRATION_PAGE,
+          destination: `${REGISTRATION_PAGE}?${params.toString()}`,
         },
       }
     }
