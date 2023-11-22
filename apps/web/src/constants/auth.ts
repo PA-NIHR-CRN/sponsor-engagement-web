@@ -20,3 +20,5 @@ export enum Roles {
   SponsorContact = 1,
   ContactManager = 2,
 }
+
+export const PASSWORD_MIN_LENGTH = 12
