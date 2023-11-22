@@ -7,7 +7,7 @@ import type { OrganisationAddInputs } from '../../../utils/schemas'
 import { organisationAddSchema } from '../../../utils/schemas'
 import { withApiHandler } from '../../../utils/withApiHandler'
 import { getOrganisationById } from '../../../lib/organisations'
-import { Prisma, prismaClient } from '../../../lib/prisma'
+import { prismaClient } from '../../../lib/prisma'
 import { Roles } from '../../../constants'
 import { EXTERNAL_CRN_URL, SIGN_IN_PAGE, SUPPORT_PAGE } from '../../../constants/routes'
 import { getAbsoluteUrl } from '../../../utils/email'
@@ -44,6 +44,28 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
 
     const registrationToken = crypto.randomBytes(24).toString('hex')
 
+    // Get existing user organisation record
+    const userOrganisation = await prismaClient.userOrganisation.findFirst({
+      where: {
+        user: { email: emailAddress },
+        organisation: { id: organisation.id },
+      },
+    })
+
+    if (userOrganisation && !userOrganisation.isDeleted) {
+      logger.error(
+        'Tried to add contact with email %s to organisation %s, but active relationship already exists',
+        emailAddress,
+        organisation.name
+      )
+      const searchParams = new URLSearchParams({ fatal: '2' })
+      return res.redirect(302, `/organisations/${organisationId}/?${searchParams.toString()}`)
+    }
+
+    if (userOrganisation) {
+      logger.info('Re-adding contact with email %s to organisation %s', emailAddress, organisation.name)
+    }
+
     // Add user to organisation
     const { name: organisationName, users } = await prismaClient.organisation.update({
       where: {
@@ -58,33 +80,46 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
       },
       data: {
         users: {
-          create: {
-            createdBy: { connect: { id: contactManagerUserId } },
-            updatedBy: { connect: { id: contactManagerUserId } },
-            user: {
-              connectOrCreate: {
-                // If a user does not exist, create the user and set a registration token
-                create: {
-                  email: emailAddress,
-                  registrationToken,
-                  registrationConfirmed: false,
-                  roles: {
-                    // If a user is not assigned the sponsor contact role, assign it
-                    createMany: {
-                      data: {
-                        roleId,
-                        createdById: contactManagerUserId,
-                        updatedById: contactManagerUserId,
+          ...(userOrganisation && {
+            update: {
+              where: {
+                id: userOrganisation.id,
+              },
+              data: {
+                isDeleted: false,
+                updatedBy: { connect: { id: contactManagerUserId } },
+              },
+            },
+          }),
+          ...(!userOrganisation && {
+            create: {
+              createdBy: { connect: { id: contactManagerUserId } },
+              updatedBy: { connect: { id: contactManagerUserId } },
+              user: {
+                connectOrCreate: {
+                  // If a user does not exist, create the user and set a registration token
+                  create: {
+                    email: emailAddress,
+                    registrationToken,
+                    registrationConfirmed: false,
+                    roles: {
+                      // If a user is not assigned the sponsor contact role, assign it
+                      createMany: {
+                        data: {
+                          roleId,
+                          createdById: contactManagerUserId,
+                          updatedById: contactManagerUserId,
+                        },
                       },
                     },
                   },
-                },
-                where: {
-                  email: emailAddress,
+                  where: {
+                    email: emailAddress,
+                  },
                 },
               },
             },
-          },
+          }),
         },
       },
     })
@@ -111,14 +146,6 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
     logger.error(error)
 
     const organisationId = req.body.organisationId
-
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      if (error.code === 'P2002') {
-        logger.info('There is a unique constraint violation, a new user cannot be created with this email')
-        const searchParams = new URLSearchParams({ fatal: '2' })
-        return res.redirect(302, `/organisations/${organisationId}/?${searchParams.toString()}`)
-      }
-    }
 
     if (error instanceof ZodError) {
       // Create an object containing the Zod validation errors
