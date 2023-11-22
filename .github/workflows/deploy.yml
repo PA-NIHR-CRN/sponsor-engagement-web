@@ -93,7 +93,7 @@ jobs:
             AUTH_CLIENT_SECRET=${{ secrets.AUTH_CLIENT_SECRET }}
             AUTH_WELL_KNOWN_URL=${{ vars.AUTH_WELL_KNOWN_URL }}
             IDG_API_URL=${{ vars.IDG_API_URL }}
-            IDG_API_USERNAME=${{ secrets.IDG.API_USERNAME }}
+            IDG_API_USERNAME=${{ secrets.IDG_API_USERNAME }}
             IDG_API_PASSWORD=${{ secrets.IDG_API_PASSWORD }}
       - name: Remove Github Actions IP from RDS security group (Dev)
         run: |
@@ -174,7 +174,7 @@ jobs:
             AUTH_CLIENT_SECRET=${{ secrets.AUTH_CLIENT_SECRET }}
             AUTH_WELL_KNOWN_URL=${{ vars.AUTH_WELL_KNOWN_URL }}
             IDG_API_URL=${{ vars.IDG_API_URL }}
-            IDG_API_USERNAME=${{ secrets.IDG.API_USERNAME }}
+            IDG_API_USERNAME=${{ secrets.IDG_API_USERNAME }}
             IDG_API_PASSWORD=${{ secrets.IDG_API_PASSWORD }}
       - name: Remove Github Actions IP from RDS security group (Test)
         run: |
@@ -255,7 +255,7 @@ jobs:
             AUTH_CLIENT_SECRET=${{ secrets.AUTH_CLIENT_SECRET }}
             AUTH_WELL_KNOWN_URL=${{ vars.AUTH_WELL_KNOWN_URL }}
             IDG_API_URL=${{ vars.IDG_API_URL }}
-            IDG_API_USERNAME=${{ secrets.IDG.API_USERNAME }}
+            IDG_API_USERNAME=${{ secrets.IDG_API_USERNAME }}
             IDG_API_PASSWORD=${{ secrets.IDG_API_PASSWORD }}
       - name: Remove Github Actions IP from RDS security group (Uat)
         run: |
@@ -336,7 +336,7 @@ jobs:
             AUTH_CLIENT_SECRET=${{ secrets.AUTH_CLIENT_SECRET }}
             AUTH_WELL_KNOWN_URL=${{ vars.AUTH_WELL_KNOWN_URL }}
             IDG_API_URL=${{ vars.IDG_API_URL }}
-            IDG_API_USERNAME=${{ secrets.IDG.API_USERNAME }}
+            IDG_API_USERNAME=${{ secrets.IDG_API_USERNAME }}
             IDG_API_PASSWORD=${{ secrets.IDG_API_PASSWORD }}
       - name: Remove Github Actions IP from RDS security group (Oat)
         run: |
@@ -417,7 +417,7 @@ jobs:
             AUTH_CLIENT_SECRET=${{ secrets.AUTH_CLIENT_SECRET }}
             AUTH_WELL_KNOWN_URL=${{ vars.AUTH_WELL_KNOWN_URL }}
             IDG_API_URL=${{ vars.IDG_API_URL }}
-            IDG_API_USERNAME=${{ secrets.IDG.API_USERNAME }}
+            IDG_API_USERNAME=${{ secrets.IDG_API_USERNAME }}
             IDG_API_PASSWORD=${{ secrets.IDG_API_PASSWORD }}
       - name: Remove Github Actions IP from RDS security group (Prod)
         run: |
