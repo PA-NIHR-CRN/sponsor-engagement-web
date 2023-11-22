@@ -41,6 +41,8 @@ const findSysRefRoleResponse = Mock.of<SysRefOrganisationRole>({
 const findOrgResponse = Mock.of<OrganisationWithRelations>({ id: 2, name: 'Test Organisation', roles: [] })
 
 describe('Successful organisation sponsor contact invitation', () => {
+  const registrationToken = 'mock-token'
+
   const body: OrganisationAddInputs = {
     organisationId: '321',
     emailAddress: 'tom.christian@nihr.ac.uk',
@@ -62,7 +64,7 @@ describe('Successful organisation sponsor contact invitation', () => {
           user: {
             email: body.emailAddress,
             registrationConfirmed: false,
-            registrationToken: 'mock-token',
+            registrationToken,
           },
         },
       ],
@@ -127,7 +129,7 @@ describe('Successful organisation sponsor contact invitation', () => {
         crnLink: EXTERNAL_CRN_URL,
         organisationName: updateOrgResponse.name,
         requestSupportLink: `http://localhost:3000${SUPPORT_PAGE}`,
-        signInLink: 'http://localhost:3000/auth/signin?registrationToken=mocked-token',
+        signInLink: `http://localhost:3000/auth/signin?registrationToken=${registrationToken}`,
       },
       templateName: 'contact-assigned',
       to: body.emailAddress,
