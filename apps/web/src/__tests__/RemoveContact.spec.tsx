@@ -101,7 +101,7 @@ describe('Remove contact page', () => {
 
     // Copy
     expect(screen.getByText('You are about to remove', { exact: false })).toHaveTextContent(
-      `You are about to remove ${mockUserOrganisation.user.email} from the organisation ${mockUserOrganisation.organisation.name}. This will mean they can no longer view or assess studies for this organisation. They will still have access to studies for any other organisation they are assigned to.`
+      `You are about to remove ${mockUserOrganisation.user.email} from acting as a Sponsor Contact for the organisation ${mockUserOrganisation.organisation.name}. This will mean they can no longer view or assess studies for this organisation. They will still have access to studies for any other organisation they are assigned to.`
     )
 
     expect(

@@ -12,7 +12,7 @@ import type { OrganisationAddInputs } from '../../../utils/schemas'
 import { userNoRoles, userWithContactManagerRole } from '../../../__mocks__/session'
 import { AuthError } from '../../../utils/auth'
 import { EXTERNAL_CRN_URL, SIGN_IN_PAGE, SUPPORT_PAGE } from '../../../constants/routes'
-import type { OrganisationWithRelations } from '../../../lib/organisations'
+import type { OrganisationWithRelations, UserOrganisationWithRelations } from '../../../lib/organisations'
 import type { ExtendedNextApiRequest } from './organisation'
 import api from './organisation'
 
@@ -33,17 +33,18 @@ const testHandler = async (handler: typeof api, options: RequestOptions) => {
   return res
 }
 
+const findSysRefRoleResponse = Mock.of<SysRefOrganisationRole>({
+  id: 999,
+  name: 'SponsorContact',
+})
+
+const findOrgResponse = Mock.of<OrganisationWithRelations>({ id: 2, name: 'Test Organisation', roles: [] })
+
 describe('Successful organisation sponsor contact invitation', () => {
   const body: OrganisationAddInputs = {
     organisationId: '321',
     emailAddress: 'tom.christian@nihr.ac.uk',
   }
-
-  const findSysRefRoleResponse = Mock.of<SysRefOrganisationRole>({
-    id: 999,
-    name: 'SponsorContact',
-  })
-  const findOrgResponse = Mock.of<OrganisationWithRelations>({ id: 2, roles: [] })
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -222,6 +223,83 @@ describe('Successful organisation sponsor contact invitation', () => {
     expect(res.statusCode).toBe(302)
     expect(res._getRedirectUrl()).toBe(`/organisations/${body.organisationId}?success=1`)
   })
+
+  test('Re-add deleted contact', async () => {
+    const updateOrgResponse = Mock.of<OrganisationWithRelations>({
+      id: 2,
+      roles: [],
+      name: 'Mock org name',
+      users: [
+        {
+          user: {
+            email: body.emailAddress,
+            registrationConfirmed: false,
+            registrationToken: null,
+          },
+        },
+      ],
+    })
+
+    jest.mocked(prismaClient.organisation.findFirst).mockResolvedValueOnce(findOrgResponse)
+
+    const mockUserOrganisation = Mock.of<UserOrganisationWithRelations>({
+      id: 123,
+      isDeleted: true,
+    })
+
+    jest.mocked(prismaClient.userOrganisation.findFirst).mockResolvedValueOnce(mockUserOrganisation)
+
+    const findSysRefRoleMock = jest
+      .mocked(prismaClient.sysRefRole.findFirstOrThrow)
+      .mockResolvedValueOnce(findSysRefRoleResponse)
+    const updateOrgMock = jest.mocked(prismaClient.organisation.update).mockResolvedValueOnce(updateOrgResponse)
+
+    const res = await testHandler(api, { method: 'POST', body })
+
+    expect(findSysRefRoleMock).toHaveBeenCalledWith({ where: { isDeleted: false, name: 'SponsorContact' } })
+
+    // Org is updated
+    expect(updateOrgMock).toHaveBeenCalledWith({
+      where: { id: Number(body.organisationId) },
+      include: {
+        users: {
+          include: {
+            user: true,
+          },
+        },
+      },
+      data: {
+        users: {
+          update: {
+            where: {
+              id: mockUserOrganisation.id,
+            },
+            data: {
+              isDeleted: false,
+              updatedBy: { connect: { id: userWithContactManagerRole.user?.id } },
+            },
+          },
+        },
+      },
+    })
+
+    // Send email
+    expect(emailService.sendEmail).toHaveBeenCalledWith({
+      subject: 'NIHR CRN has invited you to review and assess research studies',
+      templateData: {
+        crnLink: EXTERNAL_CRN_URL,
+        organisationName: updateOrgResponse.name,
+        requestSupportLink: `http://localhost:3000${SUPPORT_PAGE}`,
+        signInLink: 'http://localhost:3000/auth/signin',
+      },
+      templateName: 'contact-assigned',
+      to: body.emailAddress,
+    })
+
+    // Redirect back to organisation page
+    expect(res.statusCode).toBe(302)
+    expect(res._getRedirectUrl()).toBe(`/organisations/${body.organisationId}?success=1`)
+  })
 })
 
 describe('Failed organisation sponsor contact invitation', () => {
@@ -231,6 +309,7 @@ describe('Failed organisation sponsor contact invitation', () => {
   }
 
   beforeEach(() => {
+    jest.clearAllMocks()
     logger.info = jest.fn()
     logger.error = jest.fn()
   })
@@ -283,6 +362,33 @@ describe('Failed organisation sponsor contact invitation', () => {
           message: 'Required',
         },
       ])
+    )
+  })
+
+  test('Attempting to invite already existing contact redirects with error', async () => {
+    jest.mocked(getServerSession).mockResolvedValueOnce(userWithContactManagerRole)
+    jest.mocked(prismaClient.organisation.findFirst).mockResolvedValueOnce(findOrgResponse)
+    jest.mocked(prismaClient.sysRefRole.findFirstOrThrow).mockResolvedValueOnce(findSysRefRoleResponse)
+
+    const mockUserOrganisation = Mock.of<UserOrganisationWithRelations>({
+      id: 123,
+      isDeleted: false,
+    })
+
+    jest.mocked(prismaClient.userOrganisation.findFirst).mockResolvedValueOnce(mockUserOrganisation)
+
+    const res = await testHandler(api, { method: 'POST', body })
+
+    expect(jest.mocked(prismaClient.organisation.update)).not.toHaveBeenCalled()
+
+    expect(emailService.sendEmail).not.toHaveBeenCalled()
+
+    expect(res.statusCode).toBe(302)
+    expect(res._getRedirectUrl()).toBe(`/organisations/${body.organisationId}/?fatal=2`)
+    expect(logger.error).toHaveBeenCalledWith(
+      'Tried to add contact with email %s to organisation %s, but active relationship already exists',
+      body.emailAddress,
+      findOrgResponse.name
     )
   })
 })

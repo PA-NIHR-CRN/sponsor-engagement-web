@@ -24,7 +24,9 @@ export type OrganisationProps = InferGetServerSidePropsType<typeof getServerSide
 
 const renderNotificationBanner = (successType: number) => (
   <NotificationBanner heading={`Contact ${successType === 1 ? 'added' : 'removed'}`} success>
-    A {successType === 1 && 'new '}contact was {successType === 1 ? 'added' : 'removed'} for this organisation
+    {successType === 1
+      ? 'A new contact was added for this organisation'
+      : 'The selected contact has been removed from this organisation'}
   </NotificationBanner>
 )
 
