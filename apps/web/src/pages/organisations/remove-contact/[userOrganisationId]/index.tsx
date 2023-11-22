@@ -47,10 +47,10 @@ export default function RemoveContact({ userOrganisation }: RemoveContactProps) 
           <ErrorSummary errors={errors} />
           <h2 className="govuk-heading-l">Are you sure you want to remove this contact?</h2>
           <p className="govuk-body-m">
-            You are about to remove <strong>{userOrganisation.user.email}</strong> from the organisation{' '}
-            <strong>{userOrganisation.organisation.name}</strong>. This will mean they can no longer view or assess
-            studies for this organisation. They will still have access to studies for any other organisation they are
-            assigned to.
+            You are about to remove <strong>{userOrganisation.user.email}</strong> from acting as a Sponsor Contact for
+            the organisation <strong>{userOrganisation.organisation.name}</strong>. This will mean they can no longer
+            view or assess studies for this organisation. They will still have access to studies for any other
+            organisation they are assigned to.
           </p>
           <p className="govuk-body-m">
             Are you sure you want to remove this contact from {userOrganisation.organisation.name}? If you proceed, they

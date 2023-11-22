@@ -16,6 +16,7 @@ import type { OrganisationWithRelations } from '../lib/organisations'
 jest.mock('@nihr-ui/logger')
 jest.mock('next-auth/next')
 jest.mock('next-seo')
+jest.mock('axios')
 
 describe('getServerSideProps', () => {
   const getServerSessionMock = jest.mocked(getServerSession)
@@ -225,7 +226,7 @@ describe('Organisation page', () => {
 
     // Banner
     const banner = screen.getByRole('alert', { name: 'Success' })
-    expect(within(banner).getByText('A contact was removed for this organisation')).toBeInTheDocument()
+    expect(within(banner).getByText('The selected contact has been removed from this organisation')).toBeInTheDocument()
   })
 })
 
