@@ -69,8 +69,10 @@ export function Form<T extends FieldValues>({ action, method, children, onError,
   }
 
   const onInvalid = () => {
-    void router.replace(new URL(router.asPath, document.location.href).pathname)
-    logger.error('Form submission failed')
+    const url = new URL(router.asPath, document.location.href)
+    url.searchParams.delete('fatal')
+    void router.replace(url, undefined)
+    logger.error('Form submission failed - %s', url.toString())
   }
 
   return (
