@@ -131,7 +131,10 @@ describe('Successful organisation sponsor contact invitation', () => {
         requestSupportLink: `http://localhost:3000${SUPPORT_PAGE}`,
         signInLink: `http://localhost:3000/auth/signin?registrationToken=${registrationToken}`,
       },
-      templateName: 'contact-assigned',
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- valid any
+      htmlTemplate: expect.any(Function),
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- valid any
+      textTemplate: expect.any(Function),
       to: body.emailAddress,
     })
 
@@ -217,7 +220,10 @@ describe('Successful organisation sponsor contact invitation', () => {
         requestSupportLink: `http://localhost:3000${SUPPORT_PAGE}`,
         signInLink: 'http://localhost:3000/auth/signin',
       },
-      templateName: 'contact-assigned',
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- valid any
+      htmlTemplate: expect.any(Function),
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- valid any
+      textTemplate: expect.any(Function),
       to: body.emailAddress,
     })
 
@@ -294,7 +300,10 @@ describe('Successful organisation sponsor contact invitation', () => {
         requestSupportLink: `http://localhost:3000${SUPPORT_PAGE}`,
         signInLink: 'http://localhost:3000/auth/signin',
       },
-      templateName: 'contact-assigned',
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- valid any
+      htmlTemplate: expect.any(Function),
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- valid any
+      textTemplate: expect.any(Function),
       to: body.emailAddress,
     })
 

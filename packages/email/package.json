@@ -14,7 +14,6 @@
   "dependencies": {
     "@nihr-ui/logger": "*",
     "aws-sdk": "^2.1488.0",
-    "handlebars": "^4.7.8",
     "pino": "^8.14.1",
     "pino-pretty": "^10.0.1"
   }
