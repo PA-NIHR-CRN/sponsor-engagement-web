@@ -41,7 +41,7 @@ export function useFormErrorHydration<T extends Record<string, unknown>>({
       })
 
       if (formState.isSubmitSuccessful) {
-        void router.replace({ query: undefined }, undefined, { shallow: true })
+        void router.replace({ query: undefined })
       }
     }
   }, [router.asPath, router, hasServerErrors, onFoundError, formState.defaultValues, formState.isSubmitSuccessful])
