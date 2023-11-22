@@ -92,9 +92,9 @@ jobs:
             AUTH_CLIENT_ID=${{ secrets.AUTH_CLIENT_ID }}
             AUTH_CLIENT_SECRET=${{ secrets.AUTH_CLIENT_SECRET }}
             AUTH_WELL_KNOWN_URL=${{ vars.AUTH_WELL_KNOWN_URL }}
-            IDG_API_URL=${{ vars.API_URL }}
-            IDG_API_USERNAME=${{ secrets.API_USERNAME }}
-            IDG_API_PASSWORD=${{ secrets.API_PASSWORD }}
+            IDG_API_URL=${{ vars.IDG_API_URL }}
+            IDG_API_USERNAME=${{ secrets.IDG_API_USERNAME }}
+            IDG_API_PASSWORD=${{ secrets.IDG_API_PASSWORD }}
       - name: Remove Github Actions IP from RDS security group (Dev)
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
@@ -173,9 +173,9 @@ jobs:
             AUTH_CLIENT_ID=${{ secrets.AUTH_CLIENT_ID }}
             AUTH_CLIENT_SECRET=${{ secrets.AUTH_CLIENT_SECRET }}
             AUTH_WELL_KNOWN_URL=${{ vars.AUTH_WELL_KNOWN_URL }}
-            IDG_API_URL=${{ vars.API_URL }}
-            IDG_API_USERNAME=${{ secrets.API_USERNAME }}
-            IDG_API_PASSWORD=${{ secrets.API_PASSWORD }}
+            IDG_API_URL=${{ vars.IDG_API_URL }}
+            IDG_API_USERNAME=${{ secrets.IDG_API_USERNAME }}
+            IDG_API_PASSWORD=${{ secrets.IDG_API_PASSWORD }}
       - name: Remove Github Actions IP from RDS security group (Test)
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
@@ -254,9 +254,9 @@ jobs:
             AUTH_CLIENT_ID=${{ secrets.AUTH_CLIENT_ID }}
             AUTH_CLIENT_SECRET=${{ secrets.AUTH_CLIENT_SECRET }}
             AUTH_WELL_KNOWN_URL=${{ vars.AUTH_WELL_KNOWN_URL }}
-            IDG_API_URL=${{ vars.API_URL }}
-            IDG_API_USERNAME=${{ secrets.API_USERNAME }}
-            IDG_API_PASSWORD=${{ secrets.API_PASSWORD }}
+            IDG_API_URL=${{ vars.IDG_API_URL }}
+            IDG_API_USERNAME=${{ secrets.IDG_API_USERNAME }}
+            IDG_API_PASSWORD=${{ secrets.IDG_API_PASSWORD }}
       - name: Remove Github Actions IP from RDS security group (Uat)
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
@@ -335,9 +335,9 @@ jobs:
             AUTH_CLIENT_ID=${{ secrets.AUTH_CLIENT_ID }}
             AUTH_CLIENT_SECRET=${{ secrets.AUTH_CLIENT_SECRET }}
             AUTH_WELL_KNOWN_URL=${{ vars.AUTH_WELL_KNOWN_URL }}
-            IDG_API_URL=${{ vars.API_URL }}
-            IDG_API_USERNAME=${{ secrets.API_USERNAME }}
-            IDG_API_PASSWORD=${{ secrets.API_PASSWORD }}
+            IDG_API_URL=${{ vars.IDG_API_URL }}
+            IDG_API_USERNAME=${{ secrets.IDG_API_USERNAME }}
+            IDG_API_PASSWORD=${{ secrets.IDG_API_PASSWORD }}
       - name: Remove Github Actions IP from RDS security group (Oat)
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
@@ -416,9 +416,9 @@ jobs:
             AUTH_CLIENT_ID=${{ secrets.AUTH_CLIENT_ID }}
             AUTH_CLIENT_SECRET=${{ secrets.AUTH_CLIENT_SECRET }}
             AUTH_WELL_KNOWN_URL=${{ vars.AUTH_WELL_KNOWN_URL }}
-            IDG_API_URL=${{ vars.API_URL }}
-            IDG_API_USERNAME=${{ secrets.API_USERNAME }}
-            IDG_API_PASSWORD=${{ secrets.API_PASSWORD }}
+            IDG_API_URL=${{ vars.IDG_API_URL }}
+            IDG_API_USERNAME=${{ secrets.IDG_API_USERNAME }}
+            IDG_API_PASSWORD=${{ secrets.IDG_API_PASSWORD }}
       - name: Remove Github Actions IP from RDS security group (Prod)
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
