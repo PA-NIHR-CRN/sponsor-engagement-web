@@ -7,7 +7,7 @@
     "dev": "next dev",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
-    "precompile": "ts-node ./scripts/precompile.ts",
+    "precompile": "ts-node ./scripts/precompileTemplates.ts",
     "start": "next start",
     "test": "jest --watch",
     "test:ci": "jest --ci --coverage",

@@ -4,6 +4,7 @@ import { createResponse, createRequest } from 'node-mocks-http'
 import type { NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
 import { logger } from '@nihr-ui/logger'
+import { emailService } from '@nihr-ui/email'
 import { prismaClient } from '../../../lib/prisma'
 import type { OrganisationRemoveContactInputs } from '../../../utils/schemas'
 import { userNoRoles, userWithContactManagerRole } from '../../../__mocks__/session'
@@ -32,7 +33,11 @@ describe('Successful remove organisation contact', () => {
     userOrganisationId: '123',
   }
 
-  const findUserOrgResponse = Mock.of<UserOrganisationWithRelations>({ id: 123, organisation: { id: 12345 } })
+  const mockUserOrganisation = Mock.of<UserOrganisationWithRelations>({
+    id: 123,
+    organisation: { id: 12345, name: 'Test Organisation' },
+    user: { email: 'test@test.com' },
+  })
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -42,13 +47,11 @@ describe('Successful remove organisation contact', () => {
   })
 
   test('Removing user from an organisation', async () => {
-    const updateOrgResponse = Mock.of<UserOrganisationWithRelations>({
-      id: 123,
-    })
+    jest.mocked(prismaClient.userOrganisation.findFirst).mockResolvedValueOnce(mockUserOrganisation)
 
-    jest.mocked(prismaClient.userOrganisation.findFirst).mockResolvedValueOnce(findUserOrgResponse)
-
-    const updateUserOrgMock = jest.mocked(prismaClient.userOrganisation.update).mockResolvedValueOnce(updateOrgResponse)
+    const updateUserOrgMock = jest
+      .mocked(prismaClient.userOrganisation.update)
+      .mockResolvedValueOnce(mockUserOrganisation)
 
     const res = await testHandler(api, { method: 'POST', body })
 
@@ -65,9 +68,21 @@ describe('Successful remove organisation contact', () => {
       },
     })
 
+    expect(emailService.sendEmail).toHaveBeenCalledWith({
+      subject: `NIHR CRN has removed you as a reviewer for ${mockUserOrganisation.organisation.name}`,
+      to: mockUserOrganisation.user.email,
+      templateData: {
+        organisationName: mockUserOrganisation.organisation.name,
+      },
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- valid any
+      htmlTemplate: expect.any(Function),
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- valid any
+      textTemplate: expect.any(Function),
+    })
+
     // Redirect back to organisation page
     expect(res.statusCode).toBe(302)
-    expect(res._getRedirectUrl()).toBe(`/organisations/${findUserOrgResponse.organisation.id}?success=2`)
+    expect(res._getRedirectUrl()).toBe(`/organisations/${mockUserOrganisation.organisation.id}?success=2`)
   })
 })
 
