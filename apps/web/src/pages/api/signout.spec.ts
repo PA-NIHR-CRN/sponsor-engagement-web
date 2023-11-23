@@ -15,6 +15,9 @@ describe('API Handler: Logout', () => {
   beforeEach(() => {
     req = {
       method: 'GET',
+      query: {
+        idTokenHint: 'mocked-id-token-hint',
+      },
     }
     res = {
       redirect: jest.fn(),
@@ -30,7 +33,10 @@ describe('API Handler: Logout', () => {
 
     handler(req as NextApiRequest, res as NextApiResponse)
 
-    expect(res.redirect).toHaveBeenCalledWith(302, 'https://dev.id.nihr.ac.uk/oidc/logout')
+    expect(res.redirect).toHaveBeenCalledWith(
+      302,
+      'https://dev.id.nihr.ac.uk/oidc/logout?post_logout_redirect_uri=http%3A%2F%2Flocalhost%3A3000&id_token_hint=mocked-id-token-hint'
+    )
   })
 
   it('should handle wrong HTTP methods and log an error', () => {
