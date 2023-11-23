@@ -5,6 +5,7 @@ import { authService } from '@nihr-ui/auth'
 import type { RegistrationInputs } from '../../../utils/schemas'
 import { registrationSchema } from '../../../utils/schemas'
 import { prismaClient } from '../../../lib/prisma'
+import { AUTH_PROVIDER_NAME, AUTH_PROVIDER_TYPE } from '../../../constants'
 
 export interface ExtendedNextApiRequest extends NextApiRequest {
   body: RegistrationInputs
@@ -57,8 +58,8 @@ export default async (req: ExtendedNextApiRequest, res: NextApiResponse) => {
           accounts: {
             create: {
               providerAccountId: identityGatewayId,
-              type: 'oauth',
-              provider: 'oidc',
+              type: AUTH_PROVIDER_TYPE,
+              provider: AUTH_PROVIDER_NAME,
             },
           },
         },
