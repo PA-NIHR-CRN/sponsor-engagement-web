@@ -6,6 +6,7 @@ import { getServerSession } from 'next-auth/next'
 import { logger } from '@nihr-ui/logger'
 import { authOptions } from '../api/auth/[...nextauth]'
 import { SIGN_IN_PAGE } from '../../constants/routes'
+import { prismaClient } from '../../lib/prisma'
 
 /**
  * This sign out page provides a progressively enhanced sign out experience
@@ -35,7 +36,7 @@ export default function Signout({ csrfToken, isAuthenticated, callbackUrl }: Sig
     <Container>
       <h2 className="govuk-heading-l">Signing out...</h2>
       <form action="/api/auth/signout" method="POST">
-        <input name="callbackUrl" type="hidden" value="/api/signout" />
+        <input name="callbackUrl" type="hidden" value={callbackUrl} />
         <input name="csrfToken" type="hidden" value={csrfToken} />
         <button className="govuk-link" type="submit">
           Click here if you are not redirected
@@ -48,6 +49,15 @@ export default function Signout({ csrfToken, isAuthenticated, callbackUrl }: Sig
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   try {
     const session = await getServerSession(context.req, context.res, authOptions)
+
+    const { id_token: idTokenHint } = await prismaClient.account.findFirstOrThrow({
+      where: {
+        userId: session?.user?.id,
+      },
+      select: {
+        id_token: true,
+      },
+    })
 
     // If there's no session, redirect to sign in
     if (!session) {
@@ -65,7 +75,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         props: {
           isAuthenticated: Boolean(session),
           csrfToken: await getCsrfToken({ req: context.req }),
-          callbackUrl: '/api/signout',
+          callbackUrl: `/api/signout?idTokenHint=${idTokenHint}`,
         },
       }
     }
