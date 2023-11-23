@@ -41,7 +41,7 @@ export default async (req: ExtendedNextApiRequest, res: NextApiResponse) => {
         throw new Error('Missing data from IDG createUser response')
       }
 
-      const { id: identityGatewayId } = createUserResponse.data
+      const { userName: identityGatewayId } = createUserResponse.data
 
       logger.info('Created user in IDG, updating user in local applicaton')
 
@@ -54,6 +54,13 @@ export default async (req: ExtendedNextApiRequest, res: NextApiResponse) => {
           identityGatewayId,
           registrationConfirmed: true,
           registrationToken: null,
+          accounts: {
+            create: {
+              providerAccountId: identityGatewayId,
+              type: 'oauth',
+              provider: 'oidc',
+            },
+          },
         },
       })
 
