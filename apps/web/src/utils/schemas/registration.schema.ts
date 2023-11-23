@@ -9,11 +9,11 @@ export const registrationSchema = z
     password: z
       .string()
       .min(PASSWORD_MIN_LENGTH, { message: 'Enter a minimum of 12 characters' })
-      .refine((value) => !value.includes('#'), { message: 'Must not contain the # character' }),
+      .refine((value) => !value.includes('£'), { message: 'Must not contain the £ character' }),
     confirmPassword: z
       .string()
       .min(PASSWORD_MIN_LENGTH, { message: 'Enter a minimum of 12 characters' })
-      .refine((value) => !value.includes('#'), { message: 'Must not contain the # character' }),
+      .refine((value) => !value.includes('£'), { message: 'Must not contain the £ character' }),
   })
   .required()
   .superRefine(({ confirmPassword, password }, ctx) => {

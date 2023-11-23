@@ -144,25 +144,25 @@ describe('Failed registration - validation errors', () => {
     )
   })
 
-  test('Password contains a hash', async () => {
+  test('Password contains a £ character', async () => {
     const res = await testHandler(api, {
       method: 'POST',
-      body: { ...body, password: 'the_password_contains_a_#', confirmPassword: 'the_password_contains_a_#' },
+      body: { ...body, password: 'the_password_contains_a_£', confirmPassword: 'the_password_contains_a_£' },
     })
     expect(res.statusCode).toBe(302)
     expect(res._getRedirectUrl()).toBe(
-      `/register?passwordError=Must+not+contain+the+%23+character&confirmPasswordError=Must+not+contain+the+%23+character&registrationToken=${body.registrationToken}`
+      `/register?passwordError=Must+not+contain+the+%C2%A3+character&confirmPasswordError=Must+not+contain+the+%C2%A3+character&registrationToken=${body.registrationToken}`
     )
     expect(logger.error).toHaveBeenCalledWith(
       new ZodError([
         {
           code: 'custom',
-          message: 'Must not contain the # character',
+          message: 'Must not contain the £ character',
           path: ['password'],
         },
         {
           code: 'custom',
-          message: 'Must not contain the # character',
+          message: 'Must not contain the £ character',
           path: ['confirmPassword'],
         },
       ])
