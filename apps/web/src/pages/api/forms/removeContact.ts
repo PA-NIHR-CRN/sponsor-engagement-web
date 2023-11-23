@@ -1,11 +1,13 @@
 import type { NextApiRequest } from 'next'
 import { logger } from '@nihr-ui/logger'
+import { emailService } from '@nihr-ui/email'
 import type { OrganisationRemoveContactInputs } from '../../../utils/schemas'
 import { organisationRemoveContactSchema } from '../../../utils/schemas'
 import { withApiHandler } from '../../../utils/withApiHandler'
 import { getUserOrganisationById } from '../../../lib/organisations'
 import { prismaClient } from '../../../lib/prisma'
 import { Roles } from '../../../constants'
+import emailTemplates from '../../../templates/email'
 
 export interface ExtendedNextApiRequest extends NextApiRequest {
   body: OrganisationRemoveContactInputs
@@ -30,7 +32,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
     } = session
 
     // Remove user from organisation
-    await prismaClient.userOrganisation.update({
+    const { user, organisation } = await prismaClient.userOrganisation.update({
       where: {
         id: Number(userOrganisationId),
       },
@@ -43,6 +45,18 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
         updatedBy: { connect: { id: contactManagerUserId } },
       },
     })
+
+    if (user.email) {
+      await emailService.sendEmail({
+        to: user.email,
+        subject: `NIHR CRN has removed you as a reviewer for ${organisation.name}`,
+        htmlTemplate: emailTemplates['contact-removed.html.hbs'],
+        textTemplate: emailTemplates['contact-removed.text.hbs'],
+        templateData: {
+          organisationName: organisation.name,
+        },
+      })
+    }
 
     return res.redirect(302, `/organisations/${userOrganisation.organisation.id}?success=2`)
   } catch (error) {
