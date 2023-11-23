@@ -11,6 +11,7 @@ import { prismaClient } from '../../../lib/prisma'
 import { Roles } from '../../../constants'
 import { EXTERNAL_CRN_URL, SIGN_IN_PAGE, SUPPORT_PAGE } from '../../../constants/routes'
 import { getAbsoluteUrl } from '../../../utils/email'
+import emailTemplates from '../../../templates/email'
 
 export interface ExtendedNextApiRequest extends NextApiRequest {
   body: OrganisationAddInputs
@@ -134,7 +135,8 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
     await emailService.sendEmail({
       to: emailAddress,
       subject: 'NIHR CRN has invited you to review and assess research studies',
-      templateName: 'contact-assigned',
+      htmlTemplate: emailTemplates['contact-assigned.html.hbs'],
+      textTemplate: emailTemplates['contact-assigned.text.hbs'],
       templateData: {
         organisationName,
         crnLink: EXTERNAL_CRN_URL,

@@ -1,16 +1,12 @@
-import * as fs from 'node:fs'
-import path from 'node:path'
 import type { SES } from 'aws-sdk'
-import handlebars from 'handlebars'
 import { logger } from '@nihr-ui/logger'
 import { EMAIL_CHARSET, EMAIL_FROM_ADDRESS } from './constants'
-
-handlebars.registerHelper('eq', (a, b) => a === b)
 
 export interface EmailArgs {
   to: string
   subject: string
-  templateName: 'contact-assigned' | 'contact-removed' | 'assessment-due'
+  htmlTemplate: (data: Record<string, unknown>) => string
+  textTemplate: (data: Record<string, unknown>) => string
   templateData: Record<string, unknown>
 }
 
@@ -18,16 +14,10 @@ export class EmailService {
   constructor(private sesClient: SES) {}
 
   sendEmail = async (data: EmailArgs) => {
-    const { subject, to, templateName, templateData } = data
+    const { subject, to, htmlTemplate, textTemplate, templateData } = data
 
-    const htmlSource = fs.readFileSync(path.resolve(process.cwd(), `public/email/templates/${templateName}.html.hbs`), {
-      encoding: EMAIL_CHARSET,
-    })
-    const textSource = fs.readFileSync(path.resolve(process.cwd(), `public/email/templates/${templateName}.text.hbs`), {
-      encoding: EMAIL_CHARSET,
-    })
-    const htmlBody = handlebars.compile(htmlSource)(templateData)
-    const textBody = handlebars.compile(textSource)(templateData)
+    const htmlBody = htmlTemplate(templateData)
+    const textBody = textTemplate(templateData)
 
     const message: SES.Types.SendEmailRequest = {
       Source: `"Assessmystudy" <${EMAIL_FROM_ADDRESS}>`,
