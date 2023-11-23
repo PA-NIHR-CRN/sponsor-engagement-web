@@ -46,7 +46,10 @@ describe('Successful registration', () => {
   test('Creates an account in IDG, updates local user with the new IDG id, then redirects to the confirmation page', async () => {
     const findUserResponse = Mock.of<Prisma.UserGetPayload<null>>({ email: mockEmail })
     const updateUserResponse = Mock.of<Prisma.UserGetPayload<null>>({ id: mockLocalUserId })
-    const createUserResponse = Mock.of<z.infer<typeof createUserResponseSchema>>({ id: mockIdentityGatewayId })
+    const createUserResponse = Mock.of<z.infer<typeof createUserResponseSchema>>({
+      id: mockIdentityGatewayId,
+      userName: mockIdentityGatewayId,
+    })
 
     jest.mocked(prismaClient.user.findFirst).mockResolvedValueOnce(findUserResponse)
     jest.mocked(prismaClient.user.update).mockResolvedValueOnce(updateUserResponse)
@@ -68,6 +71,13 @@ describe('Successful registration', () => {
         identityGatewayId: mockIdentityGatewayId,
         registrationConfirmed: true,
         registrationToken: null,
+        accounts: {
+          create: {
+            provider: 'oidc',
+            providerAccountId: mockIdentityGatewayId,
+            type: 'oauth',
+          },
+        },
       },
     })
 
