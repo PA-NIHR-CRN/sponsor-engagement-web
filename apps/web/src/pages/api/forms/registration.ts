@@ -59,7 +59,7 @@ export default async (req: ExtendedNextApiRequest, res: NextApiResponse) => {
             create: {
               providerAccountId: identityGatewayId,
               type: AUTH_PROVIDER_TYPE,
-              provider: AUTH_PROVIDER_NAME,
+              provider: AUTH_PROVIDER_NAME.toLowerCase(),
             },
           },
         },
