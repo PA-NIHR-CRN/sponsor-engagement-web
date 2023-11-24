@@ -136,6 +136,13 @@ describe('getServerSideProps', () => {
     expect(logger.info).toHaveBeenCalledWith('Found IDG account matching email')
     expect(updateUserMock).toHaveBeenCalledWith({
       data: {
+        accounts: {
+          create: {
+            provider: 'oidc',
+            providerAccountId: userName,
+            type: 'oauth',
+          },
+        },
         identityGatewayId: userName,
         registrationConfirmed: true,
         registrationToken: null,
