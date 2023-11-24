@@ -46,6 +46,8 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
       },
     })
 
+    logger.info('Removed contact with email %s from organisation %s', user.email, organisation.name)
+
     if (user.email) {
       await emailService.sendEmail({
         to: user.email,

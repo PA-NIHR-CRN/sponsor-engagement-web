@@ -93,6 +93,7 @@ const mockOrganisation = Mock.of<OrganisationWithRelations>({
         registrationConfirmed: true,
       },
       createdAt: new Date('2001-01-01'),
+      updatedAt: new Date('2001-01-02'),
     },
     {
       id: 2,
@@ -101,6 +102,7 @@ const mockOrganisation = Mock.of<OrganisationWithRelations>({
         registrationConfirmed: false,
       },
       createdAt: new Date('2001-01-01'),
+      updatedAt: new Date('2001-01-02'),
     },
   ],
 })
@@ -163,10 +165,10 @@ describe('Organisation page', () => {
 
     expect(contactCells).toEqual([
       'test1@test1.com',
-      '1 January 2001',
+      '2 January 2001',
       'Remove',
       'test2@test2.com',
-      '1 January 2001',
+      '2 January 2001',
       'Remove',
     ])
 

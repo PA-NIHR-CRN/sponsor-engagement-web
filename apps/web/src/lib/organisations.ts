@@ -90,7 +90,7 @@ const organisationByIdRelations = {
         user: true,
       },
       orderBy: {
-        createdAt: Prisma.SortOrder.desc,
+        updatedAt: Prisma.SortOrder.desc,
       },
     },
   },
@@ -128,10 +128,7 @@ export type UserOrganisationWithRelations = Prisma.UserOrganisationGetPayload<ty
 
 export const getUserOrganisationById = async (userOrganisationId: number) => {
   const query = {
-    where: {
-      id: userOrganisationId,
-      isDeleted: false,
-    },
+    where: { id: userOrganisationId },
     ...userOrganisationByIdRelations,
   }
 
