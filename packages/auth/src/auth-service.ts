@@ -1,9 +1,9 @@
 import { requests } from './handlers'
 
 export class AuthService {
-  getUser = async (email: string) => {
-    return requests.getUser(email)
-  }
+  checkSession = async (token: string) => requests.checkSession(token)
+
+  getUser = async (email: string) => requests.getUser(email)
 
   createUser = async (user: {
     givenName?: string
@@ -11,7 +11,5 @@ export class AuthService {
     userName?: string
     password: string
     emails: string[]
-  }) => {
-    return requests.createUser(user)
-  }
+  }) => requests.createUser(user)
 }

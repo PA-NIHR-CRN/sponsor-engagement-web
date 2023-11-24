@@ -1,5 +1,21 @@
 import { z } from 'zod'
 
+export const checkSessionResponseSchema = z.discriminatedUnion('active', [
+  z.object({
+    active: z.literal(false),
+  }),
+  z.object({
+    active: z.literal(true),
+    nbf: z.number(),
+    scope: z.string(),
+    token_type: z.string(),
+    exp: z.number(),
+    iat: z.number(),
+    client_id: z.string(),
+    username: z.string(),
+  }),
+])
+
 export const getUserRequestSchema = z.object({
   startIndex: z.number(),
   count: z.number(),
