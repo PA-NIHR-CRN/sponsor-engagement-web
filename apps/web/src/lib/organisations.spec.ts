@@ -75,7 +75,7 @@ describe('getUserOrganisationById', () => {
 
     expect(prismaMock.userOrganisation.findFirst).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { id: 123, isDeleted: false },
+        where: { id: 123 },
       })
     )
 
