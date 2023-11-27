@@ -9,7 +9,12 @@ import { withApiHandler } from '../../../utils/withApiHandler'
 import { getOrganisationById } from '../../../lib/organisations'
 import { prismaClient } from '../../../lib/prisma'
 import { Roles } from '../../../constants'
-import { EXTERNAL_CRN_URL, SIGN_IN_PAGE, SUPPORT_PAGE } from '../../../constants/routes'
+import {
+  EXTERNAL_CRN_TERMS_CONDITIONS_URL,
+  EXTERNAL_CRN_URL,
+  SIGN_IN_PAGE,
+  SUPPORT_PAGE,
+} from '../../../constants/routes'
 import { getAbsoluteUrl } from '../../../utils/email'
 import emailTemplates from '../../../templates/email'
 
@@ -134,7 +139,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
 
     await emailService.sendEmail({
       to: emailAddress,
-      subject: 'NIHR CRN has invited you to review and assess research studies',
+      subject: 'Assess the progress of your studies',
       htmlTemplate: emailTemplates['contact-assigned.html.hbs'],
       textTemplate: emailTemplates['contact-assigned.text.hbs'],
       templateData: {
@@ -142,6 +147,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
         crnLink: EXTERNAL_CRN_URL,
         signInLink: getAbsoluteUrl(`${SIGN_IN_PAGE}${isNewUser ? `?registrationToken=${savedRegistrationToken}` : ``}`),
         requestSupportLink: getAbsoluteUrl(SUPPORT_PAGE),
+        termsAndConditionsLink: EXTERNAL_CRN_TERMS_CONDITIONS_URL,
       },
     })
 

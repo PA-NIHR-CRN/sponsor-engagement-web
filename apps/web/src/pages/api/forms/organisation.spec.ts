@@ -11,7 +11,12 @@ import { prismaClient } from '../../../lib/prisma'
 import type { OrganisationAddInputs } from '../../../utils/schemas'
 import { userNoRoles, userWithContactManagerRole } from '../../../__mocks__/session'
 import { AuthError } from '../../../utils/auth'
-import { EXTERNAL_CRN_URL, SIGN_IN_PAGE, SUPPORT_PAGE } from '../../../constants/routes'
+import {
+  EXTERNAL_CRN_TERMS_CONDITIONS_URL,
+  EXTERNAL_CRN_URL,
+  SIGN_IN_PAGE,
+  SUPPORT_PAGE,
+} from '../../../constants/routes'
 import type { OrganisationWithRelations, UserOrganisationWithRelations } from '../../../lib/organisations'
 import type { ExtendedNextApiRequest } from './organisation'
 import api from './organisation'
@@ -124,12 +129,13 @@ describe('Successful organisation sponsor contact invitation', () => {
 
     // Send email
     expect(emailService.sendEmail).toHaveBeenCalledWith({
-      subject: 'NIHR CRN has invited you to review and assess research studies',
+      subject: 'Assess the progress of your studies',
       templateData: {
         crnLink: EXTERNAL_CRN_URL,
         organisationName: updateOrgResponse.name,
         requestSupportLink: `http://localhost:3000${SUPPORT_PAGE}`,
         signInLink: `http://localhost:3000/auth/signin?registrationToken=${registrationToken}`,
+        termsAndConditionsLink: EXTERNAL_CRN_TERMS_CONDITIONS_URL,
       },
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- valid any
       htmlTemplate: expect.any(Function),
@@ -213,12 +219,13 @@ describe('Successful organisation sponsor contact invitation', () => {
 
     // Send email
     expect(emailService.sendEmail).toHaveBeenCalledWith({
-      subject: 'NIHR CRN has invited you to review and assess research studies',
+      subject: 'Assess the progress of your studies',
       templateData: {
         crnLink: EXTERNAL_CRN_URL,
         organisationName: updateOrgResponse.name,
         requestSupportLink: `http://localhost:3000${SUPPORT_PAGE}`,
         signInLink: 'http://localhost:3000/auth/signin',
+        termsAndConditionsLink: EXTERNAL_CRN_TERMS_CONDITIONS_URL,
       },
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- valid any
       htmlTemplate: expect.any(Function),
@@ -293,12 +300,13 @@ describe('Successful organisation sponsor contact invitation', () => {
 
     // Send email
     expect(emailService.sendEmail).toHaveBeenCalledWith({
-      subject: 'NIHR CRN has invited you to review and assess research studies',
+      subject: 'Assess the progress of your studies',
       templateData: {
         crnLink: EXTERNAL_CRN_URL,
         organisationName: updateOrgResponse.name,
         requestSupportLink: `http://localhost:3000${SUPPORT_PAGE}`,
         signInLink: 'http://localhost:3000/auth/signin',
+        termsAndConditionsLink: EXTERNAL_CRN_TERMS_CONDITIONS_URL,
       },
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- valid any
       htmlTemplate: expect.any(Function),
