@@ -6,10 +6,13 @@ import type {
 } from 'database'
 import { logger } from '@nihr-ui/logger'
 import dayjs from 'dayjs'
+import { config as dotEnvConfig } from 'dotenv'
 import { prismaClient } from './lib/prisma'
 import type { Study, StudySponsor, StudyWithRelationships } from './types'
 import { StudyRecordStatus, StudyStatus } from './types'
 import { getOrganisationName, getOrgsUniqueByName, getOrgsUniqueByNameRole, getOrgsUniqueByRole } from './utils'
+
+dotEnvConfig()
 
 // Entities related to the current batch of studies
 let studyEntities: StudyWithRelationships[] = []
@@ -301,8 +304,8 @@ const createStudyRelationships = async () => {
   }
 }
 
-const setAssessmentDue = async () => {
-  const threeMonthsAgo = dayjs().subtract(3, 'month').toDate()
+const setAssessmentDue = async (lapsePeriodMonths: number) => {
+  const threeMonthsAgo = dayjs().subtract(lapsePeriodMonths, 'month').toDate()
   const assessmentDueResult = await prismaClient.study.updateMany({
     data: {
       isDueAssessment: true,
@@ -431,11 +434,14 @@ const deleteOrganisationRoles = async () => {
 }
 
 export const ingest = async () => {
-  const { API_URL, API_USERNAME, API_PASSWORD } = process.env
+  const { API_URL, API_USERNAME, API_PASSWORD, ASSESSMENT_LAPSE_MONTHS } = process.env
 
   assert(API_URL)
   assert(API_USERNAME)
   assert(API_PASSWORD)
+  assert(ASSESSMENT_LAPSE_MONTHS)
+
+  const lapsePeriodMonths = Number(ASSESSMENT_LAPSE_MONTHS)
 
   allStudyIds = []
   allOrganisationIds = []
@@ -459,7 +465,7 @@ export const ingest = async () => {
     await createOrganisations()
     await createOrganisationRelationships()
     await createStudyRelationships()
-    await setAssessmentDue()
+    await setAssessmentDue(lapsePeriodMonths)
   }
 
   await deleteStudies()
