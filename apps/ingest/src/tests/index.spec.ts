@@ -10,7 +10,6 @@ import {
 } from '../mocks/entities'
 import { prismaMock } from '../mocks/prisma'
 import studies from '../mocks/studies.json'
-import { prismaClient } from '../lib/prisma'
 
 jest.mock('@nihr-ui/logger')
 
@@ -22,9 +21,15 @@ const server = setupServer(
   })
 )
 
-beforeAll(() => server.listen())
-afterEach(() => server.resetHandlers())
-afterAll(() => server.close())
+beforeAll(() => {
+  server.listen()
+})
+afterEach(() => {
+  server.resetHandlers()
+})
+afterAll(() => {
+  server.close()
+})
 
 beforeEach(() => {
   studyEntities.forEach((entity) => prismaMock.study.upsert.mockResolvedValueOnce(entity))
@@ -43,8 +48,10 @@ beforeEach(() => {
   prismaMock.organisation.findMany.mockResolvedValueOnce(organisationEntities)
   prismaMock.organisationRole.findMany.mockResolvedValueOnce(organisationRoleEntities)
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- nock
   prismaMock.$transaction.mockImplementation(async (ops: any) => {
     await Promise.all(ops)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call -- mock
     return ops.map(() => ({}))
   })
 })

@@ -1,12 +1,11 @@
-import {
+import type {
   Organisation as OrganisationEntity,
   OrganisationRole as OrganisationRoleEntity,
   SysRefOrganisationRole as SysRefOrganisationRoleEntity,
 } from 'database'
 import { simpleFaker } from '@faker-js/faker'
 import { Mock } from 'ts-mockery'
-
-import { Study, StudyWithRelationships } from '../types'
+import type { Study, StudyWithRelationships } from '../types'
 import { getOrganisationName, getOrgsUniqueByName, getOrgsUniqueByNameRole, getOrgsUniqueByRole } from '../utils'
 import studies from './studies.json'
 
