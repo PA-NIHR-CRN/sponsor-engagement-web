@@ -1,9 +1,10 @@
 import type { SES } from 'aws-sdk'
 import { logger } from '@nihr-ui/logger'
-import { EMAIL_CHARSET, EMAIL_FROM_ADDRESS } from './constants'
+import asyncPool from 'tiny-async-pool'
+import { EMAIL_CHARSET, EMAIL_FROM_ADDRESS, SES_RATE_LIMIT } from './constants'
 
 export interface EmailArgs {
-  to: string
+  to: string | string[]
   subject: string
   htmlTemplate: (data: Record<string, unknown>) => string
   textTemplate: (data: Record<string, unknown>) => string
@@ -19,10 +20,12 @@ export class EmailService {
     const htmlBody = htmlTemplate(templateData)
     const textBody = textTemplate(templateData)
 
+    const recipients = Array.isArray(to) ? to : [to]
+
     const message: SES.Types.SendEmailRequest = {
       Source: `"NIHR CRN" <${EMAIL_FROM_ADDRESS}>`,
       Destination: {
-        ToAddresses: [to],
+        ToAddresses: recipients,
       },
       Message: {
         Subject: {
@@ -45,5 +48,13 @@ export class EmailService {
     await this.sesClient.sendEmail(message).promise()
 
     logger.info('Email notification sent to %s with subject %s', to, subject)
+
+    return recipients
+  }
+
+  sendBulkEmail = async (emails: readonly EmailArgs[], onSuccess: (recipients: string[]) => Promise<void>) => {
+    for await (const recipients of asyncPool(SES_RATE_LIMIT, emails, this.sendEmail)) {
+      await onSuccess(recipients)
+    }
   }
 }
