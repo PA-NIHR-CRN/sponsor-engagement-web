@@ -106,9 +106,8 @@ describe('Organisations page', () => {
     // Study results title
     expect(screen.getByText(`${mockOrganisations.length} organisations found`)).toBeInTheDocument()
 
-    // Sort
-    expect(screen.getByRole('combobox', { name: 'Sort by' })).toBeInTheDocument()
-    expect(screen.getByRole<HTMLOptionElement>('option', { name: 'Due assessment' }).selected).toBe(true)
+    // Sort (not available for orgs page)
+    expect(screen.queryByRole('combobox', { name: 'Sort by' })).not.toBeInTheDocument()
 
     // Results
     const table = screen.getByRole('table', { name: 'Manage sponsor organisations' })

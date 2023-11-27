@@ -8,7 +8,7 @@ import { withServerSideProps } from '../../utils/withServerSideProps'
 import { getStudyOrganisations } from '../../lib/organisations'
 import { ORGANISATIONS_PER_PAGE, Roles } from '../../constants'
 import { pluraliseOrganisation } from '../../utils/pluralise'
-import { Filters, OrganisationsListSkeleton, Pagination, SelectedFilters, Sort } from '../../components/molecules'
+import { Filters, OrganisationsListSkeleton, Pagination, SelectedFilters } from '../../components/molecules'
 import { Card } from '../../components/atoms'
 import { useFormListeners } from '../../hooks/useFormListeners'
 import { getFiltersFromQuery } from '../../utils/filters'
@@ -45,19 +45,10 @@ export default function Organisations({
 
           <SelectedFilters filters={filters} isLoading={isLoading} />
 
-          {/* Sort bar */}
           <div className="flex-wrap items-center justify-between gap-3 md:flex govuk-!-margin-bottom-4">
             <p className="govuk-heading-s mb-0 whitespace-nowrap">{`${totalItems} ${pluraliseOrganisation(
               totalItems
             )} found`}</p>
-            <div className="govuk-form-group mt-2 items-center justify-end md:my-0 md:flex">
-              {/* Show filters */}
-              {/* <div>{showFiltersButton()}</div> */}
-              {/* Sort by */}
-              <div className="items-center whitespace-nowrap md:flex">
-                <Sort defaultOrder="updated" form="filters-form" />
-              </div>
-            </div>
           </div>
 
           {isLoading ? (
