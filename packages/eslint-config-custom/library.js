@@ -27,7 +27,7 @@ module.exports = {
       },
     },
   },
-  ignorePatterns: ['node_modules/', 'dist/'],
+  ignorePatterns: ['node_modules/', 'dist/', 'coverage/'],
   rules: {
     '@typescript-eslint/explicit-function-return-type': 'off',
   },
