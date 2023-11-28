@@ -8,13 +8,13 @@ const config: Config = {
   },
   testPathIgnorePatterns: ['dist', '.vscode'],
   coverageReporters: ['json-summary', 'text', 'html', 'lcov'],
-  coveragePathIgnorePatterns: ['node_modules'],
+  coveragePathIgnorePatterns: ['node_modules', './index.ts'],
   coverageThreshold: {
     global: {
-      lines: 96,
+      lines: 100,
       functions: 100,
-      branches: 85,
-      statements: 97,
+      branches: 100,
+      statements: 100,
     },
   },
   collectCoverageFrom: ['src/**/*.{ts,tsx}'],

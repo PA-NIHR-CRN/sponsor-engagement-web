@@ -25,13 +25,15 @@ describe('notify', () => {
     expect(emailService.sendBulkEmail).toHaveBeenCalledWith(
       [
         {
-          subject: `Assess progress of research studies in NIHR CRN portfolio`,
+          subject: `Assess the progress of your studies`,
           to: ['user1@test.com', 'user2@test.com'],
           templateData: {
             crnLink: 'https://www.nihr.ac.uk/explore-nihr/support/clinical-research-network.htm',
             iconUrl: 'http://localhost:3000/assets/images/exclamation-icon.png',
             requestSupportLink: 'http://localhost:3000/request-support',
             signInLink: 'http://localhost:3000/auth/signin',
+            termsAndConditionsLink:
+              'https://www.nihr.ac.uk/documents/researchers/i-need-help-to-deliver-my-research/terms-and-conditions-for-nihr-crn-support.pdf',
           },
           htmlTemplate: expect.any(Function),
           textTemplate: expect.any(Function),
