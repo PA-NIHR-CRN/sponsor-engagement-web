@@ -4,26 +4,35 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
 "<html lang='en'>
   <body>
     <div>
-      <h1>NIHR CRN has invited you to review and assess research studies</h1>
+      <h1>NIHR CRN has invited you to assess the progress of your studies</h1>
 
       <p>Hello,</p>
 
       <p>
-        The
-        <a href='https://www.nihr.ac.uk/explore-nihr/support/clinical-research-network.htm'>NIHR Clinical Research Network (CRN)</a>
-        supports patients, the public and health and care organisations across the UK to participate in high-quality
-        research.
-      </p>
-
-      <p>
-        The NIHR CRN tracks progress of research studies in its portfolio using data provided by Sponsors or their
-        delegates. NIHR CRN asks sponsors or their delegates to review these studies and provide an assessment of how
-        the study is progressing.
-      </p>
-
-      <p>
         You have been nominated as a contact for
-        Mocked org name. Sign in requires an NIHR Identity Gateway account.
+        Mocked org name
+        studies on the NIHR Clinical Research Network’s (CRN) research portfolio.
+      </p>
+
+      <p>
+        The
+        <a href='https://www.nihr.ac.uk/explore-nihr/support/clinical-research-network.htm'>NIHR CRN</a>
+        supports Sponsors and their delegates to deliver high-quality research, for the benefit of patients, the public
+        and health and care organisations across England.
+      </p>
+
+      <p>
+        The NIHR CRN tracks the progress of research studies in its portfolio using data provided by Sponsors or their
+        delegates on behalf of the Department of Health and Social Care.
+      </p>
+
+      <p>
+        NIHR CRN asks Sponsors or their delegates to review these studies and provide regular assessments of how the
+        study is progressing.
+      </p>
+
+      <p>
+        Please sign in to the Sponsor Engagement Tool to provide updates on studies.
       </p>
 
       <a
@@ -51,12 +60,12 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
 
       <h2>Why am I being asked to assess studies?</h2>
 
-      <p>Sponsors or their delegates are asked to review and assess progress of studies for UK sites when:</p>
+      <p>Sponsors or their delegates are asked to review and assess the progress of studies when:</p>
 
       <ul>
-        <li>A study falls behind the agreed milestones in the UK</li>
-        <li>A study is not recruiting to target in the UK</li>
-        <li>And the last progress assessment is over 3 months old</li>
+        <li>A study falls behind the agreed milestones</li>
+        <li>A study is not recruiting to target</li>
+        <li>And the last progress assessment is over three months old</li>
       </ul>
 
       <p>
@@ -65,7 +74,13 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
         with their research study at any time.
       </p>
 
-      <h2>Nominate someone else to assess research studies</h2>
+      <p>
+        Please note that providing regular study assessments is a requirement of the
+        <a href='https://www.nihr.ac.uk/documents/researchers/i-need-help-to-deliver-my-research/terms-and-conditions-for-nihr-crn-support.pdf'>Terms and Conditions for NIHR CRN support</a>. Failure to do so may result
+        in removal from the NIHR CRN Portfolio.
+      </p>
+
+      <h2>Nominate someone else to assess studies</h2>
 
       <p>
         The NIHR CRN can give other people in your organisation access to this service. Contact
@@ -181,35 +196,41 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
 `;
 
 exports[`Email template "contact-assigned.text.hbs" displays correctly 1`] = `
-"# NIHR CRN has invited you to review and assess research studies
+"# NIHR CRN has invited you to assess the progress of your studies
 
 Hello,
 
-The NIHR Clinical Research Network (CRN) supports patients, the public and health and care organisations across the UK
-to participate in high-quality research.
+You have been nominated as a contact for Mocked org name studies on the NIHR Clinical Research Network's (CRN) research portfolio.
 
-The NIHR CRN tracks progress of research studies in its portfolio using data provided by Sponsors or their delegates.
-NIHR CRN asks sponsors or their delegates to review these studies and provide an assessment of how the study is
-progressing.
-You have been nominated as a contact for Mocked org name. Sign in requires an NIHR Identity Gateway account.
+The NIHR CRN supports Sponsors and their delegates to deliver high-quality research, for the benefit of patients, the public and health and care organisations across England.
+
+The NIHR CRN tracks the progress of research studies in its portfolio using data provided by Sponsors or their delegates on behalf of the Department of Health and Social Care.
+
+NIHR CRN asks Sponsors or their delegates to review these studies and provide regular assessments of how the study is progressing.
+
+Please sign in to the Sponsor Engagement Tool to provide updates on studies. (http://localhost:3000/auth/signin)
 
 # Why am I being asked to assess studies?
 
-Sponsors or their delegates are asked to review and assess progress of studies for UK sites when:
+Sponsors or their delegates are asked to review and assess the progress of studies when:
 
-- A study falls behind the agreed milestones in the UK
-- A study is not recruiting to target in the UK
-- And the last progress assessment is over 3 months old
+- A study falls behind the agreed milestones
+- A study is not recruiting to target
+- And the last progress assessment is over three months old
 
 Sponsors or their delegates can request NIHR CRN support with their research study at any time. (http://localhost:3000/request-support)
 
-# Nominate someone else to assess research studies
+Please note that providing regular study assessments is a requirement of the Terms and Conditions for NIHR CRN support.
+Failure to do so may result in removal from the NIHR CRN Portfolio. (https://www.nihr.ac.uk/documents/researchers/i-need-help-to-deliver-my-research/terms-and-conditions-for-nihr-crn-support.pdf)
+
+# Nominate someone else to assess studies
 
 The NIHR CRN can give other people in your organisation access to this service. Contact supportmystudy@nihr.ac.uk to add
 a new contact.
 
 This email is not monitored, do not reply. If you’re not sure why you’ve received this email or need to be removed from
-our list contact supportmystudy@nihr.ac.uk."
+our list, please contact supportmystudy@nihr.ac.uk.
+"
 `;
 
 exports[`Email template "contact-removed.html.hbs" displays correctly 1`] = `
@@ -346,4 +367,25 @@ review and assess study progress.
 If you think there’s been an error please contact supportmystudy@nihr.ac.uk.
 
 If you’re not sure why you’ve received this email or need to be removed from our list contact supportmystudy@nihr.ac.uk."
+`;
+
+exports[`Email template "index.spec.ts" displays correctly 1`] = `
+"import { EXTERNAL_CRN_TERMS_CONDITIONS_URL, EXTERNAL_CRN_URL, SUPPORT_PAGE } from '../../constants/routes'
+import emailTemplates from '.'
+
+const templates = Object.keys(emailTemplates).filter((name) => name !== 'index.js')
+
+test.each(templates)('Email template %p displays correctly', (key) => {
+  const template = emailTemplates[key] as (data: Record<string, string>) => string
+  expect(
+    template({
+      crnLink: EXTERNAL_CRN_URL,
+      organisationName: 'Mocked org name',
+      requestSupportLink: \`http://localhost:3000\${SUPPORT_PAGE}\`,
+      signInLink: 'http://localhost:3000/auth/signin',
+      termsAndConditionsLink: EXTERNAL_CRN_TERMS_CONDITIONS_URL,
+    })
+  ).toMatchSnapshot()
+})
+"
 `;
