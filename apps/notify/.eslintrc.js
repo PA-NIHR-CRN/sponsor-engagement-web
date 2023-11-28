@@ -1,3 +1,5 @@
+const path = require('path')
+
 module.exports = {
   extends: ['custom/library'],
   ignorePatterns: [
@@ -9,6 +11,9 @@ module.exports = {
     '**/*.spec.ts',
     'src/mocks/**/*',
   ],
+  parserOptions: {
+    project: [path.join(__dirname, 'tsconfig.eslint.json')],
+  },
   overrides: [
     {
       files: ['**/*.spec.ts'],

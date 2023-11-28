@@ -8,7 +8,7 @@
     "dev": "nodemon --exec \"node -r esbuild-register ./src/index.ts\" -e .ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "precompile": "ts-node ./src/scripts/precompile-templates.ts",
+    "precompile": "ts-node ./scripts/precompile-templates.ts",
     "start": "node -r esbuild-register ./src/index.ts",
     "test": "jest --watch",
     "test:ci": "jest --ci --coverage"
