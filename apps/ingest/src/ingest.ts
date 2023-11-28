@@ -1,11 +1,14 @@
 import assert from 'assert'
 import axios from 'axios'
-import { Organisation as OrganisationEntity, SysRefOrganisationRole as SysRefOrganisationRoleEntity } from 'database'
+import type {
+  Organisation as OrganisationEntity,
+  SysRefOrganisationRole as SysRefOrganisationRoleEntity,
+} from 'database'
 import { logger } from '@nihr-ui/logger'
 import dayjs from 'dayjs'
-
 import { prismaClient } from './lib/prisma'
-import { Study, StudyRecordStatus, StudySponsor, StudyStatus, StudyWithRelationships } from './types'
+import type { Study, StudySponsor, StudyWithRelationships } from './types'
+import { StudyRecordStatus, StudyStatus } from './types'
 import { getOrganisationName, getOrgsUniqueByName, getOrgsUniqueByNameRole, getOrgsUniqueByRole } from './utils'
 
 // Entities related to the current batch of studies
@@ -36,7 +39,7 @@ const createStudies = async () => {
       sampleSize: study.SampleSize,
       chiefInvestigatorFirstName: study.ChiefInvestigatorFirstName,
       chiefInvestigatorLastName: study.ChiefInvestigatorLastName,
-      managingSpeciality: study.ManagingSpecialty ?? '',
+      managingSpeciality: study.ManagingSpecialty,
       totalRecruitmentToDate: study.TotalRecruitmentToDate,
       plannedOpeningDate: study.PlannedRecruitmentStartDate ? new Date(study.PlannedRecruitmentStartDate) : undefined,
       plannedClosureDate: study.PlannedRecruitmentEndDate ? new Date(study.PlannedRecruitmentEndDate) : undefined,
@@ -135,9 +138,8 @@ const createOrganisationRelationships = async () => {
   const relatedOrgs = getOrgsUniqueByNameRole(studies)
 
   const organisationRoleInputs = relatedOrgs.map((relatedOrg) => {
-    const organisationId = organisationEnitities.find((org) => org.name === getOrganisationName(relatedOrg))
-      ?.id as number
-    const roleId = organisationRoleRefEntities.find((ref) => ref.name === relatedOrg.OrganisationRole)?.id as number
+    const organisationId = organisationEnitities.find((org) => org.name === getOrganisationName(relatedOrg))!.id
+    const roleId = organisationRoleRefEntities.find((ref) => ref.name === relatedOrg.OrganisationRole)!.id
     return {
       organisationId,
       roleId,
@@ -163,10 +165,9 @@ const createStudyRelationships = async () => {
   const studyOrganisationInputs = studies
     .map((study) =>
       study.StudySponsors.map((sponsor) => {
-        const studyId = studyEntities.find((studyEntity) => studyEntity.cpmsId === study.Id)?.id as number
-        const organisationId = organisationEnitities.find((org) => org.name === sponsor.OrganisationName)?.id as number
-        const organisationRoleId = organisationRoleRefEntities.find((ref) => ref.name === sponsor.OrganisationRole)
-          ?.id as number
+        const studyId = studyEntities.find((studyEntity) => studyEntity.cpmsId === study.Id)!.id
+        const organisationId = organisationEnitities.find((org) => org.name === sponsor.OrganisationName)!.id
+        const organisationRoleId = organisationRoleRefEntities.find((ref) => ref.name === sponsor.OrganisationRole)!.id
         return {
           studyId,
           organisationId,
@@ -219,8 +220,8 @@ const createStudyRelationships = async () => {
   const studyFunderInputs = studies
     .map((study) =>
       study.StudyFunders.map((funder) => {
-        const studyId = studyEntities.find((studyEntity) => studyEntity.cpmsId === study.Id)?.id as number
-        const organisationId = organisationEnitities.find((org) => org.name === funder.FunderName)?.id as number
+        const studyId = studyEntities.find((studyEntity) => studyEntity.cpmsId === study.Id)!.id
+        const organisationId = organisationEnitities.find((org) => org.name === funder.FunderName)!.id
         return {
           studyId,
           organisationId,
@@ -242,7 +243,7 @@ const createStudyRelationships = async () => {
   const evaluationCategoryInputs = studies
     .map((study) =>
       study.StudyEvaluationCategories.map((category) => {
-        const studyId = studyEntities.find((studyEntity) => studyEntity.cpmsId === study.Id)?.id as number
+        const studyId = studyEntities.find((studyEntity) => studyEntity.cpmsId === study.Id)!.id
         return {
           studyId,
           indicatorType: category.EvaluationCategoryType,
@@ -332,11 +333,14 @@ const fetchStudies = async function* (url: string, username: string, password: s
   while (totalStudies === 0 || pageNumber * pageSize < totalStudies + pageSize) {
     try {
       logger.info(`Request studies page: ${pageNumber} (total ${totalStudies})`)
-      const { data } = await axios.get(url, {
-        headers: {
-          username: username,
-          password: password,
-        },
+      // eslint-disable-next-line no-await-in-loop -- generator loop
+      const { data } = await axios.get<{
+        Result: {
+          TotalRecords: number
+          Studies: Study[]
+        }
+      }>(url, {
+        headers: { username, password },
         params: {
           pageSize: 1000,
           pageNumber,
@@ -355,7 +359,7 @@ const fetchStudies = async function* (url: string, username: string, password: s
       })
       totalStudies = data.Result.TotalRecords
       ++pageNumber
-      yield data.Result.Studies as Study[]
+      yield data.Result.Studies
     } catch (error) {
       logger.error('Error occurred while fetching study data')
       if (axios.isAxiosError(error)) {
@@ -389,7 +393,7 @@ const deleteOrganisations = async () => {
   const deletedOrgIds = currentOrganisations.filter(({ id }) => !allOrganisationIds.includes(id)).map(({ id }) => id)
 
   if (deletedOrgIds.length > 0) {
-    prismaClient.organisation.updateMany({ where: { id: { in: deletedOrgIds } }, data: { isDeleted: true } })
+    await prismaClient.organisation.updateMany({ where: { id: { in: deletedOrgIds } }, data: { isDeleted: true } })
     logger.info('Flagged %s organisations as deleted', deletedOrgIds.length)
   }
 }
@@ -439,7 +443,7 @@ export const ingest = async () => {
 
   for await (const studyRecords of fetchStudies(API_URL, API_USERNAME, API_PASSWORD)) {
     studies = studyRecords
-      .filter((study) => !!study.QualificationDate)
+      .filter((study) => Boolean(study.QualificationDate))
       .map((study) => ({
         ...study,
         StudySponsors: study.StudySponsors.map(

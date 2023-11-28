@@ -1,10 +1,4 @@
-import {
-  Organisation as OrganisationEntity,
-  Prisma,
-  Study as StudyEntity,
-  StudyFunder as StudyFunderEntity,
-  StudyOrganisation as StudyOrganisationEntity,
-} from 'database'
+import type { Prisma } from 'database'
 
 export enum StudyRecordStatus {
   Live = 'SRS_LIVE@2.16.840.1.113883.2.1.3.8.5.2.4.230',
