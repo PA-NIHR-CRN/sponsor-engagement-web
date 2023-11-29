@@ -6,7 +6,6 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "downlevelIteration": true,
-    "isolatedModules": false,
     "allowJs": true
   },
   "exclude": ["dist", "build", "node_modules", "**/*.spec.ts", "src/mocks/**/*"],

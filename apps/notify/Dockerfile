@@ -28,7 +28,7 @@ COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
 
 RUN npm run db:generate
-RUN npm run build
+RUN npm run build --filter=notify...
 
 FROM base AS runner
 WORKDIR /app
