@@ -14,7 +14,7 @@ import emailTemplates from './templates/email'
 
 dotEnvConfig()
 
-export const notify = async () => {
+const sendNotifications = async () => {
   const allowList = process.env.NOTIFY_ALLOW_LIST?.split(',')
 
   const usersWithStudiesDueAssessment = await prismaClient.user.findMany({
@@ -64,4 +64,12 @@ export const notify = async () => {
   await emailService.sendBulkEmail(emailInputs, onSuccess)
 
   logger.info('Finished sending assessment notifications')
+}
+
+export const notify = async () => {
+  try {
+    await sendNotifications()
+  } catch (error) {
+    logger.error(error)
+  }
 }
