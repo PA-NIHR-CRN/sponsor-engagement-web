@@ -20,7 +20,7 @@ export class EmailService {
     const textBody = textTemplate(templateData)
 
     const message: SES.Types.SendEmailRequest = {
-      Source: `"Assessmystudy" <${EMAIL_FROM_ADDRESS}>`,
+      Source: `"NIHR CRN" <${EMAIL_FROM_ADDRESS}>`,
       Destination: {
         ToAddresses: [to],
       },
