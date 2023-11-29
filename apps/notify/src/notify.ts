@@ -1,5 +1,6 @@
 import { logger } from '@nihr-ui/logger'
 import { emailService } from '@nihr-ui/email'
+import { config as dotEnvConfig } from 'dotenv'
 import { prismaClient } from './lib/prisma'
 import { arrayChunks, getAbsoluteUrl } from './utils'
 import {
@@ -11,9 +12,14 @@ import {
 } from './constants'
 import emailTemplates from './templates/email'
 
+dotEnvConfig()
+
 export const notify = async () => {
+  const allowList = process.env.NOTIFY_ALLOW_LIST?.split(',')
+
   const usersWithStudiesDueAssessment = await prismaClient.user.findMany({
     where: {
+      ...(allowList && { email: { in: allowList } }),
       organisations: {
         some: {
           organisation: { studies: { some: { study: { isDueAssessment: true } } } },
@@ -21,6 +27,11 @@ export const notify = async () => {
       },
     },
   })
+
+  if (usersWithStudiesDueAssessment.length === 0) {
+    logger.info('No assessment notifications required')
+    return
+  }
 
   const usersWithStudiesDueAssessmentByEmail = Object.fromEntries(
     usersWithStudiesDueAssessment.map((user) => [user.email, user])

@@ -91,7 +91,7 @@ describe('EmailService', () => {
     expect(sesClientMock.sendEmail).toHaveBeenCalledTimes(2)
 
     expect(sesClientMock.sendEmail).toHaveBeenCalledWith({
-      Source: '"Assessmystudy" <noreply-assessmystudy@nihr.ac.uk>',
+      Source: '"NIHR CRN" <noreply-assessmystudy@nihr.ac.uk>',
       Destination: { ToAddresses: ['recipient1@example.com', 'recipient2@example.com'] },
       Message: {
         Subject: { Data: 'Test Subject 1', Charset: 'utf-8' },
@@ -103,7 +103,7 @@ describe('EmailService', () => {
     })
 
     expect(sesClientMock.sendEmail).toHaveBeenCalledWith({
-      Source: '"Assessmystudy" <noreply-assessmystudy@nihr.ac.uk>',
+      Source: '"NIHR CRN" <noreply-assessmystudy@nihr.ac.uk>',
       Destination: { ToAddresses: ['recipient3@example.com', 'recipient4@example.com'] },
       Message: {
         Subject: { Data: 'Test Subject 2', Charset: 'utf-8' },
