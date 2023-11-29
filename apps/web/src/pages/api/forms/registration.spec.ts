@@ -201,8 +201,7 @@ describe('Failed registration - application errors', () => {
   })
 
   test('No user associated with the provided registration token', async () => {
-    const findUserResponse = Mock.of<Prisma.UserGetPayload<null>>({ email: null })
-    jest.mocked(prismaClient.user.findFirst).mockResolvedValueOnce(findUserResponse)
+    jest.mocked(prismaClient.user.findFirst).mockResolvedValueOnce(null)
 
     const res = await testHandler(api, { method: 'POST', body })
     expect(logger.error).toHaveBeenCalledWith(

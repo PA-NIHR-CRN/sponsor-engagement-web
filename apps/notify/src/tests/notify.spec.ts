@@ -7,6 +7,7 @@ import { prismaClient } from '../lib/prisma'
 
 jest.mock('@nihr-ui/logger')
 jest.mock('@nihr-ui/email')
+jest.mock('dotenv')
 
 beforeEach(() => {
   jest.clearAllMocks()
