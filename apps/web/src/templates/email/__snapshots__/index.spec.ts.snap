@@ -75,9 +75,11 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
       </p>
 
       <p>
-        Please note that providing regular study assessments is a requirement of the
-        <a href='https://www.nihr.ac.uk/documents/researchers/i-need-help-to-deliver-my-research/terms-and-conditions-for-nihr-crn-support.pdf'>Terms and Conditions for NIHR CRN support</a>. Failure to do so may result
-        in removal from the NIHR CRN Portfolio.
+        <strong>
+          Please note that providing regular study assessments is a requirement of the
+          <a href='https://www.nihr.ac.uk/documents/researchers/i-need-help-to-deliver-my-research/terms-and-conditions-for-nihr-crn-support.pdf'>Terms and Conditions for NIHR CRN support</a>. Failure to do so may
+          result in removal from the NIHR CRN Portfolio.
+        </strong>
       </p>
 
       <h2>Nominate someone else to assess studies</h2>
