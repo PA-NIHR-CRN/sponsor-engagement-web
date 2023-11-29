@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import axios from 'axios'
 import type { ZodType, z } from 'zod'
 import rateLimit from 'axios-rate-limit'
@@ -47,7 +48,7 @@ export const requests = {
   createUser: async ({
     givenName,
     familyName,
-    userName = crypto.randomUUID(),
+    userName = randomUUID(),
     password,
     emails,
   }: {

@@ -3,7 +3,7 @@
   "globalDependencies": ["**/.env.*local"],
   "pipeline": {
     "build": {
-      "dependsOn": ["^build", "db:generate"],
+      "dependsOn": ["^build", "db:generate", "precompile"],
       "outputs": ["dist/**/*", ".next/**", "!.next/cache/**"],
       "env": [
         "APP_ENV",
@@ -25,7 +25,7 @@
     },
     "test": {
       "cache": false,
-      "dependsOn": ["db:generate"],
+      "dependsOn": ["db:generate", "precompile"],
       "dotEnv": [".env.local"],
       "env": [
         "APP_ENV",
@@ -45,7 +45,7 @@
     "typecheck": {},
     "dev": {
       "cache": false,
-      "dependsOn": ["db:generate"],
+      "dependsOn": ["db:generate", "precompile"],
       "persistent": true,
       "env": [
         "APP_ENV",
@@ -62,6 +62,9 @@
       ]
     },
     "db:generate": { "cache": false },
-    "migrate:deploy": { "cache": false }
+    "migrate:deploy": { "cache": false },
+    "precompile": {
+      "outputs": ["src/templates/email/**"]
+    }
   }
 }

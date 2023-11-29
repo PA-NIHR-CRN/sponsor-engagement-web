@@ -46,10 +46,12 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
       },
     })
 
+    logger.info('Removed contact with email %s from organisation %s', user.email, organisation.name)
+
     if (user.email) {
       await emailService.sendEmail({
         to: user.email,
-        subject: `NIHR CRN has removed you as a reviewer for ${organisation.name}`,
+        subject: `NIHR CRN has removed you as a Sponsor contact for ${organisation.name}`,
         htmlTemplate: emailTemplates['contact-removed.html.hbs'],
         textTemplate: emailTemplates['contact-removed.text.hbs'],
         templateData: {

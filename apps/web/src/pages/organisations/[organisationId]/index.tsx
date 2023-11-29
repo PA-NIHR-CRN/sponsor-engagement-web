@@ -96,7 +96,7 @@ export default function Organisation({ organisation, query }: OrganisationProps)
           {organisation.users.map((user) => (
             <Table.Row key={user.id}>
               <Table.Cell>{user.user.email}</Table.Cell>
-              <Table.Cell>{formatDate(user.createdAt)}</Table.Cell>
+              <Table.Cell>{formatDate(user.updatedAt)}</Table.Cell>
               <Table.Cell>
                 <Link href={`/organisations/remove-contact/${user.id}`}>Remove</Link>
               </Table.Cell>
