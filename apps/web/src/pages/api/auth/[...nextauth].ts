@@ -3,6 +3,8 @@ import NextAuth from 'next-auth'
 import type { OAuthConfig, OAuthUserConfig } from 'next-auth/providers'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import { logger } from '@nihr-ui/logger'
+import { authService } from '@nihr-ui/auth'
+import type { JWT } from 'next-auth/jwt'
 import { AUTH_PROVIDER_ID, AUTH_PROVIDER_NAME, AUTH_PROVIDER_TYPE } from '../../../constants/auth'
 import { prismaClient } from '../../../lib/prisma'
 import { getUserOrganisations } from '../../../lib/organisations'
@@ -53,12 +55,32 @@ const Provider = ({ clientId, clientSecret, wellKnown }: ProviderOptions): OAuth
  * `accessToken` and `accessTokenExpires`. If an error occurs,
  * returns the old token and an error property
  */
-function refreshAccessToken(token) {
+async function refreshAccessToken(token: JWT) {
   try {
-    // TODO: Implement access token refresh
-    // https://next-auth.js.org/v3/tutorials/refresh-token-rotation
+    const refreshedTokenResponse = await authService.refreshToken({
+      refreshToken: token.refreshToken,
+      clientId: process.env.AUTH_CLIENT_ID,
+      clientSecret: process.env.AUTH_CLIENT_SECRET,
+    })
+
+    if (!refreshedTokenResponse.success) {
+      throw refreshedTokenResponse.error
+    }
+
+    const {
+      access_token: accessToken,
+      expires_in: accessTokenExpiresIn,
+      refresh_token: refreshToken,
+    } = refreshedTokenResponse.data
+
+    return {
+      ...token,
+      accessToken,
+      accessTokenExpires: Date.now() + accessTokenExpiresIn * 1000,
+      refreshToken,
+    }
   } catch (error) {
-    console.log(error)
+    logger.info(error)
     return {
       ...token,
       error: 'RefreshAccessTokenError',
@@ -83,7 +105,6 @@ export const authOptions: AuthOptions = {
     jwt({ token, account, user }) {
       // Initial sign in
       if (account?.access_token && account.expires_at && account.refresh_token) {
-        logger.info('jwt callback - initial sign in')
         return {
           ...token,
           accessToken: account.access_token,
@@ -95,12 +116,10 @@ export const authOptions: AuthOptions = {
 
       // Return previous token if the access token has not expired yet
       if (Date.now() < token.accessTokenExpires) {
-        logger.info('jwt callback - returning previous token as access token has not expired yet')
         return token
       }
 
       // Access token has expired, try to update it
-      logger.info('jwt callback - access token has expired, try to update it')
       return refreshAccessToken(token)
     },
     async session({ session, token }) {
@@ -113,8 +132,6 @@ export const authOptions: AuthOptions = {
 
         session.accessToken = token.accessToken
         session.user.id = userId
-
-        // TODO: Check session is valid in IDG on every request?
 
         // When a session is established or checked we can lookup the users' role(s) and forward them inside the user object
         // https://next-auth.js.org/configuration/callbacks#session-callback
