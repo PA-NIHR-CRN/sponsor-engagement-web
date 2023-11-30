@@ -1,6 +1,7 @@
 import { logger } from '@nihr-ui/logger'
 import { emailService } from '@nihr-ui/email'
 import { config as dotEnvConfig } from 'dotenv'
+import { emailTemplates } from '@nihr-ui/templates/sponsor-engagement'
 import { prismaClient } from './lib/prisma'
 import { arrayChunks, getAbsoluteUrl } from './utils'
 import {
@@ -10,7 +11,6 @@ import {
   SIGN_IN_PAGE,
   SUPPORT_PAGE,
 } from './constants'
-import emailTemplates from './templates/email'
 
 dotEnvConfig()
 

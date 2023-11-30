@@ -1,4 +1,3 @@
-import { EXTERNAL_CRN_TERMS_CONDITIONS_URL, EXTERNAL_CRN_URL, SUPPORT_PAGE } from '../../constants'
 import emailTemplates from '.'
 
 const templates = emailTemplates as Record<string, (data: Record<string, string>) => string>
@@ -9,11 +8,12 @@ test.each(templateKeys)('Email template %p displays correctly', (key) => {
   const template = templates[key]
   expect(
     template({
-      crnLink: EXTERNAL_CRN_URL,
+      crnLink: 'http://crn-link',
       iconUrl: 'http://localhost:3000/assets/images/exclamation-icon.png',
-      requestSupportLink: `http://localhost:3000${SUPPORT_PAGE}`,
+      requestSupportLink: `http://localhost:3000/request-support`,
       signInLink: 'http://localhost:3000/auth/signin',
-      termsAndConditionsLink: EXTERNAL_CRN_TERMS_CONDITIONS_URL,
+      termsAndConditionsLink: 'http://terms-conditions-link',
+      organisationName: 'Mocked org name',
     })
   ).toMatchSnapshot()
 })
