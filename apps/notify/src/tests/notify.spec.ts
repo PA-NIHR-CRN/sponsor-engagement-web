@@ -20,7 +20,7 @@ const mockUsers = [
 ]
 
 describe('notify', () => {
-  it('it should send assessment reminder emails to the appropriate users', async () => {
+  it('should send assessment reminder emails to the appropriate users', async () => {
     jest.mocked(prismaClient.user.findMany).mockResolvedValueOnce(mockUsers)
 
     jest
@@ -54,7 +54,7 @@ describe('notify', () => {
     })
   })
 
-  it('it should only send reminders to emails within the allow list if specified', async () => {
+  it('should only send reminders to emails within the allow list if specified', async () => {
     const allowList = ['user1@test.com', 'user3@test.com']
     process.env.NOTIFY_ALLOW_LIST = allowList.join(',')
 
@@ -67,7 +67,7 @@ describe('notify', () => {
     })
   })
 
-  it('it should exit if no users have studies due assessment', async () => {
+  it('should exit if no users have studies due assessment', async () => {
     jest.mocked(prismaClient.user.findMany).mockResolvedValueOnce([])
 
     await notify()
@@ -75,5 +75,14 @@ describe('notify', () => {
     expect(emailService.sendBulkEmail).not.toHaveBeenCalled()
 
     expect(logger.info).toHaveBeenCalledWith('No assessment notifications required')
+  })
+
+  it('should log unhandled exceptions', async () => {
+    jest.mocked(prismaClient.user.findMany).mockResolvedValueOnce(mockUsers)
+    jest.mocked(emailService.sendBulkEmail).mockRejectedValueOnce('Error sending email')
+
+    await notify()
+
+    expect(logger.error).toHaveBeenCalledWith('Error sending email')
   })
 })

@@ -366,9 +366,10 @@ const fetchStudies = async function* (url: string, username: string, password: s
     } catch (error) {
       logger.error('Error occurred while fetching study data')
       if (axios.isAxiosError(error)) {
-        logger.error('Error response data: %s', error.response?.data)
+        logger.error('Error response data: %s', JSON.stringify(error.response?.data))
       }
-      throw error
+      logger.error(error)
+      yield
     }
   }
 }
@@ -448,6 +449,8 @@ export const ingest = async () => {
   allOrganisationRoleIds = []
 
   for await (const studyRecords of fetchStudies(API_URL, API_USERNAME, API_PASSWORD)) {
+    if (!studyRecords) return
+
     studies = studyRecords
       .filter((study) => Boolean(study.QualificationDate))
       .map((study) => ({

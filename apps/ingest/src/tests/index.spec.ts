@@ -257,12 +257,13 @@ describe('ingest', () => {
       })
     )
 
-    await expect(ingest()).rejects.toThrow('Request failed with status code 500')
+    await ingest()
 
     expect(prismaMock.study.updateMany).not.toHaveBeenCalled()
 
     expect(logger.error).toHaveBeenCalledWith('Error occurred while fetching study data')
-    expect(logger.error).toHaveBeenCalledWith('Error response data: %s', errorResponse)
+    expect(logger.error).toHaveBeenCalledWith('Error response data: %s', JSON.stringify(errorResponse))
+    expect(logger.error).toHaveBeenCalledWith(expect.any(Error))
   })
 
   it('should set studies no longer returned by the API as deleted', async () => {
