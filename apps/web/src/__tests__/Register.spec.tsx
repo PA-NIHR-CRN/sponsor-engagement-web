@@ -14,7 +14,7 @@ import mockRouter from 'next-router-mock'
 import type { RegisterProps } from '../pages/register'
 import Registration, { getServerSideProps } from '../pages/register'
 import { userNoRoles } from '../__mocks__/session'
-import { ERROR_PAGE_500, REGISTRATION_CONFIRMATION_PAGE, SIGN_IN_PAGE } from '../constants/routes'
+import { ERROR_PAGE_500, REGISTRATION_CONFIRMATION_LINKED_PAGE, SIGN_IN_PAGE } from '../constants/routes'
 import type { Prisma } from '../lib/prisma'
 import { prismaClient } from '../lib/prisma'
 
@@ -157,7 +157,7 @@ describe('getServerSideProps', () => {
     )
     expect(result).toEqual({
       redirect: {
-        destination: REGISTRATION_CONFIRMATION_PAGE,
+        destination: REGISTRATION_CONFIRMATION_LINKED_PAGE,
       },
     })
   })
