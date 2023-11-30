@@ -24,9 +24,14 @@ export const SUPPORT_PAGE = '/request-support'
 export const REGISTRATION_PAGE = '/register'
 
 /**
- * Registration confirmation page where users will be redirected to after successful registration
+ * Registration confirmation page where users will be redirected to after successful IDG & SE account creation
  */
 export const REGISTRATION_CONFIRMATION_PAGE = '/register/confirmation'
+
+/**
+ * Registration confirmation page where users will be redirected to after linking existing IDG accounts to SE
+ */
+export const REGISTRATION_CONFIRMATION_LINKED_PAGE = '/register/confirmation/linked'
 
 /**
  * Error page for internal server errors
