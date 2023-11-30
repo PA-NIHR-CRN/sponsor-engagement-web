@@ -1,5 +1,5 @@
-import path from 'node:path'
-import fs from 'node:fs'
+import path from 'path'
+import fs from 'fs'
 import handlebars from 'handlebars'
 
 const templatesPath = path.resolve(process.cwd(), 'src/templates/email')

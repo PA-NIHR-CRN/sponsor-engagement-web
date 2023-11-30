@@ -14,7 +14,7 @@ import mockRouter from 'next-router-mock'
 import type { RegisterProps } from '../pages/register'
 import Registration, { getServerSideProps } from '../pages/register'
 import { userNoRoles } from '../__mocks__/session'
-import { ERROR_PAGE_500, REGISTRATION_CONFIRMATION_PAGE } from '../constants/routes'
+import { ERROR_PAGE_500, REGISTRATION_CONFIRMATION_PAGE, SIGN_IN_PAGE } from '../constants/routes'
 import type { Prisma } from '../lib/prisma'
 import { prismaClient } from '../lib/prisma'
 
@@ -83,17 +83,17 @@ describe('getServerSideProps', () => {
     })
   })
 
-  test('redirects to the error page when no user is found associated with the registration token', async () => {
+  test('redirects to the sign in page when no user is found associated with the registration token', async () => {
     findUserMock.mockResolvedValueOnce(null)
 
     const result = await getServerSideProps(context)
 
-    expect(logger.error).toHaveBeenCalledWith(
-      new Error(`No email found associated with the registrationToken ${registrationToken}`)
+    expect(logger.info).toHaveBeenCalledWith(
+      `No email found associated with the registrationToken ${registrationToken}`
     )
     expect(result).toEqual({
       redirect: {
-        destination: ERROR_PAGE_500,
+        destination: SIGN_IN_PAGE,
       },
     })
   })
