@@ -1,4 +1,4 @@
-name: Deploy Ingest App
+name: Deploy Notify App
 
 on:
   push:
@@ -57,12 +57,12 @@ jobs:
         env:
           ECR_REPOSITORY: crnccd-ecr-dev-se-repository
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_NAME_TAG: se-ingest
-          IMAGE_SHA_TAG: se-ingest-${{ github.sha }}
+          IMAGE_NAME_TAG: se-notify
+          IMAGE_SHA_TAG: se-notify-${{ github.sha }}
         run: |
           echo "Using registry ${{ env.ECR_REGISTRY }}"
           echo "Tagging image with ${{ env.IMAGE_NAME_TAG}} and ${{ env.IMAGE_SHA_TAG }}"
-          docker build -f apps/ingest/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
+          docker build -f apps/notify/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG"
       - name: Run database migrations
@@ -71,12 +71,12 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
       - name: Generate task definition file from container
         run: |
-          aws ecs describe-task-definition --task-definition crnccd-ecs-dev-se-ingest-task-definition --query taskDefinition | jq 'del(.registeredAt,.registeredBy)' > ./task-definition.json
+          aws ecs describe-task-definition --task-definition crnccd-ecs-dev-se-notify-task-definition --query taskDefinition | jq 'del(.registeredAt,.registeredBy)' > ./task-definition.json
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
         env:
           ECS_TASK_DEFINITION: ./task-definition.json
-          CONTAINER_NAME: crnccd-ecs-dev-se-ingest-container
+          CONTAINER_NAME: crnccd-ecs-dev-se-notify-container
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
@@ -84,11 +84,8 @@ jobs:
           image: ${{ steps.build-image.outputs.image }}
           environment-variables: |
             APP_ENV=${{ vars.APP_ENV }}
-            ASSESSMENT_LAPSE_MONTHS=${{ vars.ASSESSMENT_LAPSE_MONTHS }}
+            NOTIFY_ALLOW_LIST=${{ vars.NOTIFY_ALLOW_LIST }}
             DATABASE_URL=${{ secrets.DATABASE_URL }}
-            API_URL=${{ vars.API_URL }}
-            API_USERNAME=${{ secrets.API_USERNAME }}
-            API_PASSWORD=${{ secrets.API_PASSWORD }}
       - name: Remove Github Actions IP from RDS security group (Dev)
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
@@ -131,12 +128,12 @@ jobs:
         env:
           ECR_REPOSITORY: crnccd-ecr-test-se-repository
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_NAME_TAG: se-ingest
-          IMAGE_SHA_TAG: se-ingest-${{ github.sha }}
+          IMAGE_NAME_TAG: se-notify
+          IMAGE_SHA_TAG: se-notify-${{ github.sha }}
         run: |
           echo "Using registry ${{ env.ECR_REGISTRY }}"
           echo "Tagging image with ${{ env.IMAGE_NAME_TAG}} and ${{ env.IMAGE_SHA_TAG }}"
-          docker build -f apps/ingest/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
+          docker build -f apps/notify/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG"
       - name: Run database migrations
@@ -145,12 +142,12 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
       - name: Generate task definition file from container
         run: |
-          aws ecs describe-task-definition --task-definition crnccd-ecs-test-se-ingest-task-definition --query taskDefinition | jq 'del(.registeredAt,.registeredBy)' > ./task-definition.json
+          aws ecs describe-task-definition --task-definition crnccd-ecs-test-se-notify-task-definition --query taskDefinition | jq 'del(.registeredAt,.registeredBy)' > ./task-definition.json
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
         env:
           ECS_TASK_DEFINITION: ./task-definition.json
-          CONTAINER_NAME: crnccd-ecs-test-se-ingest-container
+          CONTAINER_NAME: crnccd-ecs-test-se-notify-container
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
@@ -158,11 +155,8 @@ jobs:
           image: ${{ steps.build-image.outputs.image }}
           environment-variables: |
             APP_ENV=${{ vars.APP_ENV }}
-            ASSESSMENT_LAPSE_MONTHS=${{ vars.ASSESSMENT_LAPSE_MONTHS }}
+            NOTIFY_ALLOW_LIST=${{ vars.NOTIFY_ALLOW_LIST }}
             DATABASE_URL=${{ secrets.DATABASE_URL }}
-            API_URL=${{ vars.API_URL }}
-            API_USERNAME=${{ secrets.API_USERNAME }}
-            API_PASSWORD=${{ secrets.API_PASSWORD }}
       - name: Remove Github Actions IP from RDS security group (Test)
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
@@ -205,12 +199,12 @@ jobs:
         env:
           ECR_REPOSITORY: crnccs-ecr-uat-se-repository
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_NAME_TAG: se-ingest
-          IMAGE_SHA_TAG: se-ingest-${{ github.sha }}
+          IMAGE_NAME_TAG: se-notify
+          IMAGE_SHA_TAG: se-notify-${{ github.sha }}
         run: |
           echo "Using registry ${{ env.ECR_REGISTRY }}"
           echo "Tagging image with ${{ env.IMAGE_NAME_TAG}} and ${{ env.IMAGE_SHA_TAG }}"
-          docker build -f apps/ingest/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
+          docker build -f apps/notify/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG"
       - name: Run database migrations
@@ -219,12 +213,12 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
       - name: Generate task definition file from container
         run: |
-          aws ecs describe-task-definition --task-definition crnccs-ecs-uat-se-ingest-task-definition --query taskDefinition | jq 'del(.registeredAt,.registeredBy)' > ./task-definition.json
+          aws ecs describe-task-definition --task-definition crnccs-ecs-uat-se-notify-task-definition --query taskDefinition | jq 'del(.registeredAt,.registeredBy)' > ./task-definition.json
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
         env:
           ECS_TASK_DEFINITION: ./task-definition.json
-          CONTAINER_NAME: crnccs-ecs-uat-se-ingest-container
+          CONTAINER_NAME: crnccs-ecs-uat-se-notify-container
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
@@ -232,11 +226,8 @@ jobs:
           image: ${{ steps.build-image.outputs.image }}
           environment-variables: |
             APP_ENV=${{ vars.APP_ENV }}
-            ASSESSMENT_LAPSE_MONTHS=${{ vars.ASSESSMENT_LAPSE_MONTHS }}
+            NOTIFY_ALLOW_LIST=${{ vars.NOTIFY_ALLOW_LIST }}
             DATABASE_URL=${{ secrets.DATABASE_URL }}
-            API_URL=${{ vars.API_URL }}
-            API_USERNAME=${{ secrets.API_USERNAME }}
-            API_PASSWORD=${{ secrets.API_PASSWORD }}
       - name: Remove Github Actions IP from RDS security group (Uat)
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
@@ -279,12 +270,12 @@ jobs:
         env:
           ECR_REPOSITORY: crnccp-ecr-oat-se-repository
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_NAME_TAG: se-ingest
-          IMAGE_SHA_TAG: se-ingest-${{ github.sha }}
+          IMAGE_NAME_TAG: se-notify
+          IMAGE_SHA_TAG: se-notify-${{ github.sha }}
         run: |
           echo "Using registry ${{ env.ECR_REGISTRY }}"
           echo "Tagging image with ${{ env.IMAGE_NAME_TAG}} and ${{ env.IMAGE_SHA_TAG }}"
-          docker build -f apps/ingest/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
+          docker build -f apps/notify/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG"
       - name: Run database migrations
@@ -293,12 +284,12 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
       - name: Generate task definition file from container
         run: |
-          aws ecs describe-task-definition --task-definition crnccp-ecs-oat-se-ingest-task-definition --query taskDefinition | jq 'del(.registeredAt,.registeredBy)' > ./task-definition.json
+          aws ecs describe-task-definition --task-definition crnccp-ecs-oat-se-notify-task-definition --query taskDefinition | jq 'del(.registeredAt,.registeredBy)' > ./task-definition.json
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
         env:
           ECS_TASK_DEFINITION: ./task-definition.json
-          CONTAINER_NAME: crnccp-ecs-oat-se-ingest-container
+          CONTAINER_NAME: crnccp-ecs-oat-se-notify-container
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
@@ -306,11 +297,8 @@ jobs:
           image: ${{ steps.build-image.outputs.image }}
           environment-variables: |
             APP_ENV=${{ vars.APP_ENV }}
-            ASSESSMENT_LAPSE_MONTHS=${{ vars.ASSESSMENT_LAPSE_MONTHS }}
+            NOTIFY_ALLOW_LIST=${{ vars.NOTIFY_ALLOW_LIST }}
             DATABASE_URL=${{ secrets.DATABASE_URL }}
-            API_URL=${{ vars.API_URL }}
-            API_USERNAME=${{ secrets.API_USERNAME }}
-            API_PASSWORD=${{ secrets.API_PASSWORD }}
       - name: Remove Github Actions IP from RDS security group (Oat)
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
@@ -353,12 +341,12 @@ jobs:
         env:
           ECR_REPOSITORY: crnccp-ecr-prod-se-repository
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_NAME_TAG: se-ingest
-          IMAGE_SHA_TAG: se-ingest-${{ github.sha }}
+          IMAGE_NAME_TAG: se-notify
+          IMAGE_SHA_TAG: se-notify-${{ github.sha }}
         run: |
           echo "Using registry ${{ env.ECR_REGISTRY }}"
           echo "Tagging image with ${{ env.IMAGE_NAME_TAG}} and ${{ env.IMAGE_SHA_TAG }}"
-          docker build -f apps/ingest/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
+          docker build -f apps/notify/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG"
       - name: Run database migrations
@@ -367,12 +355,12 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
       - name: Generate task definition file from container
         run: |
-          aws ecs describe-task-definition --task-definition crnccp-ecs-prod-se-ingest-task-definition --query taskDefinition | jq 'del(.registeredAt,.registeredBy)' > ./task-definition.json
+          aws ecs describe-task-definition --task-definition crnccp-ecs-prod-se-notify-task-definition --query taskDefinition | jq 'del(.registeredAt,.registeredBy)' > ./task-definition.json
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
         env:
           ECS_TASK_DEFINITION: ./task-definition.json
-          CONTAINER_NAME: crnccp-ecs-prod-se-ingest-container
+          CONTAINER_NAME: crnccp-ecs-prod-se-notify-container
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
@@ -380,11 +368,8 @@ jobs:
           image: ${{ steps.build-image.outputs.image }}
           environment-variables: |
             APP_ENV=${{ vars.APP_ENV }}
-            ASSESSMENT_LAPSE_MONTHS=${{ vars.ASSESSMENT_LAPSE_MONTHS }}
+            NOTIFY_ALLOW_LIST=${{ vars.NOTIFY_ALLOW_LIST }}
             DATABASE_URL=${{ secrets.DATABASE_URL }}
-            API_URL=${{ vars.API_URL }}
-            API_USERNAME=${{ secrets.API_USERNAME }}
-            API_PASSWORD=${{ secrets.API_PASSWORD }}
       - name: Remove Github Actions IP from RDS security group (Prod)
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
