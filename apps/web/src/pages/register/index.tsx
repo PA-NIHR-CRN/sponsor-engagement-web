@@ -11,7 +11,7 @@ import clsx from 'clsx'
 import { authService } from '@nihr-ui/auth'
 import { NextSeo } from 'next-seo'
 import { RootLayout } from '../../components/organisms'
-import { ERROR_PAGE_500, REGISTRATION_CONFIRMATION_PAGE } from '../../constants/routes'
+import { ERROR_PAGE_500, REGISTRATION_CONFIRMATION_PAGE, SIGN_IN_PAGE } from '../../constants/routes'
 import { authOptions } from '../api/auth/[...nextauth]'
 import { prismaClient } from '../../lib/prisma'
 import { getValuesFromSearchParams } from '../../utils/form'
@@ -160,7 +160,12 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     })
 
     if (!user?.email) {
-      throw new Error(`No email found associated with the registrationToken ${registrationToken}`)
+      logger.info(`No email found associated with the registrationToken ${registrationToken}`)
+      return {
+        redirect: {
+          destination: SIGN_IN_PAGE,
+        },
+      }
     }
 
     const getUserResponse = await authService.getUser(user.email)
