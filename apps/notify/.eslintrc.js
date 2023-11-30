@@ -2,7 +2,7 @@ const path = require('path')
 
 module.exports = {
   extends: ['custom/library'],
-  ignorePatterns: ['node_modules/', 'dist/', 'coverage/', 'jest.config.ts', 'src/templates/**/*.js'],
+  ignorePatterns: ['node_modules/', 'dist/', 'coverage/', 'jest.config.ts'],
   parserOptions: {
     project: [path.join(__dirname, 'tsconfig.eslint.json')],
   },
