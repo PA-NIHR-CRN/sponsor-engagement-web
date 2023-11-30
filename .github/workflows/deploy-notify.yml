@@ -84,11 +84,8 @@ jobs:
           image: ${{ steps.build-image.outputs.image }}
           environment-variables: |
             APP_ENV=${{ vars.APP_ENV }}
-            ASSESSMENT_LAPSE_MONTHS=${{ vars.ASSESSMENT_LAPSE_MONTHS }}
+            NOTIFY_ALLOW_LIST=${{ vars.NOTIFY_ALLOW_LIST }}
             DATABASE_URL=${{ secrets.DATABASE_URL }}
-            API_URL=${{ vars.API_URL }}
-            API_USERNAME=${{ secrets.API_USERNAME }}
-            API_PASSWORD=${{ secrets.API_PASSWORD }}
       - name: Remove Github Actions IP from RDS security group (Dev)
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
@@ -158,11 +155,8 @@ jobs:
           image: ${{ steps.build-image.outputs.image }}
           environment-variables: |
             APP_ENV=${{ vars.APP_ENV }}
-            ASSESSMENT_LAPSE_MONTHS=${{ vars.ASSESSMENT_LAPSE_MONTHS }}
+            NOTIFY_ALLOW_LIST=${{ vars.NOTIFY_ALLOW_LIST }}
             DATABASE_URL=${{ secrets.DATABASE_URL }}
-            API_URL=${{ vars.API_URL }}
-            API_USERNAME=${{ secrets.API_USERNAME }}
-            API_PASSWORD=${{ secrets.API_PASSWORD }}
       - name: Remove Github Actions IP from RDS security group (Test)
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
@@ -232,11 +226,8 @@ jobs:
           image: ${{ steps.build-image.outputs.image }}
           environment-variables: |
             APP_ENV=${{ vars.APP_ENV }}
-            ASSESSMENT_LAPSE_MONTHS=${{ vars.ASSESSMENT_LAPSE_MONTHS }}
+            NOTIFY_ALLOW_LIST=${{ vars.NOTIFY_ALLOW_LIST }}
             DATABASE_URL=${{ secrets.DATABASE_URL }}
-            API_URL=${{ vars.API_URL }}
-            API_USERNAME=${{ secrets.API_USERNAME }}
-            API_PASSWORD=${{ secrets.API_PASSWORD }}
       - name: Remove Github Actions IP from RDS security group (Uat)
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
@@ -306,11 +297,8 @@ jobs:
           image: ${{ steps.build-image.outputs.image }}
           environment-variables: |
             APP_ENV=${{ vars.APP_ENV }}
-            ASSESSMENT_LAPSE_MONTHS=${{ vars.ASSESSMENT_LAPSE_MONTHS }}
+            NOTIFY_ALLOW_LIST=${{ vars.NOTIFY_ALLOW_LIST }}
             DATABASE_URL=${{ secrets.DATABASE_URL }}
-            API_URL=${{ vars.API_URL }}
-            API_USERNAME=${{ secrets.API_USERNAME }}
-            API_PASSWORD=${{ secrets.API_PASSWORD }}
       - name: Remove Github Actions IP from RDS security group (Oat)
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
@@ -380,11 +368,8 @@ jobs:
           image: ${{ steps.build-image.outputs.image }}
           environment-variables: |
             APP_ENV=${{ vars.APP_ENV }}
-            ASSESSMENT_LAPSE_MONTHS=${{ vars.ASSESSMENT_LAPSE_MONTHS }}
+            NOTIFY_ALLOW_LIST=${{ vars.NOTIFY_ALLOW_LIST }}
             DATABASE_URL=${{ secrets.DATABASE_URL }}
-            API_URL=${{ vars.API_URL }}
-            API_USERNAME=${{ secrets.API_USERNAME }}
-            API_PASSWORD=${{ secrets.API_PASSWORD }}
       - name: Remove Github Actions IP from RDS security group (Prod)
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
