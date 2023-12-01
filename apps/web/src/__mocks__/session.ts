@@ -4,7 +4,6 @@ import { Roles } from '../constants/auth'
 
 const defaults: Omit<Session, 'user'> = {
   expires: '12345',
-  accessToken: '654321',
 }
 
 const mockUserOrganisation: UserOrganisation = {

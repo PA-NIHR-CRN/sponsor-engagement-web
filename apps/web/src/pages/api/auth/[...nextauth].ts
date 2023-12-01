@@ -1,6 +1,6 @@
 import type { AuthOptions } from 'next-auth'
 import NextAuth from 'next-auth'
-import type { OAuthConfig, OAuthUserConfig } from 'next-auth/providers'
+import type { OAuthConfig } from 'next-auth/providers'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import { logger } from '@nihr-ui/logger'
 import { authService } from '@nihr-ui/auth'
@@ -8,27 +8,15 @@ import type { JWT } from 'next-auth/jwt'
 import { AUTH_PROVIDER_ID, AUTH_PROVIDER_NAME, AUTH_PROVIDER_TYPE } from '../../../constants/auth'
 import { prismaClient } from '../../../lib/prisma'
 import { getUserOrganisations } from '../../../lib/organisations'
-
-interface OAuthProfile {
-  at_hash: string
-  sub: string
-  amr: string[]
-  iss: string
-  given_name: string
-  aud: string
-  c_hash: string
-  nbf: number
-  azp: string
-  exp: number
-  iat: number
-  family_name: string
-  email: string
-}
-
-type ProviderOptions = OAuthUserConfig<'type'> & { wellKnown: string }
+import type { OAuthProfile, ProviderOptions } from '../../../@types/auth'
 
 /**
- * Custom oauth provider for next-auth
+ * Custom OAuth provider configuration for NextAuth.
+ *
+ * @param clientId - The OAuth client ID.
+ * @param clientSecret - The OAuth client secret.
+ * @param wellKnown - The well-known URL for OAuth discovery.
+ * @returns OAuth provider configuration.
  */
 const Provider = ({ clientId, clientSecret, wellKnown }: ProviderOptions): OAuthConfig<OAuthProfile> => ({
   id: AUTH_PROVIDER_ID,
@@ -41,6 +29,7 @@ const Provider = ({ clientId, clientSecret, wellKnown }: ProviderOptions): OAuth
   idToken: true,
   checks: ['pkce', 'state'],
   profile(profile) {
+    // Map OAuth profile data to user attributes.
     return {
       id: profile.sub,
       name: `${profile.given_name} ${profile.family_name}`,
@@ -51,9 +40,10 @@ const Provider = ({ clientId, clientSecret, wellKnown }: ProviderOptions): OAuth
 })
 
 /**
- * Takes a token, and returns a new token with updated
- * `accessToken` and `accessTokenExpires`. If an error occurs,
- * returns the old token and an error property
+ * Refreshes the access token if it has expired.
+ *
+ * @param token - The JWT token containing user session data.
+ * @returns Updated token with a refreshed access token or an error property.
  */
 async function refreshAccessToken(token: JWT) {
   try {
@@ -71,6 +61,7 @@ async function refreshAccessToken(token: JWT) {
       access_token: accessToken,
       expires_in: accessTokenExpiresIn,
       refresh_token: refreshToken,
+      id_token: idToken,
     } = refreshedTokenResponse.data
 
     return {
@@ -78,6 +69,7 @@ async function refreshAccessToken(token: JWT) {
       accessToken,
       accessTokenExpires: Date.now() + accessTokenExpiresIn * 1000,
       refreshToken,
+      idToken,
     }
   } catch (error) {
     logger.info(error)
@@ -88,12 +80,22 @@ async function refreshAccessToken(token: JWT) {
   }
 }
 
+/**
+ * Configuration options for NextAuth.
+ */
 export const authOptions: AuthOptions = {
+  // Enable debug mode in non-production environments.
   debug: process.env.APP_ENV !== 'prod',
+
+  // Use the Prisma adapter for session and user data storage.
   adapter: PrismaAdapter(prismaClient),
+
+  // Session configuration using JWT strategy.
   session: {
     strategy: 'jwt',
   },
+
+  // OAuth providers for authentication.
   providers: [
     Provider({
       clientId: process.env.AUTH_CLIENT_ID,
@@ -101,25 +103,27 @@ export const authOptions: AuthOptions = {
       wellKnown: process.env.AUTH_WELL_KNOWN_URL,
     }),
   ],
+
+  // Callbacks for JWT and session management.
   callbacks: {
     jwt({ token, account, user }) {
-      // Initial sign in
-      if (account?.access_token && account.expires_at && account.refresh_token) {
+      // Initial sign-in logic.
+      if (account) {
         return {
-          ...token,
           accessToken: account.access_token,
           accessTokenExpires: account.expires_at * 1000,
           refreshToken: account.refresh_token,
+          idToken: account.id_token,
           user,
         }
       }
 
-      // Return previous token if the access token has not expired yet
+      // Return the previous token if the access token has not expired yet.
       if (Date.now() < token.accessTokenExpires) {
         return token
       }
 
-      // Access token has expired, try to update it
+      // Access token has expired, try to update it.
       return refreshAccessToken(token)
     },
     async session({ session, token }) {
@@ -128,17 +132,21 @@ export const authOptions: AuthOptions = {
           return session
         }
 
-        const userId = Number(token.sub)
+        const {
+          user: { id, email },
+        } = token
 
-        session.accessToken = token.accessToken
+        const userId = Number(id)
+
         session.user.id = userId
 
-        // When a session is established or checked we can lookup the users' role(s) and forward them inside the user object
-        // https://next-auth.js.org/configuration/callbacks#session-callback
+        if (email) {
+          session.user.email = email
+        }
+
+        // Retrieve user roles and organizations
         const roles = await prismaClient.userRole.findMany({ where: { userId } })
-
         session.user.roles = roles.map((role) => role.roleId)
-
         session.user.organisations = await getUserOrganisations(userId)
 
         return session
