@@ -20,7 +20,7 @@ const sendNotifications = async () => {
 
   const allowList = process.env.NOTIFY_ALLOW_LIST?.split(',')
 
-  if (process.env.APP_ENV !== 'prod' && !allowList) {
+  if (process.env.APP_ENV !== 'prod' && !allowList?.length) {
     logger.error('No allow list provided for non-prod environment')
     return
   }
