@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import axios from 'axios'
 import { useRouter } from 'next/router'
 import type { FieldValues, UseFormHandleSubmit } from 'react-hook-form'
+import { logger } from '@nihr-ui/logger'
 import { Form } from './Form'
 
 // Mock next/router
@@ -10,9 +11,9 @@ jest.mock('next/router', () => ({
   useRouter: jest.fn(),
 }))
 jest.mock('axios')
-// jest.mock('@/lib/logger')
+jest.mock('@nihr-ui/logger')
 
-console.error = jest.fn()
+logger.error = jest.fn()
 
 afterEach(() => {
   jest.clearAllMocks()
@@ -105,7 +106,7 @@ test('Handles failures due to an api request error', async () => {
   expect(axiosPostMock).toHaveBeenCalledWith('/submit', { fullName: 'John' })
 
   // Verify that router functions were not called
-  expect(routerReplaceMock).toHaveBeenCalledWith('mock-url?fatal=1')
+  expect(routerReplaceMock).toHaveBeenCalledWith('http://localhost/mock-url?fatal=1')
   expect(routerPushMock).not.toHaveBeenCalled()
   expect(onError).toHaveBeenCalled()
 })

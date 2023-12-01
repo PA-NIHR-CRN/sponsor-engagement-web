@@ -9,8 +9,8 @@ import mockRouter from 'next-router-mock'
 import userEvent from '@testing-library/user-event'
 import type { StudyProps } from '../pages/studies/[studyId]'
 import Study, { getServerSideProps } from '../pages/studies/[studyId]'
-import { userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
-import { SIGN_IN_PAGE } from '../constants/routes'
+import { userWithContactManagerRole, userWithSponsorContactRole } from '../__mocks__/session'
+import { SIGN_IN_PAGE, SUPPORT_PAGE } from '../constants/routes'
 import { prismaMock } from '../__mocks__/prisma'
 
 jest.mock('next-auth/next')
@@ -29,9 +29,9 @@ describe('getServerSideProps', () => {
     })
   })
 
-  test('redirects back to the homepage for users without any roles', async () => {
+  test('redirects back to the homepage for users without sponsor contact role', async () => {
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {} })
-    getServerSessionMock.mockResolvedValueOnce(userNoRoles)
+    getServerSessionMock.mockResolvedValueOnce(userWithContactManagerRole)
 
     const result = await getServerSideProps(context)
     expect(result).toEqual({
@@ -119,7 +119,7 @@ const mockStudy = Mock.of<StudyWithRelations>({
       },
       organisationRole: {
         id: simpleFaker.number.int(),
-        name: 'Test Organisation Role',
+        name: 'Clinical Research Sponsor',
       },
     },
   ],
@@ -174,6 +174,8 @@ describe('Study page', () => {
   test('Default layout', async () => {
     prismaMock.$transaction.mockResolvedValueOnce([mockStudy])
 
+    await mockRouter.push('/study/123')
+
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
 
     const { props } = (await getServerSideProps(context)) as {
@@ -202,7 +204,10 @@ describe('Study page', () => {
     expect(screen.queryByText('Due')).not.toBeInTheDocument()
 
     expect(screen.getByText(/You can review the progress of this study at any time./)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'NIHR CRN support' })).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link', { name: 'NIHR CRN support' })).toHaveAttribute(
+      'href',
+      `${SUPPORT_PAGE}?returnPath=/study/123`
+    )
 
     // Progress summary
     expect(screen.getByRole('heading', { name: 'Progress Summary', level: 3 })).toBeInTheDocument()
@@ -279,7 +284,10 @@ describe('Study page', () => {
         'Sponsors or their delegates can request NIHR CRN support with their research study at any time.'
       )
     ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Request support' })).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link', { name: 'Request support' })).toHaveAttribute(
+      'href',
+      `${SUPPORT_PAGE}?returnPath=/study/123`
+    )
   })
 
   test('Due assessment', async () => {
@@ -403,7 +411,7 @@ describe('Study page', () => {
     // Banner
     const banner = screen.getByRole('alert', { name: 'Success' })
     expect(within(banner).getByText('The study assessment was successfully saved')).toBeInTheDocument()
-    expect(within(banner).getByRole('link', { name: 'NIHR CRN support' })).toHaveAttribute('href', '/')
+    expect(within(banner).getByRole('link', { name: 'NIHR CRN support' })).toHaveAttribute('href', SUPPORT_PAGE)
     expect(within(banner).getByRole('link', { name: 'NIHR CRN support' }).parentElement).toHaveTextContent(
       'Request NIHR CRN support for this study.'
     )

@@ -6,6 +6,7 @@ import { Container } from '@nihr-ui/frontend'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../api/auth/[...nextauth]'
 import { AUTH_PROVIDER_ID } from '../../constants/auth'
+import { REGISTRATION_PAGE } from '../../constants/routes'
 
 /**
  * Our protected routes redirect to this sign in page for unauthenticated users.
@@ -45,6 +46,16 @@ export default function Signin({ isAuthenticated, signinUrl, csrfToken, callback
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   try {
     const session = await getServerSession(context.req, context.res, authOptions)
+
+    if (context.query.registrationToken) {
+      const registrationToken = context.query.registrationToken as string
+      const params = new URLSearchParams({ registrationToken })
+      return {
+        redirect: {
+          destination: `${REGISTRATION_PAGE}?${params.toString()}`,
+        },
+      }
+    }
 
     const providers = await getProviders()
 

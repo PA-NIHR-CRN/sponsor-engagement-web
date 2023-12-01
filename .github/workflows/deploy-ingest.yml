@@ -21,8 +21,6 @@ jobs:
       - name: Build
         run: |
           touch .env.local
-          echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env.local
-          echo NEXT_PUBLIC_APP_ENV=${{ vars.APP_ENV }} >> .env.local
           npm run db:generate
           npm run build
 
@@ -95,6 +93,7 @@ jobs:
           image: ${{ steps.build-image.outputs.image }}
           environment-variables: |
             APP_ENV=${{ vars.APP_ENV }}
+            ASSESSMENT_LAPSE_MONTHS=${{ vars.ASSESSMENT_LAPSE_MONTHS }}
             DATABASE_URL=${{ secrets.DATABASE_URL }}
             API_URL=${{ vars.API_URL }}
             API_USERNAME=${{ secrets.API_USERNAME }}
@@ -177,6 +176,7 @@ jobs:
           image: ${{ steps.build-image.outputs.image }}
           environment-variables: |
             APP_ENV=${{ vars.APP_ENV }}
+            ASSESSMENT_LAPSE_MONTHS=${{ vars.ASSESSMENT_LAPSE_MONTHS }}
             DATABASE_URL=${{ secrets.DATABASE_URL }}
             API_URL=${{ vars.API_URL }}
             API_USERNAME=${{ secrets.API_USERNAME }}
@@ -259,6 +259,7 @@ jobs:
           image: ${{ steps.build-image.outputs.image }}
           environment-variables: |
             APP_ENV=${{ vars.APP_ENV }}
+            ASSESSMENT_LAPSE_MONTHS=${{ vars.ASSESSMENT_LAPSE_MONTHS }}
             DATABASE_URL=${{ secrets.DATABASE_URL }}
             API_URL=${{ vars.API_URL }}
             API_USERNAME=${{ secrets.API_USERNAME }}
@@ -341,6 +342,7 @@ jobs:
           image: ${{ steps.build-image.outputs.image }}
           environment-variables: |
             APP_ENV=${{ vars.APP_ENV }}
+            ASSESSMENT_LAPSE_MONTHS=${{ vars.ASSESSMENT_LAPSE_MONTHS }}
             DATABASE_URL=${{ secrets.DATABASE_URL }}
             API_URL=${{ vars.API_URL }}
             API_USERNAME=${{ secrets.API_USERNAME }}
@@ -423,6 +425,7 @@ jobs:
           image: ${{ steps.build-image.outputs.image }}
           environment-variables: |
             APP_ENV=${{ vars.APP_ENV }}
+            ASSESSMENT_LAPSE_MONTHS=${{ vars.ASSESSMENT_LAPSE_MONTHS }}
             DATABASE_URL=${{ secrets.DATABASE_URL }}
             API_URL=${{ vars.API_URL }}
             API_USERNAME=${{ secrets.API_USERNAME }}

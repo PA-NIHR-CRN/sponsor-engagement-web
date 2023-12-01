@@ -1,0 +1,24 @@
+{
+  "name": "@nihr-ui/email",
+  "version": "0.0.0",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "source": "./src/index.ts",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json",
+    "lint": "eslint .",
+    "test": "jest --watch",
+    "test:ci": "jest --ci --coverage"
+  },
+  "dependencies": {
+    "@nihr-ui/logger": "*",
+    "aws-sdk": "^2.1488.0",
+    "pino": "^8.14.1",
+    "pino-pretty": "^10.0.1",
+    "tiny-async-pool": "^2.1.0"
+  },
+  "devDependencies": {
+    "@types/tiny-async-pool": "^2.0.3"
+  }
+}

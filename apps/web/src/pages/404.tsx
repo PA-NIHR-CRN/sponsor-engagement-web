@@ -1,6 +1,6 @@
 import type { ReactElement } from 'react'
-import { Container } from '../components/Container/Container'
-import { RootLayout } from '../components/Layout/RootLayout'
+import { Container } from '@nihr-ui/frontend'
+import { RootLayout } from '../components/organisms'
 
 export default function PageNotFound() {
   return (

@@ -7,16 +7,18 @@ import type { Prisma } from 'database'
 import { simpleFaker } from '@faker-js/faker'
 import userEvent from '@testing-library/user-event'
 import mockRouter from 'next-router-mock'
+import { logger } from '@nihr-ui/logger'
 import type { AssessmentProps } from '../pages/assessments/[studyId]'
 import Assessment, { getServerSideProps } from '../pages/assessments/[studyId]'
 import { userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
-import { SIGN_IN_PAGE } from '../constants/routes'
+import { SIGN_IN_PAGE, SUPPORT_PAGE } from '../constants/routes'
 import { prismaMock } from '../__mocks__/prisma'
 import { sysRefAssessmentFurtherInformation, sysRefAssessmentStatus } from '../__mocks__/sysRefData'
 
 jest.mock('next-auth/next')
 jest.mock('next-seo')
 jest.mock('axios')
+jest.mock('@nihr-ui/logger')
 
 describe('getServerSideProps', () => {
   const getServerSessionMock = jest.mocked(getServerSession)
@@ -108,7 +110,7 @@ const study = Mock.of<StudyWithRelations>({
       },
       organisationRole: {
         id: simpleFaker.number.int(),
-        name: 'Test Organisation Role',
+        name: 'Clinical Research Sponsor',
       },
     },
   ],
@@ -163,6 +165,8 @@ describe('Assess progress of a study', () => {
     prismaMock.$transaction.mockResolvedValueOnce([study])
     prismaMock.$transaction.mockResolvedValueOnce([sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
 
+    await mockRouter.push('/assessments/123')
+
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: String(mockedStudyId) } })
 
     const { props } = (await getServerSideProps(context)) as {
@@ -191,7 +195,10 @@ describe('Assess progress of a study', () => {
         'Sponsors or their delegates can request NIHR CRN support with their research study at any time.'
       )
     ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Request support' })).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link', { name: 'Request support' })).toHaveAttribute(
+      'href',
+      `${SUPPORT_PAGE}?returnPath=/assessments/123`
+    )
 
     // Study sponsor
     expect(screen.getByText('Test Organisation')).toBeInTheDocument()
@@ -390,7 +397,7 @@ describe('Expanding last sponsor assessment accordion', () => {
 
 describe('Form submission failures', () => {
   beforeEach(() => {
-    console.error = jest.fn()
+    logger.error = jest.fn()
     void mockRouter.push('/assessments/123')
     jest.clearAllMocks()
   })
@@ -499,7 +506,7 @@ describe('Form submission failures', () => {
 
     const alert = screen.getByRole('alert')
     expect(
-      within(alert).getByText('An unexpected error occured whilst processing the form, please try again later.')
+      within(alert).getByText('An unexpected error occurred whilst processing the form, please try again later.')
     ).toBeInTheDocument()
   })
 })

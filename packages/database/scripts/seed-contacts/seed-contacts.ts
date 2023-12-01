@@ -1,12 +1,11 @@
 import path from 'node:path'
 import * as fs from 'node:fs'
 import assert from 'node:assert'
-import axios from 'axios'
 import { PrismaClient, type Prisma } from '@prisma/client'
-import { logger } from 'logger'
+import { logger } from '@nihr-ui/logger'
 import { parse } from 'csv-parse'
 import { stringify } from 'csv-stringify/sync'
-import rateLimit from 'axios-rate-limit'
+import { authService } from '@nihr-ui/auth'
 import { contactHeaders, ctuHeaders, croHeaders, sponsorHeaders, reportHeaders } from './constants'
 
 const prisma = new PrismaClient()
@@ -16,29 +15,6 @@ const { IDG_API_URL, IDG_API_USERNAME, IDG_API_PASSWORD } = process.env
 assert(IDG_API_URL)
 assert(IDG_API_USERNAME)
 assert(IDG_API_PASSWORD)
-
-const api = rateLimit(
-  axios.create({
-    baseURL: IDG_API_URL,
-    auth: {
-      username: IDG_API_USERNAME,
-      password: IDG_API_PASSWORD,
-    },
-  }),
-  {
-    maxRequests: 5,
-    perMilliseconds: 1000,
-    maxRPS: 5,
-  }
-)
-
-// eslint-disable-next-line @typescript-eslint/naming-convention -- intended
-interface IDGResponse {
-  totalResults: number
-  Resources?: {
-    userName: string
-  }[]
-}
 
 type SponsorHeaders = typeof sponsorHeaders
 type CROHeaders = typeof croHeaders
@@ -90,7 +66,6 @@ const seedContacts = async <T extends Row>(fileName: string, headers: SponsorHea
     create: {
       email: 'administrator@nihr.ac.uk',
       name: 'Administrator',
-      identityGatewayId: '',
     },
   })
 
@@ -128,20 +103,14 @@ const seedContacts = async <T extends Row>(fileName: string, headers: SponsorHea
 
     const identityGatewayIds = await Promise.all(
       contacts.map(async (email) => {
-        const response = await api.get<IDGResponse>(`${IDG_API_URL}/Users`, {
-          params: {
-            startIndex: 1,
-            count: 1,
-            domain: 'PRIMARY',
-            attributes: 'userName',
-            filter: `emails eq ${email}`,
-          },
-        })
-        const identityGatewayId = response.data.Resources?.[0]?.userName ?? ''
-        if (!identityGatewayId) {
-          logger.warn(`IDG ID not found: ${email}`)
+        const response = await authService.getUser(email)
+
+        if (response.success && response.data.Resources) {
+          return response.data.Resources[0]?.userName
         }
-        return identityGatewayId
+
+        logger.warn(`IDG ID not found: ${email}`)
+        return null
       })
     )
 

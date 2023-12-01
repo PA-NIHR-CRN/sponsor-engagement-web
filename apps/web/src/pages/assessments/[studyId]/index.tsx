@@ -7,7 +7,7 @@ import type { FieldError } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 import clsx from 'clsx'
 import Link from 'next/link'
-import { RootLayout } from '../../../components/Layout/RootLayout'
+import { RootLayout } from '../../../components/organisms'
 import {
   AssessmentHistory,
   RequestSupport,
@@ -24,6 +24,7 @@ import { TEXTAREA_MAX_CHARACTERS } from '../../../constants/forms'
 import { withServerSideProps } from '../../../utils/withServerSideProps'
 import { getValuesFromSearchParams } from '../../../utils/form'
 import { useFormErrorHydration } from '../../../hooks/useFormErrorHydration'
+import { Roles } from '../../../constants'
 
 export type AssessmentProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
@@ -65,6 +66,10 @@ export default function Assessment({
 
   const { defaultValues } = formState
 
+  const { organisationsByRole } = study
+
+  const supportOrgName = organisationsByRole.CRO ?? organisationsByRole.CTU
+
   return (
     <Container>
       <NextSeo title="Study Progress Review - Assess progress of study" />
@@ -79,7 +84,8 @@ export default function Assessment({
 
           <div className="text-darkGrey govuk-!-margin-bottom-0 govuk-body-s">
             <span className="govuk-visually-hidden">Study sponsor: </span>
-            {study.organisations[0].organisation.name}
+            {organisationsByRole.Sponsor}
+            {Boolean(supportOrgName) && ` (${supportOrgName})`}
           </div>
 
           <h3 className="govuk-heading-m govuk-!-margin-bottom-1">
@@ -168,7 +174,7 @@ export default function Assessment({
           </Form>
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
-          <RequestSupport />
+          <RequestSupport showCallToAction />
         </div>
       </div>
     </Container>
@@ -179,7 +185,7 @@ Assessment.getLayout = function getLayout(page: ReactElement, { user }: Assessme
   return <RootLayout user={user}>{page}</RootLayout>
 }
 
-export const getServerSideProps = withServerSideProps(async (context, session) => {
+export const getServerSideProps = withServerSideProps(Roles.SponsorContact, async (context, session) => {
   const studyId = context.query.studyId
 
   if (!studyId) {

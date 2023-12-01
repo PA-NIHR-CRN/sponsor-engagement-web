@@ -3,9 +3,18 @@
   "globalDependencies": ["**/.env.*local"],
   "pipeline": {
     "build": {
-      "dependsOn": ["^build", "db:generate"],
+      "dependsOn": ["^build", "db:generate", "precompile"],
       "outputs": ["dist/**/*", ".next/**", "!.next/cache/**"],
-      "env": ["NODE_ENV", "NEXTAUTH_URL", "AUTH_CLIENT_ID", "AUTH_CLIENT_SECRET", "AUTH_WELL_KNOWN_URL"]
+      "env": [
+        "APP_ENV",
+        "NODE_ENV",
+        "NEXTAUTH_URL",
+        "AUTH_CLIENT_ID",
+        "AUTH_CLIENT_SECRET",
+        "AUTH_WELL_KNOWN_URL",
+        "NEXT_PUBLIC_APP_ENV",
+        "PORT"
+      ]
     },
     "start": {},
     "lint": {
@@ -16,9 +25,18 @@
     },
     "test": {
       "cache": false,
-      "dependsOn": ["db:generate"],
+      "dependsOn": ["db:generate", "precompile"],
       "dotEnv": [".env.local"],
-      "env": ["NODE_ENV", "NEXTAUTH_URL", "AUTH_CLIENT_ID", "AUTH_CLIENT_SECRET", "AUTH_WELL_KNOWN_URL"]
+      "env": [
+        "APP_ENV",
+        "NODE_ENV",
+        "NEXTAUTH_URL",
+        "AUTH_CLIENT_ID",
+        "AUTH_CLIENT_SECRET",
+        "AUTH_WELL_KNOWN_URL",
+        "NEXT_PUBLIC_APP_ENV",
+        "PORT"
+      ]
     },
     "test:ci": {
       "dependsOn": ["db:generate"],
@@ -27,11 +45,26 @@
     "typecheck": {},
     "dev": {
       "cache": false,
-      "dependsOn": ["db:generate"],
+      "dependsOn": ["db:generate", "precompile"],
       "persistent": true,
-      "env": ["NODE_ENV", "NEXTAUTH_URL", "AUTH_CLIENT_ID", "AUTH_CLIENT_SECRET", "AUTH_WELL_KNOWN_URL"]
+      "env": [
+        "APP_ENV",
+        "NODE_ENV",
+        "NEXTAUTH_URL",
+        "AUTH_CLIENT_ID",
+        "AUTH_CLIENT_SECRET",
+        "AUTH_WELL_KNOWN_URL",
+        "NEXT_PUBLIC_APP_ENV",
+        "PORT",
+        "IDG_API_URL",
+        "IDG_API_USERNAME",
+        "IDG_API_PASSWORD"
+      ]
     },
     "db:generate": { "cache": false },
-    "migrate:deploy": { "cache": false }
+    "migrate:deploy": { "cache": false },
+    "precompile": {
+      "outputs": ["src/templates/email/**"]
+    }
   }
 }

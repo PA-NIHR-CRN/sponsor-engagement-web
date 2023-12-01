@@ -1,16 +1,19 @@
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
+import { organisationRoleShortName, type OrganisationRoleShortName } from './organisations'
 import { Prisma, prismaClient } from './prisma'
 
 export const getStudyById = async (studyId: number, organisationIds?: number[]) => {
   const query = {
     where: {
       id: studyId,
+      isDeleted: false,
       ...(organisationIds && {
         organisations: {
           some: {
             organisationId: {
               in: organisationIds,
             },
+            isDeleted: false,
           },
         },
       }),
@@ -22,12 +25,19 @@ export const getStudyById = async (studyId: number, organisationIds?: number[]) 
     ],
     include: {
       organisations: {
+        where: {
+          isDeleted: false,
+        },
         include: {
           organisation: true,
           organisationRole: true,
         },
       },
-      evaluationCategories: true,
+      evaluationCategories: {
+        where: {
+          isDeleted: false,
+        },
+      },
       assessments: {
         include: {
           status: true,
@@ -58,12 +68,12 @@ export const getStudyById = async (studyId: number, organisationIds?: number[]) 
     }
   }
 
-  // Map organisation roles along with the name of the organisation to quickly check for a CTO / CRO if applicable
+  // Map organisation roles along with the name of the organisation to quickly check for a CTU / CRO if applicable
   const organisationsByRole = Object.fromEntries(
     study.organisations.map((organisation) => {
-      return [organisation.organisationRole.name, organisation.organisation.name]
+      return [organisationRoleShortName[organisation.organisationRole.name], organisation.organisation.name]
     })
-  )
+  ) as Partial<Record<OrganisationRoleShortName, string>>
 
   return {
     data: {
@@ -88,6 +98,7 @@ export const getStudiesForOrgs = async ({
     skip: currentPage * pageSize - pageSize,
     take: pageSize,
     where: {
+      isDeleted: false,
       ...(searchTerm && {
         OR: [
           {
@@ -124,6 +135,7 @@ export const getStudiesForOrgs = async ({
               ],
             },
           },
+          isDeleted: false,
         },
       },
     },
@@ -133,12 +145,19 @@ export const getStudiesForOrgs = async ({
       shortTitle: true,
       isDueAssessment: true,
       organisations: {
+        where: {
+          isDeleted: false,
+        },
         include: {
           organisation: true,
           organisationRole: true,
         },
       },
-      evaluationCategories: true,
+      evaluationCategories: {
+        where: {
+          isDeleted: false,
+        },
+      },
       assessments: {
         include: {
           status: true,

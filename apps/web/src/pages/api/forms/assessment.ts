@@ -1,16 +1,18 @@
 import type { NextApiRequest } from 'next'
 import { ZodError } from 'zod'
 import type { Prisma } from 'database'
+import { logger } from '@nihr-ui/logger'
 import type { AssessmentInputs } from '../../../utils/schemas'
 import { assessmentSchema } from '../../../utils/schemas'
 import { prismaClient } from '../../../lib/prisma'
 import { withApiHandler } from '../../../utils/withApiHandler'
+import { Roles } from '../../../constants'
 
 export interface ExtendedNextApiRequest extends NextApiRequest {
   body: AssessmentInputs
 }
 
-export default withApiHandler<ExtendedNextApiRequest>(async (req, res, session) => {
+export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, async (req, res, session) => {
   try {
     if (req.method !== 'POST') {
       throw new Error('Wrong method')
@@ -49,7 +51,7 @@ export default withApiHandler<ExtendedNextApiRequest>(async (req, res, session) 
       },
     })
 
-    console.info(`Added assessment with id: ${assessmentResult.id}`)
+    logger.info(`Added assessment with id: ${assessmentResult.id}`)
 
     const studyResult = await prismaClient.study.update({
       where: {
@@ -60,7 +62,7 @@ export default withApiHandler<ExtendedNextApiRequest>(async (req, res, session) 
       },
     })
 
-    console.info(`Updated study with id: ${studyResult.id}`)
+    logger.info(`Updated study with id: ${studyResult.id}`)
 
     // Redirect back to study detail page
     if (String(req.query.returnUrl).includes(studyId)) {
@@ -70,7 +72,7 @@ export default withApiHandler<ExtendedNextApiRequest>(async (req, res, session) 
     // Otherwise, redirect back to studies list page
     return res.redirect(302, `/studies?success=1`)
   } catch (error) {
-    console.error(error)
+    logger.error(error)
 
     const studyId = req.body.studyId
 

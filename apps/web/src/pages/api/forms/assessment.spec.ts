@@ -5,6 +5,7 @@ import { createResponse, createRequest } from 'node-mocks-http'
 import type { NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
 import { ZodError } from 'zod'
+import { logger } from '@nihr-ui/logger'
 import { prismaClient } from '../../../lib/prisma'
 import type { AssessmentInputs } from '../../../utils/schemas'
 import { userNoRoles, userWithSponsorContactRole } from '../../../__mocks__/session'
@@ -14,6 +15,7 @@ import type { ExtendedNextApiRequest } from './assessment'
 import api from './assessment'
 
 jest.mock('next-auth/next')
+jest.mock('@nihr-ui/logger')
 
 type ApiRequest = ExtendedNextApiRequest
 type ApiResponse = NextApiResponse
@@ -38,7 +40,7 @@ describe('Successful study assessment submission', () => {
 
   beforeEach(() => {
     jest.mocked(getServerSession).mockResolvedValueOnce(userWithSponsorContactRole)
-    console.info = jest.fn()
+    logger.info = jest.fn()
   })
 
   test('Saves the assessment and redirects back to the study detail page', async () => {
@@ -83,8 +85,8 @@ describe('Successful study assessment submission', () => {
       data: { isDueAssessment: false },
     })
 
-    expect(console.info).toHaveBeenCalledWith('Added assessment with id: 1')
-    expect(console.info).toHaveBeenCalledWith('Updated study with id: 2')
+    expect(logger.info).toHaveBeenCalledWith('Added assessment with id: 1')
+    expect(logger.info).toHaveBeenCalledWith('Updated study with id: 2')
   })
 
   test('Saves the assessment and redirects back to the study list page', async () => {
@@ -129,8 +131,8 @@ describe('Successful study assessment submission', () => {
       data: { isDueAssessment: false },
     })
 
-    expect(console.info).toHaveBeenCalledWith('Added assessment with id: 1')
-    expect(console.info).toHaveBeenCalledWith('Updated study with id: 2')
+    expect(logger.info).toHaveBeenCalledWith('Added assessment with id: 1')
+    expect(logger.info).toHaveBeenCalledWith('Updated study with id: 2')
   })
 })
 
@@ -143,8 +145,8 @@ describe('Failed study assessment submission', () => {
   }
 
   beforeEach(() => {
-    console.info = jest.fn()
-    console.error = jest.fn()
+    logger.info = jest.fn()
+    logger.error = jest.fn()
   })
 
   test('User not logged in redirects to sign in page', async () => {
@@ -152,7 +154,7 @@ describe('Failed study assessment submission', () => {
     const res = await testHandler(api, { method: 'POST', body, query: {} })
     expect(res.statusCode).toBe(302)
     expect(res._getRedirectUrl()).toBe(SIGN_IN_PAGE)
-    expect(console.error).toHaveBeenCalledWith(new AuthError('Not signed in'))
+    expect(logger.error).toHaveBeenCalledWith(new AuthError('Not signed in'))
   })
 
   test('User without roles redirects to error page', async () => {
@@ -160,7 +162,7 @@ describe('Failed study assessment submission', () => {
     const res = await testHandler(api, { method: 'POST', body, query: {} })
     expect(res.statusCode).toBe(302)
     expect(res._getRedirectUrl()).toBe(`/500`)
-    expect(console.error).toHaveBeenCalledWith(new Error('No roles or organisations found for user'))
+    expect(logger.error).toHaveBeenCalledWith(new Error('No role found for user'))
   })
 
   test('Wrong http method redirects back to the form with a fatal error', async () => {
@@ -168,7 +170,7 @@ describe('Failed study assessment submission', () => {
     const res = await testHandler(api, { method: 'GET', body, query: {} })
     expect(res.statusCode).toBe(302)
     expect(res._getRedirectUrl()).toBe(`/assessments/${body.studyId}/?fatal=1`)
-    expect(console.error).toHaveBeenCalledWith(new Error('Wrong method'))
+    expect(logger.error).toHaveBeenCalledWith(new Error('Wrong method'))
   })
 
   test('Validation errors redirects back to the form with the errors and original values', async () => {
@@ -189,7 +191,7 @@ describe('Failed study assessment submission', () => {
     expect(res._getRedirectUrl()).toBe(
       `/assessments/999/?statusError=Select+how+the+study+is+progressing&furtherInformation=4%2C5&furtherInformationText=Some+extra+text`
     )
-    expect(console.error).toHaveBeenCalledWith(
+    expect(logger.error).toHaveBeenCalledWith(
       new ZodError([
         {
           code: 'invalid_type',

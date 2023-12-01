@@ -1,30 +1,36 @@
 import type { ReactElement } from 'react'
 import { AlertIcon, Container, Details, NotificationBanner } from '@nihr-ui/frontend'
-import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { getServerSession } from 'next-auth/next'
+import type { InferGetServerSidePropsType } from 'next'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import Skeleton from 'react-loading-skeleton'
-import { RootLayout } from '../../components/Layout/RootLayout'
-import { authOptions } from '../api/auth/[...nextauth]'
-import { SIGN_IN_PAGE } from '../../constants/routes'
-import { RequestSupport, StudyList, Pagination, Sort, Filters, SelectedFilters } from '../../components/molecules'
-import { PER_PAGE } from '../../constants'
+import { logger } from '@nihr-ui/logger'
+import { RootLayout } from '../../components/organisms'
+import {
+  RequestSupport,
+  StudyList,
+  Pagination,
+  Sort,
+  Filters,
+  SelectedFilters,
+  StudiesListSkeleton,
+} from '../../components/molecules'
+import { Roles, STUDIES_PER_PAGE } from '../../constants'
 import { pluraliseStudy } from '../../utils/pluralise'
 import { getStudiesForOrgs } from '../../lib/studies'
 import { formatDate } from '../../utils/date'
 import { isClinicalResearchSponsor } from '../../lib/organisations'
-import { useStudies } from '../../hooks/useStudies'
+import { useFormListeners } from '../../hooks/useFormListeners'
 import { getFiltersFromQuery } from '../../utils/filters'
 import { Card } from '../../components/atoms'
-import 'react-loading-skeleton/dist/skeleton.css'
+import { withServerSideProps } from '../../utils/withServerSideProps'
+import { SUPPORT_PAGE } from '../../constants/routes'
 
 const renderNotificationBanner = (success: boolean) =>
   success ? (
     <NotificationBanner heading="The study assessment was successfully saved" success>
       Request{' '}
-      <Link className="govuk-notification-banner__link" href="/">
+      <Link className="govuk-notification-banner__link" href={SUPPORT_PAGE}>
         NIHR CRN support
       </Link>{' '}
       for this study.
@@ -40,7 +46,7 @@ export default function Studies({
 }: StudiesProps) {
   const router = useRouter()
 
-  const { isLoading, handleFilterChange } = useStudies()
+  const { isLoading, handleFilterChange } = useFormListeners()
 
   const titleResultsText =
     totalItems === 0
@@ -84,7 +90,11 @@ export default function Studies({
 
           {/* Search/Filter bar */}
           <div>
-            <Filters filters={filters} onFilterChange={handleFilterChange} />
+            <Filters
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              searchLabel="Search study title, protocol number or IRAS ID"
+            />
           </div>
 
           <SelectedFilters filters={filters} isLoading={isLoading} />
@@ -105,16 +115,7 @@ export default function Studies({
           </div>
 
           {isLoading ? (
-            <Skeleton
-              baseColor="var(--colour-grey-10)"
-              borderRadius={0}
-              className="govuk-!-margin-bottom-3"
-              containerTestId="study-skeleton"
-              count={5}
-              height={152}
-              style={{ lineHeight: 'inherit' }}
-              width="100%"
-            />
+            <StudiesListSkeleton />
           ) : (
             <>
               {studies.length > 0 ? (
@@ -168,27 +169,9 @@ Studies.getLayout = function getLayout(page: ReactElement, { user }: StudiesProp
   return <RootLayout user={user}>{page}</RootLayout>
 }
 
-export const getServerSideProps = async (context: GetServerSidePropsContext) => {
+export const getServerSideProps = withServerSideProps(Roles.SponsorContact, async (context, session) => {
   try {
-    const session = await getServerSession(context.req, context.res, authOptions)
-
-    if (!session?.user) {
-      return {
-        redirect: {
-          destination: SIGN_IN_PAGE,
-        },
-      }
-    }
-
-    if (session.user.roles.length === 0) {
-      return {
-        redirect: {
-          destination: '/',
-        },
-      }
-    }
-
-    const organisationIds = session.user.organisations.map((userOrg) => userOrg.organisationId)
+    const organisationIds = session.user?.organisations.map((userOrg) => userOrg.organisationId) || []
 
     const searchParams = new URLSearchParams({
       q: context.query.q ? String(context.query.q) : '',
@@ -202,7 +185,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       organisationIds,
       searchTerm,
       currentPage: initialPage,
-      pageSize: PER_PAGE,
+      pageSize: STUDIES_PER_PAGE,
     })
 
     const filters = getFiltersFromQuery(context.query)
@@ -212,7 +195,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         user: session.user,
         meta: {
           initialPage,
-          initialPageSize: PER_PAGE,
+          initialPageSize: STUDIES_PER_PAGE,
           totalItems: studies.pagination.total,
           totalItemsDue: studies.pagination.totalDue,
         },
@@ -221,11 +204,11 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       },
     }
   } catch (error) {
-    console.error('error', error)
+    logger.error('error', error)
     return {
       redirect: {
         destination: '/500',
       },
     }
   }
-}
+})

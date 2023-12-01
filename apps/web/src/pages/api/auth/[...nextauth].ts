@@ -2,6 +2,7 @@ import type { AuthOptions } from 'next-auth'
 import NextAuth from 'next-auth'
 import type { OAuthConfig, OAuthUserConfig } from 'next-auth/providers'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
+import { logger } from '@nihr-ui/logger'
 import { AUTH_PROVIDER_ID, AUTH_PROVIDER_NAME, AUTH_PROVIDER_TYPE } from '../../../constants/auth'
 import { prismaClient } from '../../../lib/prisma'
 import { getUserOrganisations } from '../../../lib/organisations'
@@ -48,7 +49,7 @@ const Provider = ({ clientId, clientSecret, wellKnown }: ProviderOptions): OAuth
 })
 
 export const authOptions: AuthOptions = {
-  debug: true,
+  debug: process.env.APP_ENV !== 'prod',
   adapter: PrismaAdapter(prismaClient),
   providers: [
     Provider({
@@ -59,23 +60,29 @@ export const authOptions: AuthOptions = {
   ],
   callbacks: {
     async session({ session, user }) {
-      if (!session.user) {
+      try {
+        if (!session.user) {
+          return session
+        }
+
+        const userId = Number(user.id)
+
+        session.user.id = userId
+
+        // When a session is established or checked we can lookup the users' role(s) and forward them inside the user object
+        // https://next-auth.js.org/configuration/callbacks#session-callback
+        const roles = await prismaClient.userRole.findMany({ where: { userId } })
+
+        session.user.roles = roles.map((role) => role.roleId)
+
+        session.user.organisations = await getUserOrganisations(userId)
+
+        return session
+      } catch (error) {
+        logger.error('NextAuth session callback exception')
+        logger.error(error)
         return session
       }
-
-      const userId = Number(user.id)
-
-      session.user.id = userId
-
-      // When a session is established or checked we can lookup the users' role(s) and forward them inside the user object
-      // https://next-auth.js.org/configuration/callbacks#session-callback
-      const roles = await prismaClient.userRole.findMany({ where: { userId } })
-
-      session.user.roles = roles.map((role) => role.roleId)
-
-      session.user.organisations = await getUserOrganisations(userId)
-
-      return session
     },
   },
 }

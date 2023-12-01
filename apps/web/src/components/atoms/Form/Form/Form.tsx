@@ -3,8 +3,8 @@ import { useRouter } from 'next/router'
 import type { ReactNode } from 'react'
 import type { FieldValues, FormProps as HookFormProps, UseFormHandleSubmit } from 'react-hook-form'
 import type { NextApiResponse } from 'next'
+import { logger } from '@nihr-ui/logger'
 import { FORM_ERRORS } from '../../../../constants/forms'
-// import { logger } from '@/lib/logger'
 
 interface FormProps<T extends FieldValues> {
   action: string
@@ -23,9 +23,13 @@ interface FormApiResponse extends NextApiResponse {
 export function Form<T extends FieldValues>({ action, method, children, onError, handleSubmit }: FormProps<T>) {
   const router = useRouter()
 
-  const redirectToFatalError = () => {
-    onError(FORM_ERRORS.fatal)
-    void router.replace(`${router.asPath}?fatal=1`)
+  const redirectToFatalError = (code = 1) => {
+    onError(FORM_ERRORS[code])
+    // Ensure any existing URL state is cleared first
+    const oldUrl = new URL(router.asPath, document.location.href)
+    const newUrl = new URL(oldUrl.pathname, document.location.href)
+    newUrl.searchParams.append('fatal', String(code))
+    void router.replace(newUrl.toString())
   }
 
   const onValid = async (values: T) => {
@@ -43,7 +47,7 @@ export function Form<T extends FieldValues>({ action, method, children, onError,
 
       // Fatal error redirect
       if (redirectUrl.searchParams.has('fatal')) {
-        redirectToFatalError()
+        redirectToFatalError(Number(redirectUrl.searchParams.get('fatal')))
         return
       }
 
@@ -55,13 +59,20 @@ export function Form<T extends FieldValues>({ action, method, children, onError,
       // Misc error redirect
       void router.replace(`${redirectUrl.pathname}${redirectUrl.search}`)
     } catch (error) {
-      // logger.error('handleSubmit failed', error)
+      if (axios.isAxiosError(error)) {
+        logger.info(`Form component failed to submit due to ${error.message}`)
+      } else {
+        logger.info(error)
+      }
       redirectToFatalError()
     }
   }
 
   const onInvalid = () => {
-    console.error('Form submission failed')
+    const url = new URL(router.asPath, document.location.href)
+    url.searchParams.delete('fatal')
+    void router.replace(url, undefined)
+    logger.error('Form submission failed - %s', url.toString())
   }
 
   return (

@@ -4,7 +4,7 @@ import type { InferGetServerSidePropsType } from 'next'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { RootLayout } from '../../../components/Layout/RootLayout'
+import { RootLayout } from '../../../components/organisms'
 import {
   AssessmentHistory,
   RequestSupport,
@@ -14,12 +14,14 @@ import {
 import { getStudyById } from '../../../lib/studies'
 import { formatDate } from '../../../utils/date'
 import { withServerSideProps } from '../../../utils/withServerSideProps'
+import { Roles } from '../../../constants'
+import { SUPPORT_PAGE } from '../../../constants/routes'
 
 const renderNotificationBanner = (success: boolean) =>
   success ? (
     <NotificationBanner heading="The study assessment was successfully saved" success>
       Request{' '}
-      <Link className="govuk-notification-banner__link" href="/">
+      <Link className="govuk-notification-banner__link" href={SUPPORT_PAGE}>
         NIHR CRN support
       </Link>{' '}
       for this study.
@@ -30,6 +32,10 @@ export type StudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
 export default function Study({ study, assessments }: StudyProps) {
   const router = useRouter()
+
+  const { organisationsByRole } = study
+
+  const supportOrgName = organisationsByRole.CRO ?? organisationsByRole.CTU
 
   return (
     <Container>
@@ -45,7 +51,8 @@ export default function Study({ study, assessments }: StudyProps) {
 
           <span className="govuk-body-m mb-0 text-darkGrey">
             <span className="govuk-visually-hidden">Study sponsor: </span>
-            {study.organisations[0].organisation.name}
+            {organisationsByRole.Sponsor}
+            {Boolean(supportOrgName) && ` (${supportOrgName})`}
           </span>
 
           <div className="flex items-center govuk-!-margin-bottom-4 govuk-!-margin-top-4 gap-6">
@@ -62,7 +69,8 @@ export default function Study({ study, assessments }: StudyProps) {
 
           <p>
             You can review the progress of this study at any time. You will need to assess if the study is on or off
-            track and if any <Link href="/">NIHR CRN support</Link> is needed.
+            track and if any <Link href={`${SUPPORT_PAGE}?returnPath=${router.asPath}`}>NIHR CRN support</Link> is
+            needed.
           </p>
 
           {/* Progress summary */}
@@ -134,7 +142,7 @@ export default function Study({ study, assessments }: StudyProps) {
           <StudyDetails study={study} />
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
-          <RequestSupport />
+          <RequestSupport showCallToAction />
         </div>
       </div>
     </Container>
@@ -145,7 +153,7 @@ Study.getLayout = function getLayout(page: ReactElement, { user }: StudyProps) {
   return <RootLayout user={user}>{page}</RootLayout>
 }
 
-export const getServerSideProps = withServerSideProps(async (context, session) => {
+export const getServerSideProps = withServerSideProps(Roles.SponsorContact, async (context, session) => {
   const studyId = Number(context.query.studyId)
 
   if (!studyId) {

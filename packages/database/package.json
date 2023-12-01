@@ -17,10 +17,9 @@
     "studio": "npx prisma studio"
   },
   "dependencies": {
-    "@prisma/client": "latest",
-    "axios": "^1.5.1",
-    "axios-rate-limit": "^1.3.0",
-    "logger": "*"
+    "@nihr-ui/auth": "*",
+    "@nihr-ui/logger": "*",
+    "@prisma/client": "latest"
   },
   "devDependencies": {
     "@types/node": "^20.6.5",

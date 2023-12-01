@@ -13,8 +13,9 @@ describe('StudyDetails Component', () => {
       cpmsId: 12345,
       organisations: [{ organisation: { name: 'Sponsor Org' } }],
       organisationsByRole: {
-        'Managing Clinical Trials Unit': 'CTU Org',
-        'Contract Research Organisation': 'CRO Org',
+        Sponsor: 'Sponsor Org',
+        CTU: 'CTU Org',
+        CRO: 'CRO Org',
       },
       managingSpeciality: 'Specialty Name',
       chiefInvestigatorFirstName: 'John',
@@ -63,7 +64,9 @@ describe('StudyDetails Component', () => {
         irasId: null,
         cpmsId: 12345,
         organisations: [{ organisation: { name: 'Sponsor Org' } }],
-        organisationsByRole: {},
+        organisationsByRole: {
+          Sponsor: 'Sponsor Org',
+        },
         managingSpeciality: 'Specialty Name',
         chiefInvestigatorFirstName: null,
         chiefInvestigatorLastName: null,
@@ -103,8 +106,8 @@ describe('StudyDetails Component', () => {
       study: {
         ...defaultProps.study,
         organisationsByRole: {
-          'Managing Clinical Trials Unit': 'CTU Org',
-          'Contract Research Organisation': 'CRO Org',
+          CTU: 'CTU Org',
+          CRO: 'CRO Org',
         },
       },
     })

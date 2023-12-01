@@ -25,6 +25,7 @@ const formState: FormState<FieldValues> = {
   isValidating: false,
   isDirty: false,
   isLoading: false,
+  disabled: false,
 }
 
 describe('useFormErrorHydration', () => {
@@ -67,7 +68,7 @@ describe('useFormErrorHydration', () => {
     expect(onFoundError).toHaveBeenCalledWith('furtherInformation', { type: 'custom', message: 'Error message 2' })
 
     // Verify that router.replace was called with the correct arguments
-    expect(router.replace).toHaveBeenCalledWith({ query: undefined }, undefined, { shallow: true })
+    expect(router.replace).toHaveBeenCalledWith({ query: undefined })
   })
 
   it('should return formState (client side) errors when there are no server errors', () => {

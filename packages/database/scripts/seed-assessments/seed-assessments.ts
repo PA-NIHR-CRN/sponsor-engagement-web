@@ -2,8 +2,8 @@ import path from 'node:path'
 import * as fs from 'node:fs'
 import assert from 'node:assert'
 import { PrismaClient } from '@prisma/client'
-import { logger } from 'logger'
 import { parse } from 'csv-parse'
+import { logger } from '@nihr-ui/logger'
 import { batchSize, headers, intentionMap } from './constants'
 import { parseDate } from './utils'
 import type { Assessment, AssessmentRow } from './types'
@@ -57,7 +57,7 @@ const seedAssessments = async () => {
     const uniqueContacts = [...new Set(assessments.map((assessment) => assessment.createdBy))] as string[] // Cast to keep eslint happy
 
     const { count } = await prisma.user.createMany({
-      data: uniqueContacts.map((email) => ({ email, identityGatewayId: '' })),
+      data: uniqueContacts.map((email) => ({ email })),
       skipDuplicates: true,
     })
 

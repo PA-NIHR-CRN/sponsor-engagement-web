@@ -17,6 +17,7 @@ on:
         description: Select application
         options:
         - ingest
+        - notify
 
 env:
   AWS_DEFAULT_REGION: eu-west-2

@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 @layer base {
-  html {
-    font-family: var(--font-primary), arial, sans-serif;
+  html,
+  body {
     color: var(--text-grey);
   }
 }
@@ -27,7 +27,7 @@ $govuk-font-family: var(--font-primary), arial, sans-serif;
 $govuk-page-width: 1280px;
 $govuk-link-colour: var(--colour-blue);
 
-@import '~node_modules/govuk-frontend/govuk/all.scss';
+@import '../../node_modules/govuk-frontend/govuk/all.scss';
 
 @layer utilities {
   .focusable {
@@ -44,9 +44,10 @@ $govuk-link-colour: var(--colour-blue);
 
 body {
   margin: 0;
-  // Allows the side to stretch 100% of the viewport height (inc below the fold)
+  padding: 0;
+  // Allows the side nav to stretch 100% of the viewport height
+  min-height: 100vh;
   position: relative;
-  height: 100%;
 }
 
 .govuk-table {

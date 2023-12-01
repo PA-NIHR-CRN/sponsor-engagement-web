@@ -46,8 +46,10 @@ describe('getStudiesForOrgs', () => {
                   ],
                 },
               },
+              isDeleted: false,
             },
           },
+          isDeleted: false,
         },
       })
     )
@@ -66,8 +68,10 @@ describe('getStudiesForOrgs', () => {
                 ],
               },
             },
+            isDeleted: false,
           },
         },
+        isDeleted: false,
       },
     })
   })
@@ -116,8 +120,10 @@ describe('getStudiesForOrgs', () => {
                   ],
                 },
               },
+              isDeleted: false,
             },
           },
+          isDeleted: false,
         },
       })
     )
@@ -142,8 +148,10 @@ describe('getStudiesForOrgs', () => {
                 ],
               },
             },
+            isDeleted: false,
           },
         },
+        isDeleted: false,
       },
     })
   })
@@ -186,9 +194,11 @@ describe('getStudyById', () => {
       expect.objectContaining({
         where: {
           id: 1,
+          isDeleted: false,
           organisations: {
             some: {
               organisationId: { in: userOrganisationIds },
+              isDeleted: false,
             },
           },
         },
@@ -224,7 +234,7 @@ describe('getStudyById', () => {
       data: {
         ...mockStudyWithOrgs,
         organisationsByRole: {
-          'Managing Clinical Trials Unit': 'Pfizer clinical trials',
+          CTU: 'Pfizer clinical trials',
         },
       },
     })
