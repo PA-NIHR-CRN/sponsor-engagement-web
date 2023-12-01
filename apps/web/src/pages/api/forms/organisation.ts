@@ -3,6 +3,7 @@ import type { NextApiRequest } from 'next'
 import { ZodError } from 'zod'
 import { logger } from '@nihr-ui/logger'
 import { emailService } from '@nihr-ui/email'
+import { emailTemplates } from '@nihr-ui/templates/sponsor-engagement'
 import type { OrganisationAddInputs } from '../../../utils/schemas'
 import { organisationAddSchema } from '../../../utils/schemas'
 import { withApiHandler } from '../../../utils/withApiHandler'
@@ -16,7 +17,6 @@ import {
   SUPPORT_PAGE,
 } from '../../../constants/routes'
 import { getAbsoluteUrl } from '../../../utils/email'
-import emailTemplates from '../../../templates/email'
 
 export interface ExtendedNextApiRequest extends NextApiRequest {
   body: OrganisationAddInputs

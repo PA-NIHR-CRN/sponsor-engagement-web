@@ -11,7 +11,7 @@ import clsx from 'clsx'
 import { authService } from '@nihr-ui/auth'
 import { NextSeo } from 'next-seo'
 import { RootLayout } from '../../components/organisms'
-import { ERROR_PAGE_500, REGISTRATION_CONFIRMATION_PAGE, SIGN_IN_PAGE } from '../../constants/routes'
+import { ERROR_PAGE_500, REGISTRATION_CONFIRMATION_LINKED_PAGE, SIGN_IN_PAGE } from '../../constants/routes'
 import { authOptions } from '../api/auth/[...nextauth]'
 import { prismaClient } from '../../lib/prisma'
 import { getValuesFromSearchParams } from '../../utils/form'
@@ -219,7 +219,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
         return {
           redirect: {
-            destination: REGISTRATION_CONFIRMATION_PAGE,
+            destination: REGISTRATION_CONFIRMATION_LINKED_PAGE,
           },
         }
       }
