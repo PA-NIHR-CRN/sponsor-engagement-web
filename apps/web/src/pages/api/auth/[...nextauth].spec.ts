@@ -1,12 +1,21 @@
 import type { Provider } from 'next-auth/providers'
 import { Mock } from 'ts-mockery'
-import type { Session } from 'next-auth'
+import type { Session, Account } from 'next-auth'
 import type { AdapterUser } from 'next-auth/adapters'
 import type { JWT } from 'next-auth/jwt'
 import type { UserOrganisation, UserRole } from 'database'
+import { faker } from '@faker-js/faker'
+import type { refreshTokenResponseSchema } from '@nihr-ui/auth'
+import { authService } from '@nihr-ui/auth'
+import { ZodError, type z } from 'zod'
+import { logger } from '@nihr-ui/logger'
 import { prismaMock } from '../../../__mocks__/prisma'
 import { Roles } from '../../../constants/auth'
 import { authOptions } from './[...nextauth]'
+
+jest.mock('@nihr-ui/auth')
+jest.mock('@nihr-ui/logger')
+jest.useFakeTimers().setSystemTime(new Date('2023-01-01'))
 
 describe('Authentication configuration options', () => {
   test('authOptions object is defined', () => {
@@ -19,6 +28,10 @@ describe('Authentication configuration options', () => {
 
   test('prisma db adapter is set', () => {
     expect(authOptions.adapter).toBeDefined()
+  })
+
+  test('jwt stategy is set', () => {
+    expect(authOptions.session?.strategy).toBe('jwt')
   })
 })
 
@@ -40,26 +53,133 @@ describe('Custom OAuth provider is compatible with next-auth', () => {
   })
 })
 
-describe('Session authentication callback', () => {
+describe('JWT callback', () => {
+  const accountMock = Mock.of<Account>({
+    accessToken: faker.string.uuid(),
+    expires_at: Number(faker.date.future()),
+    refresh_token: faker.string.uuid(),
+    id_token: faker.string.uuid(),
+  })
+
+  const userMock = Mock.of<AdapterUser>({
+    email: faker.internet.email(),
+  })
+
+  const tokenMock = Mock.of<JWT>()
+
+  test('returns a new token with account information on initial sign in', async () => {
+    const account = accountMock
+    const user = userMock
+    const token = tokenMock
+
+    const response = await authOptions.callbacks?.jwt?.({ account, user, token })
+
+    expect(response).toEqual<JWT>({
+      accessToken: accountMock.access_token,
+      accessTokenExpires: accountMock.expires_at * 1000,
+      refreshToken: accountMock.refresh_token,
+      idToken: accountMock.id_token,
+      user: userMock,
+    })
+  })
+
+  test('returns the existing token when it has not expired yet', async () => {
+    const account = null
+    const user = userMock
+    const accessTokenExpires = Number(faker.date.future())
+    const token = Mock.of<JWT>({
+      accessToken: accountMock.access_token,
+      accessTokenExpires,
+      refreshToken: accountMock.refresh_token,
+      idToken: accountMock.id_token,
+      user: userMock,
+    })
+
+    const response = await authOptions.callbacks?.jwt?.({ account, user, token })
+
+    expect(response).toEqual<JWT>(token)
+  })
+
+  test('refreshes the token when it has expired', async () => {
+    const account = null
+    const user = userMock
+    const accessTokenExpires = Number(faker.date.past())
+    const token = Mock.of<JWT>({
+      accessToken: accountMock.access_token,
+      accessTokenExpires,
+      refreshToken: accountMock.refresh_token,
+      idToken: accountMock.id_token,
+      user: userMock,
+    })
+
+    const refreshTokenResponseMock = Mock.of<z.infer<typeof refreshTokenResponseSchema>>({
+      access_token: faker.string.uuid(),
+      expires_in: Number(faker.date.future()),
+      id_token: faker.string.uuid(),
+      refresh_token: faker.string.uuid(),
+    })
+
+    jest.mocked(authService.refreshToken).mockResolvedValueOnce({
+      success: true,
+      data: refreshTokenResponseMock,
+    })
+
+    const response = await authOptions.callbacks?.jwt?.({ account, user, token })
+
+    expect(response).toEqual<JWT>({
+      ...token,
+      accessToken: refreshTokenResponseMock.access_token,
+      accessTokenExpires: Date.now() + refreshTokenResponseMock.expires_in * 1000,
+      idToken: refreshTokenResponseMock.id_token,
+      refreshToken: refreshTokenResponseMock.refresh_token,
+    })
+  })
+
+  test('throws an error when refreshing the token rejects', async () => {
+    const account = null
+    const user = userMock
+    const accessTokenExpires = Number(faker.date.past())
+    const token = Mock.of<JWT>({
+      accessToken: accountMock.access_token,
+      accessTokenExpires,
+      refreshToken: accountMock.refresh_token,
+      idToken: accountMock.id_token,
+      user: userMock,
+    })
+
+    jest.mocked(authService.refreshToken).mockRejectedValueOnce({
+      success: false,
+      error: new ZodError([]),
+    })
+
+    const response = await authOptions.callbacks?.jwt?.({ account, user, token })
+
+    expect(logger.info).toHaveBeenCalledWith({ error: new ZodError([]), success: false })
+
+    expect(response).toEqual<JWT>({
+      ...token,
+      error: 'RefreshAccessTokenError',
+    })
+  })
+})
+
+describe('Session callback', () => {
   test('retrieves the roles for the authenticated user and forwards it to the returned session object', async () => {
-    const session = Mock.of<Session>({
-      user: {
-        name: 'Tom Christian',
-        email: 'tom.christian@nihr.ac.uk',
-      },
-    })
-    const user = Mock.of<AdapterUser>({
-      id: '26',
-    })
-    const token = Mock.of<JWT>()
+    const id = faker.string.numeric()
+    const email = faker.internet.email()
+    const name = faker.person.fullName()
+
+    const session = Mock.of<Session>({ user: { name, email } })
+    const user = Mock.of<AdapterUser>()
+    const token = Mock.of<JWT>({ user: { id, email } })
 
     prismaMock.userRole.findMany.mockResolvedValueOnce([
       Mock.of<UserRole>({
-        userId: 26,
+        userId: Number(id),
         roleId: Roles.SponsorContact,
       }),
       Mock.of<UserRole>({
-        userId: 26,
+        userId: Number(id),
         roleId: Roles.ContactManager,
       }),
     ])
@@ -79,9 +199,9 @@ describe('Session authentication callback', () => {
     expect(updatedSession).toEqual<Session>(
       Mock.of<Session>({
         user: {
-          id: 26,
-          name: 'Tom Christian',
-          email: 'tom.christian@nihr.ac.uk',
+          id: Number(id),
+          name,
+          email,
           roles: [Roles.SponsorContact, Roles.ContactManager],
           organisations: [mockUserOrganisation],
         },
@@ -89,12 +209,12 @@ describe('Session authentication callback', () => {
     )
   })
 
-  test('exits early if no user object exists', async () => {
+  test('exits early if no user object exists within the session', async () => {
+    const user = Mock.of<AdapterUser>()
+    const token = Mock.of<JWT>()
     const session = Mock.of<Session>({
       user: null,
     })
-    const user = Mock.of<AdapterUser>()
-    const token = Mock.of<JWT>()
 
     const updatedSession = await authOptions.callbacks?.session?.({
       session,
@@ -106,10 +226,6 @@ describe('Session authentication callback', () => {
 
     expect(prismaMock.userRole.findMany).not.toHaveBeenCalled()
 
-    expect(updatedSession).toEqual<Session>(
-      Mock.of<Session>({
-        user: null,
-      })
-    )
+    expect(updatedSession).toEqual<Session>(session)
   })
 })

@@ -4,7 +4,7 @@
   "setupFiles": ["<rootDir>/jest.env.js"],
   "setupFilesAfterEnv": ["@testing-library/jest-dom/extend-expect"],
   "reporters": ["default", "jest-junit"],
-  "testPathIgnorePatterns": [".vscode"],
+  "testPathIgnorePatterns": [".vscode", "dist"],
   "coverageReporters": ["json-summary", "text", "html", "lcov"],
   "coveragePathIgnorePatterns": ["node_modules", "index.ts"],
   "coverageThreshold": {
