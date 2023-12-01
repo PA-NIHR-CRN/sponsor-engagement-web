@@ -1,3 +1,4 @@
+import assert from 'assert'
 import { logger } from '@nihr-ui/logger'
 import { emailService } from '@nihr-ui/email'
 import { config as dotEnvConfig } from 'dotenv'
@@ -15,7 +16,14 @@ import {
 dotEnvConfig()
 
 const sendNotifications = async () => {
+  assert(process.env.APP_ENV)
+
   const allowList = process.env.NOTIFY_ALLOW_LIST?.split(',')
+
+  if (process.env.APP_ENV !== 'prod' && !allowList?.length) {
+    logger.error('No allow list provided for non-prod environment')
+    return
+  }
 
   const usersWithStudiesDueAssessment = await prismaClient.user.findMany({
     where: {
