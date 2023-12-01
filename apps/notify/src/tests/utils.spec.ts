@@ -69,7 +69,6 @@ describe('getAbsoluteUrl', () => {
 
   it('should return an absolute URL with custom environment', () => {
     process.env.APP_ENV = 'oat'
-    process.env.WEB_PORT = '3000'
 
     const path = '/example-path'
     const expectedUrl = 'https://oat.assessmystudy.nihr.ac.uk/example-path'
@@ -80,13 +79,16 @@ describe('getAbsoluteUrl', () => {
   })
 
   it('should return an absolute URL with default environment if APP_ENV is not set', () => {
+    process.env.APP_ENV = ''
     process.env.WEB_PORT = '3000'
 
     const path = '/example-path'
     const expectedUrl = 'http://localhost:3000/example-path'
 
-    const result = getAbsoluteUrl(path)
+    expect(getAbsoluteUrl(path)).toBe(expectedUrl)
 
-    expect(result).toBe(expectedUrl)
+    delete process.env.WEB_PORT
+
+    expect(getAbsoluteUrl(path)).toBe(expectedUrl)
   })
 })
