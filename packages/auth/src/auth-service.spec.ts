@@ -19,6 +19,8 @@ Object.defineProperty(globalThis, 'crypto', {
 describe('AuthService', () => {
   let authService: AuthService
 
+  process.env.IDG_API_URL = 'https://dev.id.nihr.ac.uk'
+
   const USERS_API_URL = 'https://dev.id.nihr.ac.uk/scim2/Users'
   const TOKEN_API_URL = 'https://dev.id.nihr.ac.uk/oauth2/token'
   const INTROSPECT_API_URL = 'https://dev.id.nihr.ac.uk/oauth2/introspect'
