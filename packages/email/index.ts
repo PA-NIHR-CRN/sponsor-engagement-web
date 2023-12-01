@@ -1,10 +1,7 @@
 import * as aws from 'aws-sdk'
 import { EmailService } from './email-service'
 
-// Ensure sandbox is used in non prod environments
-const region = process.env.APP_ENV === 'prod' ? 'eu-west-2' : 'eu-west-1'
-
-aws.config.update({ region })
+aws.config.update({ region: 'eu-west-2' })
 
 const ses = new aws.SES()
 

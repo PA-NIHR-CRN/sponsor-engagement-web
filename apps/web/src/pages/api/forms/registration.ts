@@ -7,6 +7,16 @@ import { registrationSchema } from '../../../utils/schemas'
 import { prismaClient } from '../../../lib/prisma'
 import { AUTH_PROVIDER_NAME, AUTH_PROVIDER_TYPE } from '../../../constants'
 
+/**
+ * Next.js API route for handling user registration and creation in Identity Gateway (IDG).
+ * This route expects a POST request with registration data and validates it.
+ * If registration is successful, it creates a new user in IDG and updates the local user data.
+ * If registration fails, it redirects back to the registration page with appropriate error messages.
+ *
+ * @param req - The HTTP request object containing registration data.
+ * @param res - The HTTP response object for sending responses.
+ */
+
 export interface ExtendedNextApiRequest extends NextApiRequest {
   body: RegistrationInputs
 }
