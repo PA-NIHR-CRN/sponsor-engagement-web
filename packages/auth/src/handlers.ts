@@ -12,7 +12,7 @@ import {
 
 const { IDG_API_URL, IDG_API_USERNAME, IDG_API_PASSWORD } = process.env
 
-const baseURL = new URL(IDG_API_URL).origin
+const baseURL = IDG_API_URL ? new URL(IDG_API_URL).origin : ''
 
 const api = rateLimit(
   axios.create({
