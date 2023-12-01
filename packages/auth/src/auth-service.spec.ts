@@ -1,8 +1,14 @@
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
 import type { z } from 'zod'
+import { faker } from '@faker-js/faker'
 import { AuthService } from './auth-service'
-import type { createUserResponseSchema, getUserResponseSchema } from './schemas'
+import type {
+  checkSessionResponseSchema,
+  createUserResponseSchema,
+  getUserResponseSchema,
+  refreshTokenResponseSchema,
+} from './schemas'
 
 Object.defineProperty(globalThis, 'crypto', {
   value: {
@@ -13,9 +19,9 @@ Object.defineProperty(globalThis, 'crypto', {
 describe('AuthService', () => {
   let authService: AuthService
 
-  const API_URL = 'https://dev.id.nihr.ac.uk/scim2/Users'
-
-  process.env.IDG_API_URL = API_URL
+  const USERS_API_URL = 'https://dev.id.nihr.ac.uk/scim2/Users'
+  const TOKEN_API_URL = 'https://dev.id.nihr.ac.uk/oauth2/token'
+  const INTROSPECT_API_URL = 'https://dev.id.nihr.ac.uk/oauth2/introspect'
 
   const mockGetUserResponse: z.infer<typeof getUserResponseSchema> = {
     totalResults: 1,
@@ -52,9 +58,31 @@ describe('AuthService', () => {
     userName: '01a87546-0e8e-4e78-a326-719cde27f49f',
   }
 
+  const mockRefreshTokenResponse: z.infer<typeof refreshTokenResponseSchema> = {
+    access_token: faker.string.uuid(),
+    expires_in: Number(faker.date.future()),
+    id_token: faker.string.uuid(),
+    refresh_token: faker.string.uuid(),
+    scope: faker.string.alpha(),
+    token_type: faker.string.alpha(),
+  }
+
+  const mockCheckSessionResponse: z.infer<typeof checkSessionResponseSchema> = {
+    active: true,
+    nbf: faker.number.int(),
+    scope: faker.string.alpha(),
+    token_type: faker.string.alpha(),
+    exp: faker.number.int(),
+    iat: faker.number.int(),
+    client_id: faker.string.alpha(),
+    username: faker.string.alpha(),
+  }
+
   const server = setupServer(
-    rest.get(API_URL, async (_, res, ctx) => res(ctx.json(mockGetUserResponse))),
-    rest.post(API_URL, async (_, res, ctx) => res(ctx.json(mockCreateUserResponse)))
+    rest.get(USERS_API_URL, async (_, res, ctx) => res(ctx.json(mockGetUserResponse))),
+    rest.post(USERS_API_URL, async (_, res, ctx) => res(ctx.json(mockCreateUserResponse))),
+    rest.post(TOKEN_API_URL, async (_, res, ctx) => res(ctx.json(mockRefreshTokenResponse))),
+    rest.post(INTROSPECT_API_URL, async (_, res, ctx) => res(ctx.json(mockCheckSessionResponse)))
   )
 
   beforeAll(() => {
@@ -72,6 +100,26 @@ describe('AuthService', () => {
 
   beforeEach(() => {
     authService = new AuthService()
+  })
+
+  test('refreshing an IDG token', async () => {
+    const res = await authService.refreshToken({ clientId: '', clientSecret: '', refreshToken: '' })
+
+    expect(res.success).toBeTruthy()
+
+    if (res.success) {
+      expect(res.data).toEqual(mockRefreshTokenResponse)
+    }
+  })
+
+  test('checking session validity', async () => {
+    const res = await authService.checkSession('123456')
+
+    expect(res.success).toBeTruthy()
+
+    if (res.success) {
+      expect(res.data).toEqual(mockCheckSessionResponse)
+    }
   })
 
   test('getting an IDG user by email', async () => {
