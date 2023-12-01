@@ -76,7 +76,7 @@ jobs:
       - name: Run database migrations
         run: npm run migrate:deploy
         env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
+          DATABASE_URL: ${{ env.CRNCCD_SECRET_DEV_SE_APP_CONFIG_DATABASE_URL }}
       - name: Generate task definition file from container
         run: |
           aws ecs describe-task-definition --task-definition crnccd-ecs-dev-se-notify-task-definition --query taskDefinition | jq 'del(.registeredAt,.registeredBy)' > ./task-definition.json
@@ -102,7 +102,7 @@ jobs:
           environment-variables: |
             APP_ENV=${{ vars.APP_ENV }}
             NOTIFY_ALLOW_LIST=${{ vars.NOTIFY_ALLOW_LIST }}
-            DATABASE_URL=${{ env.DATABASE_URL }}
+            DATABASE_URL=${{ env.CRNCCD_SECRET_DEV_SE_APP_CONFIG_DATABASE_URL }}
       - name: Remove Github Actions IP from RDS security group (Dev)
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
