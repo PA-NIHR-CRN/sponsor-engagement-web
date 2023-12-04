@@ -129,7 +129,9 @@ export default function Studies({
                           <StudyList
                             assessmentDue={Boolean(study.isDueAssessment)}
                             assessmentHref={`/assessments/${study.id}?returnUrl=studies`}
-                            indications={study.evaluationCategories.map((evalCategory) => evalCategory.indicatorType)}
+                            indications={study.evaluationCategories
+                              .map((evalCategory) => evalCategory.indicatorType)
+                              .filter((evalCategory, index, items) => items.indexOf(evalCategory) === index)}
                             lastAsessmentDate={formatDate(study.assessments[0]?.createdAt)}
                             shortTitle={study.shortTitle}
                             shortTitleHref={`/studies/${study.id}`}
