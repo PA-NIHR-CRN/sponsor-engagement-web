@@ -10,6 +10,11 @@ import type { Assessment, AssessmentRow } from './types'
 
 const prisma = new PrismaClient()
 
+const uniqueAssessments = new Map<string, boolean>()
+
+const getAssessmentKey = (cpmsId: number, status: string, createdBy: string, createdAt: Date) =>
+  `${cpmsId}-${status}-${createdBy}-${createdAt.toISOString().slice(0, 10)}`
+
 const seedAssessments = async () => {
   logger.info(`⧗ Assessments seed start ✓`)
 
@@ -28,6 +33,7 @@ const seedAssessments = async () => {
 
   let numTotalAssessments = 0
   let numSkippedAssessments = 0
+  let numDuplicatedAssessments = 0
   let numAddedContacts = 0
 
   const processAssessments = async () => {
@@ -108,13 +114,29 @@ const seedAssessments = async () => {
     const intentionData = intentionMap[intention]
 
     if (intentionData) {
-      assessments.push({
-        cpmsId: Number(assessmentRecord.StudyID),
-        status: intentionData[0],
-        comment: intentionData[1],
-        createdAt: parseDate(assessmentRecord['Created At']),
-        createdBy: assessmentRecord['Created By'].toLowerCase().trim(),
-      })
+      const [status, comment] = intentionData
+
+      const cpmsId = Number(assessmentRecord.StudyID)
+      const createdAt = parseDate(assessmentRecord['Created At'])
+      const createdBy = assessmentRecord['Created By'].toLowerCase().trim()
+
+      const assessmentKey = getAssessmentKey(cpmsId, status, createdBy, createdAt)
+
+      const isDuplicate = uniqueAssessments.has(assessmentKey)
+
+      if (!isDuplicate) {
+        assessments.push({
+          cpmsId,
+          status,
+          comment,
+          createdAt,
+          createdBy,
+        })
+        uniqueAssessments.set(assessmentKey, true)
+      } else {
+        logger.info('Found duplicated assessment: %s %s %s %s', cpmsId, status, createdBy, createdAt)
+        ++numDuplicatedAssessments
+      }
     }
 
     if (assessments.length > 0 && assessments.length % batchSize === 0) {
@@ -128,6 +150,7 @@ const seedAssessments = async () => {
   await processAssessments() // Process any leftover assessments
 
   logger.info('Skipped %s assessments out of a total of %s', numSkippedAssessments, numTotalAssessments)
+  logger.info('Found %s duplicated assessments out of a total of %s', numDuplicatedAssessments, numTotalAssessments)
   logger.info('Added %s contacts', numAddedContacts)
 }
 
