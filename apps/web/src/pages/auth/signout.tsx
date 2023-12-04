@@ -4,9 +4,9 @@ import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'nex
 import { Container } from '@nihr-ui/frontend'
 import { getServerSession } from 'next-auth/next'
 import { logger } from '@nihr-ui/logger'
+import { getToken } from 'next-auth/jwt'
 import { authOptions } from '../api/auth/[...nextauth]'
 import { SIGN_IN_PAGE } from '../../constants/routes'
-import { prismaClient } from '../../lib/prisma'
 
 /**
  * This sign out page provides a progressively enhanced sign out experience
@@ -49,24 +49,18 @@ export default function Signout({ csrfToken, isAuthenticated, callbackUrl }: Sig
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   try {
     const session = await getServerSession(context.req, context.res, authOptions)
+    const token = await getToken({ req: context.req })
 
-    const { id_token: idTokenHint } = await prismaClient.account.findFirstOrThrow({
-      where: {
-        userId: session?.user?.id,
-      },
-      select: {
-        id_token: true,
-      },
-    })
-
-    // If there's no session, redirect to sign in
-    if (!session) {
+    // If there's no session or token, redirect to sign in
+    if (!session || !token) {
       return {
         redirect: {
           destination: SIGN_IN_PAGE,
         },
       }
     }
+
+    const { idToken } = token
 
     const providers = await getProviders()
 
@@ -75,7 +69,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         props: {
           isAuthenticated: Boolean(session),
           csrfToken: await getCsrfToken({ req: context.req }),
-          callbackUrl: `/api/signout?idTokenHint=${idTokenHint}`,
+          callbackUrl: `/api/signout?idTokenHint=${idToken}`,
         },
       }
     }
