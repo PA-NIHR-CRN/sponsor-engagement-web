@@ -72,6 +72,16 @@ const mockStudies = Array.from(Array(15)).map((_, index) => ({
       updatedAt: new Date('2001-01-01'),
       createdAt: new Date('2001-01-01'),
     },
+    {
+      indicatorType: 'Recruitment concerns',
+      updatedAt: new Date('2001-01-01'),
+      createdAt: new Date('2001-01-01'),
+    },
+    {
+      indicatorType: 'Milestone missed',
+      updatedAt: new Date('2001-01-01'),
+      createdAt: new Date('2001-01-01'),
+    },
   ],
   assessments: [
     { status: { name: 'Off Track' }, updatedAt: new Date('2001-01-02'), createdAt: new Date('2001-01-01') },
@@ -157,7 +167,7 @@ describe('Studies page', () => {
     expect(withinSecondStudy.queryByText('Due')).not.toBeInTheDocument()
 
     // Study indicators
-    expect(withinFirstStudy.getByText('Milestone missed')).toBeInTheDocument()
+    expect(withinFirstStudy.getByText('Milestone missed, Recruitment concerns')).toBeInTheDocument()
 
     // Study assessment status
     expect(withinFirstStudy.getByText('Off Track on 1 January 2001')).toBeInTheDocument()
