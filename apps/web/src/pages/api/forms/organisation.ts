@@ -108,16 +108,6 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
                     email: emailAddress,
                     registrationToken,
                     registrationConfirmed: false,
-                    roles: {
-                      // If a user is not assigned the sponsor contact role, assign it
-                      createMany: {
-                        data: {
-                          roleId,
-                          createdById: contactManagerUserId,
-                          updatedById: contactManagerUserId,
-                        },
-                      },
-                    },
                   },
                   where: {
                     email: emailAddress,
@@ -126,6 +116,24 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
               },
             },
           }),
+        },
+      },
+    })
+
+    await prismaClient.user.update({
+      where: {
+        email: emailAddress,
+      },
+      data: {
+        roles: {
+          // If a user is not assigned the sponsor contact role, assign it
+          createMany: {
+            data: {
+              roleId,
+              createdById: contactManagerUserId,
+              updatedById: contactManagerUserId,
+            },
+          },
         },
       },
     })

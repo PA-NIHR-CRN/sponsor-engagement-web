@@ -107,20 +107,30 @@ describe('Successful organisation sponsor contact invitation', () => {
                   email: body.emailAddress,
                   registrationConfirmed: false,
                   registrationToken: 'mocked-token',
-                  roles: {
-                    createMany: {
-                      data: {
-                        roleId: findSysRefRoleResponse.id,
-                        createdById: userWithContactManagerRole.user?.id,
-                        updatedById: userWithContactManagerRole.user?.id,
-                      },
-                    },
-                  },
                 },
                 where: {
                   email: body.emailAddress,
                 },
               },
+            },
+          },
+        },
+      },
+    })
+
+    // User role is added
+    expect(prismaClient.user.update).toHaveBeenCalledWith({
+      where: {
+        email: body.emailAddress,
+      },
+      data: {
+        roles: {
+          // If a user is not assigned the sponsor contact role, assign it
+          createMany: {
+            data: {
+              roleId: findSysRefRoleResponse.id,
+              createdById: userWithContactManagerRole.user?.id,
+              updatedById: userWithContactManagerRole.user?.id,
             },
           },
         },
@@ -197,20 +207,30 @@ describe('Successful organisation sponsor contact invitation', () => {
                   email: body.emailAddress,
                   registrationConfirmed: false,
                   registrationToken: 'mocked-token',
-                  roles: {
-                    createMany: {
-                      data: {
-                        roleId: findSysRefRoleResponse.id,
-                        createdById: userWithContactManagerRole.user?.id,
-                        updatedById: userWithContactManagerRole.user?.id,
-                      },
-                    },
-                  },
                 },
                 where: {
                   email: body.emailAddress,
                 },
               },
+            },
+          },
+        },
+      },
+    })
+
+    // User role is added
+    expect(prismaClient.user.update).toHaveBeenCalledWith({
+      where: {
+        email: body.emailAddress,
+      },
+      data: {
+        roles: {
+          // If a user is not assigned the sponsor contact role, assign it
+          createMany: {
+            data: {
+              roleId: findSysRefRoleResponse.id,
+              createdById: userWithContactManagerRole.user?.id,
+              updatedById: userWithContactManagerRole.user?.id,
             },
           },
         },

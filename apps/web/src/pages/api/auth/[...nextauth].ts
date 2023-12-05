@@ -145,7 +145,7 @@ export const authOptions: AuthOptions = {
         }
 
         // Retrieve user roles and organizations
-        const roles = await prismaClient.userRole.findMany({ where: { userId } })
+        const roles = await prismaClient.userRole.findMany({ where: { userId, isDeleted: false } })
         session.user.roles = roles.map((role) => role.roleId)
         session.user.organisations = await getUserOrganisations(userId)
 
