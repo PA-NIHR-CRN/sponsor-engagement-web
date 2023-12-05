@@ -36,9 +36,9 @@ describe('notify', () => {
           to: ['user1@test.com', 'user2@test.com', 'user3@test.com'],
           templateData: {
             crnLink: 'https://www.nihr.ac.uk/explore-nihr/support/clinical-research-network.htm',
-            iconUrl: 'http://localhost:3000/assets/images/exclamation-icon.png',
-            requestSupportLink: 'http://localhost:3000/request-support',
-            signInLink: 'http://localhost:3000/auth/signin',
+            iconUrl: 'https://test.assessmystudy.nihr.ac.uk/assets/images/exclamation-icon.png',
+            requestSupportLink: 'https://test.assessmystudy.nihr.ac.uk/request-support',
+            signInLink: 'https://test.assessmystudy.nihr.ac.uk/auth/signin',
             termsAndConditionsLink:
               'https://www.nihr.ac.uk/documents/researchers/i-need-help-to-deliver-my-research/terms-and-conditions-for-nihr-crn-support.pdf',
           },
@@ -75,6 +75,22 @@ describe('notify', () => {
     expect(emailService.sendBulkEmail).not.toHaveBeenCalled()
 
     expect(logger.info).toHaveBeenCalledWith('No assessment notifications required')
+  })
+
+  it('should not run on non-production environments unless allow list is set', async () => {
+    const originalAllowList = process.env.NOTIFY_ALLOW_LIST
+
+    delete process.env.NOTIFY_ALLOW_LIST
+
+    jest.mocked(prismaClient.user.findMany).mockResolvedValueOnce(mockUsers)
+
+    await notify()
+
+    expect(emailService.sendBulkEmail).not.toHaveBeenCalled()
+
+    expect(logger.error).toHaveBeenCalledWith('No allow list provided for non-prod environment')
+
+    process.env.NOTIFY_ALLOW_LIST = originalAllowList
   })
 
   it('should log unhandled exceptions', async () => {
