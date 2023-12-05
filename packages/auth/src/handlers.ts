@@ -83,7 +83,7 @@ export const requests = {
       filter: `emails eq ${email}`,
     }
 
-    const response = await api.get<Infer<typeof getUserResponseSchema>>(`${IDG_API_URL}/scim2/Users`, { params })
+    const response = await api.get<Infer<typeof getUserResponseSchema>>(`/scim2/Users`, { params })
     return getUserResponseSchema.safeParse(response.data)
   },
   createUser: async ({
@@ -110,7 +110,7 @@ export const requests = {
       emails: emails.map((value) => ({ value })),
     }
 
-    const response = await api.post<Infer<typeof createUserResponseSchema>>(`${IDG_API_URL}/scim2/Users`, data)
+    const response = await api.post<Infer<typeof createUserResponseSchema>>(`/scim2/Users`, data)
     return createUserResponseSchema.safeParse(response.data)
   },
 }
