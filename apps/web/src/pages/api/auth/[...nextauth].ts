@@ -37,7 +37,7 @@ const Provider = ({ clientId, clientSecret, wellKnown }: ProviderOptions): OAuth
     // Map OAuth profile data to user attributes.
     return {
       id: profile.sub,
-      name: `${profile.given_name} ${profile.family_name}`,
+      name: profile.given_name && profile.family_name ? `${profile.given_name} ${profile.family_name}` : null,
       email: profile.email,
       identityGatewayId: profile.sub,
     }
