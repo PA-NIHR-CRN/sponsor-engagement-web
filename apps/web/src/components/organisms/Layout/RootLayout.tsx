@@ -1,11 +1,14 @@
 import { Roboto } from 'next/font/google'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import Router, { useRouter } from 'next/router'
 import type { ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 import { HomeIcon, SettingsIcon, SideNav } from '@nihr-ui/frontend'
 import type { Session } from 'next-auth'
-import { ORGANISATIONS_PAGE } from '../../../constants/routes'
+import { useSession } from 'next-auth/react'
+import { useIdle } from '@uidotdev/usehooks'
+import { logger } from '@nihr-ui/logger'
+import { ORGANISATIONS_PAGE, SIGN_OUT_PAGE } from '../../../constants/routes'
 import { Roles } from '../../../constants/auth'
 import { SERVICE_NAME } from '../../../constants'
 import { Header } from '../../molecules'
@@ -27,6 +30,22 @@ export interface RootLayoutProps {
 export function RootLayout({ children, backLink, heading = SERVICE_NAME, user }: RootLayoutProps) {
   const router = useRouter()
   const [sideNavOpen, setSideNavOpen] = useState(false)
+  const { data: session } = useSession()
+  const idle = useIdle(session ? session.idleTimeout * 1000 : undefined)
+
+  useEffect(() => {
+    if (session && session.error === 'RefreshAccessTokenError') {
+      logger.info(`refresh access token request error - logging out`)
+      void Router.push(SIGN_OUT_PAGE)
+    }
+  }, [session])
+
+  useEffect(() => {
+    if (idle && session) {
+      logger.info(`user is idle after ${session.idleTimeout} seconds - logging out`)
+      void Router.push(SIGN_OUT_PAGE)
+    }
+  }, [idle, session])
 
   // Close menu on route changes
   useEffect(() => {

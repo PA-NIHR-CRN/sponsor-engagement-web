@@ -31,6 +31,9 @@ declare module 'next-auth' {
    * Returned by `useSession`, `getSession`, and received as a prop on the `SessionProvider` React Context.
    */
   interface Session {
+    /** Number of seconds to wait before a user is considered idle (not related to session or token expiry) */
+    idleTimeout: number
+
     user: {
       /** Primary key ID associated with the user's local account. */
       id: number
@@ -47,6 +50,9 @@ declare module 'next-auth' {
       /** The organisations associated with the user's local account. */
       organisations: UserOrganisation[]
     } | null
+
+    /** Let's the UI know if an error has occured (e.g if refreshing the access token failed) */
+    error?: string
   }
 
   // Extended Account interface to include additional properties related to OAuth provider
@@ -73,5 +79,6 @@ declare module 'next-auth/jwt' {
     refreshToken: string
     idToken: string
     user: AdapterUser | User
+    error?: string
   }
 }

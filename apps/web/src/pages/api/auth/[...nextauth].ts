@@ -5,7 +5,12 @@ import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import { logger } from '@nihr-ui/logger'
 import { authService } from '@nihr-ui/auth'
 import type { JWT } from 'next-auth/jwt'
-import { AUTH_PROVIDER_ID, AUTH_PROVIDER_NAME, AUTH_PROVIDER_TYPE } from '../../../constants/auth'
+import {
+  AUTH_PROVIDER_ID,
+  AUTH_PROVIDER_NAME,
+  AUTH_PROVIDER_TYPE,
+  AUTH_SESSION_EXPIRY_FALLBACK,
+} from '../../../constants/auth'
 import { prismaClient } from '../../../lib/prisma'
 import { getUserOrganisations } from '../../../lib/organisations'
 import type { OAuthProfile, ProviderOptions } from '../../../@types/auth'
@@ -68,7 +73,7 @@ async function refreshAccessToken(token: JWT) {
       ...token,
       accessToken,
       accessTokenExpires: Date.now() + accessTokenExpiresIn * 1000,
-      refreshToken,
+      refreshToken: refreshToken || token.refreshToken,
       idToken,
     }
   } catch (error) {
@@ -93,6 +98,7 @@ export const authOptions: AuthOptions = {
   // Session configuration using JWT strategy.
   session: {
     strategy: 'jwt',
+    maxAge: Number(process.env.NEXTAUTH_SESSION_EXPIRY || AUTH_SESSION_EXPIRY_FALLBACK),
   },
 
   // OAuth providers for authentication.
@@ -106,9 +112,10 @@ export const authOptions: AuthOptions = {
 
   // Callbacks for JWT and session management.
   callbacks: {
-    jwt({ token, account, user }) {
+    jwt({ token, account, user, trigger }) {
       // Initial sign-in logic.
       if (account) {
+        logger.info('jwt callback - initial sign in')
         return {
           accessToken: account.access_token,
           accessTokenExpires: account.expires_at * 1000,
@@ -118,12 +125,19 @@ export const authOptions: AuthOptions = {
         }
       }
 
+      if (trigger === 'update') {
+        logger.info('jwt callback "update" triggered')
+        return refreshAccessToken(token)
+      }
+
       // Return the previous token if the access token has not expired yet.
       if (Date.now() < token.accessTokenExpires) {
+        logger.info('jwt callback - access token ok')
         return token
       }
 
       // Access token has expired, try to update it.
+      logger.info('jwt callback - token expired - attempting to refresh')
       return refreshAccessToken(token)
     },
     async session({ session, token }) {
@@ -133,12 +147,15 @@ export const authOptions: AuthOptions = {
         }
 
         const {
+          error,
           user: { id, email },
         } = token
 
         const userId = Number(id)
 
+        session.idleTimeout = Number(process.env.NEXTAUTH_IDLE_TIMEOUT)
         session.user.id = userId
+        session.error = error
 
         if (email) {
           session.user.email = email
