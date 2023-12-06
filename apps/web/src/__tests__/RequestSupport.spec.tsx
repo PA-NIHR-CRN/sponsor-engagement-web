@@ -21,7 +21,7 @@ describe('RequestSupport Component', () => {
     render(<RequestSupport />)
 
     const listItems = [
-      'Supporting study-wide planning activities (e.g. identification of potential sites), support with costing tool (e.g. SoECAT and ICT), etc.',
+      'Supporting study-wide planning activities (e.g. identification of potential sites), support with cost attribution and the identification of resource requirements using UK wide tools (SoECAT and iCT)',
       'Research delivery advice (e.g. recruitment strategies, regional care pathways and NHS support services, investigators, capabilities, etc.)',
       'Discuss site issues, including study delivery',
       'Advice regarding engagement with local communities',
