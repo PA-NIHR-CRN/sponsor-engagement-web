@@ -78,9 +78,9 @@ export default function Studies({
           </p>
 
           <Details className="[&>summary]:text-blue" heading="Why am I being asked to assess studies?">
-            <p>NIHR CRN asks sponsors or their delegates to review and assess study progress for UK sites when:</p>
+            <p>NIHR CRN asks sponsors or their delegates to review and assess study progress for UK studies when:</p>
             <ul className="govuk-list govuk-list--bullet">
-              <li>A study falls behind the agreed milestones in the UK</li>
+              <li>A study falls behind the agreed milestones in the UK or</li>
               <li>A study is not recruiting to target in the UK</li>
               <li>
                 <strong>And</strong> the last progress assessment from the sponsor is over 3 months old
