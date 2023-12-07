@@ -1,9 +1,4 @@
 /**
- * Number of recipients per send
- */
-export const MAX_RECIPIENTS = 50
-
-/**
  * Signin page that unauthenticated users are redirected to
  */
 export const SIGN_IN_PAGE = '/auth/signin'
