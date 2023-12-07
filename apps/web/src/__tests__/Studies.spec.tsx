@@ -124,10 +124,10 @@ describe('Studies page', () => {
     expect(screen.getByText('Why am I being asked to assess studies?')).toBeInTheDocument()
     expect(
       screen.getByText(
-        'NIHR CRN asks sponsors or their delegates to review and assess study progress for UK sites when:'
+        'NIHR CRN asks sponsors or their delegates to review and assess study progress for UK studies when:'
       )
     ).toBeInTheDocument()
-    expect(screen.getByText('A study falls behind the agreed milestones in the UK')).toBeInTheDocument()
+    expect(screen.getByText('A study falls behind the agreed milestones in the UK or')).toBeInTheDocument()
     expect(screen.getByText('A study is not recruiting to target in the UK')).toBeInTheDocument()
     expect(screen.getByText('the last progress assessment from the sponsor is over 3 months old')).toBeInTheDocument()
 

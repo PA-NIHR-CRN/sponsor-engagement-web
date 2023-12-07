@@ -4,14 +4,8 @@ import { emailService } from '@nihr-ui/email'
 import { config as dotEnvConfig } from 'dotenv'
 import { emailTemplates } from '@nihr-ui/templates/sponsor-engagement'
 import { prismaClient } from './lib/prisma'
-import { arrayChunks, getAbsoluteUrl } from './utils'
-import {
-  EXTERNAL_CRN_TERMS_CONDITIONS_URL,
-  EXTERNAL_CRN_URL,
-  MAX_RECIPIENTS,
-  SIGN_IN_PAGE,
-  SUPPORT_PAGE,
-} from './constants'
+import { getAbsoluteUrl } from './utils'
+import { EXTERNAL_CRN_TERMS_CONDITIONS_URL, EXTERNAL_CRN_URL, SIGN_IN_PAGE, SUPPORT_PAGE } from './constants'
 
 dotEnvConfig()
 
@@ -51,23 +45,19 @@ const sendNotifications = async () => {
     })
   }
 
-  const recipientChunks = arrayChunks(usersWithStudiesDueAssessment, MAX_RECIPIENTS)
-
-  const emailInputs = recipientChunks
-    .map((recipients) => ({
-      to: recipients.map(({ email }) => email),
-      subject: `Assess the progress of your studies`,
-      htmlTemplate: emailTemplates['assessment-reminder.html.hbs'],
-      textTemplate: emailTemplates['assessment-reminder.text.hbs'],
-      templateData: {
-        crnLink: EXTERNAL_CRN_URL,
-        termsAndConditionsLink: EXTERNAL_CRN_TERMS_CONDITIONS_URL,
-        signInLink: getAbsoluteUrl(SIGN_IN_PAGE),
-        requestSupportLink: getAbsoluteUrl(SUPPORT_PAGE),
-        iconUrl: getAbsoluteUrl('/assets/images/exclamation-icon.png'),
-      },
-    }))
-    .flat()
+  const emailInputs = usersWithStudiesDueAssessment.map(({ email }) => ({
+    to: email,
+    subject: `Assess the progress of your studies`,
+    htmlTemplate: emailTemplates['assessment-reminder.html.hbs'],
+    textTemplate: emailTemplates['assessment-reminder.text.hbs'],
+    templateData: {
+      crnLink: EXTERNAL_CRN_URL,
+      termsAndConditionsLink: EXTERNAL_CRN_TERMS_CONDITIONS_URL,
+      signInLink: getAbsoluteUrl(SIGN_IN_PAGE),
+      requestSupportLink: getAbsoluteUrl(SUPPORT_PAGE),
+      iconUrl: getAbsoluteUrl('/assets/images/exclamation-icon.png'),
+    },
+  }))
 
   await emailService.sendBulkEmail(emailInputs, onSuccess)
 

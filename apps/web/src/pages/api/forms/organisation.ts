@@ -133,6 +133,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
               createdById: contactManagerUserId,
               updatedById: contactManagerUserId,
             },
+            skipDuplicates: true,
           },
         },
       },

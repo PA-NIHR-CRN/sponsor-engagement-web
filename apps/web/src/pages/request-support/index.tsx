@@ -32,8 +32,8 @@ export default function RequestSupport({ returnPath }: RequestSupportProps) {
           <p>Here are some examples (not exhaustive) of how the NIHR CRN can support your study:</p>
           <ul className="govuk-list govuk-list--bullet">
             <li>
-              Supporting study-wide planning activities (e.g. identification of potential sites), support with costing
-              tool (e.g. SoECAT and ICT), etc.
+              Supporting study-wide planning activities (e.g. identification of potential sites), support with cost
+              attribution and the identification of resource requirements using UK wide tools (SoECAT and iCT)
             </li>
             <li>
               Research delivery advice (e.g. recruitment strategies, regional care pathways and NHS support services,
