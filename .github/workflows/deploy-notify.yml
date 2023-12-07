@@ -422,7 +422,7 @@ jobs:
         uses: aws-actions/aws-secretsmanager-get-secrets@v1
         with:
           secret-ids: |
-            crnccp-secret-oat-se-app-config
+            crnccp-secret-prod-se-app-config
           parse-json-secrets: true
 
       - name: Run database migrations
