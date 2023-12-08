@@ -26,6 +26,8 @@ export const sponsorHeaders = [
   'No. Closure Studies 04Jul23',
   'No. Reset Studies 10Aug23',
   'No. Closure Studies 10Aug23',
+  'No. Reset Studies 20Sep23',
+  'No. Closure Studies 20Sep23',
   'No. Reset Studies',
   'No. Closure Studies',
   'Notes',
@@ -77,7 +79,7 @@ export const ctuHeaders = [
   'Contact 3',
   'Contact 4',
   'Contact 5',
-  'MM contact',
+  'MM contacts',
 ] as const
 
 export const croHeaders = [
