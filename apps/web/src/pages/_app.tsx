@@ -4,6 +4,7 @@ import type { NextPage } from 'next'
 import type { AppProps } from 'next/app'
 import type { ReactElement, ReactNode } from 'react'
 import type { Session } from 'next-auth'
+import { SessionProvider } from 'next-auth/react'
 import { RootLayout, primaryFont } from '../components/organisms'
 
 export type NextPageWithLayout<P = Record<string, unknown>, IP = P> = NextPage<P, IP> & {
@@ -11,6 +12,7 @@ export type NextPageWithLayout<P = Record<string, unknown>, IP = P> = NextPage<P
 }
 
 type AppPropsWithLayout = AppProps<{
+  session: Session
   user: Session['user']
   heading: string
   page?: string
@@ -19,7 +21,7 @@ type AppPropsWithLayout = AppProps<{
 }
 
 function App({ Component, pageProps }: AppPropsWithLayout) {
-  const { user } = pageProps
+  const { user, session } = pageProps
 
   // Use the layout defined at the page level, if available
   const getLayout =
@@ -31,7 +33,7 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
     ))
 
   return (
-    <>
+    <SessionProvider session={session}>
       <style global jsx>
         {`
         html {
@@ -39,7 +41,7 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
         `}
       </style>
       {getLayout(<Component {...pageProps} />, pageProps)}
-    </>
+    </SessionProvider>
   )
 }
 

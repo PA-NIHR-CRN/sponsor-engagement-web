@@ -1,5 +1,5 @@
 import React from 'react'
-import { render } from '@testing-library/react'
+import { render } from '../../../config/TestUtils'
 import type { CardProps } from './Card'
 import { Card } from './Card'
 

@@ -1,7 +1,7 @@
 import type { GetServerSidePropsContext } from 'next'
 import { Mock } from 'ts-mockery'
 import { getServerSession } from 'next-auth/next'
-import { render } from '@testing-library/react'
+import { render } from '../config/TestUtils'
 import type { HomeProps } from '../pages/index'
 import Home, { getServerSideProps } from '../pages/index'
 import {

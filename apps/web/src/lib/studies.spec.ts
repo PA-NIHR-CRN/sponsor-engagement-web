@@ -9,10 +9,26 @@ describe('getStudiesForOrgs', () => {
   const mockStudyCount = 2
   const mockStudyDueAssessmentCount = 1
 
+  const userOrganisationIds = [1, 2]
+
+  const expectedOrganisationsQuery = {
+    some: {
+      organisationId: { in: userOrganisationIds },
+      organisationRole: {
+        rtsIdentifier: {
+          in: [
+            StudySponsorOrganisationRoleRTSIdentifier.ClinicalResearchSponsor,
+            StudySponsorOrganisationRoleRTSIdentifier.ClinicalTrialsUnit,
+            StudySponsorOrganisationRoleRTSIdentifier.ContractResearchOrganisation,
+          ],
+        },
+      },
+      isDeleted: false,
+    },
+  }
+
   it('should return studies and pagination information', async () => {
     prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudyCount, mockStudyDueAssessmentCount])
-
-    const userOrganisationIds = [1, 2]
 
     const result = await getStudiesForOrgs({
       organisationIds: userOrganisationIds,
@@ -34,21 +50,7 @@ describe('getStudiesForOrgs', () => {
         skip: 0,
         take: 10,
         where: {
-          organisations: {
-            some: {
-              organisationId: { in: userOrganisationIds },
-              organisationRole: {
-                rtsIdentifier: {
-                  in: [
-                    StudySponsorOrganisationRoleRTSIdentifier.ClinicalResearchSponsor,
-                    StudySponsorOrganisationRoleRTSIdentifier.ClinicalTrialsUnit,
-                    StudySponsorOrganisationRoleRTSIdentifier.ContractResearchOrganisation,
-                  ],
-                },
-              },
-              isDeleted: false,
-            },
-          },
+          organisations: expectedOrganisationsQuery,
           isDeleted: false,
         },
       })
@@ -56,21 +58,7 @@ describe('getStudiesForOrgs', () => {
 
     expect(prismaMock.study.count).toHaveBeenCalledWith({
       where: {
-        organisations: {
-          some: {
-            organisationId: { in: [1, 2] },
-            organisationRole: {
-              rtsIdentifier: {
-                in: [
-                  StudySponsorOrganisationRoleRTSIdentifier.ClinicalResearchSponsor,
-                  StudySponsorOrganisationRoleRTSIdentifier.ClinicalTrialsUnit,
-                  StudySponsorOrganisationRoleRTSIdentifier.ContractResearchOrganisation,
-                ],
-              },
-            },
-            isDeleted: false,
-          },
-        },
+        organisations: expectedOrganisationsQuery,
         isDeleted: false,
       },
     })
@@ -79,7 +67,6 @@ describe('getStudiesForOrgs', () => {
   it('should query studies by study title, shortTitle, irasId and protocolReferenceNumber when a search term is provided', async () => {
     prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudyCount, mockStudyDueAssessmentCount])
 
-    const userOrganisationIds = [1, 2]
     const searchTerm = 'test-study'
 
     const result = await getStudiesForOrgs({
@@ -108,21 +95,7 @@ describe('getStudiesForOrgs', () => {
             { irasId: { contains: searchTerm } },
             { protocolReferenceNumber: { contains: searchTerm } },
           ],
-          organisations: {
-            some: {
-              organisationId: { in: userOrganisationIds },
-              organisationRole: {
-                rtsIdentifier: {
-                  in: [
-                    StudySponsorOrganisationRoleRTSIdentifier.ClinicalResearchSponsor,
-                    StudySponsorOrganisationRoleRTSIdentifier.ClinicalTrialsUnit,
-                    StudySponsorOrganisationRoleRTSIdentifier.ContractResearchOrganisation,
-                  ],
-                },
-              },
-              isDeleted: false,
-            },
-          },
+          organisations: expectedOrganisationsQuery,
           isDeleted: false,
         },
       })
@@ -136,21 +109,52 @@ describe('getStudiesForOrgs', () => {
           { irasId: { contains: searchTerm } },
           { protocolReferenceNumber: { contains: searchTerm } },
         ],
-        organisations: {
-          some: {
-            organisationId: { in: [1, 2] },
-            organisationRole: {
-              rtsIdentifier: {
-                in: [
-                  StudySponsorOrganisationRoleRTSIdentifier.ClinicalResearchSponsor,
-                  StudySponsorOrganisationRoleRTSIdentifier.ClinicalTrialsUnit,
-                  StudySponsorOrganisationRoleRTSIdentifier.ContractResearchOrganisation,
-                ],
-              },
-            },
-            isDeleted: false,
-          },
+        organisations: expectedOrganisationsQuery,
+        isDeleted: false,
+      },
+    })
+  })
+
+  it('should query studies by cpmsId when a numeric search term is provided', async () => {
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudyCount, mockStudyDueAssessmentCount])
+
+    const searchTerm = '123'
+
+    await getStudiesForOrgs({
+      organisationIds: userOrganisationIds,
+      pageSize: 10,
+      currentPage: 1,
+      searchTerm,
+    })
+
+    expect(prismaMock.study.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        skip: 0,
+        take: 10,
+        where: {
+          OR: [
+            { title: { contains: searchTerm } },
+            { shortTitle: { contains: searchTerm } },
+            { irasId: { contains: searchTerm } },
+            { protocolReferenceNumber: { contains: searchTerm } },
+            { cpmsId: Number(searchTerm) },
+          ],
+          organisations: expectedOrganisationsQuery,
+          isDeleted: false,
         },
+      })
+    )
+
+    expect(prismaMock.study.count).toHaveBeenCalledWith({
+      where: {
+        OR: [
+          { title: { contains: searchTerm } },
+          { shortTitle: { contains: searchTerm } },
+          { irasId: { contains: searchTerm } },
+          { protocolReferenceNumber: { contains: searchTerm } },
+          { cpmsId: Number(searchTerm) },
+        ],
+        organisations: expectedOrganisationsQuery,
         isDeleted: false,
       },
     })
@@ -176,10 +180,10 @@ describe('getStudyById', () => {
     organisations: [],
   })
 
+  const userOrganisationIds = [1, 2]
+
   it('returns a study with the given id', async () => {
     prismaMock.$transaction.mockResolvedValueOnce([mockStudy])
-
-    const userOrganisationIds = [1, 2]
 
     const result = await getStudyById(1, userOrganisationIds)
 
@@ -225,8 +229,6 @@ describe('getStudyById', () => {
     }
 
     prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithOrgs])
-
-    const userOrganisationIds = [1, 2]
 
     const result = await getStudyById(1, userOrganisationIds)
 

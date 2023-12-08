@@ -44,6 +44,7 @@ describe('Custom OAuth provider is compatible with next-auth', () => {
       wellKnown: 'mockedWellKnownUrl',
       clientId: 'mockedClientId',
       clientSecret: 'mockedClientSecret',
+      allowDangerousEmailAccountLinking: true,
       authorization: { params: { scope: 'openid email profile' } },
       idToken: true,
       checks: ['pkce', 'state'],
@@ -198,6 +199,8 @@ describe('Session callback', () => {
 
     expect(updatedSession).toEqual<Session>(
       Mock.of<Session>({
+        error: undefined,
+        idleTimeout: 600,
         user: {
           id: Number(id),
           name,

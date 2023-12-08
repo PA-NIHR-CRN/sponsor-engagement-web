@@ -1,5 +1,5 @@
-import { render } from '@testing-library/react'
 import type { FieldErrors } from 'react-hook-form'
+import { render } from '../../../../config/TestUtils'
 import { Radio } from '../Radio/Radio'
 import { RadioGroup } from './RadioGroup'
 
