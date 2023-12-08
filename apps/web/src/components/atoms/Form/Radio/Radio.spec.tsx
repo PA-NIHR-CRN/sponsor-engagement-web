@@ -1,5 +1,5 @@
-import { render } from '@testing-library/react'
 import React from 'react'
+import { render } from '../../../../config/TestUtils'
 import { Radio } from './Radio'
 
 test('renders correctly', () => {

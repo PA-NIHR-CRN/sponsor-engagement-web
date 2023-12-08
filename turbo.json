@@ -9,11 +9,17 @@
         "APP_ENV",
         "NODE_ENV",
         "NEXTAUTH_URL",
+        "NEXTAUTH_IDLE_TIMEOUT",
+        "NEXTAUTH_SESSION_EXPIRY",
+        "NEXTAUTH_DEBUG",
         "AUTH_CLIENT_ID",
         "AUTH_CLIENT_SECRET",
         "AUTH_WELL_KNOWN_URL",
         "NEXT_PUBLIC_APP_ENV",
-        "PORT"
+        "PORT",
+        "IDG_API_URL",
+        "IDG_API_USERNAME",
+        "IDG_API_PASSWORD"
       ]
     },
     "start": {},
@@ -31,11 +37,17 @@
         "APP_ENV",
         "NODE_ENV",
         "NEXTAUTH_URL",
+        "NEXTAUTH_IDLE_TIMEOUT",
+        "NEXTAUTH_SESSION_EXPIRY",
+        "NEXTAUTH_DEBUG",
         "AUTH_CLIENT_ID",
         "AUTH_CLIENT_SECRET",
         "AUTH_WELL_KNOWN_URL",
         "NEXT_PUBLIC_APP_ENV",
-        "PORT"
+        "PORT",
+        "IDG_API_URL",
+        "IDG_API_USERNAME",
+        "IDG_API_PASSWORD"
       ]
     },
     "test:ci": {
@@ -51,6 +63,9 @@
         "APP_ENV",
         "NODE_ENV",
         "NEXTAUTH_URL",
+        "NEXTAUTH_IDLE_TIMEOUT",
+        "NEXTAUTH_SESSION_EXPIRY",
+        "NEXTAUTH_DEBUG",
         "AUTH_CLIENT_ID",
         "AUTH_CLIENT_SECRET",
         "AUTH_WELL_KNOWN_URL",

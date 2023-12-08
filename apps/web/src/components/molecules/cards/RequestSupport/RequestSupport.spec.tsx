@@ -1,6 +1,6 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
 import mockRouter from 'next-router-mock'
+import { render, screen } from '../../../../config/TestUtils'
 import { SUPPORT_PAGE } from '../../../../constants/routes'
 import { RequestSupport } from './RequestSupport'
 

@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react'
+import { render } from '../config/TestUtils'
 import ServiceUnavailable from '../pages/500'
 
 test('Displays the 500 page', () => {

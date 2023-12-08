@@ -21,15 +21,14 @@ import { SIGN_IN_PAGE } from '../../constants/routes'
  */
 export type SignoutProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function Signout({ csrfToken, isAuthenticated, callbackUrl }: SignoutProps) {
+export default function Signout({ csrfToken, callbackUrl }: SignoutProps) {
   useEffect(() => {
     const handleSignout = async () => {
       await signOut({ callbackUrl })
     }
-    if (isAuthenticated) {
-      handleSignout().catch(console.error)
-    }
-  }, [isAuthenticated, callbackUrl])
+
+    handleSignout().catch(console.error)
+  }, [callbackUrl])
 
   // Fallback for non-Javascript
   return (
@@ -67,7 +66,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     if (providers?.oidc) {
       return {
         props: {
-          isAuthenticated: Boolean(session),
           csrfToken: await getCsrfToken({ req: context.req }),
           callbackUrl: `/api/signout?idTokenHint=${idToken}`,
         },

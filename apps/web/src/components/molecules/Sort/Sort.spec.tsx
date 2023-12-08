@@ -1,7 +1,7 @@
 import userEvent from '@testing-library/user-event'
-import { render, screen } from '@testing-library/react'
 import type { FormEvent } from 'react'
 import React from 'react'
+import { render, screen } from '../../../config/TestUtils'
 import { Sort } from './Sort'
 
 test('Sorting', async () => {
