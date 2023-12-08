@@ -44,6 +44,7 @@ describe('Custom OAuth provider is compatible with next-auth', () => {
       wellKnown: 'mockedWellKnownUrl',
       clientId: 'mockedClientId',
       clientSecret: 'mockedClientSecret',
+      allowDangerousEmailAccountLinking: true,
       authorization: { params: { scope: 'openid email profile' } },
       idToken: true,
       checks: ['pkce', 'state'],
