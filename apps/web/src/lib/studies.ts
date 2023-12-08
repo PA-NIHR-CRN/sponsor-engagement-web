@@ -121,6 +121,7 @@ export const getStudiesForOrgs = async ({
               contains: searchTerm,
             },
           },
+          ...(Number(searchTerm) ? [{ cpmsId: Number(searchTerm) }] : []),
         ],
       }),
       organisations: {
