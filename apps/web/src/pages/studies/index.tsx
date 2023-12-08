@@ -206,7 +206,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
       },
     }
   } catch (error) {
-    logger.error('error', error)
+    logger.error(error)
     return {
       redirect: {
         destination: '/500',
