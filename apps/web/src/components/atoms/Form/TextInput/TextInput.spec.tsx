@@ -1,6 +1,6 @@
-import { render } from '@testing-library/react'
 import React from 'react'
 import type { FieldErrors } from 'react-hook-form'
+import { render } from '../../../../config/TestUtils'
 import { TextInput } from './TextInput'
 
 test('renders correctly without errors or hint', () => {

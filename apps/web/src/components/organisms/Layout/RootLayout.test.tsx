@@ -1,4 +1,4 @@
-import { render, within } from '@testing-library/react'
+import { render, within } from '../../../config/TestUtils'
 import { userNoRoles } from '../../../__mocks__/session'
 import { RootLayout } from './RootLayout'
 

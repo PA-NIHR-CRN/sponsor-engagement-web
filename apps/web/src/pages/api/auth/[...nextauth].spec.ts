@@ -199,6 +199,8 @@ describe('Session callback', () => {
 
     expect(updatedSession).toEqual<Session>(
       Mock.of<Session>({
+        error: undefined,
+        idleTimeout: 600,
         user: {
           id: Number(id),
           name,

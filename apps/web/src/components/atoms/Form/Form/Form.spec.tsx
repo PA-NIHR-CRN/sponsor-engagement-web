@@ -1,9 +1,9 @@
-import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import axios from 'axios'
 import { useRouter } from 'next/router'
 import type { FieldValues, UseFormHandleSubmit } from 'react-hook-form'
 import { logger } from '@nihr-ui/logger'
+import { render, screen } from '../../../../config/TestUtils'
 import { Form } from './Form'
 
 // Mock next/router

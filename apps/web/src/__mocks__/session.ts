@@ -3,6 +3,7 @@ import type { UserOrganisation } from 'database'
 import { Roles } from '../constants/auth'
 
 const defaults: Omit<Session, 'user'> = {
+  idleTimeout: 10000,
   expires: '12345',
 }
 

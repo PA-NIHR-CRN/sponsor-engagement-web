@@ -1,3 +1,5 @@
+process.env.NEXTAUTH_IDLE_TIMEOUT = 600
+process.env.NEXTAUTH_SESSION_EXPIRY = 2592000
 process.env.AUTH_CLIENT_ID = 'mockedClientId'
 process.env.AUTH_CLIENT_SECRET = 'mockedClientSecret'
 process.env.AUTH_WELL_KNOWN_URL = 'mockedWellKnownUrl'
