@@ -17,6 +17,7 @@ const getAssessmentKey = (cpmsId: number, status: string, createdBy: string, cre
 
 const seedAssessments = async () => {
   logger.info(`⧗ Assessments seed start ✓`)
+  logger.info(`⧗ Database URL: ${process.env.DATABASE_URL}`)
 
   const assessmentStatuses = await prisma.sysRefAssessmentStatus.findMany()
 

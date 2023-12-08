@@ -39,6 +39,8 @@ const skippedOrganisations: {
 
 const seedContacts = async <T extends Row>(fileName: string, headers: SponsorHeaders | CROHeaders | CTUHeaders) => {
   logger.info(`⧗ Contacts seed start (${fileName.toUpperCase()}) ✓`)
+  logger.info(`⧗ IDG API URL: ${process.env.IDG_API_URL}`)
+  logger.info(`⧗ Database URL: ${process.env.DATABASE_URL}`)
 
   const csvPath = path.resolve(__dirname, `../../csv/${fileName}.csv`)
 
