@@ -1,6 +1,6 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
 import { Mock } from 'ts-mockery'
+import { render, screen } from '../../../config/TestUtils'
 import type { AssessmentHistoryProps, Study } from './AssessmentHistory'
 import { AssessmentHistory, getAssessmentHistoryFromStudy } from './AssessmentHistory'
 

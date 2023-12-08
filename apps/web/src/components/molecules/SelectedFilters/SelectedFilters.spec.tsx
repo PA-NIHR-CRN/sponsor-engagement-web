@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react'
 import mockRouter from 'next-router-mock'
+import { render, screen } from '../../../config/TestUtils'
 import type { Filters } from '../../../@types/filters'
 import { STUDIES_PAGE } from '../../../constants/routes'
 import { SelectedFilters } from './SelectedFilters'

@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event'
-import { render, within } from '@testing-library/react'
 import { SideNavProvider } from '@nihr-ui/frontend'
+import { render, within } from '../../../config/TestUtils'
 import { userNoRoles } from '../../../__mocks__/session'
 import { Header } from './Header'
 

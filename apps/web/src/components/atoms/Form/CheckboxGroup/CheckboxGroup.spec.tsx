@@ -1,5 +1,5 @@
-import { render } from '@testing-library/react'
 import type { FieldErrors } from 'react-hook-form'
+import { render } from '../../../../config/TestUtils'
 import { Checkbox } from '../Checkbox/Checkbox'
 import { CheckboxGroup } from './CheckboxGroup'
 

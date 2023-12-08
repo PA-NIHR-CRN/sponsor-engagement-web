@@ -1,6 +1,6 @@
 import React from 'react'
-import { render, screen, within } from '@testing-library/react'
 import { Mock } from 'ts-mockery'
+import { render, screen, within } from '../../../config/TestUtils'
 import type { StudyDetailsProps } from './StudyDetails'
 import { StudyDetails } from './StudyDetails'
 
