@@ -1,38 +1,4 @@
-import { arrayChunks, getAbsoluteUrl } from '../utils'
-
-describe('arrayChunks', () => {
-  it('should split an array into chunks of the specified size', () => {
-    const array = [1, 2, 3, 4, 5, 6]
-    const chunkSize = 2
-    const result = arrayChunks(array, chunkSize)
-    expect(result).toEqual([
-      [1, 2],
-      [3, 4],
-      [5, 6],
-    ])
-  })
-
-  it('should handle empty arrays', () => {
-    const array: number[] = []
-    const chunkSize = 3
-    const result = arrayChunks(array, chunkSize)
-    expect(result).toEqual([])
-  })
-
-  it('should handle arrays with a size smaller than the chunk size', () => {
-    const array = [1, 2]
-    const chunkSize = 3
-    const result = arrayChunks(array, chunkSize)
-    expect(result).toEqual([[1, 2]])
-  })
-
-  it('should split arrays with uneven chunk sizes', () => {
-    const array = [1, 2, 3, 4, 5]
-    const chunkSize = 2
-    const result = arrayChunks(array, chunkSize)
-    expect(result).toEqual([[1, 2], [3, 4], [5]])
-  })
-})
+import { getAbsoluteUrl } from '../utils'
 
 describe('getAbsoluteUrl', () => {
   // Mock process.env.APP_ENV and process.env.PORT

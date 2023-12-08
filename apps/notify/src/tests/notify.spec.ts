@@ -30,22 +30,20 @@ describe('notify', () => {
     await notify()
 
     expect(emailService.sendBulkEmail).toHaveBeenCalledWith(
-      [
-        {
-          subject: `Assess the progress of your studies`,
-          to: ['user1@test.com', 'user2@test.com', 'user3@test.com'],
-          templateData: {
-            crnLink: 'https://www.nihr.ac.uk/explore-nihr/support/clinical-research-network.htm',
-            iconUrl: 'https://test.assessmystudy.nihr.ac.uk/assets/images/exclamation-icon.png',
-            requestSupportLink: 'https://test.assessmystudy.nihr.ac.uk/request-support',
-            signInLink: 'https://test.assessmystudy.nihr.ac.uk/auth/signin',
-            termsAndConditionsLink:
-              'https://www.nihr.ac.uk/documents/researchers/i-need-help-to-deliver-my-research/terms-and-conditions-for-nihr-crn-support.pdf',
-          },
-          htmlTemplate: expect.any(Function),
-          textTemplate: expect.any(Function),
+      mockUsers.map(({ email }) => ({
+        subject: `Assess the progress of your studies`,
+        to: email,
+        templateData: {
+          crnLink: 'https://www.nihr.ac.uk/explore-nihr/support/clinical-research-network.htm',
+          iconUrl: 'https://test.assessmystudy.nihr.ac.uk/assets/images/exclamation-icon.png',
+          requestSupportLink: 'https://test.assessmystudy.nihr.ac.uk/request-support',
+          signInLink: 'https://test.assessmystudy.nihr.ac.uk/auth/signin',
+          termsAndConditionsLink:
+            'https://www.nihr.ac.uk/documents/researchers/i-need-help-to-deliver-my-research/terms-and-conditions-for-nihr-crn-support.pdf',
         },
-      ],
+        htmlTemplate: expect.any(Function),
+        textTemplate: expect.any(Function),
+      })),
       expect.any(Function)
     )
 

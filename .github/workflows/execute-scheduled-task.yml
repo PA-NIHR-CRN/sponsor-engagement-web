@@ -47,9 +47,16 @@ jobs:
         run: |
           sleep 90
 
-      - name: Restore Original Schedule
+      - name: Restore Original Schedule (ingest)
+        if: github.event.inputs.appname == 'ingest'
         run: |
           aws events put-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 18 * * ? *)"
+          aws events enable-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname}}-cw-event-rule
+
+      - name: Restore Original Schedule (notify)
+        if: github.event.inputs.appname == 'notify'
+        run: |
+          aws events put-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 18 1 */3 ? *)"
           aws events enable-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname}}-cw-event-rule
 
   deploy-test:
@@ -77,9 +84,16 @@ jobs:
         run: |
           sleep 90
 
-      - name: Restore Original Schedule
+      - name: Restore Original Schedule (ingest)
+        if: github.event.inputs.appname == 'ingest'
         run: |
           aws events put-rule --name crnccd-ecs-test-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 18 * * ? *)"
+          aws events enable-rule --name crnccd-ecs-test-se-${{ github.event.inputs.appname}}-cw-event-rule
+
+      - name: Restore Original Schedule (notify)
+        if: github.event.inputs.appname == 'notify'
+        run: |
+          aws events put-rule --name crnccd-ecs-test-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 18 1 */3 ? *)"
           aws events enable-rule --name crnccd-ecs-test-se-${{ github.event.inputs.appname}}-cw-event-rule
 
   deploy-uat:
@@ -107,9 +121,16 @@ jobs:
         run: |
           sleep 90
 
-      - name: Restore Original Schedule
+      - name: Restore Original Schedule (ingest)
+        if: github.event.inputs.appname == 'ingest'
         run: |
           aws events put-rule --name crnccs-ecs-uat-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 18 * * ? *)"
+          aws events enable-rule --name crnccs-ecs-uat-se-${{ github.event.inputs.appname}}-cw-event-rule
+
+      - name: Restore Original Schedule (notify)
+        if: github.event.inputs.appname == 'notify'
+        run: |
+          aws events put-rule --name crnccs-ecs-uat-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 18 1 */3 ? *)"
           aws events enable-rule --name crnccs-ecs-uat-se-${{ github.event.inputs.appname}}-cw-event-rule
 
 
@@ -138,9 +159,16 @@ jobs:
         run: |
           sleep 90
 
-      - name: Restore Original Schedule
+      - name: Restore Original Schedule (ingest)
+        if: github.event.inputs.appname == 'ingest'
         run: |
           aws events put-rule --name crnccp-ecs-oat-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 18 * * ? *)"
+          aws events enable-rule --name crnccp-ecs-oat-se-${{ github.event.inputs.appname}}-cw-event-rule
+
+      - name: Restore Original Schedule (notify)
+        if: github.event.inputs.appname == 'notify'
+        run: |
+          aws events put-rule --name crnccp-ecs-oat-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 18 1 */3 ? *)"
           aws events enable-rule --name crnccp-ecs-oat-se-${{ github.event.inputs.appname}}-cw-event-rule
 
 
@@ -169,7 +197,14 @@ jobs:
         run: |
           sleep 90
 
-      - name: Restore Original Schedule
+      - name: Restore Original Schedule (ingest)
+        if: github.event.inputs.appname == 'ingest'
         run: |
           aws events put-rule --name crnccp-ecs-prod-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 18 * * ? *)"
+          aws events enable-rule --name crnccp-ecs-prod-se-${{ github.event.inputs.appname}}-cw-event-rule
+
+      - name: Restore Original Schedule (notify)
+        if: github.event.inputs.appname == 'notify'
+        run: |
+          aws events put-rule --name crnccp-ecs-prod-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 18 1 */3 ? *)"
           aws events enable-rule --name crnccp-ecs-prod-se-${{ github.event.inputs.appname}}-cw-event-rule

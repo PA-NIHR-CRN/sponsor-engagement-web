@@ -7,3 +7,4 @@ process.env.PORT = 3000
 process.env.IDG_API_URL = 'https://mocked-api-url.nihr.ac.uk'
 process.env.IDG_API_USERNAME = 'mockedUsername'
 process.env.IDG_API_PASSWORD = 'mockedPassword'
+process.env.NEXTAUTH_DEBUG = 'enabled'

@@ -4,6 +4,7 @@ declare namespace NodeJS {
     NEXTAUTH_SECRET: string
     NEXTAUTH_IDLE_TIMEOUT: string
     NEXTAUTH_SESSION_EXPIRY: string
+    NEXTAUTH_DEBUG: string
 
     AUTH_WELL_KNOWN_URL: string
     AUTH_CLIENT_ID: string

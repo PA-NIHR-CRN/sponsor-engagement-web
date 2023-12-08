@@ -33,6 +33,8 @@ const Provider = ({ clientId, clientSecret, wellKnown }: ProviderOptions): OAuth
   authorization: { params: { scope: 'openid email profile' } },
   idToken: true,
   checks: ['pkce', 'state'],
+  // https://next-auth.js.org/configuration/providers/oauth#allowdangerousemailaccountlinking-option
+  allowDangerousEmailAccountLinking: true,
   profile(profile) {
     // Map OAuth profile data to user attributes.
     return {
@@ -90,7 +92,7 @@ async function refreshAccessToken(token: JWT) {
  */
 export const authOptions: AuthOptions = {
   // Enable debug mode in non-production environments.
-  debug: process.env.APP_ENV !== 'prod',
+  debug: process.env.NEXTAUTH_DEBUG === 'enabled',
 
   // Use the Prisma adapter for session and user data storage.
   adapter: PrismaAdapter(prismaClient),
