@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react'
 import { NextSeo } from 'next-seo'
+import { render, screen } from '../config/TestUtils'
 import RequestSupport from '../pages/request-support'
 
 jest.mock('next-seo')
