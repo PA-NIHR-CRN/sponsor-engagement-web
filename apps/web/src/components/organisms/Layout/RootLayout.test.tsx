@@ -1,5 +1,5 @@
-import { userNoRoles } from '../../../__mocks__/session'
 import { RootLayout } from './RootLayout'
+import { userNoRoles } from '@/__mocks__/session'
 import { render, within } from '@/config/TestUtils'
 
 jest.mock('next/router', () => require('next-router-mock'))

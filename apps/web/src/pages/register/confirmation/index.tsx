@@ -4,9 +4,9 @@ import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'nex
 import { getServerSession } from 'next-auth/next'
 import { logger } from '@nihr-ui/logger'
 import Link from 'next/link'
-import { RootLayout } from '../../../components/organisms'
-import { ERROR_PAGE_500, SIGN_IN_PAGE } from '../../../constants/routes'
-import { authOptions } from '../../api/auth/[...nextauth]'
+import { RootLayout } from '@/components/organisms'
+import { ERROR_PAGE_500, SIGN_IN_PAGE } from '@/constants/routes'
+import { authOptions } from '@/pages/api/auth/[...nextauth]'
 
 export type RegisterConfirmationProps = InferGetServerSidePropsType<typeof getServerSideProps>
 

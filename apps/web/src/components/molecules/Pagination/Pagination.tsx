@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { usePagination } from 'react-use-pagination'
-import { generateTruncatedPagination } from '../../../utils/pagination'
+import { generateTruncatedPagination } from '@/utils/pagination'
 
 interface PaginationProps {
   initialPage: number

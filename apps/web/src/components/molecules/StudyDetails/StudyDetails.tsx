@@ -1,5 +1,5 @@
 import { Table } from '@nihr-ui/frontend'
-import type { getStudyById } from '../../../lib/studies'
+import type { getStudyById } from '@/lib/studies'
 
 export interface StudyDetailsProps {
   study: NonNullable<Awaited<ReturnType<typeof getStudyById>>['data']>

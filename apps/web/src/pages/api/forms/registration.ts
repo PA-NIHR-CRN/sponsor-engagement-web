@@ -2,10 +2,10 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { ZodError } from 'zod'
 import { logger } from '@nihr-ui/logger'
 import { authService } from '@nihr-ui/auth'
-import type { RegistrationInputs } from '../../../utils/schemas'
-import { registrationSchema } from '../../../utils/schemas'
-import { prismaClient } from '../../../lib/prisma'
-import { AUTH_PROVIDER_NAME, AUTH_PROVIDER_TYPE } from '../../../constants'
+import type { RegistrationInputs } from '@/utils/schemas'
+import { registrationSchema } from '@/utils/schemas'
+import { prismaClient } from '@/lib/prisma'
+import { AUTH_PROVIDER_NAME, AUTH_PROVIDER_TYPE } from '@/constants'
 
 /**
  * Next.js API route for handling user registration and creation in Identity Gateway (IDG).

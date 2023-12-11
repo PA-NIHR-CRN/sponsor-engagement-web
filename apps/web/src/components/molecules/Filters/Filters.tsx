@@ -3,10 +3,10 @@ import { useEffect, useRef, useState } from 'react'
 import SearchIcon from '@nihr-ui/frontend/components/Icons/SearchIcon'
 import { Button } from '@nihr-ui/frontend'
 import { useRouter } from 'next/router'
-import { Card } from '../../atoms'
-import type { Filters } from '../../../@types/filters'
 import type { OnFilterChange } from './useFilters'
 import { useFilters } from './useFilters'
+import { Card } from '@/components/atoms'
+import type { Filters } from '@/@types/filters'
 
 export interface FiltersProps {
   filters: Filters

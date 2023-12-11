@@ -7,19 +7,14 @@ import { getServerSession } from 'next-auth'
 import { ZodError } from 'zod'
 import { logger } from '@nihr-ui/logger'
 import { emailService } from '@nihr-ui/email'
-import { prismaClient } from '../../../lib/prisma'
-import type { OrganisationAddInputs } from '../../../utils/schemas'
-import { userNoRoles, userWithContactManagerRole } from '../../../__mocks__/session'
-import { AuthError } from '../../../utils/auth'
-import {
-  EXTERNAL_CRN_TERMS_CONDITIONS_URL,
-  EXTERNAL_CRN_URL,
-  SIGN_IN_PAGE,
-  SUPPORT_PAGE,
-} from '../../../constants/routes'
-import type { OrganisationWithRelations, UserOrganisationWithRelations } from '../../../lib/organisations'
 import type { ExtendedNextApiRequest } from './organisation'
 import api from './organisation'
+import { prismaClient } from '@/lib/prisma'
+import type { OrganisationAddInputs } from '@/utils/schemas'
+import { userNoRoles, userWithContactManagerRole } from '@/__mocks__/session'
+import { AuthError } from '@/utils/auth'
+import { EXTERNAL_CRN_TERMS_CONDITIONS_URL, EXTERNAL_CRN_URL, SIGN_IN_PAGE, SUPPORT_PAGE } from '@/constants/routes'
+import type { OrganisationWithRelations, UserOrganisationWithRelations } from '@/lib/organisations'
 
 jest.mock('next-auth/next')
 jest.mock('@nihr-ui/logger')

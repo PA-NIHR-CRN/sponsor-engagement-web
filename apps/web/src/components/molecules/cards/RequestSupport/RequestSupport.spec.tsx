@@ -1,7 +1,7 @@
 import React from 'react'
 import mockRouter from 'next-router-mock'
-import { SUPPORT_PAGE } from '../../../../constants/routes'
 import { RequestSupport } from './RequestSupport'
+import { SUPPORT_PAGE } from '@/constants/routes'
 import { render, screen } from '@/config/TestUtils'
 
 describe('RequestSupport Component', () => {

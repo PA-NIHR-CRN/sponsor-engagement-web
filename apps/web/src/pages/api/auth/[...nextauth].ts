@@ -10,10 +10,10 @@ import {
   AUTH_PROVIDER_NAME,
   AUTH_PROVIDER_TYPE,
   AUTH_SESSION_EXPIRY_FALLBACK,
-} from '../../../constants/auth'
-import { prismaClient } from '../../../lib/prisma'
-import { getUserOrganisations } from '../../../lib/organisations'
-import type { OAuthProfile, ProviderOptions } from '../../../@types/auth'
+} from '@/constants/auth'
+import { prismaClient } from '@/lib/prisma'
+import { getUserOrganisations } from '@/lib/organisations'
+import type { OAuthProfile, ProviderOptions } from '@/@types/auth'
 
 /**
  * Custom OAuth provider configuration for NextAuth.

@@ -5,7 +5,7 @@ import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { logger } from '@nihr-ui/logger'
-import { RootLayout } from '../../components/organisms'
+import { RootLayout } from '@/components/organisms'
 import {
   RequestSupport,
   StudyList,
@@ -14,17 +14,17 @@ import {
   Filters,
   SelectedFilters,
   StudiesListSkeleton,
-} from '../../components/molecules'
-import { Roles, STUDIES_PER_PAGE } from '../../constants'
-import { pluraliseStudy } from '../../utils/pluralise'
-import { getStudiesForOrgs } from '../../lib/studies'
-import { formatDate } from '../../utils/date'
-import { isClinicalResearchSponsor } from '../../lib/organisations'
-import { useFormListeners } from '../../hooks/useFormListeners'
-import { getFiltersFromQuery } from '../../utils/filters'
-import { Card } from '../../components/atoms'
-import { withServerSideProps } from '../../utils/withServerSideProps'
-import { SUPPORT_PAGE } from '../../constants/routes'
+} from '@/components/molecules'
+import { Roles, STUDIES_PER_PAGE } from '@/constants'
+import { pluraliseStudy } from '@/utils/pluralise'
+import { getStudiesForOrgs } from '@/lib/studies'
+import { formatDate } from '@/utils/date'
+import { isClinicalResearchSponsor } from '@/lib/organisations'
+import { useFormListeners } from '@/hooks/useFormListeners'
+import { getFiltersFromQuery } from '@/utils/filters'
+import { Card } from '@/components/atoms'
+import { withServerSideProps } from '@/utils/withServerSideProps'
+import { SUPPORT_PAGE } from '@/constants/routes'
 
 const renderNotificationBanner = (success: boolean) =>
   success ? (

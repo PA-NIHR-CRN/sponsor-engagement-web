@@ -8,11 +8,11 @@ import { faker } from '@faker-js/faker'
 import { Mock } from 'ts-mockery'
 import type { createUserResponseSchema } from '@nihr-ui/auth'
 import { authService } from '@nihr-ui/auth'
-import type { Prisma } from '../../../lib/prisma'
-import { prismaClient } from '../../../lib/prisma'
-import type { RegistrationInputs } from '../../../utils/schemas'
 import type { ExtendedNextApiRequest } from './registration'
 import api from './registration'
+import type { Prisma } from '@/lib/prisma'
+import { prismaClient } from '@/lib/prisma'
+import type { RegistrationInputs } from '@/utils/schemas'
 
 jest.mock('next-auth/next')
 jest.mock('@nihr-ui/logger')

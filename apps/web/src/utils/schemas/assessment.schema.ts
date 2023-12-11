@@ -1,5 +1,5 @@
 import * as z from 'zod'
-import { TEXTAREA_MAX_CHARACTERS } from '../../constants/forms'
+import { TEXTAREA_MAX_CHARACTERS } from '@/constants/forms'
 
 export type AssessmentInputs = z.infer<typeof assessmentSchema>
 

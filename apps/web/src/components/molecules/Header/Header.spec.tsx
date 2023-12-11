@@ -1,7 +1,7 @@
 import userEvent from '@testing-library/user-event'
 import { SideNavProvider } from '@nihr-ui/frontend'
-import { userNoRoles } from '../../../__mocks__/session'
 import { Header } from './Header'
+import { userNoRoles } from '@/__mocks__/session'
 import { render, within } from '@/config/TestUtils'
 
 test('Displays the header', () => {

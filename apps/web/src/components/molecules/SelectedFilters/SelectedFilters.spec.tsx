@@ -1,7 +1,7 @@
 import mockRouter from 'next-router-mock'
-import type { Filters } from '../../../@types/filters'
-import { STUDIES_PAGE } from '../../../constants/routes'
 import { SelectedFilters } from './SelectedFilters'
+import type { Filters } from '@/@types/filters'
+import { STUDIES_PAGE } from '@/constants/routes'
 import { render, screen } from '@/config/TestUtils'
 
 test('Displays selected filters with correct links', () => {

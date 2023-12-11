@@ -1,5 +1,5 @@
 import * as z from 'zod'
-import { PASSWORD_MIN_LENGTH } from '../../constants'
+import { PASSWORD_MIN_LENGTH } from '@/constants'
 
 export type RegistrationInputs = z.infer<typeof registrationSchema>
 
