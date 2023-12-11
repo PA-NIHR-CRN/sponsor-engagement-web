@@ -1,7 +1,7 @@
 import React from 'react'
-import { render, screen } from '../../../../config/TestUtils'
 import type { StudyListProps } from './StudyList'
 import { StudyList } from './StudyList'
+import { render, screen } from '@/config/TestUtils'
 
 describe('StudyList Component', () => {
   const defaultProps: StudyListProps = {

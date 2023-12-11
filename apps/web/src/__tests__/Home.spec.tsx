@@ -1,7 +1,6 @@
 import type { GetServerSidePropsContext } from 'next'
 import { Mock } from 'ts-mockery'
 import { getServerSession } from 'next-auth/next'
-import { render } from '../config/TestUtils'
 import type { HomeProps } from '../pages/index'
 import Home, { getServerSideProps } from '../pages/index'
 import {
@@ -11,6 +10,7 @@ import {
   userWithSponsorContactRole,
 } from '../__mocks__/session'
 import { ORGANISATIONS_PAGE, SIGN_IN_PAGE, STUDIES_PAGE } from '../constants/routes'
+import { render } from '@/config/TestUtils'
 
 jest.mock('next-auth/next')
 jest.mock('../pages/api/auth/[...nextauth]', () => ({

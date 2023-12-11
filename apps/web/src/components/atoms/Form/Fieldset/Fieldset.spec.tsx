@@ -1,6 +1,6 @@
 import React from 'react'
-import { render } from '../../../../config/TestUtils'
 import { Fieldset } from './Fieldset'
+import { render } from '@/config/TestUtils'
 
 test('Renders with legend correctly', () => {
   const legendText = 'Fieldset Legend'

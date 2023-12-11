@@ -1,6 +1,6 @@
 import React from 'react'
-import { render } from '../../../../config/TestUtils'
 import { Radio } from './Radio'
+import { render } from '@/config/TestUtils'
 
 test('renders correctly', () => {
   const label = 'Radio Label'

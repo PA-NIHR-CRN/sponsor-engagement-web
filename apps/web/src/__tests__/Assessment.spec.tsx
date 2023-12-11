@@ -7,13 +7,13 @@ import { simpleFaker } from '@faker-js/faker'
 import userEvent from '@testing-library/user-event'
 import mockRouter from 'next-router-mock'
 import { logger } from '@nihr-ui/logger'
-import { render, within, screen } from '../config/TestUtils'
 import type { AssessmentProps } from '../pages/assessments/[studyId]'
 import Assessment, { getServerSideProps } from '../pages/assessments/[studyId]'
 import { userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
 import { SIGN_IN_PAGE, SUPPORT_PAGE } from '../constants/routes'
 import { prismaMock } from '../__mocks__/prisma'
 import { sysRefAssessmentFurtherInformation, sysRefAssessmentStatus } from '../__mocks__/sysRefData'
+import { render, within, screen } from '@/config/TestUtils'
 
 jest.mock('next-auth/next')
 jest.mock('next-seo')

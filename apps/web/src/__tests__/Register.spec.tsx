@@ -10,13 +10,13 @@ import { ZodError } from 'zod'
 import { NextSeo } from 'next-seo'
 import userEvent from '@testing-library/user-event'
 import mockRouter from 'next-router-mock'
-import { render, screen, within } from '../config/TestUtils'
 import type { RegisterProps } from '../pages/register'
 import Registration, { getServerSideProps } from '../pages/register'
 import { userNoRoles } from '../__mocks__/session'
 import { ERROR_PAGE_500, REGISTRATION_CONFIRMATION_LINKED_PAGE, SIGN_IN_PAGE } from '../constants/routes'
 import type { Prisma } from '../lib/prisma'
 import { prismaClient } from '../lib/prisma'
+import { render, screen, within } from '@/config/TestUtils'
 
 jest.mock('@nihr-ui/auth')
 jest.mock('@nihr-ui/logger')

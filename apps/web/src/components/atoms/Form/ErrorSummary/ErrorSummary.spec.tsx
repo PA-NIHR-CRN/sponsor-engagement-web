@@ -1,7 +1,7 @@
 import React from 'react'
 import type { FieldErrors } from 'react-hook-form'
-import { render } from '../../../../config/TestUtils'
 import { ErrorSummary } from './ErrorSummary'
+import { render } from '@/config/TestUtils'
 
 test('Renders the error summary correctly', () => {
   const errors: FieldErrors = {

@@ -6,13 +6,13 @@ import { logger } from '@nihr-ui/logger'
 import mockRouter from 'next-router-mock'
 import userEvent from '@testing-library/user-event'
 import axios from 'axios'
-import { render, screen, within } from '../config/TestUtils'
 import type { RemoveContactProps } from '../pages/organisations/remove-contact/[userOrganisationId]'
 import RemoveContact, { getServerSideProps } from '../pages/organisations/remove-contact/[userOrganisationId]'
 import { userWithContactManagerRole, userWithSponsorContactRole } from '../__mocks__/session'
 import { SIGN_IN_PAGE } from '../constants/routes'
 import { prismaMock } from '../__mocks__/prisma'
 import type { UserOrganisationWithRelations } from '../lib/organisations'
+import { render, screen, within } from '@/config/TestUtils'
 
 jest.mock('@nihr-ui/logger')
 jest.mock('next-auth/next')
