@@ -200,7 +200,7 @@ jobs:
       - name: Restore Original Schedule (ingest)
         if: github.event.inputs.appname == 'ingest'
         run: |
-          aws events put-rule --name crnccp-ecs-prod-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 18 * * ? *)"
+          aws events put-rule --name crnccp-ecs-prod-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 02 * * ? *)"
           aws events enable-rule --name crnccp-ecs-prod-se-${{ github.event.inputs.appname}}-cw-event-rule
 
       - name: Restore Original Schedule (notify)
