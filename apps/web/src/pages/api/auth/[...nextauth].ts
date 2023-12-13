@@ -78,7 +78,7 @@ async function refreshAccessToken(token: JWT) {
       idToken,
     }
   } catch (error) {
-    logger.info(error)
+    logger.error(error)
     return {
       ...token,
       error: 'RefreshAccessTokenError',
