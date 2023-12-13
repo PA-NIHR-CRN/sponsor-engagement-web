@@ -3,7 +3,7 @@ import { Mock } from 'ts-mockery'
 import type { Session, Account } from 'next-auth'
 import type { AdapterUser } from 'next-auth/adapters'
 import type { JWT } from 'next-auth/jwt'
-import type { UserOrganisation, UserRole } from 'database'
+import type { Prisma, UserOrganisation, UserRole } from 'database'
 import { faker } from '@faker-js/faker'
 import type { refreshTokenResponseSchema } from '@nihr-ui/auth'
 import { authService } from '@nihr-ui/auth'
@@ -26,8 +26,8 @@ describe('Authentication configuration options', () => {
     expect(authOptions.debug).toBe(true)
   })
 
-  test('prisma db adapter is set', () => {
-    expect(authOptions.adapter).toBeDefined()
+  test('do not use any db adapter - we are jwt only now!', () => {
+    expect(authOptions.adapter).not.toBeDefined()
   })
 
   test('jwt stategy is set', () => {
@@ -166,21 +166,28 @@ describe('JWT callback', () => {
 
 describe('Session callback', () => {
   test('retrieves the roles for the authenticated user and forwards it to the returned session object', async () => {
-    const id = faker.string.numeric()
+    const providerUserId = 'provider-user-id'
+    const localUserId = 1
     const email = faker.internet.email()
     const name = faker.person.fullName()
 
     const session = Mock.of<Session>({ user: { name, email } })
     const user = Mock.of<AdapterUser>()
-    const token = Mock.of<JWT>({ user: { id, email } })
+    const token = Mock.of<JWT>({ user: { id: providerUserId, email } })
+
+    prismaMock.user.findFirstOrThrow.mockResolvedValueOnce(
+      Mock.of<Prisma.UserGetPayload<undefined>>({
+        id: localUserId,
+      })
+    )
 
     prismaMock.userRole.findMany.mockResolvedValueOnce([
       Mock.of<UserRole>({
-        userId: Number(id),
+        userId: Number(providerUserId),
         roleId: Roles.SponsorContact,
       }),
       Mock.of<UserRole>({
-        userId: Number(id),
+        userId: Number(providerUserId),
         roleId: Roles.ContactManager,
       }),
     ])
@@ -202,7 +209,7 @@ describe('Session callback', () => {
         error: undefined,
         idleTimeout: 600,
         user: {
-          id: Number(id),
+          id: localUserId,
           name,
           email,
           roles: [Roles.SponsorContact, Roles.ContactManager],

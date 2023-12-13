@@ -16,7 +16,6 @@
     "@axe-core/playwright": "^4.7.3",
     "@hookform/error-message": "^2.0.1",
     "@hookform/resolvers": "^3.3.2",
-    "@next-auth/prisma-adapter": "^1.0.7",
     "@nihr-ui/auth": "*",
     "@nihr-ui/configs": "*",
     "@nihr-ui/email": "*",

@@ -71,13 +71,6 @@ describe('Successful registration', () => {
         identityGatewayId: mockIdentityGatewayId,
         registrationConfirmed: true,
         registrationToken: null,
-        accounts: {
-          create: {
-            provider: 'oidc',
-            providerAccountId: mockIdentityGatewayId,
-            type: 'oauth',
-          },
-        },
       },
     })
 

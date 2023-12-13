@@ -1,7 +1,6 @@
 import type { AuthOptions } from 'next-auth'
 import NextAuth from 'next-auth'
 import type { OAuthConfig } from 'next-auth/providers'
-import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import { logger } from '@nihr-ui/logger'
 import { authService } from '@nihr-ui/auth'
 import type { JWT } from 'next-auth/jwt'
@@ -94,9 +93,6 @@ export const authOptions: AuthOptions = {
   // Enable debug mode in non-production environments.
   debug: process.env.NEXTAUTH_DEBUG === 'enabled',
 
-  // Use the Prisma adapter for session and user data storage.
-  adapter: PrismaAdapter(prismaClient),
-
   // Session configuration using JWT strategy.
   session: {
     strategy: 'jwt',
@@ -153,10 +149,12 @@ export const authOptions: AuthOptions = {
           user: { id, email },
         } = token
 
-        const userId = Number(id)
+        if (!id || !email) throw new Error('Missing id or email from jwt')
 
+        const { id: userId } = await prismaClient.user.findFirstOrThrow({ where: { email } })
+
+        session.user.id = userId // Update the user id to be the local id from our database
         session.idleTimeout = Number(process.env.NEXTAUTH_IDLE_TIMEOUT)
-        session.user.id = userId
         session.error = error
 
         if (email) {
