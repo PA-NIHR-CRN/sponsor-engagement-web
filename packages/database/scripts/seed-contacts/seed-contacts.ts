@@ -155,16 +155,6 @@ const seedContacts = async <T extends Row>(fileName: string, headers: SponsorHea
     for await (const user of upserts) {
       users.push(user)
     }
-
-    return prisma.account.createMany({
-      data: users.map((user) => ({
-        userId: user.id,
-        type: 'oauth',
-        provider: 'oidc',
-        providerAccountId: user.identityGatewayId,
-      })),
-      skipDuplicates: true,
-    })
   })
 
   await Promise.all(promises)
