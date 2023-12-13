@@ -1,6 +1,10 @@
 module.exports = {
   extends: ['custom/next'],
   ignorePatterns: ['node_modules/', 'dist/'],
+  parserOptions: {
+    project: './tsconfig.json',
+    tsconfigRootDir: __dirname,
+  },
   rules: {
     'no-restricted-imports': [
       'error',
