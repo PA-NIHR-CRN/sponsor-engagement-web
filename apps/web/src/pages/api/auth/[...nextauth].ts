@@ -31,7 +31,7 @@ const Provider = ({ clientId, clientSecret, wellKnown }: ProviderOptions): OAuth
   clientSecret,
   authorization: { params: { scope: 'openid email profile' } },
   idToken: true,
-  checks: ['pkce', 'state'],
+  checks: ['pkce'], // https://github.com/nextauthjs/next-auth/discussions/7491#discussioncomment-7303997
   // https://next-auth.js.org/configuration/providers/oauth#allowdangerousemailaccountlinking-option
   allowDangerousEmailAccountLinking: true,
   profile(profile) {
