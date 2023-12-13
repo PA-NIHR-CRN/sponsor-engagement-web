@@ -20,7 +20,6 @@ import { registrationSchema } from '../../utils/schemas'
 import { useFormErrorHydration } from '../../hooks/useFormErrorHydration'
 import { ErrorSummary, Fieldset, Form } from '../../components/atoms'
 import { TextInput } from '../../components/atoms/Form/TextInput/TextInput'
-import { AUTH_PROVIDER_NAME, AUTH_PROVIDER_TYPE } from '../../constants'
 
 export type RegisterProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
@@ -203,13 +202,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
             identityGatewayId,
             registrationConfirmed: true,
             registrationToken: null,
-            accounts: {
-              create: {
-                providerAccountId: identityGatewayId,
-                type: AUTH_PROVIDER_TYPE,
-                provider: AUTH_PROVIDER_NAME.toLowerCase(),
-              },
-            },
           },
         })
 
