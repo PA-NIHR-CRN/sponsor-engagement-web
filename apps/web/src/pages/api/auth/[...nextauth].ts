@@ -108,6 +108,19 @@ export const authOptions: AuthOptions = {
     }),
   ],
 
+  // https://github.com/nextauthjs/next-auth/discussions/6898
+  cookies: {
+    pkceCodeVerifier: {
+      name: 'next-auth.pkce.code_verifier',
+      options: {
+        httpOnly: true,
+        sameSite: 'none',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
+  },
+
   // Callbacks for JWT and session management.
   callbacks: {
     jwt({ token, account, user, trigger }) {
