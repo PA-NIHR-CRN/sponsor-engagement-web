@@ -31,7 +31,7 @@ const Provider = ({ clientId, clientSecret, wellKnown }: ProviderOptions): OAuth
   clientSecret,
   authorization: { params: { scope: 'openid email profile' } },
   idToken: true,
-  checks: ['pkce'], // https://github.com/nextauthjs/next-auth/discussions/7491#discussioncomment-7303997
+  checks: ['pkce', 'state'],
   // https://next-auth.js.org/configuration/providers/oauth#allowdangerousemailaccountlinking-option
   allowDangerousEmailAccountLinking: true,
   profile(profile) {
@@ -108,19 +108,6 @@ export const authOptions: AuthOptions = {
     }),
   ],
 
-  // https://github.com/nextauthjs/next-auth/discussions/6898
-  cookies: {
-    pkceCodeVerifier: {
-      name: 'next-auth.pkce.code_verifier',
-      options: {
-        httpOnly: true,
-        sameSite: 'none',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-      },
-    },
-  },
-
   // Callbacks for JWT and session management.
   callbacks: {
     jwt({ token, account, user, trigger }) {
@@ -185,6 +172,15 @@ export const authOptions: AuthOptions = {
         logger.error(error)
         return session
       }
+    },
+    redirect({ url, baseUrl }) {
+      if (url.startsWith('/')) {
+        const redirectUrl = `${baseUrl}/${url}`
+        logger.info(`redirect callback - redirecting to ${redirectUrl}`)
+        return redirectUrl
+      }
+      logger.info(`redirect callback - redirecting to ${baseUrl}`)
+      return baseUrl
     },
   },
 }
