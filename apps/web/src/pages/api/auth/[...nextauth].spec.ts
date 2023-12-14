@@ -24,7 +24,7 @@ describe('Authentication configuration options', () => {
 })
 
 describe('Custom OAuth provider is compatible with next-auth', () => {
-  test('authOptions object is defined', () => {
+  test('provider object is defined', () => {
     expect(authOptions.providers[0]).toEqual<Provider>({
       id: 'oidc',
       name: 'OIDC',
@@ -35,7 +35,7 @@ describe('Custom OAuth provider is compatible with next-auth', () => {
       allowDangerousEmailAccountLinking: true,
       authorization: { params: { scope: 'openid email profile' } },
       idToken: true,
-      checks: ['pkce'],
+      checks: ['pkce', 'state'],
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- valid any
       profile: expect.any(Function),
     })
