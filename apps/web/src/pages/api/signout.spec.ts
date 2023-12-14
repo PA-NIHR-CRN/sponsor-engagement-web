@@ -4,6 +4,7 @@ import handler from './signout'
 
 jest.mock('@nihr-ui/logger', () => ({
   logger: {
+    info: jest.fn(),
     error: jest.fn(),
   },
 }))
@@ -32,6 +33,10 @@ describe('API Handler: Logout', () => {
     process.env.AUTH_WELL_KNOWN_URL = 'https://dev.id.nihr.ac.uk'
 
     handler(req as NextApiRequest, res as NextApiResponse)
+
+    expect(logger.info).toHaveBeenCalledWith(
+      'sign out api handler - redirecting to idg with url https://dev.id.nihr.ac.uk/oidc/logout?post_logout_redirect_uri=http%3A%2F%2Flocalhost%3A3000&id_token_hint=mocked-id-token-hint'
+    )
 
     expect(res.redirect).toHaveBeenCalledWith(
       302,

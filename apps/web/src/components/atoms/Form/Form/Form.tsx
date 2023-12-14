@@ -62,7 +62,7 @@ export function Form<T extends FieldValues>({ action, method, children, onError,
       if (axios.isAxiosError(error)) {
         logger.info(`Form component failed to submit due to ${error.message}`)
       } else {
-        logger.info(error)
+        logger.error(error)
       }
       redirectToFatalError()
     }

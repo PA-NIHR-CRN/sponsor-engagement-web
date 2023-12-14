@@ -74,7 +74,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
     throw new Error('Could not retrieve auth providers')
   } catch (error) {
-    logger.info(error)
+    logger.error(error)
     return {
       redirect: {
         destination: '/500',

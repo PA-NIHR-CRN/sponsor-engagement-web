@@ -47,7 +47,7 @@ describe('Custom OAuth provider is compatible with next-auth', () => {
       allowDangerousEmailAccountLinking: true,
       authorization: { params: { scope: 'openid email profile' } },
       idToken: true,
-      checks: ['pkce', 'state'],
+      checks: ['pkce'],
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- valid any
       profile: expect.any(Function),
     })
@@ -155,7 +155,7 @@ describe('JWT callback', () => {
 
     const response = await authOptions.callbacks?.jwt?.({ account, user, token })
 
-    expect(logger.info).toHaveBeenCalledWith({ error: new ZodError([]), success: false })
+    expect(logger.error).toHaveBeenCalledWith({ error: new ZodError([]), success: false })
 
     expect(response).toEqual<JWT>({
       ...token,
