@@ -4,19 +4,14 @@ import { ZodError } from 'zod'
 import { logger } from '@nihr-ui/logger'
 import { emailService } from '@nihr-ui/email'
 import { emailTemplates } from '@nihr-ui/templates/sponsor-engagement'
-import type { OrganisationAddInputs } from '../../../utils/schemas'
-import { organisationAddSchema } from '../../../utils/schemas'
-import { withApiHandler } from '../../../utils/withApiHandler'
-import { getOrganisationById } from '../../../lib/organisations'
-import { prismaClient } from '../../../lib/prisma'
-import { Roles } from '../../../constants'
-import {
-  EXTERNAL_CRN_TERMS_CONDITIONS_URL,
-  EXTERNAL_CRN_URL,
-  SIGN_IN_PAGE,
-  SUPPORT_PAGE,
-} from '../../../constants/routes'
-import { getAbsoluteUrl } from '../../../utils/email'
+import type { OrganisationAddInputs } from '@/utils/schemas'
+import { organisationAddSchema } from '@/utils/schemas'
+import { withApiHandler } from '@/utils/withApiHandler'
+import { getOrganisationById } from '@/lib/organisations'
+import { prismaClient } from '@/lib/prisma'
+import { Roles } from '@/constants'
+import { EXTERNAL_CRN_TERMS_CONDITIONS_URL, EXTERNAL_CRN_URL, SIGN_IN_PAGE, SUPPORT_PAGE } from '@/constants/routes'
+import { getAbsoluteUrl } from '@/utils/email'
 
 export interface ExtendedNextApiRequest extends NextApiRequest {
   body: OrganisationAddInputs

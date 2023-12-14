@@ -1,7 +1,7 @@
 import React from 'react'
 import type { FieldErrors } from 'react-hook-form'
-import { render } from '../../../../config/TestUtils'
 import { Textarea } from './Textarea'
+import { render } from '@/config/TestUtils'
 
 test('Renders correctly without errors or hint', () => {
   const label = 'Textarea Label'

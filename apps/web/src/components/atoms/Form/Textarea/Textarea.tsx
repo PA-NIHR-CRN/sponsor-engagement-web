@@ -2,8 +2,8 @@ import clsx from 'clsx'
 import type { ReactNode } from 'react'
 import { forwardRef } from 'react'
 import type { FieldErrors } from 'react-hook-form'
-import { TEXTAREA_MAX_CHARACTERS } from '../../../../constants/forms'
 import { ErrorInline } from '../ErrorInline/ErrorInline'
+import { TEXTAREA_MAX_CHARACTERS } from '@/constants/forms'
 
 interface TextareaProps {
   label: string

@@ -9,9 +9,9 @@ import type { refreshTokenResponseSchema } from '@nihr-ui/auth'
 import { authService } from '@nihr-ui/auth'
 import { ZodError, type z } from 'zod'
 import { logger } from '@nihr-ui/logger'
-import { prismaMock } from '../../../__mocks__/prisma'
-import { Roles } from '../../../constants/auth'
 import { authOptions } from './[...nextauth]'
+import { prismaMock } from '@/__mocks__/prisma'
+import { Roles } from '@/constants/auth'
 
 jest.mock('@nihr-ui/auth')
 jest.mock('@nihr-ui/logger')

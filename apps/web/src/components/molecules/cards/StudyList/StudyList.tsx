@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Card } from '../../../atoms'
+import { Card } from '@/components/atoms'
 
 export interface StudyListProps {
   sponsorOrgName?: string

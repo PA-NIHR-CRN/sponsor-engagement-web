@@ -6,7 +6,7 @@ import { getServerSession } from 'next-auth/next'
 import { logger } from '@nihr-ui/logger'
 import { getToken } from 'next-auth/jwt'
 import { authOptions } from '../api/auth/[...nextauth]'
-import { SIGN_IN_PAGE } from '../../constants/routes'
+import { SIGN_IN_PAGE } from '@/constants/routes'
 
 /**
  * This sign out page provides a progressively enhanced sign out experience

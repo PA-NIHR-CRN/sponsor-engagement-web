@@ -2,11 +2,11 @@ import type { NextApiRequest } from 'next'
 import { ZodError } from 'zod'
 import type { Prisma } from 'database'
 import { logger } from '@nihr-ui/logger'
-import type { AssessmentInputs } from '../../../utils/schemas'
-import { assessmentSchema } from '../../../utils/schemas'
-import { prismaClient } from '../../../lib/prisma'
-import { withApiHandler } from '../../../utils/withApiHandler'
-import { Roles } from '../../../constants'
+import type { AssessmentInputs } from '@/utils/schemas'
+import { assessmentSchema } from '@/utils/schemas'
+import { prismaClient } from '@/lib/prisma'
+import { withApiHandler } from '@/utils/withApiHandler'
+import { Roles } from '@/constants'
 
 export interface ExtendedNextApiRequest extends NextApiRequest {
   body: AssessmentInputs

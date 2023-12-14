@@ -1,7 +1,7 @@
 import React from 'react'
 import type { FieldErrors } from 'react-hook-form'
-import { render } from '../../../../config/TestUtils'
 import { TextInput } from './TextInput'
+import { render } from '@/config/TestUtils'
 
 test('renders correctly without errors or hint', () => {
   const label = 'Input Label'

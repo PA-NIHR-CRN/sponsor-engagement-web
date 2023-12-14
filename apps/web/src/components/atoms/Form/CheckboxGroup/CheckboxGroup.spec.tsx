@@ -1,7 +1,7 @@
 import type { FieldErrors } from 'react-hook-form'
-import { render } from '../../../../config/TestUtils'
 import { Checkbox } from '../Checkbox/Checkbox'
 import { CheckboxGroup } from './CheckboxGroup'
+import { render } from '@/config/TestUtils'
 
 test('Renders correctly without errors or hint', () => {
   const label = 'Radio Group Label'

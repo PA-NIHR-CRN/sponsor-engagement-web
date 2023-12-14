@@ -1,8 +1,8 @@
 import React from 'react'
 import { Mock } from 'ts-mockery'
-import { render, screen } from '../../../config/TestUtils'
 import type { AssessmentHistoryProps, Study } from './AssessmentHistory'
 import { AssessmentHistory, getAssessmentHistoryFromStudy } from './AssessmentHistory'
+import { render, screen } from '@/config/TestUtils'
 
 type Assessments = AssessmentHistoryProps['assessments']
 

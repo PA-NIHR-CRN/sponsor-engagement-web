@@ -1,7 +1,7 @@
 import React from 'react'
 import type { FieldErrors } from 'react-hook-form'
-import { render } from '../../../../config/TestUtils'
 import { ErrorInline } from './ErrorInline'
+import { render } from '@/config/TestUtils'
 
 test('Renders the error message correctly', () => {
   const name = 'exampleField'

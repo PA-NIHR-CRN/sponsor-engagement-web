@@ -8,10 +8,10 @@ import type { Session } from 'next-auth'
 import { useSession } from 'next-auth/react'
 import { useIdle } from '@uidotdev/usehooks'
 import { logger } from '@nihr-ui/logger'
-import { ORGANISATIONS_PAGE, SIGN_OUT_PAGE } from '../../../constants/routes'
-import { Roles } from '../../../constants/auth'
-import { SERVICE_NAME } from '../../../constants'
-import { Header } from '../../molecules'
+import { ORGANISATIONS_PAGE, SIGN_OUT_PAGE } from '@/constants/routes'
+import { Roles } from '@/constants/auth'
+import { SERVICE_NAME } from '@/constants'
+import { Header } from '@/components/molecules'
 
 export const primaryFont = Roboto({
   weight: ['400', '700'],

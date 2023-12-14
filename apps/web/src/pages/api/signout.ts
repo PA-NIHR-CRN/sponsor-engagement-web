@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { logger } from '@nihr-ui/logger'
-import { getAbsoluteUrl } from '../../utils/email'
+import { getAbsoluteUrl } from '@/utils/email'
 
 /**
  * This API handler is responsible for redirecting to the IDG logout page

@@ -3,7 +3,7 @@ import type { ReactElement } from 'react'
 import Link from 'next/link'
 import { NextSeo } from 'next-seo'
 import type { GetServerSidePropsContext } from 'next'
-import { RootLayout } from '../../components/organisms'
+import { RootLayout } from '@/components/organisms'
 
 export interface RequestSupportProps {
   returnPath?: string

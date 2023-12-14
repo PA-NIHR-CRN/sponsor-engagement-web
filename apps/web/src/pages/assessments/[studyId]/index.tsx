@@ -7,24 +7,19 @@ import type { FieldError } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 import clsx from 'clsx'
 import Link from 'next/link'
-import { RootLayout } from '../../../components/organisms'
-import {
-  AssessmentHistory,
-  RequestSupport,
-  StudyDetails,
-  getAssessmentHistoryFromStudy,
-} from '../../../components/molecules'
-import { getStudyById } from '../../../lib/studies'
-import { Checkbox, CheckboxGroup, ErrorSummary, Fieldset, Form, Radio, RadioGroup } from '../../../components/atoms'
-import type { AssessmentInputs } from '../../../utils/schemas/assessment.schema'
-import { assessmentSchema } from '../../../utils/schemas/assessment.schema'
-import { prismaClient } from '../../../lib/prisma'
-import { Textarea } from '../../../components/atoms/Form/Textarea/Textarea'
-import { TEXTAREA_MAX_CHARACTERS } from '../../../constants/forms'
-import { withServerSideProps } from '../../../utils/withServerSideProps'
-import { getValuesFromSearchParams } from '../../../utils/form'
-import { useFormErrorHydration } from '../../../hooks/useFormErrorHydration'
-import { Roles } from '../../../constants'
+import { RootLayout } from '@/components/organisms'
+import { AssessmentHistory, RequestSupport, StudyDetails, getAssessmentHistoryFromStudy } from '@/components/molecules'
+import { getStudyById } from '@/lib/studies'
+import { Checkbox, CheckboxGroup, ErrorSummary, Fieldset, Form, Radio, RadioGroup } from '@/components/atoms'
+import type { AssessmentInputs } from '@/utils/schemas/assessment.schema'
+import { assessmentSchema } from '@/utils/schemas/assessment.schema'
+import { prismaClient } from '@/lib/prisma'
+import { Textarea } from '@/components/atoms/Form/Textarea/Textarea'
+import { TEXTAREA_MAX_CHARACTERS } from '@/constants/forms'
+import { withServerSideProps } from '@/utils/withServerSideProps'
+import { getValuesFromSearchParams } from '@/utils/form'
+import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
+import { Roles } from '@/constants'
 
 export type AssessmentProps = InferGetServerSidePropsType<typeof getServerSideProps>
 

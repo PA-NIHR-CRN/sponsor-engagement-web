@@ -1,8 +1,8 @@
 import { StartIcon } from '@nihr-ui/frontend'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Card } from '../../../atoms'
-import { SUPPORT_PAGE } from '../../../../constants/routes'
+import { SUPPORT_PAGE } from '@/constants/routes'
+import { Card } from '@/components/atoms'
 
 interface RequestSupportProps {
   showCallToAction?: boolean

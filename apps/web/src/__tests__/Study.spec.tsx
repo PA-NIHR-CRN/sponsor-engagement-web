@@ -6,12 +6,12 @@ import type { Prisma } from 'database'
 import { simpleFaker } from '@faker-js/faker'
 import mockRouter from 'next-router-mock'
 import userEvent from '@testing-library/user-event'
-import { render, screen, within } from '../config/TestUtils'
 import type { StudyProps } from '../pages/studies/[studyId]'
 import Study, { getServerSideProps } from '../pages/studies/[studyId]'
 import { userWithContactManagerRole, userWithSponsorContactRole } from '../__mocks__/session'
 import { SIGN_IN_PAGE, SUPPORT_PAGE } from '../constants/routes'
 import { prismaMock } from '../__mocks__/prisma'
+import { render, screen, within } from '@/config/TestUtils'
 
 jest.mock('next-auth/next')
 jest.mock('next-seo')

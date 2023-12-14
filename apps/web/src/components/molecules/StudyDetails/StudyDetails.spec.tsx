@@ -1,8 +1,8 @@
 import React from 'react'
 import { Mock } from 'ts-mockery'
-import { render, screen, within } from '../../../config/TestUtils'
 import type { StudyDetailsProps } from './StudyDetails'
 import { StudyDetails } from './StudyDetails'
+import { render, screen, within } from '@/config/TestUtils'
 
 describe('StudyDetails Component', () => {
   const defaultProps: StudyDetailsProps = Mock.of<StudyDetailsProps>({
