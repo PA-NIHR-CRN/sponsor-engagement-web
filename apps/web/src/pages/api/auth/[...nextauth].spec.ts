@@ -19,19 +19,7 @@ jest.useFakeTimers().setSystemTime(new Date('2023-01-01'))
 
 describe('Authentication configuration options', () => {
   test('authOptions object is defined', () => {
-    expect(authOptions).toBeDefined()
-  })
-
-  test('debug mode is set', () => {
-    expect(authOptions.debug).toBe(true)
-  })
-
-  test('do not use any db adapter - we are jwt only now!', () => {
-    expect(authOptions.adapter).not.toBeDefined()
-  })
-
-  test('jwt stategy is set', () => {
-    expect(authOptions.session?.strategy).toBe('jwt')
+    expect(authOptions).toMatchSnapshot()
   })
 })
 
