@@ -22,7 +22,7 @@ export default function Signin({ isAuthenticated, signinUrl, csrfToken, callback
 
   useEffect(() => {
     if (!isAuthenticated) {
-      void signIn(AUTH_PROVIDER_ID)
+      void signIn(AUTH_PROVIDER_ID, undefined, { prompt: 'login' })
     } else {
       void router.push('/')
     }
