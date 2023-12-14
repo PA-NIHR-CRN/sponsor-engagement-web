@@ -1,6 +1,21 @@
+import type { OrderType } from '../@types/filters'
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
 import { organisationRoleShortName, type OrganisationRoleShortName } from './organisations'
 import { Prisma, prismaClient } from './prisma'
+
+const sortMap = {
+  'due-assessment': { isDueAssessment: Prisma.SortOrder.desc },
+  'last-assessment-asc': {
+    lastAssessment: {
+      createdAt: Prisma.SortOrder.asc,
+    },
+  },
+  'last-assessment-desc': {
+    lastAssessment: {
+      createdAt: Prisma.SortOrder.desc,
+    },
+  },
+}
 
 export const getStudyById = async (studyId: number, organisationIds?: number[]) => {
   const query = {
@@ -88,11 +103,13 @@ export const getStudiesForOrgs = async ({
   currentPage,
   pageSize,
   searchTerm,
+  sortOrder,
 }: {
   organisationIds: number[]
   currentPage: number
   pageSize: number
   searchTerm: string | null
+  sortOrder: OrderType
 }) => {
   const query = {
     skip: currentPage * pageSize - pageSize,
@@ -145,6 +162,11 @@ export const getStudiesForOrgs = async ({
       title: true,
       shortTitle: true,
       isDueAssessment: true,
+      lastAssessment: {
+        include: {
+          status: true,
+        },
+      },
       organisations: {
         where: {
           isDeleted: false,
@@ -159,17 +181,8 @@ export const getStudiesForOrgs = async ({
           isDeleted: false,
         },
       },
-      assessments: {
-        include: {
-          status: true,
-        },
-        orderBy: {
-          createdAt: Prisma.SortOrder.desc,
-        },
-        take: 1,
-      },
     },
-    orderBy: [{ isDueAssessment: Prisma.SortOrder.desc }, { id: Prisma.SortOrder.asc }],
+    orderBy: [sortMap[sortOrder], { id: Prisma.SortOrder.asc }],
   }
 
   const [studies, count, countDue] = await prismaClient.$transaction([
