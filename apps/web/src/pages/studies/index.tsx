@@ -25,6 +25,7 @@ import { getFiltersFromQuery } from '@/utils/filters'
 import { Card } from '@/components/atoms'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 import { SUPPORT_PAGE } from '@/constants/routes'
+import type { OrderType } from '@/@types/filters'
 
 const renderNotificationBanner = (success: boolean) =>
   success ? (
@@ -109,7 +110,7 @@ export default function Studies({
               {/* <div>{showFiltersButton()}</div> */}
               {/* Sort by */}
               <div className="items-center whitespace-nowrap md:flex">
-                <Sort defaultOrder="updated" form="filters-form" />
+                <Sort defaultOrder={filters.order} form="filters-form" />
               </div>
             </div>
           </div>
@@ -132,12 +133,12 @@ export default function Studies({
                             indications={study.evaluationCategories
                               .map((evalCategory) => evalCategory.indicatorType)
                               .filter((evalCategory, index, items) => items.indexOf(evalCategory) === index)}
-                            lastAsessmentDate={formatDate(study.assessments[0]?.createdAt)}
+                            lastAsessmentDate={study.lastAssessment ? formatDate(study.lastAssessment.createdAt) : ''}
                             shortTitle={study.shortTitle}
                             shortTitleHref={`/studies/${study.id}`}
                             sponsorOrgName={sponsorOrg?.organisation.name}
                             supportOrgName={supportOrg?.organisation.name}
-                            trackStatus={study.assessments[0]?.status.name}
+                            trackStatus={study.lastAssessment?.status.name}
                           />
                         </li>
                       )
@@ -178,16 +179,19 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     const searchParams = new URLSearchParams({
       q: context.query.q ? String(context.query.q) : '',
       page: context.query.page ? String(context.query.page) : '1',
+      order: context.query.order ? String(context.query.order) : 'due-assessment',
     })
 
     const initialPage = Number(searchParams.get('page'))
     const searchTerm = searchParams.get('q')
+    const sortOrder = searchParams.get('order') as OrderType
 
     const studies = await getStudiesForOrgs({
       organisationIds,
       searchTerm,
       currentPage: initialPage,
       pageSize: STUDIES_PER_PAGE,
+      sortOrder,
     })
 
     const filters = getFiltersFromQuery(context.query)

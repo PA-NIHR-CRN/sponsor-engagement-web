@@ -83,9 +83,11 @@ const mockStudies = Array.from(Array(15)).map((_, index) => ({
       createdAt: new Date('2001-01-01'),
     },
   ],
-  assessments: [
-    { status: { name: 'Off Track' }, updatedAt: new Date('2001-01-02'), createdAt: new Date('2001-01-01') },
-  ],
+  lastAssessment: {
+    status: { name: 'Off Track' },
+    updatedAt: new Date('2001-01-02'),
+    createdAt: new Date('2001-01-01'),
+  },
 }))
 
 describe('Studies page', () => {

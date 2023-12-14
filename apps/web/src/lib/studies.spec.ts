@@ -1,5 +1,5 @@
 import { Mock } from 'ts-mockery'
-import type { Prisma, Study } from 'database'
+import { Prisma, type Study } from 'database'
 import { prismaMock } from '../__mocks__/prisma'
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
 import { getStudyById, getStudiesForOrgs } from './studies'
@@ -35,6 +35,7 @@ describe('getStudiesForOrgs', () => {
       pageSize: 10,
       currentPage: 1,
       searchTerm: null,
+      sortOrder: 'due-assessment',
     })
 
     expect(result).toEqual({
@@ -53,6 +54,7 @@ describe('getStudiesForOrgs', () => {
           organisations: expectedOrganisationsQuery,
           isDeleted: false,
         },
+        orderBy: [{ isDueAssessment: Prisma.SortOrder.desc }, { id: Prisma.SortOrder.asc }],
       })
     )
 
@@ -74,6 +76,7 @@ describe('getStudiesForOrgs', () => {
       pageSize: 10,
       currentPage: 1,
       searchTerm,
+      sortOrder: 'due-assessment',
     })
 
     expect(result).toEqual({
@@ -125,6 +128,7 @@ describe('getStudiesForOrgs', () => {
       pageSize: 10,
       currentPage: 1,
       searchTerm,
+      sortOrder: 'due-assessment',
     })
 
     expect(prismaMock.study.findMany).toHaveBeenCalledWith(
@@ -158,6 +162,56 @@ describe('getStudiesForOrgs', () => {
         isDeleted: false,
       },
     })
+  })
+
+  it('should allow sorting by last assessment date (ascending)', async () => {
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudyCount, mockStudyDueAssessmentCount])
+
+    await getStudiesForOrgs({
+      organisationIds: userOrganisationIds,
+      pageSize: 10,
+      currentPage: 1,
+      searchTerm: null,
+      sortOrder: 'last-assessment-asc',
+    })
+
+    expect(prismaMock.study.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        orderBy: [
+          {
+            lastAssessment: {
+              createdAt: Prisma.SortOrder.asc,
+            },
+          },
+          { id: Prisma.SortOrder.asc },
+        ],
+      })
+    )
+  })
+
+  it('should allow sorting by last assessment date (descending)', async () => {
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudyCount, mockStudyDueAssessmentCount])
+
+    await getStudiesForOrgs({
+      organisationIds: userOrganisationIds,
+      pageSize: 10,
+      currentPage: 1,
+      searchTerm: null,
+      sortOrder: 'last-assessment-desc',
+    })
+
+    expect(prismaMock.study.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        orderBy: [
+          {
+            lastAssessment: {
+              createdAt: Prisma.SortOrder.desc,
+            },
+          },
+          { id: Prisma.SortOrder.asc },
+        ],
+      })
+    )
   })
 })
 

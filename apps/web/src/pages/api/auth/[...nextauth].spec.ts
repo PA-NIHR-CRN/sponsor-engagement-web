@@ -24,7 +24,7 @@ describe('Authentication configuration options', () => {
 })
 
 describe('Custom OAuth provider is compatible with next-auth', () => {
-  test('provder object is defined', () => {
+  test('provider object is defined', () => {
     expect(authOptions.providers[0]).toEqual<Provider>({
       id: 'oidc',
       name: 'OIDC',
