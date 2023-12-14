@@ -1,4 +1,4 @@
-export type OrderType = 'updated' | 'published' | 'a-z' | 'z-a' | 'highest-population' | 'lowest-population'
+export type OrderType = 'due-assessment' | 'last-assessment-asc' | 'last-assessment-desc'
 
 export interface Filters {
   page: number
