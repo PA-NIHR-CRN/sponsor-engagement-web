@@ -108,6 +108,29 @@ export const authOptions: AuthOptions = {
     }),
   ],
 
+  cookies: {
+    pkceCodeVerifier: {
+      name: 'next-auth.pkce.code_verifier',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60, // 1 hour
+      },
+    },
+    state: {
+      name: 'next-auth.state',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60, // 1 hour
+      },
+    },
+  },
+
   // Callbacks for JWT and session management.
   callbacks: {
     jwt({ token, account, user, trigger }) {
@@ -175,7 +198,7 @@ export const authOptions: AuthOptions = {
     },
     redirect({ url, baseUrl }) {
       if (url.startsWith('/')) {
-        const redirectUrl = `${baseUrl}/${url}`
+        const redirectUrl = `${baseUrl}${url}`
         logger.info(`redirect callback - redirecting to ${redirectUrl}`)
         return redirectUrl
       }
