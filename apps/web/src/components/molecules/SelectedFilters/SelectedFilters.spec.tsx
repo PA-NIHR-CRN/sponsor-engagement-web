@@ -1,13 +1,13 @@
 import mockRouter from 'next-router-mock'
-import { SelectedFilters } from './SelectedFilters'
 import type { Filters } from '@/@types/filters'
 import { STUDIES_PAGE } from '@/constants/routes'
 import { render, screen } from '@/config/TestUtils'
+import { SelectedFilters } from './SelectedFilters'
 
 test('Displays selected filters with correct links', () => {
   const mockFilters: Filters = {
     page: 2,
-    order: 'a-z',
+    order: 'due-assessment',
     q: 'test',
   }
 
@@ -41,7 +41,7 @@ test('Displays selected filters with correct links', () => {
 test('Does not show selected filters panel if no filters selected', () => {
   const mockFilters: Filters = {
     page: 2,
-    order: 'a-z',
+    order: 'due-assessment',
   }
 
   render(<SelectedFilters filters={mockFilters} />)
