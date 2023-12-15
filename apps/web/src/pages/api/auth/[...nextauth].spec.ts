@@ -9,9 +9,9 @@ import type { refreshTokenResponseSchema } from '@nihr-ui/auth'
 import { authService } from '@nihr-ui/auth'
 import { ZodError, type z } from 'zod'
 import { logger } from '@nihr-ui/logger'
-import { authOptions } from './[...nextauth]'
 import { prismaMock } from '@/__mocks__/prisma'
 import { Roles } from '@/constants/auth'
+import { authOptions } from './[...nextauth]'
 
 jest.mock('@nihr-ui/auth')
 jest.mock('@nihr-ui/logger')
@@ -205,6 +205,37 @@ describe('Session callback', () => {
         },
       })
     )
+  })
+
+  describe('signIn callback', () => {
+    const accountMock = Mock.of<Account>({
+      accessToken: faker.string.uuid(),
+      expires_at: Number(faker.date.future()),
+      refresh_token: faker.string.uuid(),
+      id_token: faker.string.uuid(),
+    })
+
+    const userMock = Mock.of<AdapterUser>({
+      email: faker.internet.email(),
+    })
+
+    test('records the last login time for the user', async () => {
+      const account = accountMock
+      const user = userMock
+
+      const response = await authOptions.callbacks?.signIn?.({ account, user })
+
+      expect(prismaMock.user.update).toHaveBeenCalledWith({
+        where: {
+          email: user.email,
+        },
+        data: {
+          lastLogin: new Date('2023-01-01'),
+        },
+      })
+
+      expect(response).toBe(true)
+    })
   })
 
   test('exits early if no user object exists within the session', async () => {

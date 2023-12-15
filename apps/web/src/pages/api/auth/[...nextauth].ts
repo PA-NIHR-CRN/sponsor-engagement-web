@@ -205,6 +205,19 @@ export const authOptions: AuthOptions = {
       logger.info(`redirect callback - redirecting to ${baseUrl}`)
       return baseUrl
     },
+    async signIn({ user: { email } }) {
+      if (email) {
+        await prismaClient.user.update({
+          where: {
+            email,
+          },
+          data: {
+            lastLogin: new Date(),
+          },
+        })
+      }
+      return true
+    },
   },
 }
 
