@@ -76,6 +76,7 @@ model User {
   registrationToken     String?
   registrationConfirmed Boolean?             @default(false)
   isDeleted             Boolean?             @default(false)
+  lastLogin             DateTime?
   organisations         UserOrganisation[]   @relation(name: "userOrganisation")
   createdOrganisations  UserOrganisation[]   @relation(name: "createdOrganisations")
   updatedOrganisations  UserOrganisation[]   @relation(name: "updatedOrganisations")
