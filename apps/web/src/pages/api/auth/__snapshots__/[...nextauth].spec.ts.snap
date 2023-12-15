@@ -6,6 +6,7 @@ exports[`Authentication configuration options authOptions object is defined 1`] 
     "jwt": [Function],
     "redirect": [Function],
     "session": [Function],
+    "signIn": [Function],
   },
   "cookies": {
     "pkceCodeVerifier": {
