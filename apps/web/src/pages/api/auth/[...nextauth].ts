@@ -31,7 +31,7 @@ const Provider = ({ clientId, clientSecret, wellKnown }: ProviderOptions): OAuth
   clientSecret,
   authorization: { params: { scope: 'openid email profile' } },
   idToken: true,
-  checks: ['pkce', 'state'],
+  checks: ['none'],
   // https://next-auth.js.org/configuration/providers/oauth#allowdangerousemailaccountlinking-option
   allowDangerousEmailAccountLinking: true,
   profile(profile) {
@@ -108,6 +108,7 @@ export const authOptions: AuthOptions = {
     }),
   ],
 
+  // The "checks" property in the IDG provider configuration above is temporarily set to "none" meaning the below cookie overrides are redundant.
   cookies: {
     pkceCodeVerifier: {
       name: 'next-auth.pkce.code_verifier',
