@@ -94,7 +94,7 @@ export default function Studies({
             <Filters
               filters={filters}
               onFilterChange={handleFilterChange}
-              searchLabel="Search study title, protocol number or IRAS ID"
+              searchLabel="Search study title, protocol number, IRAS ID or CPMS ID"
             />
           </div>
 
