@@ -19,9 +19,7 @@
     "typecheck": "turbo run typecheck"
   },
   "dependencies": {
-    "@axe-core/playwright": "^4.7.3",
-    "mssql": "^10.0.1",
-    "mysql2": "^3.6.2"
+    "@axe-core/playwright": "^4.7.3"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.6.5",
