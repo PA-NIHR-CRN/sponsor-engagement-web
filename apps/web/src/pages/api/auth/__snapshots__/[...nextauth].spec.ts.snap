@@ -40,8 +40,7 @@ exports[`Authentication configuration options authOptions object is defined 1`] 
         },
       },
       "checks": [
-        "pkce",
-        "state",
+        "none",
       ],
       "clientId": "mockedClientId",
       "clientSecret": "mockedClientSecret",

@@ -9,9 +9,9 @@ import type { refreshTokenResponseSchema } from '@nihr-ui/auth'
 import { authService } from '@nihr-ui/auth'
 import { ZodError, type z } from 'zod'
 import { logger } from '@nihr-ui/logger'
+import { authOptions } from './[...nextauth]'
 import { prismaMock } from '@/__mocks__/prisma'
 import { Roles } from '@/constants/auth'
-import { authOptions } from './[...nextauth]'
 
 jest.mock('@nihr-ui/auth')
 jest.mock('@nihr-ui/logger')
@@ -35,7 +35,7 @@ describe('Custom OAuth provider is compatible with next-auth', () => {
       allowDangerousEmailAccountLinking: true,
       authorization: { params: { scope: 'openid email profile' } },
       idToken: true,
-      checks: ['pkce', 'state'],
+      checks: ['none'],
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- valid any
       profile: expect.any(Function),
     })
