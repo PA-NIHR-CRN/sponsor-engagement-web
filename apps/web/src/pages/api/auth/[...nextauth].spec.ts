@@ -35,7 +35,7 @@ describe('Custom OAuth provider is compatible with next-auth', () => {
       allowDangerousEmailAccountLinking: true,
       authorization: { params: { scope: 'openid email profile' } },
       idToken: true,
-      checks: ['none'],
+      checks: ['pkce', 'state'],
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- valid any
       profile: expect.any(Function),
     })

@@ -4,6 +4,9 @@ import type { UserOrganisation } from 'database'
 import type { AdapterUser } from 'next-auth/adapters'
 import type { OAuthUserConfig } from 'next-auth/providers'
 
+// Custom state parameters between SE app and IDG
+export type AuthRedirectType = 'signout' | ''
+
 // Define the OAuthProfile interface to represent an OAuth user profile
 export interface OAuthProfile {
   at_hash: string
