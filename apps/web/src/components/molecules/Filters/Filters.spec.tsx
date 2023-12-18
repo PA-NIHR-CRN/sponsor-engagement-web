@@ -7,7 +7,7 @@ import { render, screen } from '@/config/TestUtils'
 
 const defaultProps: FiltersProps = {
   filters: { page: 1 },
-  searchLabel: 'Search study title, protocol number or IRAS ID',
+  searchLabel: 'Search study title, protocol number, IRAS ID or CPMS ID',
 }
 
 beforeEach(() => {

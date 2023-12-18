@@ -275,7 +275,7 @@ describe('Studies page', () => {
 
     render(Studies.getLayout(<Studies {...props} />, { ...props }))
 
-    expect(screen.getByLabelText('Search study title, protocol number or IRAS ID')).toHaveValue('test search')
+    expect(screen.getByLabelText('Search study title, protocol number, IRAS ID or CPMS ID')).toHaveValue('test search')
 
     expect(screen.getByText('Selected filters')).toBeInTheDocument()
 
