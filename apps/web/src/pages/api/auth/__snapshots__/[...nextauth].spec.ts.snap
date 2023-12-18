@@ -4,31 +4,8 @@ exports[`Authentication configuration options authOptions object is defined 1`] 
 {
   "callbacks": {
     "jwt": [Function],
-    "redirect": [Function],
     "session": [Function],
     "signIn": [Function],
-  },
-  "cookies": {
-    "pkceCodeVerifier": {
-      "name": "next-auth.pkce.code_verifier",
-      "options": {
-        "httpOnly": true,
-        "maxAge": 3600,
-        "path": "/",
-        "sameSite": "lax",
-        "secure": false,
-      },
-    },
-    "state": {
-      "name": "next-auth.state",
-      "options": {
-        "httpOnly": true,
-        "maxAge": 3600,
-        "path": "/",
-        "sameSite": "lax",
-        "secure": false,
-      },
-    },
   },
   "debug": true,
   "providers": [
@@ -40,7 +17,8 @@ exports[`Authentication configuration options authOptions object is defined 1`] 
         },
       },
       "checks": [
-        "none",
+        "pkce",
+        "state",
       ],
       "clientId": "mockedClientId",
       "clientSecret": "mockedClientSecret",

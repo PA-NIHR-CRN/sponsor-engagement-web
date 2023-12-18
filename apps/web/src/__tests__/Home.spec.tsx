@@ -9,7 +9,7 @@ import {
   userWithSponsorContactAndContactManagerRoles,
   userWithSponsorContactRole,
 } from '../__mocks__/session'
-import { ORGANISATIONS_PAGE, SIGN_IN_PAGE, STUDIES_PAGE } from '../constants/routes'
+import { ORGANISATIONS_PAGE, SIGN_OUT_CONFIRM_PAGE, STUDIES_PAGE } from '../constants/routes'
 import { render } from '@/config/TestUtils'
 
 jest.mock('next-auth/next')
@@ -27,7 +27,7 @@ describe('getServerSideProps', () => {
     const result = await getServerSideProps(context)
     expect(result).toEqual({
       redirect: {
-        destination: SIGN_IN_PAGE,
+        destination: SIGN_OUT_CONFIRM_PAGE,
       },
     })
   })
