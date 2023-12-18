@@ -220,6 +220,16 @@ describe('<SideNavMain>', () => {
 })
 
 describe('<SideNavLink>', () => {
+  test('Renders correctly', () => {
+    const { getByRole } = render(
+      <SideNavProvider>
+        <SideNavLink href="/example">Example Link</SideNavLink>
+      </SideNavProvider>
+    )
+    const listItem = getByRole('listitem')
+    expect(within(listItem).getByRole('link', { name: 'Example Link' })).toBeInTheDocument()
+  })
+
   test('Uses the gov.uk design system class', () => {
     const { getByRole } = render(
       <SideNavProvider>
