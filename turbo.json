@@ -22,7 +22,8 @@
         "IDG_API_URL",
         "IDG_API_USERNAME",
         "IDG_API_PASSWORD",
-        "DATABASE_URL"
+        "DATABASE_URL",
+        "ENVIRONMENT_VARIABLE_CHECKS"
       ]
     },
     "start": {},

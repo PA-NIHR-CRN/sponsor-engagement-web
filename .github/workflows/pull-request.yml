@@ -34,10 +34,12 @@ jobs:
       - uses: ./.github/actions/build-cache
       - uses: ./.github/actions/turbo-cache
       - name: Build
+        # Inject the minimum amount of env vars needed to build the project
         run: |
           touch .env.local
           echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env.local
           echo NEXT_PUBLIC_APP_ENV=${{ vars.APP_ENV }} >> .env.local
+          echo ENVIRONMENT_VARIABLE_CHECKS=disabled >> .env.local
           npx turbo run build --cache-dir=".turbo"
 
   # Code quality checks
