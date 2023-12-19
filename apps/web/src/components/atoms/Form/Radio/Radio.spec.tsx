@@ -14,6 +14,7 @@ test('renders correctly', () => {
   expect(radioElement).toHaveAttribute('type', 'radio')
   expect(radioElement).toHaveAttribute('value', value)
   expect(radioElement).toHaveAttribute('id', id)
+  expect(radioElement).toHaveAttribute('aria-describedby', 'radioId-hint')
   expect(radioElement).not.toBeChecked()
 
   const labelElement = getByLabelText(label)
