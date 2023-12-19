@@ -31,7 +31,7 @@ const Provider = ({ clientId, clientSecret, wellKnown }: ProviderOptions): OAuth
   clientSecret,
   authorization: { params: { scope: 'openid email profile' } },
   idToken: true,
-  checks: ['none'],
+  checks: ['pkce', 'state'],
   // https://next-auth.js.org/configuration/providers/oauth#allowdangerousemailaccountlinking-option
   allowDangerousEmailAccountLinking: true,
   profile(profile) {
@@ -108,30 +108,6 @@ export const authOptions: AuthOptions = {
     }),
   ],
 
-  // The "checks" property in the IDG provider configuration above is temporarily set to "none" meaning the below cookie overrides are redundant.
-  cookies: {
-    pkceCodeVerifier: {
-      name: 'next-auth.pkce.code_verifier',
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 60 * 60, // 1 hour
-      },
-    },
-    state: {
-      name: 'next-auth.state',
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 60 * 60, // 1 hour
-      },
-    },
-  },
-
   // Callbacks for JWT and session management.
   callbacks: {
     jwt({ token, account, user, trigger }) {
@@ -196,15 +172,6 @@ export const authOptions: AuthOptions = {
         logger.error(error)
         return session
       }
-    },
-    redirect({ url, baseUrl }) {
-      if (url.startsWith('/')) {
-        const redirectUrl = `${baseUrl}${url}`
-        logger.info(`redirect callback - redirecting to ${redirectUrl}`)
-        return redirectUrl
-      }
-      logger.info(`redirect callback - redirecting to ${baseUrl}`)
-      return baseUrl
     },
     async signIn({ user: { email } }) {
       if (email) {

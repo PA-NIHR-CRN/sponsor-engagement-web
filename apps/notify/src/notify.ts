@@ -25,6 +25,7 @@ const sendNotifications = async () => {
       organisations: {
         some: {
           organisation: { studies: { some: { study: { isDueAssessment: true } } } },
+          isDeleted: false,
         },
       },
     },

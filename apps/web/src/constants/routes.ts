@@ -2,10 +2,16 @@
  * Signin page that unauthenticated users are redirected to
  */
 export const SIGN_IN_PAGE = '/auth/signin'
+
 /**
  * Signout page that authenticated users are redirected to when their access token has expired OR clicking logout
  */
 export const SIGN_OUT_PAGE = '/auth/signout'
+
+/**
+ * Signout page that unauthenticated users are redirected to after IDG signs out a user and redirects back to the SE app
+ */
+export const SIGN_OUT_CONFIRM_PAGE = '/auth/signout/confirmation'
 
 /**
  * List of studies that users with sponsor contact and contact manager roles can access
