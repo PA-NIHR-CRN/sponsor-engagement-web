@@ -1,18 +1,14 @@
 import clsx from 'clsx'
 import type { ReactNode } from 'react'
 
-export function Fieldset({
-  children,
-  legend,
-  legendSize = 'm',
-  className,
-  ...props
-}: {
+export interface FieldsetProps extends React.HTMLProps<HTMLFieldSetElement> {
   children: ReactNode
   legend?: string
   legendSize?: 's' | 'm' | 'l'
   className?: string
-}) {
+}
+
+export function Fieldset({ children, legend, legendSize = 'm', className, ...props }: FieldsetProps) {
   return (
     <div className={clsx('govuk-form-group', className)}>
       <fieldset className="govuk-fieldset" {...props}>
