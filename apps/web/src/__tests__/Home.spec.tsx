@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth/next'
 import type { HomeProps } from '../pages/index'
 import Home, { getServerSideProps } from '../pages/index'
 import {
+  userNoOrgs,
   userNoRoles,
   userWithContactManagerRole,
   userWithSponsorContactAndContactManagerRoles,
@@ -67,6 +68,16 @@ describe('getServerSideProps', () => {
     expect(result).toEqual({
       props: {
         user: userNoRoles.user,
+      },
+    })
+  })
+
+  test('does not redirect for Sponsor Contacts without any assigned organisations', async () => {
+    getServerSessionMock.mockResolvedValueOnce(userNoOrgs)
+    const result = await getServerSideProps(context)
+    expect(result).toEqual({
+      props: {
+        user: userNoOrgs.user,
       },
     })
   })
