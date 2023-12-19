@@ -1,16 +1,17 @@
-import { Mock } from 'ts-mockery'
 import type { UserOrganisation } from 'database'
+import { Mock } from 'ts-mockery'
+
 import { prismaMock } from '../__mocks__/prisma'
+import type {
+  OrganisationWithRelations,
+  StudyOrganisationWithRelations,
+  UserOrganisationWithRelations,
+} from './organisations'
 import {
   getOrganisationById,
   getUserOrganisationById,
   getUserOrganisations,
   isClinicalResearchSponsor,
-} from './organisations'
-import type {
-  OrganisationWithRelations,
-  StudyOrganisationWithRelations,
-  UserOrganisationWithRelations,
 } from './organisations'
 
 describe('getUserOrganisations', () => {

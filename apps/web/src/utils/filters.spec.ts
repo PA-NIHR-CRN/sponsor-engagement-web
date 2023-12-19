@@ -1,4 +1,5 @@
 import type { ParsedUrlQuery } from 'node:querystring'
+
 import { getFiltersFromQuery } from './filters'
 
 describe('getFiltersFromQuery', () => {

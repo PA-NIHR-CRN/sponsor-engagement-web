@@ -1,13 +1,14 @@
-import type { NextApiRequest } from 'next'
-import { logger } from '@nihr-ui/logger'
 import { emailService } from '@nihr-ui/email'
+import { logger } from '@nihr-ui/logger'
 import { emailTemplates } from '@nihr-ui/templates/sponsor-engagement'
+import type { NextApiRequest } from 'next'
+
+import { Roles } from '@/constants'
+import { getUserOrganisationById } from '@/lib/organisations'
+import { prismaClient } from '@/lib/prisma'
 import type { OrganisationRemoveContactInputs } from '@/utils/schemas'
 import { organisationRemoveContactSchema } from '@/utils/schemas'
 import { withApiHandler } from '@/utils/withApiHandler'
-import { getUserOrganisationById } from '@/lib/organisations'
-import { prismaClient } from '@/lib/prisma'
-import { Roles } from '@/constants'
 
 export interface ExtendedNextApiRequest extends NextApiRequest {
   body: OrganisationRemoveContactInputs

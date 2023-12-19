@@ -1,10 +1,11 @@
+import { logger } from '@nihr-ui/logger'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type { AuthOptions, Session } from 'next-auth'
 import { getServerSession } from 'next-auth'
-import { logger } from '@nihr-ui/logger'
-import { authOptions } from '../pages/api/auth/[...nextauth]'
-import { SIGN_IN_PAGE } from '../constants/routes'
+
 import type { Roles } from '../constants'
+import { SIGN_IN_PAGE } from '../constants/routes'
+import { authOptions } from '../pages/api/auth/[...nextauth]'
 import { AuthError } from './auth'
 
 interface SessionWithUser {

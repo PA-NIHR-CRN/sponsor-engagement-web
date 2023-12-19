@@ -1,8 +1,9 @@
 import type { GetServerSidePropsContext } from 'next'
-import { Mock } from 'ts-mockery'
 import { getServerSession } from 'next-auth/next'
-import type { HomeProps } from '../pages/index'
-import Home, { getServerSideProps } from '../pages/index'
+import { Mock } from 'ts-mockery'
+
+import { render } from '@/config/TestUtils'
+
 import {
   userNoRoles,
   userWithContactManagerRole,
@@ -10,7 +11,8 @@ import {
   userWithSponsorContactRole,
 } from '../__mocks__/session'
 import { ORGANISATIONS_PAGE, SIGN_OUT_CONFIRM_PAGE, STUDIES_PAGE } from '../constants/routes'
-import { render } from '@/config/TestUtils'
+import type { HomeProps } from '../pages/index'
+import Home, { getServerSideProps } from '../pages/index'
 
 jest.mock('next-auth/next')
 jest.mock('../pages/api/auth/[...nextauth]', () => ({

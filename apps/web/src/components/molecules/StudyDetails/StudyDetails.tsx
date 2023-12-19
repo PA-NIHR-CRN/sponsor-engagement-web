@@ -1,4 +1,5 @@
 import { Table } from '@nihr-ui/frontend'
+
 import type { getStudyById } from '@/lib/studies'
 
 export interface StudyDetailsProps {

@@ -1,6 +1,8 @@
 import mockRouter from 'next-router-mock'
-import { Pagination } from './Pagination'
+
 import { act, render, screen, within } from '@/config/TestUtils'
+
+import { Pagination } from './Pagination'
 
 test('No results', () => {
   render(<Pagination initialPage={0} initialPageSize={0} totalItems={0} />)

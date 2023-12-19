@@ -1,5 +1,6 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@nihr-ui/frontend'
 import clsx from 'clsx'
+
 import type { getStudyById } from '@/lib/studies'
 import { formatDate } from '@/utils/date'
 
