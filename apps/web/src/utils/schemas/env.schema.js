@@ -41,19 +41,23 @@ const envSchema = z
  * Parses and validates the environment variables using the defined schema.
  * @type {Object}
  */
-module.exports = envSchema.parse({
-  NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-  NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
-  NEXTAUTH_IDLE_TIMEOUT: process.env.NEXTAUTH_IDLE_TIMEOUT,
-  NEXTAUTH_SESSION_EXPIRY: process.env.NEXTAUTH_SESSION_EXPIRY,
-  NEXTAUTH_DEBUG: process.env.NEXTAUTH_DEBUG,
+if (process.env.ENVIRONMENT_VARIABLE_CHECKS !== 'disabled') {
+  console.info('Skipping required environment variable checks')
 
-  NEXT_PUBLIC_APP_ENV: process.env.NEXT_PUBLIC_APP_ENV,
+  module.exports = envSchema.parse({
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+    NEXTAUTH_IDLE_TIMEOUT: process.env.NEXTAUTH_IDLE_TIMEOUT,
+    NEXTAUTH_SESSION_EXPIRY: process.env.NEXTAUTH_SESSION_EXPIRY,
+    NEXTAUTH_DEBUG: process.env.NEXTAUTH_DEBUG,
 
-  AUTH_URL: process.env.AUTH_URL,
-  AUTH_WELL_KNOWN_URL: process.env.AUTH_WELL_KNOWN_URL,
-  AUTH_CLIENT_ID: process.env.AUTH_CLIENT_ID,
-  AUTH_CLIENT_SECRET: process.env.AUTH_CLIENT_SECRET,
+    NEXT_PUBLIC_APP_ENV: process.env.NEXT_PUBLIC_APP_ENV,
 
-  DATABASE_URL: process.env.DATABASE_URL,
-})
+    AUTH_URL: process.env.AUTH_URL,
+    AUTH_WELL_KNOWN_URL: process.env.AUTH_WELL_KNOWN_URL,
+    AUTH_CLIENT_ID: process.env.AUTH_CLIENT_ID,
+    AUTH_CLIENT_SECRET: process.env.AUTH_CLIENT_SECRET,
+
+    DATABASE_URL: process.env.DATABASE_URL,
+  })
+}
