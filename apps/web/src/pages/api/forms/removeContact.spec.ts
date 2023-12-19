@@ -1,18 +1,20 @@
-import { Mock } from 'ts-mockery'
-import type { RequestOptions } from 'node-mocks-http'
-import { createResponse, createRequest } from 'node-mocks-http'
+import { emailService } from '@nihr-ui/email'
+import { logger } from '@nihr-ui/logger'
 import type { NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
-import { logger } from '@nihr-ui/logger'
-import { emailService } from '@nihr-ui/email'
-import type { ExtendedNextApiRequest } from './removeContact'
-import api from './removeContact'
-import { prismaClient } from '@/lib/prisma'
-import type { OrganisationRemoveContactInputs } from '@/utils/schemas'
+import type { RequestOptions } from 'node-mocks-http'
+import { createRequest, createResponse } from 'node-mocks-http'
+import { Mock } from 'ts-mockery'
+
 import { userNoRoles, userWithContactManagerRole } from '@/__mocks__/session'
-import { AuthError } from '@/utils/auth'
 import { SIGN_IN_PAGE } from '@/constants/routes'
 import type { UserOrganisationWithRelations } from '@/lib/organisations'
+import { prismaClient } from '@/lib/prisma'
+import { AuthError } from '@/utils/auth'
+import type { OrganisationRemoveContactInputs } from '@/utils/schemas'
+
+import type { ExtendedNextApiRequest } from './removeContact'
+import api from './removeContact'
 
 jest.mock('next-auth/next')
 jest.mock('@nihr-ui/logger')

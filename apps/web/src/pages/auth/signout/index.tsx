@@ -1,12 +1,14 @@
+import { Container } from '@nihr-ui/frontend'
+import { logger } from '@nihr-ui/logger'
+import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import { getToken } from 'next-auth/jwt'
+import { getServerSession } from 'next-auth/next'
 import { getCsrfToken, getProviders, signOut } from 'next-auth/react'
 import { useEffect } from 'react'
-import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { Container } from '@nihr-ui/frontend'
-import { getServerSession } from 'next-auth/next'
-import { logger } from '@nihr-ui/logger'
-import { getToken } from 'next-auth/jwt'
-import { authOptions } from '../../api/auth/[...nextauth]'
+
 import { SIGN_IN_PAGE } from '@/constants/routes'
+
+import { authOptions } from '../../api/auth/[...nextauth]'
 
 /**
  * This sign out page provides a progressively enhanced sign out experience

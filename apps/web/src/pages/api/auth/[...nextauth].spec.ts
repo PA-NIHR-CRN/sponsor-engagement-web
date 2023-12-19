@@ -1,17 +1,19 @@
-import type { Provider } from 'next-auth/providers'
-import { Mock } from 'ts-mockery'
-import type { Session, Account } from 'next-auth'
-import type { AdapterUser } from 'next-auth/adapters'
-import type { JWT } from 'next-auth/jwt'
-import type { Prisma, UserOrganisation, UserRole } from 'database'
 import { faker } from '@faker-js/faker'
 import type { refreshTokenResponseSchema } from '@nihr-ui/auth'
 import { authService } from '@nihr-ui/auth'
-import { ZodError, type z } from 'zod'
 import { logger } from '@nihr-ui/logger'
-import { authOptions } from './[...nextauth]'
+import type { Prisma, UserOrganisation, UserRole } from 'database'
+import type { Account, Session } from 'next-auth'
+import type { AdapterUser } from 'next-auth/adapters'
+import type { JWT } from 'next-auth/jwt'
+import type { Provider } from 'next-auth/providers'
+import { Mock } from 'ts-mockery'
+import { type z, ZodError } from 'zod'
+
 import { prismaMock } from '@/__mocks__/prisma'
 import { Roles } from '@/constants/auth'
+
+import { authOptions } from './[...nextauth]'
 
 jest.mock('@nihr-ui/auth')
 jest.mock('@nihr-ui/logger')

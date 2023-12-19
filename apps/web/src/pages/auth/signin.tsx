@@ -1,12 +1,14 @@
-import { signIn, getCsrfToken, getProviders } from 'next-auth/react'
-import { useEffect } from 'react'
-import { useRouter } from 'next/router'
-import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { Container } from '@nihr-ui/frontend'
+import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import { useRouter } from 'next/router'
 import { getServerSession } from 'next-auth/next'
-import { authOptions } from '../api/auth/[...nextauth]'
+import { getCsrfToken, getProviders, signIn } from 'next-auth/react'
+import { useEffect } from 'react'
+
 import { AUTH_PROVIDER_ID } from '@/constants/auth'
 import { REGISTRATION_PAGE } from '@/constants/routes'
+
+import { authOptions } from '../api/auth/[...nextauth]'
 
 /**
  * Our protected routes redirect to this sign in page for unauthenticated users.

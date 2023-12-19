@@ -1,25 +1,28 @@
 import assert from 'node:assert'
-import { useCallback, type ReactElement } from 'react'
+
+import { zodResolver } from '@hookform/resolvers/zod'
+import { authService } from '@nihr-ui/auth'
 import { Container } from '@nihr-ui/frontend'
+import { logger } from '@nihr-ui/logger'
+import clsx from 'clsx'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { getServerSession } from 'next-auth/next'
-import { logger } from '@nihr-ui/logger'
+import { NextSeo } from 'next-seo'
+import { type ReactElement, useCallback } from 'react'
 import type { FieldError } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import clsx from 'clsx'
-import { authService } from '@nihr-ui/auth'
-import { NextSeo } from 'next-seo'
-import { authOptions } from '../api/auth/[...nextauth]'
+
+import { ErrorSummary, Fieldset, Form } from '@/components/atoms'
+import { TextInput } from '@/components/atoms/Form/TextInput/TextInput'
 import { RootLayout } from '@/components/organisms'
 import { ERROR_PAGE_500, REGISTRATION_CONFIRMATION_LINKED_PAGE, SIGN_IN_PAGE } from '@/constants/routes'
+import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
 import { prismaClient } from '@/lib/prisma'
 import { getValuesFromSearchParams } from '@/utils/form'
 import type { RegistrationInputs } from '@/utils/schemas'
 import { registrationSchema } from '@/utils/schemas'
-import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
-import { ErrorSummary, Fieldset, Form } from '@/components/atoms'
-import { TextInput } from '@/components/atoms/Form/TextInput/TextInput'
+
+import { authOptions } from '../api/auth/[...nextauth]'
 
 export type RegisterProps = InferGetServerSidePropsType<typeof getServerSideProps>
 

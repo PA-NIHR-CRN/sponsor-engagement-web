@@ -1,17 +1,18 @@
+import { HomeIcon, SettingsIcon, SideNav } from '@nihr-ui/frontend'
+import { logger } from '@nihr-ui/logger'
+import { useIdle } from '@uidotdev/usehooks'
 import { Roboto } from 'next/font/google'
 import Link from 'next/link'
 import Router, { useRouter } from 'next/router'
-import type { ReactNode } from 'react'
-import { useEffect, useState } from 'react'
-import { HomeIcon, SettingsIcon, SideNav } from '@nihr-ui/frontend'
 import type { Session } from 'next-auth'
 import { useSession } from 'next-auth/react'
-import { useIdle } from '@uidotdev/usehooks'
-import { logger } from '@nihr-ui/logger'
-import { ORGANISATIONS_PAGE, SIGN_OUT_PAGE } from '@/constants/routes'
-import { Roles } from '@/constants/auth'
-import { SERVICE_NAME } from '@/constants'
+import type { ReactNode } from 'react'
+import { useEffect, useState } from 'react'
+
 import { Header } from '@/components/molecules'
+import { SERVICE_NAME } from '@/constants'
+import { Roles } from '@/constants/auth'
+import { ORGANISATIONS_PAGE, SIGN_OUT_PAGE } from '@/constants/routes'
 
 export const primaryFont = Roboto({
   weight: ['400', '700'],

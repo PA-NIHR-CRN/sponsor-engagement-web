@@ -1,7 +1,7 @@
+import type { PolymorphicComponentPropsWithRef, PolymorphicRef } from '@nihr-ui/frontend/@types/components'
 import clsx from 'clsx'
 import type { ElementType, ReactNode } from 'react'
 import { forwardRef } from 'react'
-import type { PolymorphicComponentPropsWithRef, PolymorphicRef } from '@nihr-ui/frontend/@types/components'
 
 /**
  * HeaderTitle

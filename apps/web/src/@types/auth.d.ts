@@ -1,6 +1,5 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars -- required for type augmentation
-import type { DefaultSession, User } from 'next-auth'
 import type { UserOrganisation } from 'database'
+import type { User } from 'next-auth'
 import type { AdapterUser } from 'next-auth/adapters'
 import type { OAuthUserConfig } from 'next-auth/providers'
 

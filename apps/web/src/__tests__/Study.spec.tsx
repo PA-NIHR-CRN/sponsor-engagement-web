@@ -1,17 +1,19 @@
-import type { GetServerSidePropsContext } from 'next'
-import { Mock } from 'ts-mockery'
-import { getServerSession } from 'next-auth/next'
-import { NextSeo } from 'next-seo'
-import type { Prisma } from 'database'
 import { simpleFaker } from '@faker-js/faker'
-import mockRouter from 'next-router-mock'
 import userEvent from '@testing-library/user-event'
-import type { StudyProps } from '../pages/studies/[studyId]'
-import Study, { getServerSideProps } from '../pages/studies/[studyId]'
+import type { Prisma } from 'database'
+import type { GetServerSidePropsContext } from 'next'
+import { getServerSession } from 'next-auth/next'
+import mockRouter from 'next-router-mock'
+import { NextSeo } from 'next-seo'
+import { Mock } from 'ts-mockery'
+
+import { render, screen, within } from '@/config/TestUtils'
+
+import { prismaMock } from '../__mocks__/prisma'
 import { userWithContactManagerRole, userWithSponsorContactRole } from '../__mocks__/session'
 import { SIGN_IN_PAGE, SUPPORT_PAGE } from '../constants/routes'
-import { prismaMock } from '../__mocks__/prisma'
-import { render, screen, within } from '@/config/TestUtils'
+import type { StudyProps } from '../pages/studies/[studyId]'
+import Study, { getServerSideProps } from '../pages/studies/[studyId]'
 
 jest.mock('next-auth/next')
 jest.mock('next-seo')

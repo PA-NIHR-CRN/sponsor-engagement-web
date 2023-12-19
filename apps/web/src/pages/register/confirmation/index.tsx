@@ -1,9 +1,10 @@
-import type { ReactElement } from 'react'
 import { Container, NotificationBanner } from '@nihr-ui/frontend'
-import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { getServerSession } from 'next-auth/next'
 import { logger } from '@nihr-ui/logger'
+import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
+import { getServerSession } from 'next-auth/next'
+import type { ReactElement } from 'react'
+
 import { RootLayout } from '@/components/organisms'
 import { ERROR_PAGE_500, SIGN_IN_PAGE } from '@/constants/routes'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'

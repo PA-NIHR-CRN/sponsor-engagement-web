@@ -1,8 +1,10 @@
 import userEvent from '@testing-library/user-event'
 import type { FormEvent } from 'react'
 import React from 'react'
-import { Sort } from './Sort'
+
 import { render, screen } from '@/config/TestUtils'
+
+import { Sort } from './Sort'
 
 test('Sorting', async () => {
   const onSubmitSpy = jest.fn().mockImplementation((e: FormEvent<HTMLFormElement>) => {

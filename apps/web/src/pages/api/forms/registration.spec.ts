@@ -1,18 +1,20 @@
-import type { RequestOptions } from 'node-mocks-http'
-import { createResponse, createRequest } from 'node-mocks-http'
-import type { NextApiResponse } from 'next'
-import type { z } from 'zod'
-import { ZodError } from 'zod'
-import { logger } from '@nihr-ui/logger'
 import { faker } from '@faker-js/faker'
-import { Mock } from 'ts-mockery'
 import type { createUserResponseSchema } from '@nihr-ui/auth'
 import { authService } from '@nihr-ui/auth'
-import type { ExtendedNextApiRequest } from './registration'
-import api from './registration'
+import { logger } from '@nihr-ui/logger'
+import type { NextApiResponse } from 'next'
+import type { RequestOptions } from 'node-mocks-http'
+import { createRequest, createResponse } from 'node-mocks-http'
+import { Mock } from 'ts-mockery'
+import type { z } from 'zod'
+import { ZodError } from 'zod'
+
 import type { Prisma } from '@/lib/prisma'
 import { prismaClient } from '@/lib/prisma'
 import type { RegistrationInputs } from '@/utils/schemas'
+
+import type { ExtendedNextApiRequest } from './registration'
+import api from './registration'
 
 jest.mock('next-auth/next')
 jest.mock('@nihr-ui/logger')

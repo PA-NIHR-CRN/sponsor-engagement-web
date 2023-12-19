@@ -1,17 +1,19 @@
-import type { GetServerSidePropsContext } from 'next'
-import { Mock } from 'ts-mockery'
-import { getServerSession } from 'next-auth/next'
-import { NextSeo } from 'next-seo'
 import { logger } from '@nihr-ui/logger'
-import mockRouter from 'next-router-mock'
 import userEvent from '@testing-library/user-event'
-import type { OrganisationProps } from '../pages/organisations/[organisationId]'
-import Organisation, { getServerSideProps } from '../pages/organisations/[organisationId]'
+import type { GetServerSidePropsContext } from 'next'
+import { getServerSession } from 'next-auth/next'
+import mockRouter from 'next-router-mock'
+import { NextSeo } from 'next-seo'
+import { Mock } from 'ts-mockery'
+
+import { render, screen, within } from '@/config/TestUtils'
+
+import { prismaMock } from '../__mocks__/prisma'
 import { userWithContactManagerRole, userWithSponsorContactRole } from '../__mocks__/session'
 import { SIGN_IN_PAGE } from '../constants/routes'
-import { prismaMock } from '../__mocks__/prisma'
 import type { OrganisationWithRelations } from '../lib/organisations'
-import { render, screen, within } from '@/config/TestUtils'
+import type { OrganisationProps } from '../pages/organisations/[organisationId]'
+import Organisation, { getServerSideProps } from '../pages/organisations/[organisationId]'
 
 jest.mock('@nihr-ui/logger')
 jest.mock('next-auth/next')

@@ -1,5 +1,6 @@
-import type { Session } from 'next-auth'
 import type { UserOrganisation } from 'database'
+import type { Session } from 'next-auth'
+
 import { Roles } from '../constants/auth'
 
 const defaults: Omit<Session, 'user'> = {

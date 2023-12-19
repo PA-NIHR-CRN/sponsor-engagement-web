@@ -1,9 +1,10 @@
-import type { ReactElement } from 'react'
 import { Container } from '@nihr-ui/frontend'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { getServerSession } from 'next-auth/next'
+import type { ReactElement } from 'react'
+
 import { RootLayout } from '../components/organisms'
-import { ORGANISATIONS_PAGE, ERROR_PAGE_500, STUDIES_PAGE, SIGN_OUT_CONFIRM_PAGE } from '../constants/routes'
+import { ERROR_PAGE_500, ORGANISATIONS_PAGE, SIGN_OUT_CONFIRM_PAGE, STUDIES_PAGE } from '../constants/routes'
 import { isContactManager, isContactManagerAndSponsorContact, isSponsorContact } from '../utils/auth'
 import { authOptions } from './api/auth/[...nextauth]'
 
