@@ -15,6 +15,7 @@ declare namespace NodeJS {
     IDG_API_PASSWORD: string
 
     NEXT_PUBLIC_APP_ENV: 'dev' | 'test' | 'uat' | 'oat' | 'prod' | undefined
+    NEXT_PUBLIC_CLOUDWATCH_RUM_APP_ID: string
     DATABASE_URL: string
   }
 }
