@@ -174,7 +174,15 @@ Studies.getLayout = function getLayout(page: ReactElement, { user }: StudiesProp
 
 export const getServerSideProps = withServerSideProps(Roles.SponsorContact, async (context, session) => {
   try {
-    const organisationIds = session.user?.organisations.map((userOrg) => userOrg.organisationId) || []
+    if (!session.user?.organisations.length) {
+      return {
+        redirect: {
+          destination: '/',
+        },
+      }
+    }
+
+    const organisationIds = session.user.organisations.map((userOrg) => userOrg.organisationId)
 
     const searchParams = new URLSearchParams({
       q: context.query.q ? String(context.query.q) : '',

@@ -6,7 +6,7 @@ import { simpleFaker } from '@faker-js/faker'
 import mockRouter from 'next-router-mock'
 import type { StudiesProps } from '../pages/studies'
 import Studies, { getServerSideProps } from '../pages/studies'
-import { userWithContactManagerRole, userWithSponsorContactRole } from '../__mocks__/session'
+import { userNoOrgs, userWithContactManagerRole, userWithSponsorContactRole } from '../__mocks__/session'
 import { SIGN_IN_PAGE, SUPPORT_PAGE } from '../constants/routes'
 import { prismaMock } from '../__mocks__/prisma'
 import { render, within, screen } from '@/config/TestUtils'
@@ -30,6 +30,17 @@ describe('getServerSideProps', () => {
 
   test('redirects back to the homepage for users without sponsor contact role', async () => {
     getServerSessionMock.mockResolvedValueOnce(userWithContactManagerRole)
+
+    const result = await getServerSideProps(context)
+    expect(result).toEqual({
+      redirect: {
+        destination: '/',
+      },
+    })
+  })
+
+  test('redirects back to the homepage for users without any assigned organisations', async () => {
+    getServerSessionMock.mockResolvedValueOnce(userNoOrgs)
 
     const result = await getServerSideProps(context)
     expect(result).toEqual({

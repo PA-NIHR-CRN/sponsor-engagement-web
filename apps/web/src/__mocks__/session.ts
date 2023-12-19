@@ -35,7 +35,7 @@ export const userNoOrgs: Session = {
     id: 123,
     name: 'Test User',
     email: 'testuser@nihr.ac.uk',
-    roles: [],
+    roles: [Roles.SponsorContact],
     organisations: [],
   },
 }
