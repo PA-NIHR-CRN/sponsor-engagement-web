@@ -1,10 +1,12 @@
 import type { ParsedUrlQuery } from 'node:querystring'
+
+import { CrossIcon } from '@nihr-ui/frontend'
 import clsx from 'clsx'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import type { ReactNode } from 'react'
-import { CrossIcon } from '@nihr-ui/frontend'
-import type { FilterKey, FilterValue, Filters } from '@/@types/filters'
+
+import type { FilterKey, Filters, FilterValue } from '@/@types/filters'
 import { SELECTABLE_FILTERS } from '@/constants'
 
 export interface SelectedFiltersProps {

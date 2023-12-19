@@ -2,9 +2,10 @@ import clsx from 'clsx'
 import type { ReactNode } from 'react'
 import { Children, cloneElement, forwardRef, isValidElement } from 'react'
 import type { FieldErrors } from 'react-hook-form'
+
+import type { CheckboxProps } from '../Checkbox/Checkbox'
 import { ErrorInline } from '../ErrorInline/ErrorInline'
 import { Fieldset } from '../Fieldset/Fieldset'
-import type { CheckboxProps } from '../Checkbox/Checkbox'
 
 interface CheckboxGroupProps {
   children: ReactNode

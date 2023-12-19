@@ -1,4 +1,5 @@
 import type { ParsedUrlQuery } from 'node:querystring'
+
 import type { Filters, OrderType } from '../@types/filters'
 
 export const getFiltersFromQuery = (query: ParsedUrlQuery) => {

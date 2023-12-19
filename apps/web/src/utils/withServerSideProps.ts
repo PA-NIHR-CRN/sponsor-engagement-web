@@ -1,9 +1,10 @@
 import type { GetServerSidePropsContext } from 'next'
 import type { Session } from 'next-auth'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '../pages/api/auth/[...nextauth]'
-import { SIGN_IN_PAGE } from '../constants/routes'
+
 import type { Roles } from '../constants'
+import { SIGN_IN_PAGE } from '../constants/routes'
+import { authOptions } from '../pages/api/auth/[...nextauth]'
 
 export const withServerSideProps =
   <R>(role: Roles, getServerSideProps: (context: GetServerSidePropsContext, session: Session) => R) =>

@@ -1,6 +1,6 @@
 import type { OrderType } from '../@types/filters'
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
-import { organisationRoleShortName, type OrganisationRoleShortName } from './organisations'
+import { type OrganisationRoleShortName, organisationRoleShortName } from './organisations'
 import { Prisma, prismaClient } from './prisma'
 
 const sortMap = {

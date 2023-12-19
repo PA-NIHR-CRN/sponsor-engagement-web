@@ -1,5 +1,6 @@
 import { Head, Html, Main, NextScript } from 'next/document'
 import { NextSeo } from 'next-seo'
+
 import { SERVICE_NAME } from '../constants'
 
 export default function Document() {

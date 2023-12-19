@@ -1,13 +1,15 @@
 import userEvent from '@testing-library/user-event'
 import mockRouter from 'next-router-mock'
+
+import { render, screen } from '@/config/TestUtils'
+import { STUDIES_PAGE } from '@/constants/routes'
+
 import type { FiltersProps } from './Filters'
 import { Filters } from './Filters'
-import { STUDIES_PAGE } from '@/constants/routes'
-import { render, screen } from '@/config/TestUtils'
 
 const defaultProps: FiltersProps = {
   filters: { page: 1 },
-  searchLabel: 'Search study title, protocol number or IRAS ID',
+  searchLabel: 'Search study title, protocol number, IRAS ID or CPMS ID',
 }
 
 beforeEach(() => {

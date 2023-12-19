@@ -225,27 +225,29 @@ export const SideNavLink = forwardRef(
     const { open } = useSideNav()
 
     return (
-      <Component
-        ref={ref}
-        href={href}
-        className={clsx(
-          'text-[var(--colour-cobalt)] navigation-link navigation-link--active govuk-!-padding-left-3 govuk-!-padding-right-3 govuk-!-padding-top-3 govuk-!-padding-bottom-3 govuk-link govuk-link--no-visited-state flex items-center text-sm no-underline hover:underline',
-          { 'w-[calc(var(--side-nav-width-expanded) - 1.5rem)]': open },
-          className
-        )}
-        {...props}
-      >
-        <div>{icon}</div>
-        <span
+      <li>
+        <Component
+          ref={ref}
+          href={href}
           className={clsx(
-            '-translate-x-3 transform whitespace-nowrap opacity-0 transition duration-200 ease-in-out motion-reduce:transform-none motion-reduce:opacity-100 motion-reduce:transition-none',
-            { 'translate-x-0 opacity-100': open, 'govuk-!-margin-left-4': !!icon },
+            'text-[var(--colour-cobalt)] navigation-link navigation-link--active govuk-!-padding-left-3 govuk-!-padding-right-3 govuk-!-padding-top-3 govuk-!-padding-bottom-3 govuk-link govuk-link--no-visited-state flex items-center text-sm no-underline hover:underline',
+            { 'w-[calc(var(--side-nav-width-expanded) - 1.5rem)]': open },
             className
           )}
+          {...props}
         >
-          {children}
-        </span>
-      </Component>
+          <div>{icon}</div>
+          <span
+            className={clsx(
+              '-translate-x-3 transform whitespace-nowrap opacity-0 transition duration-200 ease-in-out motion-reduce:transform-none motion-reduce:opacity-100 motion-reduce:transition-none',
+              { 'translate-x-0 opacity-100': open, 'govuk-!-margin-left-4': !!icon },
+              className
+            )}
+          >
+            {children}
+          </span>
+        </Component>
+      </li>
     )
   }
 )

@@ -1,11 +1,13 @@
-import type { GetServerSidePropsContext } from 'next'
-import { Mock } from 'ts-mockery'
-import { getServerSession } from 'next-auth/next'
 import { logger } from '@nihr-ui/logger'
-import RegistrationConfirmation, { getServerSideProps } from '../pages/register/confirmation'
+import type { GetServerSidePropsContext } from 'next'
+import { getServerSession } from 'next-auth/next'
+import { Mock } from 'ts-mockery'
+
+import { render, screen, within } from '@/config/TestUtils'
+
 import { userNoRoles } from '../__mocks__/session'
 import { ERROR_PAGE_500, SIGN_IN_PAGE } from '../constants/routes'
-import { render, screen, within } from '@/config/TestUtils'
+import RegistrationConfirmation, { getServerSideProps } from '../pages/register/confirmation'
 
 jest.mock('@nihr-ui/logger')
 jest.mock('next-auth/next')

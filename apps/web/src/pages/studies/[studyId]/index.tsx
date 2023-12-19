@@ -1,16 +1,17 @@
-import type { ReactElement } from 'react'
 import { Container, NotificationBanner, Table } from '@nihr-ui/frontend'
 import type { InferGetServerSidePropsType } from 'next'
-import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { NextSeo } from 'next-seo'
+import type { ReactElement } from 'react'
+
+import { AssessmentHistory, getAssessmentHistoryFromStudy, RequestSupport, StudyDetails } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
-import { AssessmentHistory, RequestSupport, StudyDetails, getAssessmentHistoryFromStudy } from '@/components/molecules'
+import { Roles } from '@/constants'
+import { SUPPORT_PAGE } from '@/constants/routes'
 import { getStudyById } from '@/lib/studies'
 import { formatDate } from '@/utils/date'
 import { withServerSideProps } from '@/utils/withServerSideProps'
-import { Roles } from '@/constants'
-import { SUPPORT_PAGE } from '@/constants/routes'
 
 const renderNotificationBanner = (success: boolean) =>
   success ? (

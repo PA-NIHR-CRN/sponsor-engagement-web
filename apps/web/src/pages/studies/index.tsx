@@ -1,31 +1,32 @@
-import type { ReactElement } from 'react'
 import { AlertIcon, Container, Details, NotificationBanner } from '@nihr-ui/frontend'
-import type { InferGetServerSidePropsType } from 'next'
-import { NextSeo } from 'next-seo'
-import { useRouter } from 'next/router'
-import Link from 'next/link'
 import { logger } from '@nihr-ui/logger'
-import { RootLayout } from '@/components/organisms'
+import type { InferGetServerSidePropsType } from 'next'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { NextSeo } from 'next-seo'
+import type { ReactElement } from 'react'
+
+import type { OrderType } from '@/@types/filters'
+import { Card } from '@/components/atoms'
 import {
-  RequestSupport,
-  StudyList,
-  Pagination,
-  Sort,
   Filters,
+  Pagination,
+  RequestSupport,
   SelectedFilters,
+  Sort,
   StudiesListSkeleton,
+  StudyList,
 } from '@/components/molecules'
+import { RootLayout } from '@/components/organisms'
 import { Roles, STUDIES_PER_PAGE } from '@/constants'
-import { pluraliseStudy } from '@/utils/pluralise'
+import { SUPPORT_PAGE } from '@/constants/routes'
+import { useFormListeners } from '@/hooks/useFormListeners'
+import { isClinicalResearchSponsor } from '@/lib/organisations'
 import { getStudiesForOrgs } from '@/lib/studies'
 import { formatDate } from '@/utils/date'
-import { isClinicalResearchSponsor } from '@/lib/organisations'
-import { useFormListeners } from '@/hooks/useFormListeners'
 import { getFiltersFromQuery } from '@/utils/filters'
-import { Card } from '@/components/atoms'
+import { pluraliseStudy } from '@/utils/pluralise'
 import { withServerSideProps } from '@/utils/withServerSideProps'
-import { SUPPORT_PAGE } from '@/constants/routes'
-import type { OrderType } from '@/@types/filters'
 
 const renderNotificationBanner = (success: boolean) =>
   success ? (
@@ -94,7 +95,7 @@ export default function Studies({
             <Filters
               filters={filters}
               onFilterChange={handleFilterChange}
-              searchLabel="Search study title, protocol number or IRAS ID"
+              searchLabel="Search study title, protocol number, IRAS ID or CPMS ID"
             />
           </div>
 
@@ -174,7 +175,15 @@ Studies.getLayout = function getLayout(page: ReactElement, { user }: StudiesProp
 
 export const getServerSideProps = withServerSideProps(Roles.SponsorContact, async (context, session) => {
   try {
-    const organisationIds = session.user?.organisations.map((userOrg) => userOrg.organisationId) || []
+    if (!session.user?.organisations.length) {
+      return {
+        redirect: {
+          destination: '/',
+        },
+      }
+    }
+
+    const organisationIds = session.user.organisations.map((userOrg) => userOrg.organisationId)
 
     const searchParams = new URLSearchParams({
       q: context.query.q ? String(context.query.q) : '',

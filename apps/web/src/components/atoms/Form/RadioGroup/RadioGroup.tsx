@@ -2,6 +2,7 @@ import clsx from 'clsx'
 import type { ReactNode } from 'react'
 import { Children, cloneElement, forwardRef, isValidElement } from 'react'
 import type { FieldErrors } from 'react-hook-form'
+
 import { ErrorInline } from '../ErrorInline/ErrorInline'
 import { Fieldset } from '../Fieldset/Fieldset'
 import type { RadioProps } from '../Radio/Radio'
@@ -23,12 +24,17 @@ export const RadioGroup = forwardRef<HTMLInputElement, RadioGroupProps>(
     return (
       <div className={clsx('govuk-form-group', { 'govuk-form-group--error': Boolean(error) })}>
         <Fieldset
+          aria-describedby={clsx({
+            [`${rest.name}-error`]: error,
+          })}
           aria-errormessage={clsx({
             [`${rest.name}-error`]: error,
           })}
           aria-invalid={error ? 'true' : 'false'}
+          aria-required={required}
           legend={label}
           legendSize="s"
+          role="radiogroup"
         >
           <div className="govuk-radios" data-module="govuk-radios">
             <div className="govuk-label-wrapper">
@@ -54,9 +60,6 @@ export const RadioGroup = forwardRef<HTMLInputElement, RadioGroupProps>(
                     defaultChecked: defaultValue === child.props.value,
                     'aria-required': required,
                     'aria-invalid': error ? 'true' : 'false',
-                    'aria-errormessage': clsx({
-                      [`${rest.name}-error`]: error,
-                    }),
                   } as RadioProps)}
                 </>
               ) : null

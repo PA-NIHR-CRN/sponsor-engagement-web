@@ -23,7 +23,9 @@ module.exports = {
   plugins: ['simple-import-sort', 'unused-imports', 'jest'],
   parserOptions: {
     project,
+    sourceType: 'module',
   },
+  env: { es6: true },
   globals: {
     React: true,
     JSX: true,
@@ -58,5 +60,14 @@ module.exports = {
       },
     ],
     'no-console': 'off',
+
+    // https://github.com/lydell/eslint-plugin-simple-import-sort
+    'import/order': 'off',
+    'sort-imports': 'off',
+    'simple-import-sort/imports': 'error',
+    'simple-import-sort/exports': 'error',
+    'import/first': 'error',
+    'import/newline-after-import': 'error',
+    'import/no-duplicates': 'error',
   },
 }

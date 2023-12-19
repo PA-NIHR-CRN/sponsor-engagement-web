@@ -1,19 +1,21 @@
-import type { GetServerSidePropsContext } from 'next'
-import { Mock } from 'ts-mockery'
-import { getServerSession } from 'next-auth/next'
-import { NextSeo } from 'next-seo'
-import type { Prisma } from 'database'
 import { simpleFaker } from '@faker-js/faker'
-import userEvent from '@testing-library/user-event'
-import mockRouter from 'next-router-mock'
 import { logger } from '@nihr-ui/logger'
+import userEvent from '@testing-library/user-event'
+import type { Prisma } from 'database'
+import type { GetServerSidePropsContext } from 'next'
+import { getServerSession } from 'next-auth/next'
+import mockRouter from 'next-router-mock'
+import { NextSeo } from 'next-seo'
+import { Mock } from 'ts-mockery'
+
+import { render, screen, within } from '@/config/TestUtils'
+
+import { prismaMock } from '../__mocks__/prisma'
+import { userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
+import { sysRefAssessmentFurtherInformation, sysRefAssessmentStatus } from '../__mocks__/sysRefData'
+import { SIGN_IN_PAGE, SUPPORT_PAGE } from '../constants/routes'
 import type { AssessmentProps } from '../pages/assessments/[studyId]'
 import Assessment, { getServerSideProps } from '../pages/assessments/[studyId]'
-import { userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
-import { SIGN_IN_PAGE, SUPPORT_PAGE } from '../constants/routes'
-import { prismaMock } from '../__mocks__/prisma'
-import { sysRefAssessmentFurtherInformation, sysRefAssessmentStatus } from '../__mocks__/sysRefData'
-import { render, within, screen } from '@/config/TestUtils'
 
 jest.mock('next-auth/next')
 jest.mock('next-seo')
@@ -219,7 +221,7 @@ describe('Assess progress of a study', () => {
     ).toBeInTheDocument()
 
     // Form Input - Status
-    const statusFieldset = screen.getByRole('group', { name: 'Is this study progressing as planned?' })
+    const statusFieldset = screen.getByRole('radiogroup', { name: 'Is this study progressing as planned?' })
 
     expect(within(statusFieldset).getByLabelText('On track')).toBeInTheDocument()
     expect(within(statusFieldset).getByLabelText('On track')).toHaveAccessibleDescription(
@@ -429,9 +431,9 @@ describe('Form submission failures', () => {
     ).not.toBeInTheDocument()
 
     // Field errors
-    expect(screen.getByRole('group', { name: 'Is this study progressing as planned?' })).toHaveAccessibleErrorMessage(
-      'Error: Select how the study is progressing'
-    )
+    expect(
+      screen.getByRole('radiogroup', { name: 'Is this study progressing as planned?' })
+    ).toHaveAccessibleErrorMessage('Error: Select how the study is progressing')
     expect(
       screen.getByRole('group', {
         name: 'Is there any additional information that would help NIHR CRN understand this progress assessment?',
@@ -467,9 +469,9 @@ describe('Form submission failures', () => {
     ).not.toBeInTheDocument()
 
     // Field errors
-    expect(screen.getByRole('group', { name: 'Is this study progressing as planned?' })).toHaveAccessibleErrorMessage(
-      'Error: Select how the study is progressing'
-    )
+    expect(
+      screen.getByRole('radiogroup', { name: 'Is this study progressing as planned?' })
+    ).toHaveAccessibleErrorMessage('Error: Select how the study is progressing')
     expect(
       screen.getByRole('group', {
         name: 'Is there any additional information that would help NIHR CRN understand this progress assessment?',

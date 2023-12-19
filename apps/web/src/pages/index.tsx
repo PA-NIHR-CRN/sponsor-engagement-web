@@ -1,9 +1,10 @@
-import type { ReactElement } from 'react'
 import { Container } from '@nihr-ui/frontend'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { getServerSession } from 'next-auth/next'
+import type { ReactElement } from 'react'
+
 import { RootLayout } from '../components/organisms'
-import { ORGANISATIONS_PAGE, ERROR_PAGE_500, SIGN_IN_PAGE, STUDIES_PAGE } from '../constants/routes'
+import { ERROR_PAGE_500, ORGANISATIONS_PAGE, SIGN_OUT_CONFIRM_PAGE, STUDIES_PAGE } from '../constants/routes'
 import { isContactManager, isContactManagerAndSponsorContact, isSponsorContact } from '../utils/auth'
 import { authOptions } from './api/auth/[...nextauth]'
 
@@ -33,13 +34,13 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     if (!session?.user) {
       return {
         redirect: {
-          destination: SIGN_IN_PAGE,
+          destination: SIGN_OUT_CONFIRM_PAGE,
         },
       }
     }
 
     const {
-      user: { roles },
+      user: { roles, organisations },
     } = session
 
     if (isContactManager(roles)) {
@@ -50,7 +51,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       }
     }
 
-    if (isSponsorContact(roles) || isContactManagerAndSponsorContact(roles)) {
+    if ((isSponsorContact(roles) || isContactManagerAndSponsorContact(roles)) && organisations.length > 0) {
       return {
         redirect: {
           destination: STUDIES_PAGE,

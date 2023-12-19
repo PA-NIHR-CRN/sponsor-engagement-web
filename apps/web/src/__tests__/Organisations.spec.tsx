@@ -1,15 +1,17 @@
+import { simpleFaker } from '@faker-js/faker'
+import type { Prisma } from 'database'
 import type { GetServerSidePropsContext } from 'next'
-import { Mock } from 'ts-mockery'
 import { getServerSession } from 'next-auth/next'
 import { NextSeo } from 'next-seo'
-import type { Prisma } from 'database'
-import { simpleFaker } from '@faker-js/faker'
-import type { OrganisationsProps } from '../pages/organisations'
-import Organisations, { getServerSideProps } from '../pages/organisations'
+import { Mock } from 'ts-mockery'
+
+import { render, screen, within } from '@/config/TestUtils'
+
+import { prismaMock } from '../__mocks__/prisma'
 import { userNoRoles, userWithContactManagerRole } from '../__mocks__/session'
 import { SIGN_IN_PAGE } from '../constants/routes'
-import { prismaMock } from '../__mocks__/prisma'
-import { render, within, screen } from '@/config/TestUtils'
+import type { OrganisationsProps } from '../pages/organisations'
+import Organisations, { getServerSideProps } from '../pages/organisations'
 
 jest.mock('next-auth/next')
 jest.mock('next-seo')
