@@ -40,7 +40,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     }
 
     const {
-      user: { roles },
+      user: { roles, organisations },
     } = session
 
     if (isContactManager(roles)) {
@@ -51,7 +51,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       }
     }
 
-    if (isSponsorContact(roles) || isContactManagerAndSponsorContact(roles)) {
+    if ((isSponsorContact(roles) || isContactManagerAndSponsorContact(roles)) && organisations.length > 0) {
       return {
         redirect: {
           destination: STUDIES_PAGE,
