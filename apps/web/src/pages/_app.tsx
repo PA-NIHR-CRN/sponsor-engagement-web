@@ -6,6 +6,7 @@ import type { ReactElement, ReactNode } from 'react'
 import type { Session } from 'next-auth'
 import { SessionProvider } from 'next-auth/react'
 import { RootLayout, primaryFont } from '../components/organisms'
+import RealtimeApplicationMonitoringInit from '@/components/molecules/Analytics/RealtimeApplicationMonitoring'
 
 export type NextPageWithLayout<P = Record<string, unknown>, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement, props: P) => ReactNode
@@ -34,6 +35,7 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
 
   return (
     <SessionProvider session={session}>
+      <RealtimeApplicationMonitoringInit />
       <style global jsx>
         {`
         html {
