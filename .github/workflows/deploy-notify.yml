@@ -20,7 +20,8 @@ jobs:
         run: npm ci --no-audit --no-fund
       - name: Build
         run: |
-          touch .env.local
+          touch apps/web/.env.local
+          echo ENVIRONMENT_VARIABLE_CHECKS=disabled >> apps/web/.env.local
           npm run db:generate
           npm run build
 
