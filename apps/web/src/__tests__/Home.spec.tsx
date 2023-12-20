@@ -100,6 +100,6 @@ describe('Homepage for users with no role', () => {
     expect(
       getByRole('heading', { level: 2, name: 'Your details are not associated with any account on this application' })
     ).toBeInTheDocument()
-    expect(getByText('Please contact crn.servicedesk@nihr.ac.uk for further assistance.')).toBeInTheDocument()
+    expect(getByText('Please contact supportmystudy@nihr.ac.uk for further assistance.')).toBeInTheDocument()
   })
 })
