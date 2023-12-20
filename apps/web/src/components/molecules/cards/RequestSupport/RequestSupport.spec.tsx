@@ -1,8 +1,10 @@
-import React from 'react'
 import mockRouter from 'next-router-mock'
-import { RequestSupport } from './RequestSupport'
-import { SUPPORT_PAGE } from '@/constants/routes'
+import React from 'react'
+
 import { render, screen } from '@/config/TestUtils'
+import { SUPPORT_PAGE } from '@/constants/routes'
+
+import { RequestSupport } from './RequestSupport'
 
 describe('RequestSupport Component', () => {
   test('renders a card without a call to action', () => {

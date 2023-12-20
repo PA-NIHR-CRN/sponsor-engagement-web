@@ -1,15 +1,17 @@
-import type { GetServerSidePropsContext } from 'next'
-import { Mock } from 'ts-mockery'
-import { getServerSession } from 'next-auth/next'
-import { NextSeo } from 'next-seo'
 import { simpleFaker } from '@faker-js/faker'
+import type { GetServerSidePropsContext } from 'next'
+import { getServerSession } from 'next-auth/next'
 import mockRouter from 'next-router-mock'
+import { NextSeo } from 'next-seo'
+import { Mock } from 'ts-mockery'
+
+import { render, screen, within } from '@/config/TestUtils'
+
+import { prismaMock } from '../__mocks__/prisma'
+import { userNoOrgs, userWithContactManagerRole, userWithSponsorContactRole } from '../__mocks__/session'
+import { SIGN_IN_PAGE, SUPPORT_PAGE } from '../constants/routes'
 import type { StudiesProps } from '../pages/studies'
 import Studies, { getServerSideProps } from '../pages/studies'
-import { userWithContactManagerRole, userWithSponsorContactRole } from '../__mocks__/session'
-import { SIGN_IN_PAGE, SUPPORT_PAGE } from '../constants/routes'
-import { prismaMock } from '../__mocks__/prisma'
-import { render, within, screen } from '@/config/TestUtils'
 
 jest.mock('next-auth/next')
 jest.mock('next-seo')
@@ -30,6 +32,17 @@ describe('getServerSideProps', () => {
 
   test('redirects back to the homepage for users without sponsor contact role', async () => {
     getServerSessionMock.mockResolvedValueOnce(userWithContactManagerRole)
+
+    const result = await getServerSideProps(context)
+    expect(result).toEqual({
+      redirect: {
+        destination: '/',
+      },
+    })
+  })
+
+  test('redirects back to the homepage for users without any assigned organisations', async () => {
+    getServerSessionMock.mockResolvedValueOnce(userNoOrgs)
 
     const result = await getServerSideProps(context)
     expect(result).toEqual({

@@ -2,6 +2,7 @@ import clsx from 'clsx'
 import type { ReactNode } from 'react'
 import { forwardRef } from 'react'
 import type { FieldErrors } from 'react-hook-form'
+
 import { ErrorInline } from '../ErrorInline/ErrorInline'
 
 interface TextInputProps extends React.HTMLProps<HTMLInputElement> {

@@ -1,8 +1,9 @@
-import { Mock } from 'ts-mockery'
 import { Prisma, type Study } from 'database'
+import { Mock } from 'ts-mockery'
+
 import { prismaMock } from '../__mocks__/prisma'
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
-import { getStudyById, getStudiesForOrgs } from './studies'
+import { getStudiesForOrgs, getStudyById } from './studies'
 
 describe('getStudiesForOrgs', () => {
   const mockStudies = [Mock.of<Study>({ id: 1, title: 'Study 1' }), Mock.of<Study>({ id: 2, title: 'Study 2' })]

@@ -1,18 +1,19 @@
+import { authService } from '@nihr-ui/auth'
+import { logger } from '@nihr-ui/logger'
 import type { AuthOptions } from 'next-auth'
 import NextAuth from 'next-auth'
-import type { OAuthConfig } from 'next-auth/providers'
-import { logger } from '@nihr-ui/logger'
-import { authService } from '@nihr-ui/auth'
 import type { JWT } from 'next-auth/jwt'
+import type { OAuthConfig } from 'next-auth/providers'
+
+import type { OAuthProfile, ProviderOptions } from '@/@types/auth'
 import {
   AUTH_PROVIDER_ID,
   AUTH_PROVIDER_NAME,
   AUTH_PROVIDER_TYPE,
   AUTH_SESSION_EXPIRY_FALLBACK,
 } from '@/constants/auth'
-import { prismaClient } from '@/lib/prisma'
 import { getUserOrganisations } from '@/lib/organisations'
-import type { OAuthProfile, ProviderOptions } from '@/@types/auth'
+import { prismaClient } from '@/lib/prisma'
 
 /**
  * Custom OAuth provider configuration for NextAuth.

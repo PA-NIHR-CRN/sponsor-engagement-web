@@ -1,5 +1,5 @@
 import { Roles } from '../constants/auth'
-import { isContactManager, isSponsorContact, isContactManagerAndSponsorContact } from './auth'
+import { isContactManager, isContactManagerAndSponsorContact, isSponsorContact } from './auth'
 
 describe('Authentication utility functions', () => {
   describe('isContactManager', () => {

@@ -1,6 +1,8 @@
 import { NextSeo } from 'next-seo'
-import RequestSupport from '../pages/request-support'
+
 import { render, screen } from '@/config/TestUtils'
+
+import RequestSupport from '../pages/request-support'
 
 jest.mock('next-seo')
 

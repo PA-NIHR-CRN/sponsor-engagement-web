@@ -1,7 +1,8 @@
+import { logger } from '@nihr-ui/logger'
+import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { Mock } from 'ts-mockery'
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { logger } from '@nihr-ui/logger'
+
 import { userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
 import { Roles } from '../constants'
 import { withApiHandler } from './withApiHandler'

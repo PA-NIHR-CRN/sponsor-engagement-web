@@ -1,10 +1,12 @@
+import { logger } from '@nihr-ui/logger'
 import userEvent from '@testing-library/user-event'
 import axios from 'axios'
 import { useRouter } from 'next/router'
 import type { FieldValues, UseFormHandleSubmit } from 'react-hook-form'
-import { logger } from '@nihr-ui/logger'
-import { Form } from './Form'
+
 import { render, screen } from '@/config/TestUtils'
+
+import { Form } from './Form'
 
 // Mock next/router
 jest.mock('next/router', () => ({

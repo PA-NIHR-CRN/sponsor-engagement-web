@@ -1,17 +1,18 @@
-import clsx from 'clsx'
-import Image from 'next/image'
-import { useRef } from 'react'
 import {
-  Logo,
-  SideNav,
-  SettingsIcon,
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuTrigger,
+  Logo,
+  SettingsIcon,
+  SideNav,
 } from '@nihr-ui/frontend'
-import type { Session } from 'next-auth'
+import clsx from 'clsx'
+import Image from 'next/image'
 import Link from 'next/link'
+import type { Session } from 'next-auth'
+import { useRef } from 'react'
+
 import { HeaderTitle } from './Title'
 
 interface HeaderProps {

@@ -1,7 +1,7 @@
 /* eslint-env jest -- set environment to jest */
 import '@testing-library/jest-dom'
 
-import { TextEncoder, TextDecoder } from 'node:util'
+import { TextDecoder, TextEncoder } from 'node:util'
 
 jest.mock('axios-rate-limit')
 

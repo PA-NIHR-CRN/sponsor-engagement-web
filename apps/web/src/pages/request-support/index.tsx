@@ -1,8 +1,9 @@
 import { Container } from '@nihr-ui/frontend'
-import type { ReactElement } from 'react'
+import type { GetServerSidePropsContext } from 'next'
 import Link from 'next/link'
 import { NextSeo } from 'next-seo'
-import type { GetServerSidePropsContext } from 'next'
+import type { ReactElement } from 'react'
+
 import { RootLayout } from '@/components/organisms'
 
 export interface RequestSupportProps {

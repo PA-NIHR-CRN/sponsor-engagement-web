@@ -1,7 +1,9 @@
 import type { FieldErrors } from 'react-hook-form'
+
+import { render } from '@/config/TestUtils'
+
 import { Radio } from '../Radio/Radio'
 import { RadioGroup } from './RadioGroup'
-import { render } from '@/config/TestUtils'
 
 test('Renders correctly without errors or hint', () => {
   const label = 'Radio Group Label'
@@ -17,7 +19,7 @@ test('Renders correctly without errors or hint', () => {
     </RadioGroup>
   )
 
-  const labelElement = getByRole('group', { name: label })
+  const labelElement = getByRole('radiogroup', { name: label })
   expect(labelElement).toBeInTheDocument()
 
   const radioElement = getByLabelText('option2') as HTMLInputElement
@@ -50,8 +52,9 @@ test('Renders correctly with errors and hint', () => {
     </RadioGroup>
   )
 
-  const labelElement = getByRole('group', { name: label })
+  const labelElement = getByRole('radiogroup', { name: label })
   expect(labelElement).toBeInTheDocument()
+  expect(labelElement).toHaveAccessibleErrorMessage('Error: Radio group error message')
 
   const radioElement = getByLabelText('option3') as HTMLInputElement
   expect(radioElement).toBeInTheDocument()

@@ -4,6 +4,7 @@ import { render } from '@testing-library/react'
 import { SessionProvider } from 'next-auth/react'
 import type { ReactElement } from 'react'
 import React from 'react'
+
 import { userNoRoles } from '../__mocks__/session'
 
 function AllTheProviders({ children }: { children: React.ReactNode }) {

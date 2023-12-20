@@ -1,5 +1,6 @@
 import { Container } from '@nihr-ui/frontend'
 import type { ReactElement } from 'react'
+
 import { RootLayout } from '../components/organisms'
 
 export default function ServiceUnavailable() {

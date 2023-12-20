@@ -1,6 +1,8 @@
 import React from 'react'
-import { Checkbox } from './Checkbox'
+
 import { render } from '@/config/TestUtils'
+
+import { Checkbox } from './Checkbox'
 
 test('renders correctly', () => {
   const label = 'Checkbox Label'

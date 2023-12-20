@@ -1,5 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
 import { logger } from '@nihr-ui/logger'
+import type { NextApiRequest, NextApiResponse } from 'next'
+
 import handler from './signout'
 
 jest.mock('@nihr-ui/logger', () => ({

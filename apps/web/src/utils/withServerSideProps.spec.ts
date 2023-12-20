@@ -1,9 +1,10 @@
+import type { GetServerSideProps, GetServerSidePropsContext } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { Mock } from 'ts-mockery'
-import type { GetServerSideProps, GetServerSidePropsContext } from 'next'
-import { SIGN_IN_PAGE } from '../constants/routes'
+
 import { userNoRoles, userWithContactManagerRole, userWithSponsorContactRole } from '../__mocks__/session'
 import { Roles } from '../constants'
+import { SIGN_IN_PAGE } from '../constants/routes'
 import { withServerSideProps } from './withServerSideProps'
 
 jest.mock('next-auth/next')

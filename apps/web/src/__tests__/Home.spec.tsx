@@ -1,16 +1,19 @@
 import type { GetServerSidePropsContext } from 'next'
-import { Mock } from 'ts-mockery'
 import { getServerSession } from 'next-auth/next'
-import type { HomeProps } from '../pages/index'
-import Home, { getServerSideProps } from '../pages/index'
+import { Mock } from 'ts-mockery'
+
+import { render } from '@/config/TestUtils'
+
 import {
+  userNoOrgs,
   userNoRoles,
   userWithContactManagerRole,
   userWithSponsorContactAndContactManagerRoles,
   userWithSponsorContactRole,
 } from '../__mocks__/session'
 import { ORGANISATIONS_PAGE, SIGN_OUT_CONFIRM_PAGE, STUDIES_PAGE } from '../constants/routes'
-import { render } from '@/config/TestUtils'
+import type { HomeProps } from '../pages/index'
+import Home, { getServerSideProps } from '../pages/index'
 
 jest.mock('next-auth/next')
 jest.mock('../pages/api/auth/[...nextauth]', () => ({
@@ -67,6 +70,16 @@ describe('getServerSideProps', () => {
     expect(result).toEqual({
       props: {
         user: userNoRoles.user,
+      },
+    })
+  })
+
+  test('does not redirect for Sponsor Contacts without any assigned organisations', async () => {
+    getServerSessionMock.mockResolvedValueOnce(userNoOrgs)
+    const result = await getServerSideProps(context)
+    expect(result).toEqual({
+      props: {
+        user: userNoOrgs.user,
       },
     })
   })
