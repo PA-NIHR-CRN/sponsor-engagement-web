@@ -41,7 +41,6 @@ const envSchema = z
  * Parses and validates the environment variables using the defined schema.
  * @type {Object}
  */
-console.log('ENV: ', process.env)
 if (process.env.ENVIRONMENT_VARIABLE_CHECKS !== 'disabled') {
   module.exports = envSchema.parse({
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
