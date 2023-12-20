@@ -313,7 +313,7 @@ const setAssessmentDue = async (lapsePeriodMonths: number) => {
     where: {
       id: { in: studyEntities.map((study) => study.id) },
       evaluationCategories: {
-        some: {},
+        some: { isDeleted: false },
       },
       assessments: {
         every: {
