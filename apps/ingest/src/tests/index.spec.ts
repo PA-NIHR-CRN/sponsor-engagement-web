@@ -224,7 +224,7 @@ describe('ingest', () => {
       where: {
         id: { in: studyEntities.map(({ id }) => id) },
         evaluationCategories: {
-          some: {},
+          some: { isDeleted: false },
         },
         assessments: {
           every: {
