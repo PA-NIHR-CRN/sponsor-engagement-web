@@ -1,15 +1,15 @@
 import { devices, PlaywrightTestConfig } from '@playwright/test'
 
 const config: PlaywrightTestConfig = {
-  testDir: './qa/tests/features',
-  outputDir: './qa/test-results',
+  testDir: './tests/features',
+  outputDir: './test-results',
   testMatch: /features/,
   testIgnore: '**/apps/**',
   reporter: [
     ['list', { printSteps: true }],
-    ['html', { outputFolder: './qa/test-report' }],
+    ['html', { outputFolder: './test-report' }],
   ],
-  globalSetup: './qa/hooks/GlobalSetup.ts',
+  globalSetup: './hooks/GlobalSetup.ts',
   timeout: 30000,
   // workers: 6, // to enforce parallel workers in Actions Workflow
   retries: 2,

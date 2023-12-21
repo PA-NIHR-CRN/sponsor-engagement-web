@@ -16,7 +16,10 @@ export default function Home() {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <h2 className="govuk-heading-l">Your details are not associated with any account on this application</h2>
-          <p className="govuk-body">Please contact crn.servicedesk@nihr.ac.uk for further assistance.</p>
+          <p className="govuk-body">
+            The Sponsor Engagement Tool is for use by project sponsors or their delegates in CRO/CTU organisations only.
+          </p>
+          <p className="govuk-body">Please contact supportmystudy@nihr.ac.uk for further assistance.</p>
         </div>
       </div>
     </Container>

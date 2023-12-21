@@ -1,3 +1,4 @@
+import './src/config/jest/jest.env'
 import type { Config } from 'jest'
 import nextJest from 'next/jest.js'
 
@@ -23,10 +24,10 @@ const customJestConfig: Config = {
   coveragePathIgnorePatterns: ['node_modules'],
   coverageThreshold: {
     global: {
-      lines: 0,
-      functions: 0,
-      branches: 0,
-      statements: 0,
+      lines: 89,
+      functions: 87,
+      branches: 80,
+      statements: 88,
     },
   },
   collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}', '!qa/**'],
