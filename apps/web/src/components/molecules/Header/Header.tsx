@@ -17,7 +17,7 @@ import { HeaderTitle } from './Title'
 
 interface HeaderProps {
   heading: string
-  user: Session['user']
+  user?: Session['user']
 }
 
 export function Header({ heading, user }: HeaderProps) {
@@ -43,19 +43,21 @@ export function Header({ heading, user }: HeaderProps) {
             <div className="flex items-center justify-center">
               {user ? <span className="hidden text-sm md:block">{user.email}</span> : null}
 
-              <DropdownMenu>
-                <DropdownMenuTrigger className="ml-3 hidden text-white md:block focusable no-js:hidden">
-                  <span className="govuk-visually-hidden">Settings menu</span>
-                  <SettingsIcon />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem asChild>
-                    <Link className="govuk-link--no-visited-state" href="/auth/signout">
-                      Logout
-                    </Link>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="ml-3 text-white focusable no-js:hidden">
+                    <span className="govuk-visually-hidden">Settings menu</span>
+                    <SettingsIcon />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem asChild>
+                      <Link className="govuk-link--no-visited-state" href="/auth/signout">
+                        Logout
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : null}
 
               {/* No JavaScript fallback */}
               <Link className="govuk-link--inverse js:hidden govuk-!-margin-left-4" href="/auth/signout">
