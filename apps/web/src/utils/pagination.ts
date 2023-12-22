@@ -6,12 +6,17 @@ export function generateTruncatedPagination(totalPages: number, currentPage: num
   const fixedLength = 7 // Desired fixed length
 
   // Logic to determine which pages should be shown without ellipses
-  if (currentPage <= (fixedLength - 1) / 2) {
+  if (totalPages <= fixedLength) {
+    // If total pages is less than or equal to the fixed length, display all pages
+    for (let i = 1; i <= totalPages; i++) {
+      result.push(i)
+    }
+  } else if (currentPage <= (fixedLength - 1) / 2) {
     for (let i = 1; i <= fixedLength - 2 && i < totalPages; i++) {
       // Ensure i doesn't exceed totalPages
       result.push(i)
     }
-    if (totalPages > fixedLength - 1 && result[result.length - 1] !== totalPages - 1) {
+    if (result[result.length - 1] !== totalPages - 1) {
       result.push('...')
       result.push(totalPages)
     } else if (result[result.length - 1] !== totalPages) {
