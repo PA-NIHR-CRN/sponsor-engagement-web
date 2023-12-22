@@ -86,3 +86,13 @@ test('Clicking the settings button icon toggles the settings menu open', async (
   expect(within(openMenu).getAllByRole('menuitem')).toHaveLength(1)
   expect(within(openMenu).getByRole('menuitem', { name: 'Logout' })).toBeInTheDocument()
 })
+
+test('Does not show settings menu for logged out users', () => {
+  const { queryByRole } = render(
+    <SideNavProvider>
+      <Header heading="Test Heading" />
+    </SideNavProvider>
+  )
+
+  expect(queryByRole('button', { name: 'Settings menu' })).not.toBeInTheDocument()
+})
