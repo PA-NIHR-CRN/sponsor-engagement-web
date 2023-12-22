@@ -34,7 +34,6 @@ describe('StudyDetails Component', () => {
     const aboutHeaders = within(table).getAllByRole('rowheader')
     expect(aboutHeaders.map((header) => header.textContent)).toEqual([
       'Study full title',
-      'Protocol reference number',
       'IRAS ID',
       'CPMS ID',
       'Sponsor',
@@ -47,7 +46,6 @@ describe('StudyDetails Component', () => {
     const aboutRows = within(table).getAllByRole('row')
     expect(aboutRows.map((row) => within(row).getByRole('cell').textContent)).toEqual([
       'Study Title',
-      'Protocol123',
       'IRAS456',
       '12345',
       'Sponsor Org',
@@ -83,7 +81,6 @@ describe('StudyDetails Component', () => {
     const aboutHeaders = within(table).getAllByRole('rowheader')
     expect(aboutHeaders.map((header) => header.textContent)).toEqual([
       'Study full title',
-      'Protocol reference number',
       'IRAS ID',
       'CPMS ID',
       'Sponsor',
@@ -95,6 +92,51 @@ describe('StudyDetails Component', () => {
     expect(aboutRows.map((row) => within(row).getByRole('cell').textContent)).toEqual([
       'Study Title',
       'None available',
+      '12345',
+      'Sponsor Org',
+      'Specialty Name',
+      'None available',
+    ])
+  })
+
+  test('renders "Protocol reference number" for commercial studies only', () => {
+    const props: StudyDetailsProps = Mock.of<StudyDetailsProps>({
+      study: {
+        title: 'Study Title',
+        protocolReferenceNumber: '123',
+        irasId: null,
+        cpmsId: 12345,
+        organisations: [{ organisation: { name: 'Sponsor Org' } }],
+        organisationsByRole: {
+          Sponsor: 'Sponsor Org',
+        },
+        route: 'Commercial',
+        managingSpeciality: 'Specialty Name',
+        chiefInvestigatorFirstName: null,
+        chiefInvestigatorLastName: null,
+      },
+    })
+
+    render(<StudyDetails {...props} />)
+
+    const table = screen.getByRole('table', { name: 'About this study' })
+    expect(table).toBeInTheDocument()
+
+    const aboutHeaders = within(table).getAllByRole('rowheader')
+    expect(aboutHeaders.map((header) => header.textContent)).toEqual([
+      'Study full title',
+      'Protocol reference number',
+      'IRAS ID',
+      'CPMS ID',
+      'Sponsor',
+      'Managing specialty',
+      'Chief investigator',
+    ])
+
+    const aboutRows = within(table).getAllByRole('row')
+    expect(aboutRows.map((row) => within(row).getByRole('cell').textContent)).toEqual([
+      'Study Title',
+      '123',
       'None available',
       '12345',
       'Sponsor Org',

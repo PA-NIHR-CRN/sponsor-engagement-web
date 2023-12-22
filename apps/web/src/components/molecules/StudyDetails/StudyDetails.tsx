@@ -15,10 +15,12 @@ export function StudyDetails({ study }: StudyDetailsProps) {
           <Table.CellHeader className="w-1/3">Study full title</Table.CellHeader>
           <Table.Cell>{study.title}</Table.Cell>
         </Table.Row>
-        <Table.Row>
-          <Table.CellHeader className="w-1/3">Protocol reference number</Table.CellHeader>
-          <Table.Cell>{study.protocolReferenceNumber ?? 'None available'}</Table.Cell>
-        </Table.Row>
+        {study.route === 'Commercial' && (
+          <Table.Row>
+            <Table.CellHeader className="w-1/3">Protocol reference number</Table.CellHeader>
+            <Table.Cell>{study.protocolReferenceNumber ?? 'None available'}</Table.Cell>
+          </Table.Row>
+        )}
         <Table.Row>
           <Table.CellHeader className="w-1/3">IRAS ID</Table.CellHeader>
           <Table.Cell>{study.irasId ?? 'None available'}</Table.Cell>
