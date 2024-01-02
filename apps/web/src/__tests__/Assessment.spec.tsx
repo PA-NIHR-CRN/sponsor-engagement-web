@@ -334,7 +334,6 @@ describe('Expanding the show study details accordion', () => {
     const aboutHeaders = within(table).getAllByRole('rowheader')
     expect(aboutHeaders.map((header) => header.textContent)).toEqual([
       'Study full title',
-      'Protocol reference number',
       'IRAS ID',
       'CPMS ID',
       'Sponsor',
@@ -345,7 +344,6 @@ describe('Expanding the show study details accordion', () => {
     const aboutRows = within(table).getAllByRole('row')
     expect(aboutRows.map((row) => within(row).getByRole('cell').textContent)).toEqual([
       study.title,
-      'None available',
       'None available',
       `${study.cpmsId}`,
       study.organisations[0].organisation.name,

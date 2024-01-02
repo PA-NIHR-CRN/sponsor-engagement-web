@@ -353,7 +353,6 @@ const fetchStudies = async function* (url: string, username: string, password: s
             StudyStatus.InSetupApprovalReceived,
             StudyStatus.OpenToRecruitment,
             StudyStatus.OpenActivelyRecruiting,
-            StudyStatus.ClosedInFollowUp,
             StudyStatus.SuspendedOpenRecruitment,
             StudyStatus.SuspendedActivelyRecruiting,
           ],
