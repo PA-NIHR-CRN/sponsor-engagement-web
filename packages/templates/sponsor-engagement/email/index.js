@@ -34,7 +34,7 @@ templates['assessment-reminder.html.hbs'] = handlebars.template({
             })
           : helper)
       ) +
-      "' style='display:block; width: 35px; height: 35px;' />\r\n        <span style='margin-left: 10px; margin-top: 3px;'>There are 1 or more studies to assess</span>\r\n      </p>\r\n\r\n      <p>Hello,</p>\r\n\r\n      <p>You are nominated as a Sponsor contact for studies on the NIHR Clinical Research Network’s (CRN) research\r\n        portfolio. One or more studies require an update on their status. Please sign in to the Sponsor Engagement Tool\r\n        to provide these updates.</p>\r\n\r\n      <a\r\n        href='" +
+      "' style='display:block; width: 35px; height: 35px;' />\r\n        <span style='margin-left: 10px; margin-top: 3px;'>There are one or more studies to assess</span>\r\n      </p>\r\n\r\n      <p>Hello,</p>\r\n\r\n      <p>You are nominated as a Sponsor contact for studies on the NIHR Clinical Research Network’s (CRN) research\r\n        portfolio. One or more studies require an update on their status. Please sign in to the Sponsor Engagement Tool\r\n        to provide these updates.</p>\r\n\r\n      <a\r\n        href='" +
       alias4(
         ((helper =
           (helper =
@@ -124,7 +124,7 @@ templates['assessment-reminder.text.hbs'] = handlebars.template({
         }
 
     return (
-      '# Assess progress of research studies in NIHR CRN portfolio\r\n\r\nThere are 1 or more studies to assess\r\n\r\nSign-in [' +
+      '# Assess progress of research studies in NIHR CRN portfolio\r\n\r\nThere are one or more studies to assess\r\n\r\nSign-in [' +
       alias4(
         ((helper =
           (helper =
