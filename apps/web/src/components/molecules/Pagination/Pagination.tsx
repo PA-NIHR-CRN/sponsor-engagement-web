@@ -37,6 +37,8 @@ export function Pagination({ initialPage, initialPageSize, totalItems, className
 
   const pages = generateTruncatedPagination(totalPages, currentPage + 1)
 
+  const { success: _, ...query } = router.query
+
   return (
     <nav aria-label="results" className={clsx('govuk-pagination', className)} role="navigation">
       {previousEnabled ? (
@@ -45,7 +47,7 @@ export function Pagination({ initialPage, initialPageSize, totalItems, className
             className="govuk-link govuk-pagination__link govuk-link--no-visited-state"
             href={{
               pathname: router.pathname,
-              query: { ...router.query, page: currentPage },
+              query: { ...query, page: currentPage },
             }}
             onClick={setPreviousPage}
             rel="prev"
@@ -86,7 +88,7 @@ export function Pagination({ initialPage, initialPageSize, totalItems, className
                   className="govuk-link govuk-pagination__link govuk-link--no-visited-state"
                   href={{
                     pathname: router.pathname,
-                    query: { ...router.query, page },
+                    query: { ...query, page },
                   }}
                   onClick={() => {
                     setPage(Number(page) - 1)
@@ -105,7 +107,7 @@ export function Pagination({ initialPage, initialPageSize, totalItems, className
             className="govuk-link govuk-pagination__link govuk-link--no-visited-state"
             href={{
               pathname: router.pathname,
-              query: { ...router.query, page: currentPage + 2 },
+              query: { ...query, page: currentPage + 2 },
             }}
             onClick={setNextPage}
             rel="next"

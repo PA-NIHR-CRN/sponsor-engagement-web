@@ -116,3 +116,13 @@ test('Forward/back updates the set page', async () => {
   expect(within(pagination).getByRole('link', { name: 'Page 1' })).toHaveAttribute('aria-current', 'page')
   expect(within(pagination).getByRole('link', { name: 'Page 2' })).not.toHaveAttribute('aria-current')
 })
+
+test('Removes success query param', async () => {
+  await mockRouter.push('?page=1&success=1')
+
+  render(<Pagination initialPage={1} initialPageSize={4} totalItems={5} />)
+
+  const pagination = screen.getByRole('navigation', { name: 'results' })
+
+  expect(within(pagination).getByRole('link', { name: 'Page 1' })).toHaveAttribute('href', '/?page=1')
+})
