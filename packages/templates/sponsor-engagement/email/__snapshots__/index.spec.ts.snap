@@ -9,7 +9,7 @@ exports[`Email template "assessment-reminder.html.hbs" displays correctly 1`] = 
 
       <p style='font-size: 19px; font-weight:700; display: flex;'>
         <img src='http://localhost:3000/assets/images/exclamation-icon.png' style='display:block; width: 35px; height: 35px;' />
-        <span style='margin-left: 10px; margin-top: 3px;'>There are 1 or more studies to assess</span>
+        <span style='margin-left: 10px; margin-top: 3px;'>There are one or more studies to assess</span>
       </p>
 
       <p>Hello,</p>
@@ -197,7 +197,7 @@ exports[`Email template "assessment-reminder.html.hbs" displays correctly 1`] = 
 exports[`Email template "assessment-reminder.text.hbs" displays correctly 1`] = `
 "# Assess progress of research studies in NIHR CRN portfolio
 
-There are 1 or more studies to assess
+There are one or more studies to assess
 
 Sign-in [http://localhost:3000/auth/signin]
 
