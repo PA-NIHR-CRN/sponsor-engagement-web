@@ -24,5 +24,6 @@ describe('generateTruncatedPagination', () => {
 
   test('totalPages less than fixedLength', () => {
     expect(generateTruncatedPagination(5, 3)).toEqual([1, 2, 3, 4, 5])
+    expect(generateTruncatedPagination(5, 4)).toEqual([1, 2, 3, 4, 5])
   })
 })
