@@ -247,7 +247,8 @@ const createStudyRelationships = async () => {
     .map((study) =>
       study.StudyEvaluationCategories.map((category) => {
         const studyId = studyEntities.find((studyEntity) => studyEntity.cpmsId === study.Id)!.id
-        return {
+
+        const evaluationCategoryData = {
           studyId,
           indicatorType: category.EvaluationCategoryType,
           indicatorValue: category.EvaluationCategoryValue,
@@ -262,17 +263,26 @@ const createStudyRelationships = async () => {
           actualOpeningDate: category.ActualOpeningDate ? new Date(category.ActualOpeningDate) : undefined,
           actualClosureDate: category.ActualClosureDate ? new Date(category.ActualClosureDate) : undefined,
           expectedReopenDate: category.ExpectedReopenDate ? new Date(category.ExpectedReopenDate) : undefined,
+          isDeleted: false,
         }
+
+        return prismaClient.studyEvaluationCategory.upsert({
+          where: {
+            studyId_indicatorValue: {
+              studyId,
+              indicatorValue: category.EvaluationCategoryValue,
+            },
+          },
+          update: evaluationCategoryData,
+          create: evaluationCategoryData,
+        })
       })
     )
     .flat()
 
-  const evaluationCategoriesResult = await prismaClient.studyEvaluationCategory.createMany({
-    data: evaluationCategoryInputs,
-    skipDuplicates: true,
-  })
+  const evaluationCategories = await Promise.all(evaluationCategoryInputs)
 
-  logger.info(`Added ${evaluationCategoriesResult.count} study evaluation categories`)
+  logger.info(`Added or updated ${evaluationCategories.length} study evaluation categories`)
 
   // Delete study evaluation categories
   const deletedEvaluationCategoryIds = studyEntities
@@ -280,7 +290,7 @@ const createStudyRelationships = async () => {
       study.evaluationCategories
         .filter(
           (evalCategory) =>
-            !evaluationCategoryInputs.some(
+            !evaluationCategories.some(
               ({ studyId, indicatorValue }) => studyId === study.id && indicatorValue === evalCategory.indicatorValue
             )
         )
@@ -288,16 +298,10 @@ const createStudyRelationships = async () => {
     )
     .flat()
 
-  const [, { count: deletedEvalCategoryCount }] = await prismaClient.$transaction([
-    prismaClient.studyEvaluationCategory.updateMany({
-      where: { studyId: { in: studyEntityIds }, NOT: { id: { in: deletedEvaluationCategoryIds } } },
-      data: { isDeleted: false },
-    }),
-    prismaClient.studyEvaluationCategory.updateMany({
-      where: { id: { in: deletedEvaluationCategoryIds }, isDeleted: false },
-      data: { isDeleted: true },
-    }),
-  ])
+  const { count: deletedEvalCategoryCount } = await prismaClient.studyEvaluationCategory.updateMany({
+    where: { id: { in: deletedEvaluationCategoryIds }, isDeleted: false },
+    data: { isDeleted: true },
+  })
 
   if (deletedEvalCategoryCount > 0) {
     logger.info('Flagged %s study evaluation categories as deleted', deletedEvalCategoryCount)

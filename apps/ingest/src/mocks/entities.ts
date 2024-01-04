@@ -2,6 +2,7 @@ import type {
   Organisation as OrganisationEntity,
   OrganisationRole as OrganisationRoleEntity,
   SysRefOrganisationRole as SysRefOrganisationRoleEntity,
+  StudyEvaluationCategory as EvalCategoryEntity,
 } from 'database'
 import { simpleFaker } from '@faker-js/faker'
 import { Mock } from 'ts-mockery'
@@ -22,7 +23,7 @@ const organisationRoleNameToId = Object.fromEntries(
 
 export const studyEntities = studies.Result.Studies.map((study) =>
   Mock.of<StudyWithRelationships>({
-    id: simpleFaker.number.int(),
+    id: study.Id,
     cpmsId: study.Id,
     title: study.Title,
     shortTitle: study.ShortName,
@@ -64,3 +65,22 @@ export const organisationRoleEntities = getOrgsUniqueByNameRole(studies.Result.S
     roleId: organisationRoleNameToId[org.OrganisationRole],
   })
 )
+
+export const evalCategoryEntities = studies.Result.Studies.map((study) =>
+  study.StudyEvaluationCategories.map((category) =>
+    Mock.of<EvalCategoryEntity>({
+      studyId: study.Id,
+      indicatorType: category.EvaluationCategoryType,
+      indicatorValue: category.EvaluationCategoryValue,
+      sampleSize: category.SampleSize,
+      totalRecruitmentToDate: category.TotalRecruitmentToDate,
+      plannedOpeningDate: category.PlannedRecruitmentStartDate
+        ? new Date(category.PlannedRecruitmentStartDate)
+        : undefined,
+      plannedClosureDate: category.PlannedRecruitmentEndDate ? new Date(category.PlannedRecruitmentEndDate) : undefined,
+      actualOpeningDate: category.ActualOpeningDate ? new Date(category.ActualOpeningDate) : undefined,
+      actualClosureDate: category.ActualClosureDate ? new Date(category.ActualClosureDate) : undefined,
+      expectedReopenDate: category.ExpectedReopenDate ? new Date(category.ExpectedReopenDate) : undefined,
+    })
+  )
+).flat()

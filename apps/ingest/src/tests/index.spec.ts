@@ -7,6 +7,7 @@ import {
   organisationRoleEntities,
   organisationRoleRefEntities,
   studyEntities,
+  evalCategoryEntities,
 } from '../mocks/entities'
 import { prismaMock } from '../mocks/prisma'
 import studies from '../mocks/studies.json'
@@ -37,11 +38,12 @@ beforeEach(() => {
   organisationRoleRefEntities.forEach((entity) =>
     prismaMock.sysRefOrganisationRole.upsert.mockResolvedValueOnce(entity)
   )
+  evalCategoryEntities.forEach((entity) => prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(entity))
 
   prismaMock.organisationRole.createMany.mockResolvedValueOnce({ count: 1 })
   prismaMock.studyOrganisation.createMany.mockResolvedValueOnce({ count: 1 })
   prismaMock.studyFunder.createMany.mockResolvedValueOnce({ count: 1 })
-  prismaMock.studyEvaluationCategory.createMany.mockResolvedValueOnce({ count: 1 })
+  prismaMock.studyEvaluationCategory.updateMany.mockResolvedValueOnce({ count: 1 })
   prismaMock.study.updateMany.mockResolvedValueOnce({ count: 1 })
 
   prismaMock.study.findMany.mockResolvedValueOnce(studyEntities)
@@ -191,24 +193,31 @@ describe('ingest', () => {
   it('should seed the study evaluation categories', async () => {
     await ingest()
 
-    expect(prismaMock.studyEvaluationCategory.createMany).toHaveBeenCalledTimes(1)
+    expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(6)
 
-    expect(prismaMock.studyEvaluationCategory.createMany).toHaveBeenCalledWith({
-      data: expect.arrayContaining([
-        expect.objectContaining({
-          studyId: studyEntities[0].id,
-          indicatorType: 'Recruitment concerns',
-          indicatorValue: 'Recruitment target met',
-          sampleSize: 444,
-          totalRecruitmentToDate: 683,
-          plannedOpeningDate: expect.any(Date),
-          plannedClosureDate: expect.any(Date),
-          actualOpeningDate: expect.any(Date),
-          actualClosureDate: expect.any(Date),
-          expectedReopenDate: expect.any(Date),
-        }),
-      ]),
-      skipDuplicates: true,
+    const expectedData = {
+      studyId: evalCategoryEntities[0].studyId,
+      indicatorType: 'Recruitment concerns',
+      indicatorValue: 'Recruitment target met',
+      sampleSize: 444,
+      totalRecruitmentToDate: 683,
+      plannedOpeningDate: expect.any(Date),
+      plannedClosureDate: expect.any(Date),
+      actualOpeningDate: expect.any(Date),
+      actualClosureDate: expect.any(Date),
+      expectedReopenDate: expect.any(Date),
+      isDeleted: false,
+    }
+
+    expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledWith({
+      where: {
+        studyId_indicatorValue: {
+          studyId: evalCategoryEntities[0].studyId,
+          indicatorValue: evalCategoryEntities[0].indicatorValue,
+        },
+      },
+      update: expect.objectContaining(expectedData),
+      create: expect.objectContaining(expectedData),
     })
   })
 
@@ -376,15 +385,6 @@ describe('ingest', () => {
     const expectedDeletedEvalCategoryIds = studyEntities[studyEntities.length - 1].evaluationCategories.map(
       ({ id }) => id
     )
-
-    // Sets all existing evaluation categories to be isDeleted = false
-    expect(prismaMock.studyEvaluationCategory.updateMany).toHaveBeenCalledWith({
-      where: {
-        studyId: { in: studyEntities.map(({ id }) => id) },
-        NOT: { id: { in: expectedDeletedEvalCategoryIds } },
-      },
-      data: { isDeleted: false },
-    })
 
     // Sets evaluation categories not seen during ingest as isDeleted = true
     expect(prismaMock.studyEvaluationCategory.updateMany).toHaveBeenCalledWith({

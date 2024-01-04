@@ -85,12 +85,26 @@
         "ActualClosureDate": "2002-03-31T00:00:00",
         "StudyEvaluationCategories": [
           {
-            "EvaluationCategoryType": "Recruitment",
-            "EvaluationCategoryValue": "Study is behind planned recruitment"
+            "EvaluationCategoryType": "Recruitment concerns",
+            "EvaluationCategoryValue": "Recruitment target met",
+            "SampleSize": 444,
+            "TotalRecruitmentToDate": 683,
+            "PlannedRecruitmentStartDate": "2018-03-01T00:00:00",
+            "PlannedRecruitmentEndDate": "2025-03-31T00:00:00",
+            "ActualOpeningDate": "2018-03-01T00:00:00",
+            "ActualClosureDate": "2003-02-28T00:00:00",
+            "ExpectedReopenDate": "2003-02-28T00:00:00"
           },
           {
-            "EvaluationCategoryType": "Milestone",
-            "EvaluationCategoryValue": "Study is past planned opening date"
+            "EvaluationCategoryType": "Recruitment concerns",
+            "EvaluationCategoryValue": "No recruitment in past 6 months",
+            "SampleSize": 444,
+            "TotalRecruitmentToDate": 683,
+            "PlannedRecruitmentStartDate": "2018-03-01T00:00:00",
+            "PlannedRecruitmentEndDate": "2025-03-31T00:00:00",
+            "ActualOpeningDate": "2018-03-01T00:00:00",
+            "ActualClosureDate": null,
+            "ExpectedReopenDate": null
           }
         ],
         "StudySponsors": [
@@ -148,12 +162,26 @@
         "ActualClosureDate": "2002-01-31T00:00:00",
         "StudyEvaluationCategories": [
           {
-            "EvaluationCategoryType": "Milestone",
-            "EvaluationCategoryValue": "Study is past planned opening date"
+            "EvaluationCategoryType": "Recruitment concerns",
+            "EvaluationCategoryValue": "Recruitment target met",
+            "SampleSize": 444,
+            "TotalRecruitmentToDate": 683,
+            "PlannedRecruitmentStartDate": "2018-03-01T00:00:00",
+            "PlannedRecruitmentEndDate": "2025-03-31T00:00:00",
+            "ActualOpeningDate": "2018-03-01T00:00:00",
+            "ActualClosureDate": "2003-02-28T00:00:00",
+            "ExpectedReopenDate": "2003-02-28T00:00:00"
           },
           {
-            "EvaluationCategoryType": "Recruitment",
-            "EvaluationCategoryValue": "Study is behind planned recruitment"
+            "EvaluationCategoryType": "Recruitment concerns",
+            "EvaluationCategoryValue": "No recruitment in past 6 months",
+            "SampleSize": 444,
+            "TotalRecruitmentToDate": 683,
+            "PlannedRecruitmentStartDate": "2018-03-01T00:00:00",
+            "PlannedRecruitmentEndDate": "2025-03-31T00:00:00",
+            "ActualOpeningDate": "2018-03-01T00:00:00",
+            "ActualClosureDate": null,
+            "ExpectedReopenDate": null
           }
         ],
         "StudySponsors": [
