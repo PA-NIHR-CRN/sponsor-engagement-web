@@ -22,7 +22,7 @@ describe('EmailService', () => {
 
   it('should send an email with the correct parameters', async () => {
     // Mock SES sendEmail
-    const sendEmailMock = jest.fn().mockResolvedValue({})
+    const sendEmailMock = jest.fn().mockResolvedValue({ MessageId: '123' })
     sesClientMock.sendEmail = jest.fn().mockReturnValueOnce({ promise: sendEmailMock })
 
     const templateData = { name: 'John Doe' }
@@ -35,7 +35,12 @@ describe('EmailService', () => {
       templateData,
     }
 
-    await emailService.sendEmail(emailData)
+    const result = await emailService.sendEmail(emailData)
+
+    expect(result).toStrictEqual({
+      messageId: '123',
+      recipients: ['recipient@example.com'],
+    })
 
     expect(emailData.htmlTemplate).toHaveBeenCalledWith(templateData)
     expect(emailData.textTemplate).toHaveBeenCalledWith(templateData)
@@ -60,9 +65,33 @@ describe('EmailService', () => {
     )
   })
 
+  it('should handle errors when sending an email', async () => {
+    // Mock SES sendEmail
+    const sendEmailMock = jest.fn().mockRejectedValueOnce(new Error('test error'))
+    sesClientMock.sendEmail = jest.fn().mockReturnValueOnce({ promise: sendEmailMock })
+
+    const templateData = { name: 'John Doe' }
+
+    const emailData: EmailArgs = {
+      to: 'recipient@example.com',
+      subject: 'Test Subject',
+      htmlTemplate: jest.fn(() => 'html'),
+      textTemplate: jest.fn(() => 'text'),
+      templateData,
+    }
+
+    await expect(emailService.sendEmail(emailData)).rejects.toThrow('test error')
+
+    expect(logger.error).toHaveBeenCalledWith(
+      'Error occurred sending email notification to %s with subject %s',
+      'recipient@example.com',
+      'Test Subject'
+    )
+  })
+
   it('should send a bulk email with the correct parameters', async () => {
     // Mock SES sendEmail
-    const sendEmailMock = jest.fn().mockResolvedValue({})
+    const sendEmailMock = jest.fn().mockResolvedValue({ MessageId: 123 })
     sesClientMock.sendEmail = jest.fn().mockReturnValue({ promise: sendEmailMock })
 
     const templateData = { name: 'John Doe' }
@@ -114,6 +143,18 @@ describe('EmailService', () => {
       },
     })
 
+    expect(onSuccessSpy).toHaveBeenCalledTimes(2)
+
+    expect(onSuccessSpy).toHaveBeenCalledWith({
+      messageId: 123,
+      recipients: ['recipient1@example.com', 'recipient2@example.com'],
+    })
+
+    expect(onSuccessSpy).toHaveBeenLastCalledWith({
+      messageId: 123,
+      recipients: ['recipient3@example.com', 'recipient4@example.com'],
+    })
+
     expect(logger.info).toHaveBeenCalledWith(
       'Email notification sent to %s with subject %s',
       ['recipient1@example.com', 'recipient2@example.com'],
@@ -125,5 +166,55 @@ describe('EmailService', () => {
       ['recipient3@example.com', 'recipient4@example.com'],
       'Test Subject 2'
     )
+  })
+
+  it('should handle errors when sending a bulk email', async () => {
+    // Mock SES sendEmail
+    const sendEmailMock = jest.fn()
+
+    sesClientMock.sendEmail = jest.fn().mockReturnValue({ promise: sendEmailMock })
+
+    sendEmailMock.mockRejectedValueOnce('test error')
+    sendEmailMock.mockResolvedValueOnce({ MessageId: '123' })
+
+    const templateData = { name: 'John Doe' }
+
+    const emails: EmailArgs[] = [
+      {
+        to: ['recipient1@example.com', 'recipient2@example.com'],
+        subject: 'Test Subject 1',
+        htmlTemplate: jest.fn(() => 'html'),
+        textTemplate: jest.fn(() => 'text'),
+        templateData,
+      },
+      {
+        to: ['recipient3@example.com', 'recipient4@example.com'],
+        subject: 'Test Subject 2',
+        htmlTemplate: jest.fn(() => 'html'),
+        textTemplate: jest.fn(() => 'text'),
+        templateData,
+      },
+    ]
+
+    const onSuccessSpy = jest.fn()
+
+    await emailService.sendBulkEmail(emails, onSuccessSpy)
+
+    expect(sesClientMock.sendEmail).toHaveBeenCalledTimes(2)
+
+    expect(onSuccessSpy).toHaveBeenCalledTimes(1)
+
+    expect(onSuccessSpy).toHaveBeenLastCalledWith({
+      messageId: '123',
+      recipients: ['recipient3@example.com', 'recipient4@example.com'],
+    })
+
+    expect(logger.info).toHaveBeenCalledWith(
+      'Email notification sent to %s with subject %s',
+      ['recipient3@example.com', 'recipient4@example.com'],
+      'Test Subject 2'
+    )
+
+    expect(logger.error).toHaveBeenCalledWith('test error')
   })
 })

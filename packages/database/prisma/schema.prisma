@@ -197,10 +197,12 @@ model AssessmentFurtherInformation {
 }
 
 model AssessmentReminder {
-  id     Int      @id @default(autoincrement())
-  user   User     @relation(fields: [userId], references: [id])
-  userId Int
-  sentAt DateTime @default(now())
+  id        Int       @id @default(autoincrement())
+  user      User      @relation(fields: [userId], references: [id])
+  userId    Int
+  messageId String?
+  sentAt    DateTime?
+  createdAt DateTime  @default(now())
 }
 
 model SysRefRole {

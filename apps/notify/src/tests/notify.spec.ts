@@ -23,10 +23,6 @@ describe('notify', () => {
   it('should send assessment reminder emails to the appropriate users', async () => {
     jest.mocked(prismaClient.user.findMany).mockResolvedValueOnce(mockUsers)
 
-    jest
-      .mocked(emailService.sendBulkEmail)
-      .mockImplementationOnce((_, onSuccess) => onSuccess(mockUsers.map(({ email }) => email)))
-
     await notify()
 
     expect(emailService.sendBulkEmail).toHaveBeenCalledWith(

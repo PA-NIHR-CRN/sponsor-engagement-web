@@ -2,9 +2,8 @@
   "name": "@nihr-ui/email",
   "version": "0.0.0",
   "license": "MIT",
-  "main": "./dist/index.js",
-  "source": "./src/index.ts",
-  "types": "./dist/index.d.ts",
+  "main": "./index.ts",
+  "types": "./index.ts",
   "scripts": {
     "build": "tsc -b tsconfig.build.json",
     "lint": "eslint .",
@@ -13,12 +12,12 @@
   },
   "dependencies": {
     "@nihr-ui/logger": "*",
+    "async": "^3.2.5",
     "aws-sdk": "^2.1488.0",
     "pino": "^8.14.1",
-    "pino-pretty": "^10.0.1",
-    "tiny-async-pool": "^2.1.0"
+    "pino-pretty": "^10.0.1"
   },
   "devDependencies": {
-    "@types/tiny-async-pool": "^2.0.3"
+    "@types/async": "^3.2.24"
   }
 }
