@@ -9,6 +9,8 @@ jest.mock('@nihr-ui/logger')
 jest.mock('@nihr-ui/email')
 jest.mock('dotenv')
 
+jest.useFakeTimers().setSystemTime(new Date('2023-01-01'))
+
 beforeEach(() => {
   jest.clearAllMocks()
 })
@@ -21,6 +23,13 @@ const mockUsers = [
 
 describe('notify', () => {
   it('should send assessment reminder emails to the appropriate users', async () => {
+    jest.mocked(emailService.sendBulkEmail).mockImplementationOnce(async (emails, onSuccess) => {
+      await onSuccess({
+        recipients: emails.map(({ to }) => (Array.isArray(to) ? to : [to])).flat(),
+        messageId: '123',
+      })
+    })
+
     jest.mocked(prismaClient.user.findMany).mockResolvedValueOnce(mockUsers)
 
     await notify()
@@ -45,6 +54,14 @@ describe('notify', () => {
 
     expect(prismaClient.assessmentReminder.createMany).toHaveBeenCalledWith({
       data: [{ userId: 1 }, { userId: 2 }, { userId: 3 }],
+    })
+
+    expect(prismaClient.assessmentReminder.updateMany).toHaveBeenCalledWith({
+      where: { userId: { in: [1, 2, 3] } },
+      data: {
+        sentAt: new Date('2023-01-01'),
+        messageId: '123',
+      },
     })
   })
 
