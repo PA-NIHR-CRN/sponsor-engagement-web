@@ -1,6 +1,6 @@
 import assert from 'assert'
 import { logger } from '@nihr-ui/logger'
-import { emailService } from '@nihr-ui/email'
+import { emailService, type EmailResult } from '@nihr-ui/email'
 import { config as dotEnvConfig } from 'dotenv'
 import { emailTemplates } from '@nihr-ui/templates/sponsor-engagement'
 import { prismaClient } from './lib/prisma'
@@ -40,9 +40,20 @@ const sendNotifications = async () => {
     usersWithStudiesDueAssessment.map((user) => [user.email, user])
   )
 
-  const onSuccess = async (recipients: string[]) => {
-    await prismaClient.assessmentReminder.createMany({
-      data: recipients.map((email) => ({ userId: usersWithStudiesDueAssessmentByEmail[email].id })),
+  await prismaClient.assessmentReminder.createMany({
+    data: usersWithStudiesDueAssessment.map((user) => ({
+      userId: user.id,
+    })),
+  })
+
+  const onSuccess = async ({ messageId, recipients }: EmailResult) => {
+    const userIds = recipients.map((email) => usersWithStudiesDueAssessmentByEmail[email].id)
+    await prismaClient.assessmentReminder.updateMany({
+      where: { userId: { in: userIds } },
+      data: {
+        sentAt: new Date(),
+        messageId,
+      },
     })
   }
 
