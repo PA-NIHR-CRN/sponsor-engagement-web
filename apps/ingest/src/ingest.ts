@@ -391,20 +391,6 @@ const deleteStudies = async () => {
   }
 }
 
-const deleteOrganisations = async () => {
-  const currentOrganisations = await prismaClient.organisation.findMany({
-    select: { id: true },
-    where: { isDeleted: false },
-  })
-
-  const deletedOrgIds = currentOrganisations.filter(({ id }) => !allOrganisationIds.includes(id)).map(({ id }) => id)
-
-  if (deletedOrgIds.length > 0) {
-    await prismaClient.organisation.updateMany({ where: { id: { in: deletedOrgIds } }, data: { isDeleted: true } })
-    logger.info('Flagged %s organisations as deleted', deletedOrgIds.length)
-  }
-}
-
 const deleteOrganisationRoles = async () => {
   const currentOrgRoles = await prismaClient.organisationRole.findMany({
     select: { id: true, roleId: true, organisationId: true },
@@ -475,6 +461,5 @@ export const ingest = async () => {
   }
 
   await deleteStudies()
-  await deleteOrganisations()
   await deleteOrganisationRoles()
 }
