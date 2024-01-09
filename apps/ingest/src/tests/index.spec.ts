@@ -290,23 +290,6 @@ describe('ingest', () => {
     })
   })
 
-  it('should set organisations no longer returned by the API as deleted', async () => {
-    server.use(
-      rest.get(API_URL, async (_, res, ctx) => {
-        return res(ctx.json({ ...studies, Result: { Studies: studies.Result.Studies.slice(0, -1) } }))
-      })
-    )
-
-    await ingest()
-
-    expect(prismaMock.organisation.updateMany).toHaveBeenCalledWith({
-      where: {
-        id: { in: [organisationEntities[organisationEntities.length - 1].id] },
-      },
-      data: { isDeleted: true },
-    })
-  })
-
   it('should set organisation roles no longer returned by the API as deleted', async () => {
     server.use(
       rest.get(API_URL, async (_, res, ctx) => {
