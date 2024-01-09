@@ -220,7 +220,7 @@ jobs:
         id: get_cron
         run: |
           future_time=$(date -u -d '+60 seconds' +'%M %H %d %m ? %Y')
-          echo "::set-output name=cron_expression::$future_time"
+          echo "{cron_expression}={$future_time}" >> $GITHUB_OUTPUT
 
       - name: Update CloudWatch Event Rule
         run: |
