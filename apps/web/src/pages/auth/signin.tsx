@@ -1,6 +1,6 @@
 import { Container } from '@nihr-ui/frontend'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { useRouter } from 'next/router'
+import Router from 'next/router'
 import { getServerSession } from 'next-auth/next'
 import { getCsrfToken, getProviders, signIn } from 'next-auth/react'
 import { useEffect } from 'react'
@@ -20,15 +20,13 @@ import { authOptions } from '../api/auth/[...nextauth]'
 export type SigninProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
 export default function Signin({ isAuthenticated, signinUrl, csrfToken, callbackUrl }: SigninProps) {
-  const router = useRouter()
-
   useEffect(() => {
     if (!isAuthenticated) {
       void signIn(AUTH_PROVIDER_ID, undefined, { prompt: 'login' })
     } else {
-      void router.push('/')
+      void Router.push('/')
     }
-  }, [isAuthenticated, router])
+  }, [isAuthenticated])
 
   // Fallback for non-Javascript
   return (
