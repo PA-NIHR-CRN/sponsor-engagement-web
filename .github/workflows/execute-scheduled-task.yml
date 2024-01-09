@@ -38,21 +38,27 @@ jobs:
           aws-region: eu-west-2
           role-session-name: GitHubActionsDev
 
-      - name: Get current time
-        id: current_time
-        run: echo "::set-output name=time::$(date +%s)"
+      - name: Get cron expression
+        id: get_cron
+        run: |
+          echo '#!/bin/bash
 
-      - name: Calculate future time
-        id: future_time
-        run: echo "::set-output name=time::$(echo $(( ${{ steps.current_time.outputs.time }} + 60 )))"
+          current_time=$(date +%s)
+          future_time=$((current_time + 60))
+          formatted_time=$(date -u -d @${future_time} +'%S %M %H %d %m ?')
 
-      - name: Format future time to cron expression
-        id: cron_expression
-        run: echo "::set-output name=expression::$(date -d @${{ steps.future_time.outputs.time }} -u +'%S %M %H %d %m ?')"
+          echo $formatted_time' > calculate_cron.sh
+          chmod +x calculate_cron.sh
+          ./calculate_cron.sh > cron_expression.txt
+
+      - name: Read cron expression
+        run: |
+          cron_expression=$(<cron_expression.txt)
+          echo "Cron Expression: $cron_expression"
 
       - name: Update CloudWatch Event Rule
         run: |
-          aws events put-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname }}-cw-event-rule --schedule-expression "cron(${{ steps.cron_expression.outputs.expression }})"
+          aws events put-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname }}-cw-event-rule --schedule-expression "cron($cron_expression)"
           aws events enable-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname}}-cw-event-rule
 
       - name: Wait for 90 seconds
