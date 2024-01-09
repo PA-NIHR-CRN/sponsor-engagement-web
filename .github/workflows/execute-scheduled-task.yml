@@ -38,7 +38,6 @@ jobs:
           aws-region: eu-west-2
           role-session-name: GitHubActionsDev
 
-
       - name: Get cron expression
         id: get_cron
         run: |
@@ -83,9 +82,16 @@ jobs:
           aws-region: eu-west-2
           role-session-name: GitHubActionsTest
 
+      - name: Get cron expression
+        id: get_cron
+        run: |
+          future_time=$(date -u -d '+60 seconds' +'%M %H %d %m ? %Y')
+          echo "::set-output name=cron_expression::$future_time"
+
       - name: Update CloudWatch Event Rule
         run: |
-          aws events put-rule --name crnccd-ecs-test-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "rate(1 minute)"
+          cron_expression="${{ steps.get_cron.outputs.cron_expression }}"
+          aws events put-rule --name crnccd-ecs-test-se-${{ github.event.inputs.appname }}-cw-event-rule --schedule-expression "cron(${cron_expression})"
           aws events enable-rule --name crnccd-ecs-test-se-${{ github.event.inputs.appname}}-cw-event-rule
 
       - name: Wait for 90 seconds
@@ -120,9 +126,16 @@ jobs:
           aws-region: eu-west-2
           role-session-name: GitHubActionsUat
 
+      - name: Get cron expression
+        id: get_cron
+        run: |
+          future_time=$(date -u -d '+60 seconds' +'%M %H %d %m ? %Y')
+          echo "::set-output name=cron_expression::$future_time"
+
       - name: Update CloudWatch Event Rule
         run: |
-          aws events put-rule --name crnccs-ecs-uat-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "rate(1 minute)"
+          cron_expression="${{ steps.get_cron.outputs.cron_expression }}"
+          aws events put-rule --name crnccs-ecs-uat-se-${{ github.event.inputs.appname }}-cw-event-rule --schedule-expression "cron(${cron_expression})"
           aws events enable-rule --name crnccs-ecs-uat-se-${{ github.event.inputs.appname}}-cw-event-rule
 
       - name: Wait for 90 seconds
@@ -158,9 +171,16 @@ jobs:
           aws-region: eu-west-2
           role-session-name: GitHubActionsOat
 
+      - name: Get cron expression
+        id: get_cron
+        run: |
+          future_time=$(date -u -d '+60 seconds' +'%M %H %d %m ? %Y')
+          echo "::set-output name=cron_expression::$future_time"
+
       - name: Update CloudWatch Event Rule
         run: |
-          aws events put-rule --name crnccp-ecs-oat-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "rate(1 minute)"
+          cron_expression="${{ steps.get_cron.outputs.cron_expression }}"
+          aws events put-rule --name crnccp-ecs-oat-se-${{ github.event.inputs.appname }}-cw-event-rule --schedule-expression "cron(${cron_expression})"
           aws events enable-rule --name crnccp-ecs-oat-se-${{ github.event.inputs.appname}}-cw-event-rule
 
       - name: Wait for 90 seconds
@@ -196,9 +216,16 @@ jobs:
           aws-region: eu-west-2
           role-session-name: GitHubActionsProd
 
+      - name: Get cron expression
+        id: get_cron
+        run: |
+          future_time=$(date -u -d '+60 seconds' +'%M %H %d %m ? %Y')
+          echo "::set-output name=cron_expression::$future_time"
+
       - name: Update CloudWatch Event Rule
         run: |
-          aws events put-rule --name crnccp-ecs-prod-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "rate(1 minute)"
+          cron_expression="${{ steps.get_cron.outputs.cron_expression }}"
+          aws events put-rule --name crnccp-ecs-prod-se-${{ github.event.inputs.appname }}-cw-event-rule --schedule-expression "cron(${cron_expression})"
           aws events enable-rule --name crnccp-ecs-prod-se-${{ github.event.inputs.appname}}-cw-event-rule
 
       - name: Wait for 90 seconds
