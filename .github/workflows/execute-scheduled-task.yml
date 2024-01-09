@@ -38,9 +38,21 @@ jobs:
           aws-region: eu-west-2
           role-session-name: GitHubActionsDev
 
+      - name: Get current time
+        id: current_time
+        run: echo "::set-output name=time::$(date +%s)"
+
+      - name: Calculate future time
+        id: future_time
+        run: echo "::set-output name=time::$(echo $(( ${{ steps.current_time.outputs.time }} + 90 )))"
+
+      - name: Format future time to cron expression
+        id: cron_expression
+        run: echo "::set-output name=expression::$(date -d @${{ steps.future_time.outputs.time }} -u +'%S %M %H %d %m ? %Y')"
+
       - name: Update CloudWatch Event Rule
         run: |
-          aws events put-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "rate(1 minute)"
+          aws events put-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname }}-cw-event-rule --schedule-expression "cron(${{ steps.cron_expression.outputs.expression }})"
           aws events enable-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname}}-cw-event-rule
 
       - name: Wait for 90 seconds
