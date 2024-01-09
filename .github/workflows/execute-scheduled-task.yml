@@ -44,7 +44,7 @@ jobs:
 
       - name: Calculate future time
         id: future_time
-        run: echo "::set-output name=time::$(echo $(( ${{ steps.current_time.outputs.time }} + 90 )))"
+        run: echo "::set-output name=time::$(echo $(( ${{ steps.current_time.outputs.time }} + 60 )))"
 
       - name: Format future time to cron expression
         id: cron_expression
