@@ -41,23 +41,12 @@ jobs:
       - name: Get cron expression
         id: get_cron
         run: |
-          echo '#!/bin/bash
-
-          current_time=$(date +%s)
-          future_time=$((current_time + 60))
-          formatted_time=$(date -u -d @${future_time} +'%S %M %H %d %m ?')
-
-          echo $formatted_time' > calculate_cron.sh
-          chmod +x calculate_cron.sh
-          ./calculate_cron.sh > cron_expression.txt
-
-      - name: Read cron expression
-        run: |
-          cron_expression=$(<cron_expression.txt)
-          echo "Cron Expression: $cron_expression"
+          future_time=$(date -u -d '+60 seconds' +'%S %M %H %d %m ?')
+          echo "::set-output name=cron_expression::$future_time"
 
       - name: Update CloudWatch Event Rule
         run: |
+          cron_expression="${{ steps.get_cron.outputs.cron_expression }}"
           aws events put-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname }}-cw-event-rule --schedule-expression "cron($cron_expression)"
           aws events enable-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname}}-cw-event-rule
 
