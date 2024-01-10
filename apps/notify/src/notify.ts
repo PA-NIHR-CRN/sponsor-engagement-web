@@ -24,7 +24,7 @@ const sendNotifications = async () => {
       ...(allowList && { email: { in: allowList } }),
       organisations: {
         some: {
-          organisation: { studies: { some: { study: { isDueAssessment: true } } } },
+          organisation: { studies: { some: { study: { isDueAssessment: true, isDeleted: false }, isDeleted: false } } },
           isDeleted: false,
         },
       },
