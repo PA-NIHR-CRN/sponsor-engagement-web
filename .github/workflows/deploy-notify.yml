@@ -103,6 +103,7 @@ jobs:
           environment-variables: |
             APP_ENV=${{ vars.APP_ENV }}
             NOTIFY_ALLOW_LIST=${{ vars.NOTIFY_ALLOW_LIST }}
+            NOTIFY_RESEND_DELAY=${{ vars.NOTIFY_RESEND_DELAY }}
             DATABASE_URL=${{ env.CRNCCD_SECRET_DEV_SE_APP_CONFIG_DATABASE_URL }}
       - name: Remove Github Actions IP from RDS security group (Dev)
         run: |
@@ -191,6 +192,7 @@ jobs:
           environment-variables: |
             APP_ENV=${{ vars.APP_ENV }}
             NOTIFY_ALLOW_LIST=${{ vars.NOTIFY_ALLOW_LIST }}
+            NOTIFY_RESEND_DELAY=${{ vars.NOTIFY_RESEND_DELAY }}
             DATABASE_URL=${{ env.CRNCCD_SECRET_TEST_SE_APP_CONFIG_DATABASE_URL }}
       - name: Remove Github Actions IP from RDS security group (Test)
         run: |
@@ -279,6 +281,7 @@ jobs:
           environment-variables: |
             APP_ENV=${{ vars.APP_ENV }}
             NOTIFY_ALLOW_LIST=${{ vars.NOTIFY_ALLOW_LIST }}
+            NOTIFY_RESEND_DELAY=${{ vars.NOTIFY_RESEND_DELAY }}
             DATABASE_URL=${{ env.CRNCCS_SECRET_UAT_SE_APP_CONFIG_DATABASE_URL }}
       - name: Remove Github Actions IP from RDS security group (Uat)
         run: |
@@ -367,6 +370,7 @@ jobs:
           environment-variables: |
             APP_ENV=${{ vars.APP_ENV }}
             NOTIFY_ALLOW_LIST=${{ vars.NOTIFY_ALLOW_LIST }}
+            NOTIFY_RESEND_DELAY=${{ vars.NOTIFY_RESEND_DELAY }}
             DATABASE_URL=${{ env.CRNCCP_SECRET_OAT_SE_APP_CONFIG_DATABASE_URL }}
       - name: Remove Github Actions IP from RDS security group (Oat)
         run: |
@@ -455,6 +459,7 @@ jobs:
           environment-variables: |
             APP_ENV=${{ vars.APP_ENV }}
             NOTIFY_ALLOW_LIST=${{ vars.NOTIFY_ALLOW_LIST }}
+            NOTIFY_RESEND_DELAY=${{ vars.NOTIFY_RESEND_DELAY }}
             DATABASE_URL=${{ env.CRNCCP_SECRET_PROD_SE_APP_CONFIG_DATABASE_URL }}
       - name: Remove Github Actions IP from RDS security group (Prod)
         run: |

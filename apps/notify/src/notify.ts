@@ -21,6 +21,8 @@ const sendNotifications = async () => {
     return
   }
 
+  const resendDelay = process.env.NOTIFY_RESEND_DELAY ? Number(process.env.NOTIFY_RESEND_DELAY) : 7
+
   const usersWithStudiesDueAssessment = await prismaClient.user.findMany({
     where: {
       ...(allowList && { email: { in: allowList } }),
@@ -33,7 +35,7 @@ const sendNotifications = async () => {
       // Check for recent successful sends to prevent duplicate emails being sent on re-runs
       assessmentReminders: {
         none: {
-          AND: [{ sentAt: { not: null } }, { sentAt: { gte: dayjs().subtract(1, 'week').toDate() } }],
+          AND: [{ sentAt: { not: null } }, { sentAt: { gte: dayjs().subtract(resendDelay, 'days').toDate() } }],
         },
       },
     },
