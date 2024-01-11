@@ -12,12 +12,9 @@
   },
   "dependencies": {
     "@nihr-ui/logger": "*",
-    "async": "^3.2.5",
     "aws-sdk": "^2.1488.0",
+    "bottleneck": "^2.19.5",
     "pino": "^8.14.1",
     "pino-pretty": "^10.0.1"
-  },
-  "devDependencies": {
-    "@types/async": "^3.2.24"
   }
 }

@@ -3,6 +3,8 @@ import { logger } from '@nihr-ui/logger'
 import { emailService, type EmailResult } from '@nihr-ui/email'
 import { config as dotEnvConfig } from 'dotenv'
 import { emailTemplates } from '@nihr-ui/templates/sponsor-engagement'
+import dayjs from 'dayjs'
+import { Prisma } from 'database'
 import { prismaClient } from './lib/prisma'
 import { getAbsoluteUrl } from './utils'
 import { EXTERNAL_CRN_TERMS_CONDITIONS_URL, EXTERNAL_CRN_URL, SIGN_IN_PAGE, SUPPORT_PAGE } from './constants'
@@ -28,6 +30,12 @@ const sendNotifications = async () => {
           isDeleted: false,
         },
       },
+      // Check for recent successful sends to prevent duplicate emails being sent on re-runs
+      assessmentReminders: {
+        none: {
+          AND: [{ sentAt: { not: null } }, { sentAt: { gte: dayjs().subtract(1, 'week').toDate() } }],
+        },
+      },
     },
   })
 
@@ -36,10 +44,6 @@ const sendNotifications = async () => {
     return
   }
 
-  const usersWithStudiesDueAssessmentByEmail = Object.fromEntries(
-    usersWithStudiesDueAssessment.map((user) => [user.email, user])
-  )
-
   await prismaClient.assessmentReminder.createMany({
     data: usersWithStudiesDueAssessment.map((user) => ({
       userId: user.id,
@@ -47,9 +51,18 @@ const sendNotifications = async () => {
   })
 
   const onSuccess = async ({ messageId, recipients }: EmailResult) => {
-    const userIds = recipients.map((email) => usersWithStudiesDueAssessmentByEmail[email].id)
-    await prismaClient.assessmentReminder.updateMany({
-      where: { userId: { in: userIds } },
+    const recipient = recipients[0]
+
+    const assessmentReminder = await prismaClient.assessmentReminder.findMany({
+      where: { user: { email: recipient } },
+      orderBy: {
+        createdAt: Prisma.SortOrder.desc,
+      },
+      take: 1,
+    })
+
+    await prismaClient.assessmentReminder.update({
+      where: { id: assessmentReminder[0].id },
       data: {
         sentAt: new Date(),
         messageId,
