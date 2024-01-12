@@ -1,5 +1,6 @@
 import { authService } from '@nihr-ui/auth'
 import { logger } from '@nihr-ui/logger'
+import axios from 'axios'
 import type { AuthOptions } from 'next-auth'
 import NextAuth from 'next-auth'
 import type { JWT } from 'next-auth/jwt'
@@ -79,7 +80,13 @@ async function refreshAccessToken(token: JWT) {
       idToken,
     }
   } catch (error) {
-    logger.error(error)
+    const isAxiosError = axios.isAxiosError<{ error: string }>(error)
+
+    if (isAxiosError && error.response?.data.error === 'invalid_grant') {
+      logger.info('jwt callback - refresh token expired - redirecting to login')
+    } else {
+      logger.error(error)
+    }
     return {
       ...token,
       error: 'RefreshAccessTokenError',

@@ -22,7 +22,7 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
     identityProviderLogoutUrl.searchParams.set('post_logout_redirect_uri', getAbsoluteUrl(''))
     identityProviderLogoutUrl.searchParams.set('id_token_hint', String(req.query.idTokenHint))
 
-    logger.info(`sign out api handler - redirecting to idg with url ${identityProviderLogoutUrl.toString()}`)
+    logger.info(`sign out api handler - redirecting to idg`)
 
     res.redirect(302, identityProviderLogoutUrl.toString())
   } catch (error) {
