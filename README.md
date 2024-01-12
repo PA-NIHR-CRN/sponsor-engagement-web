@@ -14,6 +14,33 @@ A handful of GitHub Actions workflows are defined. These are described below:
 
 TBC
 
+## Monorepo
+
+This project employs a monorepo architecture with `turborepo` being used to manage workspaces as well as build the different services that Sponsor Engagement requires to function. The modules are split between the `apps` directory which contains the NextJS web application and scheduled task applications and the `packages` directory which contains shared, reusable libraries which can be used across all existing as well as any future apps.
+
+### Apps
+
+| Name     | Info                              |
+| -------- | --------------------------------- |
+| `web`    | NextJS web application            |
+| `ingest` | CPMS ingest scheduled task        |
+| `notify` | Notification email scheduled task |
+
+### Packages
+
+| Name                   | Info                                                                        |
+| ---------------------- | --------------------------------------------------------------------------- |
+| `auth`                 | Auth service providing IDG integration                                      |
+| `configs`              | Shared configuration files (currently only used for Tailwind CSS config)    |
+| `database`             | Database service containing prisma schema and client                        |
+| `email`                | Email service providing SES integration                                     |
+| `eslint-config-custom` | ESLint configuration files                                                  |
+| `logger`               | Logger service using pino for structured log output                         |
+| `qa`                   | QA package for automated e2e tests using Playwright                         |
+| `templates`            | Contains email templates and handles bundling of templates using Handlebars |
+| `tsconfig`             | TypeScript configuration files                                              |
+| `ui`                   | Reusable GDS React component library                                        |
+
 > ## Prerequisites:
 
 1. NodeJs 18.17.1
