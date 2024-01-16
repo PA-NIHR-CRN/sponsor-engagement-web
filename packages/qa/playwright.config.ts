@@ -10,19 +10,35 @@ const config: PlaywrightTestConfig = {
     ['html', { outputFolder: './test-report' }],
   ],
   globalSetup: './hooks/GlobalSetup.ts',
+  globalTeardown: './hooks/GlobalTeardown.ts',
   timeout: 30000,
-  // workers: 6, // to enforce parallel workers in Actions Workflow
+  workers: 1, // to enforce serial execution
   retries: 2,
   projects: [
+    // Setup project for Authorization
+    {
+      name: 'setup',
+      testDir: 'tests/authSetup',
+      testMatch: 'auth.setup.e2e.ts',
+      use: {
+        trace: 'on',
+        baseURL: `${process.env.BASE_URL}`,
+        headless: true,
+        screenshot: 'on',
+        launchOptions: {
+          slowMo: 0,
+        },
+      },
+    },
     {
       name: 'SponsorEngagement',
+      dependencies: ['setup'],
       testIgnore: '**/accessibilityTests/**',
       use: {
         trace: 'on',
         baseURL: `${process.env.BASE_URL}`,
         headless: true,
         screenshot: 'on',
-        // storageState: 'qa/utils/cookieAccept.json',
         launchOptions: {
           slowMo: 0,
         },
@@ -30,6 +46,7 @@ const config: PlaywrightTestConfig = {
     },
     {
       name: 'SE Firefox',
+      dependencies: ['setup'],
       testIgnore: '**/tests/**',
       use: {
         ...devices['Desktop Firefox'],
@@ -44,6 +61,7 @@ const config: PlaywrightTestConfig = {
     },
     {
       name: 'SE Safari',
+      dependencies: ['setup'],
       testIgnore: '**/tests/**',
       use: {
         ...devices['Desktop Safari'],
@@ -58,6 +76,7 @@ const config: PlaywrightTestConfig = {
     },
     {
       name: 'SE Microsoft Edge',
+      dependencies: ['setup'],
       testIgnore: '**/tests/**',
       use: {
         ...devices['Desktop Edge'],
@@ -73,6 +92,7 @@ const config: PlaywrightTestConfig = {
     },
     {
       name: 'SE Google Chrome',
+      dependencies: ['setup'],
       testIgnore: '**/tests/**',
       use: {
         ...devices['Desktop Chrome'],
@@ -88,6 +108,7 @@ const config: PlaywrightTestConfig = {
     },
     {
       name: 'SE Mobile Chrome',
+      dependencies: ['setup'],
       testIgnore: '**/tests/**',
       use: {
         ...devices['Pixel 5'],
@@ -102,6 +123,7 @@ const config: PlaywrightTestConfig = {
     },
     {
       name: 'SE Mobile Safari',
+      dependencies: ['setup'],
       testIgnore: '**/tests/**',
       use: {
         ...devices['iPhone 13'],
