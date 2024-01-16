@@ -4,5 +4,6 @@ node_modules
 .turbo
 dist
 
+.auth
 test-report
 test-results
