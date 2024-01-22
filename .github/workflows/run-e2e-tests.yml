@@ -23,6 +23,9 @@ jobs:
   e2e-test:
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./packages/qa
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-node@v3
