@@ -34,7 +34,7 @@ jobs:
       run: npx playwright install --with-deps
     - name: Install Playwright dependencies
       working-directory: ./packages/qa
-      run: npm ci
+      run: npm i
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
