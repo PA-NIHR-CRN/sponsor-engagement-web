@@ -23,9 +23,6 @@ jobs:
   e2e-test:
     timeout-minutes: 15
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./packages/qa
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-node@v3
@@ -48,6 +45,7 @@ jobs:
       run: |
           aws ec2 authorize-security-group-ingress --group-id ${{ secrets.LB_SG_TEST }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 443, "ToPort": 443, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for SE automation test run"}]}]'
     - name: Run All SE E2E Tests
+      working-directory: ./packages/qa
       if: github.event.inputs.test-tag == '' || github.event.inputs.test-tag == 'all'
       run: npx playwright test
       env:
@@ -60,6 +58,7 @@ jobs:
           CONTACT_MANAGER_PASS: ${{ secrets.CONTACT_MANAGER_PASS }}
           SE_NO_LOCAL_ACCOUNT_PASS: ${{ secrets.SE_NO_LOCAL_ACCOUNT_PASS }}
     - name: Run Tag Specific SE E2E Tests
+      working-directory: ./packages/qa
       if: github.event.inputs.test-tag != '' && github.event.inputs.test-tag != 'all'
       run: npx playwright test --grep ${{ github.event.inputs.test-tag }}
     - name: Remove Github Actions IP from LB security group (Test)
