@@ -1,7 +1,7 @@
 // import mysql, { ConnectionOptions } from 'mysql2'
 
 // export const cpmsDbConfig = {
-//   user: 'chris.mcneill',
+//   user: 'cpmsuser,
 //   password: `${process.env.CPMS_TEST_DB_PASSWORD}`, //set in .github/workflows/playwright.yml using GitHub secrets, hardcode when running locally
 //   server: `${process.env.CPMS_TEST_DB_SERVER}`, //set in .github/workflows/playwright.yml using GitHub secrets, hardcode when running locally
 //   database: 'NIHR.CRN.CPMS.OperationalDatabase',
