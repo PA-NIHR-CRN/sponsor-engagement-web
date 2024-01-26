@@ -22,6 +22,7 @@ on:
 jobs:
   e2e-test:
     timeout-minutes: 15
+    environment: TEST
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -47,6 +48,9 @@ jobs:
     - name: Add Github Actions IP to LB security group (Test)
       run: |
           aws ec2 authorize-security-group-ingress --group-id ${{ secrets.LB_SG_TEST }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 443, "ToPort": 443, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for SE automation test run"}]}]'
+    - name: Add Github Actions IP to RDS security group (Test)
+      run: |
+          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for SE automation DB requests"}]}]'
     - name: Run All SE E2E Tests
       working-directory: ./packages/qa
       if: github.event.inputs.test-tag == '' || github.event.inputs.test-tag == 'all'
@@ -76,6 +80,9 @@ jobs:
     - name: Remove Github Actions IP from LB security group (Test)
       run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.LB_SG_TEST }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 443, "ToPort": 443, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for SE automation test run"}]}]'
+    - name: Remove Github Actions IP from LB security group (Test)
+      run: |
+          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for SE automation DB requests"}]}]'
     - name: Upload HTML Report as artifact
       uses: actions/upload-artifact@v3
       if: always()
