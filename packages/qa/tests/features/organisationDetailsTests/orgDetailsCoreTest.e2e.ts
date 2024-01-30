@@ -11,7 +11,6 @@ const orgIdWithContacts = 1508
 let expectedContactDetails: RowDataPacket[]
 
 test.beforeAll('Setup Test Users', async () => {
-  //   await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
   const singleRoleOrgDetails = await seDatabaseReq(`
     SELECT Organisation.name AS orgName, Organisation.rtsIdentifier, SysRefOrganisationRole.name AS roleName FROM Organisation 
     INNER JOIN OrganisationRole ON OrganisationRole.organisationId = Organisation.id
@@ -48,7 +47,7 @@ test.describe('Display Sponsor Organisation Details and Current Contacts - @se_1
       await organisationDetailsPage.assertOnOrganisationDetailsPage(singleRoleorgId.toString())
     })
     await test.step(`Then it will have a Page Title of ${expectedSingleRoleOrgDetails[0].orgName}`, async () => {
-      await organisationDetailsPage.assertOrgDetailsPageTitle(expectedSingleRoleOrgDetails[0].orgName)
+      await organisationDetailsPage.assertOrgDetailsPageTitle("TEST TO FAIL")//expectedSingleRoleOrgDetails[0].orgName)
     })
     await test.step('And the Organisations Role will be the Page Sub Heading', async () => {
       await organisationDetailsPage.assertOrgDetailsSubHeading(expectedSingleRoleOrgDetails)
