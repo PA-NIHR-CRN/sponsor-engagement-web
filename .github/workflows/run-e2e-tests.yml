@@ -99,7 +99,7 @@ jobs:
       if: github.event.inputs.publish-report != 'false' && always()
       uses: JamesIves/github-pages-deploy-action@v4
       with:
-        folder: ${{steps.download.outputs.download-path}}/qa/test-report/
+        folder: ${{steps.download.outputs.download-path}}/test-report/
         branch: gh-pages
 # Add in slack once webhook is setup for SE channel
   # send-slack-message-failure:
