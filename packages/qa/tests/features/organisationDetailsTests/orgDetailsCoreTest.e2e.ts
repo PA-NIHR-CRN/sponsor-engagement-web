@@ -11,7 +11,6 @@ const orgIdWithContacts = 1508
 let expectedContactDetails: RowDataPacket[]
 
 test.beforeAll('Setup Test Users', async () => {
-  //   await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
   const singleRoleOrgDetails = await seDatabaseReq(`
     SELECT Organisation.name AS orgName, Organisation.rtsIdentifier, SysRefOrganisationRole.name AS roleName FROM Organisation 
     INNER JOIN OrganisationRole ON OrganisationRole.organisationId = Organisation.id

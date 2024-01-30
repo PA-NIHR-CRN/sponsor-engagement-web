@@ -65,7 +65,7 @@ test.describe('Login as a Sponsor Contact - @se_21', () => {
     })
   })
 
-  test('As a Contact Manager upon Login I am taken to the Mange Contacts Page - @se_21_login_contact_manager', async ({
+  test('As a Contact Manager upon Login I am taken to the Organisations Page Page - @se_21_login_contact_manager', async ({
     commonItemsPage,
     signedOutPage,
     loginPage,
