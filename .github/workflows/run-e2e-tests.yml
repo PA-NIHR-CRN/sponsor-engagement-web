@@ -88,7 +88,7 @@ jobs:
       if: always()
       with:
         name: test-report
-        path: qa/test-report/
+        path: ./packages/qa/test-report/
         retention-days: 3
     - name: 'Download HTML Report Artifact'
       uses: actions/download-artifact@v3
