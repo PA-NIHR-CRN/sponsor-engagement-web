@@ -45,7 +45,7 @@ jobs:
       id: publicip
       run: |
         response=$(curl -s icanhazip.com)
-        echo "ip='$response'" >> "$GITHUB_OUTPUT"
+        echo "ip=$response" >> "$GITHUB_OUTPUT"
     - name: Add Github Actions IP to LB security group (Test)
       run: |
           aws ec2 authorize-security-group-ingress --group-id ${{ secrets.LB_SG_TEST }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 443, "ToPort": 443, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for SE automation test run"}]}]'
