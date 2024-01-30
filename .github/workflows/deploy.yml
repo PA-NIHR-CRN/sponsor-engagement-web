@@ -301,43 +301,23 @@ jobs:
         folder: ${{steps.download.outputs.download-path}}/test-report/
         branch: gh-pages
 
-  send-slack-message-failure:
-    name: Send slack message failure
-    needs: [e2e-test]
-    runs-on: ubuntu-latest
-    if: failure()
-    steps:
-      - uses: technote-space/workflow-conclusion-action@v3
-      - name: "Set Env Message to TEST"
-        run: |
-          echo "ENV_MSG=TEST" >> "$GITHUB_ENV"
-      - name: Slack Notify
-        if: github.ref == 'refs/heads/tests/e2e-workflow-update'
-        uses: rtCamp/action-slack-notify@v2.2.0
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SE_SLACK_WEBHOOK }}
-          SLACK_COLOR: "failure"
-          SLACK_MESSAGE: "SE E2E Regression Tests Failed in ${{ env.ENV_MSG }}! :face_with_thermometer:"
-          SLACK_TITLE: "Sponsor Engagement E2E UI Tests - ENV:${{ env.ENV_MSG }} : FAILURE :x:"
+    - name: Send slack message failure
+      if: failure() && github.ref == 'refs/heads/tests/e2e-workflow-update'
+      uses: rtCamp/action-slack-notify@v2.2.0
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SE_SLACK_WEBHOOK }}
+        SLACK_COLOR: "failure"
+        SLACK_MESSAGE: "SE E2E Regression Tests Failed in ${{ env.ENV_MSG }}! :face_with_thermometer:"
+        SLACK_TITLE: "Sponsor Engagement E2E UI Tests - ENV:${{ env.ENV_MSG }} : FAILURE :x:"
 
-  send-slack-message-success:
-    name: Send slack message success
-    needs: [e2e-test]
-    runs-on: ubuntu-latest
-    if: success()
-    steps:
-      - uses: technote-space/workflow-conclusion-action@v3
-      - name: "Set Env Message to TEST"
-        run: |
-          echo "ENV_MSG=TEST" >> "$GITHUB_ENV"
-      - name: Slack Notify
-        if: github.ref == 'refs/heads/tests/e2e-workflow-update'
-        uses: rtCamp/action-slack-notify@v2.2.0
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SE_SLACK_WEBHOOK }}
-          SLACK_COLOR: "success"
-          SLACK_MESSAGE: "SE E2E Regression Tests Passed in ${{ env.ENV_MSG }}! :partying_face:"
-          SLACK_TITLE: "Sponsor Engagement E2E UI Tests - ENV:${{ env.ENV_MSG }} : SUCCESS :tick:"
+    - name: Send slack message success
+      if: success() && github.ref == 'refs/heads/tests/e2e-workflow-update'
+      uses: rtCamp/action-slack-notify@v2.2.0
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SE_SLACK_WEBHOOK }}
+        SLACK_COLOR: "success"
+        SLACK_MESSAGE: "SE E2E Regression Tests Passed in ${{ env.ENV_MSG }}! :partying_face:"
+        SLACK_TITLE: "Sponsor Engagement E2E UI Tests - ENV:${{ env.ENV_MSG }} : SUCCESS :tick:"
 
   deploy-uat:
     needs: e2e-test
