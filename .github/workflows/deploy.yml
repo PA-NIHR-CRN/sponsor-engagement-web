@@ -49,13 +49,15 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Get Github Actions Runner Public IP
-        id: ip
-        uses: haythem/public-ip@v1.3
+      - name: Get GitHub Actions Runner Public IP
+        id: publicip
+        run: |
+          response=$(curl -s icanhazip.com)
+          echo "ip=$response" >> "$GITHUB_OUTPUT"
 
       - name: Add Github Actions IP to RDS security group (Dev)
         run: |
-          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
+          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
 
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
@@ -112,7 +114,7 @@ jobs:
             IDG_API_PASSWORD=${{ secrets.IDG_API_PASSWORD }}
       - name: Remove Github Actions IP from RDS security group (Dev)
         run: |
-          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
+          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
       - name: Deploy Amazon ECS task definition
         env:
           ECS_SERVICE: crnccd-ecs-dev-se-service
@@ -144,12 +146,14 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Get Github Actions Runner Public IP
-        id: ip
-        uses: haythem/public-ip@v1.3
+      - name: Get GitHub Actions Runner Public IP
+        id: publicip
+        run: |
+          response=$(curl -s icanhazip.com)
+          echo "ip=$response" >> "$GITHUB_OUTPUT"
       - name: Add Github Actions IP to RDS security group (Test)
         run: |
-          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
+          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
         env:
@@ -205,7 +209,7 @@ jobs:
             IDG_API_PASSWORD=${{ secrets.IDG_API_PASSWORD }}
       - name: Remove Github Actions IP from RDS security group (Test)
         run: |
-          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
+          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
       - name: Deploy Amazon ECS task definition
         env:
           ECS_SERVICE: crnccd-ecs-test-se-service
@@ -241,15 +245,17 @@ jobs:
         aws-access-key-id: ${{ secrets.NIHR_GITHUB_ACTIONS_IAM_ID }}
         aws-secret-access-key: ${{ secrets.NIHR_GITHUB_ACTIONS_IAM_SECRET }}
         aws-region: eu-west-2
-    - name: Get Github Actions Runner Public IP
-      id: ip
-      uses: haythem/public-ip@v1.3
+    - name: Get GitHub Actions Runner Public IP
+      id: publicip
+      run: |
+        response=$(curl -s icanhazip.com)
+        echo "ip=$response" >> "$GITHUB_OUTPUT"
     - name: Add Github Actions IP to LB security group (Test)
       run: |
-          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.LB_SG_TEST }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 443, "ToPort": 443, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for SE automation test run"}]}]'
+          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.LB_SG_TEST }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 443, "ToPort": 443, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for SE automation test run"}]}]'
     - name: Add Github Actions IP to RDS security group (Test)
       run: |
-          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for SE automation DB requests"}]}]'
+          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for SE automation DB requests"}]}]'
     - name: Run All SE E2E Tests
       working-directory: ./packages/qa
       if: github.event.inputs.test-tag == '' || github.event.inputs.test-tag == 'all'
@@ -278,10 +284,10 @@ jobs:
           SE_NO_LOCAL_ACCOUNT_PASS: ${{ secrets.SE_NO_LOCAL_ACCOUNT_PASS }}
     - name: Remove Github Actions IP from LB security group (Test)
       run: |
-          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.LB_SG_TEST }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 443, "ToPort": 443, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for SE automation test run"}]}]'
+          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.LB_SG_TEST }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 443, "ToPort": 443, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for SE automation test run"}]}]'
     - name: Remove Github Actions IP from LB security group (Test)
       run: |
-          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for SE automation DB requests"}]}]'
+          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for SE automation DB requests"}]}]'
     - name: Upload HTML Report as artifact
       uses: actions/upload-artifact@v3
       if: always()
@@ -339,12 +345,14 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Get Github Actions Runner Public IP
-        id: ip
-        uses: haythem/public-ip@v1.3
+      - name: Get GitHub Actions Runner Public IP
+        id: publicip
+        run: |
+          response=$(curl -s icanhazip.com)
+          echo "ip=$response" >> "$GITHUB_OUTPUT"
       - name: Add Github Actions IP to RDS security group (Uat)
         run: |
-          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
+          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
         env:
@@ -400,7 +408,7 @@ jobs:
             IDG_API_PASSWORD=${{ secrets.IDG_API_PASSWORD }}
       - name: Remove Github Actions IP from RDS security group (Uat)
         run: |
-          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
+          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
       - name: Deploy Amazon ECS task definition
         env:
           ECS_SERVICE: crnccs-ecs-uat-se-service
@@ -432,12 +440,14 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Get Github Actions Runner Public IP
-        id: ip
-        uses: haythem/public-ip@v1.3
+      - name: Get GitHub Actions Runner Public IP
+        id: publicip
+        run: |
+          response=$(curl -s icanhazip.com)
+          echo "ip=$response" >> "$GITHUB_OUTPUT"
       - name: Add Github Actions IP to RDS security group (Oat)
         run: |
-          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
+          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
         env:
@@ -493,7 +503,7 @@ jobs:
             IDG_API_PASSWORD=${{ secrets.IDG_API_PASSWORD }}
       - name: Remove Github Actions IP from RDS security group (Oat)
         run: |
-          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
+          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
       - name: Deploy Amazon ECS task definition
         env:
           ECS_SERVICE: crnccp-ecs-oat-se-service
@@ -525,12 +535,14 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Get Github Actions Runner Public IP
-        id: ip
-        uses: haythem/public-ip@v1.3
+      - name: Get GitHub Actions Runner Public IP
+        id: publicip
+        run: |
+          response=$(curl -s icanhazip.com)
+          echo "ip=$response" >> "$GITHUB_OUTPUT"
       - name: Add Github Actions IP to RDS security group (Prod)
         run: |
-          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
+          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
         env:
@@ -586,7 +598,7 @@ jobs:
             IDG_API_PASSWORD=${{ secrets.IDG_API_PASSWORD }}
       - name: Remove Github Actions IP from RDS security group (Prod)
         run: |
-          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.ip.outputs.ipv4 }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
+          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
       - name: Deploy Amazon ECS task definition
         env:
           ECS_SERVICE: crnccp-ecs-prod-se-service
