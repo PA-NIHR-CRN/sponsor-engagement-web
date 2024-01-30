@@ -308,22 +308,22 @@ jobs:
         branch: gh-pages
 
     - name: Send slack message failure
-      if: failure() && github.ref == 'refs/heads/tests/e2e-workflow-update'
+      if: failure() && github.ref == 'refs/heads/main'
       uses: rtCamp/action-slack-notify@v2.2.0
       env:
         SLACK_WEBHOOK: ${{ secrets.SE_SLACK_WEBHOOK }}
         SLACK_COLOR: "failure"
-        SLACK_MESSAGE: "SE E2E Regression Tests Failed in ${{ env.ENV_MSG }}! :face_with_thermometer:"
-        SLACK_TITLE: "Sponsor Engagement E2E UI Tests - ENV:${{ env.ENV_MSG }} : FAILURE :x:"
+        SLACK_MESSAGE: "SE E2E Regression Tests Failed in TEST! :face_with_thermometer:"
+        SLACK_TITLE: "Sponsor Engagement E2E UI Tests - ENV: TEST : FAILURE :x:"
 
     - name: Send slack message success
-      if: success() && github.ref == 'refs/heads/tests/e2e-workflow-update'
+      if: success() && github.ref == 'refs/heads/main'
       uses: rtCamp/action-slack-notify@v2.2.0
       env:
         SLACK_WEBHOOK: ${{ secrets.SE_SLACK_WEBHOOK }}
         SLACK_COLOR: "success"
-        SLACK_MESSAGE: "SE E2E Regression Tests Passed in ${{ env.ENV_MSG }}! :partying_face:"
-        SLACK_TITLE: "Sponsor Engagement E2E UI Tests - ENV:${{ env.ENV_MSG }} : SUCCESS :tick:"
+        SLACK_MESSAGE: "SE E2E Regression Tests Passed in TEST! :partying_face:"
+        SLACK_TITLE: "Sponsor Engagement E2E UI Tests - ENV: TEST : SUCCESS :tick:"
 
   deploy-uat:
     needs: e2e-test
