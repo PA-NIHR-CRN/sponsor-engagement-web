@@ -162,7 +162,19 @@ export default function Studies({
           )}
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
-          <RequestSupport />
+          <div className="lg:sticky top-4">
+            <RequestSupport />
+            <Card className="mt-4" filled padding={4}>
+              <h3 className="govuk-heading-m">Export Study Data</h3>
+              <p>
+                This export provides a static download of the information held within the Sponsor Engagement Tools for
+                the sponsor / delegate organisation.
+              </p>
+              <a className="govuk-button mb-0" href="/api/export">
+                Download Export
+              </a>
+            </Card>
+          </div>
         </div>
       </div>
     </Container>

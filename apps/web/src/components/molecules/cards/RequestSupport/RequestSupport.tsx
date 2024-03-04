@@ -1,4 +1,5 @@
 import { StartIcon } from '@nihr-ui/frontend'
+import clsx from 'clsx'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
@@ -7,12 +8,13 @@ import { SUPPORT_PAGE } from '@/constants/routes'
 
 interface RequestSupportProps {
   showCallToAction?: boolean
+  sticky?: boolean
 }
 
-export function RequestSupport({ showCallToAction = false }: RequestSupportProps) {
+export function RequestSupport({ showCallToAction = false, sticky = true }: RequestSupportProps) {
   const { asPath } = useRouter()
   return (
-    <Card className="lg:sticky lg:top-4" filled padding={4}>
+    <Card className={clsx({ 'lg:sticky lg:top-4': sticky })} filled padding={4}>
       <h3 className="govuk-heading-m">Request NIHR CRN support</h3>
       {showCallToAction ? (
         <>
