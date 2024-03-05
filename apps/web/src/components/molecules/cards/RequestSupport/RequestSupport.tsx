@@ -11,7 +11,7 @@ interface RequestSupportProps {
   sticky?: boolean
 }
 
-export function RequestSupport({ showCallToAction = false, sticky = true }: RequestSupportProps) {
+export function RequestSupport({ showCallToAction = false, sticky = false }: RequestSupportProps) {
   const { asPath } = useRouter()
   return (
     <Card className={clsx({ 'lg:sticky lg:top-4': sticky })} filled padding={4}>

@@ -138,7 +138,7 @@ export default function Study({ study, assessments }: StudyProps) {
           <StudyDetails study={study} />
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
-          <RequestSupport showCallToAction />
+          <RequestSupport showCallToAction sticky />
         </div>
       </div>
     </Container>

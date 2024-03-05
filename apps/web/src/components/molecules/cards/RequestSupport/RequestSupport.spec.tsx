@@ -20,13 +20,13 @@ describe('RequestSupport Component', () => {
 
     expect(screen.queryByRole('link', { name: 'Request support' })).not.toBeInTheDocument()
 
-    // position:sticky by default
-    expect(container.firstChild).toHaveClass('lg:sticky')
+    // Not positioned sticky by default
+    expect(container.firstChild).not.toHaveClass('lg:sticky')
   })
 
-  test('renders a card without sticky positioning', () => {
-    const { container } = render(<RequestSupport sticky={false} />)
-    expect(container.firstChild).not.toHaveClass('lg:sticky')
+  test('renders a card with sticky positioning', () => {
+    const { container } = render(<RequestSupport sticky />)
+    expect(container.firstChild).toHaveClass('lg:sticky')
   })
 
   test('renders a card with a call to action', async () => {
