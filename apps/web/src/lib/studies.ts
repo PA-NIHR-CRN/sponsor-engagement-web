@@ -207,24 +207,6 @@ export const getStudiesForOrgs = async ({
 
 const studiesForExportFields = {
   include: {
-    id: true,
-    title: true,
-    shortTitle: true,
-    isDueAssessment: true,
-    cpmsId: true,
-    studyStatus: true,
-    route: true,
-    irasId: true,
-    protocolReferenceNumber: true,
-    sampleSize: true,
-    chiefInvestigatorFirstName: true,
-    chiefInvestigatorLastName: true,
-    managingSpeciality: true,
-    plannedOpeningDate: true,
-    plannedClosureDate: true,
-    actualOpeningDate: true,
-    actualClosureDate: true,
-    totalRecruitmentToDate: true,
     lastAssessment: {
       include: {
         status: true,

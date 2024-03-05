@@ -1,6 +1,7 @@
 import { logger } from '@nihr-ui/logger'
 import type * as exceljs from 'exceljs'
 import { Workbook } from 'exceljs'
+import MockDate from 'mockdate'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
 import type { RequestOptions } from 'node-mocks-http'
@@ -16,6 +17,8 @@ import api from './export'
 jest.mock('exceljs')
 jest.mock('next-auth/next')
 jest.mock('@nihr-ui/logger')
+
+MockDate.set(new Date('2001-01-01'))
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -60,7 +63,7 @@ describe('Exporting studies list', () => {
     // Helper text inserted as first row
     const helpTextRow = mockWorksheet.getRow(1)
     expect(helpTextRow.height).toBe(250)
-    expect(helpTextRow.values[1]).toBe(HELPER_TEXT)
+    expect(helpTextRow.values[1]).toBe(HELPER_TEXT.replace('%s', '01/01/2001'))
 
     // Correct column headings + formatting
     const headings = mockWorksheet.getRow(2)
@@ -73,8 +76,9 @@ describe('Exporting studies list', () => {
       'Study Short Title',
       'Study Long Title',
       'Study Chief Investigator',
-      'Sponsor',
-      'Study CRO/CTU Organisation',
+      'Study Sponsor Organisation',
+      'Study CTU',
+      'Study CRO',
       'Due assessment?',
       'Last Assessment Value',
       'Last Assessment Date',
@@ -90,7 +94,7 @@ describe('Exporting studies list', () => {
       'Network recruitment target',
       'Total network recruitment to date',
       'Managing speciality',
-      'On track (Yes or No)',
+      'Sponsor Assessment',
       'Additional Information (including any updates to study status, target, and/or date milestones)',
     ])
 
@@ -113,6 +117,7 @@ describe('Exporting studies list', () => {
       study.title,
       `${study.chiefInvestigatorFirstName} ${study.chiefInvestigatorLastName}`,
       'Test Clinical Research Sponsor',
+      undefined, // Study CTU
       'Test Contract Research Organisation',
       'Yes',
       'Off Track',
@@ -131,12 +136,16 @@ describe('Exporting studies list', () => {
     ])
 
     // Cell validations added
-    mockWorksheet.getColumn('onTrack').eachCell((cell) => {
-      expect(cell.dataValidation).toEqual({
-        type: 'list',
-        allowBlank: true,
-        formulae: ['"Yes, No"'],
-      })
+    mockWorksheet.getColumn('onTrack').eachCell((cell, rowNumber) => {
+      if (rowNumber <= 2) {
+        expect(cell.dataValidation).toBeUndefined()
+      } else {
+        expect(cell.dataValidation).toEqual({
+          type: 'list',
+          allowBlank: true,
+          formulae: ['"On track, Off track"'],
+        })
+      }
     })
 
     expect(res.statusCode).toBe(200)
@@ -166,8 +175,8 @@ describe('Exporting studies list', () => {
       'Study Short Title',
       'Study Long Title',
       'Study Chief Investigator',
-      'Sponsor',
-      'Study CRO/CTU Organisation',
+      'Study Sponsor Organisation',
+      'Study CTU',
       'Due assessment?',
       'Last Assessment Value',
       'Last Assessment Date',
@@ -181,7 +190,7 @@ describe('Exporting studies list', () => {
       'UK recruitment target',
       'Total UK recruitment to date',
       'Managing speciality',
-      'On track (Yes or No)',
+      'Sponsor Assessment',
       'Additional Information (including any updates to study status, target, and/or date milestones)',
     ])
 
@@ -238,8 +247,8 @@ describe('Exporting studies list', () => {
       'Study Protocol Number',
       'Study Short Title',
       'Study Long Title',
-      'Sponsor',
-      'Study CRO/CTU Organisation',
+      'Study Sponsor Organisation',
+      'Study CRO',
       'Due assessment?',
       'Last Assessment Value',
       'Last Assessment Date',
@@ -253,7 +262,7 @@ describe('Exporting studies list', () => {
       'Network recruitment target',
       'Total network recruitment to date',
       'Managing speciality',
-      'On track (Yes or No)',
+      'Sponsor Assessment',
       'Additional Information (including any updates to study status, target, and/or date milestones)',
     ])
 

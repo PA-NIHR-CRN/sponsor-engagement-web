@@ -6,13 +6,15 @@ export const FILE_NAME = 'studies.xlsx'
 /**
  * Helper/intro text for the excel document
  */
-export const HELPER_TEXT = `This export provides a static download of the information held within the Sponsor Engagement Tools for the sponsor / delegate organisation.
+export const HELPER_TEXT = `This export provides a static download of the information held within the Sponsor Engagement Tools for the sponsor / delegate organisation. Once exported, the information within this document may become out of date and is no longer guaranteed to be an accurate copy of data held by the live Sponsor Engagement Tool. 
 
-Please note that the information within this export download may become out of date and become misaligned with the live Sponsor Engagement Tool and once exported, the security of the information is the responsibility of the sponsor who requested the export.
+This export was created on %s.
 
-Please use columns X to provide an Assessment for each study. Please use column X to provide further information, as needed. For example; if there is an update to a study status, planned or actual milestone dates or targets, please add this information to the ‘additional information’ column.
+Please note that the security of the information contained in this document is the responsibility of the sponsor who requested the export. 
 
-There is no ability to automatically import the information collected via this export into the Sponsor Engagement Tool. Therefore, please can the sponsor / delegate representative enter the information into the live Sponsor Engagement Tool (https://assessmystudy.nihr.ac.uk/).
+Data in this document cannot be imported back into the Sponsor Engagement Tool. 
+
+The last columns in the spreadsheet are provided only to assist with local data gathering for new study assessments. For example; if there is an update to a study status, planned or actual milestone dates or targets, information can be added to the ‘additional information’ column. Once collated, information then has to be entered into the live Sponsor Engagement Tool (http://assessmystudy.nihr.ac.uk) by the sponsor / delegate representative. 
 
 If any further information, advice or support is required, please contact supportmystudy@nihr.ac.uk`
 

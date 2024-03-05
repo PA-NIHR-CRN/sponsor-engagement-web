@@ -1,4 +1,5 @@
 import { logger } from '@nihr-ui/logger'
+import dayjs from 'dayjs'
 import { Workbook, type Worksheet } from 'exceljs'
 
 import { FILE_NAME, GREY_FILL, HELPER_TEXT, PINK_FILL, Roles } from '@/constants'
@@ -13,8 +14,9 @@ const columns = [
   { key: 'shortTitle', header: 'Study Short Title' },
   { key: 'title', header: 'Study Long Title' },
   { key: 'chiefInvestigator', header: 'Study Chief Investigator' },
-  { key: 'sponsorOrg', header: 'Sponsor' },
-  { key: 'supportOrg', header: 'Study CRO/CTU Organisation' },
+  { key: 'sponsorOrg', header: 'Study Sponsor Organisation' },
+  { key: 'studyCTU', header: 'Study CTU' },
+  { key: 'studyCRO', header: 'Study CRO' },
   { key: 'isDueAssessment', header: 'Due assessment?' },
   { key: 'lastAssessmentStatus', header: 'Last Assessment Value' },
   { key: 'lastAssessmentDate', header: 'Last Assessment Date', style: { numFmt: 'dd/mm/yyy' } },
@@ -30,7 +32,7 @@ const columns = [
   { key: 'recruitmentTargetNetwork', header: 'Network recruitment target' },
   { key: 'recruitmentToDateNetwork', header: 'Total network recruitment to date' },
   { key: 'managingSpeciality', header: 'Managing speciality' },
-  { key: 'onTrack', header: 'On track (Yes or No)' },
+  { key: 'onTrack', header: 'Sponsor Assessment' },
   {
     key: 'additionalInformation',
     header: 'Additional Information (including any updates to study status, target, and/or date milestones)',
@@ -41,12 +43,18 @@ type Columns = typeof columns
 type ColumnKeys = Columns[number]['key']
 
 const commercialColumns: ColumnKeys[] = [
+  'studyCRO',
   'protocolReferenceNumber',
   'recruitmentTargetNetwork',
   'recruitmentToDateNetwork',
 ]
 
-const nonCommercialColumns: ColumnKeys[] = ['chiefInvestigator', 'recruitmentTargetUK', 'recruitmentToDateUK']
+const nonCommercialColumns: ColumnKeys[] = [
+  'studyCTU',
+  'chiefInvestigator',
+  'recruitmentTargetUK',
+  'recruitmentToDateUK',
+]
 
 type StudyDataMapper = (study: StudyForExport) => string | number | Date | null | undefined
 
@@ -59,7 +67,14 @@ const studyDataMappers: Partial<Record<ColumnKeys, StudyDataMapper>> = {
   chiefInvestigator: (study) =>
     study.chiefInvestigatorFirstName ? `${study.chiefInvestigatorFirstName} ${study.chiefInvestigatorLastName}` : null,
   sponsorOrg: (study) => study.organisations.find((org) => isClinicalResearchSponsor(org))?.organisation.name,
-  supportOrg: (study) => study.organisations.find((org) => !isClinicalResearchSponsor(org))?.organisation.name,
+  studyCRO: (study) =>
+    study.route === 'Commercial'
+      ? study.organisations.find((org) => !isClinicalResearchSponsor(org))?.organisation.name
+      : undefined,
+  studyCTU: (study) =>
+    study.route !== 'Commercial'
+      ? study.organisations.find((org) => !isClinicalResearchSponsor(org))?.organisation.name
+      : undefined,
   isDueAssessment: (study) => (study.isDueAssessment ? 'Yes' : 'No'),
   lastAssessmentStatus: (study) => study.lastAssessment?.status.name,
   lastAssessmentDate: (study) => study.lastAssessment?.createdAt,
@@ -88,16 +103,18 @@ const addHelperText = (worksheet: Worksheet) => {
   worksheet.insertRow(1, { key: 'helpText', header: 'Help Text' })
   const helpTextRow = worksheet.getRow(1)
   helpTextRow.height = 250
-  helpTextRow.values = [HELPER_TEXT]
+  helpTextRow.values = [HELPER_TEXT.replace('%s', dayjs().format('DD/MM/YYYY'))]
   worksheet.mergeCells('A1', `${worksheet.lastColumn?.letter}1`)
 }
 
 const addValidations = (worksheet: Worksheet) => {
-  worksheet.getColumn('onTrack').eachCell((cell) => {
-    cell.dataValidation = {
-      type: 'list',
-      allowBlank: true,
-      formulae: ['"Yes, No"'],
+  worksheet.getColumn('onTrack').eachCell((cell, rowNumber) => {
+    if (rowNumber > 2) {
+      cell.dataValidation = {
+        type: 'list',
+        allowBlank: true,
+        formulae: ['"On track, Off track"'],
+      }
     }
   })
 }
