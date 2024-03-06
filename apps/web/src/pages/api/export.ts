@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { Workbook, type Worksheet } from 'exceljs'
 
 import { FILE_NAME, GREY_FILL, HELPER_TEXT, PINK_FILL, Roles } from '@/constants'
-import { isClinicalResearchSponsor } from '@/lib/organisations'
+import { getSponsorOrgName, getSupportOrgName } from '@/lib/organisations'
 import { getStudiesForExport, type StudyForExport } from '@/lib/studies'
 import { withApiHandler } from '@/utils/withApiHandler'
 
@@ -66,15 +66,9 @@ const studyDataMappers: Partial<Record<ColumnKeys, StudyDataMapper>> = {
   title: (study) => study.title,
   chiefInvestigator: (study) =>
     study.chiefInvestigatorFirstName ? `${study.chiefInvestigatorFirstName} ${study.chiefInvestigatorLastName}` : null,
-  sponsorOrg: (study) => study.organisations.find((org) => isClinicalResearchSponsor(org))?.organisation.name,
-  studyCRO: (study) =>
-    study.route === 'Commercial'
-      ? study.organisations.find((org) => !isClinicalResearchSponsor(org))?.organisation.name
-      : undefined,
-  studyCTU: (study) =>
-    study.route !== 'Commercial'
-      ? study.organisations.find((org) => !isClinicalResearchSponsor(org))?.organisation.name
-      : undefined,
+  sponsorOrg: (study) => getSponsorOrgName(study.organisations),
+  studyCRO: (study) => (study.route === 'Commercial' ? getSupportOrgName(study.organisations) : undefined),
+  studyCTU: (study) => (study.route !== 'Commercial' ? getSupportOrgName(study.organisations) : undefined),
   isDueAssessment: (study) => (study.isDueAssessment ? 'Yes' : 'No'),
   lastAssessmentStatus: (study) => study.lastAssessment?.status.name,
   lastAssessmentDate: (study) => study.lastAssessment?.createdAt,

@@ -9,6 +9,8 @@ import type {
 } from './organisations'
 import {
   getOrganisationById,
+  getSponsorOrgName,
+  getSupportOrgName,
   getUserOrganisationById,
   getUserOrganisations,
   isClinicalResearchSponsor,
@@ -110,5 +112,63 @@ describe('isClinicalResearchSponsor', () => {
   it('returns true if the organisation is a Clinical Research Sponsor', () => {
     expect(isClinicalResearchSponsor(mockClinicalResearchSponsor)).toBe(true)
     expect(isClinicalResearchSponsor(mockContactResearchOrganisation)).toBe(false)
+  })
+})
+
+describe('getSponsorOrgName', () => {
+  const mockStudyOrgs = [
+    Mock.of<StudyOrganisationWithRelations>({
+      organisation: {
+        id: 123,
+        name: 'Test Clinical Research Sponsor',
+      },
+      organisationRole: {
+        id: 123,
+        name: 'Clinical Research Sponsor',
+      },
+    }),
+    Mock.of<StudyOrganisationWithRelations>({
+      organisation: {
+        id: 123,
+        name: 'Test Contract Research Organisation',
+      },
+      organisationRole: {
+        id: 123,
+        name: 'Contract Research Organisation',
+      },
+    }),
+  ]
+
+  it('returns the name of the associated sponsor organisation', () => {
+    expect(getSponsorOrgName(mockStudyOrgs)).toBe('Test Clinical Research Sponsor')
+  })
+})
+
+describe('getSupportOrgName', () => {
+  const mockStudyOrgs = [
+    Mock.of<StudyOrganisationWithRelations>({
+      organisation: {
+        id: 123,
+        name: 'Test Clinical Research Sponsor',
+      },
+      organisationRole: {
+        id: 123,
+        name: 'Clinical Research Sponsor',
+      },
+    }),
+    Mock.of<StudyOrganisationWithRelations>({
+      organisation: {
+        id: 123,
+        name: 'Test Contract Research Organisation',
+      },
+      organisationRole: {
+        id: 123,
+        name: 'Contract Research Organisation',
+      },
+    }),
+  ]
+
+  it('returns the name of the associated support organisation (i.e. CTU/CRO)', () => {
+    expect(getSupportOrgName(mockStudyOrgs)).toBe('Test Contract Research Organisation')
   })
 })
