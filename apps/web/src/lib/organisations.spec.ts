@@ -1,12 +1,14 @@
 import type { UserOrganisation } from 'database'
 import { Mock } from 'ts-mockery'
 
+import {
+  mockClinicalResearchSponsor,
+  mockContactResearchOrganisation,
+  mockStudyOrganisations,
+} from '@/mocks/organisations'
+
 import { prismaMock } from '../__mocks__/prisma'
-import type {
-  OrganisationWithRelations,
-  StudyOrganisationWithRelations,
-  UserOrganisationWithRelations,
-} from './organisations'
+import type { OrganisationWithRelations, UserOrganisationWithRelations } from './organisations'
 import {
   getOrganisationById,
   getSponsorOrgName,
@@ -87,28 +89,6 @@ describe('getUserOrganisationById', () => {
 })
 
 describe('isClinicalResearchSponsor', () => {
-  const mockClinicalResearchSponsor = Mock.of<StudyOrganisationWithRelations>({
-    organisation: {
-      id: 123,
-      name: 'Test Clinical Research Sponsor',
-    },
-    organisationRole: {
-      id: 123,
-      name: 'Clinical Research Sponsor',
-    },
-  })
-
-  const mockContactResearchOrganisation = Mock.of<StudyOrganisationWithRelations>({
-    organisation: {
-      id: 123,
-      name: 'Test Contract Research Organisation',
-    },
-    organisationRole: {
-      id: 123,
-      name: 'Contract Research Organisation',
-    },
-  })
-
   it('returns true if the organisation is a Clinical Research Sponsor', () => {
     expect(isClinicalResearchSponsor(mockClinicalResearchSponsor)).toBe(true)
     expect(isClinicalResearchSponsor(mockContactResearchOrganisation)).toBe(false)
@@ -116,59 +96,13 @@ describe('isClinicalResearchSponsor', () => {
 })
 
 describe('getSponsorOrgName', () => {
-  const mockStudyOrgs = [
-    Mock.of<StudyOrganisationWithRelations>({
-      organisation: {
-        id: 123,
-        name: 'Test Clinical Research Sponsor',
-      },
-      organisationRole: {
-        id: 123,
-        name: 'Clinical Research Sponsor',
-      },
-    }),
-    Mock.of<StudyOrganisationWithRelations>({
-      organisation: {
-        id: 123,
-        name: 'Test Contract Research Organisation',
-      },
-      organisationRole: {
-        id: 123,
-        name: 'Contract Research Organisation',
-      },
-    }),
-  ]
-
   it('returns the name of the associated sponsor organisation', () => {
-    expect(getSponsorOrgName(mockStudyOrgs)).toBe('Test Clinical Research Sponsor')
+    expect(getSponsorOrgName(mockStudyOrganisations)).toBe('Test Clinical Research Sponsor')
   })
 })
 
 describe('getSupportOrgName', () => {
-  const mockStudyOrgs = [
-    Mock.of<StudyOrganisationWithRelations>({
-      organisation: {
-        id: 123,
-        name: 'Test Clinical Research Sponsor',
-      },
-      organisationRole: {
-        id: 123,
-        name: 'Clinical Research Sponsor',
-      },
-    }),
-    Mock.of<StudyOrganisationWithRelations>({
-      organisation: {
-        id: 123,
-        name: 'Test Contract Research Organisation',
-      },
-      organisationRole: {
-        id: 123,
-        name: 'Contract Research Organisation',
-      },
-    }),
-  ]
-
   it('returns the name of the associated support organisation (i.e. CTU/CRO)', () => {
-    expect(getSupportOrgName(mockStudyOrgs)).toBe('Test Contract Research Organisation')
+    expect(getSupportOrgName(mockStudyOrganisations)).toBe('Test Contract Research Organisation')
   })
 })
