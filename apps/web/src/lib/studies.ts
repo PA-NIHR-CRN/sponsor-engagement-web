@@ -204,3 +204,59 @@ export const getStudiesForOrgs = async ({
     data: studies,
   }
 }
+
+const studiesForExportFields = {
+  include: {
+    lastAssessment: {
+      include: {
+        status: true,
+        furtherInformation: {
+          include: { furtherInformation: true },
+        },
+      },
+    },
+    organisations: {
+      where: {
+        isDeleted: false,
+      },
+      include: {
+        organisation: true,
+        organisationRole: true,
+      },
+    },
+    evaluationCategories: {
+      where: {
+        isDeleted: false,
+      },
+    },
+  },
+}
+
+export type StudyForExport = Prisma.StudyGetPayload<typeof studiesForExportFields>
+
+export const getStudiesForExport = async (organisationIds: number[]) => {
+  const query = {
+    where: {
+      isDeleted: false,
+      organisations: {
+        some: {
+          organisationId: { in: organisationIds },
+          organisationRole: {
+            rtsIdentifier: {
+              in: [
+                StudySponsorOrganisationRoleRTSIdentifier.ClinicalResearchSponsor,
+                StudySponsorOrganisationRoleRTSIdentifier.ClinicalTrialsUnit,
+                StudySponsorOrganisationRoleRTSIdentifier.ContractResearchOrganisation,
+              ],
+            },
+          },
+          isDeleted: false,
+        },
+      },
+    },
+    ...studiesForExportFields,
+    orderBy: [{ isDueAssessment: Prisma.SortOrder.desc }, { id: Prisma.SortOrder.asc }],
+  }
+
+  return prismaClient.study.findMany(query)
+}

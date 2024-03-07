@@ -154,6 +154,15 @@ describe('Studies page', () => {
       )
     ).toBeInTheDocument()
 
+    // Export Study Data
+    expect(screen.getByRole('heading', { level: 3, name: 'Export Study Data' })).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'This export provides a static download of the information held within the Sponsor Engagement Tools for the sponsor / delegate organisation.'
+      )
+    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Download Export' })).toHaveAttribute('href', '/api/export')
+
     // Study results title
     expect(screen.getByText(`${mockStudies.length} studies found (3 due for assessment)`)).toBeInTheDocument()
 

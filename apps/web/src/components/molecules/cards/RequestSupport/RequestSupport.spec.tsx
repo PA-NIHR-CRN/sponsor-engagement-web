@@ -8,7 +8,7 @@ import { RequestSupport } from './RequestSupport'
 
 describe('RequestSupport Component', () => {
   test('renders a card without a call to action', () => {
-    render(<RequestSupport />)
+    const { container } = render(<RequestSupport />)
 
     const headingElement = screen.getByText('Request NIHR CRN support')
     const descriptionElement = screen.getByText(
@@ -19,6 +19,14 @@ describe('RequestSupport Component', () => {
     expect(descriptionElement).toBeInTheDocument()
 
     expect(screen.queryByRole('link', { name: 'Request support' })).not.toBeInTheDocument()
+
+    // Not positioned sticky by default
+    expect(container.firstChild).not.toHaveClass('lg:sticky')
+  })
+
+  test('renders a card with sticky positioning', () => {
+    const { container } = render(<RequestSupport sticky />)
+    expect(container.firstChild).toHaveClass('lg:sticky')
   })
 
   test('renders a card with a call to action', async () => {
