@@ -9,7 +9,7 @@ import { createRequest, createResponse } from 'node-mocks-http'
 
 import { prismaMock } from '@/__mocks__/prisma'
 import { userWithSponsorContactRole } from '@/__mocks__/session'
-import { HELPER_TEXT, PINK_FILL } from '@/constants'
+import { HELPER_TEXT, PINK_FILL, RED_TEXT } from '@/constants'
 import { mockStudiesForExport } from '@/mocks/studies'
 
 import api from './export'
@@ -62,7 +62,8 @@ describe('Exporting studies list', () => {
 
     // Helper text inserted as first row
     const helpTextRow = mockWorksheet.getRow(1)
-    expect(helpTextRow.height).toBe(250)
+    expect(helpTextRow.height).toBe(200)
+    expect(helpTextRow.alignment).toEqual({ vertical: 'top', wrapText: true })
     expect(helpTextRow.values[1]).toBe(HELPER_TEXT.replace('%s', '01/01/2001'))
 
     // Correct column headings + formatting
@@ -70,8 +71,8 @@ describe('Exporting studies list', () => {
 
     expect(headings.values).toEqual([
       undefined,
-      'CPMS ID',
-      'IRAS ID',
+      'Study CPMS ID',
+      'Study IRAS ID',
       'Study Protocol Number',
       'Study Short Title',
       'Study Long Title',
@@ -94,7 +95,7 @@ describe('Exporting studies list', () => {
       'Network recruitment target',
       'Total network recruitment to date',
       'Managing speciality',
-      'Sponsor Assessment',
+      'Sponsor Assessment (On track or Off track)',
       'Additional Information (including any updates to study status, target, and/or date milestones)',
     ])
 
@@ -103,6 +104,7 @@ describe('Exporting studies list', () => {
     expect(headings.alignment.horizontal).toBe('center')
     expect(headings.getCell('onTrack').fill).toBe(PINK_FILL)
     expect(headings.getCell('additionalInformation').fill).toBe(PINK_FILL)
+    expect(headings.getCell('isDueAssessment').style).toBe(RED_TEXT)
 
     // Correct study data
     const studyRow = mockWorksheet.getRow(3)
@@ -170,8 +172,8 @@ describe('Exporting studies list', () => {
 
     expect(headings.values).toEqual([
       undefined,
-      'CPMS ID',
-      'IRAS ID',
+      'Study CPMS ID',
+      'Study IRAS ID',
       'Study Short Title',
       'Study Long Title',
       'Study Chief Investigator',
@@ -190,7 +192,7 @@ describe('Exporting studies list', () => {
       'UK recruitment target',
       'Total UK recruitment to date',
       'Managing speciality',
-      'Sponsor Assessment',
+      'Sponsor Assessment (On track or Off track)',
       'Additional Information (including any updates to study status, target, and/or date milestones)',
     ])
 
@@ -242,8 +244,8 @@ describe('Exporting studies list', () => {
 
     expect(headings.values).toEqual([
       undefined,
-      'CPMS ID',
-      'IRAS ID',
+      'Study CPMS ID',
+      'Study IRAS ID',
       'Study Protocol Number',
       'Study Short Title',
       'Study Long Title',
@@ -262,7 +264,7 @@ describe('Exporting studies list', () => {
       'Network recruitment target',
       'Total network recruitment to date',
       'Managing speciality',
-      'Sponsor Assessment',
+      'Sponsor Assessment (On track or Off track)',
       'Additional Information (including any updates to study status, target, and/or date milestones)',
     ])
 

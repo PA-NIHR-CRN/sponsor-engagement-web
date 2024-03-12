@@ -23,3 +23,6 @@ export const PINK_FILL = { type: 'pattern', pattern: 'solid', fgColor: { argb: '
 
 /** Grey colour for empty cells */
 export const GREY_FILL = { type: 'pattern', pattern: 'solid', bgColor: { argb: 'F0F0F0' } } as const
+
+/** Red text colour */
+export const RED_TEXT = { font: { color: { argb: 'FF0000' } } } as const
