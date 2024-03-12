@@ -2,14 +2,14 @@ import { logger } from '@nihr-ui/logger'
 import dayjs from 'dayjs'
 import { Workbook, type Worksheet } from 'exceljs'
 
-import { FILE_NAME, GREY_FILL, HELPER_TEXT, PINK_FILL, Roles } from '@/constants'
+import { FILE_NAME, GREY_FILL, HELPER_TEXT, PINK_FILL, RED_TEXT, Roles } from '@/constants'
 import { getSponsorOrgName, getSupportOrgName } from '@/lib/organisations'
 import { getStudiesForExport, type StudyForExport } from '@/lib/studies'
 import { withApiHandler } from '@/utils/withApiHandler'
 
 const columns = [
-  { key: 'cpmsId', header: 'CPMS ID' },
-  { key: 'irasId', header: 'IRAS ID' },
+  { key: 'cpmsId', header: 'Study CPMS ID' },
+  { key: 'irasId', header: 'Study IRAS ID' },
   { key: 'protocolReferenceNumber', header: 'Study Protocol Number' },
   { key: 'shortTitle', header: 'Study Short Title' },
   { key: 'title', header: 'Study Long Title' },
@@ -32,7 +32,7 @@ const columns = [
   { key: 'recruitmentTargetNetwork', header: 'Network recruitment target' },
   { key: 'recruitmentToDateNetwork', header: 'Total network recruitment to date' },
   { key: 'managingSpeciality', header: 'Managing speciality' },
-  { key: 'onTrack', header: 'Sponsor Assessment' },
+  { key: 'onTrack', header: 'Sponsor Assessment (On track or Off track)' },
   {
     key: 'additionalInformation',
     header: 'Additional Information (including any updates to study status, target, and/or date milestones)',
@@ -138,7 +138,7 @@ const addConditionalFormatting = (worksheet: Worksheet) => {
         operator: 'containsText',
         priority: 1,
         text: 'Yes',
-        style: { font: { color: { argb: 'FF0000' } } },
+        style: RED_TEXT,
       },
     ],
   })
@@ -160,6 +160,9 @@ const addFormatting = (worksheet: Worksheet) => {
   // Pink headings
   headings.getCell('onTrack').fill = PINK_FILL
   headings.getCell('additionalInformation').fill = PINK_FILL
+
+  // Red headings
+  headings.getCell('isDueAssessment').style = RED_TEXT
 }
 
 const addStudyData = (worksheet: Worksheet, studies: StudyForExport[]) => {
