@@ -62,7 +62,8 @@ describe('Exporting studies list', () => {
 
     // Helper text inserted as first row
     const helpTextRow = mockWorksheet.getRow(1)
-    expect(helpTextRow.height).toBe(250)
+    expect(helpTextRow.height).toBe(200)
+    expect(helpTextRow.alignment).toEqual({ vertical: 'top', wrapText: true })
     expect(helpTextRow.values[1]).toBe(HELPER_TEXT.replace('%s', '01/01/2001'))
 
     // Correct column headings + formatting

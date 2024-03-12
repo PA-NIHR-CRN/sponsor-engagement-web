@@ -96,8 +96,9 @@ const studyDataMappers: Partial<Record<ColumnKeys, StudyDataMapper>> = {
 const addHelperText = (worksheet: Worksheet) => {
   worksheet.insertRow(1, { key: 'helpText', header: 'Help Text' })
   const helpTextRow = worksheet.getRow(1)
-  helpTextRow.height = 250
+  helpTextRow.height = 200
   helpTextRow.values = [HELPER_TEXT.replace('%s', dayjs().format('DD/MM/YYYY'))]
+  helpTextRow.alignment = { vertical: 'top', wrapText: true }
   worksheet.mergeCells('A1', `${worksheet.lastColumn?.letter}1`)
 }
 
@@ -145,10 +146,14 @@ const addConditionalFormatting = (worksheet: Worksheet) => {
 }
 
 const addFormatting = (worksheet: Worksheet) => {
-  // Global column styling
+  // Set column widths
   worksheet.columns.forEach((sheetColumn) => {
     sheetColumn.width = 15
-    sheetColumn.alignment = { wrapText: true }
+  })
+
+  // Set wrap text
+  worksheet.eachRow((row) => {
+    row.alignment = { ...row.alignment, wrapText: true }
   })
 
   const headings = worksheet.getRow(2)
