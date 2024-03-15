@@ -167,7 +167,7 @@ const addFormatting = (worksheet: Worksheet) => {
   headings.getCell('additionalInformation').fill = PINK_FILL
 
   // Red headings
-  headings.getCell('isDueAssessment').style = RED_TEXT
+  headings.getCell('isDueAssessment').font = { ...RED_TEXT.font, bold: true }
 }
 
 const addStudyData = (worksheet: Worksheet, studies: StudyForExport[]) => {
