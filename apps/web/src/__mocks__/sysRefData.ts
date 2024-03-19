@@ -46,7 +46,7 @@ export const sysRefAssessmentFurtherInformation: SysRefAssessmentFurtherInformat
   },
   {
     id: 5,
-    name: 'Work in progress with CRN to update key milestones and recruitment activity',
+    name: 'Work in progress with RDN to update key milestones and recruitment activity',
     sortOrder: 5,
     description: '',
     isDeleted: false,

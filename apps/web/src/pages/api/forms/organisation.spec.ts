@@ -139,7 +139,7 @@ describe('Successful organisation sponsor contact invitation', () => {
     expect(emailService.sendEmail).toHaveBeenCalledWith({
       subject: 'Assess the progress of your studies',
       templateData: {
-        crnLink: EXTERNAL_CRN_URL,
+        rdnLink: EXTERNAL_CRN_URL,
         organisationName: updateOrgResponse.name,
         requestSupportLink: `http://localhost:3000${SUPPORT_PAGE}`,
         signInLink: `http://localhost:3000/auth/signin?registrationToken=${registrationToken}`,
@@ -240,7 +240,7 @@ describe('Successful organisation sponsor contact invitation', () => {
     expect(emailService.sendEmail).toHaveBeenCalledWith({
       subject: 'Assess the progress of your studies',
       templateData: {
-        crnLink: EXTERNAL_CRN_URL,
+        rdnLink: EXTERNAL_CRN_URL,
         organisationName: updateOrgResponse.name,
         requestSupportLink: `http://localhost:3000${SUPPORT_PAGE}`,
         signInLink: 'http://localhost:3000/auth/signin',
@@ -321,7 +321,7 @@ describe('Successful organisation sponsor contact invitation', () => {
     expect(emailService.sendEmail).toHaveBeenCalledWith({
       subject: 'Assess the progress of your studies',
       templateData: {
-        crnLink: EXTERNAL_CRN_URL,
+        rdnLink: EXTERNAL_CRN_URL,
         organisationName: updateOrgResponse.name,
         requestSupportLink: `http://localhost:3000${SUPPORT_PAGE}`,
         signInLink: 'http://localhost:3000/auth/signin',

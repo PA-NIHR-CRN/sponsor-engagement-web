@@ -97,19 +97,19 @@ export default class CommonItemsPage {
   async assertRequestSupportPresent() {
     await expect(this.requestSupportSection).toBeVisible()
     await expect(this.requestSupportHeader).toBeVisible()
-    await expect(this.requestSupportHeader).toHaveText('Request NIHR CRN support')
+    await expect(this.requestSupportHeader).toHaveText('Request NIHR RDN support')
   }
 
   async assertRequestSupportGuidanceText(pageContext: string) {
     await expect(this.requestSupportText).toBeVisible()
     if (pageContext.toLowerCase() == 'list') {
       await expect(this.requestSupportText).toHaveText(
-        'Sponsors or their delegates can request NIHR CRN support with their research study at any time.' +
+        'Sponsors or their delegates can request NIHR RDN support with their research study at any time.' +
           ' Click into your study for study level support guidance.'
       )
     } else {
       await expect(this.requestSupportText).toHaveText(
-        'Sponsors or their delegates can request NIHR CRN support with their research study at any time.'
+        'Sponsors or their delegates can request NIHR RDN support with their research study at any time.'
       )
     }
   }

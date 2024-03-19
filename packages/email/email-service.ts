@@ -28,7 +28,7 @@ export class EmailService {
     const recipients = Array.isArray(to) ? to : [to]
 
     const message: SES.Types.SendEmailRequest = {
-      Source: `"NIHR CRN" <${EMAIL_FROM_ADDRESS}>`,
+      Source: `"NIHR RDN" <${EMAIL_FROM_ADDRESS}>`,
       Destination: {
         ToAddresses: recipients,
       },

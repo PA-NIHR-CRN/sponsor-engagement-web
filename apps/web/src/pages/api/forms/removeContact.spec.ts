@@ -71,7 +71,7 @@ describe('Successful remove organisation contact', () => {
     })
 
     expect(emailService.sendEmail).toHaveBeenCalledWith({
-      subject: `NIHR CRN has removed you as a Sponsor contact for ${mockUserOrganisation.organisation.name}`,
+      subject: `NIHR RDN has removed you as a Sponsor contact for ${mockUserOrganisation.organisation.name}`,
       to: mockUserOrganisation.user.email,
       templateData: {
         organisationName: mockUserOrganisation.organisation.name,
