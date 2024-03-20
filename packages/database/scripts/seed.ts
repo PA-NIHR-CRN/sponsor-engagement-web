@@ -48,7 +48,7 @@ async function main() {
     'Waiting for HRA or MHRA approvals',
     'Waiting for site approval or activation',
     'In process of seeking an extension or protocol amendment',
-    'Work in progress with CRN to update key milestones and recruitment activity',
+    'Work in progress with RDN to update key milestones and recruitment activity',
     'In discussion with stakeholders to agree next steps',
     'No recruitment expected within the last 90 days, in line with the study plan',
     'Study closed to recruitment, in follow up',

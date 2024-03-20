@@ -33,7 +33,7 @@ const renderNotificationBanner = (success: boolean) =>
     <NotificationBanner heading="The study assessment was successfully saved" success>
       Request{' '}
       <Link className="govuk-notification-banner__link" href={SUPPORT_PAGE}>
-        NIHR CRN support
+        NIHR RDN support
       </Link>{' '}
       for this study.
     </NotificationBanner>
@@ -74,13 +74,13 @@ export default function Studies({
           </div>
 
           <p className="govuk-body">
-            The NIHR CRN tracks the progress of research studies in its portfolio using data provided by study teams.
-            Sponsors or their delegates need to assess if studies are on or off track and if any NIHR CRN support is
+            The NIHR RDN tracks the progress of research studies in its portfolio using data provided by study teams.
+            Sponsors or their delegates need to assess if studies are on or off track and if any NIHR RDN support is
             needed.
           </p>
 
           <Details className="[&>summary]:text-blue" heading="Why am I being asked to assess studies?">
-            <p>NIHR CRN asks sponsors or their delegates to review and assess study progress for UK studies when:</p>
+            <p>NIHR RDN asks sponsors or their delegates to review and assess study progress for UK studies when:</p>
             <ul className="govuk-list govuk-list--bullet">
               <li>A study falls behind the agreed milestones in the UK or</li>
               <li>A study is not recruiting to target in the UK</li>

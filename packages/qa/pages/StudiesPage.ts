@@ -114,8 +114,8 @@ export default class StudiesPage {
   async assertIntroGuideTxt() {
     await expect(this.txtIntroGuidance).toBeVisible()
     await expect(this.txtIntroGuidance).toHaveText(
-      'The NIHR CRN tracks the progress of research studies in its portfolio using data provided by study teams. ' +
-        'Sponsors or their delegates need to assess if studies are on or off track and if any NIHR CRN support is needed.'
+      'The NIHR RDN tracks the progress of research studies in its portfolio using data provided by study teams. ' +
+        'Sponsors or their delegates need to assess if studies are on or off track and if any NIHR RDN support is needed.'
     )
   }
 
@@ -134,7 +134,7 @@ export default class StudiesPage {
 
   async assertExpandibleSectionTxt() {
     await expect(this.expandCollapseSectionContents.locator('p')).toHaveText(
-      'NIHR CRN asks sponsors or their delegates to review and assess study progress for UK studies when:'
+      'NIHR RDN asks sponsors or their delegates to review and assess study progress for UK studies when:'
     )
     await expect(this.expandCollapseSectionContents.locator('ul > li')).toHaveText([
       'A study falls behind the agreed milestones in the UK or',

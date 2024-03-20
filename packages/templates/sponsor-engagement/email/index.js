@@ -18,7 +18,7 @@ templates['assessment-reminder.html.hbs'] = handlebars.template({
         }
 
     return (
-      "<html lang='en'>\r\n\r\n  <body>\r\n    <div>\r\n      <h1>NIHR CRN has invited you to assess the progress of your studies</h1>\r\n\r\n      <p style='font-size: 19px; font-weight:700; display: flex;'>\r\n        <img src='" +
+      "<html lang='en'>\r\n\r\n  <body>\r\n    <div>\r\n      <h1>NIHR RDN has invited you to assess the progress of your studies</h1>\r\n\r\n      <p style='font-size: 19px; font-weight:700; display: flex;'>\r\n        <img src='" +
       alias4(
         ((helper =
           (helper =
@@ -34,7 +34,7 @@ templates['assessment-reminder.html.hbs'] = handlebars.template({
             })
           : helper)
       ) +
-      "' style='display:block; width: 35px; height: 35px;' />\r\n        <span style='margin-left: 10px; margin-top: 3px;'>There are one or more studies to assess</span>\r\n      </p>\r\n\r\n      <p>Hello,</p>\r\n\r\n      <p>You are nominated as a Sponsor contact for studies on the NIHR Clinical Research Network’s (CRN) research\r\n        portfolio. One or more studies require an update on their status. Please sign in to the Sponsor Engagement Tool\r\n        to provide these updates.</p>\r\n\r\n      <a\r\n        href='" +
+      "' style='display:block; width: 35px; height: 35px;' />\r\n        <span style='margin-left: 10px; margin-top: 3px;'>There are one or more studies to assess</span>\r\n      </p>\r\n\r\n      <p>Hello,</p>\r\n\r\n      <p>You are nominated as a Sponsor contact for studies on the NIHR Research Delivery Network’s (RDN) research\r\n        portfolio. One or more studies require an update on their status. Please sign in to the Sponsor Engagement Tool\r\n        to provide these updates.</p>\r\n\r\n      <p>As a nominated contact for your organisation, you will see all studies linked to your organisation. The Sponsor\r\n        Engagement Tool does not associate contacts to specific studies or groups of studies, only to the organisation.</p>\r\n\r\n      <a\r\n        href='" +
       alias4(
         ((helper =
           (helper =
@@ -47,7 +47,7 @@ templates['assessment-reminder.html.hbs'] = handlebars.template({
               name: 'signInLink',
               hash: {},
               data: data,
-              loc: { start: { line: 20, column: 14 }, end: { line: 20, column: 28 } },
+              loc: { start: { line: 23, column: 14 }, end: { line: 23, column: 28 } },
             })
           : helper)
       ) +
@@ -55,19 +55,19 @@ templates['assessment-reminder.html.hbs'] = handlebars.template({
       alias4(
         ((helper =
           (helper =
-            lookupProperty(helpers, 'crnLink') || (depth0 != null ? lookupProperty(depth0, 'crnLink') : depth0)) != null
+            lookupProperty(helpers, 'rdnLink') || (depth0 != null ? lookupProperty(depth0, 'rdnLink') : depth0)) != null
             ? helper
             : alias2),
         typeof helper === alias3
           ? helper.call(alias1, {
-              name: 'crnLink',
+              name: 'rdnLink',
               hash: {},
               data: data,
-              loc: { start: { line: 46, column: 17 }, end: { line: 46, column: 28 } },
+              loc: { start: { line: 49, column: 17 }, end: { line: 49, column: 28 } },
             })
           : helper)
       ) +
-      "'>NIHR CRN</a>\r\n        supports Sponsors and their delegates to deliver high-quality research, for the benefit of patients, the public\r\n        and health and care organisations across England.\r\n      </p>\r\n\r\n      <p>\r\n        The NIHR CRN tracks the progress of research studies in its portfolio using data provided by Sponsors or their\r\n        delegates on behalf of the Department of Health and Social Care.\r\n      </p>\r\n\r\n      <p>Sponsors or their delegates are asked to review and assess the progress of studies when:</p>\r\n\r\n      <ul>\r\n        <li>A study falls behind the agreed milestones or</li>\r\n        <li>A study is not recruiting to target</li>\r\n        <li>And the last progress assessment is over three months old</li>\r\n      </ul>\r\n\r\n      <p>\r\n        Sponsors or their delegates can request\r\n        <a href='" +
+      "'>NIHR RDN</a>\r\n        supports Sponsors and their delegates to deliver high-quality research, for the benefit of patients, the public\r\n        and health and care organisations across England.\r\n      </p>\r\n\r\n      <p>\r\n        The NIHR RDN tracks the progress of research studies in its portfolio using data provided by Sponsors or their\r\n        delegates on behalf of the Department of Health and Social Care.\r\n      </p>\r\n\r\n      <p>Sponsors or their delegates are asked to review and assess the progress of studies when:</p>\r\n\r\n      <ul>\r\n        <li>A study falls behind the agreed milestones or</li>\r\n        <li>A study is not recruiting to target</li>\r\n        <li>And the last progress assessment is over three months old</li>\r\n      </ul>\r\n\r\n      <p>\r\n        Sponsors or their delegates can request\r\n        <a href='" +
       alias4(
         ((helper =
           (helper =
@@ -80,11 +80,11 @@ templates['assessment-reminder.html.hbs'] = handlebars.template({
               name: 'requestSupportLink',
               hash: {},
               data: data,
-              loc: { start: { line: 66, column: 17 }, end: { line: 66, column: 39 } },
+              loc: { start: { line: 69, column: 17 }, end: { line: 69, column: 39 } },
             })
           : helper)
       ) +
-      "'>NIHR CRN support</a>\r\n        with their research study at any time.\r\n      </p>\r\n\r\n      <p>\r\n        <strong>\r\n          Please note that providing regular study assessments is a requirement of the\r\n          <a href='" +
+      "'>NIHR RDN support</a>\r\n        with their research study at any time.\r\n      </p>\r\n\r\n      <p>\r\n        <strong>\r\n          Please note that providing regular study assessments is a requirement of the\r\n          <a href='" +
       alias4(
         ((helper =
           (helper =
@@ -97,11 +97,11 @@ templates['assessment-reminder.html.hbs'] = handlebars.template({
               name: 'termsAndConditionsLink',
               hash: {},
               data: data,
-              loc: { start: { line: 73, column: 19 }, end: { line: 73, column: 45 } },
+              loc: { start: { line: 76, column: 19 }, end: { line: 76, column: 45 } },
             })
           : helper)
       ) +
-      "'>Terms and Conditions for NIHR CRN support</a>. Failure to do so may\r\n          result in removal from the NIHR CRN Portfolio.\r\n        </strong>\r\n      </p>\r\n\r\n      <h2>Nominate someone else to assess research studies</h2>\r\n\r\n      <p>\r\n        The NIHR CRN can give other people in your organisation access to this service. Contact\r\n        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>\r\n        to add a new contact.\r\n      </p>\r\n\r\n      <hr />\r\n\r\n      <p>\r\n        This email is not monitored, do not reply. If you’re not sure why you’ve received this email or need to be\r\n        removed from our list contact\r\n        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>.\r\n      </p>\r\n    </div>\r\n\r\n    <br />\r\n\r\n    <div>\r\n      <table style='width: 540px; border-collapse: collapse'>\r\n        <tbody>\r\n          <tr>\r\n            <td style='width: 162px'>\r\n              <p>\r\n                &nbsp;<img\r\n                  src='https://www.nihr.ac.uk/layout/4.0/assets/external/nihr-logo.png'\r\n                  alt='NIHRLogo'\r\n                  width='206'\r\n                  class='CToWUd'\r\n                  data-bit='iit'\r\n                />\r\n              </p>\r\n            </td>\r\n          </tr>\r\n        </tbody>\r\n      </table>\r\n\r\n      <p>\r\n        <a\r\n          href='https://www.nihr.ac.uk/explore-nihr/campaigns/nhs-75/?utm_source=gmail&amp;utm_medium=email&amp;utm_campaign=nhs75&amp;utm_term=signature&amp;utm_content=signature'\r\n          target='_blank'\r\n        ><img\r\n            src='https://www.nihr.ac.uk/layout/img/external/nhs75-shape-the-future-signature.png'\r\n            alt='NIHR, Supporting NHS75. Life changing research funded by the public. Click, get involved in our NHS75 campaign'\r\n            width='540'\r\n            height='101'\r\n            class='CToWUd'\r\n            data-bit='iit'\r\n          />\r\n        </a>\r\n      </p>\r\n\r\n      <p>\r\n        Follow us:\r\n        <img\r\n          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/f_logo_RGB-Blue_58.png'\r\n          alt='FB Logo'\r\n          width='11'\r\n          height='11'\r\n          class='CToWUd'\r\n          data-bit='iit'\r\n        />\r\n        <a href='https://www.facebook.com/OfficialNIHR' target='_blank'>OfficialNIHR</a>&nbsp;|&nbsp;<img\r\n          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/Twitter_Logo_Blue.png'\r\n          alt='Twitter logo'\r\n          width='11'\r\n          height='11'\r\n          class='CToWUd'\r\n          data-bit='iit'\r\n        />\r\n        <a href='https://twitter.com/NIHRresearch' target='_blank'>@NIHRresearch</a>&nbsp;|&nbsp;<img\r\n          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/LI-In-Bug.png'\r\n          alt='LI Logo'\r\n          width='11'\r\n          height='9'\r\n          class='CToWUd'\r\n          data-bit='iit'\r\n        /><a href='https://www.linkedin.com/company/nihr-research' target='_blank'>NIHR</a>\r\n        |\r\n        <img\r\n          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/youtube_logo_rgb_light.png'\r\n          alt='Youtube Logo'\r\n          width='11'\r\n          height='9'\r\n          class='CToWUd'\r\n          data-bit='iit'\r\n        />\r\n        <a href='https://www.youtube.com/user/NIHRtv' target='_blank'>NIHRtv</a>\r\n        |\r\n        <img\r\n          src='https://www.nihr.ac.uk/layout/img/external/nihr-link-icon.png'\r\n          alt='URL Logo'\r\n          width='11'\r\n          height='9'\r\n          class='CToWUd'\r\n          data-bit='iit'\r\n        />\r\n        <a\r\n          href='https://www.nihr.ac.uk/?utm_source=gmail&amp;utm_medium=email&amp;utm_campaign=ccsignature'\r\n          target='_blank'\r\n        >nihr.ac.uk</a>\r\n      </p>\r\n      <br />\r\n      <br />\r\n      <p style='color: rgb(34, 34, 34); font-family: arial, sans-serif; background-color: rgb(255, 255, 255)'>\r\n        Confidential information may be contained in this message. If you are not the intended recipient, any reading,\r\n        printing, storage, disclosure, copying or any other action taken in respect of this e-mail is prohibited and may\r\n        be unlawful. If you are not the intended recipient, please notify the sender immediately by using the reply\r\n        function and then permanently delete what you have received.\r\n      </p>\r\n    </div>\r\n  </body>\r\n\r\n</html>"
+      "'>Terms and Conditions for NIHR RDN support</a>. Failure to do so may\r\n          result in removal from the NIHR RDN Portfolio.\r\n        </strong>\r\n      </p>\r\n\r\n      <h2>Nominate someone else to assess research studies</h2>\r\n\r\n      <p>\r\n        The NIHR RDN can give other people in your organisation access to this service. Contact\r\n        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>\r\n        to add a new contact.\r\n      </p>\r\n\r\n      <hr />\r\n\r\n      <p>\r\n        This email is not monitored, do not reply. If you’re not sure why you’ve received this email or need to be\r\n        removed from our list contact\r\n        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>.\r\n      </p>\r\n    </div>\r\n\r\n    <br />\r\n\r\n    <div>\r\n      <table style='width: 540px; border-collapse: collapse'>\r\n        <tbody>\r\n          <tr>\r\n            <td style='width: 162px'>\r\n              <p>\r\n                &nbsp;<img\r\n                  src='https://www.nihr.ac.uk/layout/4.0/assets/external/nihr-logo.png'\r\n                  alt='NIHRLogo'\r\n                  width='206'\r\n                  class='CToWUd'\r\n                  data-bit='iit'\r\n                />\r\n              </p>\r\n            </td>\r\n          </tr>\r\n        </tbody>\r\n      </table>\r\n\r\n      <p>\r\n        <a\r\n          href='https://www.nihr.ac.uk/explore-nihr/campaigns/nhs-75/?utm_source=gmail&amp;utm_medium=email&amp;utm_campaign=nhs75&amp;utm_term=signature&amp;utm_content=signature'\r\n          target='_blank'\r\n        ><img\r\n            src='https://www.nihr.ac.uk/layout/img/external/nhs75-shape-the-future-signature.png'\r\n            alt='NIHR, Supporting NHS75. Life changing research funded by the public. Click, get involved in our NHS75 campaign'\r\n            width='540'\r\n            height='101'\r\n            class='CToWUd'\r\n            data-bit='iit'\r\n          />\r\n        </a>\r\n      </p>\r\n\r\n      <p>\r\n        Follow us:\r\n        <img\r\n          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/f_logo_RGB-Blue_58.png'\r\n          alt='FB Logo'\r\n          width='11'\r\n          height='11'\r\n          class='CToWUd'\r\n          data-bit='iit'\r\n        />\r\n        <a href='https://www.facebook.com/OfficialNIHR' target='_blank'>OfficialNIHR</a>&nbsp;|&nbsp;<img\r\n          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/Twitter_Logo_Blue.png'\r\n          alt='Twitter logo'\r\n          width='11'\r\n          height='11'\r\n          class='CToWUd'\r\n          data-bit='iit'\r\n        />\r\n        <a href='https://twitter.com/NIHRresearch' target='_blank'>@NIHRresearch</a>&nbsp;|&nbsp;<img\r\n          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/LI-In-Bug.png'\r\n          alt='LI Logo'\r\n          width='11'\r\n          height='9'\r\n          class='CToWUd'\r\n          data-bit='iit'\r\n        /><a href='https://www.linkedin.com/company/nihr-research' target='_blank'>NIHR</a>\r\n        |\r\n        <img\r\n          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/youtube_logo_rgb_light.png'\r\n          alt='Youtube Logo'\r\n          width='11'\r\n          height='9'\r\n          class='CToWUd'\r\n          data-bit='iit'\r\n        />\r\n        <a href='https://www.youtube.com/user/NIHRtv' target='_blank'>NIHRtv</a>\r\n        |\r\n        <img\r\n          src='https://www.nihr.ac.uk/layout/img/external/nihr-link-icon.png'\r\n          alt='URL Logo'\r\n          width='11'\r\n          height='9'\r\n          class='CToWUd'\r\n          data-bit='iit'\r\n        />\r\n        <a\r\n          href='https://www.nihr.ac.uk/?utm_source=gmail&amp;utm_medium=email&amp;utm_campaign=ccsignature'\r\n          target='_blank'\r\n        >nihr.ac.uk</a>\r\n      </p>\r\n      <br />\r\n      <br />\r\n      <p style='color: rgb(34, 34, 34); font-family: arial, sans-serif; background-color: rgb(255, 255, 255)'>\r\n        Confidential information may be contained in this message. If you are not the intended recipient, any reading,\r\n        printing, storage, disclosure, copying or any other action taken in respect of this e-mail is prohibited and may\r\n        be unlawful. If you are not the intended recipient, please notify the sender immediately by using the reply\r\n        function and then permanently delete what you have received.\r\n      </p>\r\n    </div>\r\n  </body>\r\n\r\n</html>"
     )
   },
   useData: true,
@@ -124,7 +124,7 @@ templates['assessment-reminder.text.hbs'] = handlebars.template({
         }
 
     return (
-      '# Assess progress of research studies in NIHR CRN portfolio\r\n\r\nThere are one or more studies to assess\r\n\r\nSign-in [' +
+      '# Assess progress of research studies in NIHR RDN portfolio\r\n\r\nThere are one or more studies to assess\r\n\r\nSign-in [' +
       alias4(
         ((helper =
           (helper =
@@ -141,23 +141,23 @@ templates['assessment-reminder.text.hbs'] = handlebars.template({
             })
           : helper)
       ) +
-      ']\r\n\r\nHello,\r\n\r\nYou are nominated as a Sponsor contact for studies on the NIHR Clinical Research Network’s (CRN) research portfolio. One\r\nor more studies require an update on their status. Please sign in to the Sponsor Engagement Tool to provide these\r\nupdates.\r\n\r\n# Why am I being asked to assess studies?\r\n\r\nThe NIHR CRN [' +
+      ']\r\n\r\nHello,\r\n\r\nYou are nominated as a Sponsor contact for studies on the NIHR Research Delivery Network’s (RDN) research portfolio. One\r\nor more studies require an update on their status. Please sign in to the Sponsor Engagement Tool to provide these\r\nupdates.\r\n\r\nAs a nominated contact for your organisation, you will see all studies linked to your organisation. The Sponsor Engagement Tool\r\ndoes not associate contacts to specific studies or groups of studies, only to the organisation.\r\n\r\n# Why am I being asked to assess studies?\r\n\r\nThe NIHR RDN [' +
       alias4(
         ((helper =
           (helper =
-            lookupProperty(helpers, 'crnLink') || (depth0 != null ? lookupProperty(depth0, 'crnLink') : depth0)) != null
+            lookupProperty(helpers, 'rdnLink') || (depth0 != null ? lookupProperty(depth0, 'rdnLink') : depth0)) != null
             ? helper
             : alias2),
         typeof helper === alias3
           ? helper.call(alias1, {
-              name: 'crnLink',
+              name: 'rdnLink',
               hash: {},
               data: data,
-              loc: { start: { line: 15, column: 14 }, end: { line: 15, column: 25 } },
+              loc: { start: { line: 18, column: 14 }, end: { line: 18, column: 25 } },
             })
           : helper)
       ) +
-      '] supports Sponsors and their delegates to deliver high-quality research, for the benefit of\r\npatients, the public and health and care organisations across England.\r\n\r\n\r\nThe NIHR CRN tracks the progress of research studies in its portfolio using data provided by Sponsors or their delegates\r\non behalf of the Department of Health and Social Care.\r\n\r\nSponsors or their delegates are asked to review and assess the progress of studies when:\r\n\r\n- A study falls behind the agreed milestones\r\n- A study is not recruiting to target\r\n- And the last progress assessment is over three months old\r\n\r\nSponsors or their delegates can request NIHR CRN support with their research study at any time. [' +
+      '] supports Sponsors and their delegates to deliver high-quality research, for the benefit of\r\npatients, the public and health and care organisations across England.\r\n\r\n\r\nThe NIHR RDN tracks the progress of research studies in its portfolio using data provided by Sponsors or their delegates\r\non behalf of the Department of Health and Social Care.\r\n\r\nSponsors or their delegates are asked to review and assess the progress of studies when:\r\n\r\n- A study falls behind the agreed milestones\r\n- A study is not recruiting to target\r\n- And the last progress assessment is over three months old\r\n\r\nSponsors or their delegates can request NIHR RDN support with their research study at any time. [' +
       alias4(
         ((helper =
           (helper =
@@ -170,11 +170,11 @@ templates['assessment-reminder.text.hbs'] = handlebars.template({
               name: 'requestSupportLink',
               hash: {},
               data: data,
-              loc: { start: { line: 28, column: 97 }, end: { line: 28, column: 119 } },
+              loc: { start: { line: 31, column: 97 }, end: { line: 31, column: 119 } },
             })
           : helper)
       ) +
-      ']\r\n\r\nPlease note that providing regular study assessments is a requirement of the Terms and Conditions for NIHR CRN support\r\n[' +
+      ']\r\n\r\nPlease note that providing regular study assessments is a requirement of the Terms and Conditions for NIHR RDN support\r\n[' +
       alias4(
         ((helper =
           (helper =
@@ -187,11 +187,11 @@ templates['assessment-reminder.text.hbs'] = handlebars.template({
               name: 'termsAndConditionsLink',
               hash: {},
               data: data,
-              loc: { start: { line: 31, column: 1 }, end: { line: 31, column: 27 } },
+              loc: { start: { line: 34, column: 1 }, end: { line: 34, column: 27 } },
             })
           : helper)
       ) +
-      ']. Failure to do so may result in removal from the NIHR CRN Portfolio.\r\n\r\n# Nominate someone else to assess research studies\r\n\r\nThe NIHR CRN can give other people in your organisation access to this service. Contact supportmystudy@nihr.ac.uk to add\r\na new contact.\r\n\r\nThis email is not monitored, do not reply. If you’re not sure why you’ve received this email or need to be removed from\r\nour list contact supportmystudy@nihr.ac.uk.'
+      ']. Failure to do so may result in removal from the NIHR RDN Portfolio.\r\n\r\n# Nominate someone else to assess research studies\r\n\r\nThe NIHR RDN can give other people in your organisation access to this service. Contact supportmystudy@nihr.ac.uk to add\r\na new contact.\r\n\r\nThis email is not monitored, do not reply. If you’re not sure why you’ve received this email or need to be removed from\r\nour list contact supportmystudy@nihr.ac.uk.'
     )
   },
   useData: true,
@@ -214,7 +214,7 @@ templates['contact-assigned.html.hbs'] = handlebars.template({
         }
 
     return (
-      "<html lang='en'>\r\n\r\n  <body>\r\n    <div>\r\n      <h1>NIHR CRN has invited you to assess the progress of your studies</h1>\r\n\r\n      <p>Hello,</p>\r\n\r\n      <p>\r\n        You have been nominated as a contact for\r\n        " +
+      "<html lang='en'>\r\n\r\n  <body>\r\n    <div>\r\n      <h1>NIHR RDN has invited you to assess the progress of your studies</h1>\r\n\r\n      <p>Hello,</p>\r\n\r\n      <p>\r\n        You have been nominated as a contact for\r\n        " +
       alias4(
         ((helper =
           (helper =
@@ -231,23 +231,23 @@ templates['contact-assigned.html.hbs'] = handlebars.template({
             })
           : helper)
       ) +
-      "\r\n        studies on the NIHR Clinical Research Network’s (CRN) research portfolio.\r\n      </p>\r\n\r\n      <p>\r\n        The\r\n        <a href='" +
+      "\r\n        studies on the NIHR Research Delivery Network’s (RDN) research portfolio.\r\n      </p>\r\n\r\n      <p>\r\n        The\r\n        <a href='" +
       alias4(
         ((helper =
           (helper =
-            lookupProperty(helpers, 'crnLink') || (depth0 != null ? lookupProperty(depth0, 'crnLink') : depth0)) != null
+            lookupProperty(helpers, 'rdnLink') || (depth0 != null ? lookupProperty(depth0, 'rdnLink') : depth0)) != null
             ? helper
             : alias2),
         typeof helper === alias3
           ? helper.call(alias1, {
-              name: 'crnLink',
+              name: 'rdnLink',
               hash: {},
               data: data,
               loc: { start: { line: 18, column: 17 }, end: { line: 18, column: 28 } },
             })
           : helper)
       ) +
-      "'>NIHR CRN</a>\r\n        supports Sponsors and their delegates to deliver high-quality research, for the benefit of patients, the public\r\n        and health and care organisations across England.\r\n      </p>\r\n\r\n      <p>\r\n        The NIHR CRN tracks the progress of research studies in its portfolio using data provided by Sponsors or their\r\n        delegates on behalf of the Department of Health and Social Care.\r\n      </p>\r\n\r\n      <p>\r\n        NIHR CRN asks Sponsors or their delegates to review these studies and provide regular assessments of how the\r\n        study is progressing.\r\n      </p>\r\n\r\n      <p>\r\n        Please sign in to the Sponsor Engagement Tool to provide updates on studies.\r\n      </p>\r\n\r\n      <a\r\n        href='" +
+      "'>NIHR RDN</a>\r\n        supports Sponsors and their delegates to deliver high-quality research, for the benefit of patients, the public\r\n        and health and care organisations across England.\r\n      </p>\r\n\r\n      <p>\r\n        The NIHR RDN tracks the progress of research studies in its portfolio using data provided by Sponsors or their\r\n        delegates on behalf of the Department of Health and Social Care.\r\n      </p>\r\n\r\n      <p>\r\n        NIHR RDN asks Sponsors or their delegates to review these studies and provide regular assessments of how the\r\n        study is progressing.\r\n      </p>\r\n\r\n      <p>\r\n        Please sign in to the Sponsor Engagement Tool to provide updates on studies.\r\n      </p>\r\n\r\n      <a\r\n        href='" +
       alias4(
         ((helper =
           (helper =
@@ -281,7 +281,7 @@ templates['contact-assigned.html.hbs'] = handlebars.template({
             })
           : helper)
       ) +
-      "'>NIHR CRN support</a>\r\n        with their research study at any time.\r\n      </p>\r\n\r\n      <p>\r\n        <strong>\r\n          Please note that providing regular study assessments is a requirement of the\r\n          <a href='" +
+      "'>NIHR RDN support</a>\r\n        with their research study at any time.\r\n      </p>\r\n\r\n      <p>\r\n        <strong>\r\n          Please note that providing regular study assessments is a requirement of the\r\n          <a href='" +
       alias4(
         ((helper =
           (helper =
@@ -298,7 +298,7 @@ templates['contact-assigned.html.hbs'] = handlebars.template({
             })
           : helper)
       ) +
-      "'>Terms and Conditions for NIHR CRN support</a>. Failure to do so may\r\n          result in removal from the NIHR CRN Portfolio.\r\n        </strong>\r\n      </p>\r\n\r\n      <h2>Nominate someone else to assess studies</h2>\r\n\r\n      <p>\r\n        The NIHR CRN can give other people in your organisation access to this service. Contact\r\n        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>\r\n        to add a new contact.\r\n      </p>\r\n\r\n      <p>\r\n        This email is not monitored, do not reply. If you’re not sure why you’ve received this email or need to be\r\n        removed from our list contact\r\n        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>.\r\n      </p>\r\n    </div>\r\n\r\n    <br />\r\n\r\n    <div>\r\n      <table style='width: 540px; border-collapse: collapse'>\r\n        <tbody>\r\n          <tr>\r\n            <td style='width: 162px'>\r\n              <p>\r\n                &nbsp;<img\r\n                  src='https://www.nihr.ac.uk/layout/4.0/assets/external/nihr-logo.png'\r\n                  alt='NIHRLogo'\r\n                  width='206'\r\n                  class='CToWUd'\r\n                  data-bit='iit'\r\n                />\r\n              </p>\r\n            </td>\r\n          </tr>\r\n        </tbody>\r\n      </table>\r\n\r\n      <p>\r\n        <a\r\n          href='https://www.nihr.ac.uk/explore-nihr/campaigns/nhs-75/?utm_source=gmail&amp;utm_medium=email&amp;utm_campaign=nhs75&amp;utm_term=signature&amp;utm_content=signature'\r\n          target='_blank'\r\n        ><img\r\n            src='https://www.nihr.ac.uk/layout/img/external/nhs75-shape-the-future-signature.png'\r\n            alt='NIHR, Supporting NHS75. Life changing research funded by the public. Click, get involved in our NHS75 campaign'\r\n            width='540'\r\n            height='101'\r\n            class='CToWUd'\r\n            data-bit='iit'\r\n          />\r\n        </a>\r\n      </p>\r\n\r\n      <p>\r\n        Follow us:\r\n        <img\r\n          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/f_logo_RGB-Blue_58.png'\r\n          alt='FB Logo'\r\n          width='11'\r\n          height='11'\r\n          class='CToWUd'\r\n          data-bit='iit'\r\n        />\r\n        <a href='https://www.facebook.com/OfficialNIHR' target='_blank'>OfficialNIHR</a>&nbsp;|&nbsp;<img\r\n          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/Twitter_Logo_Blue.png'\r\n          alt='Twitter logo'\r\n          width='11'\r\n          height='11'\r\n          class='CToWUd'\r\n          data-bit='iit'\r\n        />\r\n        <a href='https://twitter.com/NIHRresearch' target='_blank'>@NIHRresearch</a>&nbsp;|&nbsp;<img\r\n          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/LI-In-Bug.png'\r\n          alt='LI Logo'\r\n          width='11'\r\n          height='9'\r\n          class='CToWUd'\r\n          data-bit='iit'\r\n        /><a href='https://www.linkedin.com/company/nihr-research' target='_blank'>NIHR</a>\r\n        |\r\n        <img\r\n          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/youtube_logo_rgb_light.png'\r\n          alt='Youtube Logo'\r\n          width='11'\r\n          height='9'\r\n          class='CToWUd'\r\n          data-bit='iit'\r\n        />\r\n        <a href='https://www.youtube.com/user/NIHRtv' target='_blank'>NIHRtv</a>\r\n        |\r\n        <img\r\n          src='https://www.nihr.ac.uk/layout/img/external/nihr-link-icon.png'\r\n          alt='URL Logo'\r\n          width='11'\r\n          height='9'\r\n          class='CToWUd'\r\n          data-bit='iit'\r\n        />\r\n        <a\r\n          href='https://www.nihr.ac.uk/?utm_source=gmail&amp;utm_medium=email&amp;utm_campaign=ccsignature'\r\n          target='_blank'\r\n        >nihr.ac.uk</a>\r\n      </p>\r\n      <br />\r\n      <br />\r\n      <p style='color: rgb(34, 34, 34); font-family: arial, sans-serif; background-color: rgb(255, 255, 255)'>\r\n        Confidential information may be contained in this message. If you are not the intended recipient, any reading,\r\n        printing, storage, disclosure, copying or any other action taken in respect of this e-mail is prohibited and may\r\n        be unlawful. If you are not the intended recipient, please notify the sender immediately by using the reply\r\n        function and then permanently delete what you have received.\r\n      </p>\r\n    </div>\r\n  </body>\r\n\r\n</html>"
+      "'>Terms and Conditions for NIHR RDN support</a>. Failure to do so may\r\n          result in removal from the NIHR RDN Portfolio.\r\n        </strong>\r\n      </p>\r\n\r\n      <h2>Nominate someone else to assess studies</h2>\r\n\r\n      <p>\r\n        The NIHR RDN can give other people in your organisation access to this service. Contact\r\n        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>\r\n        to add a new contact.\r\n      </p>\r\n\r\n      <p>\r\n        This email is not monitored, do not reply. If you’re not sure why you’ve received this email or need to be\r\n        removed from our list contact\r\n        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>.\r\n      </p>\r\n    </div>\r\n\r\n    <br />\r\n\r\n    <div>\r\n      <table style='width: 540px; border-collapse: collapse'>\r\n        <tbody>\r\n          <tr>\r\n            <td style='width: 162px'>\r\n              <p>\r\n                &nbsp;<img\r\n                  src='https://www.nihr.ac.uk/layout/4.0/assets/external/nihr-logo.png'\r\n                  alt='NIHRLogo'\r\n                  width='206'\r\n                  class='CToWUd'\r\n                  data-bit='iit'\r\n                />\r\n              </p>\r\n            </td>\r\n          </tr>\r\n        </tbody>\r\n      </table>\r\n\r\n      <p>\r\n        <a\r\n          href='https://www.nihr.ac.uk/explore-nihr/campaigns/nhs-75/?utm_source=gmail&amp;utm_medium=email&amp;utm_campaign=nhs75&amp;utm_term=signature&amp;utm_content=signature'\r\n          target='_blank'\r\n        ><img\r\n            src='https://www.nihr.ac.uk/layout/img/external/nhs75-shape-the-future-signature.png'\r\n            alt='NIHR, Supporting NHS75. Life changing research funded by the public. Click, get involved in our NHS75 campaign'\r\n            width='540'\r\n            height='101'\r\n            class='CToWUd'\r\n            data-bit='iit'\r\n          />\r\n        </a>\r\n      </p>\r\n\r\n      <p>\r\n        Follow us:\r\n        <img\r\n          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/f_logo_RGB-Blue_58.png'\r\n          alt='FB Logo'\r\n          width='11'\r\n          height='11'\r\n          class='CToWUd'\r\n          data-bit='iit'\r\n        />\r\n        <a href='https://www.facebook.com/OfficialNIHR' target='_blank'>OfficialNIHR</a>&nbsp;|&nbsp;<img\r\n          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/Twitter_Logo_Blue.png'\r\n          alt='Twitter logo'\r\n          width='11'\r\n          height='11'\r\n          class='CToWUd'\r\n          data-bit='iit'\r\n        />\r\n        <a href='https://twitter.com/NIHRresearch' target='_blank'>@NIHRresearch</a>&nbsp;|&nbsp;<img\r\n          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/LI-In-Bug.png'\r\n          alt='LI Logo'\r\n          width='11'\r\n          height='9'\r\n          class='CToWUd'\r\n          data-bit='iit'\r\n        /><a href='https://www.linkedin.com/company/nihr-research' target='_blank'>NIHR</a>\r\n        |\r\n        <img\r\n          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/youtube_logo_rgb_light.png'\r\n          alt='Youtube Logo'\r\n          width='11'\r\n          height='9'\r\n          class='CToWUd'\r\n          data-bit='iit'\r\n        />\r\n        <a href='https://www.youtube.com/user/NIHRtv' target='_blank'>NIHRtv</a>\r\n        |\r\n        <img\r\n          src='https://www.nihr.ac.uk/layout/img/external/nihr-link-icon.png'\r\n          alt='URL Logo'\r\n          width='11'\r\n          height='9'\r\n          class='CToWUd'\r\n          data-bit='iit'\r\n        />\r\n        <a\r\n          href='https://www.nihr.ac.uk/?utm_source=gmail&amp;utm_medium=email&amp;utm_campaign=ccsignature'\r\n          target='_blank'\r\n        >nihr.ac.uk</a>\r\n      </p>\r\n      <br />\r\n      <br />\r\n      <p style='color: rgb(34, 34, 34); font-family: arial, sans-serif; background-color: rgb(255, 255, 255)'>\r\n        Confidential information may be contained in this message. If you are not the intended recipient, any reading,\r\n        printing, storage, disclosure, copying or any other action taken in respect of this e-mail is prohibited and may\r\n        be unlawful. If you are not the intended recipient, please notify the sender immediately by using the reply\r\n        function and then permanently delete what you have received.\r\n      </p>\r\n    </div>\r\n  </body>\r\n\r\n</html>"
     )
   },
   useData: true,
@@ -321,7 +321,7 @@ templates['contact-assigned.text.hbs'] = handlebars.template({
         }
 
     return (
-      '# NIHR CRN has invited you to assess the progress of your studies\r\n\r\nHello,\r\n\r\nYou have been nominated as a contact for ' +
+      '# NIHR RDN has invited you to assess the progress of your studies\r\n\r\nHello,\r\n\r\nYou have been nominated as a contact for ' +
       alias4(
         ((helper =
           (helper =
@@ -338,7 +338,7 @@ templates['contact-assigned.text.hbs'] = handlebars.template({
             })
           : helper)
       ) +
-      " studies on the NIHR Clinical Research Network's (CRN) research portfolio.\r\n\r\nThe NIHR CRN supports Sponsors and their delegates to deliver high-quality research, for the benefit of patients, the public and health and care organisations across England.\r\n\r\nThe NIHR CRN tracks the progress of research studies in its portfolio using data provided by Sponsors or their delegates on behalf of the Department of Health and Social Care.\r\n\r\nNIHR CRN asks Sponsors or their delegates to review these studies and provide regular assessments of how the study is progressing.\r\n\r\nPlease sign in to the Sponsor Engagement Tool to provide updates on studies. (" +
+      " studies on the NIHR Research Delivery Network's (RDN) research portfolio.\r\n\r\nThe NIHR RDN supports Sponsors and their delegates to deliver high-quality research, for the benefit of patients, the public and health and care organisations across England.\r\n\r\nThe NIHR RDN tracks the progress of research studies in its portfolio using data provided by Sponsors or their delegates on behalf of the Department of Health and Social Care.\r\n\r\nNIHR RDN asks Sponsors or their delegates to review these studies and provide regular assessments of how the study is progressing.\r\n\r\nPlease sign in to the Sponsor Engagement Tool to provide updates on studies. (" +
       alias4(
         ((helper =
           (helper =
@@ -355,7 +355,7 @@ templates['contact-assigned.text.hbs'] = handlebars.template({
             })
           : helper)
       ) +
-      ')\r\n\r\n# Why am I being asked to assess studies?\r\n\r\nSponsors or their delegates are asked to review and assess the progress of studies when:\r\n\r\n- A study falls behind the agreed milestones\r\n- A study is not recruiting to target\r\n- And the last progress assessment is over three months old\r\n\r\nSponsors or their delegates can request NIHR CRN support with their research study at any time. (' +
+      ')\r\n\r\n# Why am I being asked to assess studies?\r\n\r\nSponsors or their delegates are asked to review and assess the progress of studies when:\r\n\r\n- A study falls behind the agreed milestones\r\n- A study is not recruiting to target\r\n- And the last progress assessment is over three months old\r\n\r\nSponsors or their delegates can request NIHR RDN support with their research study at any time. (' +
       alias4(
         ((helper =
           (helper =
@@ -372,7 +372,7 @@ templates['contact-assigned.text.hbs'] = handlebars.template({
             })
           : helper)
       ) +
-      ')\r\n\r\nPlease note that providing regular study assessments is a requirement of the Terms and Conditions for NIHR CRN support.\r\nFailure to do so may result in removal from the NIHR CRN Portfolio. (' +
+      ')\r\n\r\nPlease note that providing regular study assessments is a requirement of the Terms and Conditions for NIHR RDN support.\r\nFailure to do so may result in removal from the NIHR RDN Portfolio. (' +
       alias4(
         ((helper =
           (helper =
@@ -389,7 +389,7 @@ templates['contact-assigned.text.hbs'] = handlebars.template({
             })
           : helper)
       ) +
-      ')\r\n\r\n# Nominate someone else to assess studies\r\n\r\nThe NIHR CRN can give other people in your organisation access to this service. Contact supportmystudy@nihr.ac.uk to add\r\na new contact.\r\n\r\nThis email is not monitored, do not reply. If you’re not sure why you’ve received this email or need to be removed from\r\nour list, please contact supportmystudy@nihr.ac.uk.\r\n'
+      ')\r\n\r\n# Nominate someone else to assess studies\r\n\r\nThe NIHR RDN can give other people in your organisation access to this service. Contact supportmystudy@nihr.ac.uk to add\r\na new contact.\r\n\r\nThis email is not monitored, do not reply. If you’re not sure why you’ve received this email or need to be removed from\r\nour list, please contact supportmystudy@nihr.ac.uk.\r\n'
     )
   },
   useData: true,
@@ -412,7 +412,7 @@ templates['contact-removed.html.hbs'] = handlebars.template({
         }
 
     return (
-      "<html lang='en'>\r\n  <body>\r\n    <div>\r\n      <h1>NIHR CRN has removed you as a reviewer for " +
+      "<html lang='en'>\r\n  <body>\r\n    <div>\r\n      <h1>NIHR RDN has removed you as a reviewer for " +
       alias4(
         ((helper =
           (helper =
@@ -469,7 +469,7 @@ templates['contact-removed.text.hbs'] = handlebars.template({
         }
 
     return (
-      '# NIHR CRN has removed you as a reviewer for ' +
+      '# NIHR RDN has removed you as a reviewer for ' +
       alias4(
         ((helper =
           (helper =

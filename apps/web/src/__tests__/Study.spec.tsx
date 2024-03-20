@@ -206,7 +206,7 @@ describe('Study page', () => {
     expect(screen.queryByText('Due')).not.toBeInTheDocument()
 
     expect(screen.getByText(/You can review the progress of this study at any time./)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'NIHR CRN support' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'NIHR RDN support' })).toHaveAttribute(
       'href',
       `${SUPPORT_PAGE}?returnPath=/study/123`
     )
@@ -280,10 +280,10 @@ describe('Study page', () => {
     ])
 
     // Support
-    expect(screen.getByRole('heading', { level: 3, name: 'Request NIHR CRN support' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 3, name: 'Request NIHR RDN support' })).toBeInTheDocument()
     expect(
       screen.getByText(
-        'Sponsors or their delegates can request NIHR CRN support with their research study at any time.'
+        'Sponsors or their delegates can request NIHR RDN support with their research study at any time.'
       )
     ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Request support' })).toHaveAttribute(
@@ -413,9 +413,9 @@ describe('Study page', () => {
     // Banner
     const banner = screen.getByRole('alert', { name: 'Success' })
     expect(within(banner).getByText('The study assessment was successfully saved')).toBeInTheDocument()
-    expect(within(banner).getByRole('link', { name: 'NIHR CRN support' })).toHaveAttribute('href', SUPPORT_PAGE)
-    expect(within(banner).getByRole('link', { name: 'NIHR CRN support' }).parentElement).toHaveTextContent(
-      'Request NIHR CRN support for this study.'
+    expect(within(banner).getByRole('link', { name: 'NIHR RDN support' })).toHaveAttribute('href', SUPPORT_PAGE)
+    expect(within(banner).getByRole('link', { name: 'NIHR RDN support' }).parentElement).toHaveTextContent(
+      'Request NIHR RDN support for this study.'
     )
   })
 })

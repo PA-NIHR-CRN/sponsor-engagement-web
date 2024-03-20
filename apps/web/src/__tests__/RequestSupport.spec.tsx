@@ -9,13 +9,13 @@ jest.mock('next-seo')
 describe('RequestSupport Component', () => {
   it('renders page title and heading correctly', () => {
     render(<RequestSupport />)
-    expect(NextSeo).toHaveBeenCalledWith({ title: `Request NIHR CRN support` }, {})
-    expect(screen.getByRole('heading', { name: /Request NIHR CRN support/i })).toBeInTheDocument()
+    expect(NextSeo).toHaveBeenCalledWith({ title: `Request NIHR RDN support` }, {})
+    expect(screen.getByRole('heading', { name: /Request NIHR RDN support/i })).toBeInTheDocument()
   })
 
-  it('renders link to local CRN', () => {
+  it('renders link to local RDN', () => {
     render(<RequestSupport />)
-    const link = screen.getByRole('link', { name: /your local CRN/i })
+    const link = screen.getByRole('link', { name: /your local RDN/i })
     expect(link).toHaveAttribute('href', 'https://www.nihr.ac.uk/documents/study-support-service-contacts/11921')
   })
 

@@ -8,7 +8,7 @@ test.each(templateKeys)('Email template %p displays correctly', (key) => {
   const template = templates[key]
   expect(
     template({
-      crnLink: 'http://crn-link',
+      rdnLink: 'http://rdn-link',
       iconUrl: 'http://localhost:3000/assets/images/exclamation-icon.png',
       requestSupportLink: `http://localhost:3000/request-support`,
       signInLink: 'http://localhost:3000/auth/signin',

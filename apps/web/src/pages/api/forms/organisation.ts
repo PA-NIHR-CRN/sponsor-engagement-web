@@ -150,7 +150,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
       textTemplate: emailTemplates['contact-assigned.text.hbs'],
       templateData: {
         organisationName,
-        crnLink: EXTERNAL_CRN_URL,
+        rdnLink: EXTERNAL_CRN_URL,
         signInLink: getAbsoluteUrl(`${SIGN_IN_PAGE}${isNewUser ? `?registrationToken=${savedRegistrationToken}` : ``}`),
         requestSupportLink: getAbsoluteUrl(SUPPORT_PAGE),
         termsAndConditionsLink: EXTERNAL_CRN_TERMS_CONDITIONS_URL,
