@@ -30,13 +30,13 @@ export default class RequestSupportPage {
 
   async assertOnRequestSupportPageViaDetails(studyId: string) {
     await expect(this.pageTitle).toBeVisible()
-    await expect(this.pageTitle).toHaveText('Request NIHR CRN support')
+    await expect(this.pageTitle).toHaveText('Request NIHR RDN support')
     await expect(this.page).toHaveURL(`request-support?returnPath=/studies/${studyId}`)
   }
 
   async assertOnRequestSupportPageViaAssess(studyId: string) {
     await expect(this.pageTitle).toBeVisible()
-    await expect(this.pageTitle).toHaveText('Request NIHR CRN support')
+    await expect(this.pageTitle).toHaveText('Request NIHR RDN support')
     await expect(this.page).toHaveURL(`request-support?returnPath=/assessments/${studyId}`)
   }
 
@@ -44,15 +44,15 @@ export default class RequestSupportPage {
     await expect(this.guidanceTextParagraphs.nth(0)).toBeVisible()
     await expect(this.guidanceTextBullets.nth(0)).toBeVisible()
     await expect(this.guidanceTextParagraphs.nth(0)).toContainText(
-      'Contact your local CRN if you would like to discuss how the NIHR CRN may be able to support you'
+      'Contact your local RDN if you would like to discuss how the NIHR RDN may be able to support you'
     )
     await expect(this.guidanceTextParagraphs.nth(1)).toContainText(
-      'All NIHR CRN Portfolio studies are able to access the NIHR CRN Study Support Service'
+      'All NIHR RDN Portfolio studies are able to access the NIHR RDN Study Support Service'
     )
     await expect(this.guidanceTextParagraphs.nth(2)).toContainText(
-      'the NIHR CRN will work in partnership to support you'
+      'the NIHR RDN will work in partnership to support you'
     )
-    await expect(this.guidanceTextParagraphs.nth(3)).toContainText('how the NIHR CRN can support your study:')
+    await expect(this.guidanceTextParagraphs.nth(3)).toContainText('how the NIHR RDN can support your study:')
     await expect(this.guidanceTextBullets.nth(0)).toContainText('Supporting study-wide planning activities')
     await expect(this.guidanceTextBullets.nth(1)).toContainText('Research delivery advice')
     await expect(this.guidanceTextBullets.nth(2)).toContainText('Discuss site issues')
@@ -61,7 +61,7 @@ export default class RequestSupportPage {
     await expect(this.guidanceTextBullets.nth(5)).toContainText('Support to overcome barriers')
   }
 
-  async assertCrnLinkPresent() {
+  async assertRdnLinkPresent() {
     await expect(this.guidanceTextLink).toBeVisible()
     await expect(this.guidanceTextLink).toHaveAttribute(
       'href',

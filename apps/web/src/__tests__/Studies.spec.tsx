@@ -131,7 +131,7 @@ describe('Studies page', () => {
     // Description
     expect(
       screen.getByText(
-        'The NIHR CRN tracks the progress of research studies in its portfolio using data provided by study teams. Sponsors or their delegates need to assess if studies are on or off track and if any NIHR CRN support is needed.'
+        'The NIHR RDN tracks the progress of research studies in its portfolio using data provided by study teams. Sponsors or their delegates need to assess if studies are on or off track and if any NIHR RDN support is needed.'
       )
     ).toBeInTheDocument()
 
@@ -139,7 +139,7 @@ describe('Studies page', () => {
     expect(screen.getByText('Why am I being asked to assess studies?')).toBeInTheDocument()
     expect(
       screen.getByText(
-        'NIHR CRN asks sponsors or their delegates to review and assess study progress for UK studies when:'
+        'NIHR RDN asks sponsors or their delegates to review and assess study progress for UK studies when:'
       )
     ).toBeInTheDocument()
     expect(screen.getByText('A study falls behind the agreed milestones in the UK or')).toBeInTheDocument()
@@ -147,10 +147,10 @@ describe('Studies page', () => {
     expect(screen.getByText('the last progress assessment from the sponsor is over 3 months old')).toBeInTheDocument()
 
     // Support
-    expect(screen.getByRole('heading', { level: 3, name: 'Request NIHR CRN support' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 3, name: 'Request NIHR RDN support' })).toBeInTheDocument()
     expect(
       screen.getByText(
-        'Sponsors or their delegates can request NIHR CRN support with their research study at any time. Click into your study for study level support guidance.'
+        'Sponsors or their delegates can request NIHR RDN support with their research study at any time. Click into your study for study level support guidance.'
       )
     ).toBeInTheDocument()
 
@@ -278,9 +278,9 @@ describe('Studies page', () => {
     // Banner
     const banner = screen.getByRole('alert', { name: 'Success' })
     expect(within(banner).getByText('The study assessment was successfully saved')).toBeInTheDocument()
-    expect(within(banner).getByRole('link', { name: 'NIHR CRN support' })).toHaveAttribute('href', SUPPORT_PAGE)
-    expect(within(banner).getByRole('link', { name: 'NIHR CRN support' }).parentElement).toHaveTextContent(
-      'Request NIHR CRN support for this study.'
+    expect(within(banner).getByRole('link', { name: 'NIHR RDN support' })).toHaveAttribute('href', SUPPORT_PAGE)
+    expect(within(banner).getByRole('link', { name: 'NIHR RDN support' }).parentElement).toHaveTextContent(
+      'Request NIHR RDN support for this study.'
     )
   })
 

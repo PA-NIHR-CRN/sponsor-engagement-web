@@ -186,15 +186,15 @@ describe('Assess progress of a study', () => {
     // Description
     expect(
       screen.getByText(
-        'You will need to assess if the study is on or off track and if any action is being taken. If you need NIHR CRN support with this study you will need to request this separately.'
+        'You will need to assess if the study is on or off track and if any action is being taken. If you need NIHR RDN support with this study you will need to request this separately.'
       )
     ).toBeInTheDocument()
 
     // Support
-    expect(screen.getByRole('heading', { level: 3, name: 'Request NIHR CRN support' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 3, name: 'Request NIHR RDN support' })).toBeInTheDocument()
     expect(
       screen.getByText(
-        'Sponsors or their delegates can request NIHR CRN support with their research study at any time.'
+        'Sponsors or their delegates can request NIHR RDN support with their research study at any time.'
       )
     ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Request support' })).toHaveAttribute(
@@ -234,7 +234,7 @@ describe('Assess progress of a study', () => {
 
     // Form Input - Further information
     const furtherInformationFieldset = screen.getByRole('group', {
-      name: 'Is there any additional information that would help NIHR CRN understand this progress assessment?',
+      name: 'Is there any additional information that would help NIHR RDN understand this progress assessment?',
     })
 
     for (const item of sysRefAssessmentFurtherInformation) {
@@ -434,7 +434,7 @@ describe('Form submission failures', () => {
     ).toHaveAccessibleErrorMessage('Error: Select how the study is progressing')
     expect(
       screen.getByRole('group', {
-        name: 'Is there any additional information that would help NIHR CRN understand this progress assessment?',
+        name: 'Is there any additional information that would help NIHR RDN understand this progress assessment?',
       })
     ).not.toHaveAccessibleErrorMessage()
     expect(screen.getByLabelText('Further information (optional)')).not.toHaveAccessibleErrorMessage()
@@ -472,7 +472,7 @@ describe('Form submission failures', () => {
     ).toHaveAccessibleErrorMessage('Error: Select how the study is progressing')
     expect(
       screen.getByRole('group', {
-        name: 'Is there any additional information that would help NIHR CRN understand this progress assessment?',
+        name: 'Is there any additional information that would help NIHR RDN understand this progress assessment?',
       })
     ).not.toHaveAccessibleErrorMessage()
     expect(screen.getByLabelText('Further information (optional)')).not.toHaveAccessibleErrorMessage()

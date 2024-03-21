@@ -287,7 +287,7 @@ export default class StudyDetailsPage {
   async assertGuidanceText() {
     await expect(this.guidanceText).toBeVisible()
     await expect(this.guidanceText).toHaveText(
-      'You can review the progress of this study at any time. You will need to assess if the study is on or off track and if any NIHR CRN support is needed.'
+      'You can review the progress of this study at any time. You will need to assess if the study is on or off track and if any NIHR RDN support is needed.'
     )
   }
 

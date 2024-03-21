@@ -15,7 +15,7 @@ test.beforeAll('Setup Tests', async () => {
   startingStudyId = randomStudyIdSelected[0].id
 })
 
-test.describe('View Request CRN Support Guidance - @se_30', () => {
+test.describe('View Request RDN Support Guidance - @se_30', () => {
   test.use({ storageState: '.auth/sponsorContact.json' })
 
   test('As a Sponsor I see Request Support Guidance text Only, on the Study List page - @se_30_ac1', async ({
@@ -26,7 +26,7 @@ test.describe('View Request CRN Support Guidance - @se_30', () => {
       await studiesPage.goto()
       await studiesPage.assertOnStudiesPage()
     })
-    await test.step(`When I view the section titled 'Request NIHR CRN support'`, async () => {
+    await test.step(`When I view the section titled 'Request NIHR RDN support'`, async () => {
       await commonItemsPage.assertRequestSupportPresent()
     })
     await test.step(`Then the expected Guidance Text is provided`, async () => {
@@ -46,7 +46,7 @@ test.describe('View Request CRN Support Guidance - @se_30', () => {
       await studyDetailsPage.goto(startingStudyId.toString())
       await studyDetailsPage.assertOnStudyDetailsPage(startingStudyId.toString())
     })
-    await test.step(`And I view the section titled 'Request NIHR CRN support'`, async () => {
+    await test.step(`And I view the section titled 'Request NIHR RDN support'`, async () => {
       await commonItemsPage.assertRequestSupportPresent()
     })
     await test.step(`And the expected gudiance text is provided`, async () => {
@@ -64,8 +64,8 @@ test.describe('View Request CRN Support Guidance - @se_30', () => {
     await test.step(`And the Request Support page contains the expected Guidance text`, async () => {
       await requestSupportPage.assertGuidanceTextContains()
     })
-    await test.step(`And the Request Support page contains a link to an existing Local CRN Support page`, async () => {
-      await requestSupportPage.assertCrnLinkPresent()
+    await test.step(`And the Request Support page contains a link to an existing Local RDN Support page`, async () => {
+      await requestSupportPage.assertRdnLinkPresent()
     })
     await test.step(`And the Request Support page contains a Button to 'Return to previous page'`, async () => {
       await requestSupportPage.assertReturnPreviousPresent()
@@ -85,7 +85,7 @@ test.describe('View Request CRN Support Guidance - @se_30', () => {
       await assessmentPage.goto(startingStudyId.toString())
       await assessmentPage.assertOnAssessmentPage(startingStudyId.toString())
     })
-    await test.step(`And I view the section titled 'Request NIHR CRN support'`, async () => {
+    await test.step(`And I view the section titled 'Request NIHR RDN support'`, async () => {
       await commonItemsPage.assertRequestSupportPresent()
     })
     await test.step(`And the expected gudiance text is provided`, async () => {
@@ -103,8 +103,8 @@ test.describe('View Request CRN Support Guidance - @se_30', () => {
     await test.step(`And the Request Support page contains the expected Guidance text`, async () => {
       await requestSupportPage.assertGuidanceTextContains()
     })
-    await test.step(`And the Request Support page contains a link to an existing Local CRN Support page`, async () => {
-      await requestSupportPage.assertCrnLinkPresent()
+    await test.step(`And the Request Support page contains a link to an existing Local RDN Support page`, async () => {
+      await requestSupportPage.assertRdnLinkPresent()
     })
     await test.step(`And the Request Support page contains a button to 'Return to previous page'`, async () => {
       await requestSupportPage.assertReturnPreviousPresent()

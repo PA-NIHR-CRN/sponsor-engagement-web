@@ -10,9 +10,9 @@ describe('RequestSupport Component', () => {
   test('renders a card without a call to action', () => {
     const { container } = render(<RequestSupport />)
 
-    const headingElement = screen.getByText('Request NIHR CRN support')
+    const headingElement = screen.getByText('Request NIHR RDN support')
     const descriptionElement = screen.getByText(
-      'Sponsors or their delegates can request NIHR CRN support with their research study at any time. Click into your study for study level support guidance.'
+      'Sponsors or their delegates can request NIHR RDN support with their research study at any time. Click into your study for study level support guidance.'
     )
 
     expect(headingElement).toBeInTheDocument()
@@ -34,9 +34,9 @@ describe('RequestSupport Component', () => {
 
     render(<RequestSupport showCallToAction />)
 
-    const headingElement = screen.getByText('Request NIHR CRN support')
+    const headingElement = screen.getByText('Request NIHR RDN support')
     const descriptionElement = screen.getByText(
-      'Sponsors or their delegates can request NIHR CRN support with their research study at any time.'
+      'Sponsors or their delegates can request NIHR RDN support with their research study at any time.'
     )
 
     expect(headingElement).toBeInTheDocument()

@@ -78,7 +78,7 @@ const sendNotifications = async () => {
     htmlTemplate: emailTemplates['assessment-reminder.html.hbs'],
     textTemplate: emailTemplates['assessment-reminder.text.hbs'],
     templateData: {
-      crnLink: EXTERNAL_CRN_URL,
+      rdnLink: EXTERNAL_CRN_URL,
       termsAndConditionsLink: EXTERNAL_CRN_TERMS_CONDITIONS_URL,
       signInLink: getAbsoluteUrl(SIGN_IN_PAGE),
       requestSupportLink: getAbsoluteUrl(SUPPORT_PAGE),

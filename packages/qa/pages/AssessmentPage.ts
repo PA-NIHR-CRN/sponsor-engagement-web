@@ -355,7 +355,7 @@ export default class AssessmentPage {
     await expect(this.additionalInfoSection).toBeVisible()
     await expect(this.additionalInfoSectionHeader).toBeVisible()
     await expect(this.additionalInfoSectionHeader).toHaveText(
-      'Is there any additional information that would help NIHR CRN understand this progress assessment?'
+      'Is there any additional information that would help NIHR RDN understand this progress assessment?'
     )
   }
 
@@ -375,7 +375,7 @@ export default class AssessmentPage {
     await expect(this.waitingForSiteLbl).toHaveText('Waiting for site approval or activation')
     await expect(this.seekingExtensionLbl).toHaveText('In process of seeking an extension or protocol amendment')
     await expect(this.progressWithCrnLbl).toHaveText(
-      'Work in progress with CRN to update key milestones and recruitment activity'
+      'Work in progress with RDN to update key milestones and recruitment activity'
     )
     await expect(this.discussionStakeholdersLbl).toHaveText('In discussion with stakeholders to agree next steps')
     await expect(this.noRecruitmentInputLbl).toHaveText(
