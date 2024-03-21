@@ -104,7 +104,7 @@ describe('Exporting studies list', () => {
     expect(headings.alignment.horizontal).toBe('center')
     expect(headings.getCell('onTrack').fill).toBe(PINK_FILL)
     expect(headings.getCell('additionalInformation').fill).toBe(PINK_FILL)
-    expect(headings.getCell('isDueAssessment').style).toBe(RED_TEXT)
+    expect(headings.getCell('isDueAssessment').font).toEqual({ ...RED_TEXT.font, bold: true })
 
     // Correct study data
     const studyRow = mockWorksheet.getRow(3)
