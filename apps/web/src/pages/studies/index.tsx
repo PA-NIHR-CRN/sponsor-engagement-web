@@ -161,13 +161,13 @@ export default function Studies({
           <div className="lg:sticky top-4">
             <RequestSupport />
             <Card className="mt-4" filled padding={4}>
-              <h3 className="govuk-heading-m">Export Study Data</h3>
+              <h3 className="govuk-heading-m">Download study data</h3>
               <p>
-                This export provides a static download of the information held within the Sponsor Engagement Tools for
-                the sponsor / delegate organisation.
+                This download is a snapshot of all the information held within the Sponsor Engagement Tool for the
+                sponsor/delegate organisation.
               </p>
               <a className="govuk-button mb-0" href="/api/export">
-                Download Export
+                Download
               </a>
             </Card>
           </div>

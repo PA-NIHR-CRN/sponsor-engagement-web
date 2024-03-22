@@ -6,7 +6,7 @@ export const FILE_NAME = 'studies.xlsx'
 /**
  * Helper/intro text for the excel document
  */
-export const HELPER_TEXT = `This export provides a static download of the information held within the Sponsor Engagement Tools for the sponsor / delegate organisation. Once exported, the information within this document may become out of date and is no longer guaranteed to be an accurate copy of data held by the live Sponsor Engagement Tool. 
+export const HELPER_TEXT = `This download is a snapshot of all the information held within the Sponsor Engagement Tool for the sponsor/delegate organisation. Once exported, the information within this document may become out of date and is no longer guaranteed to be an accurate copy of data held by the live Sponsor Engagement Tool. 
 
 This export was created on %s.
 
