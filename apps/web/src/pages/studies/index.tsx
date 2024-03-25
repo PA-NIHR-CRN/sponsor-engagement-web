@@ -160,7 +160,7 @@ export default function Studies({
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
           <div className="lg:sticky top-4">
             <RequestSupport />
-            <Card className="mt-4" filled padding={4}>
+            <Card className="mt-4" filled padding={4} data-testid="export-study-data">
               <h3 className="govuk-heading-m">Download study data</h3>
               <p>
                 This download is a snapshot of all the information held within the Sponsor Engagement Tool for the

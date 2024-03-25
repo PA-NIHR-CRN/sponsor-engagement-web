@@ -14,7 +14,7 @@ interface RequestSupportProps {
 export function RequestSupport({ showCallToAction = false, sticky = false }: RequestSupportProps) {
   const { asPath } = useRouter()
   return (
-    <Card className={clsx({ 'lg:sticky lg:top-4': sticky })} filled padding={4}>
+    <Card className={clsx({ 'lg:sticky lg:top-4': sticky })} filled padding={4} data-testid="request-support">
       <h3 className="govuk-heading-m">Request NIHR RDN support</h3>
       {showCallToAction ? (
         <>

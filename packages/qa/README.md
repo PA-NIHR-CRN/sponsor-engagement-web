@@ -7,7 +7,7 @@ Written in Typescript, using Playwright
 Install Node on your local machine. e.g. If using a Mac `brew install node`  
 Or Download and Install from here https://nodejs.org/en/download/
 
-Clone repo to local directory 
+Clone repo to local directory
 From the projects root folder  
 Run the command `npm i` to install Playwright and other dependencies
 
@@ -21,16 +21,19 @@ It contains global properties, as well as project specific properties inside a *
 By default the tests run using the **SponsorEngagement** project  
 With the **setup** project always running before it,  
 Which sets and stores Authentication states for the Test Users.  
-The `BASE_URL` environment variable is populated in the `GlobalSetup.ts` file  
-It is set to run in the Test environment by default
+The `E2E_BASE_URL` environment variable should be defined in your .env file
 
-Should you wish to run the tests in another environment  
-Simply change the `BASE_URL` value to the desired environment   
-**DO NOT ADD, COMMIT OR PUSH THIS CHANGE TO GITHUB**
+Should you wish to run the test in another environment  
+Simply change the `E2E_BASE_URL` value to the desired environment
+Note: some tests require specific content that is currently only available in the `test` environment
+
+Before executing the tests for the first time
+From within the **packages/qa** project folder, create a `.env` file from the `.env.example` and update its values
+The test account passwords can be found in the following document: https://docs.google.com/document/d/1J9I1b4hb28rd9vl34Oe7XPCeZqk8yVsyG84KJgXS6k0/edit?pli=1
 
 To execute the tests  
 From the projects root folder  
-Run the command 
+Run the command
 Or  
 From the **packages/qa** project folder  
 Run the command `npx playwright test`  
@@ -52,16 +55,16 @@ Playwright Testing Documentation - https://playwright.dev/docs/api/class-test
 
 Go to `playwright.config.ts` file  
 The SponsorEngagement project within the **projects** array has a property called **testIgnore**  
-Which is set to ignore all tests that fall within the **accessibiltyTests** folder.   
-This is so that the accessibility tests are not included in the day to day runs.  
+Which is set to ignore all tests that fall within the **accessibiltyTests** folder.  
+This is so that the accessibility tests are not included in the day to day runs.
 
 To include the accessibilty tests in the run simply comment out this line.  
 Alternatively, to run only the Accessibilty tests,  
-change the property from testIgnore to **testMatch**  
+change the property from testIgnore to **testMatch**
 
 **DO NOT ADD, COMMIT OR PUSH THIS CHANGE TO GITHUB**
 
-You could also do any of the the following to run all the accessibilty tests, or specific ones  
+You could also do any of the the following to run all the accessibilty tests, or specific ones
 
 - run using the test tag command 'npx playwright test --grep <tag name>' e.g. npx playwright test --grep @accessibility
 - add the '.only' method on any individual tests blocks, e.g. test.only("Test Name"{...});
@@ -74,10 +77,10 @@ There is a **projects** array containing multiple project objects
 Each project object is set to run using a different browser and/or device combination  
 For example Firefox on Desktop and Safari on Mobile  
 The default project has the name SponsorEngagement  
-And is set to run the tests in Playwrights default environment, Desktop Chromium  
+And is set to run the tests in Playwrights default environment, Desktop Chromium
 
 All of the other projects have a **testIgnore** property  
-With a value that is set to ignore all tests that fall within the **tests** folder, i.e all of them  
+With a value that is set to ignore all tests that fall within the **tests** folder, i.e all of them
 
 To enable tests to run using the config from other project objects  
 Simply comment out the line with the **testIgnore** property for the relevant project  
@@ -95,7 +98,7 @@ The GitHub Action to manually trigger the SE E2E test run is configured in the r
 The GitHub Action which runs the SE E2E tests as part of the CI/CD pipeline is configured in the deploy.yml file  
 This ensures that the tests will be run after the latest work has been deployed to Test, but before it can be deployed to UAT.  
 The SE E2E tests must all pass, before the deployment to UAT can be triggered.  
-This is part of the **Deploy Web App** workflow  
+This is part of the **Deploy Web App** workflow
 
 To trigger the test run manually  
 Go the the repo's GitHub actions page - https://github.com/PA-NIHR-CRN/sponsor-engagement-web/actions  
@@ -123,7 +126,7 @@ As The Playwright Trace Viewer must be loaded over the http:// or https:// proto
 When a report is to be published to the GitHub page this will trigger a different Actions workflow  
 This workflow is called **pages-build-deployment**  
 It is configured to run off the `gh-pages` branch  
-This configuration can be seen in the repo settings - https://github.com/PA-NIHR-CRN/sponsor-engagement-web/settings/pages    
+This configuration can be seen in the repo settings - https://github.com/PA-NIHR-CRN/sponsor-engagement-web/settings/pages  
 Any change to the `gh-pages` pages branch will trigger the workflow  
 If the **Upload test report** input is not false,  
 Then the `Download HTML Report Artifact` & `Publish to GH Pages` steps in the `playwright.yml` file are executed  
