@@ -17,6 +17,10 @@ export default class CommonItemsPage {
   readonly requestSupportHeader: Locator
   readonly requestSupportText: Locator
   readonly requestSupportButton: Locator
+  readonly downloadStudyDataSection: Locator
+  readonly downloadStudyDataHeader: Locator
+  readonly downloadStudyDataText: Locator
+  readonly exportStudyDataButton: Locator
   readonly usernameBanner: Locator
   readonly cogIcon: Locator
   readonly logoutOption: Locator
@@ -34,10 +38,14 @@ export default class CommonItemsPage {
     this.assessStudiesDropdown = page.locator('span[class="govuk-details__summary-text"]')
     this.studiesFoundHeading = page.locator('p[class="govuk-heading-s mb-0 whitespace-nowrap"]')
     this.txtGenericErrorGuidance = page.locator('p[class="govuk-body"]')
-    this.requestSupportSection = page.locator('div[class="govuk-!-padding-4 relative lg:sticky lg:top-4 bg-grey-50"]')
+    this.requestSupportSection = page.locator('div[data-testid="request-support"]')
     this.requestSupportHeader = this.requestSupportSection.locator('h3')
     this.requestSupportText = this.requestSupportSection.locator('p')
     this.requestSupportButton = this.requestSupportSection.locator('a')
+    this.downloadStudyDataSection = page.locator('div[data-testid="export-study-data"]')
+    this.downloadStudyDataHeader = this.downloadStudyDataSection.locator('h3')
+    this.downloadStudyDataText = this.downloadStudyDataSection.locator('p')
+    this.exportStudyDataButton = this.downloadStudyDataSection.locator('a')
     this.usernameBanner = page.locator('span[class="hidden text-sm md:block"]')
     this.cogIcon = page.locator('button[aria-haspopup="menu"]')
     this.logoutOption = page.locator('a[role="menuitem"]')
@@ -122,6 +130,24 @@ export default class CommonItemsPage {
     } else {
       await expect(this.requestSupportButton).toBeHidden()
     }
+  }
+
+  async assertDownloadStudyDataPresent() {
+    await expect(this.downloadStudyDataSection).toBeVisible()
+    await expect(this.downloadStudyDataHeader).toBeVisible()
+    await expect(this.downloadStudyDataHeader).toHaveText('Export study data')
+  }
+
+  async assertDownloadStudyDataGuidanceText() {
+    await expect(this.downloadStudyDataText).toBeVisible()
+    await expect(this.downloadStudyDataText).toHaveText(
+      'This download is a snapshot of all the information held within the Sponsor Engagement Tool for the sponsor/delegate organisation.'
+    )
+  }
+
+  async assertDownloadStudyDataButtonPresent() {
+    await expect(this.exportStudyDataButton).toBeVisible()
+    await expect(this.exportStudyDataButton).toHaveText('Download')
   }
 
   async assertStudyHasNullOpeningDate(dbReq: string, isNull: boolean) {
