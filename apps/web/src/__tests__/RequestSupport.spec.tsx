@@ -15,7 +15,7 @@ describe('RequestSupport Component', () => {
 
   it('renders link to local RDN', () => {
     render(<RequestSupport />)
-    const link = screen.getByRole('link', { name: /your local RDN/i })
+    const link = screen.getByRole('link', { name: /your local network/i })
     expect(link).toHaveAttribute('href', 'https://www.nihr.ac.uk/documents/study-support-service-contacts/11921')
   })
 
