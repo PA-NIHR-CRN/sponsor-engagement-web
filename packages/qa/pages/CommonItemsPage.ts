@@ -135,7 +135,7 @@ export default class CommonItemsPage {
   async assertDownloadStudyDataPresent() {
     await expect(this.downloadStudyDataSection).toBeVisible()
     await expect(this.downloadStudyDataHeader).toBeVisible()
-    await expect(this.downloadStudyDataHeader).toHaveText('Export study data')
+    await expect(this.downloadStudyDataHeader).toHaveText('Download study data')
   }
 
   async assertDownloadStudyDataGuidanceText() {
