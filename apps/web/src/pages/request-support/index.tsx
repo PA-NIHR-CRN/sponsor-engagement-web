@@ -19,7 +19,7 @@ export default function RequestSupport({ returnPath }: RequestSupportProps) {
           <h1 className="govuk-heading-l">Request NIHR RDN support</h1>
           <p>
             Contact{' '}
-            <Link href="https://www.nihr.ac.uk/documents/study-support-service-contacts/11921">your local RDN</Link> if
+            <Link href="https://www.nihr.ac.uk/documents/study-support-service-contacts/11921">your local network</Link> if
             you would like to discuss how the NIHR RDN may be able to support you to deliver your study.
           </p>
           <p>

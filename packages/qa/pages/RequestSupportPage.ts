@@ -44,7 +44,7 @@ export default class RequestSupportPage {
     await expect(this.guidanceTextParagraphs.nth(0)).toBeVisible()
     await expect(this.guidanceTextBullets.nth(0)).toBeVisible()
     await expect(this.guidanceTextParagraphs.nth(0)).toContainText(
-      'Contact your local RDN if you would like to discuss how the NIHR RDN may be able to support you'
+      'Contact your local network if you would like to discuss how the NIHR RDN may be able to support you'
     )
     await expect(this.guidanceTextParagraphs.nth(1)).toContainText(
       'All NIHR RDN Portfolio studies are able to access the NIHR RDN Study Support Service'
