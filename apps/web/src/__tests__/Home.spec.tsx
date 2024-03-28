@@ -1,3 +1,4 @@
+import { logger } from '@nihr-ui/logger'
 import type { GetServerSidePropsContext } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { Mock } from 'ts-mockery'
@@ -15,6 +16,7 @@ import { ORGANISATIONS_PAGE, SIGN_OUT_CONFIRM_PAGE, STUDIES_PAGE } from '../cons
 import type { HomeProps } from '../pages/index'
 import Home, { getServerSideProps } from '../pages/index'
 
+jest.mock('@nihr-ui/logger')
 jest.mock('next-auth/next')
 jest.mock('../pages/api/auth/[...nextauth]', () => ({
   '@auth/prisma-adapter': jest.fn(),
@@ -91,15 +93,36 @@ describe('Homepage for users with no role', () => {
   test('shows an error message', async () => {
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {} })
 
-    const { props } = (await getServerSideProps(context)) as {
-      props: HomeProps
-    }
+    const { props } = (await getServerSideProps(context)) as { props: HomeProps }
 
     const { getByRole, getByText } = render(Home.getLayout(<Home />, { ...props }))
 
     expect(
       getByRole('heading', { level: 2, name: 'Your details are not associated with any account on this application' })
     ).toBeInTheDocument()
+
     expect(getByText('Please contact supportmystudy@nihr.ac.uk for further assistance.')).toBeInTheDocument()
+  })
+})
+
+describe('Homepage when no database User record available', () => {
+  const userNoDatabaseRecord = { user: { id: null } }
+
+  test('shows an error message', async () => {
+    jest.mocked(getServerSession).mockResolvedValue(userNoDatabaseRecord)
+
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {} })
+
+    const { props } = (await getServerSideProps(context)) as { props: HomeProps }
+
+    const { getByRole } = render(Home.getLayout(<Home />, { ...props }))
+
+    expect(
+      getByRole('heading', { level: 2, name: 'Your details are not associated with any account on this application' })
+    ).toBeInTheDocument()
+
+    expect(logger.error).toHaveBeenCalledWith(
+      'Session missing required user data. Check this IDG user has a corresponding User record.'
+    )
   })
 })
