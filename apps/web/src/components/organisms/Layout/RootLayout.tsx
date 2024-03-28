@@ -25,7 +25,7 @@ export interface RootLayoutProps {
   children: ReactNode
   heading?: string
   backLink?: ReactNode
-  user: Session['user']
+  user?: Session['user']
 }
 
 export function RootLayout({ children, backLink, heading = SERVICE_NAME, user }: RootLayoutProps) {
@@ -42,7 +42,7 @@ export function RootLayout({ children, backLink, heading = SERVICE_NAME, user }:
   }, [session])
 
   useEffect(() => {
-    if (idle && session) {
+    if (idle && session?.idleTimeout) {
       logger.info(`user is idle after ${session.idleTimeout} seconds - logging out`)
       void Router.push(SIGN_OUT_PAGE)
     }

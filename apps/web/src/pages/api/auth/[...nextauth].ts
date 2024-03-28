@@ -176,21 +176,26 @@ export const authOptions: AuthOptions = {
 
         return session
       } catch (error) {
-        logger.error('NextAuth session callback exception')
+        logger.error('NextAuth session callback exception for %s', token.user.email)
         logger.error(error)
         return session
       }
     },
     async signIn({ user: { email } }) {
       if (email) {
-        await prismaClient.user.update({
-          where: {
-            email,
-          },
-          data: {
-            lastLogin: new Date(),
-          },
-        })
+        try {
+          await prismaClient.user.update({
+            where: {
+              email,
+            },
+            data: {
+              lastLogin: new Date(),
+            },
+          })
+        } catch (error) {
+          logger.error('NextAuth signIn callback exception for %s', email)
+          logger.error(error)
+        }
       }
       return true
     },
