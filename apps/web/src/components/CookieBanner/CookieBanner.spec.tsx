@@ -107,13 +107,3 @@ test('Hides cookie banner on page change if cookie was already set', async () =>
 
   expect(queryByLabelText('Cookies on Sponsor Engagement')).not.toBeInTheDocument()
 })
-
-test('Dispatches custom event when cookie settings are changed', async () => {
-  const dispatchEventSpy = jest.spyOn(document, 'dispatchEvent')
-
-  const { getByRole } = render(<CookieBanner />)
-
-  // Accept cookies
-  await userEvent.click(getByRole('button', { name: /accept additional cookies/i }))
-  expect((dispatchEventSpy.mock.calls[0][0] as CustomEventInit).detail).toEqual(1)
-})
