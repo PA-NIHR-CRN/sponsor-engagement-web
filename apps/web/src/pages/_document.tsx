@@ -22,7 +22,7 @@ export default function Document() {
             'ad_user_data': 'denied',
             'ad_personalization': 'denied'
           });
-          gtag('js', new Date()); gtag('config', 'G-YPS8HKL3BR');
+          gtag('js', new Date()); gtag('config', '${process.env.GTM_ID}');
 
           (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
           new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],

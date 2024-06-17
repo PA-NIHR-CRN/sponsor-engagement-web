@@ -2,14 +2,9 @@ import { getCookie, setCookie } from 'cookies-next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import type { MouseEventHandler } from 'react'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
-import {
-  COOKIE_SETTINGS_CHANGE_EVENT,
-  SE_GDPR_COOKIE_ACCEPT_VALUE,
-  SE_GDPR_COOKIE_NAME,
-  SE_GDPR_COOKIE_REJECT_VALUE,
-} from '@/constants/cookies'
+import { SE_GDPR_COOKIE_ACCEPT_VALUE, SE_GDPR_COOKIE_NAME, SE_GDPR_COOKIE_REJECT_VALUE } from '@/constants/cookies'
 import { getGDPRCookieExpiryDate } from '@/utils/date'
 
 enum CookieBannerView {
@@ -26,28 +21,13 @@ export function CookieBanner() {
 
   const router = useRouter()
 
-  useEffect(() => {
-    const handleRouteChange = (url: string) => {
-      if (url.includes('?change-settings=1')) {
-        setView(CookieBannerView.Selection)
-        regionRef.current?.focus()
-      } else {
-        // Hide banner after navigating away from cookie policy page
-        const isCookieSet = Boolean(getCookie(SE_GDPR_COOKIE_NAME))
-        if (view === CookieBannerView.Selection && isCookieSet) {
-          setView(CookieBannerView.Hidden)
-        }
-      }
-    }
-    router.events.on('routeChangeComplete', handleRouteChange)
-    return () => {
-      router.events.off('routeChangeComplete', handleRouteChange)
-    }
-  }, [router, view])
-
-  useEffect(() => {
+  const handleRouteChange = useCallback(() => {
+    // Hide banner after navigating away from cookie policy page
     const isCookieSet = Boolean(getCookie(SE_GDPR_COOKIE_NAME))
 
+    if (view === CookieBannerView.Selection && isCookieSet) {
+      setView(CookieBannerView.Hidden)
+    }
     // Set initial visibility on client
     if (view === CookieBannerView.Hidden && !isCookieSet) {
       setView(CookieBannerView.Selection)
@@ -57,35 +37,34 @@ export function CookieBanner() {
     if (view === CookieBannerView.Accepted || view === CookieBannerView.Rejected) {
       regionRef.current?.focus()
     }
+  }, [router, view])
 
-    // Set focus after clicking "change settings"
-    if (view === CookieBannerView.Selection && isCookieSet) {
-      regionRef.current?.focus()
+  useEffect(() => {
+    handleRouteChange()
+    router.events.on('routeChangeComplete', handleRouteChange)
+    return () => {
+      router.events.off('routeChangeComplete', handleRouteChange)
     }
-  }, [view])
+  }, [handleRouteChange])
 
   const handleAccept: MouseEventHandler = () => {
     setView(CookieBannerView.Accepted)
-    setCookie(SE_GDPR_COOKIE_NAME, SE_GDPR_COOKIE_ACCEPT_VALUE, { expires: getGDPRCookieExpiryDate(), secure: true })
-    window.gtag('consent', 'update', {
-      ad_storage: 'granted',
-      analytics_storage: 'granted',
-      ad_user_data: 'granted',
-      ad_personalization: 'granted',
-    })
-    document.dispatchEvent(new CustomEvent(COOKIE_SETTINGS_CHANGE_EVENT, { detail: 1 }))
+    handleDecision('granted', SE_GDPR_COOKIE_ACCEPT_VALUE)
   }
 
   const handleReject: MouseEventHandler = () => {
     setView(CookieBannerView.Rejected)
-    setCookie(SE_GDPR_COOKIE_NAME, SE_GDPR_COOKIE_REJECT_VALUE, { expires: getGDPRCookieExpiryDate(), secure: true })
+    handleDecision('denied', SE_GDPR_COOKIE_REJECT_VALUE)
+  }
+
+  const handleDecision = (cookieConsent: string, cookieValue: string) => {
+    setCookie(SE_GDPR_COOKIE_NAME, cookieValue, { expires: getGDPRCookieExpiryDate(), secure: true })
     window.gtag('consent', 'update', {
-      ad_storage: 'denied',
-      analytics_storage: 'denied',
-      ad_user_data: 'denied',
-      ad_personalization: 'denied',
+      ad_storage: cookieConsent,
+      analytics_storage: cookieConsent,
+      ad_user_data: cookieConsent,
+      ad_personalization: cookieConsent,
     })
-    document.dispatchEvent(new CustomEvent(COOKIE_SETTINGS_CHANGE_EVENT, { detail: 0 }))
   }
 
   const handleHide: MouseEventHandler = () => {
@@ -109,10 +88,10 @@ export function CookieBanner() {
         </div>
 
         <div className="govuk-button-group mb-0">
-          <button className="govuk-button" name="cookies" onClick={handleAccept} type="button" value="accept">
+          <button className="govuk-button" name="cookies" onClick={handleAccept} type="button">
             Accept additional cookies
           </button>
-          <button className="govuk-button" name="cookies" onClick={handleReject} type="button" value="reject">
+          <button className="govuk-button" name="cookies" onClick={handleReject} type="button">
             Reject additional cookies
           </button>
           <Link className="govuk-link" href="#cookie-policy">
