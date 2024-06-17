@@ -9,6 +9,7 @@ import { useSession } from 'next-auth/react'
 import type { ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 
+import { CookieBanner } from '@/components/CookieBanner/CookieBanner'
 import { Header } from '@/components/molecules'
 import { SERVICE_NAME } from '@/constants'
 import { Roles } from '@/constants/auth'
@@ -59,6 +60,7 @@ export function RootLayout({ children, backLink, heading = SERVICE_NAME, user }:
 
   return (
     <div className={`${primaryFont.variable} font-sans`}>
+      <CookieBanner />
       <SideNav.Provider open={sideNavOpen} setOpen={setSideNavOpen}>
         <Header heading={heading} user={user} />
         {backLink}
