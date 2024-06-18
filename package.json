@@ -11,7 +11,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
-    "migrate:deploy": "turbo run migrate:deploy",
+    "migrate:deploy": "npx turbo@^1 run migrate:deploy",
     "prepare": "husky install",
     "start": "turbo run start",
     "test": "turbo run test",
