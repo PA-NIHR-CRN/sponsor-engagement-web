@@ -7,7 +7,7 @@
   "scripts": {
     "build": "turbo run build",
     "db:generate": "turbo run db:generate",
-    "dev": "turbo run dev",
+    "dev": "turbo run dev --concurrency 14",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
