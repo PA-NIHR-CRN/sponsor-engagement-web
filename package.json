@@ -7,7 +7,7 @@
   "scripts": {
     "build": "turbo run build",
     "db:generate": "turbo run db:generate",
-    "dev": "turbo run dev --concurrency 14",
+    "dev": "turbo run dev",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
@@ -32,7 +32,7 @@
     "lint-staged": "^13.2.2",
     "prettier": "^2.8.8",
     "tsconfig": "*",
-    "turbo": "1.13.3"
+    "turbo": "1.11.2"
   },
   "packageManager": "npm@8.3.1"
 }
