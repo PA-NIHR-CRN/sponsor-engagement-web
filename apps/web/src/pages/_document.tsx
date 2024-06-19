@@ -4,6 +4,8 @@ import { NextSeo } from 'next-seo'
 
 import { SERVICE_NAME } from '../constants'
 
+const GTM_ID = process.env.NEXT_PUBLIC_APP_ENV === 'prod' ? 'G-3ZXPW1HKG0' : 'G-YPS8HKL3BR'
+
 export default function Document() {
   return (
     <Html lang="en">
@@ -22,13 +24,13 @@ export default function Document() {
             'ad_user_data': 'denied',
             'ad_personalization': 'denied'
           });
-          gtag('js', new Date()); gtag('config', '${process.env.GTM_ID}');
+          gtag('js', new Date()); gtag('config', '${GTM_ID}');
 
           (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
           new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
           j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           'https://www.googletagmanager.com/gtag/js?id='+i+dl;f.parentNode.insertBefore(j,f);
-          })(window,document,'script','dataLayer','${process.env.GTM_ID}');
+          })(window,document,'script','dataLayer','${GTM_ID}');
         `}
         </Script>
       </Head>
