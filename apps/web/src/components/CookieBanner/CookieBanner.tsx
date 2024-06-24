@@ -94,7 +94,12 @@ export function CookieBanner() {
         <button className="govuk-button" name="cookies" onClick={handleReject} type="button">
           Reject additional cookies
         </button>
-        <Link className="govuk-link" href={EXTERNAL_COOKIE_POLICY_PAGE_URL}>
+        <Link
+          aria-label="Cookie policy (opens in a new tab)"
+          className="govuk-link"
+          href={EXTERNAL_COOKIE_POLICY_PAGE_URL}
+          target="_blank"
+        >
           View cookie policy
         </Link>
       </div>
@@ -108,7 +113,12 @@ export function CookieBanner() {
           <div className="govuk-cookie-banner__content focus:outline-0" ref={regionRef} tabIndex={-1}>
             <p className="govuk-body" data-testid="confirmation-message">
               You’ve {view === CookieBannerView.Accepted ? 'accepted' : 'rejected'} additional cookies. You can view the{' '}
-              <Link className="govuk-link" href={EXTERNAL_COOKIE_POLICY_PAGE_URL}>
+              <Link
+                aria-label="Cookie policy (opens in a new tab)"
+                className="govuk-link"
+                href={EXTERNAL_COOKIE_POLICY_PAGE_URL}
+                target="_blank"
+              >
                 cookie policy
               </Link>{' '}
               at any time.
