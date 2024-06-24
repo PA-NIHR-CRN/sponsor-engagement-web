@@ -5,6 +5,7 @@ import { NextSeo } from 'next-seo'
 import { SERVICE_NAME } from '../constants'
 
 const envVar = JSON.stringify(process.env)
+const authvar = process.env.AUTH_WELL_KNOWN_URL
 
 export default function Document() {
   return (
@@ -24,15 +25,16 @@ export default function Document() {
             'ad_user_data': 'denied',
             'ad_personalization': 'denied'
           });
-          gtag('js', new Date()); gtag('config', '${process.env.GTM_ID}');
+          gtag('js', new Date()); gtag('config', '${process.env.NEXT_PUBLIC_GTM_ID}');
 
           (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
           new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
           j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           'https://www.googletagmanager.com/gtag/js?id='+i+dl;f.parentNode.insertBefore(j,f);
-          })(window,document,'script','dataLayer','${process.env.GTM_ID}');
+          })(window,document,'script','dataLayer','${process.env.NEXT_PUBLIC_GTM_ID}');
 
-          console.log(${envVar}) 
+          console.log(${envVar});
+          console.log(${authvar});
         `}
         </Script>
       </Head>
