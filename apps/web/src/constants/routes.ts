@@ -61,3 +61,6 @@ export const EXTERNAL_CRN_URL = 'https://www.nihr.ac.uk/explore-nihr/support/cli
 
 export const EXTERNAL_CRN_TERMS_CONDITIONS_URL =
   'https://www.nihr.ac.uk/documents/researchers/i-need-help-to-deliver-my-research/terms-and-conditions-for-nihr-crn-support.pdf'
+
+export const EXTERNAL_COOKIE_POLICY_PAGE_URL =
+  'https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-cookie-policy'

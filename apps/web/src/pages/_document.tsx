@@ -4,8 +4,6 @@ import { NextSeo } from 'next-seo'
 
 import { SERVICE_NAME } from '../constants'
 
-const envVar = JSON.stringify(process.env)
-
 export default function Document() {
   return (
     <Html lang="en">
@@ -32,7 +30,6 @@ export default function Document() {
           'https://www.googletagmanager.com/gtag/js?id='+i+dl;f.parentNode.insertBefore(j,f);
           })(window,document,'script','dataLayer','${process.env.NEXT_PUBLIC_GTM_ID}');
 
-          console.log(${envVar});
         `}
         </Script>
       </Head>

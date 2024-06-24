@@ -58,7 +58,10 @@ test('Changes to the confirmation view when rejecting cookies', async () => {
   expect(getByTestId('confirmation-message')).toBeInTheDocument()
   expect(getByText(/You’ve rejected additional cookies./)).toBeInTheDocument()
 
-  expect(getByRole('link', { name: /cookie policy/ })).toHaveAttribute('href', '#cookie-policy')
+  expect(getByRole('link', { name: /cookie policy/ })).toHaveAttribute(
+    'href',
+    'https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-cookie-policy'
+  )
 
   expect(window.gtag).toHaveBeenLastCalledWith('consent', 'update', {
     ad_storage: 'denied',
