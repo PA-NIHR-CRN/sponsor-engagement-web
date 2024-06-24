@@ -112,6 +112,7 @@ jobs:
             IDG_API_URL=${{ vars.IDG_API_URL }}
             IDG_API_USERNAME=${{ secrets.IDG_API_USERNAME }}
             IDG_API_PASSWORD=${{ secrets.IDG_API_PASSWORD }}
+            GTM_ID=${{ secrets.GTM_ID_DEV }}
       - name: Remove Github Actions IP from RDS security group (Dev)
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
