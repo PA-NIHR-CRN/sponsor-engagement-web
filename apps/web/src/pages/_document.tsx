@@ -5,7 +5,6 @@ import { NextSeo } from 'next-seo'
 import { SERVICE_NAME } from '../constants'
 
 const envVar = JSON.stringify(process.env)
-const authvar = process.env.AUTH_WELL_KNOWN_URL
 
 export default function Document() {
   return (
@@ -34,7 +33,6 @@ export default function Document() {
           })(window,document,'script','dataLayer','${process.env.NEXT_PUBLIC_GTM_ID}');
 
           console.log(${envVar});
-          console.log(${authvar});
         `}
         </Script>
       </Head>
