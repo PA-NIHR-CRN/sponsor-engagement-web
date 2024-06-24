@@ -25,6 +25,7 @@ jobs:
           touch apps/web/.env.local
           echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> apps/web/.env.local
           echo NEXT_PUBLIC_APP_ENV=${{ vars.APP_ENV }} >> apps/web/.env.local
+          echo NEXT_PUBLIC_GTM_ID=${{ secrets.GTM_ID_DEV }} >> apps/web/.env.local
           echo ENVIRONMENT_VARIABLE_CHECKS=disabled >> apps/web/.env.local
           npm run db:generate
           npm run build
@@ -69,7 +70,7 @@ jobs:
         run: |
           echo "Using registry ${{ env.ECR_REGISTRY }}"
           echo "Tagging image with ${{ env.IMAGE_NAME_TAG}} and ${{ env.IMAGE_SHA_TAG }}"
-          docker build -f apps/web/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
+          docker build -f apps/web/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} GTM_ID=${{ secrets.GTM_ID_DEV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG" >> "$GITHUB_OUTPUT"
       - name: Run database migrations
