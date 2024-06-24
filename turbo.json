@@ -24,7 +24,7 @@
         "IDG_API_PASSWORD",
         "DATABASE_URL",
         "ENVIRONMENT_VARIABLE_CHECKS",
-        "GTM_ID"
+        "NEXT_PUBLIC_GTM_ID"
       ]
     },
     "start": {},
