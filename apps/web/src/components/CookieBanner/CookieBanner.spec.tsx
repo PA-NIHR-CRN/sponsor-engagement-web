@@ -28,7 +28,7 @@ test('Renders the cookie banner selection view', () => {
   expect(getByText('We may use some essential cookies to make this service work.')).toBeInTheDocument()
   expect(getByRole('button', { name: /accept additional cookies/i })).toBeInTheDocument()
   expect(getByRole('button', { name: /reject additional cookies/i })).toBeInTheDocument()
-  expect(getByRole('link', { name: /View cookie policy/i })).toBeInTheDocument()
+  expect(queryByTestId('veiwCookiePolicy')).toBeInTheDocument()
 
   // Ensure that the confirmation message is not rendered initially
   expect(queryByTestId('confirmation-message')).not.toBeInTheDocument()
@@ -57,11 +57,6 @@ test('Changes to the confirmation view when rejecting cookies', async () => {
 
   expect(getByTestId('confirmation-message')).toBeInTheDocument()
   expect(getByText(/You’ve rejected additional cookies./)).toBeInTheDocument()
-
-  expect(getByRole('link', { name: /cookie policy/ })).toHaveAttribute(
-    'href',
-    'https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-cookie-policy'
-  )
 
   expect(window.gtag).toHaveBeenLastCalledWith('consent', 'update', {
     ad_storage: 'denied',

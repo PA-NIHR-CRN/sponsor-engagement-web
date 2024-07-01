@@ -95,8 +95,9 @@ export function CookieBanner() {
           Reject additional cookies
         </button>
         <Link
-          aria-label="Cookie policy (opens in a new tab)"
+          aria-label="View Cookie policy (opens in a new tab)"
           className="govuk-link"
+          data-testid="veiwCookiePolicy"
           href={EXTERNAL_COOKIE_POLICY_PAGE_URL}
           target="_blank"
         >
