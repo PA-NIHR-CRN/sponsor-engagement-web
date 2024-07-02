@@ -57,5 +57,7 @@ if (process.env.ENVIRONMENT_VARIABLE_CHECKS !== 'disabled') {
     AUTH_CLIENT_SECRET: process.env.AUTH_CLIENT_SECRET,
 
     DATABASE_URL: process.env.DATABASE_URL,
+
+    NEXT_PUBLIC_GTM_ID: process.env.NEXT_PUBLIC_GTM_ID,
   })
 }
