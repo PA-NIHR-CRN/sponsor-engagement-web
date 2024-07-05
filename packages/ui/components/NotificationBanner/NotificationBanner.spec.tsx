@@ -61,3 +61,17 @@ describe('NotificationBanner Component', () => {
     })
   })
 })
+
+test('renders rich text when richText prop is true', () => {
+  render(
+    <NotificationBanner richText heading="Test Heading">
+      <p>Test Content</p>
+    </NotificationBanner>
+  )
+  expect(screen.getByText('Test Content')).toBeInTheDocument()
+})
+
+test('renders plain text when richText prop is false', () => {
+  render(<NotificationBanner heading="Test Heading">Test Content</NotificationBanner>)
+  expect(screen.getByText('Test Content')).toBeInTheDocument()
+})
