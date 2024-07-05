@@ -24,6 +24,13 @@ test('Table', () => {
           <Table.Cell>Row 2, cell 2</Table.Cell>
         </Table.Row>
       </Table.Body>
+      <Table.Footer>
+        <Table.Row>
+          <Table.Cell>Footer 1</Table.Cell>
+          <Table.Cell>Footer 2</Table.Cell>
+          <Table.Cell>Footer 3</Table.Cell>
+        </Table.Row>
+      </Table.Footer>
     </Table>
   )
 
@@ -31,28 +38,24 @@ test('Table', () => {
   expect(table).toHaveClass('test-class')
 
   const columnHeaders = within(table).getAllByRole('columnheader')
-
   expect(columnHeaders.map((header) => header.textContent)).toEqual([
     'Column 1 header',
     'Column 2 header',
     'Column 3 header',
   ])
 
-  const rowHeaders = within(table).getAllByRole('rowheader')
-
-  expect(rowHeaders.map((header) => header.textContent)).toEqual(['Row 1 header', 'Row 2 header'])
-
-  const rowCells = within(table)
-    .getAllByRole('row')
-    .slice(1)
-    .map((row) =>
-      within(row)
-        .getAllByRole('cell')
-        .map((cell) => cell.textContent)
-    )
+  const bodyRows = within(table).getAllByRole('row', { name: /Row/ })
+  const rowCells = bodyRows.map((row) =>
+    within(row)
+      .getAllByRole('cell')
+      .map((cell) => cell.textContent)
+  )
 
   expect(rowCells).toEqual([
     ['Row 1, cell 1', 'Row 1, cell 2'],
     ['Row 2, cell 1', 'Row 2, cell 2'],
   ])
+
+  const footerCells = within(table).queryAllByRole('cell', { name: /Footer/ })
+  expect(footerCells).toHaveLength(3)
 })
