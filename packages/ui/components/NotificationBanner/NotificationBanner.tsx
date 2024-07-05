@@ -9,12 +9,13 @@ type NotificationBannerProps<C extends ElementType = ElementType> = PolymorphicC
     success?: boolean
     children: ReactNode
     className?: string
+    richText?: boolean
   }
 >
 
 export const NotificationBanner = forwardRef(
   <C extends React.ElementType = 'div'>(
-    { as, heading, children, success, className, ...props }: NotificationBannerProps<C>,
+    { as, heading, children, success, className, richText, ...props }: NotificationBannerProps<C>,
     ref?: PolymorphicRef<C>
   ) => {
     const Component = as || 'div'
@@ -35,7 +36,7 @@ export const NotificationBanner = forwardRef(
         </div>
         <div className="govuk-notification-banner__content">
           <p className="govuk-notification-banner__heading">{heading}</p>
-          <p className="govuk-body">{children}</p>
+          {richText ? children : <p className="govuk-body">{children}</p>}
         </div>
       </Component>
     )

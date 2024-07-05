@@ -1,5 +1,6 @@
 import { AlertIcon, Container, Details, NotificationBanner } from '@nihr-ui/frontend'
 import { logger } from '@nihr-ui/logger'
+import type { Entry } from 'contentful'
 import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -7,7 +8,9 @@ import { NextSeo } from 'next-seo'
 import type { ReactElement } from 'react'
 
 import type { OrderType } from '@/@types/filters'
+import type { TypeBannerSkeleton } from '@/@types/generated'
 import { Card } from '@/components/atoms'
+import CmsNotificationBanner from '@/components/CmsNotificationBanner/CmsNotificationBanner'
 import {
   Filters,
   Pagination,
@@ -21,6 +24,7 @@ import { RootLayout } from '@/components/organisms'
 import { Roles, STUDIES_PER_PAGE } from '@/constants'
 import { SUPPORT_PAGE } from '@/constants/routes'
 import { useFormListeners } from '@/hooks/useFormListeners'
+import { getNotficationBanner } from '@/lib/contentfulService'
 import { getSponsorOrgName, getSupportOrgName } from '@/lib/organisations'
 import { getStudiesForOrgs } from '@/lib/studies'
 import { formatDate } from '@/utils/date'
@@ -45,6 +49,7 @@ export default function Studies({
   studies,
   meta: { totalItems, totalItemsDue, initialPage, initialPageSize },
   filters,
+  entry,
 }: StudiesProps) {
   const router = useRouter()
 
@@ -60,6 +65,9 @@ export default function Studies({
   return (
     <Container>
       <NextSeo title={`Study Progress Review - Search results ${titleResultsText}`} />
+
+      <CmsNotificationBanner entry={entry} />
+
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
           {renderNotificationBanner(Boolean(router.query.success))}
@@ -160,7 +168,7 @@ export default function Studies({
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
           <div className="lg:sticky top-4">
             <RequestSupport />
-            <Card className="mt-4" filled padding={4} data-testid="export-study-data">
+            <Card className="mt-4" data-testid="export-study-data" filled padding={4}>
               <h3 className="govuk-heading-m">Download study data</h3>
               <p>
                 This download is a snapshot of all the information held within the Sponsor Engagement Tool for the
@@ -212,6 +220,13 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     })
 
     const filters = getFiltersFromQuery(context.query)
+    let entry: Entry<TypeBannerSkeleton> | null
+
+    try {
+      entry = await getNotficationBanner()
+    } catch {
+      entry = null
+    }
 
     return {
       props: {
@@ -224,6 +239,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
         },
         studies: studies.data,
         filters,
+        entry,
       },
     }
   } catch (error) {
