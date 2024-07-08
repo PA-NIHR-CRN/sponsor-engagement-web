@@ -24,7 +24,7 @@ import { RootLayout } from '@/components/organisms'
 import { Roles, STUDIES_PER_PAGE } from '@/constants'
 import { SUPPORT_PAGE } from '@/constants/routes'
 import { useFormListeners } from '@/hooks/useFormListeners'
-import { getNotficationBanner } from '@/lib/contentfulService'
+import { getNotificationBanner } from '@/lib/contentfulService'
 import { getSponsorOrgName, getSupportOrgName } from '@/lib/organisations'
 import { getStudiesForOrgs } from '@/lib/studies'
 import { formatDate } from '@/utils/date'
@@ -223,7 +223,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     let entry: Entry<TypeBannerSkeleton> | null
 
     try {
-      entry = await getNotficationBanner()
+      entry = await getNotificationBanner()
     } catch {
       entry = null
     }

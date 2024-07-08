@@ -1,16 +1,19 @@
+import type { Entry, EntrySkeletonType } from 'contentful'
+
 import type { TypeBannerSkeleton } from '@/@types/generated'
 
 import contentClient from './contentful'
 
-export const getEntryById = async (id: string) => {
-  const entry = await contentClient.getEntry(id)
+export const getEntryById = async <T extends EntrySkeletonType>(id: string): Promise<Entry<T>> => {
+  const entry = await contentClient.getEntry<T>(id)
   return entry
 }
 
-export const getNotficationBanner = async () => {
-  const entries = await contentClient.getEntries<TypeBannerSkeleton>({
-    limit: 1,
-    content_type: 'banner',
-  })
-  return entries.items.length ? entries.items[0] : null
+export const getNotificationBanner = async (): Promise<Entry<TypeBannerSkeleton> | null> => {
+  const bannerEntryId = '60C0kd55BPlECeAZbFlHsc'
+  try {
+    return await getEntryById<TypeBannerSkeleton>(bannerEntryId)
+  } catch {
+    return null
+  }
 }
