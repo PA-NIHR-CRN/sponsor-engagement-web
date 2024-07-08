@@ -45,3 +45,5 @@ next-env.d.ts
 /playwright/.cache/
 qa/test-results/
 qa/test-report/
+
+.idea

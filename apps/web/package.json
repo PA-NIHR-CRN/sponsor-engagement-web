@@ -14,7 +14,6 @@
   },
   "dependencies": {
     "@axe-core/playwright": "^4.7.3",
-    "@contentful/rich-text-html-renderer": "^16.6.1",
     "@contentful/rich-text-react-renderer": "^15.22.1",
     "@contentful/rich-text-types": "^16.6.1",
     "@hookform/error-message": "^2.0.1",

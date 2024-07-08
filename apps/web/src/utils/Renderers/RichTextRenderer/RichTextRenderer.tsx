@@ -3,16 +3,29 @@ import { documentToReactComponents } from '@contentful/rich-text-react-renderer'
 import type { Document } from '@contentful/rich-text-types'
 import { BLOCKS, INLINES, MARKS } from '@contentful/rich-text-types'
 import Link from 'next/link'
-import type { FC, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import React from 'react'
 
-import { List, ListItem } from '@/components/molecules/List/List'
+import { List, ListItem } from '../../../components/molecules'
 
-function Bold({ children }: { children: ReactNode }) {
+interface TypographyProps {
+  children: ReactNode
+}
+
+interface LinkEntryProps {
+  text: string
+  url: string
+}
+
+interface RichTextRendererProps {
+  children: Document
+}
+
+function Bold({ children }: TypographyProps) {
   return <span className="font-bold">{children}</span>
 }
 
-function Text({ children }: { children: ReactNode }) {
+function Text({ children }: TypographyProps) {
   return <p>{children}</p>
 }
 
@@ -21,11 +34,6 @@ const headingVariants = ['xl', 'l', 'm', 's']
 function Heading({ level, children }: { level: 2 | 3 | 4; children: ReactNode }) {
   const Tag = `h${level}` as const
   return <Tag className={`govuk-heading-${headingVariants[level - 1]}`}>{children}</Tag>
-}
-
-interface LinkEntryProps {
-  text: string
-  url: string
 }
 
 function LinkEntry({ text, url }: LinkEntryProps) {
@@ -53,11 +61,6 @@ const options: Options = {
     ),
   },
 }
-
-interface RichTextRendererProps {
-  children: Document
-}
-
-export const RichTextRenderer: FC<RichTextRendererProps> = ({ children }: RichTextRendererProps) => {
+export function RichTextRenderer({ children }: RichTextRendererProps) {
   return <>{documentToReactComponents(children, options)}</>
 }

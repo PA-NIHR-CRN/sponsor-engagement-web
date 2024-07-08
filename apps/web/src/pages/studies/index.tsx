@@ -10,7 +10,6 @@ import type { ReactElement } from 'react'
 import type { OrderType } from '@/@types/filters'
 import type { TypeBannerSkeleton } from '@/@types/generated'
 import { Card } from '@/components/atoms'
-import CmsNotificationBanner from '@/components/CmsNotificationBanner/CmsNotificationBanner'
 import {
   Filters,
   Pagination,
@@ -21,10 +20,11 @@ import {
   StudyList,
 } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
+import CmsNotificationBanner from '@/components/organisms/CmsNotificationBanner/CmsNotificationBanner'
 import { Roles, STUDIES_PER_PAGE } from '@/constants'
 import { SUPPORT_PAGE } from '@/constants/routes'
 import { useFormListeners } from '@/hooks/useFormListeners'
-import { getNotificationBanner } from '@/lib/contentfulService'
+import { getNotificationBanner } from '@/lib/contentful/contentfulService'
 import { getSponsorOrgName, getSupportOrgName } from '@/lib/organisations'
 import { getStudiesForOrgs } from '@/lib/studies'
 import { formatDate } from '@/utils/date'

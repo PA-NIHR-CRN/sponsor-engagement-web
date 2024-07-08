@@ -3,8 +3,7 @@ import { NotificationBanner } from '@nihr-ui/frontend'
 import type { Entry } from 'contentful'
 
 import type { TypeBannerSkeleton } from '@/@types/generated'
-
-import { RichTextRenderer } from '../Renderers/RichTextRenderer/RichTextRender'
+import { RichTextRenderer } from '@/utils/Renderers/RichTextRenderer/RichTextRenderer'
 
 interface CmsNotificationBannerProps {
   entry: Entry<TypeBannerSkeleton> | null
@@ -22,7 +21,7 @@ function CmsNotificationBanner({ entry }: CmsNotificationBannerProps) {
   }
 
   return (
-    <NotificationBanner heading={entry.fields.bannerTitle} richText>
+    <NotificationBanner heading={entry.fields.bannerTitle} isRichText>
       <RichTextRenderer>{bannerBody}</RichTextRenderer>
     </NotificationBanner>
   )

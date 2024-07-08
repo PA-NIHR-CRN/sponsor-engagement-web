@@ -12,8 +12,4 @@ export const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTM
   )
 )
 
-export const TableFooter = ({ children }: { children: React.ReactNode }) => {
-  return <tfoot>{children}</tfoot>
-}
-
 Table.displayName = 'Table'

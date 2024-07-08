@@ -58,4 +58,5 @@ test('Table', () => {
 
   const footerCells = within(table).queryAllByRole('cell', { name: /Footer/ })
   expect(footerCells).toHaveLength(3)
+  expect(footerCells.map((cell) => cell.textContent)).toEqual(['Footer 1', 'Footer 2', 'Footer 3'])
 })
