@@ -39,6 +39,7 @@ jobs:
           touch apps/web/.env.local
           echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> apps/web/.env.local
           echo NEXT_PUBLIC_APP_ENV=${{ vars.APP_ENV }} >> apps/web/.env.local
+          echo CONTENTFUL_BANNER_ENTRY_ID=test>> apps/web/.env.local
           echo ENVIRONMENT_VARIABLE_CHECKS=disabled >> apps/web/.env.local
           npx turbo run build --cache-dir=".turbo"
 

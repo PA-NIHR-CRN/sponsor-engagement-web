@@ -10,8 +10,8 @@ const {
   CONTENTFUL_PREVIEW_ACCESS_TOKEN,
 } = process.env
 
-assert(CONTENTFUL_ACCESS_TOKEN)
-assert(CONTENTFUL_SPACE_ID)
+assert(CONTENTFUL_ACCESS_TOKEN, 'CONTENTFUL_ACCESS_TOKEN is required')
+assert(CONTENTFUL_SPACE_ID, 'CONTENTFUL_SPACE_ID is required')
 
 const contentfulEnvironment = CONTENTFUL_ENVIRONMENT || 'master'
 
