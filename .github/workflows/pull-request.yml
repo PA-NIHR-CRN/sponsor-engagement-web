@@ -33,11 +33,30 @@ jobs:
       - uses: ./.github/actions/install-cache
       - uses: ./.github/actions/build-cache
       - uses: ./.github/actions/turbo-cache
+      - name: Configure AWS credentials (dev)
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.NIHR_GITHUB_ACTIONS_IAM_ID }}
+          aws-secret-access-key: ${{ secrets.NIHR_GITHUB_ACTIONS_IAM_SECRET }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Get secrets from Secrets Manager
+        uses: aws-actions/aws-secretsmanager-get-secrets@v1
+        with:
+          secret-ids: |
+            crnccd-secret-dev-se-app-config
+          parse-json-secrets: true
       - name: Build
         # Inject the minimum amount of env vars needed to build the project
         run: |
           touch apps/web/.env.local
           echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> apps/web/.env.local
+          echo CONTENTFUL_BANNER_ENTRY_ID=${{ env.CONTENTFUL_BANNER_ENTRY_ID }} >> apps/web/.env.local
+          echo CONTENTFUL_SPACE_ID=${{ env.CONTENTFUL_SPACE_ID }} >> apps/web/.env.local
+          echo CONTENTFUL_ACCESS_TOKEN=${{ env.CONTENTFUL_ACCESS_TOKEN }} >> apps/web/.env.local
+          echo CONTENTFUL_ENVIRONMENT=${{ env.CONTENTFUL_ENVIRONMENT }} >> apps/web/.env.local
+          echo CONTENTFUL_PREVIEW_MODE=${{ vars.CONTENTFUL_PREVIEW_MODE }} >> apps/web/.env.local
+          echo CONTENTFUL_PREVIEW_ACCESS_TOKEN=${{ vars.CONTENTFUL_PREVIEW_ACCESS_TOKEN }} >> apps/web/.env.local
           echo NEXT_PUBLIC_APP_ENV=${{ vars.APP_ENV }} >> apps/web/.env.local
           echo CONTENTFUL_BANNER_ENTRY_ID=test>> apps/web/.env.local
           echo ENVIRONMENT_VARIABLE_CHECKS=disabled >> apps/web/.env.local
