@@ -9,6 +9,9 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  AWS_REGION: eu-west-2
+
 jobs:
   # Install dependencies
   install:
