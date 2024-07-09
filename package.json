@@ -11,7 +11,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
-    "migrate:deploy": "npx turbo run migrate:deploy",
+    "migrate:deploy": "npx turbo@^1 run migrate:deploy",
     "prepare": "husky install",
     "start": "turbo run start",
     "test": "turbo run test",
@@ -32,7 +32,7 @@
     "lint-staged": "^13.2.2",
     "prettier": "^2.8.8",
     "tsconfig": "*",
-    "turbo": "^1.11.2"
+    "turbo": "1.11.2"
   },
   "packageManager": "npm@8.3.1"
 }

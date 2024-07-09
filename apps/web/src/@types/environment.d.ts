@@ -16,5 +16,6 @@ declare namespace NodeJS {
 
     NEXT_PUBLIC_APP_ENV: 'dev' | 'test' | 'uat' | 'oat' | 'prod' | undefined
     DATABASE_URL: string
+    NEXT_PUBLIC_GTM_ID: string
   }
 }
