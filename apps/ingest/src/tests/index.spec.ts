@@ -12,6 +12,23 @@ import {
 import { prismaMock } from '../mocks/prisma'
 import studies from '../mocks/studies.json'
 
+interface EvalCategory {
+  id: number
+  studyId: number
+  indicatorType: string
+  indicatorValue: string
+  sampleSize: number | null
+  totalRecruitmentToDate: number
+  plannedOpeningDate: Date | null
+  plannedClosureDate: Date | null
+  actualOpeningDate: Date | null
+  actualClosureDate: Date | null
+  expectedReopenDate: Date | null
+  createdAt: Date
+  updatedAt: Date
+  isDeleted: boolean | null
+}
+
 jest.mock('@nihr-ui/logger')
 
 const API_URL = 'https://dev.cpmsapi.nihr.ac.uk/api/v1/study-summaries'
@@ -38,7 +55,9 @@ beforeEach(() => {
   organisationRoleRefEntities.forEach((entity) =>
     prismaMock.sysRefOrganisationRole.upsert.mockResolvedValueOnce(entity)
   )
-  evalCategoryEntities.forEach((entity) => prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(entity))
+  evalCategoryEntities.forEach((entity: EvalCategory) =>
+    prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(entity)
+  )
 
   prismaMock.organisationRole.createMany.mockResolvedValueOnce({ count: 1 })
   prismaMock.studyOrganisation.createMany.mockResolvedValueOnce({ count: 1 })
@@ -299,7 +318,7 @@ describe('ingest', () => {
 
     await ingest()
 
-    const expectedDeletedEntityIds = organisationRoleEntities.slice(-2).map(({ id }) => id)
+    const expectedDeletedEntityIds = organisationRoleEntities.slice(-2).map(({ id }: { id: number }) => id)
 
     // Sets all existing organisation roles to be isDeleted = false
     expect(prismaMock.organisationRole.updateMany).toHaveBeenCalledWith({
