@@ -311,6 +311,12 @@ describe('Successful organisation sponsor contact invitation', () => {
             data: {
               isDeleted: false,
               updatedBy: { connect: { id: userWithContactManagerRole.user?.id } },
+              user: {
+                update: {
+                  registrationConfirmed: false,
+                  registrationToken: 'mocked-token',
+                },
+              },
             },
           },
         },
