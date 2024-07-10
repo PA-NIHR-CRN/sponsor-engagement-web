@@ -18,7 +18,7 @@ const renderNotificationBanner = (success: boolean) =>
     <NotificationBanner heading="The study assessment was successfully saved" success>
       Request{' '}
       <Link className="govuk-notification-banner__link" href={SUPPORT_PAGE}>
-        NIHR CRN support
+        NIHR RDN support
       </Link>{' '}
       for this study.
     </NotificationBanner>
@@ -65,7 +65,7 @@ export default function Study({ study, assessments }: StudyProps) {
 
           <p>
             You can review the progress of this study at any time. You will need to assess if the study is on or off
-            track and if any <Link href={`${SUPPORT_PAGE}?returnPath=${router.asPath}`}>NIHR CRN support</Link> is
+            track and if any <Link href={`${SUPPORT_PAGE}?returnPath=${router.asPath}`}>NIHR RDN support</Link> is
             needed.
           </p>
 
@@ -138,7 +138,7 @@ export default function Study({ study, assessments }: StudyProps) {
           <StudyDetails study={study} />
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
-          <RequestSupport showCallToAction />
+          <RequestSupport showCallToAction sticky />
         </div>
       </div>
     </Container>

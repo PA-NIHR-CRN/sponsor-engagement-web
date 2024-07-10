@@ -140,3 +140,11 @@ body {
   --red: #d4351c;
   --text-grey: #0b0c0c;
 }
+// allows cookie banner to stick to bottom of veiw port
+.SE-cookie-banner{
+  bottom: 0;
+  position: fixed;
+  width: 100%;
+  z-index: 9999;
+
+}

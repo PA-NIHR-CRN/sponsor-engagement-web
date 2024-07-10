@@ -8,7 +8,7 @@ import type { AdapterUser } from 'next-auth/adapters'
 import type { JWT } from 'next-auth/jwt'
 import type { Provider } from 'next-auth/providers'
 import { Mock } from 'ts-mockery'
-import { type z, ZodError } from 'zod'
+import { type z } from 'zod'
 
 import { prismaMock } from '@/__mocks__/prisma'
 import { Roles } from '@/constants/auth'
@@ -18,6 +18,10 @@ import { authOptions } from './[...nextauth]'
 jest.mock('@nihr-ui/auth')
 jest.mock('@nihr-ui/logger')
 jest.useFakeTimers().setSystemTime(new Date('2023-01-01'))
+
+beforeEach(() => {
+  jest.clearAllMocks()
+})
 
 describe('Authentication configuration options', () => {
   test('authOptions object is defined', () => {
@@ -126,7 +130,7 @@ describe('JWT callback', () => {
     })
   })
 
-  test('throws an error when refreshing the token rejects', async () => {
+  test('refresh token endpoint returns a 400 error due to refresh token expiry', async () => {
     const account = null
     const user = userMock
     const accessTokenExpires = Number(faker.date.past())
@@ -139,13 +143,46 @@ describe('JWT callback', () => {
     })
 
     jest.mocked(authService.refreshToken).mockRejectedValueOnce({
-      success: false,
-      error: new ZodError([]),
+      isAxiosError: true,
+      response: {
+        data: {
+          error: 'invalid_grant',
+        },
+      },
     })
 
     const response = await authOptions.callbacks?.jwt?.({ account, user, token })
 
-    expect(logger.error).toHaveBeenCalledWith({ error: new ZodError([]), success: false })
+    expect(logger.info).toHaveBeenCalledWith('jwt callback - refresh token expired - redirecting to login')
+
+    expect(response).toEqual<JWT>({
+      ...token,
+      error: 'RefreshAccessTokenError',
+    })
+  })
+
+  test('refresh token endpoint returns an unexpected error', async () => {
+    const account = null
+    const user = userMock
+    const accessTokenExpires = Number(faker.date.past())
+    const token = Mock.of<JWT>({
+      accessToken: accountMock.access_token,
+      accessTokenExpires,
+      refreshToken: accountMock.refresh_token,
+      idToken: accountMock.id_token,
+      user: userMock,
+    })
+
+    jest.mocked(authService.refreshToken).mockRejectedValueOnce({
+      isAxiosError: true,
+      response: {
+        data: {},
+      },
+    })
+
+    const response = await authOptions.callbacks?.jwt?.({ account, user, token })
+
+    expect(logger.error).toHaveBeenCalledWith({ isAxiosError: true, response: { data: {} } })
 
     expect(response).toEqual<JWT>({
       ...token,

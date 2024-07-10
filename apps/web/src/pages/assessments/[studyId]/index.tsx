@@ -75,7 +75,7 @@ export default function Assessment({
 
           <p className="govuk-body govuk-!-margin-bottom-6">
             You will need to assess if the study is on or off track and if any action is being taken. If you need NIHR
-            CRN support with this study you will need to request this separately.
+            RDN support with this study you will need to request this separately.
           </p>
 
           <div className="text-darkGrey govuk-!-margin-bottom-0 govuk-body-s">
@@ -139,7 +139,7 @@ export default function Assessment({
                     : []
                 }
                 errors={errors}
-                label="Is there any additional information that would help NIHR CRN understand this progress assessment?"
+                label="Is there any additional information that would help NIHR RDN understand this progress assessment?"
                 required={false}
                 {...register('furtherInformation')}
               >
@@ -170,7 +170,7 @@ export default function Assessment({
           </Form>
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
-          <RequestSupport showCallToAction />
+          <RequestSupport showCallToAction sticky />
         </div>
       </div>
     </Container>

@@ -1,4 +1,7 @@
+import { config as dotEnvConfig } from 'dotenv'
+
 async function globalSetup() {
-  process.env.BASE_URL = 'https://test.assessmystudy.nihr.ac.uk/'
+  dotEnvConfig()
 }
+
 export default globalSetup

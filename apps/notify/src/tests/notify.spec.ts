@@ -3,7 +3,7 @@ import type { Prisma } from 'database'
 import { Mock } from 'ts-mockery'
 import { logger } from '@nihr-ui/logger'
 import { notify } from '../notify'
-import { prismaClient } from '../lib/prisma'
+import { prismaMock } from '../mocks/prisma'
 
 jest.mock('@nihr-ui/logger')
 jest.mock('@nihr-ui/email')
@@ -21,16 +21,23 @@ const mockUsers = [
   Mock.of<Prisma.UserGetPayload<undefined>>({ id: 3, email: 'user3@test.com' }),
 ]
 
+const mockAssessmentReminders = [Mock.of<Prisma.AssessmentReminderGetPayload<undefined>>({ id: 123 })]
+
 describe('notify', () => {
   it('should send assessment reminder emails to the appropriate users', async () => {
     jest.mocked(emailService.sendBulkEmail).mockImplementationOnce(async (emails, onSuccess) => {
-      await onSuccess({
-        recipients: emails.map(({ to }) => (Array.isArray(to) ? to : [to])).flat(),
-        messageId: '123',
-      })
+      await Promise.all(
+        emails.map(({ to }) =>
+          onSuccess({
+            recipients: Array.isArray(to) ? to : [to],
+            messageId: '123',
+          })
+        )
+      )
     })
 
-    jest.mocked(prismaClient.user.findMany).mockResolvedValueOnce(mockUsers)
+    prismaMock.user.findMany.mockResolvedValueOnce(mockUsers)
+    prismaMock.assessmentReminder.findMany.mockResolvedValue(mockAssessmentReminders)
 
     await notify()
 
@@ -39,7 +46,7 @@ describe('notify', () => {
         subject: `Assess the progress of your studies`,
         to: email,
         templateData: {
-          crnLink: 'https://www.nihr.ac.uk/explore-nihr/support/clinical-research-network.htm',
+          rdnLink: 'https://www.nihr.ac.uk/explore-nihr/support/clinical-research-network.htm',
           iconUrl: 'https://test.assessmystudy.nihr.ac.uk/assets/images/exclamation-icon.png',
           requestSupportLink: 'https://test.assessmystudy.nihr.ac.uk/request-support',
           signInLink: 'https://test.assessmystudy.nihr.ac.uk/auth/signin',
@@ -52,12 +59,12 @@ describe('notify', () => {
       expect.any(Function)
     )
 
-    expect(prismaClient.assessmentReminder.createMany).toHaveBeenCalledWith({
+    expect(prismaMock.assessmentReminder.createMany).toHaveBeenCalledWith({
       data: [{ userId: 1 }, { userId: 2 }, { userId: 3 }],
     })
 
-    expect(prismaClient.assessmentReminder.updateMany).toHaveBeenCalledWith({
-      where: { userId: { in: [1, 2, 3] } },
+    expect(prismaMock.assessmentReminder.update).toHaveBeenCalledWith({
+      where: { id: 123 },
       data: {
         sentAt: new Date('2023-01-01'),
         messageId: '123',
@@ -69,17 +76,17 @@ describe('notify', () => {
     const allowList = ['user1@test.com', 'user3@test.com']
     process.env.NOTIFY_ALLOW_LIST = allowList.join(',')
 
-    jest.mocked(prismaClient.user.findMany).mockResolvedValueOnce(mockUsers)
+    prismaMock.user.findMany.mockResolvedValueOnce(mockUsers)
 
     await notify()
 
-    expect(prismaClient.user.findMany).toHaveBeenCalledWith({
+    expect(prismaMock.user.findMany).toHaveBeenCalledWith({
       where: expect.objectContaining({ email: { in: allowList } }),
     })
   })
 
   it('should exit if no users have studies due assessment', async () => {
-    jest.mocked(prismaClient.user.findMany).mockResolvedValueOnce([])
+    prismaMock.user.findMany.mockResolvedValueOnce([])
 
     await notify()
 
@@ -93,7 +100,7 @@ describe('notify', () => {
 
     delete process.env.NOTIFY_ALLOW_LIST
 
-    jest.mocked(prismaClient.user.findMany).mockResolvedValueOnce(mockUsers)
+    prismaMock.user.findMany.mockResolvedValueOnce(mockUsers)
 
     await notify()
 
@@ -105,7 +112,7 @@ describe('notify', () => {
   })
 
   it('should log unhandled exceptions', async () => {
-    jest.mocked(prismaClient.user.findMany).mockResolvedValueOnce(mockUsers)
+    prismaMock.user.findMany.mockResolvedValueOnce(mockUsers)
     jest.mocked(emailService.sendBulkEmail).mockRejectedValueOnce('Error sending email')
 
     await notify()

@@ -32,11 +32,13 @@ COPY turbo.json turbo.json
 # NextJs requires these as build args because it bakes them into the generated JavaScript bundles
 ARG APP_ENV
 ENV NEXT_PUBLIC_APP_ENV $APP_ENV
+ARG GTM_ID
+ENV NEXT_PUBLIC_GTM_ID $GTM_ID
 
 # ARG TURBO_TOKEN
 # ENV TURBO_TOKEN=$TURBO_TOKEN
 
-RUN npm run build --filter=web...
+RUN ENVIRONMENT_VARIABLE_CHECKS=disabled npm run build --filter=web...
 
 # RUN npx prisma generate
 
@@ -61,6 +63,7 @@ COPY --from=installer --chown=nextjs:nodejs /app/apps/web/public ./apps/web/publ
 # Used at runtime during NextJs SSR (Server side rendering)
 # Any variables not required at build time can be inserted via the task definition generation step in the workflow
 ENV NEXT_PUBLIC_APP_ENV $APP_ENV
+ENV NEXT_PUBLIC_GTM_ID $GTM_ID
 ENV DATABASE_URL = ''
 
 EXPOSE 3000

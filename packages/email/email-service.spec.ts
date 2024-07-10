@@ -47,7 +47,7 @@ describe('EmailService', () => {
 
     expect(sesClientMock.sendEmail).toHaveBeenCalledTimes(1)
     expect(sesClientMock.sendEmail).toHaveBeenCalledWith({
-      Source: '"NIHR CRN" <noreply-assessmystudy@nihr.ac.uk>',
+      Source: '"NIHR RDN" <noreply-assessmystudy@nihr.ac.uk>',
       Destination: { ToAddresses: ['recipient@example.com'] },
       Message: {
         Subject: { Data: 'Test Subject', Charset: 'utf-8' },
@@ -89,10 +89,52 @@ describe('EmailService', () => {
     )
   })
 
+  it('should perform a set number of retries if SES returns a rate limit error', async () => {
+    jest.useFakeTimers()
+
+    // Mock SES sendEmail
+    const sesError: Error & { code?: string } = new Error('Rate limit error')
+    sesError.code = 'Throttling'
+    const sendEmailMock = jest.fn().mockRejectedValue(sesError)
+    sesClientMock.sendEmail = jest.fn().mockReturnValue({ promise: sendEmailMock })
+
+    const email: EmailArgs = {
+      to: ['recipient1@example.com', 'recipient2@example.com'],
+      subject: 'Test Subject 1',
+      htmlTemplate: jest.fn(() => 'html'),
+      textTemplate: jest.fn(() => 'text'),
+      templateData: { name: 'John Doe' },
+    }
+
+    const promise = emailService.sendEmail(email)
+
+    await jest.runOnlyPendingTimersAsync()
+
+    expect(logger.info).toHaveBeenNthCalledWith(1, 'Rate limit exceeded. Retrying... (%s retries left)', 3)
+
+    await jest.runOnlyPendingTimersAsync()
+
+    expect(logger.info).toHaveBeenNthCalledWith(2, 'Rate limit exceeded. Retrying... (%s retries left)', 2)
+
+    jest.runOnlyPendingTimers()
+
+    expect(logger.info).toHaveBeenNthCalledWith(3, 'Rate limit exceeded. Retrying... (%s retries left)', 1)
+
+    await expect(promise).rejects.toThrow('Rate limit error')
+
+    expect(sesClientMock.sendEmail).toHaveBeenCalledTimes(4)
+
+    jest.useRealTimers()
+  })
+
   it('should send a bulk email with the correct parameters', async () => {
     // Mock SES sendEmail
     const sendEmailMock = jest.fn().mockResolvedValue({ MessageId: 123 })
     sesClientMock.sendEmail = jest.fn().mockReturnValue({ promise: sendEmailMock })
+
+    // Mock SES getSendQuota
+    const getSendQuotaMock = jest.fn().mockResolvedValue({ MaxSendRate: 14 })
+    sesClientMock.getSendQuota = jest.fn().mockReturnValueOnce({ promise: getSendQuotaMock })
 
     const templateData = { name: 'John Doe' }
 
@@ -120,7 +162,7 @@ describe('EmailService', () => {
     expect(sesClientMock.sendEmail).toHaveBeenCalledTimes(2)
 
     expect(sesClientMock.sendEmail).toHaveBeenCalledWith({
-      Source: '"NIHR CRN" <noreply-assessmystudy@nihr.ac.uk>',
+      Source: '"NIHR RDN" <noreply-assessmystudy@nihr.ac.uk>',
       Destination: { ToAddresses: ['recipient1@example.com', 'recipient2@example.com'] },
       Message: {
         Subject: { Data: 'Test Subject 1', Charset: 'utf-8' },
@@ -132,7 +174,7 @@ describe('EmailService', () => {
     })
 
     expect(sesClientMock.sendEmail).toHaveBeenCalledWith({
-      Source: '"NIHR CRN" <noreply-assessmystudy@nihr.ac.uk>',
+      Source: '"NIHR RDN" <noreply-assessmystudy@nihr.ac.uk>',
       Destination: { ToAddresses: ['recipient3@example.com', 'recipient4@example.com'] },
       Message: {
         Subject: { Data: 'Test Subject 2', Charset: 'utf-8' },
@@ -177,6 +219,10 @@ describe('EmailService', () => {
     sendEmailMock.mockRejectedValueOnce('test error')
     sendEmailMock.mockResolvedValueOnce({ MessageId: '123' })
 
+    // Mock SES getSendQuota
+    const getSendQuotaMock = jest.fn().mockResolvedValue({ MaxSendRate: 14 })
+    sesClientMock.getSendQuota = jest.fn().mockReturnValueOnce({ promise: getSendQuotaMock })
+
     const templateData = { name: 'John Doe' }
 
     const emails: EmailArgs[] = [
@@ -216,5 +262,58 @@ describe('EmailService', () => {
     )
 
     expect(logger.error).toHaveBeenCalledWith('test error')
+  })
+
+  it('should rate limit according to the SES maximum send rate', async () => {
+    jest.useFakeTimers()
+
+    // Mock SES sendEmail
+    const sendEmailMock = jest.fn().mockResolvedValue({ MessageId: 123 })
+    sesClientMock.sendEmail = jest.fn().mockReturnValue({ promise: sendEmailMock })
+
+    // Mock SES getSendQuota
+    const getSendQuotaMock = jest.fn().mockResolvedValue({ MaxSendRate: 2 }) // MaxSendRate will be halved so we expect 1 email per second
+    sesClientMock.getSendQuota = jest.fn().mockReturnValueOnce({ promise: getSendQuotaMock })
+
+    const templateData = { name: 'John Doe' }
+
+    const emails: EmailArgs[] = [
+      {
+        to: ['recipient1@example.com', 'recipient2@example.com'],
+        subject: 'Test Subject 1',
+        htmlTemplate: jest.fn(() => 'html'),
+        textTemplate: jest.fn(() => 'text'),
+        templateData,
+      },
+      {
+        to: ['recipient3@example.com', 'recipient4@example.com'],
+        subject: 'Test Subject 2',
+        htmlTemplate: jest.fn(() => 'html'),
+        textTemplate: jest.fn(() => 'text'),
+        templateData,
+      },
+    ]
+
+    void emailService.sendBulkEmail(emails, jest.fn())
+
+    expect(sesClientMock.sendEmail).toHaveBeenCalledTimes(0)
+
+    await jest.advanceTimersByTimeAsync(1000)
+
+    expect(sesClientMock.sendEmail).toHaveBeenCalledTimes(1)
+
+    await jest.advanceTimersByTimeAsync(1000)
+
+    expect(sesClientMock.sendEmail).toHaveBeenCalledTimes(2)
+
+    jest.useRealTimers()
+  })
+
+  it('should throw an error if the maximum send rate is not obtainable', async () => {
+    // Mock SES getSendQuota
+    const getSendQuotaMock = jest.fn().mockResolvedValue({})
+    sesClientMock.getSendQuota = jest.fn().mockReturnValueOnce({ promise: getSendQuotaMock })
+
+    await expect(emailService.sendBulkEmail([], jest.fn())).rejects.toThrow('Unable to determine maximum send rate')
   })
 })

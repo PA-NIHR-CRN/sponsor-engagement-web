@@ -18,6 +18,12 @@ export const organisationRoleShortName = {
 export const isClinicalResearchSponsor = (studyOrg: StudyOrganisationWithRelations) =>
   studyOrg.organisationRole.name === 'Clinical Research Sponsor'
 
+export const getSponsorOrgName = (studyOrgs: StudyOrganisationWithRelations[]) =>
+  studyOrgs.find((org) => isClinicalResearchSponsor(org))?.organisation.name
+
+export const getSupportOrgName = (studyOrgs: StudyOrganisationWithRelations[]) =>
+  studyOrgs.find((org) => !isClinicalResearchSponsor(org))?.organisation.name
+
 export const getUserOrganisations = async (userId: number) => {
   return prismaClient.userOrganisation.findMany({
     where: {

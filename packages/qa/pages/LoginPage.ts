@@ -1,4 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test'
+import { convertIsoDateToDisplayDate, convertIsoDateToDisplayTime } from '../utils/UtilFunctions'
+import { RowDataPacket } from 'mysql2'
 
 //Declare Page Objects
 export default class LoginPage {
@@ -56,5 +58,19 @@ export default class LoginPage {
     await this.btnNext.click()
     await this.passwordInput.fill(password)
     await this.btnContinue.click()
+  }
+
+  async getLastLoginFormattedDate(dateValueRecord: RowDataPacket[]): Promise<string> {
+    const formattedLastLogin =
+      convertIsoDateToDisplayDate(new Date(dateValueRecord[0].lastLogin)) +
+      ' ' +
+      convertIsoDateToDisplayTime(new Date(dateValueRecord[0].lastLogin))
+    return formattedLastLogin
+  }
+
+  async assertLastLoginUpdated(previousValue: RowDataPacket[], updatedValue: RowDataPacket[]) {
+    expect(new Date(updatedValue[0].lastLogin).getTime()).toBeGreaterThan(
+      new Date(previousValue[0].lastLogin).getTime()
+    )
   }
 }

@@ -13,24 +13,24 @@ export interface RequestSupportProps {
 export default function RequestSupport({ returnPath }: RequestSupportProps) {
   return (
     <Container>
-      <NextSeo title="Request NIHR CRN support" />
+      <NextSeo title="Request NIHR RDN support" />
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-l">Request NIHR CRN support</h1>
+          <h1 className="govuk-heading-l">Request NIHR RDN support</h1>
           <p>
             Contact{' '}
-            <Link href="https://www.nihr.ac.uk/documents/study-support-service-contacts/11921">your local CRN</Link> if
-            you would like to discuss how the NIHR CRN may be able to support you to deliver your study.
+            <Link href="https://www.nihr.ac.uk/documents/study-support-service-contacts/11921">your local network</Link> if
+            you would like to discuss how the NIHR RDN may be able to support you to deliver your study.
           </p>
           <p>
-            All NIHR CRN Portfolio studies are able to access the NIHR CRN Study Support Service - a standard national
+            All NIHR RDN Portfolio studies are able to access the NIHR RDN Study Support Service - a standard national
             framework of support to help you Plan, Place and Perform high quality research.
           </p>
           <p>
-            Upon the Sponsor (or delegates) request, the NIHR CRN will work in partnership to support you to overcome
+            Upon the Sponsor (or delegates) request, the NIHR RDN will work in partnership to support you to overcome
             challenges to the delivery of your study.
           </p>
-          <p>Here are some examples (not exhaustive) of how the NIHR CRN can support your study:</p>
+          <p>Here are some examples (not exhaustive) of how the NIHR RDN can support your study:</p>
           <ul className="govuk-list govuk-list--bullet">
             <li>
               Supporting study-wide planning activities (e.g. identification of potential sites), support with cost

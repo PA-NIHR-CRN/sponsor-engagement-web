@@ -21,7 +21,7 @@ import { RootLayout } from '@/components/organisms'
 import { Roles, STUDIES_PER_PAGE } from '@/constants'
 import { SUPPORT_PAGE } from '@/constants/routes'
 import { useFormListeners } from '@/hooks/useFormListeners'
-import { isClinicalResearchSponsor } from '@/lib/organisations'
+import { getSponsorOrgName, getSupportOrgName } from '@/lib/organisations'
 import { getStudiesForOrgs } from '@/lib/studies'
 import { formatDate } from '@/utils/date'
 import { getFiltersFromQuery } from '@/utils/filters'
@@ -33,7 +33,7 @@ const renderNotificationBanner = (success: boolean) =>
     <NotificationBanner heading="The study assessment was successfully saved" success>
       Request{' '}
       <Link className="govuk-notification-banner__link" href={SUPPORT_PAGE}>
-        NIHR CRN support
+        NIHR RDN support
       </Link>{' '}
       for this study.
     </NotificationBanner>
@@ -74,13 +74,13 @@ export default function Studies({
           </div>
 
           <p className="govuk-body">
-            The NIHR CRN tracks the progress of research studies in its portfolio using data provided by study teams.
-            Sponsors or their delegates need to assess if studies are on or off track and if any NIHR CRN support is
+            The NIHR RDN tracks the progress of research studies in its portfolio using data provided by study teams.
+            Sponsors or their delegates need to assess if studies are on or off track and if any NIHR RDN support is
             needed.
           </p>
 
           <Details className="[&>summary]:text-blue" heading="Why am I being asked to assess studies?">
-            <p>NIHR CRN asks sponsors or their delegates to review and assess study progress for UK studies when:</p>
+            <p>NIHR RDN asks sponsors or their delegates to review and assess study progress for UK studies when:</p>
             <ul className="govuk-list govuk-list--bullet">
               <li>A study falls behind the agreed milestones in the UK or</li>
               <li>A study is not recruiting to target in the UK</li>
@@ -123,27 +123,23 @@ export default function Studies({
               {studies.length > 0 ? (
                 <>
                   <ol aria-label="Studies" className="govuk-list govuk-list--spaced">
-                    {studies.map((study) => {
-                      const sponsorOrg = study.organisations.find((org) => isClinicalResearchSponsor(org))
-                      const supportOrg = study.organisations.find((org) => !isClinicalResearchSponsor(org))
-                      return (
-                        <li key={study.id}>
-                          <StudyList
-                            assessmentDue={Boolean(study.isDueAssessment)}
-                            assessmentHref={`/assessments/${study.id}?returnUrl=studies`}
-                            indications={study.evaluationCategories
-                              .map((evalCategory) => evalCategory.indicatorType)
-                              .filter((evalCategory, index, items) => items.indexOf(evalCategory) === index)}
-                            lastAsessmentDate={study.lastAssessment ? formatDate(study.lastAssessment.createdAt) : ''}
-                            shortTitle={study.shortTitle}
-                            shortTitleHref={`/studies/${study.id}`}
-                            sponsorOrgName={sponsorOrg?.organisation.name}
-                            supportOrgName={supportOrg?.organisation.name}
-                            trackStatus={study.lastAssessment?.status.name}
-                          />
-                        </li>
-                      )
-                    })}
+                    {studies.map((study) => (
+                      <li key={study.id}>
+                        <StudyList
+                          assessmentDue={Boolean(study.isDueAssessment)}
+                          assessmentHref={`/assessments/${study.id}?returnUrl=studies`}
+                          indications={study.evaluationCategories
+                            .map((evalCategory) => evalCategory.indicatorType)
+                            .filter((evalCategory, index, items) => items.indexOf(evalCategory) === index)}
+                          lastAsessmentDate={study.lastAssessment ? formatDate(study.lastAssessment.createdAt) : ''}
+                          shortTitle={study.shortTitle}
+                          shortTitleHref={`/studies/${study.id}`}
+                          sponsorOrgName={getSponsorOrgName(study.organisations)}
+                          supportOrgName={getSupportOrgName(study.organisations)}
+                          trackStatus={study.lastAssessment?.status.name}
+                        />
+                      </li>
+                    ))}
                   </ol>
 
                   <Pagination
@@ -162,7 +158,19 @@ export default function Studies({
           )}
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
-          <RequestSupport />
+          <div className="lg:sticky top-4">
+            <RequestSupport />
+            <Card className="mt-4" filled padding={4} data-testid="export-study-data">
+              <h3 className="govuk-heading-m">Download study data</h3>
+              <p>
+                This download is a snapshot of all the information held within the Sponsor Engagement Tool for the
+                sponsor/delegate organisation.
+              </p>
+              <a className="govuk-button mb-0" href="/api/export">
+                Download
+              </a>
+            </Card>
+          </div>
         </div>
       </div>
     </Container>
