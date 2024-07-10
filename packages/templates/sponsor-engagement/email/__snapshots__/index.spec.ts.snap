@@ -1,0 +1,615 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Email template "assessment-reminder.html.hbs" displays correctly 1`] = `
+"<html lang='en'>
+
+  <body>
+    <div>
+      <h1>NIHR RDN has invited you to assess the progress of your studies</h1>
+
+      <p style='font-size: 19px; font-weight:700; display: flex;'>
+        <img src='http://localhost:3000/assets/images/exclamation-icon.png' style='display:block; width: 35px; height: 35px;' />
+        <span style='margin-left: 10px; margin-top: 3px;'>There are one or more studies to assess</span>
+      </p>
+
+      <p>Hello,</p>
+
+      <p>You are nominated as a Sponsor contact for studies on the NIHR Research Delivery Network’s (RDN) research
+        portfolio. One or more studies require an update on their status. Please sign in to the Sponsor Engagement Tool
+        to provide these updates.</p>
+
+      <p>As a nominated contact for your organisation, you will see all studies linked to your organisation. The Sponsor
+        Engagement Tool does not associate contacts to specific studies or groups of studies, only to the organisation.</p>
+
+      <a
+        href='http://localhost:3000/auth/signin'
+        style='
+          box-sizing: border-box;
+          display: inline-block;
+          position: relative;
+          margin-top: 0;
+          margin-right: 0;
+          margin-left: 0;
+          margin-bottom: 22px;
+          padding: 8px 10px 7px;
+          border: 2px solid rgba(0, 0, 0, 0);
+          border-radius: 0;
+          color: #fff;
+          background-color: #00703c;
+          box-shadow: 0 2px 0 #002d18;
+          text-align: center;
+          vertical-align: top;
+          cursor: pointer;
+          -webkit-appearance: none;
+        '
+      >Sign in to assess studies</a>
+
+      <h2>Why am I being asked to assess studies?</h2>
+
+      <p>
+        The
+        <a href='http://rdn-link'>NIHR RDN</a>
+        supports Sponsors and their delegates to deliver high-quality research, for the benefit of patients, the public
+        and health and care organisations across England.
+      </p>
+
+      <p>
+        The NIHR RDN tracks the progress of research studies in its portfolio using data provided by Sponsors or their
+        delegates on behalf of the Department of Health and Social Care.
+      </p>
+
+      <p>Sponsors or their delegates are asked to review and assess the progress of studies when:</p>
+
+      <ul>
+        <li>A study falls behind the agreed milestones or</li>
+        <li>A study is not recruiting to target</li>
+        <li>And the last progress assessment is over three months old</li>
+      </ul>
+
+      <p>
+        Sponsors or their delegates can request
+        <a href='http://localhost:3000/request-support'>NIHR RDN support</a>
+        with their research study at any time.
+      </p>
+
+      <p>
+        <strong>
+          Please note that providing regular study assessments is a requirement of the
+          <a href='http://terms-conditions-link'>Terms and Conditions for NIHR RDN support</a>. Failure to do so may
+          result in removal from the NIHR RDN Portfolio.
+        </strong>
+      </p>
+
+      <h2>Nominate someone else to assess research studies</h2>
+
+      <p>
+        The NIHR RDN can give other people in your organisation access to this service. Contact
+        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>
+        to add a new contact.
+      </p>
+
+      <hr />
+
+      <p>
+        This email is not monitored, do not reply. If you’re not sure why you’ve received this email or need to be
+        removed from our list contact
+        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>.
+      </p>
+    </div>
+
+    <br />
+
+    <div>
+      <table style='width: 540px; border-collapse: collapse'>
+        <tbody>
+          <tr>
+            <td style='width: 162px'>
+              <p>
+                &nbsp;<img
+                  src='https://www.nihr.ac.uk/layout/4.0/assets/external/nihr-logo.png'
+                  alt='NIHRLogo'
+                  width='206'
+                  class='CToWUd'
+                  data-bit='iit'
+                />
+              </p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        <a
+          href='https://www.nihr.ac.uk/explore-nihr/campaigns/nhs-75/?utm_source=gmail&amp;utm_medium=email&amp;utm_campaign=nhs75&amp;utm_term=signature&amp;utm_content=signature'
+          target='_blank'
+        ><img
+            src='https://www.nihr.ac.uk/layout/img/external/nhs75-shape-the-future-signature.png'
+            alt='NIHR, Supporting NHS75. Life changing research funded by the public. Click, get involved in our NHS75 campaign'
+            width='540'
+            height='101'
+            class='CToWUd'
+            data-bit='iit'
+          />
+        </a>
+      </p>
+
+      <p>
+        Follow us:
+        <img
+          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/f_logo_RGB-Blue_58.png'
+          alt='FB Logo'
+          width='11'
+          height='11'
+          class='CToWUd'
+          data-bit='iit'
+        />
+        <a href='https://www.facebook.com/OfficialNIHR' target='_blank'>OfficialNIHR</a>&nbsp;|&nbsp;<img
+          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/Twitter_Logo_Blue.png'
+          alt='Twitter logo'
+          width='11'
+          height='11'
+          class='CToWUd'
+          data-bit='iit'
+        />
+        <a href='https://twitter.com/NIHRresearch' target='_blank'>@NIHRresearch</a>&nbsp;|&nbsp;<img
+          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/LI-In-Bug.png'
+          alt='LI Logo'
+          width='11'
+          height='9'
+          class='CToWUd'
+          data-bit='iit'
+        /><a href='https://www.linkedin.com/company/nihr-research' target='_blank'>NIHR</a>
+        |
+        <img
+          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/youtube_logo_rgb_light.png'
+          alt='Youtube Logo'
+          width='11'
+          height='9'
+          class='CToWUd'
+          data-bit='iit'
+        />
+        <a href='https://www.youtube.com/user/NIHRtv' target='_blank'>NIHRtv</a>
+        |
+        <img
+          src='https://www.nihr.ac.uk/layout/img/external/nihr-link-icon.png'
+          alt='URL Logo'
+          width='11'
+          height='9'
+          class='CToWUd'
+          data-bit='iit'
+        />
+        <a
+          href='https://www.nihr.ac.uk/?utm_source=gmail&amp;utm_medium=email&amp;utm_campaign=ccsignature'
+          target='_blank'
+        >nihr.ac.uk</a>
+      </p>
+      <br />
+      <br />
+      <p style='color: rgb(34, 34, 34); font-family: arial, sans-serif; background-color: rgb(255, 255, 255)'>
+        Confidential information may be contained in this message. If you are not the intended recipient, any reading,
+        printing, storage, disclosure, copying or any other action taken in respect of this e-mail is prohibited and may
+        be unlawful. If you are not the intended recipient, please notify the sender immediately by using the reply
+        function and then permanently delete what you have received.
+      </p>
+    </div>
+  </body>
+
+</html>"
+`;
+
+exports[`Email template "assessment-reminder.text.hbs" displays correctly 1`] = `
+"# Assess progress of research studies in NIHR RDN portfolio
+
+There are one or more studies to assess
+
+Sign-in [http://localhost:3000/auth/signin]
+
+Hello,
+
+You are nominated as a Sponsor contact for studies on the NIHR Research Delivery Network’s (RDN) research portfolio. One
+or more studies require an update on their status. Please sign in to the Sponsor Engagement Tool to provide these
+updates.
+
+As a nominated contact for your organisation, you will see all studies linked to your organisation. The Sponsor Engagement Tool
+does not associate contacts to specific studies or groups of studies, only to the organisation.
+
+# Why am I being asked to assess studies?
+
+The NIHR RDN [http://rdn-link] supports Sponsors and their delegates to deliver high-quality research, for the benefit of
+patients, the public and health and care organisations across England.
+
+
+The NIHR RDN tracks the progress of research studies in its portfolio using data provided by Sponsors or their delegates
+on behalf of the Department of Health and Social Care.
+
+Sponsors or their delegates are asked to review and assess the progress of studies when:
+
+- A study falls behind the agreed milestones
+- A study is not recruiting to target
+- And the last progress assessment is over three months old
+
+Sponsors or their delegates can request NIHR RDN support with their research study at any time. [http://localhost:3000/request-support]
+
+Please note that providing regular study assessments is a requirement of the Terms and Conditions for NIHR RDN support
+[http://terms-conditions-link]. Failure to do so may result in removal from the NIHR RDN Portfolio.
+
+# Nominate someone else to assess research studies
+
+The NIHR RDN can give other people in your organisation access to this service. Contact supportmystudy@nihr.ac.uk to add
+a new contact.
+
+This email is not monitored, do not reply. If you’re not sure why you’ve received this email or need to be removed from
+our list contact supportmystudy@nihr.ac.uk."
+`;
+
+exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
+"<html lang='en'>
+
+  <body>
+    <div>
+      <h1>NIHR RDN has invited you to assess the progress of your studies</h1>
+
+      <p>Hello,</p>
+
+      <p>
+        You have been nominated as a contact for
+        Mocked org name
+        studies on the NIHR Research Delivery Network’s (RDN) research portfolio.
+      </p>
+
+      <p>
+        The
+        <a href='http://rdn-link'>NIHR RDN</a>
+        supports Sponsors and their delegates to deliver high-quality research, for the benefit of patients, the public
+        and health and care organisations across England.
+      </p>
+
+      <p>
+        The NIHR RDN tracks the progress of research studies in its portfolio using data provided by Sponsors or their
+        delegates on behalf of the Department of Health and Social Care.
+      </p>
+
+      <p>
+        NIHR RDN asks Sponsors or their delegates to review these studies and provide regular assessments of how the
+        study is progressing.
+      </p>
+
+      <p>
+        Please sign in to the Sponsor Engagement Tool to provide updates on studies.
+      </p>
+
+      <a
+        href='http://localhost:3000/auth/signin'
+        style='
+          box-sizing: border-box;
+          display: inline-block;
+          position: relative;
+          margin-top: 0;
+          margin-right: 0;
+          margin-left: 0;
+          margin-bottom: 22px;
+          padding: 8px 10px 7px;
+          border: 2px solid rgba(0, 0, 0, 0);
+          border-radius: 0;
+          color: #fff;
+          background-color: #00703c;
+          box-shadow: 0 2px 0 #002d18;
+          text-align: center;
+          vertical-align: top;
+          cursor: pointer;
+          -webkit-appearance: none;
+        '
+      >Sign in to assess studies</a>
+
+      <h2>Why am I being asked to assess studies?</h2>
+
+      <p>Sponsors or their delegates are asked to review and assess the progress of studies when:</p>
+
+      <ul>
+        <li>A study falls behind the agreed milestones or</li>
+        <li>A study is not recruiting to target</li>
+        <li>And the last progress assessment is over three months old</li>
+      </ul>
+
+      <p>
+        Sponsors or their delegates can request
+        <a href='http://localhost:3000/request-support'>NIHR RDN support</a>
+        with their research study at any time.
+      </p>
+
+      <p>
+        <strong>
+          Please note that providing regular study assessments is a requirement of the
+          <a href='http://terms-conditions-link'>Terms and Conditions for NIHR RDN support</a>. Failure to do so may
+          result in removal from the NIHR RDN Portfolio.
+        </strong>
+      </p>
+
+      <h2>Nominate someone else to assess studies</h2>
+
+      <p>
+        The NIHR RDN can give other people in your organisation access to this service. Contact
+        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>
+        to add a new contact.
+      </p>
+
+      <p>
+        This email is not monitored, do not reply. If you’re not sure why you’ve received this email or need to be
+        removed from our list contact
+        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>.
+      </p>
+    </div>
+
+    <br />
+
+    <div>
+      <table style='width: 540px; border-collapse: collapse'>
+        <tbody>
+          <tr>
+            <td style='width: 162px'>
+              <p>
+                &nbsp;<img
+                  src='https://www.nihr.ac.uk/layout/4.0/assets/external/nihr-logo.png'
+                  alt='NIHRLogo'
+                  width='206'
+                  class='CToWUd'
+                  data-bit='iit'
+                />
+              </p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        <a
+          href='https://www.nihr.ac.uk/explore-nihr/campaigns/nhs-75/?utm_source=gmail&amp;utm_medium=email&amp;utm_campaign=nhs75&amp;utm_term=signature&amp;utm_content=signature'
+          target='_blank'
+        ><img
+            src='https://www.nihr.ac.uk/layout/img/external/nhs75-shape-the-future-signature.png'
+            alt='NIHR, Supporting NHS75. Life changing research funded by the public. Click, get involved in our NHS75 campaign'
+            width='540'
+            height='101'
+            class='CToWUd'
+            data-bit='iit'
+          />
+        </a>
+      </p>
+
+      <p>
+        Follow us:
+        <img
+          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/f_logo_RGB-Blue_58.png'
+          alt='FB Logo'
+          width='11'
+          height='11'
+          class='CToWUd'
+          data-bit='iit'
+        />
+        <a href='https://www.facebook.com/OfficialNIHR' target='_blank'>OfficialNIHR</a>&nbsp;|&nbsp;<img
+          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/Twitter_Logo_Blue.png'
+          alt='Twitter logo'
+          width='11'
+          height='11'
+          class='CToWUd'
+          data-bit='iit'
+        />
+        <a href='https://twitter.com/NIHRresearch' target='_blank'>@NIHRresearch</a>&nbsp;|&nbsp;<img
+          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/LI-In-Bug.png'
+          alt='LI Logo'
+          width='11'
+          height='9'
+          class='CToWUd'
+          data-bit='iit'
+        /><a href='https://www.linkedin.com/company/nihr-research' target='_blank'>NIHR</a>
+        |
+        <img
+          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/youtube_logo_rgb_light.png'
+          alt='Youtube Logo'
+          width='11'
+          height='9'
+          class='CToWUd'
+          data-bit='iit'
+        />
+        <a href='https://www.youtube.com/user/NIHRtv' target='_blank'>NIHRtv</a>
+        |
+        <img
+          src='https://www.nihr.ac.uk/layout/img/external/nihr-link-icon.png'
+          alt='URL Logo'
+          width='11'
+          height='9'
+          class='CToWUd'
+          data-bit='iit'
+        />
+        <a
+          href='https://www.nihr.ac.uk/?utm_source=gmail&amp;utm_medium=email&amp;utm_campaign=ccsignature'
+          target='_blank'
+        >nihr.ac.uk</a>
+      </p>
+      <br />
+      <br />
+      <p style='color: rgb(34, 34, 34); font-family: arial, sans-serif; background-color: rgb(255, 255, 255)'>
+        Confidential information may be contained in this message. If you are not the intended recipient, any reading,
+        printing, storage, disclosure, copying or any other action taken in respect of this e-mail is prohibited and may
+        be unlawful. If you are not the intended recipient, please notify the sender immediately by using the reply
+        function and then permanently delete what you have received.
+      </p>
+    </div>
+  </body>
+
+</html>"
+`;
+
+exports[`Email template "contact-assigned.text.hbs" displays correctly 1`] = `
+"# NIHR RDN has invited you to assess the progress of your studies
+
+Hello,
+
+You have been nominated as a contact for Mocked org name studies on the NIHR Research Delivery Network's (RDN) research portfolio.
+
+The NIHR RDN supports Sponsors and their delegates to deliver high-quality research, for the benefit of patients, the public and health and care organisations across England.
+
+The NIHR RDN tracks the progress of research studies in its portfolio using data provided by Sponsors or their delegates on behalf of the Department of Health and Social Care.
+
+NIHR RDN asks Sponsors or their delegates to review these studies and provide regular assessments of how the study is progressing.
+
+Please sign in to the Sponsor Engagement Tool to provide updates on studies. (http://localhost:3000/auth/signin)
+
+# Why am I being asked to assess studies?
+
+Sponsors or their delegates are asked to review and assess the progress of studies when:
+
+- A study falls behind the agreed milestones
+- A study is not recruiting to target
+- And the last progress assessment is over three months old
+
+Sponsors or their delegates can request NIHR RDN support with their research study at any time. (http://localhost:3000/request-support)
+
+Please note that providing regular study assessments is a requirement of the Terms and Conditions for NIHR RDN support.
+Failure to do so may result in removal from the NIHR RDN Portfolio. (http://terms-conditions-link)
+
+# Nominate someone else to assess studies
+
+The NIHR RDN can give other people in your organisation access to this service. Contact supportmystudy@nihr.ac.uk to add
+a new contact.
+
+This email is not monitored, do not reply. If you’re not sure why you’ve received this email or need to be removed from
+our list, please contact supportmystudy@nihr.ac.uk.
+"
+`;
+
+exports[`Email template "contact-removed.html.hbs" displays correctly 1`] = `
+"<html lang='en'>
+  <body>
+    <div>
+      <h1>NIHR RDN has removed you as a reviewer for Mocked org name</h1>
+
+      <p>Hello,</p>
+
+      <p>You have been removed as a reviewer of research studies for
+        Mocked org name. You will no longer be able to review and assess study progress.
+      </p>
+
+      <hr />
+
+      <h2>Not sure why you've been removed?</h2>
+
+      <p>If you think there’s been an error please contact
+        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>.</p>
+
+      <p>If you’re not sure why you’ve received this email or need to be removed from our list contact
+        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>.</p>
+    </div>
+
+    <br />
+
+    <div>
+      <table style='width: 540px; border-collapse: collapse'>
+        <tbody>
+          <tr>
+            <td style='width: 162px'>
+              <p>
+                &nbsp;<img
+                  src='https://www.nihr.ac.uk/layout/4.0/assets/external/nihr-logo.png'
+                  alt='NIHRLogo'
+                  width='206'
+                  class='CToWUd'
+                  data-bit='iit'
+                />
+              </p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        <a
+          href='https://www.nihr.ac.uk/explore-nihr/campaigns/nhs-75/?utm_source=gmail&amp;utm_medium=email&amp;utm_campaign=nhs75&amp;utm_term=signature&amp;utm_content=signature'
+          target='_blank'
+        ><img
+            src='https://www.nihr.ac.uk/layout/img/external/nhs75-shape-the-future-signature.png'
+            alt='NIHR, Supporting NHS75. Life changing research funded by the public. Click, get involved in our NHS75 campaign'
+            width='540'
+            height='101'
+            class='CToWUd'
+            data-bit='iit'
+          />
+        </a>
+      </p>
+
+      <p>
+        Follow us:
+        <img
+          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/f_logo_RGB-Blue_58.png'
+          alt='FB Logo'
+          width='11'
+          height='11'
+          class='CToWUd'
+          data-bit='iit'
+        />
+        <a href='https://www.facebook.com/OfficialNIHR' target='_blank'>OfficialNIHR</a>&nbsp;|&nbsp;<img
+          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/Twitter_Logo_Blue.png'
+          alt='Twitter logo'
+          width='11'
+          height='11'
+          class='CToWUd'
+          data-bit='iit'
+        />
+        <a href='https://twitter.com/NIHRresearch' target='_blank'>@NIHRresearch</a>&nbsp;|&nbsp;<img
+          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/LI-In-Bug.png'
+          alt='LI Logo'
+          width='11'
+          height='9'
+          class='CToWUd'
+          data-bit='iit'
+        /><a href='https://www.linkedin.com/company/nihr-research' target='_blank'>NIHR</a>
+        |
+        <img
+          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/youtube_logo_rgb_light.png'
+          alt='Youtube Logo'
+          width='11'
+          height='9'
+          class='CToWUd'
+          data-bit='iit'
+        />
+        <a href='https://www.youtube.com/user/NIHRtv' target='_blank'>NIHRtv</a>
+        |
+        <img
+          src='https://www.nihr.ac.uk/layout/img/external/nihr-link-icon.png'
+          alt='URL Logo'
+          width='11'
+          height='9'
+          class='CToWUd'
+          data-bit='iit'
+        />
+        <a
+          href='https://www.nihr.ac.uk/?utm_source=gmail&amp;utm_medium=email&amp;utm_campaign=ccsignature'
+          target='_blank'
+        >nihr.ac.uk</a>
+      </p>
+      <br />
+      <br />
+      <p style='color: rgb(34, 34, 34); font-family: arial, sans-serif; background-color: rgb(255, 255, 255)'>
+        Confidential information may be contained in this message. If you are not the intended recipient, any reading,
+        printing, storage, disclosure, copying or any other action taken in respect of this e-mail is prohibited and may
+        be unlawful. If you are not the intended recipient, please notify the sender immediately by using the reply
+        function and then permanently delete what you have received.
+      </p>
+    </div>
+  </body>
+
+</html>"
+`;
+
+exports[`Email template "contact-removed.text.hbs" displays correctly 1`] = `
+"# NIHR RDN has removed you as a reviewer for Mocked org name
+
+Hello, You have been removed as a reviewer of research studies for Mocked org name. You will no longer be able to
+review and assess study progress.
+
+# Not sure why you've been removed?
+
+If you think there’s been an error please contact supportmystudy@nihr.ac.uk.
+
+If you’re not sure why you’ve received this email or need to be removed from our list contact supportmystudy@nihr.ac.uk."
+`;

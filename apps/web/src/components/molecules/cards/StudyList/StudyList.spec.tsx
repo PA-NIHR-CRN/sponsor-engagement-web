@@ -1,18 +1,20 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+
+import { render, screen } from '@/config/TestUtils'
+
 import type { StudyListProps } from './StudyList'
 import { StudyList } from './StudyList'
 
 describe('StudyList Component', () => {
   const defaultProps: StudyListProps = {
-    sponsorName: 'Sponsor ABC',
+    sponsorOrgName: 'Sponsor ABC',
     shortTitle: 'Study XYZ',
     shortTitleHref: '/study/xyz',
     lastAsessmentDate: '2023-09-30',
-    assessmentHref: '/assessment/xyz',
-    trackStatus: 'On',
+    assessmentHref: '/assessments/xyz',
+    trackStatus: 'On track',
     trackStatusHref: '/track/on',
-    indication: 'Indication ABC',
+    indications: ['Indication ABC'],
   }
 
   test('renders with default props', () => {
@@ -57,7 +59,7 @@ describe('StudyList Component', () => {
   test('renders with different sponsorName and shortTitle', () => {
     const props: StudyListProps = {
       ...defaultProps,
-      sponsorName: 'New Sponsor',
+      sponsorOrgName: 'New Sponsor',
       shortTitle: 'New Study',
     }
     render(<StudyList {...props} />)
@@ -68,5 +70,15 @@ describe('StudyList Component', () => {
 
     expect(sponsorNameElement).toBeInTheDocument()
     expect(shortTitleElement).toBeInTheDocument()
+  })
+
+  test('renders support organisation (i.e. CTU or CRO) name when provided', () => {
+    const props: StudyListProps = {
+      ...defaultProps,
+      supportOrgName: 'Support Org ABC',
+    }
+    render(<StudyList {...props} />)
+
+    expect(screen.getByText('Sponsor ABC (Support Org ABC)')).toBeInTheDocument()
   })
 })

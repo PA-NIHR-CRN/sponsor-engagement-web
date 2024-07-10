@@ -7,3 +7,15 @@ test('Button', () => {
   const button = screen.getByRole('button', { name: 'Welcome' })
   expect(button).toHaveClass('govuk-button')
 })
+
+test('Button (Secondary)', () => {
+  render(<Button secondary>Welcome</Button>)
+  const button = screen.getByRole('button', { name: 'Welcome' })
+  expect(button).toHaveClass('govuk-button--secondary')
+})
+
+test('Button (Warning)', () => {
+  render(<Button warning>Welcome</Button>)
+  const button = screen.getByRole('button', { name: 'Welcome' })
+  expect(button).toHaveClass('govuk-button--warning')
+})

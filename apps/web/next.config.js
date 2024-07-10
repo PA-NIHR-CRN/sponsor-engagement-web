@@ -1,15 +1,11 @@
+require('./src/utils/schemas/env.schema.js')
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'images.ctfassets.net',
-      },
-    ],
-  },
   transpilePackages: ['ui', 'database'],
 }
 
-module.exports = nextConfig
+const { withSuperjson } = require('next-superjson')
+
+module.exports = withSuperjson()(nextConfig)

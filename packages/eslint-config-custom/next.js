@@ -23,7 +23,9 @@ module.exports = {
   plugins: ['simple-import-sort', 'unused-imports', 'jest'],
   parserOptions: {
     project,
+    sourceType: 'module',
   },
+  env: { es6: true },
   globals: {
     React: true,
     JSX: true,
@@ -44,7 +46,9 @@ module.exports = {
     '@typescript-eslint/no-unsafe-return': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/unbound-method': 'off',
+    '@typescript-eslint/non-nullable-type-assertion-style': 'off',
     'react/display-name': 'off',
+    'react/no-unknown-property': ['error', { ignore: ['jsx', 'global'] }],
     'unicorn/filename-case': [
       'error',
       {
@@ -55,5 +59,15 @@ module.exports = {
         ignore: ['\\.spec\\.ts$', '\\.spec\\.tsx$'],
       },
     ],
+    'no-console': 'off',
+
+    // https://github.com/lydell/eslint-plugin-simple-import-sort
+    'import/order': 'off',
+    'sort-imports': 'off',
+    'simple-import-sort/imports': 'error',
+    'simple-import-sort/exports': 'error',
+    'import/first': 'error',
+    'import/newline-after-import': 'error',
+    'import/no-duplicates': 'error',
   },
 }

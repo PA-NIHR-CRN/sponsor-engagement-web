@@ -1,0 +1,38 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Authentication configuration options authOptions object is defined 1`] = `
+{
+  "callbacks": {
+    "jwt": [Function],
+    "session": [Function],
+    "signIn": [Function],
+  },
+  "debug": true,
+  "providers": [
+    {
+      "allowDangerousEmailAccountLinking": true,
+      "authorization": {
+        "params": {
+          "scope": "openid email profile",
+        },
+      },
+      "checks": [
+        "pkce",
+        "state",
+      ],
+      "clientId": "mockedClientId",
+      "clientSecret": "mockedClientSecret",
+      "id": "oidc",
+      "idToken": true,
+      "name": "OIDC",
+      "profile": [Function],
+      "type": "oauth",
+      "wellKnown": "mockedWellKnownUrl",
+    },
+  ],
+  "session": {
+    "maxAge": 2592000,
+    "strategy": "jwt",
+  },
+}
+`;

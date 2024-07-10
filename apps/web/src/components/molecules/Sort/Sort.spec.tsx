@@ -1,7 +1,9 @@
 import userEvent from '@testing-library/user-event'
-import { render, screen } from '@testing-library/react'
 import type { FormEvent } from 'react'
 import React from 'react'
+
+import { render, screen } from '@/config/TestUtils'
+
 import { Sort } from './Sort'
 
 test('Sorting', async () => {
@@ -11,7 +13,7 @@ test('Sorting', async () => {
 
   render(
     <form id="test-form" onSubmit={onSubmitSpy}>
-      <Sort defaultOrder="updated" form="test-form" />
+      <Sort defaultOrder="due-assessment" form="test-form" />
     </form>
   )
 
@@ -19,17 +21,16 @@ test('Sorting', async () => {
   const options = screen.getAllByRole('option')
 
   expect(options.map((option) => option.textContent)).toEqual([
-    'Alphabetical (ascending)',
-    'Alphabetical (descending)',
-    'Recently updated',
-    'Recently published',
+    'Due assessment',
+    'Last Assessment Date (Ascending)',
+    'Last Assessment Date (Descending)',
   ])
 
   // Default sort order is set
-  expect((options[2] as HTMLOptionElement).selected).toBe(true)
+  expect((options[0] as HTMLOptionElement).selected).toBe(true)
 
   // Change sort order via selecting an option
-  await userEvent.selectOptions(select, 'Alphabetical (descending)')
+  await userEvent.selectOptions(select, 'Last Assessment Date (Ascending)')
   expect((options[1] as HTMLOptionElement).selected).toBe(true)
   expect(onSubmitSpy).toHaveBeenCalled()
 

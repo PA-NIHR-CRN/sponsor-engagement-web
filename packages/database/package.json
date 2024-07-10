@@ -11,15 +11,20 @@
     "lint": "eslint .",
     "migrate:deploy": "npx prisma migrate deploy",
     "migrate:dev": "npx prisma migrate dev",
-    "seed": "ts-node prisma/seed.ts",
+    "seed": "ts-node scripts/seed.ts",
+    "seed:assessments": "ts-node scripts/seed-assessments/seed-assessments.ts",
+    "seed:contacts": "ts-node scripts/seed-contacts/seed-contacts.ts",
     "studio": "npx prisma studio"
   },
   "dependencies": {
-    "@prisma/client": "latest",
-    "logger": "*"
+    "@nihr-ui/auth": "*",
+    "@nihr-ui/logger": "*",
+    "@prisma/client": "latest"
   },
   "devDependencies": {
     "@types/node": "^20.6.5",
+    "csv-parse": "^5.5.2",
+    "csv-stringify": "^6.4.4",
     "prisma": "latest",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"

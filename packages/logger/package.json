@@ -1,10 +1,9 @@
 {
-  "name": "logger",
+  "name": "@nihr-ui/logger",
   "version": "0.0.0",
   "license": "MIT",
-  "main": "./dist/index.js",
-  "source": "./src/index.ts",
-  "types": "./dist/index.d.ts",
+  "main": "./index.ts",
+  "types": "./index.ts",
   "scripts": {
     "build": "tsc",
     "lint": "eslint .",
@@ -12,7 +11,7 @@
     "test:ci": ""
   },
   "dependencies": {
-    "pino": "^8.14.1",
-    "pino-pretty": "^10.0.1"
+    "pino": "^8.16.2",
+    "pino-pretty": "^10.2.3"
   }
 }

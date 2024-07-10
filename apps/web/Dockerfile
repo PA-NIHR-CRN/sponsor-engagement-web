@@ -1,4 +1,4 @@
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 
 FROM base AS builder
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
@@ -6,7 +6,7 @@ RUN apk add --no-cache libc6-compat
 RUN apk update
 # Set working directory
 WORKDIR /app
-RUN npm i -g turbo
+RUN npm i -g turbo@^1
 COPY . .
 RUN turbo prune --scope=web --docker
 
@@ -32,11 +32,13 @@ COPY turbo.json turbo.json
 # NextJs requires these as build args because it bakes them into the generated JavaScript bundles
 ARG APP_ENV
 ENV NEXT_PUBLIC_APP_ENV $APP_ENV
+ARG GTM_ID
+ENV NEXT_PUBLIC_GTM_ID $GTM_ID
 
 # ARG TURBO_TOKEN
 # ENV TURBO_TOKEN=$TURBO_TOKEN
 
-RUN npm run build --filter=web...
+RUN ENVIRONMENT_VARIABLE_CHECKS=disabled npm run build --filter=web...
 
 # RUN npx prisma generate
 
@@ -61,6 +63,7 @@ COPY --from=installer --chown=nextjs:nodejs /app/apps/web/public ./apps/web/publ
 # Used at runtime during NextJs SSR (Server side rendering)
 # Any variables not required at build time can be inserted via the task definition generation step in the workflow
 ENV NEXT_PUBLIC_APP_ENV $APP_ENV
+ENV NEXT_PUBLIC_GTM_ID $GTM_ID
 ENV DATABASE_URL = ''
 
 EXPOSE 3000

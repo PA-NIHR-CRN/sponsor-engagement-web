@@ -1,4 +1,4 @@
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 
 FROM base AS builder
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
@@ -6,7 +6,7 @@ RUN apk add --no-cache libc6-compat
 RUN apk update
 # Set working directory
 WORKDIR /app
-RUN npm i -g turbo
+RUN npm i -g turbo@^1
 COPY . .
 RUN turbo prune --scope=ingest --docker
 
@@ -28,7 +28,7 @@ COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
 
 RUN npm run db:generate
-RUN npm run build
+RUN npm run build --filter=ingest...
 
 FROM base AS runner
 WORKDIR /app

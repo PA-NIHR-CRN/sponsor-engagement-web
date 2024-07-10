@@ -1,20 +1,30 @@
 import assert from 'assert'
 import axios from 'axios'
-import { Organisation as OrganisationEntity, SysRefOrganisationRole as SysRefOrganisationRoleEntity } from 'database'
-import { logger } from 'logger'
-
+import type {
+  Organisation as OrganisationEntity,
+  SysRefOrganisationRole as SysRefOrganisationRoleEntity,
+} from 'database'
+import { logger } from '@nihr-ui/logger'
+import dayjs from 'dayjs'
+import { config as dotEnvConfig } from 'dotenv'
 import { prismaClient } from './lib/prisma'
-import { Study, StudyRecordStatus, StudyStatus, StudyWithRelationships } from './types'
+import type { Study, StudySponsor, StudyWithRelationships } from './types'
+import { StudyRecordStatus, StudyStatus } from './types'
 import { getOrganisationName, getOrgsUniqueByName, getOrgsUniqueByNameRole, getOrgsUniqueByRole } from './utils'
+
+dotEnvConfig()
 
 // Entities related to the current batch of studies
 let studyEntities: StudyWithRelationships[] = []
 let organisationEnitities: OrganisationEntity[] = []
-let organisationRoleEntities: SysRefOrganisationRoleEntity[] = []
+let organisationRoleRefEntities: SysRefOrganisationRoleEntity[] = []
+
+type OrgRoleTuple = [organisationId: number, roleId: number]
 
 // Running cache of all entity IDs
-const allStudyIds: number[] = []
-const allOrganisationIds: number[] = []
+let allStudyIds: number[]
+let allOrganisationIds: number[]
+let allOrganisationRoleIds: OrgRoleTuple[]
 
 let studies: Study[]
 
@@ -22,8 +32,9 @@ const createStudies = async () => {
   const studyQueries = studies.map((study) => {
     const studyData = {
       cpmsId: study.Id,
-      name: study.Name,
-      status: study.Status,
+      title: study.Title,
+      shortTitle: study.ShortName,
+      studyStatus: study.StudyStatus,
       recordStatus: study.StudyRecordStatus,
       route: study.StudyRoute,
       irasId: study.IrasId,
@@ -32,10 +43,12 @@ const createStudies = async () => {
       chiefInvestigatorFirstName: study.ChiefInvestigatorFirstName,
       chiefInvestigatorLastName: study.ChiefInvestigatorLastName,
       managingSpeciality: study.ManagingSpecialty,
+      totalRecruitmentToDate: study.TotalRecruitmentToDate,
       plannedOpeningDate: study.PlannedRecruitmentStartDate ? new Date(study.PlannedRecruitmentStartDate) : undefined,
       plannedClosureDate: study.PlannedRecruitmentEndDate ? new Date(study.PlannedRecruitmentEndDate) : undefined,
       actualOpeningDate: study.ActualOpeningDate ? new Date(study.ActualOpeningDate) : undefined,
       actualClosureDate: study.ActualClosureDate ? new Date(study.ActualClosureDate) : undefined,
+      isDueAssessment: false,
       isDeleted: false,
     }
 
@@ -47,12 +60,16 @@ const createStudies = async () => {
         organisations: {
           include: {
             organisation: true,
+            organisationRole: true,
           },
         },
         funders: {
           include: {
             organisation: true,
           },
+        },
+        evaluationCategories: {
+          select: { id: true, indicatorValue: true },
         },
       },
     })
@@ -77,6 +94,7 @@ const createOrganisations = async () => {
     const organisationData = {
       name,
       rtsIdentifier,
+      isDeleted: false,
     }
 
     return prismaClient.organisation.upsert({
@@ -104,6 +122,7 @@ const createOrganisations = async () => {
       name,
       description: '',
       rtsIdentifier,
+      isDeleted: false,
     }
 
     return prismaClient.sysRefOrganisationRole.upsert({
@@ -113,7 +132,7 @@ const createOrganisations = async () => {
     })
   })
 
-  organisationRoleEntities = await Promise.all(organisationRoleRefQueries)
+  organisationRoleRefEntities = await Promise.all(organisationRoleRefQueries)
 
   logger.info(`Finished adding/updating organisation role refs`)
 }
@@ -121,11 +140,9 @@ const createOrganisations = async () => {
 const createOrganisationRelationships = async () => {
   const relatedOrgs = getOrgsUniqueByNameRole(studies)
 
-  // Create the array of organisation roles for this batch of studies
   const organisationRoleInputs = relatedOrgs.map((relatedOrg) => {
-    const organisationId = organisationEnitities.find((org) => org.name === getOrganisationName(relatedOrg))
-      ?.id as number
-    const roleId = organisationRoleEntities.find((ref) => ref.name === relatedOrg.OrganisationRole)?.id as number
+    const organisationId = organisationEnitities.find((org) => org.name === getOrganisationName(relatedOrg))!.id
+    const roleId = organisationRoleRefEntities.find((ref) => ref.name === relatedOrg.OrganisationRole)!.id
     return {
       organisationId,
       roleId,
@@ -137,16 +154,23 @@ const createOrganisationRelationships = async () => {
     skipDuplicates: true,
   })
 
-  logger.info(`Added ${organisationRolesResult.count} organisation roles`)
+  allOrganisationRoleIds.push(
+    ...organisationRoleInputs.map(({ organisationId, roleId }) => [organisationId, roleId] as OrgRoleTuple)
+  )
 
-  // Create the array of study organisations for this batch of studies
+  logger.info(`Added ${organisationRolesResult.count} organisation roles`)
+}
+
+const createStudyRelationships = async () => {
+  const studyEntityIds = studyEntities.map((study) => study.id)
+
+  // Add study organisations
   const studyOrganisationInputs = studies
     .map((study) =>
       study.StudySponsors.map((sponsor) => {
-        const studyId = studyEntities.find((studyEntity) => studyEntity.cpmsId === study.Id)?.id as number
-        const organisationId = organisationEnitities.find((org) => org.name === sponsor.OrganisationName)?.id as number
-        const organisationRoleId = organisationRoleEntities.find((ref) => ref.name === sponsor.OrganisationRole)
-          ?.id as number
+        const studyId = studyEntities.find((studyEntity) => studyEntity.cpmsId === study.Id)!.id
+        const organisationId = organisationEnitities.find((org) => org.name === sponsor.OrganisationName)!.id
+        const organisationRoleId = organisationRoleRefEntities.find((ref) => ref.name === sponsor.OrganisationRole)!.id
         return {
           studyId,
           organisationId,
@@ -163,12 +187,44 @@ const createOrganisationRelationships = async () => {
 
   logger.info(`Added ${studyOrganisationsResult.count} study organisations`)
 
-  // Create the array of study funders for this batch of studies
+  // Delete study organisations
+  const deletedStudyOrganisationIds = studyEntities
+    .map((study) =>
+      study.organisations
+        .filter(
+          (studyOrg) =>
+            !studyOrganisationInputs.some(
+              ({ studyId, organisationId, organisationRoleId }) =>
+                studyId === study.id &&
+                organisationId === studyOrg.organisationId &&
+                organisationRoleId === studyOrg.organisationRoleId
+            )
+        )
+        .map((studyOrg) => studyOrg.id)
+    )
+    .flat()
+
+  const [, { count: deletedStudyOrgCount }] = await prismaClient.$transaction([
+    prismaClient.studyOrganisation.updateMany({
+      where: { studyId: { in: studyEntityIds }, NOT: { id: { in: deletedStudyOrganisationIds } } },
+      data: { isDeleted: false },
+    }),
+    prismaClient.studyOrganisation.updateMany({
+      where: { id: { in: deletedStudyOrganisationIds }, isDeleted: false },
+      data: { isDeleted: true },
+    }),
+  ])
+
+  if (deletedStudyOrgCount > 0) {
+    logger.info('Flagged %s study organisations as deleted', deletedStudyOrgCount)
+  }
+
+  // Add study funders
   const studyFunderInputs = studies
     .map((study) =>
       study.StudyFunders.map((funder) => {
-        const studyId = studyEntities.find((studyEntity) => studyEntity.cpmsId === study.Id)?.id as number
-        const organisationId = organisationEnitities.find((org) => org.name === funder.FunderName)?.id as number
+        const studyId = studyEntities.find((studyEntity) => studyEntity.cpmsId === study.Id)!.id
+        const organisationId = organisationEnitities.find((org) => org.name === funder.FunderName)!.id
         return {
           studyId,
           organisationId,
@@ -186,12 +242,13 @@ const createOrganisationRelationships = async () => {
 
   logger.info(`Added ${studyFundersResult.count} study funders`)
 
-  // Create the array of evaluation categories for this batch of studies
+  // Add study evaluation categories
   const evaluationCategoryInputs = studies
     .map((study) =>
       study.StudyEvaluationCategories.map((category) => {
-        const studyId = studyEntities.find((studyEntity) => studyEntity.cpmsId === study.Id)?.id as number
-        return {
+        const studyId = studyEntities.find((studyEntity) => studyEntity.cpmsId === study.Id)!.id
+
+        const evaluationCategoryData = {
           studyId,
           indicatorType: category.EvaluationCategoryType,
           indicatorValue: category.EvaluationCategoryValue,
@@ -204,72 +261,205 @@ const createOrganisationRelationships = async () => {
             ? new Date(category.PlannedRecruitmentEndDate)
             : undefined,
           actualOpeningDate: category.ActualOpeningDate ? new Date(category.ActualOpeningDate) : undefined,
-          actualClosureDate: category.ActualClosedDate ? new Date(category.ActualClosedDate) : undefined,
+          actualClosureDate: category.ActualClosureDate ? new Date(category.ActualClosureDate) : undefined,
           expectedReopenDate: category.ExpectedReopenDate ? new Date(category.ExpectedReopenDate) : undefined,
+          isDeleted: false,
         }
+
+        return prismaClient.studyEvaluationCategory.upsert({
+          where: {
+            studyId_indicatorValue: {
+              studyId,
+              indicatorValue: category.EvaluationCategoryValue,
+            },
+          },
+          update: evaluationCategoryData,
+          create: evaluationCategoryData,
+        })
       })
     )
     .flat()
 
-  const evaluationCategoriesResult = await prismaClient.studyEvaluationCategory.createMany({
-    data: evaluationCategoryInputs,
-    skipDuplicates: true,
+  const evaluationCategories = await Promise.all(evaluationCategoryInputs)
+
+  logger.info(`Added or updated ${evaluationCategories.length} study evaluation categories`)
+
+  // Delete study evaluation categories
+  const deletedEvaluationCategoryIds = studyEntities
+    .map((study) =>
+      study.evaluationCategories
+        .filter(
+          (evalCategory) =>
+            !evaluationCategories.some(
+              ({ studyId, indicatorValue }) => studyId === study.id && indicatorValue === evalCategory.indicatorValue
+            )
+        )
+        .map((evalCategory) => evalCategory.id)
+    )
+    .flat()
+
+  const { count: deletedEvalCategoryCount } = await prismaClient.studyEvaluationCategory.updateMany({
+    where: { id: { in: deletedEvaluationCategoryIds }, isDeleted: false },
+    data: { isDeleted: true },
   })
 
-  logger.info(`Added ${evaluationCategoriesResult.count} study evaluation categories`)
+  if (deletedEvalCategoryCount > 0) {
+    logger.info('Flagged %s study evaluation categories as deleted', deletedEvalCategoryCount)
+  }
+}
+
+const setAssessmentDue = async (lapsePeriodMonths: number) => {
+  const threeMonthsAgo = dayjs().subtract(lapsePeriodMonths, 'month').toDate()
+  const assessmentDueResult = await prismaClient.study.updateMany({
+    data: {
+      isDueAssessment: true,
+    },
+    where: {
+      id: { in: studyEntities.map((study) => study.id) },
+      evaluationCategories: {
+        some: { isDeleted: false },
+      },
+      assessments: {
+        every: {
+          createdAt: {
+            lte: threeMonthsAgo,
+          },
+        },
+      },
+      OR: [{ actualOpeningDate: null }, { actualOpeningDate: { lte: threeMonthsAgo } }],
+    },
+  })
+
+  logger.info(`Flagged ${assessmentDueResult.count} studies as being due assessment`)
 }
 
 const fetchStudies = async function* (url: string, username: string, password: string) {
   const pageSize = 1000
   let pageNumber = 1
   let totalStudies = 0
-  while (totalStudies === 0 || pageNumber * pageSize < totalStudies) {
+  while (totalStudies === 0 || pageNumber * pageSize < totalStudies + pageSize) {
     try {
-      logger.info(`Request studies page: ${pageNumber}`)
-      const { data } = await axios.get(url, {
-        headers: {
-          username: username,
-          password: password,
-        },
+      logger.info(`Request studies page: ${pageNumber} (total ${totalStudies})`)
+      // eslint-disable-next-line no-await-in-loop -- generator loop
+      const { data } = await axios.get<{
+        Result: {
+          TotalRecords: number
+          Studies: Study[]
+        }
+      }>(url, {
+        headers: { username, password },
         params: {
           pageSize: 1000,
           pageNumber,
           studyStatus: [
-            StudyStatus.OpenActivelyRecruiting,
+            StudyStatus.InSetup,
+            StudyStatus.InSetupPendingApproval,
+            StudyStatus.InSetupApprovalReceived,
             StudyStatus.OpenToRecruitment,
-            StudyStatus.ClosedInFollowUp,
-            StudyStatus.SuspendedActivelyRecruiting,
+            StudyStatus.OpenActivelyRecruiting,
             StudyStatus.SuspendedOpenRecruitment,
-            StudyStatus.InSetupRecruiting,
-            StudyStatus.InSetupPermissionReceived,
-            StudyStatus.InSetupPendingApplication,
-            StudyStatus.InSetupPendingNHSPerm,
+            StudyStatus.SuspendedActivelyRecruiting,
           ],
           studyRecordStatus: [StudyRecordStatus.Live, StudyRecordStatus.LiveChangesPendingApproval],
         },
       })
       totalStudies = data.Result.TotalRecords
       ++pageNumber
-      yield data.Result.Studies as Study[]
-    } catch (e) {
-      logger.error(`Error fetching studies data`, e)
-      yield []
+      yield data.Result.Studies
+    } catch (error) {
+      logger.error('Error occurred while fetching study data')
+      if (axios.isAxiosError(error)) {
+        logger.error('Error response data: %s', JSON.stringify(error.response?.data))
+      }
+      logger.error(error)
+      yield
     }
   }
 }
 
+const deleteStudies = async () => {
+  const currentStudies = await prismaClient.study.findMany({
+    select: { id: true },
+    where: { isDeleted: false },
+  })
+
+  const deletedStudyIds = currentStudies.filter(({ id }) => !allStudyIds.includes(id)).map(({ id }) => id)
+
+  if (deletedStudyIds.length > 0) {
+    await prismaClient.study.updateMany({ where: { id: { in: deletedStudyIds } }, data: { isDeleted: true } })
+    logger.info('Flagged %s studies as deleted', deletedStudyIds.length)
+  }
+}
+
+const deleteOrganisationRoles = async () => {
+  const currentOrgRoles = await prismaClient.organisationRole.findMany({
+    select: { id: true, roleId: true, organisationId: true },
+  })
+
+  const currentOrgRolesById = Object.fromEntries(
+    currentOrgRoles.map(({ id, organisationId, roleId }) => [id, [organisationId, roleId]])
+  )
+
+  const deletedOrgRoleIds = Object.keys(currentOrgRolesById)
+    .filter((id) => {
+      const [currentOrgId, currentOrgRoleId] = currentOrgRolesById[id]
+      return !allOrganisationRoleIds.some(([orgId, roleId]) => orgId === currentOrgId && roleId === currentOrgRoleId)
+    })
+    .map(Number)
+
+  const [, { count: deletedOrgRoleCount }] = await prismaClient.$transaction([
+    prismaClient.organisationRole.updateMany({
+      where: { NOT: { id: { in: deletedOrgRoleIds } } },
+      data: { isDeleted: false },
+    }),
+    prismaClient.organisationRole.updateMany({
+      where: { id: { in: deletedOrgRoleIds }, isDeleted: false },
+      data: { isDeleted: true },
+    }),
+  ])
+
+  if (deletedOrgRoleCount > 0) {
+    logger.info('Flagged %s organisation roles as deleted', deletedOrgRoleCount)
+  }
+}
+
 export const ingest = async () => {
-  const { API_URL, API_USERNAME, API_PASSWORD } = process.env
+  const { API_URL, API_USERNAME, API_PASSWORD, ASSESSMENT_LAPSE_MONTHS } = process.env
 
   assert(API_URL)
   assert(API_USERNAME)
   assert(API_PASSWORD)
+  assert(ASSESSMENT_LAPSE_MONTHS)
+
+  const lapsePeriodMonths = Number(ASSESSMENT_LAPSE_MONTHS)
+
+  allStudyIds = []
+  allOrganisationIds = []
+  allOrganisationRoleIds = []
 
   for await (const studyRecords of fetchStudies(API_URL, API_USERNAME, API_PASSWORD)) {
-    studies = studyRecords.filter((study) => !!study.QualificationDate)
+    if (!studyRecords) return
+
+    studies = studyRecords
+      .filter((study) => Boolean(study.QualificationDate))
+      .map((study) => ({
+        ...study,
+        StudySponsors: study.StudySponsors.map(
+          (sponsor) =>
+            ({
+              ...sponsor,
+              OrganisationRole: sponsor.OrganisationRole.trim(),
+            } as StudySponsor)
+        ),
+      }))
 
     await createStudies()
     await createOrganisations()
     await createOrganisationRelationships()
+    await createStudyRelationships()
+    await setAssessmentDue(lapsePeriodMonths)
   }
+
+  await deleteStudies()
+  await deleteOrganisationRoles()
 }

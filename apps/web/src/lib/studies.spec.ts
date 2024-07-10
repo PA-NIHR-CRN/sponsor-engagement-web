@@ -1,82 +1,297 @@
+import { Prisma, type Study } from 'database'
 import { Mock } from 'ts-mockery'
-import type { Study, UserOrganisation } from 'database'
+
 import { prismaMock } from '../__mocks__/prisma'
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
-import { getUserStudies } from './studies'
+import { getStudiesForOrgs, getStudyById } from './studies'
 
-describe('getUserStudies', () => {
-  const mockUserOrganisations = [
-    Mock.of<UserOrganisation>({ organisationId: 1 }),
-    Mock.of<UserOrganisation>({ organisationId: 2 }),
-  ]
-  const mockStudies = [Mock.of<Study>({ id: 1, name: 'Study 1' }), Mock.of<Study>({ id: 2, name: 'Study 2' })]
+describe('getStudiesForOrgs', () => {
+  const mockStudies = [Mock.of<Study>({ id: 1, title: 'Study 1' }), Mock.of<Study>({ id: 2, title: 'Study 2' })]
   const mockStudyCount = 2
+  const mockStudyDueAssessmentCount = 1
+
+  const userOrganisationIds = [1, 2]
+
+  const expectedOrganisationsQuery = {
+    some: {
+      organisationId: { in: userOrganisationIds },
+      organisationRole: {
+        rtsIdentifier: {
+          in: [
+            StudySponsorOrganisationRoleRTSIdentifier.ClinicalResearchSponsor,
+            StudySponsorOrganisationRoleRTSIdentifier.ClinicalTrialsUnit,
+            StudySponsorOrganisationRoleRTSIdentifier.ContractResearchOrganisation,
+          ],
+        },
+      },
+      isDeleted: false,
+    },
+  }
 
   it('should return studies and pagination information', async () => {
-    prismaMock.userOrganisation.findMany.mockResolvedValueOnce(mockUserOrganisations)
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudyCount, mockStudyDueAssessmentCount])
 
-    prismaMock.study.findMany.mockResolvedValueOnce(mockStudies)
-    prismaMock.study.count.mockResolvedValueOnce(mockStudyCount)
-
-    prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudyCount])
-
-    const result = await getUserStudies(1, 1, 10)
+    const result = await getStudiesForOrgs({
+      organisationIds: userOrganisationIds,
+      pageSize: 10,
+      currentPage: 1,
+      searchTerm: null,
+      sortOrder: 'due-assessment',
+    })
 
     expect(result).toEqual({
       pagination: {
         total: mockStudyCount,
+        totalDue: mockStudyDueAssessmentCount,
       },
       data: mockStudies,
     })
 
-    expect(prismaMock.userOrganisation.findMany).toHaveBeenCalledWith({
-      where: { userId: 1 },
-    })
-
-    expect(prismaMock.study.findMany).toHaveBeenCalledWith({
-      skip: 0,
-      take: 10,
-      where: {
-        organisations: {
-          some: {
-            id: { in: [1, 2] },
-            organisationRole: {
-              rtsIdentifier: {
-                in: [
-                  StudySponsorOrganisationRoleRTSIdentifier.ClinicalResearchSponsor,
-                  StudySponsorOrganisationRoleRTSIdentifier.ClinicalTrialsUnit,
-                  StudySponsorOrganisationRoleRTSIdentifier.ContractResearchOrganisation,
-                ],
-              },
-            },
-          },
+    expect(prismaMock.study.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        skip: 0,
+        take: 10,
+        where: {
+          organisations: expectedOrganisationsQuery,
+          isDeleted: false,
         },
-      },
-      include: {
-        organisations: {
-          include: {
-            organisation: true,
-            organisationRole: true,
-          },
-        },
-      },
-    })
+        orderBy: [{ isDueAssessment: Prisma.SortOrder.desc }, { id: Prisma.SortOrder.asc }],
+      })
+    )
 
     expect(prismaMock.study.count).toHaveBeenCalledWith({
       where: {
-        organisations: {
-          some: {
-            id: { in: [1, 2] },
-            organisationRole: {
-              rtsIdentifier: {
-                in: [
-                  StudySponsorOrganisationRoleRTSIdentifier.ClinicalResearchSponsor,
-                  StudySponsorOrganisationRoleRTSIdentifier.ClinicalTrialsUnit,
-                  StudySponsorOrganisationRoleRTSIdentifier.ContractResearchOrganisation,
-                ],
-              },
+        organisations: expectedOrganisationsQuery,
+        isDeleted: false,
+      },
+    })
+  })
+
+  it('should query studies by study title, shortTitle, irasId and protocolReferenceNumber when a search term is provided', async () => {
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudyCount, mockStudyDueAssessmentCount])
+
+    const searchTerm = 'test-study'
+
+    const result = await getStudiesForOrgs({
+      organisationIds: userOrganisationIds,
+      pageSize: 10,
+      currentPage: 1,
+      searchTerm,
+      sortOrder: 'due-assessment',
+    })
+
+    expect(result).toEqual({
+      pagination: {
+        total: mockStudyCount,
+        totalDue: mockStudyDueAssessmentCount,
+      },
+      data: mockStudies,
+    })
+
+    expect(prismaMock.study.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        skip: 0,
+        take: 10,
+        where: {
+          OR: [
+            { title: { contains: searchTerm } },
+            { shortTitle: { contains: searchTerm } },
+            { irasId: { contains: searchTerm } },
+            { protocolReferenceNumber: { contains: searchTerm } },
+          ],
+          organisations: expectedOrganisationsQuery,
+          isDeleted: false,
+        },
+      })
+    )
+
+    expect(prismaMock.study.count).toHaveBeenCalledWith({
+      where: {
+        OR: [
+          { title: { contains: searchTerm } },
+          { shortTitle: { contains: searchTerm } },
+          { irasId: { contains: searchTerm } },
+          { protocolReferenceNumber: { contains: searchTerm } },
+        ],
+        organisations: expectedOrganisationsQuery,
+        isDeleted: false,
+      },
+    })
+  })
+
+  it('should query studies by cpmsId when a numeric search term is provided', async () => {
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudyCount, mockStudyDueAssessmentCount])
+
+    const searchTerm = '123'
+
+    await getStudiesForOrgs({
+      organisationIds: userOrganisationIds,
+      pageSize: 10,
+      currentPage: 1,
+      searchTerm,
+      sortOrder: 'due-assessment',
+    })
+
+    expect(prismaMock.study.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        skip: 0,
+        take: 10,
+        where: {
+          OR: [
+            { title: { contains: searchTerm } },
+            { shortTitle: { contains: searchTerm } },
+            { irasId: { contains: searchTerm } },
+            { protocolReferenceNumber: { contains: searchTerm } },
+            { cpmsId: Number(searchTerm) },
+          ],
+          organisations: expectedOrganisationsQuery,
+          isDeleted: false,
+        },
+      })
+    )
+
+    expect(prismaMock.study.count).toHaveBeenCalledWith({
+      where: {
+        OR: [
+          { title: { contains: searchTerm } },
+          { shortTitle: { contains: searchTerm } },
+          { irasId: { contains: searchTerm } },
+          { protocolReferenceNumber: { contains: searchTerm } },
+          { cpmsId: Number(searchTerm) },
+        ],
+        organisations: expectedOrganisationsQuery,
+        isDeleted: false,
+      },
+    })
+  })
+
+  it('should allow sorting by last assessment date (ascending)', async () => {
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudyCount, mockStudyDueAssessmentCount])
+
+    await getStudiesForOrgs({
+      organisationIds: userOrganisationIds,
+      pageSize: 10,
+      currentPage: 1,
+      searchTerm: null,
+      sortOrder: 'last-assessment-asc',
+    })
+
+    expect(prismaMock.study.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        orderBy: [
+          {
+            lastAssessment: {
+              createdAt: Prisma.SortOrder.asc,
             },
           },
+          { id: Prisma.SortOrder.asc },
+        ],
+      })
+    )
+  })
+
+  it('should allow sorting by last assessment date (descending)', async () => {
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudyCount, mockStudyDueAssessmentCount])
+
+    await getStudiesForOrgs({
+      organisationIds: userOrganisationIds,
+      pageSize: 10,
+      currentPage: 1,
+      searchTerm: null,
+      sortOrder: 'last-assessment-desc',
+    })
+
+    expect(prismaMock.study.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        orderBy: [
+          {
+            lastAssessment: {
+              createdAt: Prisma.SortOrder.desc,
+            },
+          },
+          { id: Prisma.SortOrder.asc },
+        ],
+      })
+    )
+  })
+})
+
+describe('getStudyById', () => {
+  const mockStudy = Mock.of<
+    Prisma.StudyGetPayload<{
+      include: {
+        title: true
+        organisations: {
+          include: {
+            organisation: true
+            organisationRole: true
+          }
+        }
+      }
+    }>
+  >({
+    id: 1,
+    title: 'Study 1',
+    organisations: [],
+  })
+
+  const userOrganisationIds = [1, 2]
+
+  it('returns a study with the given id', async () => {
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudy])
+
+    const result = await getStudyById(1, userOrganisationIds)
+
+    expect(result).toEqual({
+      data: {
+        ...mockStudy,
+        organisationsByRole: {},
+      },
+    })
+
+    expect(prismaMock.study.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          id: 1,
+          isDeleted: false,
+          organisations: {
+            some: {
+              organisationId: { in: userOrganisationIds },
+              isDeleted: false,
+            },
+          },
+        },
+      })
+    )
+
+    expect(result.data?.id).toEqual(1)
+    expect(result.data?.title).toEqual('Study 1')
+  })
+
+  it('maps organisation roles to organisation name', async () => {
+    const mockStudyWithOrgs = {
+      ...mockStudy,
+      organisations: [
+        {
+          organisation: {
+            name: 'Pfizer clinical trials',
+          },
+          organisationRole: {
+            name: 'Managing Clinical Trials Unit',
+          },
+        },
+      ],
+    }
+
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithOrgs])
+
+    const result = await getStudyById(1, userOrganisationIds)
+
+    expect(result).toEqual({
+      data: {
+        ...mockStudyWithOrgs,
+        organisationsByRole: {
+          CTU: 'Pfizer clinical trials',
         },
       },
     })

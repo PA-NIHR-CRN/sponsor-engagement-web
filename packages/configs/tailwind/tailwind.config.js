@@ -1,3 +1,5 @@
+const plugin = require('tailwindcss/plugin')
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   important: true,
@@ -110,5 +112,11 @@ module.exports = {
     },
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    require('tailwindcss-animate'),
+    plugin(function ({ addVariant }) {
+      addVariant('js', 'body.js-enabled &')
+      addVariant('no-js', 'body:not(.js-enabled) &')
+    }),
+  ],
 }

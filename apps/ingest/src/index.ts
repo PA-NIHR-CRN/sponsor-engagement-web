@@ -1,3 +1,3 @@
 import { ingest } from './ingest'
 
-ingest()
+void ingest()

@@ -1,16 +1,19 @@
 import type { GetServerSidePropsContext } from 'next'
-import { Mock } from 'ts-mockery'
 import { getServerSession } from 'next-auth/next'
-import { render } from '@testing-library/react'
-import type { HomeProps } from '../pages/index'
-import Home, { getServerSideProps } from '../pages/index'
+import { Mock } from 'ts-mockery'
+
+import { render } from '@/config/TestUtils'
+
 import {
+  userNoOrgs,
   userNoRoles,
   userWithContactManagerRole,
   userWithSponsorContactAndContactManagerRoles,
   userWithSponsorContactRole,
 } from '../__mocks__/session'
-import { ORGANISATIONS_PAGE, SIGN_IN_PAGE, STUDIES_PAGE } from '../constants/routes'
+import { ORGANISATIONS_PAGE, SIGN_OUT_CONFIRM_PAGE, STUDIES_PAGE } from '../constants/routes'
+import type { HomeProps } from '../pages/index'
+import Home, { getServerSideProps } from '../pages/index'
 
 jest.mock('next-auth/next')
 jest.mock('../pages/api/auth/[...nextauth]', () => ({
@@ -27,7 +30,7 @@ describe('getServerSideProps', () => {
     const result = await getServerSideProps(context)
     expect(result).toEqual({
       redirect: {
-        destination: SIGN_IN_PAGE,
+        destination: SIGN_OUT_CONFIRM_PAGE,
       },
     })
   })
@@ -70,6 +73,16 @@ describe('getServerSideProps', () => {
       },
     })
   })
+
+  test('does not redirect for Sponsor Contacts without any assigned organisations', async () => {
+    getServerSessionMock.mockResolvedValueOnce(userNoOrgs)
+    const result = await getServerSideProps(context)
+    expect(result).toEqual({
+      props: {
+        user: userNoOrgs.user,
+      },
+    })
+  })
 })
 
 describe('Homepage for users with no role', () => {
@@ -87,6 +100,6 @@ describe('Homepage for users with no role', () => {
     expect(
       getByRole('heading', { level: 2, name: 'Your details are not associated with any account on this application' })
     ).toBeInTheDocument()
-    expect(getByText('Please contact crn.servicedesk@nihr.ac.uk for further assistance.')).toBeInTheDocument()
+    expect(getByText('Please contact supportmystudy@nihr.ac.uk for further assistance.')).toBeInTheDocument()
   })
 })

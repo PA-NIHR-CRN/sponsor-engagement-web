@@ -1,10 +1,4 @@
-import {
-  Organisation as OrganisationEntity,
-  Prisma,
-  Study as StudyEntity,
-  StudyFunder as StudyFunderEntity,
-  StudyOrganisation as StudyOrganisationEntity,
-} from 'database'
+import type { Prisma } from 'database'
 
 export enum StudyRecordStatus {
   Live = 'SRS_LIVE@2.16.840.1.113883.2.1.3.8.5.2.4.230',
@@ -12,15 +6,14 @@ export enum StudyRecordStatus {
 }
 
 export enum StudyStatus {
+  InSetup = 'STDY_STS_CPMS_IN_STP@2.16.840.1.113883.2.1.3.8.5.2.4.68',
+  InSetupPendingApproval = 'STDY_STS_CPMS_STP_PNDNG_APP@2.16.840.1.113883.2.1.3.8.5.2.4.68',
+  InSetupApprovalReceived = 'STDY_STS_CPMS_IN_STP_APP_REC@2.16.840.1.113883.2.1.3.8.5.2.4.68',
   OpenToRecruitment = 'STDY_STS_CPMS_OPN_TO_RCRTMNT@2.16.840.1.113883.2.1.3.8.5.2.4.68',
   OpenActivelyRecruiting = 'STDY_STS_CPMS_OPN_ACTVLY_RECRTG@2.16.840.1.113883.2.1.3.8.5.2.4.68',
   ClosedInFollowUp = 'STDY_STS_CPMS_CLD_FLW_UP@2.16.840.1.113883.2.1.3.8.5.2.4.68',
   SuspendedOpenRecruitment = 'STDY_STS_CPMS_SPNDED_OPN_TO_RCRTMNT@2.16.840.1.113883.2.1.3.8.5.2.4.68',
   SuspendedActivelyRecruiting = 'STDY_STS_CPMS_SPNDED_OPN_ACTVLY_RECRTG@2.16.840.1.113883.2.1.3.8.5.2.4.68',
-  InSetupPendingApplication = 'STDY_STS_CPMS_STP_PNDNG_APP@2.16.840.1.113883.2.1.3.8.5.2.4.68',
-  InSetupPendingNHSPerm = 'STDY_STS_CPMS_STP_PNDNG_NHS_PERM@2.16.840.1.113883.2.1.3.8.5.2.4.68',
-  InSetupRecruiting = 'STDY_STS_CPMS_IN_STP_APP_REC@2.16.840.1.113883.2.1.3.8.5.2.4.68',
-  InSetupPermissionReceived = 'STDY_STS_CPMS_IN_STP_NHS_PERM_REC@2.16.840.1.113883.2.1.3.8.5.2.4.68',
 }
 
 export type StudyWithRelationships = Prisma.StudyGetPayload<{
@@ -28,12 +21,16 @@ export type StudyWithRelationships = Prisma.StudyGetPayload<{
     organisations: {
       include: {
         organisation: true
+        organisationRole: true
       }
     }
     funders: {
       include: {
         organisation: true
       }
+    }
+    evaluationCategories: {
+      select: { id: true; indicatorValue: true }
     }
   }
 }>
@@ -47,8 +44,9 @@ export interface ResultResult {
 
 export interface Study {
   Id: number
-  Name: string
-  Status: Status
+  ShortName: string
+  Title: string
+  StudyStatus: Status
   StudyRecordStatus: StudyRecordStatus
   StudyRoute: StudyRoute
   IrasId: null | string
@@ -58,6 +56,7 @@ export interface Study {
   ChiefInvestigatorLastName: null | string
   ManagingSpecialty: ManagingSpecialty
   QualificationDate: null | string
+  TotalRecruitmentToDate: number | null
   PlannedRecruitmentStartDate: null | string
   PlannedRecruitmentEndDate: null | string
   ActualOpeningDate: null | string
@@ -116,7 +115,7 @@ export interface StudyEvaluationCategory {
   PlannedRecruitmentStartDate: string | null
   PlannedRecruitmentEndDate: string | null
   ActualOpeningDate: string | null
-  ActualClosedDate: string | null
+  ActualClosureDate: string | null
   ExpectedReopenDate: string | null
 }
 

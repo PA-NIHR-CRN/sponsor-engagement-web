@@ -1,0 +1,1 @@
+UPDATE SysRefAssessmentFurtherInformation SET name = REPLACE(name, 'CRN', 'RDN')

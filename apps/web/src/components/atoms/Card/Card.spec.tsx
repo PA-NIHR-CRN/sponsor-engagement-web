@@ -1,5 +1,7 @@
 import React from 'react'
-import { render } from '@testing-library/react'
+
+import { render } from '@/config/TestUtils'
+
 import type { CardProps } from './Card'
 import { Card } from './Card'
 
@@ -42,5 +44,11 @@ describe('Card Component', () => {
     const { container } = render(<Card {...defaultProps} className="custom-class" />)
     const cardElement = container.firstChild as HTMLElement
     expect(cardElement).toHaveClass('custom-class')
+  })
+
+  test('applies custom html attributes', () => {
+    const { container } = render(<Card {...defaultProps} id="custom-id" />)
+    const cardElement = container.firstChild as HTMLElement
+    expect(cardElement).toHaveAttribute('id', 'custom-id')
   })
 })

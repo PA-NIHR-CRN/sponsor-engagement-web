@@ -1,5 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 
+export { Prisma } from '@prisma/client'
+
 export const prismaClient = new PrismaClient()
 
 // Getting the above via the database package is erroring with "PrismaClient is not a constructor"

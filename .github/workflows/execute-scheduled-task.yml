@@ -17,6 +17,7 @@ on:
         description: Select application
         options:
         - ingest
+        - notify
 
 env:
   AWS_DEFAULT_REGION: eu-west-2
@@ -29,7 +30,7 @@ jobs:
     steps:
       # credentials to connect to AWS 
       - name: Configure AWS credentials (dev/test)
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
 
         with:
           aws-access-key-id: ${{ secrets.NIHR_GITHUB_ACTIONS_IAM_ID }}
@@ -37,18 +38,32 @@ jobs:
           aws-region: eu-west-2
           role-session-name: GitHubActionsDev
 
+      - name: Get cron expression
+        id: get_cron
+        run: |
+          future_time=$(date -u -d '+60 seconds' +'%M %H %d %m ? %Y')
+          echo "cron_expression=${future_time}" >> $GITHUB_OUTPUT
+
       - name: Update CloudWatch Event Rule
         run: |
-          aws events put-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "rate(1 minute)"
+          cron_expression="${{ steps.get_cron.outputs.cron_expression }}"
+          aws events put-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname }}-cw-event-rule --schedule-expression "cron(${cron_expression})"
           aws events enable-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname}}-cw-event-rule
 
       - name: Wait for 90 seconds
         run: |
           sleep 90
 
-      - name: Restore Original Schedule
+      - name: Restore Original Schedule (ingest)
+        if: github.event.inputs.appname == 'ingest'
         run: |
-          aws events put-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 20 * * ? *)"
+          aws events put-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 18 * * ? *)"
+          aws events enable-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname}}-cw-event-rule
+
+      - name: Restore Original Schedule (notify)
+        if: github.event.inputs.appname == 'notify'
+        run: |
+          aws events put-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 18 1 */3 ? *)"
           aws events enable-rule --name crnccd-ecs-dev-se-${{ github.event.inputs.appname}}-cw-event-rule
 
   deploy-test:
@@ -59,7 +74,7 @@ jobs:
     steps:
       # credentials to connect to AWS 
       - name: Configure AWS credentials (dev/test)
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
 
         with:
           aws-access-key-id: ${{ secrets.NIHR_GITHUB_ACTIONS_IAM_ID }}
@@ -67,18 +82,32 @@ jobs:
           aws-region: eu-west-2
           role-session-name: GitHubActionsTest
 
+      - name: Get cron expression
+        id: get_cron
+        run: |
+          future_time=$(date -u -d '+60 seconds' +'%M %H %d %m ? %Y')
+          echo "cron_expression=${future_time}" >> $GITHUB_OUTPUT
+
       - name: Update CloudWatch Event Rule
         run: |
-          aws events put-rule --name crnccd-ecs-test-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "rate(1 minute)"
+          cron_expression="${{ steps.get_cron.outputs.cron_expression }}"
+          aws events put-rule --name crnccd-ecs-test-se-${{ github.event.inputs.appname }}-cw-event-rule --schedule-expression "cron(${cron_expression})"
           aws events enable-rule --name crnccd-ecs-test-se-${{ github.event.inputs.appname}}-cw-event-rule
 
       - name: Wait for 90 seconds
         run: |
           sleep 90
 
-      - name: Restore Original Schedule
+      - name: Restore Original Schedule (ingest)
+        if: github.event.inputs.appname == 'ingest'
         run: |
-          aws events put-rule --name crnccd-ecs-test-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 20 * * ? *)"
+          aws events put-rule --name crnccd-ecs-test-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 18 * * ? *)"
+          aws events enable-rule --name crnccd-ecs-test-se-${{ github.event.inputs.appname}}-cw-event-rule
+
+      - name: Restore Original Schedule (notify)
+        if: github.event.inputs.appname == 'notify'
+        run: |
+          aws events put-rule --name crnccd-ecs-test-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 18 1 */3 ? *)"
           aws events enable-rule --name crnccd-ecs-test-se-${{ github.event.inputs.appname}}-cw-event-rule
 
   deploy-uat:
@@ -89,7 +118,7 @@ jobs:
     steps:
       # credentials to connect to AWS 
       - name: Configure AWS credentials (uat)
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
 
         with:
           aws-access-key-id: ${{ secrets.CRNCC_STAGING_IAM_ACCESS_KEY_ID }}
@@ -97,18 +126,32 @@ jobs:
           aws-region: eu-west-2
           role-session-name: GitHubActionsUat
 
+      - name: Get cron expression
+        id: get_cron
+        run: |
+          future_time=$(date -u -d '+60 seconds' +'%M %H %d %m ? %Y')
+          echo "cron_expression=${future_time}" >> $GITHUB_OUTPUT
+
       - name: Update CloudWatch Event Rule
         run: |
-          aws events put-rule --name crnccs-ecs-uat-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "rate(1 minute)"
+          cron_expression="${{ steps.get_cron.outputs.cron_expression }}"
+          aws events put-rule --name crnccs-ecs-uat-se-${{ github.event.inputs.appname }}-cw-event-rule --schedule-expression "cron(${cron_expression})"
           aws events enable-rule --name crnccs-ecs-uat-se-${{ github.event.inputs.appname}}-cw-event-rule
 
       - name: Wait for 90 seconds
         run: |
           sleep 90
 
-      - name: Restore Original Schedule
+      - name: Restore Original Schedule (ingest)
+        if: github.event.inputs.appname == 'ingest'
         run: |
-          aws events put-rule --name crnccs-ecs-uat-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 20 * * ? *)"
+          aws events put-rule --name crnccs-ecs-uat-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 18 * * ? *)"
+          aws events enable-rule --name crnccs-ecs-uat-se-${{ github.event.inputs.appname}}-cw-event-rule
+
+      - name: Restore Original Schedule (notify)
+        if: github.event.inputs.appname == 'notify'
+        run: |
+          aws events put-rule --name crnccs-ecs-uat-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 18 1 */3 ? *)"
           aws events enable-rule --name crnccs-ecs-uat-se-${{ github.event.inputs.appname}}-cw-event-rule
 
 
@@ -120,7 +163,7 @@ jobs:
     steps:
       # credentials to connect to AWS 
       - name: Configure AWS credentials (oat/prod)
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
 
         with:
           aws-access-key-id: ${{ secrets.CRNCC_PROD_IAM_ACCESS_KEY_ID }}
@@ -128,18 +171,32 @@ jobs:
           aws-region: eu-west-2
           role-session-name: GitHubActionsOat
 
+      - name: Get cron expression
+        id: get_cron
+        run: |
+          future_time=$(date -u -d '+60 seconds' +'%M %H %d %m ? %Y')
+          echo "cron_expression=${future_time}" >> $GITHUB_OUTPUT
+
       - name: Update CloudWatch Event Rule
         run: |
-          aws events put-rule --name crnccp-ecs-oat-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "rate(1 minute)"
+          cron_expression="${{ steps.get_cron.outputs.cron_expression }}"
+          aws events put-rule --name crnccp-ecs-oat-se-${{ github.event.inputs.appname }}-cw-event-rule --schedule-expression "cron(${cron_expression})"
           aws events enable-rule --name crnccp-ecs-oat-se-${{ github.event.inputs.appname}}-cw-event-rule
 
       - name: Wait for 90 seconds
         run: |
           sleep 90
 
-      - name: Restore Original Schedule
+      - name: Restore Original Schedule (ingest)
+        if: github.event.inputs.appname == 'ingest'
         run: |
-          aws events put-rule --name crnccp-ecs-oat-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 20 * * ? *)"
+          aws events put-rule --name crnccp-ecs-oat-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 18 * * ? *)"
+          aws events enable-rule --name crnccp-ecs-oat-se-${{ github.event.inputs.appname}}-cw-event-rule
+
+      - name: Restore Original Schedule (notify)
+        if: github.event.inputs.appname == 'notify'
+        run: |
+          aws events put-rule --name crnccp-ecs-oat-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 18 1 */3 ? *)"
           aws events enable-rule --name crnccp-ecs-oat-se-${{ github.event.inputs.appname}}-cw-event-rule
 
 
@@ -151,7 +208,7 @@ jobs:
     steps:
       # credentials to connect to AWS 
       - name: Configure AWS credentials (oat/prod)
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
 
         with:
           aws-access-key-id: ${{ secrets.CRNCC_PROD_IAM_ACCESS_KEY_ID }}
@@ -159,16 +216,30 @@ jobs:
           aws-region: eu-west-2
           role-session-name: GitHubActionsProd
 
+      - name: Get cron expression
+        id: get_cron
+        run: |
+          future_time=$(date -u -d '+60 seconds' +'%M %H %d %m ? %Y')
+          echo "cron_expression=${future_time}" >> $GITHUB_OUTPUT
+
       - name: Update CloudWatch Event Rule
         run: |
-          aws events put-rule --name crnccp-ecs-prod-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "rate(1 minute)"
+          cron_expression="${{ steps.get_cron.outputs.cron_expression }}"
+          aws events put-rule --name crnccp-ecs-prod-se-${{ github.event.inputs.appname }}-cw-event-rule --schedule-expression "cron(${cron_expression})"
           aws events enable-rule --name crnccp-ecs-prod-se-${{ github.event.inputs.appname}}-cw-event-rule
 
       - name: Wait for 90 seconds
         run: |
           sleep 90
 
-      - name: Restore Original Schedule
+      - name: Restore Original Schedule (ingest)
+        if: github.event.inputs.appname == 'ingest'
         run: |
-          aws events put-rule --name crnccp-ecs-prod-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 20 * * ? *)"
+          aws events put-rule --name crnccp-ecs-prod-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 02 * * ? *)"
+          aws events enable-rule --name crnccp-ecs-prod-se-${{ github.event.inputs.appname}}-cw-event-rule
+
+      - name: Restore Original Schedule (notify)
+        if: github.event.inputs.appname == 'notify'
+        run: |
+          aws events put-rule --name crnccp-ecs-prod-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 18 1 */3 ? *)"
           aws events enable-rule --name crnccp-ecs-prod-se-${{ github.event.inputs.appname}}-cw-event-rule

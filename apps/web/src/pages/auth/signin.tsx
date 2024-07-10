@@ -1,11 +1,14 @@
-import { signIn, getCsrfToken, getProviders } from 'next-auth/react'
-import { useEffect } from 'react'
-import { useRouter } from 'next/router'
-import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { Container } from '@nihr-ui/frontend'
+import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import Router from 'next/router'
 import { getServerSession } from 'next-auth/next'
+import { getCsrfToken, getProviders, signIn } from 'next-auth/react'
+import { useEffect } from 'react'
+
+import { AUTH_PROVIDER_ID } from '@/constants/auth'
+import { REGISTRATION_PAGE } from '@/constants/routes'
+
 import { authOptions } from '../api/auth/[...nextauth]'
-import { AUTH_PROVIDER_ID } from '../../constants/auth'
 
 /**
  * Our protected routes redirect to this sign in page for unauthenticated users.
@@ -17,15 +20,13 @@ import { AUTH_PROVIDER_ID } from '../../constants/auth'
 export type SigninProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
 export default function Signin({ isAuthenticated, signinUrl, csrfToken, callbackUrl }: SigninProps) {
-  const router = useRouter()
-
   useEffect(() => {
     if (!isAuthenticated) {
-      void signIn(AUTH_PROVIDER_ID)
+      void signIn(AUTH_PROVIDER_ID, undefined, { prompt: 'login' })
     } else {
-      void router.push('/')
+      void Router.push('/')
     }
-  }, [isAuthenticated, router])
+  }, [isAuthenticated])
 
   // Fallback for non-Javascript
   return (
@@ -45,6 +46,16 @@ export default function Signin({ isAuthenticated, signinUrl, csrfToken, callback
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   try {
     const session = await getServerSession(context.req, context.res, authOptions)
+
+    if (context.query.registrationToken) {
+      const registrationToken = context.query.registrationToken as string
+      const params = new URLSearchParams({ registrationToken })
+      return {
+        redirect: {
+          destination: `${REGISTRATION_PAGE}?${params.toString()}`,
+        },
+      }
+    }
 
     const providers = await getProviders()
 

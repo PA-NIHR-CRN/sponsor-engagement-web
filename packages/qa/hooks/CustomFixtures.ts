@@ -1,0 +1,82 @@
+import AxeBuilder from '@axe-core/playwright'
+import { test as base } from '@playwright/test'
+
+import CommonItemsPage from '../pages/CommonItemsPage'
+import LoginPage from '../pages/LoginPage'
+import StudiesPage from '../pages/StudiesPage'
+import OrganisationsPage from '../pages/OrganisationsPage'
+import StudyDetailsPage from '../pages/StudyDetailsPage'
+import AssessmentPage from '../pages/AssessmentPage'
+import RequestSupportPage from '../pages/RequestSupportPage'
+import OrganisationDetailsPage from '../pages/OrganisationDetailsPage'
+import RemoveContactPage from '../pages/RemoveContactPage'
+import CreatePasswordPage from '../pages/CreatePasswordPage'
+import SignedOutPage from '../pages/SignedOutPage'
+
+type CustomFixtures = {
+  commonItemsPage: CommonItemsPage
+  loginPage: LoginPage
+  studiesPage: StudiesPage
+  organisationsPage: OrganisationsPage
+  studyDetailsPage: StudyDetailsPage
+  assessmentPage: AssessmentPage
+  requestSupportPage: RequestSupportPage
+  organisationDetailsPage: OrganisationDetailsPage
+  removeContactPage: RemoveContactPage
+  createPasswordPage: CreatePasswordPage
+  signedOutPage: SignedOutPage
+  makeAxeBuilder: () => AxeBuilder
+}
+
+export const test = base.extend<CustomFixtures>({
+  commonItemsPage: async ({ page }, use) => {
+    await use(new CommonItemsPage(page))
+  },
+
+  loginPage: async ({ page }, use) => {
+    await use(new LoginPage(page))
+  },
+
+  studiesPage: async ({ page }, use) => {
+    await use(new StudiesPage(page))
+  },
+
+  organisationsPage: async ({ page }, use) => {
+    await use(new OrganisationsPage(page))
+  },
+
+  studyDetailsPage: async ({ page }, use) => {
+    await use(new StudyDetailsPage(page))
+  },
+
+  assessmentPage: async ({ page }, use) => {
+    await use(new AssessmentPage(page))
+  },
+
+  requestSupportPage: async ({ page }, use) => {
+    await use(new RequestSupportPage(page))
+  },
+
+  organisationDetailsPage: async ({ page }, use) => {
+    await use(new OrganisationDetailsPage(page))
+  },
+
+  removeContactPage: async ({ page }, use) => {
+    await use(new RemoveContactPage(page))
+  },
+
+  createPasswordPage: async ({ page }, use) => {
+    await use(new CreatePasswordPage(page))
+  },
+
+  signedOutPage: async ({ page }, use) => {
+    await use(new SignedOutPage(page))
+  },
+
+  makeAxeBuilder: async ({ page }, use) => {
+    const makeAxeBuilder = () => new AxeBuilder({ page })
+    await use(makeAxeBuilder)
+  },
+})
+
+export { expect } from '@playwright/test'

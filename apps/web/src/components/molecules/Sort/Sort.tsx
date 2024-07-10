@@ -1,8 +1,10 @@
 import { useRef } from 'react'
 
+import type { OrderType } from '../../../@types/filters'
+
 interface SortProps {
   form: string
-  defaultOrder?: 'updated'
+  defaultOrder?: OrderType
 }
 
 export function Sort({ form, defaultOrder }: SortProps) {
@@ -21,10 +23,9 @@ export function Sort({ form, defaultOrder }: SortProps) {
         name="order"
         onChange={() => sortButtonRef.current?.click()}
       >
-        <option value="a-z">Alphabetical (ascending)</option>
-        <option value="z-a">Alphabetical (descending)</option>
-        <option value="updated">Recently updated</option>
-        <option value="published">Recently published</option>
+        <option value="due-assessment">Due assessment</option>
+        <option value="last-assessment-asc">Last Assessment Date (Ascending)</option>
+        <option value="last-assessment-desc">Last Assessment Date (Descending)</option>
       </select>
       <button
         className="govuk-button govuk-button--secondary mb-0 ml-3 [.js-enabled_&]:hidden"

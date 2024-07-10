@@ -1,9 +1,18 @@
 import mockRouter from 'next-router-mock'
-import { act, render, screen, within } from '@testing-library/react'
+
+import { act, render, screen, within } from '@/config/TestUtils'
+
 import { Pagination } from './Pagination'
 
 test('No results', () => {
   render(<Pagination initialPage={0} initialPageSize={0} totalItems={0} />)
+
+  const pagination = screen.queryByRole('navigation', { name: 'results' })
+  expect(pagination).not.toBeInTheDocument()
+})
+
+test('One page', () => {
+  render(<Pagination initialPage={0} initialPageSize={5} totalItems={5} />)
 
   const pagination = screen.queryByRole('navigation', { name: 'results' })
   expect(pagination).not.toBeInTheDocument()
@@ -106,4 +115,14 @@ test('Forward/back updates the set page', async () => {
 
   expect(within(pagination).getByRole('link', { name: 'Page 1' })).toHaveAttribute('aria-current', 'page')
   expect(within(pagination).getByRole('link', { name: 'Page 2' })).not.toHaveAttribute('aria-current')
+})
+
+test('Removes success query param', async () => {
+  await mockRouter.push('?page=1&success=1')
+
+  render(<Pagination initialPage={1} initialPageSize={4} totalItems={5} />)
+
+  const pagination = screen.getByRole('navigation', { name: 'results' })
+
+  expect(within(pagination).getByRole('link', { name: 'Page 1' })).toHaveAttribute('href', '/?page=1')
 })
