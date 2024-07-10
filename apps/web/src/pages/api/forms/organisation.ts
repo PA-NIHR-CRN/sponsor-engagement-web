@@ -91,6 +91,12 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
               data: {
                 isDeleted: false,
                 updatedBy: { connect: { id: contactManagerUserId } },
+                user: {
+                  update: {
+                    registrationToken,
+                    registrationConfirmed: false,
+                  },
+                },
               },
             },
           }),
