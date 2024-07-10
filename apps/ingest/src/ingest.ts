@@ -44,10 +44,10 @@ const createStudies = async () => {
       chiefInvestigatorLastName: study.ChiefInvestigatorLastName,
       managingSpeciality: study.ManagingSpecialty,
       totalRecruitmentToDate: study.TotalRecruitmentToDate,
-      plannedOpeningDate: study.PlannedRecruitmentStartDate ? new Date(study.PlannedRecruitmentStartDate) : undefined,
-      plannedClosureDate: study.PlannedRecruitmentEndDate ? new Date(study.PlannedRecruitmentEndDate) : undefined,
-      actualOpeningDate: study.ActualOpeningDate ? new Date(study.ActualOpeningDate) : undefined,
-      actualClosureDate: study.ActualClosureDate ? new Date(study.ActualClosureDate) : undefined,
+      plannedOpeningDate: study.PlannedRecruitmentStartDate ? new Date(study.PlannedRecruitmentStartDate) : null,
+      plannedClosureDate: study.PlannedRecruitmentEndDate ? new Date(study.PlannedRecruitmentEndDate) : null,
+      actualOpeningDate: study.ActualOpeningDate ? new Date(study.ActualOpeningDate) : null,
+      actualClosureDate: study.ActualClosureDate ? new Date(study.ActualClosureDate) : null,
       isDueAssessment: false,
       isDeleted: false,
     }
@@ -256,13 +256,11 @@ const createStudyRelationships = async () => {
           totalRecruitmentToDate: category.TotalRecruitmentToDate,
           plannedOpeningDate: category.PlannedRecruitmentStartDate
             ? new Date(category.PlannedRecruitmentStartDate)
-            : undefined,
-          plannedClosureDate: category.PlannedRecruitmentEndDate
-            ? new Date(category.PlannedRecruitmentEndDate)
-            : undefined,
-          actualOpeningDate: category.ActualOpeningDate ? new Date(category.ActualOpeningDate) : undefined,
-          actualClosureDate: category.ActualClosureDate ? new Date(category.ActualClosureDate) : undefined,
-          expectedReopenDate: category.ExpectedReopenDate ? new Date(category.ExpectedReopenDate) : undefined,
+            : null,
+          plannedClosureDate: category.PlannedRecruitmentEndDate ? new Date(category.PlannedRecruitmentEndDate) : null,
+          actualOpeningDate: category.ActualOpeningDate ? new Date(category.ActualOpeningDate) : null,
+          actualClosureDate: category.ActualClosureDate ? new Date(category.ActualClosureDate) : null,
+          expectedReopenDate: category.ExpectedReopenDate ? new Date(category.ExpectedReopenDate) : null,
           isDeleted: false,
         }
 
