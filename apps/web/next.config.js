@@ -4,6 +4,9 @@ require('./src/utils/schemas/env.schema.js')
 const nextConfig = {
   output: 'standalone',
   transpilePackages: ['ui', 'database'],
+  experimental: {
+    instrumentationHook: true,
+  },
 }
 
 const { withSuperjson } = require('next-superjson')
