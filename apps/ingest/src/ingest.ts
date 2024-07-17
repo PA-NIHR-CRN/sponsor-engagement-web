@@ -332,7 +332,7 @@ const setAssessmentDue = async (lapsePeriodMonths: number) => {
 }
 
 const fetchStudies = async function* (url: string, username: string, password: string) {
-  const pageSize = 1000
+  const pageSize = 250
   let pageNumber = 1
   let totalStudies = 0
   while (totalStudies === 0 || pageNumber * pageSize < totalStudies + pageSize) {
@@ -347,7 +347,7 @@ const fetchStudies = async function* (url: string, username: string, password: s
       }>(url, {
         headers: { username, password },
         params: {
-          pageSize: 1000,
+          pageSize,
           pageNumber,
           studyStatus: [
             StudyStatus.InSetup,
