@@ -1,6 +1,6 @@
 module.exports = {
   extends: ['custom/next'],
-  ignorePatterns: ['node_modules/', 'dist/'],
+  ignorePatterns: ['node_modules/', 'dist/', 'src/@types/generated/*.ts'],
   parserOptions: {
     project: './tsconfig.json',
     tsconfigRootDir: __dirname,

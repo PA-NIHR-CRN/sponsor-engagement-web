@@ -26,7 +26,14 @@
         "ENVIRONMENT_VARIABLE_CHECKS",
         "NEXT_PUBLIC_GTM_ID",
         "AWS_SECRET_NAME",
-        "AWS_REGION"
+        "AWS_REGION",
+        "NEXT_PUBLIC_GTM_ID",
+        "CONTENTFUL_SPACE_ID",
+        "CONTENTFUL_ACCESS_TOKEN",
+        "CONTENTFUL_ENVIRONMENT",
+        "CONTENTFUL_BANNER_ENTRY_ID",
+        "CONTENTFUL_PREVIEW_MODE",
+        "CONTENTFUL_PREVIEW_ACCESS_TOKEN"
       ]
     },
     "start": {},
@@ -59,7 +66,14 @@
         "IDG_API_PASSWORD",
         "DATABASE_URL",
         "AWS_SECRET_NAME",
-        "AWS_REGION"
+        "AWS_REGION",
+        "DATABASE_URL",
+        "CONTENTFUL_SPACE_ID",
+        "CONTENTFUL_ACCESS_TOKEN",
+        "CONTENTFUL_ENVIRONMENT",
+        "CONTENTFUL_BANNER_ENTRY_ID",
+        "CONTENTFUL_PREVIEW_MODE",
+        "CONTENTFUL_PREVIEW_ACCESS_TOKEN"
       ]
     },
     "test:ci": {
@@ -91,7 +105,14 @@
         "DATABASE_URL",
         "NEXT_PUBLIC_GTM_ID",
         "AWS_SECRET_NAME",
-        "AWS_REGION"
+        "AWS_REGION",
+        "NEXT_PUBLIC_GTM_ID",
+        "CONTENTFUL_SPACE_ID",
+        "CONTENTFUL_ACCESS_TOKEN",
+        "CONTENTFUL_ENVIRONMENT",
+        "CONTENTFUL_BANNER_ENTRY_ID",
+        "CONTENTFUL_PREVIEW_MODE",
+        "CONTENTFUL_PREVIEW_ACCESS_TOKEN"
       ]
     },
     "db:generate": { "cache": false },

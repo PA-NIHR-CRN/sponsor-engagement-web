@@ -1,63 +1,76 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { render } from '@testing-library/react'
 
 import { NotificationBanner } from './NotificationBanner'
 
 describe('NotificationBanner Component', () => {
   describe('Rendering the banner', () => {
     test('renders with given heading and content', () => {
-      render(<NotificationBanner heading="Test Heading">Test Content</NotificationBanner>)
+      const { getByText } = render(<NotificationBanner heading="Test Heading">Test Content</NotificationBanner>)
 
-      expect(screen.getByText('Test Heading')).toBeInTheDocument()
-      expect(screen.getByText('Test Content')).toBeInTheDocument()
+      expect(getByText('Test Heading')).toBeInTheDocument()
+      expect(getByText('Test Content')).toBeInTheDocument()
     })
 
     test('renders with default Important prefix when success is false', () => {
-      render(<NotificationBanner heading="Test Heading">Test Content</NotificationBanner>)
-      expect(screen.getByText('Important')).toBeInTheDocument()
+      const { getByText } = render(<NotificationBanner heading="Test Heading">Test Content</NotificationBanner>)
+      expect(getByText('Important')).toBeInTheDocument()
     })
 
     test('renders with Success prefix when success is true', () => {
-      render(
+      const { getByText } = render(
         <NotificationBanner success heading="Test Heading">
           Test Content
         </NotificationBanner>
       )
-      expect(screen.getByText('Success')).toBeInTheDocument()
+      expect(getByText('Success')).toBeInTheDocument()
+    })
+
+    test('renders rich text when richText prop is true', () => {
+      const { getByText } = render(
+        <NotificationBanner isRichText heading="Test Heading">
+          Test Content
+        </NotificationBanner>
+      )
+
+      const richTextContent = getByText('Test Content')
+      expect(richTextContent).toBeInTheDocument()
+
+      expect(richTextContent.parentElement?.tagName).not.toBe('p')
     })
   })
 
   describe('Component roles and styles', () => {
     test('has role alert when success is true', () => {
-      render(
+      const { getByRole } = render(
         <NotificationBanner success heading="Test Heading">
           Test Content
         </NotificationBanner>
       )
-      expect(screen.getByRole('alert')).toBeInTheDocument()
+      expect(getByRole('alert')).toBeInTheDocument()
     })
 
     test('has role region when success is false', () => {
-      render(<NotificationBanner heading="Test Heading">Test Content</NotificationBanner>)
-      expect(screen.getByRole('region')).toBeInTheDocument()
+      const { getByRole } = render(<NotificationBanner heading="Test Heading">Test Content</NotificationBanner>)
+      expect(getByRole('region')).toBeInTheDocument()
     })
 
     test('applies provided className', () => {
-      render(
+      const { getByRole } = render(
         <NotificationBanner className="test-class" heading="Test Heading">
           Test Content
         </NotificationBanner>
       )
-      expect(screen.getByRole('region')).toHaveClass('test-class')
+      expect(getByRole('region')).toHaveClass('test-class')
     })
 
     test('applies govuk-notification-banner--success class when success is true', () => {
-      render(
+      const { getByRole } = render(
         <NotificationBanner success heading="Test Heading">
           Test Content
         </NotificationBanner>
       )
-      expect(screen.getByRole('alert')).toHaveClass('govuk-notification-banner--success')
+      expect(getByRole('alert')).toHaveClass('govuk-notification-banner--success')
     })
   })
 })

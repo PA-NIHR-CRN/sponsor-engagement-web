@@ -15,6 +15,10 @@ import Studies, { getServerSideProps } from '../pages/studies'
 
 jest.mock('next-auth/next')
 jest.mock('next-seo')
+jest.mock('contentful')
+jest.mock('../lib/contentful/contentfulService', () => ({
+  getNotficationBanner: jest.fn(),
+}))
 
 describe('getServerSideProps', () => {
   const getServerSessionMock = jest.mocked(getServerSession)

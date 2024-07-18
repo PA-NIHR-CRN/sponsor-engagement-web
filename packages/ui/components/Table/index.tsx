@@ -5,6 +5,7 @@ import { TableCaption } from './TableCaption'
 import { TableCellHeader } from './TableCellHeader'
 import { TableCell } from './TableCell'
 import { TableRow } from './TableRow'
+import { TableFooter } from './TableFooter'
 
 const TableNamespace = Object.assign(Table, {
   Caption: TableCaption,
@@ -13,6 +14,7 @@ const TableNamespace = Object.assign(Table, {
   Row: TableRow,
   Cell: TableCell,
   CellHeader: TableCellHeader,
+  Footer: TableFooter,
 })
 
 export { TableNamespace as Table }

@@ -69,6 +69,8 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
       logger.info('Re-adding contact with email %s to organisation %s', emailAddress, organisation.name)
     }
 
+    // TODO - check if user has idg token and add registration
+
     // Add user to organisation
     const { name: organisationName, users } = await prismaClient.organisation.update({
       where: {
