@@ -246,35 +246,31 @@ describe('Session callback', () => {
     )
   })
 
-  describe('signIn callback', () => {
-    const accountMock = Mock.of<Account>({
-      accessToken: faker.string.uuid(),
-      expires_at: Number(faker.date.future()),
-      refresh_token: faker.string.uuid(),
-      id_token: faker.string.uuid(),
+  test('handles errors when fetching user', async () => {
+    const user = Mock.of<AdapterUser>()
+    const token = Mock.of<JWT>({ user: { id: faker.string.alphanumeric(5), email: faker.internet.email() } })
+    const session = Mock.of<Session>({
+      user: {},
     })
 
-    const userMock = Mock.of<AdapterUser>({
-      email: faker.internet.email(),
+    prismaMock.user.findFirstOrThrow.mockRejectedValueOnce('user not found')
+
+    const updatedSession = await authOptions.callbacks?.session?.({
+      session,
+      user,
+      token,
+      newSession: false,
+      trigger: 'update',
     })
 
-    test('records the last login time for the user', async () => {
-      const account = accountMock
-      const user = userMock
+    expect(logger.error).toHaveBeenCalledWith('NextAuth session callback exception for %s', token.user.email)
+    expect(logger.error).toHaveBeenCalledWith('user not found')
 
-      const response = await authOptions.callbacks?.signIn?.({ account, user })
-
-      expect(prismaMock.user.update).toHaveBeenCalledWith({
-        where: {
-          email: user.email,
-        },
-        data: {
-          lastLogin: new Date('2023-01-01'),
-        },
+    expect(updatedSession).toEqual<Session>(
+      Mock.of<Session>({
+        user: {},
       })
-
-      expect(response).toBe(true)
-    })
+    )
   })
 
   test('exits early if no user object exists within the session', async () => {
@@ -295,5 +291,50 @@ describe('Session callback', () => {
     expect(prismaMock.userRole.findMany).not.toHaveBeenCalled()
 
     expect(updatedSession).toEqual<Session>(session)
+  })
+})
+
+describe('signIn callback', () => {
+  const accountMock = Mock.of<Account>({
+    accessToken: faker.string.uuid(),
+    expires_at: Number(faker.date.future()),
+    refresh_token: faker.string.uuid(),
+    id_token: faker.string.uuid(),
+  })
+
+  const userMock = Mock.of<AdapterUser>({
+    email: faker.internet.email(),
+  })
+
+  test('records the last login time for the user', async () => {
+    const account = accountMock
+    const user = userMock
+
+    const response = await authOptions.callbacks?.signIn?.({ account, user })
+
+    expect(prismaMock.user.update).toHaveBeenCalledWith({
+      where: {
+        email: user.email,
+      },
+      data: {
+        lastLogin: new Date('2023-01-01'),
+      },
+    })
+
+    expect(response).toBe(true)
+  })
+
+  test('handles failures when updating user record', async () => {
+    const account = accountMock
+    const user = userMock
+
+    prismaMock.user.update.mockRejectedValueOnce('test error')
+
+    const response = await authOptions.callbacks?.signIn?.({ account, user })
+
+    expect(logger.error).toHaveBeenCalledWith('NextAuth signIn callback exception for %s', userMock.email)
+    expect(logger.error).toHaveBeenCalledWith('test error')
+
+    expect(response).toBe(true)
   })
 })

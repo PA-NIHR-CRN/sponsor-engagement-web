@@ -1,4 +1,5 @@
 import { Container } from '@nihr-ui/frontend'
+import { logger } from '@nihr-ui/logger'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import { getServerSession } from 'next-auth/next'
 import type { ReactElement } from 'react'
@@ -42,6 +43,13 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       }
     }
 
+    if (!session.user.id) {
+      logger.error('Session missing required user data. Check this IDG user has a corresponding User record.')
+      return {
+        props: {},
+      }
+    }
+
     const {
       user: { roles, organisations },
     } = session
@@ -68,6 +76,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       },
     }
   } catch (error) {
+    logger.error(error)
     return {
       redirect: {
         destination: ERROR_PAGE_500,
