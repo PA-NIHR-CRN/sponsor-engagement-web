@@ -113,6 +113,26 @@ These commands should be run from the repository root.
 | `npm run test`    | This will use the turbo CLI to run the test command for all apps    |
 | `npm run test:ci` | This will use the turbo CLI to run the test:ci command for all apps |
 
+## Debugging unit tests
+
+It's useful to be able to debug unit tests. You can do this in VS Code by using the `Jest Runner` plugin. When debugging unit tests in the web application, you'll need to tweak your `jest.config.ts` file and update the following snippet from:
+
+```js
+const createJestConfig = nextJest({
+  // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
+  dir: './',
+})
+```
+
+to:
+
+```js
+const createJestConfig = nextJest({
+  // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
+  dir: './apps/web',
+})
+```
+
 ## Database
 
 To regenerate the local Prisma client run: `npm run db:generate` from within the `database` package.

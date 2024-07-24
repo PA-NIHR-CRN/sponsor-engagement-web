@@ -6,6 +6,7 @@ import { NextSeo } from 'next-seo'
 import { Mock } from 'ts-mockery'
 
 import { render, screen, within } from '@/config/TestUtils'
+import { getNotificationBanner } from '@/lib/contentful/contentfulService'
 
 import { prismaMock } from '../__mocks__/prisma'
 import { userNoOrgs, userWithContactManagerRole, userWithSponsorContactRole } from '../__mocks__/session'
@@ -16,9 +17,6 @@ import Studies, { getServerSideProps } from '../pages/studies'
 jest.mock('next-auth/next')
 jest.mock('next-seo')
 jest.mock('contentful')
-jest.mock('../lib/contentful/contentfulService', () => ({
-  getNotficationBanner: jest.fn(),
-}))
 
 describe('getServerSideProps', () => {
   const getServerSessionMock = jest.mocked(getServerSession)
@@ -109,6 +107,7 @@ const mockStudies = Array.from(Array(15)).map((_, index) => ({
 
 describe('Studies page', () => {
   jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRole)
+  jest.mocked(getNotificationBanner)
 
   test('Default layout', async () => {
     prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudies.length, 3])
