@@ -143,17 +143,11 @@ jobs:
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
 
-
-
-#          Create build artifact and save it as an artifact
-
   deploy-test:
     needs: deploy-dev
     environment: TEST
     name: 'Deploy Test'
     runs-on: ubuntu-latest
-#    Fetch build artifact
-
     steps:
       - uses: actions/checkout@v3
 

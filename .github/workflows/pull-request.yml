@@ -50,19 +50,7 @@ jobs:
             crnccd-secret-dev-se-app-config
           parse-json-secrets: true
       - name: Build
-        # Inject the minimum amount of env vars needed to build the project
         run: |
-          touch apps/web/.env.local
-          echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> apps/web/.env.local
-          echo CONTENTFUL_BANNER_ENTRY_ID=${{ env.CRNCCD_SECRET_DEV_SE_APP_CONFIG_CONTENTFUL_BANNER_ENTRY_ID }} >> apps/web/.env.local
-          echo CONTENTFUL_SPACE_ID=${{ env.CRNCCD_SECRET_DEV_SE_APP_CONFIG_CONTENTFUL_SPACE_ID }} >> apps/web/.env.local
-          echo CONTENTFUL_ACCESS_TOKEN=${{ env.CRNCCD_SECRET_DEV_SE_APP_CONFIG_CONTENTFUL_ACCESS_TOKEN }} >> apps/web/.env.local
-          echo CONTENTFUL_ENVIRONMENT=${{ env.CRNCCD_SECRET_DEV_SE_APP_CONFIG_CONTENTFUL_ENVIRONMENT }} >> apps/web/.env.local
-          echo CONTENTFUL_PREVIEW_MODE=${{ env.CRNCCD_SECRET_DEV_SE_APP_CONFIG_CONTENTFUL_PREVIEW_MODE }} >> apps/web/.env.local
-          echo CONTENTFUL_PREVIEW_ACCESS_TOKEN=${{ env.CRNCCD_SECRET_DEV_SE_APP_CONFIG_CONTENTFUL_PREVIEW_ACCESS_TOKEN }} >> apps/web/.env.local
-          echo NEXT_PUBLIC_APP_ENV=${{ vars.APP_ENV }} >> apps/web/.env.local
-          echo CONTENTFUL_BANNER_ENTRY_ID=test>> apps/web/.env.local
-          echo ENVIRONMENT_VARIABLE_CHECKS=disabled >> apps/web/.env.local
           npx turbo run build --cache-dir=".turbo"
 
   # Code quality checks

@@ -45,12 +45,8 @@ const envSchema = z
   })
   .required()
 
-/**
- * Parses and validates the environment variables using the defined schema.
- * @type {Object}
- */
-if (process.env.ENVIRONMENT_VARIABLE_CHECKS !== 'disabled') {
-  module.exports = envSchema.parse({
+const validateEnv = () => {
+  const result = envSchema.safeParse({
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
     NEXTAUTH_IDLE_TIMEOUT: process.env.NEXTAUTH_IDLE_TIMEOUT,
@@ -74,4 +70,14 @@ if (process.env.ENVIRONMENT_VARIABLE_CHECKS !== 'disabled') {
     AWS_SECRET_NAME: process.env.AWS_SECRET_NAME,
     AWS_REGION: process.env.AWS_REGION,
   })
+  if (!result.success) {
+    console.error('Environment variable validation error:', JSON.stringify(result.error.flatten()))
+    throw new Error(`Environment variable validation failed: ${JSON.stringify(result.error.flatten())}`)
+  }
 }
+
+/**
+ * Parses and validates the environment variables using the defined schema.
+ * @type {Object}
+ */
+module.exports = { validateEnv }
