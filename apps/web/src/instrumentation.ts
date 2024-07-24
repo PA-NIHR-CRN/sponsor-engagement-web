@@ -4,12 +4,14 @@ import { logger } from '@nihr-ui/logger'
 import { getAllSecrets } from '@nihr-ui/secrets'
 
 export async function register() {
-  logger.info('Registering secrets')
+  const { AWS_SECRET_NAME, APP_ENV } = process.env
 
-  const { AWS_SECRET_NAME } = process.env
-  assert(AWS_SECRET_NAME, 'AWS_SECRET_NAME is not defined')
+  if (APP_ENV) {
+    logger.info(`${APP_ENV}: Attempting to register secrets from AWS Secrets Manager as environment variables.`)
+    assert(AWS_SECRET_NAME, 'AWS_SECRET_NAME is not defined')
 
-  await getAllSecrets(AWS_SECRET_NAME)
+    await getAllSecrets(AWS_SECRET_NAME)
 
-  logger.info('Secrets registered')
+    logger.info(`${APP_ENV}: Successfully registered secrets from AWS Secrets Manager as environment variables.`)
+  }
 }

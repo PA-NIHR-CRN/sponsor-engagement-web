@@ -1,7 +1,7 @@
 import { getAbsoluteUrl } from './email'
 
 describe('getAbsoluteUrl', () => {
-  // Mock process.env.NEXT_PUBLIC_APP_ENV and process.env.PORT
+  // Mock process.env.APP_ENV and process.env.PORT
   const originalEnv = process.env
   beforeEach(() => {
     process.env = { ...originalEnv }
@@ -12,7 +12,7 @@ describe('getAbsoluteUrl', () => {
   })
 
   it('should return an absolute URL with production environment', () => {
-    process.env.NEXT_PUBLIC_APP_ENV = 'prod'
+    process.env.APP_ENV = 'prod'
 
     const path = '/example-path'
     const expectedUrl = 'https://assessmystudy.nihr.ac.uk/example-path'
@@ -23,7 +23,7 @@ describe('getAbsoluteUrl', () => {
   })
 
   it('should return an absolute URL with development environment', () => {
-    process.env.NEXT_PUBLIC_APP_ENV = 'dev'
+    process.env.APP_ENV = 'dev'
 
     const path = '/example-path'
     const expectedUrl = 'https://dev.assessmystudy.nihr.ac.uk/example-path'
@@ -34,7 +34,7 @@ describe('getAbsoluteUrl', () => {
   })
 
   it('should return an absolute URL with custom environment', () => {
-    process.env.NEXT_PUBLIC_APP_ENV = 'oat'
+    process.env.APP_ENV = 'oat'
     process.env.PORT = '3000'
 
     const path = '/example-path'
@@ -45,7 +45,7 @@ describe('getAbsoluteUrl', () => {
     expect(result).toBe(expectedUrl)
   })
 
-  it('should return an absolute URL with default environment if NEXT_PUBLIC_APP_ENV is not set', () => {
+  it('should return an absolute URL with default environment if APP_ENV is not set', () => {
     process.env.PORT = '3000'
 
     const path = '/example-path'

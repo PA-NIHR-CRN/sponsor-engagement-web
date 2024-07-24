@@ -1,5 +1,4 @@
-import assert from 'node:assert'
-
+import { logger } from '@nihr-ui/logger'
 import type { Entry, EntrySkeletonType } from 'contentful'
 
 import type { TypeBannerSkeleton } from '@/@types/generated'
@@ -13,11 +12,14 @@ export const getEntryById = async <T extends EntrySkeletonType>(id: string): Pro
 export const getNotificationBanner = async (): Promise<Entry<TypeBannerSkeleton> | null> => {
   const { CONTENTFUL_BANNER_ENTRY_ID } = process.env
 
-  assert(CONTENTFUL_BANNER_ENTRY_ID, 'CONTENTFUL_BANNER_ENTRY_ID is not defined')
-
-  try {
-    return await getEntryById<TypeBannerSkeleton>(CONTENTFUL_BANNER_ENTRY_ID)
-  } catch {
-    return null
+  if (CONTENTFUL_BANNER_ENTRY_ID) {
+    try {
+      return await getEntryById<TypeBannerSkeleton>(CONTENTFUL_BANNER_ENTRY_ID)
+    } catch (error) {
+      logger.error(`Encountered error fetching entry from Contentful when ENV variable was set: ${error}`)
+      return null
+    }
   }
+
+  return null
 }

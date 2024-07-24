@@ -220,13 +220,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     })
 
     const filters = getFiltersFromQuery(context.query)
-    let entry: Entry<TypeBannerSkeleton> | null
-
-    try {
-      entry = await getNotificationBanner()
-    } catch {
-      entry = null
-    }
+    const entry: Entry<TypeBannerSkeleton> | null = await getNotificationBanner()
 
     return {
       props: {

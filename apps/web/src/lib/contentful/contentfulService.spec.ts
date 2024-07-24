@@ -55,12 +55,5 @@ describe('Contentful Client Functions', () => {
       expect(result).toBeNull()
       expect(contentClient.getEntry).toHaveBeenCalledWith('banner-entry-id')
     })
-
-    it('should throw an assertion error if CONTENTFUL_BANNER_ENTRY_ID is not defined', async () => {
-      process.env.CONTENTFUL_BANNER_ENTRY_ID = undefined
-
-      await expect(getNotificationBanner()).rejects.toThrow('CONTENTFUL_BANNER_ENTRY_ID is not defined')
-      expect(contentClient.getEntry).not.toHaveBeenCalled()
-    })
   })
 })
