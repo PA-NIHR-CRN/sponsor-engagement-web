@@ -1,4 +1,5 @@
 import './src/config/jest/jest.env'
+
 import type { Config } from 'jest'
 import nextJest from 'next/jest.js'
 
