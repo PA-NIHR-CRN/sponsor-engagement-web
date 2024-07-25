@@ -2,9 +2,20 @@ import type { TypeBannerSkeleton } from '@/@types/generated'
 import { cmsBannerMock } from '@/lib/contentful/cmsBannerMock'
 
 import { getEntryById, getNotificationBanner } from './contentfulService'
-import contentClient from './index'
 
-jest.mock('./index')
+const mockGetEntry = jest.fn()
+const mockGetEntries = jest.fn()
+
+const mockCreateClient = jest.fn(() => {
+  return {
+    getEntry: mockGetEntry,
+    getEntries: mockGetEntries,
+  }
+})
+
+jest.mock('contentful', () => ({
+  createClient: mockCreateClient,
+}))
 
 describe('Contentful Client Functions', () => {
   beforeEach(() => {
@@ -13,18 +24,18 @@ describe('Contentful Client Functions', () => {
 
   describe('getEntryById', () => {
     it('should fetch entry by ID', async () => {
-      ;(contentClient.getEntry as jest.Mock).mockResolvedValue(cmsBannerMock)
+      mockGetEntry.mockResolvedValue(cmsBannerMock)
 
       const result = await getEntryById<TypeBannerSkeleton>('test-id')
       expect(result).toEqual(cmsBannerMock)
-      expect(contentClient.getEntry).toHaveBeenCalledWith('test-id')
+      expect(mockGetEntry).toHaveBeenCalledWith('test-id')
     })
 
     it('should throw an error if fetch fails', async () => {
-      ;(contentClient.getEntry as jest.Mock).mockRejectedValue(new Error('Failed to fetch'))
+      mockGetEntry.mockRejectedValue(new Error('Failed to fetch'))
 
       await expect(getEntryById<TypeBannerSkeleton>('test-id')).rejects.toThrow('Failed to fetch')
-      expect(contentClient.getEntry).toHaveBeenCalledWith('test-id')
+      expect(mockGetEntry).toHaveBeenCalledWith('test-id')
     })
   })
 
@@ -41,19 +52,19 @@ describe('Contentful Client Functions', () => {
     })
 
     it('should fetch notification banner', async () => {
-      ;(contentClient.getEntry as jest.Mock).mockResolvedValue(cmsBannerMock)
+      mockGetEntry.mockResolvedValue(cmsBannerMock)
 
       const result = await getNotificationBanner()
       expect(result).toEqual(cmsBannerMock)
-      expect(contentClient.getEntry).toHaveBeenCalledWith('banner-entry-id')
+      expect(mockGetEntry).toHaveBeenCalledWith('banner-entry-id')
     })
 
     it('should return null if fetch fails', async () => {
-      ;(contentClient.getEntry as jest.Mock).mockRejectedValue(new Error('Failed to fetch'))
+      mockGetEntry.mockRejectedValue(new Error('Failed to fetch'))
 
       const result = await getNotificationBanner()
       expect(result).toBeNull()
-      expect(contentClient.getEntry).toHaveBeenCalledWith('banner-entry-id')
+      expect(mockGetEntry).toHaveBeenCalledWith('banner-entry-id')
     })
   })
 })
