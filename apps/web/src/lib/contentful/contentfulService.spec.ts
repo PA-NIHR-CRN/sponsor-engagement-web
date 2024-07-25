@@ -4,17 +4,13 @@ import { cmsBannerMock } from '@/lib/contentful/cmsBannerMock'
 import { getEntryById, getNotificationBanner } from './contentfulService'
 
 const mockGetEntry = jest.fn()
-const mockGetEntries = jest.fn()
-
-const mockCreateClient = jest.fn(() => {
-  return {
-    getEntry: mockGetEntry,
-    getEntries: mockGetEntries,
-  }
-})
 
 jest.mock('contentful', () => ({
-  createClient: mockCreateClient,
+  createClient: jest.fn(() => {
+    return {
+      getEntry: mockGetEntry,
+    }
+  }),
 }))
 
 describe('Contentful Client Functions', () => {
