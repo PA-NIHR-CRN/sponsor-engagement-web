@@ -92,6 +92,7 @@ jobs:
           environment-variables: |
             AWS_REGION=${{ env.AWS_REGION }}
             AWS_SECRET_NAME=${{ vars.AWS_SECRET_NAME }}
+            NEXTAUTH_URL=https://dev.assessmystudy.nihr.ac.uk
 
       - name: Remove Github Actions IP from RDS security group (Dev)
         run: |
