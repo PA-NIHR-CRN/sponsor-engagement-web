@@ -79,14 +79,10 @@ jobs:
         env:
           DATABASE_URL: ${{ env.CRNCCD_SECRET_DEV_SE_APP_CONFIG_DATABASE_URL }}
 
-      - name: Generate task definition file from container
-        run: |
-          echo "${{ vars.AWS_ECS_TASK_DEFINITION }}" > ./task-definition.json
-
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
         env:
-          ECS_TASK_DEFINITION: ./task-definition.json
+          ECS_TASK_DEFINITION: ./apps/web/.aws/task-definition-dev.json
           CONTAINER_NAME: crnccd-ecs-dev-se-container
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
@@ -164,22 +160,11 @@ jobs:
         run: npm run migrate:deploy
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      - name: Generate task definition file from container
-        run: |
-          aws ecs describe-task-definition --task-definition crnccd-ecs-test-se-task-definition --query taskDefinition > ./task-definition.json
-          echo $(cat ./task-definition.json | jq 'del(
-                  .taskDefinitionArn,
-                  .requiresAttributes,
-                  .compatibilities,
-                  .revision,
-                  .status,
-                  .registeredAt,
-                  .registeredBy
-              )') > ./task-definition.json
+
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
         env:
-          ECS_TASK_DEFINITION: ./task-definition.json
+          ECS_TASK_DEFINITION: ./apps/web/.aws/task-definition-test.json
           CONTAINER_NAME: crnccd-ecs-test-se-container
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
@@ -380,22 +365,10 @@ jobs:
         run: npm run migrate:deploy
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      - name: Generate task definition file from container
-        run: |
-          aws ecs describe-task-definition --task-definition crnccs-ecs-uat-se-task-definition --query taskDefinition > ./task-definition.json
-          echo $(cat ./task-definition.json | jq 'del(
-                  .taskDefinitionArn,
-                  .requiresAttributes,
-                  .compatibilities,
-                  .revision,
-                  .status,
-                  .registeredAt,
-                  .registeredBy
-              )') > ./task-definition.json
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
         env:
-          ECS_TASK_DEFINITION: ./task-definition.json
+          ECS_TASK_DEFINITION: ./apps/web/.aws/task-definition-uat.json
           CONTAINER_NAME: crnccs-ecs-uat-se-container
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
@@ -489,22 +462,11 @@ jobs:
         run: npm run migrate:deploy
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      - name: Generate task definition file from container
-        run: |
-          aws ecs describe-task-definition --task-definition crnccp-ecs-oat-se-task-definition --query taskDefinition > ./task-definition.json
-          echo $(cat ./task-definition.json | jq 'del(
-                  .taskDefinitionArn,
-                  .requiresAttributes,
-                  .compatibilities,
-                  .revision,
-                  .status,
-                  .registeredAt,
-                  .registeredBy
-              )') > ./task-definition.json
+
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
         env:
-          ECS_TASK_DEFINITION: ./task-definition.json
+          ECS_TASK_DEFINITION: ./apps/web/.aws/task-definition-oat.json
           CONTAINER_NAME: crnccp-ecs-oat-se-container
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
@@ -598,22 +560,11 @@ jobs:
         run: npm run migrate:deploy
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      - name: Generate task definition file from container
-        run: |
-          aws ecs describe-task-definition --task-definition crnccp-ecs-prod-se-task-definition --query taskDefinition > ./task-definition.json
-          echo $(cat ./task-definition.json | jq 'del(
-                  .taskDefinitionArn,
-                  .requiresAttributes,
-                  .compatibilities,
-                  .revision,
-                  .status,
-                  .registeredAt,
-                  .registeredBy
-              )') > ./task-definition.json
+
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
         env:
-          ECS_TASK_DEFINITION: ./task-definition.json
+          ECS_TASK_DEFINITION: ./apps/web/.aws/task-definition-prod.json
           CONTAINER_NAME: crnccp-ecs-prod-se-container
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
