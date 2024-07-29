@@ -20,8 +20,6 @@ jobs:
         run: npm ci --no-audit --no-fund
       - name: Build
         run: |
-          touch apps/web/.env.local
-          echo ENVIRONMENT_VARIABLE_CHECKS=disabled >> apps/web/.env.local
           npm run db:generate
           npm run build
 
@@ -95,12 +93,12 @@ jobs:
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
           environment-variables: |
-            APP_ENV=${{ vars.APP_ENV }}
-            ASSESSMENT_LAPSE_MONTHS=${{ vars.ASSESSMENT_LAPSE_MONTHS }}
-            DATABASE_URL=${{ secrets.DATABASE_URL }}
-            API_URL=${{ vars.API_URL }}
-            API_USERNAME=${{ secrets.API_USERNAME }}
-            API_PASSWORD=${{ secrets.API_PASSWORD }}
+            APP_ENV=${{ env.CRNCCD_SECRET_DEV_SE_APP_CONFIG_APP_ENV }}
+            ASSESSMENT_LAPSE_MONTHS=${{ env.CRNCCD_SECRET_DEV_SE_APP_CONFIG_ASSESSMENT_LAPSE_MONTHS }}
+            DATABASE_URL=${{ env.CRNCCD_SECRET_DEV_SE_APP_CONFIG_DATABASE_URL }}
+            API_URL=${{ env.CRNCCD_SECRET_DEV_SE_APP_CONFIG_API_URL }}
+            API_USERNAME=${{ env.CRNCCD_SECRET_DEV_SE_APP_CONFIG_API_USERNAME }}
+            API_PASSWORD=${{ env.CRNCCD_SECRET_DEV_SE_APP_CONFIG_API_PASSWORD }}
       - name: Remove Github Actions IP from RDS security group (Dev)
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'

@@ -70,7 +70,7 @@ jobs:
         run: |
           echo "Using registry ${{ env.ECR_REGISTRY }}"
           echo "Tagging image with ${{ env.IMAGE_NAME_TAG}} and ${{ env.IMAGE_SHA_TAG }}"
-          docker build -f apps/web/Dockerfile --build-arg APP_ENV=dev --build-arg NEXT_PUBLIC_GTM_ID=${{ secrets.CRNCCD_SECRET_DEV_SE_APP_CONFIG_NEXT_PUBLIC_GTM_ID }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
+          docker build -f apps/web/Dockerfile --build-arg APP_ENV=dev --build-arg NEXT_PUBLIC_GTM_ID=${{ env.CRNCCD_SECRET_DEV_SE_APP_CONFIG_NEXT_PUBLIC_GTM_ID }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG" >> "$GITHUB_OUTPUT"
 
