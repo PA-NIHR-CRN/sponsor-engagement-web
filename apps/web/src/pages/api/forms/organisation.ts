@@ -69,8 +69,16 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
       logger.info('Re-adding contact with email %s to organisation %s', emailAddress, organisation.name)
     }
 
+    const existingUser = await prismaClient.user.findUnique({
+      where: {
+        email: emailAddress,
+      },
+    })
+
+    const shouldUpdateRegistrationToken = (existingUser?.identityGatewayId ?? null) === null
+
     // Add user to organisation
-    const { name: organisationName, users } = await prismaClient.organisation.update({
+    const { name: organisationName } = await prismaClient.organisation.update({
       where: {
         id: Number(organisationId),
       },
@@ -100,11 +108,9 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
               updatedBy: { connect: { id: contactManagerUserId } },
               user: {
                 connectOrCreate: {
-                  // If a user does not exist, create the user and set a registration token
+                  // If a user does not exist, create the user. We'll set registration token later.
                   create: {
                     email: emailAddress,
-                    registrationToken,
-                    registrationConfirmed: false,
                   },
                   where: {
                     email: emailAddress,
@@ -117,11 +123,15 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
       },
     })
 
-    await prismaClient.user.update({
+    const user = await prismaClient.user.update({
       where: {
         email: emailAddress,
       },
       data: {
+        ...(shouldUpdateRegistrationToken && {
+          registrationToken,
+          registrationConfirmed: false,
+        }),
         roles: {
           // If a user is not assigned the sponsor contact role, assign it
           createMany: {
@@ -136,12 +146,9 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
       },
     })
 
-    const isNewUser = users.some((user) => {
-      const { email, registrationConfirmed, registrationToken: token } = user.user
-      return email === emailAddress && Boolean(token) && registrationConfirmed === false
-    })
+    const isNewUser = Boolean(user.registrationToken) && !user.registrationConfirmed
 
-    const savedRegistrationToken = users.find((user) => user.user.email === emailAddress)?.user.registrationToken
+    const savedRegistrationToken = user.registrationToken
 
     await emailService.sendEmail({
       to: emailAddress,

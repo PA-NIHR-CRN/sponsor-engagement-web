@@ -1,4 +1,5 @@
 import './src/config/jest/jest.env'
+
 import type { Config } from 'jest'
 import nextJest from 'next/jest.js'
 
@@ -21,7 +22,7 @@ const customJestConfig: Config = {
   reporters: ['default', 'jest-junit'],
   testPathIgnorePatterns: ['.vscode'],
   coverageReporters: ['json-summary', 'text', 'html', 'lcov'],
-  coveragePathIgnorePatterns: ['node_modules'],
+  coveragePathIgnorePatterns: ['node_modules', 'src/utils/schemas/env.schema.js'],
   coverageThreshold: {
     global: {
       lines: 89,

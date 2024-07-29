@@ -20,7 +20,6 @@ WORKDIR /app
 COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/package-lock.json ./package-lock.json
-# COPY prisma ./prisma/
 
 RUN npm ci
 
@@ -30,17 +29,10 @@ COPY turbo.json turbo.json
 
 # The environment variables are assigned directly to the corresponding build arg
 # NextJs requires these as build args because it bakes them into the generated JavaScript bundles
-ARG APP_ENV
-ENV NEXT_PUBLIC_APP_ENV $APP_ENV
-ARG GTM_ID
-ENV NEXT_PUBLIC_GTM_ID $GTM_ID
+ARG NEXT_PUBLIC_GTM_ID
+ENV NEXT_PUBLIC_GTM_ID $NEXT_PUBLIC_GTM_ID
 
-# ARG TURBO_TOKEN
-# ENV TURBO_TOKEN=$TURBO_TOKEN
-
-RUN ENVIRONMENT_VARIABLE_CHECKS=disabled npm run build --filter=web...
-
-# RUN npx prisma generate
+RUN npm run build --filter=web...
 
 FROM base AS runner
 WORKDIR /app
@@ -58,13 +50,6 @@ COPY --from=installer /app/apps/web/package.json .
 COPY --from=installer --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
 COPY --from=installer --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
 COPY --from=installer --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
-
-# ENVIRONMENT VARIABLES
-# Used at runtime during NextJs SSR (Server side rendering)
-# Any variables not required at build time can be inserted via the task definition generation step in the workflow
-ENV NEXT_PUBLIC_APP_ENV $APP_ENV
-ENV NEXT_PUBLIC_GTM_ID $GTM_ID
-ENV DATABASE_URL = ''
 
 EXPOSE 3000
 

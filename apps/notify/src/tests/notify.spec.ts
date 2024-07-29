@@ -24,7 +24,9 @@ const mockUsers = [
 const mockAssessmentReminders = [Mock.of<Prisma.AssessmentReminderGetPayload<undefined>>({ id: 123 })]
 
 describe('notify', () => {
-  it('should send assessment reminder emails to the appropriate users', async () => {
+  it('should send assessment reminder emails to the appropriate users in prod', async () => {
+    const originalEnv = process.env.APP_ENV
+    process.env.APP_ENV = 'prod'
     jest.mocked(emailService.sendBulkEmail).mockImplementationOnce(async (emails, onSuccess) => {
       await Promise.all(
         emails.map(({ to }) =>
@@ -47,9 +49,9 @@ describe('notify', () => {
         to: email,
         templateData: {
           rdnLink: 'https://www.nihr.ac.uk/explore-nihr/support/clinical-research-network.htm',
-          iconUrl: 'https://test.assessmystudy.nihr.ac.uk/assets/images/exclamation-icon.png',
-          requestSupportLink: 'https://test.assessmystudy.nihr.ac.uk/request-support',
-          signInLink: 'https://test.assessmystudy.nihr.ac.uk/auth/signin',
+          iconUrl: 'https://assessmystudy.nihr.ac.uk/assets/images/exclamation-icon.png',
+          requestSupportLink: 'https://assessmystudy.nihr.ac.uk/request-support',
+          signInLink: 'https://assessmystudy.nihr.ac.uk/auth/signin',
           termsAndConditionsLink:
             'https://www.nihr.ac.uk/documents/researchers/i-need-help-to-deliver-my-research/terms-and-conditions-for-nihr-crn-support.pdf',
         },
@@ -70,6 +72,8 @@ describe('notify', () => {
         messageId: '123',
       },
     })
+
+    process.env.APP_ENV = originalEnv
   })
 
   it('should only send reminders to emails within the allow list if specified', async () => {

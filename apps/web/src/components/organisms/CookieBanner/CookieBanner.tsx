@@ -38,7 +38,7 @@ export function CookieBanner() {
     if (view === CookieBannerView.Accepted || view === CookieBannerView.Rejected) {
       regionRef.current?.focus()
     }
-  }, [router, view])
+  }, [view])
 
   useEffect(() => {
     handleRouteChange()

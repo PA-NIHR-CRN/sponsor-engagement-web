@@ -72,12 +72,25 @@ describe('Successful organisation sponsor contact invitation', () => {
       ],
     })
 
+    const updateUserResponse = {
+      id: 1,
+      name: null,
+      email: body.emailAddress,
+      identityGatewayId: null,
+      registrationToken,
+      registrationConfirmed: false,
+      isDeleted: false,
+      lastLogin: null,
+    }
+
     jest.mocked(prismaClient.organisation.findFirst).mockResolvedValueOnce(findOrgResponse)
 
     const findSysRefRoleMock = jest
       .mocked(prismaClient.sysRefRole.findFirstOrThrow)
       .mockResolvedValueOnce(findSysRefRoleResponse)
     const updateOrgMock = jest.mocked(prismaClient.organisation.update).mockResolvedValueOnce(updateOrgResponse)
+
+    jest.mocked(prismaClient.user.update).mockResolvedValueOnce(updateUserResponse)
 
     const res = await testHandler(api, { method: 'POST', body })
 
@@ -102,8 +115,6 @@ describe('Successful organisation sponsor contact invitation', () => {
               connectOrCreate: {
                 create: {
                   email: body.emailAddress,
-                  registrationConfirmed: false,
-                  registrationToken: 'mocked-token',
                 },
                 where: {
                   email: body.emailAddress,
@@ -121,6 +132,8 @@ describe('Successful organisation sponsor contact invitation', () => {
         email: body.emailAddress,
       },
       data: {
+        registrationConfirmed: false,
+        registrationToken: 'mocked-token',
         roles: {
           // If a user is not assigned the sponsor contact role, assign it
           createMany: {
@@ -157,7 +170,7 @@ describe('Successful organisation sponsor contact invitation', () => {
     expect(res._getRedirectUrl()).toBe(`/organisations/${body.organisationId}?success=1`)
   })
 
-  test('Existing user', async () => {
+  test('Existing user - registration confirmed', async () => {
     const updateOrgResponse = Mock.of<OrganisationWithRelations>({
       id: 2,
       roles: [],
@@ -173,7 +186,20 @@ describe('Successful organisation sponsor contact invitation', () => {
       ],
     })
 
+    const updateUserResponse = {
+      id: 1,
+      name: null,
+      email: body.emailAddress,
+      identityGatewayId: 'mock-gateway-id',
+      registrationToken: null,
+      registrationConfirmed: true,
+      isDeleted: false,
+      lastLogin: null,
+    }
+
+    jest.mocked(prismaClient.user.findUnique).mockResolvedValueOnce(updateUserResponse)
     jest.mocked(prismaClient.organisation.findFirst).mockResolvedValueOnce(findOrgResponse)
+    jest.mocked(prismaClient.user.update).mockResolvedValueOnce(updateUserResponse)
 
     const findSysRefRoleMock = jest
       .mocked(prismaClient.sysRefRole.findFirstOrThrow)
@@ -203,8 +229,6 @@ describe('Successful organisation sponsor contact invitation', () => {
               connectOrCreate: {
                 create: {
                   email: body.emailAddress,
-                  registrationConfirmed: false,
-                  registrationToken: 'mocked-token',
                 },
                 where: {
                   email: body.emailAddress,
@@ -274,6 +298,19 @@ describe('Successful organisation sponsor contact invitation', () => {
       ],
     })
 
+    const updateUserResponse = {
+      id: 1,
+      name: null,
+      email: body.emailAddress,
+      identityGatewayId: 'mock-gateway-id',
+      registrationToken: null,
+      registrationConfirmed: true,
+      isDeleted: false,
+      lastLogin: null,
+    }
+
+    jest.mocked(prismaClient.user.findUnique).mockResolvedValueOnce(updateUserResponse)
+    jest.mocked(prismaClient.user.update).mockResolvedValueOnce(updateUserResponse)
     jest.mocked(prismaClient.organisation.findFirst).mockResolvedValueOnce(findOrgResponse)
 
     const mockUserOrganisation = Mock.of<UserOrganisationWithRelations>({

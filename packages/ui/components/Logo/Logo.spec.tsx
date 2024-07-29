@@ -9,6 +9,13 @@ describe('Logo image', () => {
     const img = getByAltText('National Institute for Health and Care Research logo')
     expect(img).toHaveAttribute('height', '18')
     expect(img).toHaveAttribute('width', '154')
+    expect(img).toHaveAttribute('src', '/example.svg')
+
+    const div = img.parentElement
+    expect(div).toHaveClass('flex items-center gap-2')
+
+    const span = div?.parentElement
+    expect(span).toHaveClass('govuk-header__logotype')
   })
 
   test('Custom class name', () => {
