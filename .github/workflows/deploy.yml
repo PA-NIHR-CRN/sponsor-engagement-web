@@ -81,7 +81,7 @@ jobs:
 
       - name: Generate task definition file from container
         run: |
-          echo "${{ vars.AWS_ECS_TASK_DEFINITION }}" > ./task-definition.json
+          echo '${{ vars.AWS_ECS_TASK_DEFINITION }}' > ./task-definition.json
           cat ./task-definition.json
 
       - name: Fill in the new image ID in the Amazon ECS task definition
