@@ -14,9 +14,9 @@ dotEnvConfig()
 const sendNotifications = async () => {
   assert(process.env.APP_ENV)
 
-  const allowList = process.env.NOTIFY_ALLOW_LIST?.split(',')
+  const allowList = process.env.NOTIFY_ALLOW_LIST?.split(',').filter(Boolean)
 
-  if (process.env.APP_ENV !== 'prod' && !allowList?.length) {
+  if (process.env.APP_ENV !== 'prod' && (!allowList || allowList.length === 0)) {
     logger.error('No allow list provided for non-prod environment')
     return
   }
@@ -25,7 +25,7 @@ const sendNotifications = async () => {
 
   let usersWithStudiesDueAssessment
 
-  if (allowList) {
+  if (allowList && allowList.length > 0) {
     logger.info(
       `notify ${process.env.APP_ENV}: Allow list detected, limiting email sends to ${process.env.NOTIFY_ALLOW_LIST}`
     )
