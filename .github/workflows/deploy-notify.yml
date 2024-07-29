@@ -63,7 +63,7 @@ jobs:
         run: |
           echo "Using registry ${{ env.ECR_REGISTRY }}"
           echo "Tagging image with ${{ env.IMAGE_NAME_TAG}} and ${{ env.IMAGE_SHA_TAG }}"
-          docker build -f apps/notify/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
+          docker build -f apps/notify/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG" >> "$GITHUB_OUTPUT"
 
@@ -78,6 +78,7 @@ jobs:
         run: npm run migrate:deploy
         env:
           DATABASE_URL: ${{ env.CRNCCD_SECRET_DEV_SE_APP_CONFIG_DATABASE_URL }}
+
       - name: Generate task definition file from container
         run: |
           aws ecs describe-task-definition --task-definition crnccd-ecs-dev-se-notify-task-definition --query taskDefinition | jq 'del(.registeredAt,.registeredBy)' > ./task-definition.json
@@ -90,6 +91,7 @@ jobs:
                   .registeredAt,
                   .registeredBy
               )') > ./task-definition.json
+
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
         env:
@@ -105,9 +107,11 @@ jobs:
             NOTIFY_ALLOW_LIST=${{ env.CRNCCD_SECRET_DEV_SE_APP_CONFIG_NOTIFY_ALLOW_LIST }}
             NOTIFY_RESEND_DELAY=${{ env.CRNCCD_SECRET_DEV_SE_APP_CONFIG_NOTIFY_RESEND_DELAY }}
             DATABASE_URL=${{ env.CRNCCD_SECRET_DEV_SE_APP_CONFIG_DATABASE_URL }}
+
       - name: Remove Github Actions IP from RDS security group (Dev)
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
+
       - name: Deploy Amazon ECS scheduled task definition
         env:
           ECS_CLUSTER: crnccd-ecs-dev-se-cluster
@@ -141,9 +145,11 @@ jobs:
         run: |
           response=$(curl -s icanhazip.com)
           echo "ip=$response" >> "$GITHUB_OUTPUT"
+
       - name: Add Github Actions IP to RDS security group (Test)
         run: |
           aws ec2 authorize-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
+
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
         env:
@@ -154,7 +160,7 @@ jobs:
         run: |
           echo "Using registry ${{ env.ECR_REGISTRY }}"
           echo "Tagging image with ${{ env.IMAGE_NAME_TAG}} and ${{ env.IMAGE_SHA_TAG }}"
-          docker build -f apps/notify/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
+          docker build -f apps/notify/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG" >> "$GITHUB_OUTPUT"
 
@@ -169,6 +175,7 @@ jobs:
         run: npm run migrate:deploy
         env:
           DATABASE_URL: ${{ env.CRNCCD_SECRET_TEST_SE_APP_CONFIG_DATABASE_URL }}
+
       - name: Generate task definition file from container
         run: |
           aws ecs describe-task-definition --task-definition crnccd-ecs-test-se-notify-task-definition --query taskDefinition | jq 'del(.registeredAt,.registeredBy)' > ./task-definition.json
@@ -181,6 +188,7 @@ jobs:
                   .registeredAt,
                   .registeredBy
               )') > ./task-definition.json
+
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
         env:
@@ -192,10 +200,11 @@ jobs:
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
           environment-variables: |
-            APP_ENV=${{ vars.APP_ENV }}
-            NOTIFY_ALLOW_LIST=${{ vars.NOTIFY_ALLOW_LIST }}
-            NOTIFY_RESEND_DELAY=${{ vars.NOTIFY_RESEND_DELAY }}
+            APP_ENV=${{ env.CRNCCD_SECRET_TEST_SE_APP_CONFIG_APP_ENV }}
+            NOTIFY_ALLOW_LIST=${{ env.CRNCCD_SECRET_TEST_SE_APP_CONFIG_NOTIFY_ALLOW_LIST }}
+            NOTIFY_RESEND_DELAY=${{ env.CRNCCD_SECRET_TEST_SE_APP_CONFIG_NOTIFY_RESEND_DELAY }}
             DATABASE_URL=${{ env.CRNCCD_SECRET_TEST_SE_APP_CONFIG_DATABASE_URL }}
+
       - name: Remove Github Actions IP from RDS security group (Test)
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
@@ -245,7 +254,7 @@ jobs:
         run: |
           echo "Using registry ${{ env.ECR_REGISTRY }}"
           echo "Tagging image with ${{ env.IMAGE_NAME_TAG}} and ${{ env.IMAGE_SHA_TAG }}"
-          docker build -f apps/notify/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
+          docker build -f apps/notify/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG" >> "$GITHUB_OUTPUT"
 
@@ -283,9 +292,9 @@ jobs:
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
           environment-variables: |
-            APP_ENV=${{ vars.APP_ENV }}
-            NOTIFY_ALLOW_LIST=${{ vars.NOTIFY_ALLOW_LIST }}
-            NOTIFY_RESEND_DELAY=${{ vars.NOTIFY_RESEND_DELAY }}
+            APP_ENV=${{ env.CRNCCS_SECRET_UAT_SE_APP_CONFIG_APP_ENV }}
+            NOTIFY_ALLOW_LIST=${{ env.CRNCCS_SECRET_UAT_SE_APP_CONFIG_NOTIFY_ALLOW_LIST }}
+            NOTIFY_RESEND_DELAY=${{ env.CRNCCS_SECRET_UAT_SE_APP_CONFIG_NOTIFY_RESEND_DELAY }}
             DATABASE_URL=${{ env.CRNCCS_SECRET_UAT_SE_APP_CONFIG_DATABASE_URL }}
       - name: Remove Github Actions IP from RDS security group (Uat)
         run: |
@@ -336,7 +345,7 @@ jobs:
         run: |
           echo "Using registry ${{ env.ECR_REGISTRY }}"
           echo "Tagging image with ${{ env.IMAGE_NAME_TAG}} and ${{ env.IMAGE_SHA_TAG }}"
-          docker build -f apps/notify/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
+          docker build -f apps/notify/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG" >> "$GITHUB_OUTPUT"
 
@@ -374,9 +383,9 @@ jobs:
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
           environment-variables: |
-            APP_ENV=${{ vars.APP_ENV }}
-            NOTIFY_ALLOW_LIST=${{ vars.NOTIFY_ALLOW_LIST }}
-            NOTIFY_RESEND_DELAY=${{ vars.NOTIFY_RESEND_DELAY }}
+            APP_ENV=${{ env.CRNCCP_SECRET_OAT_SE_APP_CONFIG_APP_ENV }}
+            NOTIFY_ALLOW_LIST=${{ env.CRNCCP_SECRET_OAT_SE_APP_CONFIG_NOTIFY_ALLOW_LIST }}
+            NOTIFY_RESEND_DELAY=${{ env.CRNCCP_SECRET_OAT_SE_APP_CONFIG_NOTIFY_RESEND_DELAY }}
             DATABASE_URL=${{ env.CRNCCP_SECRET_OAT_SE_APP_CONFIG_DATABASE_URL }}
       - name: Remove Github Actions IP from RDS security group (Oat)
         run: |
@@ -427,7 +436,7 @@ jobs:
         run: |
           echo "Using registry ${{ env.ECR_REGISTRY }}"
           echo "Tagging image with ${{ env.IMAGE_NAME_TAG}} and ${{ env.IMAGE_SHA_TAG }}"
-          docker build -f apps/notify/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
+          docker build -f apps/notify/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG" >> "$GITHUB_OUTPUT"
 
@@ -465,9 +474,9 @@ jobs:
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
           environment-variables: |
-            APP_ENV=${{ vars.APP_ENV }}
-            NOTIFY_ALLOW_LIST=${{ vars.NOTIFY_ALLOW_LIST }}
-            NOTIFY_RESEND_DELAY=${{ vars.NOTIFY_RESEND_DELAY }}
+            APP_ENV=${{ env.CRNCCP_SECRET_PROD_SE_APP_CONFIG_APP_ENV }}
+            NOTIFY_ALLOW_LIST=${{ env.CRNCCP_SECRET_PROD_SE_APP_CONFIG_NOTIFY_ALLOW_LIST }}
+            NOTIFY_RESEND_DELAY=${{ env.CRNCCP_SECRET_PROD_SE_APP_CONFIG_NOTIFY_RESEND_DELAY }}
             DATABASE_URL=${{ env.CRNCCP_SECRET_PROD_SE_APP_CONFIG_DATABASE_URL }}
       - name: Remove Github Actions IP from RDS security group (Prod)
         run: |

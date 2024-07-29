@@ -28,7 +28,6 @@ jobs:
     environment: DEV
     name: 'Deploy Dev'
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
 
@@ -143,6 +142,7 @@ jobs:
       - name: Add Github Actions IP to RDS security group (Test)
         run: |
           aws ec2 authorize-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
+
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
         env:
@@ -153,13 +153,14 @@ jobs:
         run: |
           echo "Using registry ${{ env.ECR_REGISTRY }}"
           echo "Tagging image with ${{ env.IMAGE_NAME_TAG}} and ${{ env.IMAGE_SHA_TAG }}"
-          docker build -f apps/web/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} --build-arg GTM_ID=${{ secrets.GTM_ID_DEV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
+          docker build -f apps/web/Dockerfile --build-arg GTM_ID=${{ env.CRNCCD_SECRET_TEST_SE_APP_CONFIG_NEXT_PUBLIC_GTM_ID }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG" >> "$GITHUB_OUTPUT"
+
       - name: Run database migrations
         run: npm run migrate:deploy
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ env.CRNCCD_SECRET_TEST_SE_APP_CONFIG_DATABASE_URL }}
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
@@ -172,29 +173,14 @@ jobs:
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
           environment-variables: |
-            APP_ENV=${{ vars.APP_ENV }}
-            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            AWS_REGION=${{ env.AWS_REGION }}
+            AWS_SECRET_NAME=${{ vars.AWS_SECRET_NAME }}
             NEXTAUTH_URL=${{ vars.NEXTAUTH_URL }}
-            NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
-            NEXTAUTH_IDLE_TIMEOUT=${{ vars.NEXTAUTH_IDLE_TIMEOUT }}
-            NEXTAUTH_SESSION_EXPIRY=${{ vars.NEXTAUTH_SESSION_EXPIRY }}
-            NEXTAUTH_DEBUG=${{ vars.NEXTAUTH_DEBUG }}
-            AUTH_CLIENT_ID=${{ secrets.AUTH_CLIENT_ID }}
-            AUTH_CLIENT_SECRET=${{ secrets.AUTH_CLIENT_SECRET }}
-            AUTH_WELL_KNOWN_URL=${{ vars.AUTH_WELL_KNOWN_URL }}
-            IDG_API_URL=${{ vars.IDG_API_URL }}
-            IDG_API_USERNAME=${{ secrets.IDG_API_USERNAME }}
-            IDG_API_PASSWORD=${{ secrets.IDG_API_PASSWORD }}
-            NEXT_PUBLIC_GTM_ID=${{ secrets.GTM_ID_DEV }}
-            CONTENTFUL_BANNER_ENTRY_ID=${{ env.CRNCCD_SECRET_TEST_SE_APP_CONFIG_CONTENTFUL_BANNER_ENTRY_ID }}
-            CONTENTFUL_SPACE_ID=${{ env.CRNCCD_SECRET_TEST_SE_APP_CONFIG_CONTENTFUL_SPACE_ID }}
-            CONTENTFUL_ACCESS_TOKEN=${{ env.CRNCCD_SECRET_TEST_SE_APP_CONFIG_CONTENTFUL_ACCESS_TOKEN }}
-            CONTENTFUL_ENVIRONMENT=${{ env.CRNCCD_SECRET_TEST_SE_APP_CONFIG_CONTENTFUL_ENVIRONMENT }}
-            CONTENTFUL_PREVIEW_MODE=${{ env.CRNCCD_SECRET_TEST_SE_APP_CONFIG_CONTENTFUL_PREVIEW_MODE }}
-            CONTENTFUL_PREVIEW_ACCESS_TOKEN=${{ env.CRNCCD_SECRET_TEST_SE_APP_CONFIG_CONTENTFUL_PREVIEW_ACCESS_TOKEN }}
+            
       - name: Remove Github Actions IP from RDS security group (Test)
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
+
       - name: Deploy Amazon ECS task definition
         env:
           ECS_SERVICE: crnccd-ecs-test-se-service
@@ -214,16 +200,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+
     - uses: actions/setup-node@v4
       with:
         node-version: 20
+
     - name: Install dependencies
       run: npm ci
+
     - name: Install Playwright
       run: npx playwright install --with-deps
+
     - name: Install Playwright dependencies
       working-directory: ./packages/qa
       run: npm i
+
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
@@ -236,12 +227,15 @@ jobs:
       run: |
         response=$(curl -s icanhazip.com)
         echo "ip=$response" >> "$GITHUB_OUTPUT"
+
     - name: Add Github Actions IP to LB security group (Test)
       run: |
           aws ec2 authorize-security-group-ingress --group-id ${{ secrets.LB_SG_TEST }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 443, "ToPort": 443, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for SE automation test run"}]}]'
+
     - name: Add Github Actions IP to RDS security group (Test)
       run: |
           aws ec2 authorize-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for SE automation DB requests"}]}]'
+
     - name: Run All SE E2E Tests
       working-directory: ./packages/qa
       if: github.event.inputs.test-tag == '' || github.event.inputs.test-tag == 'all'
@@ -256,6 +250,7 @@ jobs:
           SPONSOR_CONTACT_MANAGER_PASS: ${{ secrets.SPONSOR_CONTACT_MANAGER_PASS }}
           CONTACT_MANAGER_PASS: ${{ secrets.CONTACT_MANAGER_PASS }}
           SE_NO_LOCAL_ACCOUNT_PASS: ${{ secrets.SE_NO_LOCAL_ACCOUNT_PASS }}
+
     - name: Run Tag Specific SE E2E Tests
       working-directory: ./packages/qa
       if: github.event.inputs.test-tag != '' && github.event.inputs.test-tag != 'all'
@@ -270,12 +265,15 @@ jobs:
           SPONSOR_CONTACT_MANAGER_PASS: ${{ secrets.SPONSOR_CONTACT_MANAGER_PASS }}
           CONTACT_MANAGER_PASS: ${{ secrets.CONTACT_MANAGER_PASS }}
           SE_NO_LOCAL_ACCOUNT_PASS: ${{ secrets.SE_NO_LOCAL_ACCOUNT_PASS }}
+          
     - name: Remove Github Actions IP from LB security group (Test)
       run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.LB_SG_TEST }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 443, "ToPort": 443, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for SE automation test run"}]}]'
+
     - name: Remove Github Actions IP from LB security group (Test)
       run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for SE automation DB requests"}]}]'
+
     - name: Upload HTML Report as artifact
       uses: actions/upload-artifact@v3
       if: always()
@@ -283,6 +281,7 @@ jobs:
         name: test-report
         path: ./packages/qa/test-report/
         retention-days: 3
+
     - name: 'Download HTML Report Artifact'
       uses: actions/download-artifact@v3
       id: download
@@ -318,7 +317,6 @@ jobs:
     environment: UAT
     name: 'Deploy Uat'
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
 
@@ -345,9 +343,11 @@ jobs:
         run: |
           response=$(curl -s icanhazip.com)
           echo "ip=$response" >> "$GITHUB_OUTPUT"
+
       - name: Add Github Actions IP to RDS security group (Uat)
         run: |
           aws ec2 authorize-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
+
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
         env:
@@ -358,13 +358,15 @@ jobs:
         run: |
           echo "Using registry ${{ env.ECR_REGISTRY }}"
           echo "Tagging image with ${{ env.IMAGE_NAME_TAG}} and ${{ env.IMAGE_SHA_TAG }}"
-          docker build -f apps/web/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} --build-arg GTM_ID=${{ secrets.GTM_ID_DEV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
+          docker build -f apps/web/Dockerfile --build-arg GTM_ID=${{ env.CRNCCS_SECRET_UAT_SE_APP_CONFIG_NEXT_PUBLIC_GTM_ID }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG" >> "$GITHUB_OUTPUT"
+
       - name: Run database migrations
         run: npm run migrate:deploy
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ env.CRNCCS_SECRET_UAT_SE_APP_CONFIG_DATABASE_URL }}
+
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
         env:
@@ -376,26 +378,10 @@ jobs:
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
           environment-variables: |
-            APP_ENV=${{ vars.APP_ENV }}
-            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            AWS_REGION=${{ env.AWS_REGION }}
+            AWS_SECRET_NAME=${{ vars.AWS_SECRET_NAME }}
             NEXTAUTH_URL=${{ vars.NEXTAUTH_URL }}
-            NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
-            NEXTAUTH_IDLE_TIMEOUT=${{ vars.NEXTAUTH_IDLE_TIMEOUT }}
-            NEXTAUTH_SESSION_EXPIRY=${{ vars.NEXTAUTH_SESSION_EXPIRY }}
-            NEXTAUTH_DEBUG=${{ vars.NEXTAUTH_DEBUG }}
-            AUTH_CLIENT_ID=${{ secrets.AUTH_CLIENT_ID }}
-            AUTH_CLIENT_SECRET=${{ secrets.AUTH_CLIENT_SECRET }}
-            AUTH_WELL_KNOWN_URL=${{ vars.AUTH_WELL_KNOWN_URL }}
-            IDG_API_URL=${{ vars.IDG_API_URL }}
-            IDG_API_USERNAME=${{ secrets.IDG_API_USERNAME }}
-            IDG_API_PASSWORD=${{ secrets.IDG_API_PASSWORD }}
-            NEXT_PUBLIC_GTM_ID=${{ secrets.GTM_ID_DEV }}
-            CONTENTFUL_BANNER_ENTRY_ID=${{ env.CRNCCS_SECRET_UAT_SE_APP_CONFIG_CONTENTFUL_BANNER_ENTRY_ID }}
-            CONTENTFUL_SPACE_ID=${{ env.CRNCCS_SECRET_UAT_SE_APP_CONFIG_CONTENTFUL_SPACE_ID }}
-            CONTENTFUL_ACCESS_TOKEN=${{ env.CRNCCS_SECRET_UAT_SE_APP_CONFIG_CONTENTFUL_ACCESS_TOKEN }}
-            CONTENTFUL_ENVIRONMENT=${{ env.CRNCCS_SECRET_UAT_SE_APP_CONFIG_CONTENTFUL_ENVIRONMENT }}
-            CONTENTFUL_PREVIEW_MODE=${{ env.CRNCCS_SECRET_UAT_SE_APP_CONFIG_CONTENTFUL_PREVIEW_MODE }}
-            CONTENTFUL_PREVIEW_ACCESS_TOKEN=${{ env.CRNCCS_SECRET_UAT_SE_APP_CONFIG_CONTENTFUL_PREVIEW_ACCESS_TOKEN }}
+
       - name: Remove Github Actions IP from RDS security group (Uat)
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
@@ -455,13 +441,13 @@ jobs:
         run: |
           echo "Using registry ${{ env.ECR_REGISTRY }}"
           echo "Tagging image with ${{ env.IMAGE_NAME_TAG}} and ${{ env.IMAGE_SHA_TAG }}"
-          docker build -f apps/web/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} --build-arg GTM_ID=${{ secrets.GTM_ID_DEV }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
+          docker build -f apps/web/Dockerfile --build-arg GTM_ID=${{ env.CRNCCP_SECRET_OAT_SE_APP_CONFIG_NEXT_PUBLIC_GTM_ID }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG" >> "$GITHUB_OUTPUT"
       - name: Run database migrations
         run: npm run migrate:deploy
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ env.CRNCCP_SECRET_OAT_SE_APP_CONFIG_DATABASE_URL }}
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
@@ -474,26 +460,10 @@ jobs:
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
           environment-variables: |
-            APP_ENV=${{ vars.APP_ENV }}
-            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            AWS_REGION=${{ env.AWS_REGION }}
+            AWS_SECRET_NAME=${{ vars.AWS_SECRET_NAME }}
             NEXTAUTH_URL=${{ vars.NEXTAUTH_URL }}
-            NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
-            NEXTAUTH_IDLE_TIMEOUT=${{ vars.NEXTAUTH_IDLE_TIMEOUT }}
-            NEXTAUTH_SESSION_EXPIRY=${{ vars.NEXTAUTH_SESSION_EXPIRY }}
-            NEXTAUTH_DEBUG=${{ vars.NEXTAUTH_DEBUG }}
-            AUTH_CLIENT_ID=${{ secrets.AUTH_CLIENT_ID }}
-            AUTH_CLIENT_SECRET=${{ secrets.AUTH_CLIENT_SECRET }}
-            AUTH_WELL_KNOWN_URL=${{ vars.AUTH_WELL_KNOWN_URL }}
-            IDG_API_URL=${{ vars.IDG_API_URL }}
-            IDG_API_USERNAME=${{ secrets.IDG_API_USERNAME }}
-            IDG_API_PASSWORD=${{ secrets.IDG_API_PASSWORD }}
-            NEXT_PUBLIC_GTM_ID=${{ secrets.GTM_ID_DEV }}
-            CONTENTFUL_BANNER_ENTRY_ID=${{ env.CRNCCP_SECRET_OAT_SE_APP_CONFIG_CONTENTFUL_BANNER_ENTRY_ID }}
-            CONTENTFUL_SPACE_ID=${{ env.CRNCCP_SECRET_OAT_SE_APP_CONFIG_CONTENTFUL_SPACE_ID }}
-            CONTENTFUL_ACCESS_TOKEN=${{ env.CRNCCP_SECRET_OAT_SE_APP_CONFIG_CONTENTFUL_ACCESS_TOKEN }}
-            CONTENTFUL_ENVIRONMENT=${{ env.CRNCCP_SECRET_OAT_SE_APP_CONFIG_CONTENTFUL_ENVIRONMENT }}
-            CONTENTFUL_PREVIEW_MODE=${{ env.CRNCCP_SECRET_OAT_SE_APP_CONFIG_CONTENTFUL_PREVIEW_MODE }}
-            CONTENTFUL_PREVIEW_ACCESS_TOKEN=${{ env.CRNCCP_SECRET_OAT_SE_APP_CONFIG_CONTENTFUL_PREVIEW_ACCESS_TOKEN }}
+
       - name: Remove Github Actions IP from RDS security group (Oat)
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'
@@ -553,13 +523,13 @@ jobs:
         run: |
           echo "Using registry ${{ env.ECR_REGISTRY }}"
           echo "Tagging image with ${{ env.IMAGE_NAME_TAG}} and ${{ env.IMAGE_SHA_TAG }}"
-          docker build -f apps/web/Dockerfile --build-arg APP_ENV=${{ vars.APP_ENV }} --build-arg GTM_ID=${{ secrets.GTM_ID_PROD }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
+          docker build -f apps/web/Dockerfile --build-arg GTM_ID=${{ env.CRNCCP_SECRET_PROD_SE_APP_CONFIG_NEXT_PUBLIC_GTM_ID }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG" >> "$GITHUB_OUTPUT"
       - name: Run database migrations
         run: npm run migrate:deploy
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ env.CRNCCP_SECRET_PROD_SE_APP_CONFIG_DATABASE_URL }}
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
@@ -572,26 +542,10 @@ jobs:
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
           environment-variables: |
-            APP_ENV=${{ vars.APP_ENV }}
-            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            AWS_REGION=${{ env.AWS_REGION }}
+            AWS_SECRET_NAME=${{ vars.AWS_SECRET_NAME }}
             NEXTAUTH_URL=${{ vars.NEXTAUTH_URL }}
-            NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
-            NEXTAUTH_IDLE_TIMEOUT=${{ vars.NEXTAUTH_IDLE_TIMEOUT }}
-            NEXTAUTH_SESSION_EXPIRY=${{ vars.NEXTAUTH_SESSION_EXPIRY }}
-            NEXTAUTH_DEBUG=${{ vars.NEXTAUTH_DEBUG }}
-            AUTH_CLIENT_ID=${{ secrets.AUTH_CLIENT_ID }}
-            AUTH_CLIENT_SECRET=${{ secrets.AUTH_CLIENT_SECRET }}
-            AUTH_WELL_KNOWN_URL=${{ vars.AUTH_WELL_KNOWN_URL }}
-            IDG_API_URL=${{ vars.IDG_API_URL }}
-            IDG_API_USERNAME=${{ secrets.IDG_API_USERNAME }}
-            IDG_API_PASSWORD=${{ secrets.IDG_API_PASSWORD }}
-            NEXT_PUBLIC_GTM_ID=${{ secrets.GTM_ID_PROD }}
-            CONTENTFUL_BANNER_ENTRY_ID=${{ env.CRNCCP_SECRET_PROD_SE_APP_CONFIG_CONTENTFUL_BANNER_ENTRY_ID }}
-            CONTENTFUL_SPACE_ID=${{ env.CRNCCP_SECRET_PROD_SE_APP_CONFIG_CONTENTFUL_SPACE_ID }}
-            CONTENTFUL_ACCESS_TOKEN=${{ env.CRNCCP_SECRET_PROD_SE_APP_CONFIG_CONTENTFUL_ACCESS_TOKEN }}
-            CONTENTFUL_ENVIRONMENT=${{ env.CRNCCP_SECRET_PROD_SE_APP_CONFIG_CONTENTFUL_ENVIRONMENT }}
-            CONTENTFUL_PREVIEW_MODE=${{ env.CRNCCP_SECRET_PROD_SE_APP_CONFIG_CONTENTFUL_PREVIEW_MODE }}
-            CONTENTFUL_PREVIEW_ACCESS_TOKEN=${{ env.CRNCCP_SECRET_PROD_SE_APP_CONFIG_CONTENTFUL_PREVIEW_ACCESS_TOKEN }}
+
       - name: Remove Github Actions IP from RDS security group (Prod)
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for Sponsor Engagement automation DB migration"}]}]'

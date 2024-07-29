@@ -23,23 +23,51 @@ const sendNotifications = async () => {
 
   const resendDelay = process.env.NOTIFY_RESEND_DELAY ? Number(process.env.NOTIFY_RESEND_DELAY) : 7
 
-  const usersWithStudiesDueAssessment = await prismaClient.user.findMany({
-    where: {
-      ...(allowList && { email: { in: allowList } }),
-      organisations: {
-        some: {
-          organisation: { studies: { some: { study: { isDueAssessment: true, isDeleted: false }, isDeleted: false } } },
-          isDeleted: false,
+  let usersWithStudiesDueAssessment
+
+  if (allowList) {
+    logger.info(
+      `notify ${process.env.APP_ENV}: Allow list detected, limiting email sends to ${process.env.NOTIFY_ALLOW_LIST}`
+    )
+    usersWithStudiesDueAssessment = await prismaClient.user.findMany({
+      where: {
+        email: { in: allowList },
+        organisations: {
+          some: {
+            organisation: {
+              studies: { some: { study: { isDueAssessment: true, isDeleted: false }, isDeleted: false } },
+            },
+            isDeleted: false,
+          },
+        },
+        // Check for recent successful sends to prevent duplicate emails being sent on re-runs
+        assessmentReminders: {
+          none: {
+            AND: [{ sentAt: { not: null } }, { sentAt: { gte: dayjs().subtract(resendDelay, 'days').toDate() } }],
+          },
         },
       },
-      // Check for recent successful sends to prevent duplicate emails being sent on re-runs
-      assessmentReminders: {
-        none: {
-          AND: [{ sentAt: { not: null } }, { sentAt: { gte: dayjs().subtract(resendDelay, 'days').toDate() } }],
+    })
+  } else {
+    usersWithStudiesDueAssessment = await prismaClient.user.findMany({
+      where: {
+        organisations: {
+          some: {
+            organisation: {
+              studies: { some: { study: { isDueAssessment: true, isDeleted: false }, isDeleted: false } },
+            },
+            isDeleted: false,
+          },
+        },
+        // Check for recent successful sends to prevent duplicate emails being sent on re-runs
+        assessmentReminders: {
+          none: {
+            AND: [{ sentAt: { not: null } }, { sentAt: { gte: dayjs().subtract(resendDelay, 'days').toDate() } }],
+          },
         },
       },
-    },
-  })
+    })
+  }
 
   if (usersWithStudiesDueAssessment.length === 0) {
     logger.info('No assessment notifications required')

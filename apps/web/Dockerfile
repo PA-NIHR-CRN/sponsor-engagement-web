@@ -51,12 +51,6 @@ COPY --from=installer --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
 COPY --from=installer --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
 COPY --from=installer --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
 
-# ENVIRONMENT VARIABLES
-# Used at runtime during NextJs SSR (Server side rendering)
-# Any variables not required at build time can be inserted via the task definition generation step in the workflow
-# ENV NEXT_PUBLIC_GTM_ID $NEXT_PUBLIC_GTM_ID
-# ENV DATABASE_URL = ''
-
 EXPOSE 3000
 
 ENV PORT 3000
