@@ -332,7 +332,8 @@ const setAssessmentDue = async (lapsePeriodMonths: number) => {
 }
 
 const fetchStudies = async function* (url: string, username: string, password: string) {
-  // TODO get this at run time from secrets manager
+  logger.info(`ingest ${process.env.APP_ENV}: fetching studies from ${url}`)
+
   const pageSize = 250
   let pageNumber = 1
   let totalStudies = 0
