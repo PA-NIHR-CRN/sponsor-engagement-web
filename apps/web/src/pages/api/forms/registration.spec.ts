@@ -35,10 +35,14 @@ describe('Successful registration', () => {
   const mockLocalUserId = faker.number.int()
   const mockIdentityGatewayId = faker.string.uuid()
   const mockPassword = faker.string.numeric(12)
+  const mockFirstName = 'First'
+  const mockLastName = 'Last'
   const body: RegistrationInputs = {
     registrationToken: '789',
     password: mockPassword,
     confirmPassword: mockPassword,
+    firstName: mockFirstName,
+    lastName: mockLastName,
   }
 
   beforeEach(() => {
@@ -90,6 +94,8 @@ describe('Failed registration - validation errors', () => {
     registrationToken: '789',
     password: '1234567689123',
     confirmPassword: '1234567689123',
+    firstName: 'test',
+    lastName: 'test',
   }
 
   beforeEach(() => {
@@ -99,7 +105,13 @@ describe('Failed registration - validation errors', () => {
   test('Passwords do not match', async () => {
     const res = await testHandler(api, {
       method: 'POST',
-      body: { ...body, password: 'this_password_is___', confirmPassword: 'not_the_same___' },
+      body: {
+        ...body,
+        password: 'this_password_is___',
+        confirmPassword: 'not_the_same___',
+        firstName: 'test',
+        lastName: 'test',
+      },
     })
     expect(res.statusCode).toBe(302)
     expect(res._getRedirectUrl()).toBe(
@@ -119,7 +131,7 @@ describe('Failed registration - validation errors', () => {
   test('Password is less than 12 characters', async () => {
     const res = await testHandler(api, {
       method: 'POST',
-      body: { ...body, password: 'notenough', confirmPassword: 'notenough' },
+      body: { ...body, password: 'notenough', confirmPassword: 'notenough', firstName: 'test', lastName: 'test' },
     })
     expect(res.statusCode).toBe(302)
     expect(res._getRedirectUrl()).toBe(
@@ -152,7 +164,13 @@ describe('Failed registration - validation errors', () => {
   test('Password contains a £ character', async () => {
     const res = await testHandler(api, {
       method: 'POST',
-      body: { ...body, password: 'the_password_contains_a_£', confirmPassword: 'the_password_contains_a_£' },
+      body: {
+        ...body,
+        password: 'the_password_contains_a_£',
+        confirmPassword: 'the_password_contains_a_£',
+        firstName: 'test',
+        lastName: 'test',
+      },
     })
     expect(res.statusCode).toBe(302)
     expect(res._getRedirectUrl()).toBe(
@@ -173,15 +191,67 @@ describe('Failed registration - validation errors', () => {
       ])
     )
   })
+
+  test('First name is not entered', async () => {
+    const res = await testHandler(api, {
+      method: 'POST',
+      body: { ...body, firstName: '', lastName: 'Doe' },
+    })
+    expect(res.statusCode).toBe(302)
+    expect(res._getRedirectUrl()).toBe(
+      `/register?firstNameError=First+name+is+required&registrationToken=${body.registrationToken}`
+    )
+    expect(logger.error).toHaveBeenCalledWith(
+      new ZodError([
+        {
+          code: 'too_small',
+          minimum: 1,
+          type: 'string',
+          inclusive: true,
+          exact: false,
+          message: 'First name is required',
+          path: ['firstName'],
+        },
+      ])
+    )
+  })
+
+  test('Last name is not entered', async () => {
+    const res = await testHandler(api, {
+      method: 'POST',
+      body: { ...body, firstName: 'John', lastName: '' },
+    })
+    expect(res.statusCode).toBe(302)
+    expect(res._getRedirectUrl()).toBe(
+      `/register?lastNameError=Last+name+is+required&registrationToken=${body.registrationToken}`
+    )
+    expect(logger.error).toHaveBeenCalledWith(
+      new ZodError([
+        {
+          code: 'too_small',
+          minimum: 1,
+          type: 'string',
+          inclusive: true,
+          exact: false,
+          message: 'Last name is required',
+          path: ['lastName'],
+        },
+      ])
+    )
+  })
 })
 
 describe('Failed registration - application errors', () => {
   const mockEmail = faker.internet.email()
   const mockPassword = faker.string.numeric(12)
+  const mockFirstName = 'First'
+  const mockLastName = 'Last'
   const body: RegistrationInputs = {
     registrationToken: '789',
     password: mockPassword,
     confirmPassword: mockPassword,
+    firstName: mockFirstName,
+    lastName: mockLastName,
   }
 
   beforeEach(() => {

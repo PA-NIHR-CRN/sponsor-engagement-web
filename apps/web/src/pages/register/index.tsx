@@ -79,6 +79,22 @@ export default function Register({ query, registrationToken }: RegisterProps) {
             <Fieldset legend="Set a password for your NIHR Identity Gateway account">
               <TextInput
                 className="govuk-input--width-20 flex-grow"
+                defaultValue={defaultValues?.firstName}
+                errors={errors}
+                label="First name"
+                type="text"
+                {...register('firstName')}
+              />
+              <TextInput
+                className="govuk-input--width-20 flex-grow"
+                defaultValue={defaultValues?.lastName}
+                errors={errors}
+                label="Last name"
+                type="text"
+                {...register('lastName')}
+              />
+              <TextInput
+                className="govuk-input--width-20 flex-grow"
                 defaultValue={defaultValues?.password}
                 errors={errors}
                 label="Create your password"
