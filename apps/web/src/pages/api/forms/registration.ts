@@ -27,7 +27,7 @@ export default async (req: ExtendedNextApiRequest, res: NextApiResponse) => {
       throw new Error('Wrong method')
     }
 
-    const { password, registrationToken } = registrationSchema.parse(req.body)
+    const { password, registrationToken, firstName, lastName } = registrationSchema.parse(req.body)
 
     // Find contact information associated with the given registrationToken
     const user = await prismaClient.user.findFirst({
@@ -41,8 +41,13 @@ export default async (req: ExtendedNextApiRequest, res: NextApiResponse) => {
       throw new Error(`No email found associated with the registrationToken ${registrationToken}`)
     }
 
+    const givenName = firstName
+    const familyName = lastName
+
     // Create a new user in IDG
     const createUserResponse = await authService.createUser({
+      givenName,
+      familyName,
       password,
       emails: [user.email],
     })

@@ -7,6 +7,8 @@ export type RegistrationInputs = z.infer<typeof registrationSchema>
 export const registrationSchema = z
   .object({
     registrationToken: z.string(),
+    firstName: z.string().min(1, { message: 'First name is required' }),
+    lastName: z.string().min(1, { message: 'Last name is required' }),
     password: z
       .string()
       .min(PASSWORD_MIN_LENGTH, { message: 'Enter a minimum of 12 characters' })
