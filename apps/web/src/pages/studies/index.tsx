@@ -186,8 +186,11 @@ export default function Studies({
                   Sponsors can view all of their studies included in the RDN portfolio by clicking the button below.
                 </p>
                 <a
+                  aria-label="Access dashboard (Opens in a new tab)"
                   className="govuk-button mb-0"
                   href="https://sense.odp.nihr.ac.uk/sense/app/5726efde-5ca6-45a9-a600-7b3178760ed6/overview"
+                  rel="noopener noreferrer"
+                  target="_blank"
                 >
                   Access dashboard
                 </a>
