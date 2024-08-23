@@ -55,9 +55,7 @@ export default function Studies({
   const router = useRouter()
 
   const { isLoading, handleFilterChange } = useFormListeners()
-  console.log('user: ', user)
   const isOdpUser = user.wso2Roles.includes('ODP_SponsorEngagementTool')
-
   const titleResultsText =
     totalItems === 0
       ? `(no matching search results)`
