@@ -46,6 +46,7 @@ const renderNotificationBanner = (success: boolean) =>
 export type StudiesProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
 export default function Studies({
+  user,
   studies,
   meta: { totalItems, totalItemsDue, initialPage, initialPageSize },
   filters,
@@ -54,6 +55,8 @@ export default function Studies({
   const router = useRouter()
 
   const { isLoading, handleFilterChange } = useFormListeners()
+  console.log('user: ', user)
+  const isOdpUser = user.wso2Roles.includes('ODP_SponsorEngagementTool')
 
   const titleResultsText =
     totalItems === 0
@@ -166,18 +169,32 @@ export default function Studies({
           )}
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
-          <div className="lg:sticky top-4">
+          <Card className="mt-4" data-testid="export-study-data" filled padding={4}>
+            <h3 className="govuk-heading-m">Download study data</h3>
+            <p>
+              This download is a snapshot of all the information held within the Sponsor Engagement Tool for the
+              sponsor/delegate organisation.
+            </p>
+            <a className="govuk-button mb-0" href="/api/export">
+              Download
+            </a>
+          </Card>
+          <div className="lg:sticky top-4 mt-4">
             <RequestSupport />
-            <Card className="mt-4" data-testid="export-study-data" filled padding={4}>
-              <h3 className="govuk-heading-m">Download study data</h3>
-              <p>
-                This download is a snapshot of all the information held within the Sponsor Engagement Tool for the
-                sponsor/delegate organisation.
-              </p>
-              <a className="govuk-button mb-0" href="/api/export">
-                Download
-              </a>
-            </Card>
+            {isOdpUser ? (
+              <Card className="mt-4" data-testid="export-study-data" filled padding={4}>
+                <h3 className="govuk-heading-m">Access Sponsor RDN Portfolio Dashboard</h3>
+                <p>
+                  Sponsors can view all of their studies included in the RDN portfolio by clicking the button below.
+                </p>
+                <a
+                  className="govuk-button mb-0"
+                  href="https://sense.odp.nihr.ac.uk/sense/app/5726efde-5ca6-45a9-a600-7b3178760ed6/overview"
+                >
+                  Access dashboard
+                </a>
+              </Card>
+            ) : null}
           </div>
         </div>
       </div>

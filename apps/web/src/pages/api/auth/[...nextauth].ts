@@ -173,6 +173,7 @@ export const authOptions: AuthOptions = {
         const roles = await prismaClient.userRole.findMany({ where: { userId, isDeleted: false } })
         session.user.roles = roles.map((role) => role.roleId)
         session.user.organisations = await getUserOrganisations(userId)
+        session.user.wso2Roles = []
 
         return session
       } catch (error) {
