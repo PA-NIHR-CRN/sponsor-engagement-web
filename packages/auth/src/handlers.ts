@@ -8,6 +8,7 @@ import {
   getUserResponseSchema,
   createUserResponseSchema,
   refreshTokenResponseSchema,
+  updateGroupResponseSchema,
 } from './schemas'
 
 const { IDG_API_URL, IDG_API_USERNAME, IDG_API_PASSWORD } = process.env
@@ -120,7 +121,7 @@ export const requests = {
       throw new Error(`Failed to retrieve user with email: ${email}`)
     }
 
-    const user = userResponse.data?.Resources?.[0]
+    const user = userResponse.data.Resources?.[0]
 
     if (!user) {
       throw new Error(`No user found with email: ${email}`)
@@ -144,7 +145,8 @@ export const requests = {
     }
 
     const response = await api.patch(`/scim2/Groups/${role}`, roleUpdateData)
+    const validatedResponse = updateGroupResponseSchema.parse(response.data)
 
-    return response.data
+    return validatedResponse
   },
 }

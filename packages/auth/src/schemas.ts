@@ -117,3 +117,23 @@ export const createUserResponseSchema = z.union([
     userName: z.string(),
   }),
 ])
+
+export const updateGroupResponseSchema = z.object({
+  displayName: z.string(),
+  meta: z.object({
+    created: z.string(),
+    location: z.string(),
+    lastModified: z.string(),
+  }),
+  schemas: z.array(z.string()),
+  members: z
+    .array(
+      z.object({
+        display: z.string(),
+        value: z.string(),
+        $ref: z.string(),
+      })
+    )
+    .optional(),
+  id: z.string(),
+})
