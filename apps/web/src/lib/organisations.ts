@@ -142,3 +142,28 @@ export const getUserOrganisationById = async (userOrganisationId: number) => {
 
   return userOrganisation
 }
+
+export const getUserWithRolesAndOrgs = async (userId: number) => {
+  return prismaClient.user.findUnique({
+    where: { id: userId },
+    include: {
+      roles: {
+        where: { isDeleted: false },
+        select: { roleId: true },
+      },
+      organisations: {
+        include: {
+          organisation: {
+            include: {
+              roles: {
+                select: {
+                  role: { select: { name: true } },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+}

@@ -50,4 +50,15 @@ export class AuthService {
   }) {
     return requests.createUser(user)
   }
+
+  /**
+   *
+   * @param userId Assigns new wso2 role to user
+   * @param userName
+   * @param role
+   * @returns
+   */
+  async assignUserRole(email: string, role: string) {
+    return requests.assignUserRole(email, role)
+  }
 }

@@ -28,3 +28,7 @@ export enum Roles {
 }
 
 export const PASSWORD_MIN_LENGTH = 12
+
+export const ODP_ROLE = 'ODP_SponsorEngagementTool'
+
+export const ODP_ROLE_GROUP_ID = 'd6500611-5cf5-4230-8695-5a63329e2648'

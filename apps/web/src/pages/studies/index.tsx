@@ -21,7 +21,7 @@ import {
 } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
 import CmsNotificationBanner from '@/components/organisms/CmsNotificationBanner/CmsNotificationBanner'
-import { Roles, STUDIES_PER_PAGE } from '@/constants'
+import { ODP_ROLE, Roles, STUDIES_PER_PAGE } from '@/constants'
 import { SUPPORT_PAGE } from '@/constants/routes'
 import { useFormListeners } from '@/hooks/useFormListeners'
 import { getNotificationBanner } from '@/lib/contentful/contentfulService'
@@ -55,7 +55,7 @@ export default function Studies({
   const router = useRouter()
 
   const { isLoading, handleFilterChange } = useFormListeners()
-  const isOdpUser = user.wso2Roles.includes('ODP_SponsorEngagementTool')
+  const isOdpUser = user.wso2Roles.includes(ODP_ROLE)
   const titleResultsText =
     totalItems === 0
       ? `(no matching search results)`
