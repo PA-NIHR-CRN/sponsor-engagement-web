@@ -6,8 +6,7 @@ export interface StudyListProps {
   sponsorOrgName?: string
   supportOrgName?: string
   shortTitle: string
-  shortTitleHref: string
-  assessmentHref: string
+  studyHref: string
   lastAsessmentDate?: string
   assessmentDue?: boolean
   trackStatus?: string
@@ -19,8 +18,7 @@ export function StudyList({
   sponsorOrgName,
   supportOrgName,
   shortTitle,
-  shortTitleHref,
-  assessmentHref,
+  studyHref,
   assessmentDue,
   trackStatus,
   trackStatusHref,
@@ -37,12 +35,9 @@ export function StudyList({
           {Boolean(supportOrgName) && ` (${supportOrgName})`}
         </div>
 
-        <Link
-          className="govuk-link--no-visited-state govuk-heading-s govuk-!-margin-bottom-4 govuk-!-padding-top-0 inline-block"
-          href={shortTitleHref}
-        >
+        <div className="govuk-heading-s govuk-!-margin-bottom-4 govuk-!-padding-top-0 inline-block font-extrabold">
           {shortTitle}
-        </Link>
+        </div>
       </div>
 
       <div className="sm:flex sm:justify-between lg:justify-normal sm:gap-3">
@@ -74,8 +69,8 @@ export function StudyList({
         </div>
 
         <div className="text-right lg:w-full">
-          <Link className="govuk-button w-auto govuk-!-margin-bottom-0" href={assessmentHref}>
-            Assess
+          <Link className="govuk-button w-auto govuk-!-margin-bottom-0" href={studyHref}>
+            View study
           </Link>
         </div>
       </div>
