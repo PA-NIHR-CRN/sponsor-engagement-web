@@ -58,7 +58,18 @@ export class AuthService {
    * @param role - New wso2 role
    * @returns
    */
-  async assignUserRole(email: string, role: string) {
-    return requests.assignUserRole(email, role)
+  async assignWSO2UserRole(email: string, role: string) {
+    return requests.assignWSO2UserRole(email, role)
+  }
+
+  /**
+   *
+   * @param userId - wso2 role to remove
+   * @param userName - wso2 username
+   * @param role - wso2 role
+   * @returns
+   */
+  async removeWSO2UserRole(email: string, role: string) {
+    return requests.removeWSO2UserRole(email, role)
   }
 }

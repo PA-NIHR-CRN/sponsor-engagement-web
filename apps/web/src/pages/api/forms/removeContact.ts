@@ -1,3 +1,4 @@
+import { authService } from '@nihr-ui/auth'
 import { emailService } from '@nihr-ui/email'
 import { logger } from '@nihr-ui/logger'
 import { emailTemplates } from '@nihr-ui/templates/sponsor-engagement'
@@ -12,6 +13,14 @@ import { withApiHandler } from '@/utils/withApiHandler'
 
 export interface ExtendedNextApiRequest extends NextApiRequest {
   body: OrganisationRemoveContactInputs
+}
+
+export async function removeWSO2UserRole(email: string, role: string) {
+  try {
+    await authService.removeWSO2UserRole(email, role)
+  } catch (roleError) {
+    logger.error(`Failed to remove role ${role} from user ${email}: ${roleError}`)
+  }
 }
 
 export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, async (req, res, session) => {
@@ -31,6 +40,8 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
     const {
       user: { id: contactManagerUserId },
     } = session
+
+    // check for and remove odp role
 
     // Remove user from organisation
     const { user, organisation } = await prismaClient.userOrganisation.update({

@@ -23,7 +23,7 @@ import { registrationSchema } from '@/utils/schemas'
 
 export async function assignRoleToUser(email: string, role: string) {
   try {
-    await authService.assignUserRole(email, role)
+    await authService.assignWSO2UserRole(email, role)
   } catch (roleError) {
     logger.error(`Failed to assign role ${role} to user ${email}: ${roleError}`)
   }
