@@ -1,41 +1,45 @@
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
+import { AuthService } from './auth-service'
 import type { z } from 'zod'
 import { faker } from '@faker-js/faker'
-import { AuthService } from './auth-service'
-import type {
+import {
   checkSessionResponseSchema,
   createUserResponseSchema,
   getUserResponseSchema,
   refreshTokenResponseSchema,
+  updateGroupResponseSchema,
 } from './schemas'
-
-Object.defineProperty(globalThis, 'crypto', {
-  value: {
-    randomUUID: jest.fn(() => 'random-id'),
-  },
-})
+import { requests } from './handlers'
 
 describe('AuthService', () => {
   let authService: AuthService
-
-  process.env.IDG_API_URL = 'https://dev.id.nihr.ac.uk'
+  type UserResponseType = z.infer<typeof getUserResponseSchema>
 
   const USERS_API_URL = 'https://dev.id.nihr.ac.uk/scim2/Users'
   const TOKEN_API_URL = 'https://dev.id.nihr.ac.uk/oauth2/token'
   const INTROSPECT_API_URL = 'https://dev.id.nihr.ac.uk/oauth2/introspect'
+  const GROUPS_API_URL = 'https://dev.id.nihr.ac.uk/scim2/Groups'
 
   const mockGetUserResponse: z.infer<typeof getUserResponseSchema> = {
+    schemas: ['urn:ietf:params:scim:api:messages:2.0:ListResponse'],
     totalResults: 1,
     startIndex: 1,
     itemsPerPage: 1,
-    schemas: ['urn:ietf:params:scim:api:messages:2.0:ListResponse'],
     Resources: [
       {
         id: '2c2aa0a8-59d4-40c7-9f3d-3a310bb03f49',
         userName: '01a87546-0e8e-4e78-a326-719cde27f49f',
       },
     ],
+  }
+
+  const mockEmptyGetUserResponse: z.infer<typeof getUserResponseSchema> = {
+    schemas: ['urn:ietf:params:scim:api:messages:2.0:ListResponse'],
+    totalResults: 0,
+    startIndex: 1,
+    itemsPerPage: 0,
+    Resources: [],
   }
 
   const mockCreateUserResponse: z.infer<typeof createUserResponseSchema> = {
@@ -80,11 +84,35 @@ describe('AuthService', () => {
     username: faker.string.alpha(),
   }
 
+  const mockUpdateGroupResponse: z.infer<typeof updateGroupResponseSchema> = {
+    schemas: ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+    id: 'd6500611-5cf5-4230-8695-5a63329e2648',
+    displayName: 'ODP_SponsorEngagementTool',
+    meta: {
+      created: new Date().toISOString(),
+      location: 'https://dev.id.nihr.ac.uk/scim2/Groups/d6500611-5cf5-4230-8695-5a63329e2648',
+      lastModified: new Date().toISOString(),
+    },
+    members: [
+      {
+        value: 'eb9d56dc-5b0e-4fb9-983a-ffbe018c7d5e',
+        display: '01a87546-0e8e-4e78-a326-719cde27f49f',
+      },
+    ],
+  }
+
   const server = setupServer(
-    rest.get(USERS_API_URL, async (_, res, ctx) => res(ctx.json(mockGetUserResponse))),
+    rest.get(USERS_API_URL, async (req, res, ctx) => {
+      const email = req.url.searchParams.get('filter')?.split(' ')[2]
+      if (email === 'nonexistent@nihr.ac.uk') {
+        return res(ctx.status(200), ctx.json(mockEmptyGetUserResponse))
+      }
+      return res(ctx.json(mockGetUserResponse))
+    }),
     rest.post(USERS_API_URL, async (_, res, ctx) => res(ctx.json(mockCreateUserResponse))),
     rest.post(TOKEN_API_URL, async (_, res, ctx) => res(ctx.json(mockRefreshTokenResponse))),
-    rest.post(INTROSPECT_API_URL, async (_, res, ctx) => res(ctx.json(mockCheckSessionResponse)))
+    rest.post(INTROSPECT_API_URL, async (_, res, ctx) => res(ctx.json(mockCheckSessionResponse))),
+    rest.patch(`${GROUPS_API_URL}/:role`, async (_, res, ctx) => res(ctx.json(mockUpdateGroupResponse)))
   )
 
   beforeAll(() => {
@@ -145,5 +173,79 @@ describe('AuthService', () => {
     if (res.success) {
       expect(res.data).toEqual(mockCreateUserResponse)
     }
+  })
+
+  test('assigning WSO2 user role succeeds', async () => {
+    const res = await authService.assignWSO2UserRole('mockuser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
+
+    expect(res.success).toBeTruthy()
+
+    if (res.success) {
+      expect(res.data).toEqual(mockUpdateGroupResponse)
+    }
+  })
+
+  test('removing WSO2 user role succeeds', async () => {
+    const res = await authService.removeWSO2UserRole('mockuser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
+
+    expect(res.success).toBeTruthy()
+
+    if (res.success) {
+      expect(res.data).toEqual(mockUpdateGroupResponse)
+    }
+  })
+
+  test('assigning WSO2 user role fails when user is not found', async () => {
+    await expect(
+      authService.assignWSO2UserRole('nonexistent@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
+    ).rejects.toThrow('No user found with email: nonexistent@nihr.ac.uk')
+  })
+
+  test('removing WSO2 user role fails when user is not found', async () => {
+    await expect(
+      authService.removeWSO2UserRole('nonexistent@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
+    ).rejects.toThrow('No user found with email: nonexistent@nihr.ac.uk')
+  })
+
+  test('assignWSO2UserRole throws error when getUser fails', async () => {
+    jest.spyOn(requests, 'getUser').mockResolvedValueOnce({
+      success: false,
+    } as any)
+
+    await expect(
+      authService.assignWSO2UserRole('invaliduser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
+    ).rejects.toThrow('Failed to retrieve user with email: invaliduser@nihr.ac.uk')
+  })
+
+  test('removeWSO2UserRole throws error when getUser fails', async () => {
+    jest.spyOn(requests, 'getUser').mockResolvedValueOnce({
+      success: false,
+    } as any)
+
+    await expect(
+      authService.removeWSO2UserRole('invaliduser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
+    ).rejects.toThrow('Failed to retrieve user with email: invaliduser@nihr.ac.uk')
+  })
+
+  test('assignWSO2UserRole throws error when user is undefined in getUser response', async () => {
+    jest.spyOn(requests, 'getUser').mockResolvedValueOnce({
+      success: true,
+      data: mockEmptyGetUserResponse,
+    } as any)
+
+    await expect(
+      authService.assignWSO2UserRole('mockuser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
+    ).rejects.toThrow('No user found with email: mockuser@nihr.ac.uk')
+  })
+
+  test('removeWSO2UserRole throws error when user is undefined in getUser response', async () => {
+    jest.spyOn(requests, 'getUser').mockResolvedValueOnce({
+      success: true,
+      data: mockEmptyGetUserResponse,
+    } as any)
+
+    await expect(
+      authService.removeWSO2UserRole('mockuser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
+    ).rejects.toThrow('No user found with email: mockuser@nihr.ac.uk')
   })
 })

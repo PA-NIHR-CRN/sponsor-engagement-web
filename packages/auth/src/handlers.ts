@@ -145,9 +145,8 @@ export const requests = {
     }
 
     const response = await api.patch(`/scim2/Groups/${role}`, roleUpdateData)
-    const validatedResponse = updateGroupResponseSchema.parse(response.data)
 
-    return validatedResponse
+    return updateGroupResponseSchema.safeParse(response.data)
   },
   removeWSO2UserRole: async (email: string, role: string) => {
     const userResponse = await requests.getUser(email)
@@ -180,8 +179,7 @@ export const requests = {
     }
 
     const response = await api.patch(`/scim2/Groups/${role}`, roleUpdateData)
-    const validatedResponse = updateGroupResponseSchema.parse(response.data)
 
-    return validatedResponse
+    return updateGroupResponseSchema.safeParse(response.data)
   },
 }

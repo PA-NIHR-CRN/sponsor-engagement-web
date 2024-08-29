@@ -71,7 +71,7 @@ export default async (req: ExtendedNextApiRequest, res: NextApiResponse) => {
 
       const { userName: identityGatewayId } = createUserResponse.data
 
-      logger.info('Created user in IDG, updating user in local applicaton')
+      logger.info('Created user in IDG, updating user in local application')
 
       const { id } = await prismaClient.user.update({
         where: {

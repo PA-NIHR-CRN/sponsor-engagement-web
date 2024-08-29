@@ -131,7 +131,6 @@ export const updateGroupResponseSchema = z.object({
       z.object({
         display: z.string(),
         value: z.string(),
-        $ref: z.string(),
       })
     )
     .optional(),
