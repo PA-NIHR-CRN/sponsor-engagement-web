@@ -1,7 +1,8 @@
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
 import { AuthService } from './auth-service'
-import type { z } from 'zod'
+import { ZodError, SafeParseReturnType, z } from 'zod'
+
 import { faker } from '@faker-js/faker'
 import {
   checkSessionResponseSchema,
@@ -12,6 +13,13 @@ import {
 } from './schemas'
 import { requests } from './handlers'
 
+// Define types inferred from Zod schemas
+type GetUserResponse = z.infer<typeof getUserResponseSchema>
+type CreateUserResponse = z.infer<typeof createUserResponseSchema>
+type RefreshTokenResponse = z.infer<typeof refreshTokenResponseSchema>
+type CheckSessionResponse = z.infer<typeof checkSessionResponseSchema>
+type UpdateGroupResponse = z.infer<typeof updateGroupResponseSchema>
+
 describe('AuthService', () => {
   let authService: AuthService
   const USERS_API_URL = 'https://dev.id.nihr.ac.uk/scim2/Users'
@@ -19,7 +27,7 @@ describe('AuthService', () => {
   const INTROSPECT_API_URL = 'https://dev.id.nihr.ac.uk/oauth2/introspect'
   const GROUPS_API_URL = 'https://dev.id.nihr.ac.uk/scim2/Groups'
 
-  const mockGetUserResponse: z.infer<typeof getUserResponseSchema> = {
+  const mockGetUserResponse: GetUserResponse = {
     schemas: ['urn:ietf:params:scim:api:messages:2.0:ListResponse'],
     totalResults: 1,
     startIndex: 1,
@@ -32,7 +40,7 @@ describe('AuthService', () => {
     ],
   }
 
-  const mockEmptyGetUserResponse: z.infer<typeof getUserResponseSchema> = {
+  const mockEmptyGetUserResponse: GetUserResponse = {
     schemas: ['urn:ietf:params:scim:api:messages:2.0:ListResponse'],
     totalResults: 0,
     startIndex: 1,
@@ -40,7 +48,7 @@ describe('AuthService', () => {
     Resources: [],
   }
 
-  const mockCreateUserResponse: z.infer<typeof createUserResponseSchema> = {
+  const mockCreateUserResponse: CreateUserResponse = {
     emails: ['tom4@test.nihr.ac.uk'],
     meta: {
       created: '2023-11-20T20:09:45.305Z',
@@ -62,7 +70,7 @@ describe('AuthService', () => {
     userName: '01a87546-0e8e-4e78-a326-719cde27f49f',
   }
 
-  const mockRefreshTokenResponse: z.infer<typeof refreshTokenResponseSchema> = {
+  const mockRefreshTokenResponse: RefreshTokenResponse = {
     access_token: faker.string.uuid(),
     expires_in: Number(faker.date.future()),
     id_token: faker.string.uuid(),
@@ -71,7 +79,7 @@ describe('AuthService', () => {
     token_type: faker.string.alpha(),
   }
 
-  const mockCheckSessionResponse: z.infer<typeof checkSessionResponseSchema> = {
+  const mockCheckSessionResponse: CheckSessionResponse = {
     active: true,
     nbf: faker.number.int(),
     scope: faker.string.alpha(),
@@ -82,7 +90,7 @@ describe('AuthService', () => {
     username: faker.string.alpha(),
   }
 
-  const mockUpdateGroupResponse: z.infer<typeof updateGroupResponseSchema> = {
+  const mockUpdateGroupResponse: UpdateGroupResponse = {
     schemas: ['urn:ietf:params:scim:schemas:core:2.0:Group'],
     id: 'd6500611-5cf5-4230-8695-5a63329e2648',
     displayName: 'ODP_SponsorEngagementTool',
@@ -206,9 +214,14 @@ describe('AuthService', () => {
   })
 
   test('assignWSO2UserRole throws error when getUser fails', async () => {
-    jest.spyOn(requests, 'getUser').mockResolvedValueOnce({
+    const mockZodError = new ZodError([])
+
+    const mockFailureResponse: SafeParseReturnType<any, any> = {
       success: false,
-    } as any)
+      error: mockZodError,
+    }
+
+    jest.spyOn(requests, 'getUser').mockResolvedValueOnce(mockFailureResponse)
 
     await expect(
       authService.assignWSO2UserRole('invaliduser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
@@ -216,9 +229,14 @@ describe('AuthService', () => {
   })
 
   test('removeWSO2UserRole throws error when getUser fails', async () => {
-    jest.spyOn(requests, 'getUser').mockResolvedValueOnce({
+    const mockZodError = new ZodError([])
+
+    const mockFailureResponse: SafeParseReturnType<any, any> = {
       success: false,
-    } as any)
+      error: mockZodError,
+    }
+
+    jest.spyOn(requests, 'getUser').mockResolvedValueOnce(mockFailureResponse)
 
     await expect(
       authService.removeWSO2UserRole('invaliduser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
@@ -229,7 +247,7 @@ describe('AuthService', () => {
     jest.spyOn(requests, 'getUser').mockResolvedValueOnce({
       success: true,
       data: mockEmptyGetUserResponse,
-    } as any)
+    } as SafeParseReturnType<GetUserResponse, any>)
 
     await expect(
       authService.assignWSO2UserRole('mockuser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
@@ -240,7 +258,7 @@ describe('AuthService', () => {
     jest.spyOn(requests, 'getUser').mockResolvedValueOnce({
       success: true,
       data: mockEmptyGetUserResponse,
-    } as any)
+    } as SafeParseReturnType<GetUserResponse, any>)
 
     await expect(
       authService.removeWSO2UserRole('mockuser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
