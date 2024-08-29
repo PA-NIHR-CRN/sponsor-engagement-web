@@ -1,9 +1,9 @@
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
-import { AuthService } from './auth-service'
-import { ZodError, SafeParseReturnType, z } from 'zod'
-
 import { faker } from '@faker-js/faker'
+import { ZodError } from 'zod'
+import type { z, SafeParseReturnType } from 'zod'
+import { AuthService } from './auth-service'
 import {
   checkSessionResponseSchema,
   createUserResponseSchema,
@@ -19,6 +19,8 @@ type CreateUserResponse = z.infer<typeof createUserResponseSchema>
 type RefreshTokenResponse = z.infer<typeof refreshTokenResponseSchema>
 type CheckSessionResponse = z.infer<typeof checkSessionResponseSchema>
 type UpdateGroupResponse = z.infer<typeof updateGroupResponseSchema>
+type ParsedGetUserResponse = SafeParseReturnType<GetUserResponse, GetUserResponse>
+type ParsedGetUserFailureResponse = SafeParseReturnType<GetUserResponse, ZodError<GetUserResponse>>
 
 describe('AuthService', () => {
   let authService: AuthService
@@ -214,9 +216,9 @@ describe('AuthService', () => {
   })
 
   test('assignWSO2UserRole throws error when getUser fails', async () => {
-    const mockZodError = new ZodError([])
+    const mockZodError = new ZodError<GetUserResponse>([])
 
-    const mockFailureResponse: SafeParseReturnType<any, any> = {
+    const mockFailureResponse: ParsedGetUserFailureResponse = {
       success: false,
       error: mockZodError,
     }
@@ -229,9 +231,9 @@ describe('AuthService', () => {
   })
 
   test('removeWSO2UserRole throws error when getUser fails', async () => {
-    const mockZodError = new ZodError([])
+    const mockZodError = new ZodError<GetUserResponse>([])
 
-    const mockFailureResponse: SafeParseReturnType<any, any> = {
+    const mockFailureResponse: ParsedGetUserFailureResponse = {
       success: false,
       error: mockZodError,
     }
@@ -244,10 +246,12 @@ describe('AuthService', () => {
   })
 
   test('assignWSO2UserRole throws error when user is undefined in getUser response', async () => {
-    jest.spyOn(requests, 'getUser').mockResolvedValueOnce({
+    const mockSuccessResponse: ParsedGetUserResponse = {
       success: true,
       data: mockEmptyGetUserResponse,
-    } as SafeParseReturnType<GetUserResponse, any>)
+    }
+
+    jest.spyOn(requests, 'getUser').mockResolvedValueOnce(mockSuccessResponse)
 
     await expect(
       authService.assignWSO2UserRole('mockuser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
@@ -255,10 +259,12 @@ describe('AuthService', () => {
   })
 
   test('removeWSO2UserRole throws error when user is undefined in getUser response', async () => {
-    jest.spyOn(requests, 'getUser').mockResolvedValueOnce({
+    const mockResponse: ParsedGetUserResponse = {
       success: true,
       data: mockEmptyGetUserResponse,
-    } as SafeParseReturnType<GetUserResponse, any>)
+    }
+
+    jest.spyOn(requests, 'getUser').mockResolvedValueOnce(mockResponse)
 
     await expect(
       authService.removeWSO2UserRole('mockuser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
