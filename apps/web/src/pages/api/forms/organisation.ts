@@ -6,7 +6,7 @@ import { emailTemplates } from '@nihr-ui/templates/sponsor-engagement'
 import type { NextApiRequest } from 'next'
 import { ZodError } from 'zod'
 
-import { ODP_ROLE_GROUP_ID, Roles } from '@/constants'
+import { Roles } from '@/constants'
 import { EXTERNAL_CRN_TERMS_CONDITIONS_URL, EXTERNAL_CRN_URL, SIGN_IN_PAGE, SUPPORT_PAGE } from '@/constants/routes'
 import { getOrganisationById } from '@/lib/organisations'
 import { prismaClient } from '@/lib/prisma'
@@ -26,6 +26,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
     if (req.method !== 'POST') {
       throw new Error('Wrong method')
     }
+    const { ODP_ROLE_GROUP_ID = '' } = process.env
 
     const { emailAddress, organisationId } = organisationAddSchema.parse(req.body)
 
@@ -153,8 +154,8 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
     const savedRegistrationToken = user.registrationToken
 
     if (!isNewUser) {
-      const hasOdpRole = await isUserEligibleForOdpRole(user.id)
-      if (hasOdpRole) {
+      const isEligibleForOdpRole = await isUserEligibleForOdpRole(user.id)
+      if (isEligibleForOdpRole) {
         await assignRoleToUser(user.email, ODP_ROLE_GROUP_ID)
       }
     }

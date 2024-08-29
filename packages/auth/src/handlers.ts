@@ -132,14 +132,13 @@ export const requests = {
       Operations: [
         {
           op: 'add',
-          value: {
-            members: [
-              {
-                display: user.userName, // The user's username
-                value: user.id, // The user's SCIM ID
-              },
-            ],
-          },
+          path: 'members',
+          value: [
+            {
+              display: user.userName, // The user's username
+              value: user.id, // The user's SCIM ID
+            },
+          ],
         },
       ],
     }
@@ -166,14 +165,13 @@ export const requests = {
       Operations: [
         {
           op: 'remove',
-          value: {
-            members: [
-              {
-                display: user.userName, // The user's username
-                value: user.id, // The user's SCIM ID
-              },
-            ],
-          },
+          path: 'members',
+          value: [
+            {
+              display: user.userName, // The user's username
+              value: user.id, // The user's SCIM ID
+            },
+          ],
         },
       ],
     }

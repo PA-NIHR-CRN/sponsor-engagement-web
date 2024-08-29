@@ -3,7 +3,6 @@ import { logger } from '@nihr-ui/logger'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { ZodError } from 'zod'
 
-import { ODP_ROLE_GROUP_ID } from '@/constants'
 import { REGISTRATION_CONFIRMATION_PAGE, REGISTRATION_PAGE } from '@/constants/routes'
 import { getUserWithRolesAndOrgs } from '@/lib/organisations'
 import { prismaClient } from '@/lib/prisma'
@@ -38,6 +37,7 @@ export default async (req: ExtendedNextApiRequest, res: NextApiResponse) => {
     if (req.method !== 'POST') {
       throw new Error('Wrong method')
     }
+    const { ODP_ROLE_GROUP_ID = '' } = process.env
 
     const { password, registrationToken, firstName, lastName } = registrationSchema.parse(req.body)
 
@@ -89,8 +89,8 @@ export default async (req: ExtendedNextApiRequest, res: NextApiResponse) => {
         `Updated local user ${id} with identityGatewayId ${identityGatewayId}, now redirecting to confirmation page`
       )
 
-      const hasOdpRole = await isUserEligibleForOdpRole(id)
-      if (hasOdpRole) {
+      const isEligibleForOdpRole = await isUserEligibleForOdpRole(id)
+      if (isEligibleForOdpRole) {
         await assignRoleToUser(user.email, ODP_ROLE_GROUP_ID)
       }
 

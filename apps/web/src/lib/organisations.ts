@@ -152,12 +152,20 @@ export const getUserWithRolesAndOrgs = async (userId: number) => {
         select: { roleId: true },
       },
       organisations: {
+        where: {
+          isDeleted: false,
+          organisation: {
+            isDeleted: false,
+          },
+        },
         include: {
           organisation: {
             include: {
               roles: {
                 select: {
-                  role: { select: { name: true } },
+                  role: {
+                    select: { name: true },
+                  },
                 },
               },
             },
