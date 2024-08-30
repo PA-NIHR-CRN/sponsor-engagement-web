@@ -55,12 +55,16 @@ export const getUserResponseSchema = z.object({
   Resources: z
     .array(
       z.object({
-        roles: z
+        groups: z
           .array(
-            z.object({
-              type: z.string(),
-              value: z.string(),
-            })
+            z.union([
+              z.object({
+                display: z.string(),
+                value: z.string(),
+                $ref: z.string(),
+              }),
+              z.string(), // To handle cases where "groups" can contain strings like "test"
+            ])
           )
           .optional(),
         id: z.string(),
