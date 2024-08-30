@@ -241,6 +241,7 @@ describe('Session callback', () => {
           email,
           roles: [Roles.SponsorContact, Roles.ContactManager],
           organisations: [mockUserOrganisation],
+          wso2Roles: [],
         },
       })
     )

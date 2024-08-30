@@ -52,7 +52,22 @@ export const getUserResponseSchema = z.object({
   startIndex: z.number(),
   itemsPerPage: z.number(),
   schemas: z.array(z.string()),
-  Resources: z.array(z.object({ id: z.string(), userName: z.string() })).optional(),
+  Resources: z
+    .array(
+      z.object({
+        roles: z
+          .array(
+            z.object({
+              type: z.string(),
+              value: z.string(),
+            })
+          )
+          .optional(),
+        id: z.string(),
+        userName: z.string(),
+      })
+    )
+    .optional(),
 })
 
 export const createUserRequestSchema = z.object({
@@ -102,3 +117,22 @@ export const createUserResponseSchema = z.union([
     userName: z.string(),
   }),
 ])
+
+export const updateGroupResponseSchema = z.object({
+  displayName: z.string(),
+  meta: z.object({
+    created: z.string(),
+    location: z.string(),
+    lastModified: z.string(),
+  }),
+  schemas: z.array(z.string()),
+  members: z
+    .array(
+      z.object({
+        display: z.string(),
+        value: z.string(),
+      })
+    )
+    .optional(),
+  id: z.string(),
+})
