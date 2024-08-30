@@ -25,7 +25,7 @@ const renderNotificationBanner = (success: boolean) =>
   ) : null
 
 const renderBackLink = () => (
-  <div className="ml-8 govuk-!-padding-top-6">
+  <div className="ml-8 govuk-!-padding-top-3">
     <Container>
       <Link className="govuk-back-link" href="/studies">
         All studies
