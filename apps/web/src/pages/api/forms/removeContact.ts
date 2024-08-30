@@ -1,3 +1,4 @@
+import { authService } from '@nihr-ui/auth'
 import { emailService } from '@nihr-ui/email'
 import { logger } from '@nihr-ui/logger'
 import { emailTemplates } from '@nihr-ui/templates/sponsor-engagement'
@@ -10,8 +11,18 @@ import type { OrganisationRemoveContactInputs } from '@/utils/schemas'
 import { organisationRemoveContactSchema } from '@/utils/schemas'
 import { withApiHandler } from '@/utils/withApiHandler'
 
+import { isUserEligibleForOdpRole } from './registration'
+
 export interface ExtendedNextApiRequest extends NextApiRequest {
   body: OrganisationRemoveContactInputs
+}
+
+export async function removeWSO2UserRole(email: string, role: string) {
+  try {
+    await authService.removeWSO2UserRole(email, role)
+  } catch (roleError) {
+    logger.error(`Failed to remove role ${role} from user ${email}: ${roleError}`)
+  }
 }
 
 export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, async (req, res, session) => {
@@ -19,6 +30,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
     if (req.method !== 'POST') {
       throw new Error('Wrong method')
     }
+    const { ODP_ROLE_GROUP_ID = '' } = process.env
 
     const { userOrganisationId } = organisationRemoveContactSchema.parse(req.body)
 
@@ -48,6 +60,11 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
     })
 
     logger.info('Removed contact with email %s from organisation %s', user.email, organisation.name)
+
+    const isEligibleForOdpRole = await isUserEligibleForOdpRole(user.id)
+    if (!isEligibleForOdpRole) {
+      await removeWSO2UserRole(user.email, ODP_ROLE_GROUP_ID)
+    }
 
     if (user.email) {
       await emailService.sendEmail({

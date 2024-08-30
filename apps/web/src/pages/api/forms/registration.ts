@@ -3,7 +3,10 @@ import { logger } from '@nihr-ui/logger'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { ZodError } from 'zod'
 
+import { REGISTRATION_CONFIRMATION_PAGE, REGISTRATION_PAGE } from '@/constants/routes'
+import { getUserWithRolesAndOrgs } from '@/lib/organisations'
 import { prismaClient } from '@/lib/prisma'
+import { isContactManagerAndSponsorContact, isSponsorContact } from '@/utils/auth'
 import type { RegistrationInputs } from '@/utils/schemas'
 import { registrationSchema } from '@/utils/schemas'
 
@@ -17,6 +20,14 @@ import { registrationSchema } from '@/utils/schemas'
  * @param res - The HTTP response object for sending responses.
  */
 
+export async function assignRoleToUser(email: string, role: string) {
+  try {
+    await authService.assignWSO2UserRole(email, role)
+  } catch (roleError) {
+    logger.error(`Failed to assign role ${role} to user ${email}: ${roleError}`)
+  }
+}
+
 export interface ExtendedNextApiRequest extends NextApiRequest {
   body: RegistrationInputs
 }
@@ -26,6 +37,7 @@ export default async (req: ExtendedNextApiRequest, res: NextApiResponse) => {
     if (req.method !== 'POST') {
       throw new Error('Wrong method')
     }
+    const { ODP_ROLE_GROUP_ID = '' } = process.env
 
     const { password, registrationToken, firstName, lastName } = registrationSchema.parse(req.body)
 
@@ -59,7 +71,7 @@ export default async (req: ExtendedNextApiRequest, res: NextApiResponse) => {
 
       const { userName: identityGatewayId } = createUserResponse.data
 
-      logger.info('Created user in IDG, updating user in local applicaton')
+      logger.info('Created user in IDG, updating user in local application')
 
       const { id } = await prismaClient.user.update({
         where: {
@@ -77,7 +89,12 @@ export default async (req: ExtendedNextApiRequest, res: NextApiResponse) => {
         `Updated local user ${id} with identityGatewayId ${identityGatewayId}, now redirecting to confirmation page`
       )
 
-      return res.redirect(302, `/register/confirmation`)
+      const isEligibleForOdpRole = await isUserEligibleForOdpRole(id)
+      if (isEligibleForOdpRole) {
+        await assignRoleToUser(user.email, ODP_ROLE_GROUP_ID)
+      }
+
+      return res.redirect(302, REGISTRATION_CONFIRMATION_PAGE)
     }
 
     throw new Error('Failed to create user in IDG')
@@ -95,10 +112,29 @@ export default async (req: ExtendedNextApiRequest, res: NextApiResponse) => {
       delete fieldErrors.registrationToken
 
       const searchParams = new URLSearchParams({ ...fieldErrors, registrationToken })
-      return res.redirect(302, `/register?${searchParams.toString()}`)
+      return res.redirect(302, `${REGISTRATION_PAGE}?${searchParams.toString()}`)
     }
 
     const searchParams = new URLSearchParams({ fatal: '1', ...(registrationToken && { registrationToken }) })
-    return res.redirect(302, `/register?${searchParams.toString()}`)
+    return res.redirect(302, `${REGISTRATION_PAGE}?${searchParams.toString()}`)
   }
+}
+
+export const isUserEligibleForOdpRole = async (userId: number): Promise<boolean> => {
+  const userWithRolesAndOrgs = await getUserWithRolesAndOrgs(userId)
+
+  if (!userWithRolesAndOrgs) {
+    return false
+  }
+
+  const userRoleIds = userWithRolesAndOrgs.roles.map((role) => role.roleId)
+
+  const hasClinicalResearchSponsorOrganisation = userWithRolesAndOrgs.organisations.some((orgRole) =>
+    orgRole.organisation.roles.some((role) => role.role.name === 'Clinical Research Sponsor')
+  )
+
+  return (
+    (isSponsorContact(userRoleIds) || isContactManagerAndSponsorContact(userRoleIds)) &&
+    hasClinicalResearchSponsorOrganisation
+  )
 }

@@ -48,6 +48,8 @@ declare module 'next-auth' {
 
       /** The organisations associated with the user's local account. */
       organisations: UserOrganisation[]
+
+      wso2Roles: string[]
     } | null
 
     /** Let's the UI know if an error has occured (e.g if refreshing the access token failed) */
