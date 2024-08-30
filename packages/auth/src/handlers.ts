@@ -80,7 +80,7 @@ export const requests = {
       startIndex: 1,
       count: 1,
       domain: 'PRIMARY',
-      attributes: 'userName,roles',
+      attributes: 'userName,groups',
       filter: `emails eq ${email}`,
     }
 
