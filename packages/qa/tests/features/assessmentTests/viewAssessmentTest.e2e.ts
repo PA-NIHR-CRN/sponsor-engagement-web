@@ -62,6 +62,7 @@ test.describe('Access Study Assessment Page and view Summary - @se_29 @se_29_vie
 
   test('As a Sponsor I can access the Study Assessment page via the Study List - @se_29_ac1_listNav', async ({
     studiesPage,
+    studyDetailsPage,
     assessmentPage,
   }) => {
     let studyListItemToClick: number
@@ -72,20 +73,26 @@ test.describe('Access Study Assessment Page and view Summary - @se_29 @se_29_vie
       await studiesPage.goto()
       await studiesPage.assertOnStudiesPage()
     })
-    await test.step(`When I click the Assess button for any Study on the List`, async () => {
+    await test.step(`And I click the View Study button on any Study on the List`, async () => {
       studyListItemToClick = await studiesPage.selectRandomStudyListItemIndex()
-      studyIdSelected = await studiesPage.getStudyIdFromListTitle(studyListItemToClick)
+      studyIdSelected = await studiesPage.getStudyIdFromListViewButton(studyListItemToClick)
       studyDetails =
         await seDatabaseReq(`SELECT Study.shortTitle, Study.title, Organisation.name AS sponsorName FROM Study
-            INNER JOIN StudyOrganisation
-            ON StudyOrganisation.studyId = Study.id 
-            INNER JOIN Organisation
-            ON StudyOrganisation.organisationId = Organisation.id 
-            WHERE Study.id = ${studyIdSelected} AND StudyOrganisation.organisationRoleId = 1;`)
-      studiesPage.assessListButton.nth(studyListItemToClick).click()
+          INNER JOIN StudyOrganisation
+          ON StudyOrganisation.studyId = Study.id 
+          INNER JOIN Organisation
+          ON StudyOrganisation.organisationId = Organisation.id 
+          WHERE Study.id = ${studyIdSelected} AND StudyOrganisation.organisationRoleId = 1;`)
+      studiesPage.viewStudyButton.nth(studyListItemToClick).click()
+    })
+    await test.step(`And I am taken to the Study Details page for Study with SE Id ${studyIdSelected}`, async () => {
+      await studyDetailsPage.assertOnStudyDetailsPage(studyIdSelected.toString())
+    })
+    await test.step(`And I click the Assess button`, async () => {
+      await studyDetailsPage.assessButton.click()
     })
     await test.step(`Then I am taken to the Assessment page for Study with SE Id ${studyIdSelected}`, async () => {
-      await assessmentPage.assertOnAssessmentPageViaStudyList(studyIdSelected)
+      await assessmentPage.assertOnAssessmentPage(studyIdSelected)
     })
     await test.step('And the Expected Introductory Text is displayed benath the Page Title', async () => {
       await assessmentPage.assertIntroText()
@@ -130,39 +137,9 @@ test.describe('Access Study Assessment Page and view Summary - @se_29 @se_29_vie
   })
 
   test('I am returned to the page I came from, when cancelling an Assessment - @se_29_ac4', async ({
-    studiesPage,
     assessmentPage,
     studyDetailsPage,
   }) => {
-    let studyListItemToClick: number
-    let studyIdSelected: string = ''
-    let studyDetails: RowDataPacket[]
-
-    await test.step(`Given I have navigated to the Study List Page`, async () => {
-      await studiesPage.goto()
-      await studiesPage.assertOnStudiesPage()
-    })
-    await test.step(`And I click the Assess button for any Study on the List`, async () => {
-      studyListItemToClick = await studiesPage.selectRandomStudyListItemIndex()
-      studyIdSelected = await studiesPage.getStudyIdFromListTitle(studyListItemToClick)
-      studyDetails =
-        await seDatabaseReq(`SELECT Study.shortTitle, Study.title, Organisation.name AS sponsorName FROM Study
-            INNER JOIN StudyOrganisation
-            ON StudyOrganisation.studyId = Study.id 
-            INNER JOIN Organisation
-            ON StudyOrganisation.organisationId = Organisation.id 
-            WHERE Study.id = ${studyIdSelected} AND StudyOrganisation.organisationRoleId = 1;`)
-      studiesPage.assessListButton.nth(studyListItemToClick).click()
-    })
-    await test.step(`And I am taken to the Assessment page for Study with SE Id ${studyIdSelected}`, async () => {
-      await assessmentPage.assertOnAssessmentPageViaStudyList(studyIdSelected)
-    })
-    await test.step(`When I click the Cancel button`, async () => {
-      await assessmentPage.cancelButton.click()
-    })
-    await test.step(`Then I am returned to the Study List page`, async () => {
-      await studiesPage.assertOnStudiesPage()
-    })
     await test.step(`Given I have navigated to the Study Details Page for Study with SE Id ${startingStudyId}`, async () => {
       await studyDetailsPage.goto(startingStudyId.toString())
       await studyDetailsPage.assertOnStudyDetailsPage(startingStudyId.toString())

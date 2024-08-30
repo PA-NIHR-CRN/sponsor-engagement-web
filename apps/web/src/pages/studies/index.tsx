@@ -22,7 +22,7 @@ import {
 import { RootLayout } from '@/components/organisms'
 import CmsNotificationBanner from '@/components/organisms/CmsNotificationBanner/CmsNotificationBanner'
 import { Roles, STUDIES_PER_PAGE } from '@/constants'
-import { SUPPORT_PAGE } from '@/constants/routes'
+import { STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/routes'
 import { useFormListeners } from '@/hooks/useFormListeners'
 import { getNotificationBanner } from '@/lib/contentful/contentfulService'
 import { getSponsorOrgName, getSupportOrgName } from '@/lib/organisations'
@@ -140,7 +140,7 @@ export default function Studies({
                           lastAsessmentDate={study.lastAssessment ? formatDate(study.lastAssessment.createdAt) : ''}
                           shortTitle={study.shortTitle}
                           sponsorOrgName={getSponsorOrgName(study.organisations)}
-                          studyHref={`/studies/${study.id}`}
+                          studyHref={`${STUDIES_PAGE}/${study.id}`}
                           supportOrgName={getSupportOrgName(study.organisations)}
                           trackStatus={study.lastAssessment?.status.name}
                         />

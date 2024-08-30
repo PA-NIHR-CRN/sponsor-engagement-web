@@ -96,6 +96,7 @@ test.describe('Submit a Study Assessment and Validate Form Inputs - @se_38', () 
   test('Submit Assessment Form via Study List, with required field only, Submission is Successful - @se_38_ac2_list', async ({
     studiesPage,
     assessmentPage,
+    studyDetailsPage,
   }) => {
     await test.step('Given I have navigated to the Studies Page', async () => {
       await studiesPage.goto()
@@ -110,11 +111,17 @@ test.describe('Submit a Study Assessment and Validate Form Inputs - @se_38', () 
     await test.step('And it has a Last Assessment value of `None`', async () => {
       await studiesPage.assertSpecificLastAssessmentValue('None', 0)
     })
-    await test.step(`And I click the Assess button on the Study Item`, async () => {
-      await studiesPage.assessListButton.click()
+    await test.step(`And I click the View Study button on the Study Item`, async () => {
+      await studiesPage.viewStudyButton.click()
+    })
+    await test.step(`And I am taken to the Study Details page for Study with SE Id ${noAssessmentStudyId}`, async () => {
+      await studyDetailsPage.assertOnStudyDetailsPage(noAssessmentStudyId.toString())
+    })
+    await test.step(`And I click the Assess Study button `, async () => {
+      await studyDetailsPage.assessButton.click()
     })
     await test.step(`And I am taken to the Assessment page for Study with SE Id ${noAssessmentStudyId}`, async () => {
-      await assessmentPage.assertOnAssessmentPageViaStudyList(noAssessmentStudyId.toString())
+      await assessmentPage.assertOnAssessmentPage(noAssessmentStudyId.toString())
     })
     await test.step(`When I select the 'Off Track' option`, async () => {
       await assessmentPage.radioButtonOffTrack.check()
