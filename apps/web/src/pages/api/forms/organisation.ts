@@ -15,6 +15,8 @@ import type { OrganisationAddInputs } from '@/utils/schemas'
 import { organisationAddSchema } from '@/utils/schemas'
 import { withApiHandler } from '@/utils/withApiHandler'
 
+import { assignRoleToUser, isUserEligibleForOdpRole } from './registration'
+
 export interface ExtendedNextApiRequest extends NextApiRequest {
   body: OrganisationAddInputs
 }
@@ -24,6 +26,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
     if (req.method !== 'POST') {
       throw new Error('Wrong method')
     }
+    const { ODP_ROLE_GROUP_ID = '' } = process.env
 
     const { emailAddress, organisationId } = organisationAddSchema.parse(req.body)
 
@@ -149,6 +152,13 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
     const isNewUser = Boolean(user.registrationToken) && !user.registrationConfirmed
 
     const savedRegistrationToken = user.registrationToken
+
+    if (!isNewUser) {
+      const isEligibleForOdpRole = await isUserEligibleForOdpRole(user.id)
+      if (isEligibleForOdpRole) {
+        await assignRoleToUser(user.email, ODP_ROLE_GROUP_ID)
+      }
+    }
 
     await emailService.sendEmail({
       to: emailAddress,

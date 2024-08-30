@@ -1,4 +1,4 @@
-import { authService } from '@nihr-ui/auth'
+import { authService, getUserResponseSchema } from '@nihr-ui/auth'
 import { logger } from '@nihr-ui/logger'
 import axios from 'axios'
 import type { AuthOptions } from 'next-auth'
@@ -173,6 +173,18 @@ export const authOptions: AuthOptions = {
         const roles = await prismaClient.userRole.findMany({ where: { userId, isDeleted: false } })
         session.user.roles = roles.map((role) => role.roleId)
         session.user.organisations = await getUserOrganisations(userId)
+        session.user.wso2Roles = []
+
+        const userResponse = await authService.getUser(email)
+
+        if (userResponse.success) {
+          const parsedUserResponse = getUserResponseSchema.safeParse(userResponse.data)
+
+          if (parsedUserResponse.success) {
+            const resources = parsedUserResponse.data.Resources || []
+            session.user.wso2Roles = resources[0]?.roles?.flatMap((role) => role.value.split(',')) || []
+          }
+        }
 
         return session
       } catch (error) {

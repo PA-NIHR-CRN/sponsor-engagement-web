@@ -27,6 +27,7 @@ export const userNoRoles: Session = {
     email: 'testuser@nihr.ac.uk',
     roles: [],
     organisations: [mockUserOrganisation],
+    wso2Roles: [],
   },
 }
 
@@ -38,6 +39,7 @@ export const userNoOrgs: Session = {
     email: 'testuser@nihr.ac.uk',
     roles: [Roles.SponsorContact],
     organisations: [],
+    wso2Roles: [],
   },
 }
 
@@ -49,6 +51,7 @@ export const userWithSponsorContactRole: Session = {
     email: 'testuser@nihr.ac.uk',
     roles: [Roles.SponsorContact],
     organisations: [mockUserOrganisation],
+    wso2Roles: [],
   },
 }
 
@@ -60,6 +63,7 @@ export const userWithContactManagerRole: Session = {
     email: 'testuser@nihr.ac.uk',
     roles: [Roles.ContactManager],
     organisations: [mockUserOrganisation],
+    wso2Roles: [],
   },
 }
 
@@ -71,5 +75,6 @@ export const userWithSponsorContactAndContactManagerRoles: Session = {
     email: 'testuser@nihr.ac.uk',
     roles: [Roles.SponsorContact, Roles.ContactManager],
     organisations: [mockUserOrganisation],
+    wso2Roles: [],
   },
 }

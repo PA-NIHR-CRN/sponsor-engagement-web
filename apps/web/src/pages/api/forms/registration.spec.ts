@@ -66,7 +66,7 @@ describe('Successful registration', () => {
       body,
     })
 
-    expect(logger.info).toHaveBeenCalledWith('Created user in IDG, updating user in local applicaton')
+    expect(logger.info).toHaveBeenCalledWith('Created user in IDG, updating user in local application')
 
     expect(prismaClient.user.update).toHaveBeenCalledWith({
       where: {
