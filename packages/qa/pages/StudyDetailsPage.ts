@@ -87,7 +87,7 @@ export default class StudyDetailsPage {
     })
     this.aboutHeader = page.locator('h3[class="govuk-heading-m govuk-!-margin-bottom-3"]')
     this.aboutSection = page.locator('table[class="govuk-table govuk-!-margin-bottom-3"]')
-    this.guidanceText = page.locator('div[class="w-full"] p').nth(0)
+    this.guidanceText = page.locator('div[class="govuk-inset-text mt-7"]')
     this.sponsorOrgSubTitle = page.locator('span[class="govuk-body-m mb-0 text-darkGrey"]')
     this.progressSummarySubTitle = page.locator('span[class="govuk-body-s text-darkGrey"]')
     this.assessButton = page.locator('a[class="govuk-button w-auto govuk-!-margin-bottom-0"]')
@@ -127,7 +127,9 @@ export default class StudyDetailsPage {
       hasText: 'Actual closure to recruitment date',
     })
     this.tableActualClosureDateValue = this.tableActualClosureDateHeader.locator('..').locator('td')
-    this.tableUkTargetHeader = page.locator('th[scope="row"]', { hasText: 'UK recruitment target' })
+    this.tableUkTargetHeader = page.locator('th[scope="row"]', {
+      hasText: 'UK recruitment target (excluding private site)',
+    })
     this.tableUkTargetValue = this.tableUkTargetHeader.locator('..').locator('td')
     this.tableUkTotalHeader = page.locator('th[scope="row"]', { hasText: 'Total UK recruitment to date' })
     this.tableUkTotalValue = this.tableUkTotalHeader.locator('..').locator('td')
