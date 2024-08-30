@@ -173,7 +173,7 @@ const mockStudy = Mock.of<StudyWithRelations>({
 describe('Study page', () => {
   jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRole)
 
-  test.only('Default layout', async () => {
+  test('Default layout', async () => {
     const originalEnv = process.env.EDIT_STUDY_ALLOW_LIST
     process.env.EDIT_STUDY_ALLOW_LIST = userWithSponsorContactRole.user?.email
 

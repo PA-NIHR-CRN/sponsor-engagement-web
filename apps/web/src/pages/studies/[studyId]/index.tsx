@@ -8,7 +8,7 @@ import type { ReactElement } from 'react'
 import { AssessmentHistory, getAssessmentHistoryFromStudy, RequestSupport, StudyDetails } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
-import { SUPPORT_PAGE } from '@/constants/routes'
+import { ASSESSMENT_PAGE, STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/routes'
 import { getStudyById } from '@/lib/studies'
 import { formatDate } from '@/utils/date'
 import { withServerSideProps } from '@/utils/withServerSideProps'
@@ -69,13 +69,13 @@ export default function Study({ study, assessments, showEditStudyFeature }: Stud
               </div>
             )}
             <div className="flex gap-4">
-              <Link className="govuk-button w-auto govuk-!-margin-bottom-0" href={`/assessments/${study.id}`}>
+              <Link className="govuk-button w-auto govuk-!-margin-bottom-0" href={`${ASSESSMENT_PAGE}/${study.id}`}>
                 Assess study
               </Link>
               {showEditStudyFeature ? (
                 <Link
                   className="govuk-button govuk-button--secondary w-auto govuk-!-margin-bottom-0"
-                  href={`/studies/${study.id}/edit`}
+                  href={`${STUDIES_PAGE}/${study.id}/edit`}
                 >
                   Edit study data
                 </Link>
