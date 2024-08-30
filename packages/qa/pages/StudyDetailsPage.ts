@@ -82,7 +82,7 @@ export default class StudyDetailsPage {
     //Locators
     this.pageTitle = page.locator('h2[class="govuk-heading-l govuk-!-margin-bottom-1"]')
     this.progressHeader = page.locator('h3[class="govuk-heading-m govuk-!-margin-bottom-1 p-0"]', {
-      hasText: 'Progress Summary',
+      hasText: 'Summary of study’s progress (UK)',
     })
     this.progressSection = page.locator('table[class="govuk-table govuk-!-margin-top-3"]')
     this.assessmentHeader = page.locator('h3[class="govuk-heading-m govuk-!-margin-bottom-1 p-0"]', {
