@@ -152,7 +152,7 @@ test.describe('Access Study Details Page and view Summary - @se_26', () => {
       await studyDetailsPage.assertUkTarget(studyProgressDetails[0].sampleSize)
     })
     await test.step('And I can see the Studies UK Recruitment Total', async () => {
-      await studyDetailsPage.assertUkTarget(studyProgressDetails[0].totalRecruitmentToDate)
+      await studyDetailsPage.assertUkTotal(studyProgressDetails[0].totalRecruitmentToDate)
     })
   })
 
