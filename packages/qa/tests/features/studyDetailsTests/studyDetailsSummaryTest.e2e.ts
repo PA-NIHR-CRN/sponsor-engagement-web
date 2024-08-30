@@ -119,12 +119,14 @@ test.describe('Access Study Details Page and view Summary - @se_26', () => {
     })
   })
 
-  test('As a Sponsor I can see the Progress Summary of a Specific Study - @se_26_ac2', async ({ studyDetailsPage }) => {
+  test('As a Sponsor I can see the Summary of study’s progress (UK) of a Specific Study - @se_26_ac2', async ({
+    studyDetailsPage,
+  }) => {
     await test.step(`Given I have navigated to the Study Details Page for a Commercial Study with SE Id ${startingStudyId}`, async () => {
       await studyDetailsPage.goto(startingStudyId.toString())
       await studyDetailsPage.assertOnStudyDetailsPage(startingStudyId.toString())
     })
-    await test.step(`When I view the Section titled 'Progress Summary'`, async () => {
+    await test.step(`When I view the Section titled 'Summary of study’s progress (UK)'`, async () => {
       await studyDetailsPage.assertProgressSummarySectionPresent()
       await studyDetailsPage.assertProgressSummarySectionSubtitle()
     })
@@ -146,11 +148,11 @@ test.describe('Access Study Details Page and view Summary - @se_26', () => {
     await test.step('And I can see the Studies Actual Closure Date', async () => {
       await studyDetailsPage.assertActualClosureDate(studyProgressDetails)
     })
-    await test.step('And I can see the Studies Network Recruitment Target', async () => {
-      await studyDetailsPage.assertNetworkTarget(studyProgressDetails[0].sampleSize)
+    await test.step('And I can see the Studies UK Recruitment Target', async () => {
+      await studyDetailsPage.assertUkTarget(studyProgressDetails[0].sampleSize)
     })
-    await test.step('And I can see the Studies Network Recruitment Total', async () => {
-      await studyDetailsPage.assertNetworkTotal(studyProgressDetails[0].totalRecruitmentToDate)
+    await test.step('And I can see the Studies UK Recruitment Total', async () => {
+      await studyDetailsPage.assertUkTarget(studyProgressDetails[0].totalRecruitmentToDate)
     })
   })
 
@@ -167,7 +169,7 @@ test.describe('Access Study Details Page and view Summary - @se_26', () => {
       await studyDetailsPage.goto(noConcernsStudyId.toString())
       await studyDetailsPage.assertOnStudyDetailsPage(noConcernsStudyId.toString())
     })
-    await test.step(`When I view the Section titled 'Progress Summary'`, async () => {
+    await test.step(`When I view the Section titled 'Summary of study’s progress (UK)'`, async () => {
       await studyDetailsPage.assertProgressSummarySectionPresent()
       await studyDetailsPage.assertProgressSummarySectionSubtitle()
     })
@@ -189,7 +191,7 @@ test.describe('Access Study Details Page and view Summary - @se_26', () => {
       await studyDetailsPage.goto(nullValuesStudyId.toString())
       await studyDetailsPage.assertOnStudyDetailsPage(nullValuesStudyId.toString())
     })
-    await test.step(`When I view the Section titled 'Progress Summary'`, async () => {
+    await test.step(`When I view the Section titled 'Summary of study’s progress (UK)'`, async () => {
       await studyDetailsPage.assertProgressSummarySectionPresent()
       await studyDetailsPage.assertProgressSummarySectionSubtitle()
     })
@@ -202,8 +204,8 @@ test.describe('Access Study Details Page and view Summary - @se_26', () => {
     await test.step('And I can see the Studies Actual Closure Date has a `-` icon', async () => {
       await studyDetailsPage.assertActualClosureDate(nullStudyProgressValues)
     })
-    await test.step('And I can see the Studies Network Recruitment Target has a `-` icon', async () => {
-      await studyDetailsPage.assertNetworkTarget(nullStudyProgressValues[0].sampleSize)
+    await test.step('And I can see the Studies UK Recruitment Target has a `-` icon', async () => {
+      await studyDetailsPage.assertUkTarget(nullStudyProgressValues[0].sampleSize)
     })
   })
 
@@ -220,7 +222,7 @@ test.describe('Access Study Details Page and view Summary - @se_26', () => {
       await studyDetailsPage.goto(estimatedReopenStudyId.toString())
       await studyDetailsPage.assertOnStudyDetailsPage(estimatedReopenStudyId.toString())
     })
-    await test.step(`When I view the Section titled 'Progress Summary'`, async () => {
+    await test.step(`When I view the Section titled 'Summary of study’s progress (UK)'`, async () => {
       await studyDetailsPage.assertProgressSummarySectionPresent()
       await studyDetailsPage.assertProgressSummarySectionSubtitle()
     })
@@ -234,7 +236,7 @@ test.describe('Access Study Details Page and view Summary - @se_26', () => {
       await studyDetailsPage.goto(noConcernsStudyId.toString())
       await studyDetailsPage.assertOnStudyDetailsPage(noConcernsStudyId.toString())
     })
-    await test.step(`When I view the Section titled 'Progress Summary'`, async () => {
+    await test.step(`When I view the Section titled 'Summary of study’s progress (UK)'`, async () => {
       await studyDetailsPage.assertProgressSummarySectionPresent()
       await studyDetailsPage.assertProgressSummarySectionSubtitle()
     })
@@ -251,7 +253,7 @@ test.describe('Access Study Details Page and view Summary - @se_26', () => {
       await studyDetailsPage.goto(nonCommStudyId.toString())
       await studyDetailsPage.assertOnStudyDetailsPage(nonCommStudyId.toString())
     })
-    await test.step(`When I view the Section titled 'Progress Summary'`, async () => {
+    await test.step(`When I view the Section titled 'Summary of study’s progress (UK)'`, async () => {
       await studyDetailsPage.assertProgressSummarySectionPresent()
       await studyDetailsPage.assertProgressSummarySectionSubtitle()
     })
