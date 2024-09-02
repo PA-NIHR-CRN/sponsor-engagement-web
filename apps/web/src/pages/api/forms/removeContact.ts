@@ -4,7 +4,7 @@ import { logger } from '@nihr-ui/logger'
 import { emailTemplates } from '@nihr-ui/templates/sponsor-engagement'
 import type { NextApiRequest } from 'next'
 
-import { Roles } from '@/constants'
+import { Roles, Wso2GroupsOperations } from '@/constants'
 import { getUserOrganisationById } from '@/lib/organisations'
 import { prismaClient } from '@/lib/prisma'
 import type { OrganisationRemoveContactInputs } from '@/utils/schemas'
@@ -19,7 +19,7 @@ export interface ExtendedNextApiRequest extends NextApiRequest {
 
 export async function removeWSO2UserRole(email: string, role: string) {
   try {
-    await authService.removeWSO2UserRole(email, role)
+    await authService.updateWSO2UserRole(email, role, Wso2GroupsOperations.Remove)
   } catch (roleError) {
     logger.error(`Failed to remove role ${role} from user ${email}: ${roleError}`)
   }

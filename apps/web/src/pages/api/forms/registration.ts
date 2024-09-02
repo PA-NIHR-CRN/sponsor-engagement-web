@@ -3,6 +3,7 @@ import { logger } from '@nihr-ui/logger'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { ZodError } from 'zod'
 
+import { Wso2GroupsOperations } from '@/constants'
 import { REGISTRATION_CONFIRMATION_PAGE, REGISTRATION_PAGE } from '@/constants/routes'
 import { getUserWithRolesAndOrgs } from '@/lib/organisations'
 import { prismaClient } from '@/lib/prisma'
@@ -10,19 +11,9 @@ import { isContactManagerAndSponsorContact, isSponsorContact } from '@/utils/aut
 import type { RegistrationInputs } from '@/utils/schemas'
 import { registrationSchema } from '@/utils/schemas'
 
-/**
- * Next.js API route for handling user registration and creation in Identity Gateway (IDG).
- * This route expects a POST request with registration data and validates it.
- * If registration is successful, it creates a new user in IDG and updates the local user data.
- * If registration fails, it redirects back to the registration page with appropriate error messages.
- *
- * @param req - The HTTP request object containing registration data.
- * @param res - The HTTP response object for sending responses.
- */
-
 export async function assignRoleToUser(email: string, role: string) {
   try {
-    await authService.assignWSO2UserRole(email, role)
+    await authService.updateWSO2UserRole(email, role, Wso2GroupsOperations.Add)
   } catch (roleError) {
     logger.error(`Failed to assign role ${role} to user ${email}: ${roleError}`)
   }
@@ -37,11 +28,11 @@ export default async (req: ExtendedNextApiRequest, res: NextApiResponse) => {
     if (req.method !== 'POST') {
       throw new Error('Wrong method')
     }
+
     const { ODP_ROLE_GROUP_ID = '' } = process.env
 
     const { password, registrationToken, firstName, lastName } = registrationSchema.parse(req.body)
 
-    // Find contact information associated with the given registrationToken
     const user = await prismaClient.user.findFirst({
       where: {
         registrationToken,
@@ -56,7 +47,6 @@ export default async (req: ExtendedNextApiRequest, res: NextApiResponse) => {
     const givenName = firstName
     const familyName = lastName
 
-    // Create a new user in IDG
     const createUserResponse = await authService.createUser({
       givenName,
       familyName,
@@ -104,7 +94,6 @@ export default async (req: ExtendedNextApiRequest, res: NextApiResponse) => {
     const { registrationToken } = req.body
 
     if (error instanceof ZodError) {
-      // Create an object containing the Zod validation errors
       const fieldErrors: Record<string, string> = Object.fromEntries(
         error.errors.map(({ path: [fieldId], message }) => [`${fieldId}Error`, message])
       )

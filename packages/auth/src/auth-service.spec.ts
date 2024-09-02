@@ -184,7 +184,11 @@ describe('AuthService', () => {
   })
 
   test('assigning WSO2 user role succeeds', async () => {
-    const res = await authService.assignWSO2UserRole('mockuser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
+    const res = await authService.updateWSO2UserRole(
+      'mockuser@nihr.ac.uk',
+      'd6500611-5cf5-4230-8695-5a63329e2648',
+      'add'
+    )
 
     expect(res.success).toBeTruthy()
 
@@ -194,7 +198,11 @@ describe('AuthService', () => {
   })
 
   test('removing WSO2 user role succeeds', async () => {
-    const res = await authService.removeWSO2UserRole('mockuser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
+    const res = await authService.updateWSO2UserRole(
+      'mockuser@nihr.ac.uk',
+      'd6500611-5cf5-4230-8695-5a63329e2648',
+      'remove'
+    )
 
     expect(res.success).toBeTruthy()
 
@@ -205,13 +213,13 @@ describe('AuthService', () => {
 
   test('assigning WSO2 user role fails when user is not found', async () => {
     await expect(
-      authService.assignWSO2UserRole('nonexistent@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
+      authService.updateWSO2UserRole('nonexistent@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648', 'add')
     ).rejects.toThrow('No user found with email: nonexistent@nihr.ac.uk')
   })
 
   test('removing WSO2 user role fails when user is not found', async () => {
     await expect(
-      authService.removeWSO2UserRole('nonexistent@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
+      authService.updateWSO2UserRole('nonexistent@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648', 'remove')
     ).rejects.toThrow('No user found with email: nonexistent@nihr.ac.uk')
   })
 
@@ -226,7 +234,7 @@ describe('AuthService', () => {
     jest.spyOn(requests, 'getUser').mockResolvedValueOnce(mockFailureResponse)
 
     await expect(
-      authService.assignWSO2UserRole('invaliduser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
+      authService.updateWSO2UserRole('invaliduser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648', 'add')
     ).rejects.toThrow('Failed to retrieve user with email: invaliduser@nihr.ac.uk')
   })
 
@@ -241,7 +249,7 @@ describe('AuthService', () => {
     jest.spyOn(requests, 'getUser').mockResolvedValueOnce(mockFailureResponse)
 
     await expect(
-      authService.removeWSO2UserRole('invaliduser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
+      authService.updateWSO2UserRole('invaliduser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648', 'remove')
     ).rejects.toThrow('Failed to retrieve user with email: invaliduser@nihr.ac.uk')
   })
 
@@ -254,7 +262,7 @@ describe('AuthService', () => {
     jest.spyOn(requests, 'getUser').mockResolvedValueOnce(mockSuccessResponse)
 
     await expect(
-      authService.assignWSO2UserRole('mockuser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
+      authService.updateWSO2UserRole('mockuser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648', 'add')
     ).rejects.toThrow('No user found with email: mockuser@nihr.ac.uk')
   })
 
@@ -267,7 +275,71 @@ describe('AuthService', () => {
     jest.spyOn(requests, 'getUser').mockResolvedValueOnce(mockResponse)
 
     await expect(
-      authService.removeWSO2UserRole('mockuser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
+      authService.updateWSO2UserRole('mockuser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648', 'remove')
     ).rejects.toThrow('No user found with email: mockuser@nihr.ac.uk')
+  })
+
+  test('handles case when userResponse.data is undefined', async () => {
+    const mockResponse: ParsedGetUserResponse = {
+      success: true,
+      data: undefined as unknown as GetUserResponse,
+    }
+
+    jest.spyOn(requests, 'getUser').mockResolvedValueOnce(mockResponse)
+
+    const result = await authService.getUser('mockuser@nihr.ac.uk')
+
+    expect(result).toEqual(mockResponse)
+  })
+
+  test('handles case when userResponse.data.Resources is undefined', async () => {
+    const mockResponse: ParsedGetUserResponse = {
+      success: true,
+      data: {
+        ...mockEmptyGetUserResponse,
+        Resources: undefined,
+      },
+    }
+
+    jest.spyOn(requests, 'getUser').mockResolvedValueOnce(mockResponse)
+
+    const result = await authService.getUser('mockuser@nihr.ac.uk')
+
+    expect(result).toEqual(mockResponse)
+  })
+
+  test('handles case when userResponse.data.Resources is an empty array', async () => {
+    const mockResponse: ParsedGetUserResponse = {
+      success: true,
+      data: {
+        ...mockEmptyGetUserResponse,
+        Resources: [],
+      },
+    }
+
+    jest.spyOn(requests, 'getUser').mockResolvedValueOnce(mockResponse)
+
+    await expect(authService.getUser('mockuser@nihr.ac.uk')).resolves.toEqual(mockResponse)
+  })
+
+  test('returns the first user when userResponse.data.Resources contains users', async () => {
+    const mockResponse: ParsedGetUserResponse = {
+      success: true,
+      data: {
+        ...mockEmptyGetUserResponse,
+        Resources: [
+          {
+            id: 'user-123',
+            userName: 'mockuser',
+          },
+        ],
+      },
+    }
+
+    jest.spyOn(requests, 'getUser').mockResolvedValueOnce(mockResponse)
+
+    const result = await authService.getUser('mockuser@nihr.ac.uk')
+
+    expect(result).toEqual(mockResponse)
   })
 })
