@@ -12,6 +12,7 @@ import {
   AUTH_PROVIDER_NAME,
   AUTH_PROVIDER_TYPE,
   AUTH_SESSION_EXPIRY_FALLBACK,
+  ODP_ROLE,
 } from '@/constants/auth'
 import { getUserOrganisations } from '@/lib/organisations'
 import { prismaClient } from '@/lib/prisma'
@@ -176,13 +177,23 @@ export const authOptions: AuthOptions = {
         session.user.wso2Roles = []
 
         const userResponse = await authService.getUser(email)
-
         if (userResponse.success) {
           const parsedUserResponse = getUserResponseSchema.safeParse(userResponse.data)
 
           if (parsedUserResponse.success) {
             const resources = parsedUserResponse.data.Resources || []
-            session.user.wso2Roles = resources[0]?.roles?.flatMap((role) => role.value.split(',')) || []
+            const groups = resources[0]?.groups || []
+
+            const hasODPSponsorEngagementTool = groups.some((group) => {
+              if (typeof group === 'object' && group.display) {
+                return group.display === ODP_ROLE
+              }
+              return false
+            })
+
+            if (hasODPSponsorEngagementTool) {
+              session.user.wso2Roles.push(ODP_ROLE)
+            }
           }
         }
 
@@ -193,6 +204,7 @@ export const authOptions: AuthOptions = {
         return session
       }
     },
+
     async signIn({ user: { email } }) {
       if (email) {
         try {
