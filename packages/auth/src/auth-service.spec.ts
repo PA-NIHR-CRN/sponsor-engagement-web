@@ -223,7 +223,7 @@ describe('AuthService', () => {
     ).rejects.toThrow('No user found with email: nonexistent@nihr.ac.uk')
   })
 
-  test('assignWSO2UserRole throws error when getUser fails', async () => {
+  test('updateWSO2UserRole throws error when getUser fails', async () => {
     const mockZodError = new ZodError<GetUserResponse>([])
 
     const mockFailureResponse: ParsedGetUserFailureResponse = {
@@ -238,7 +238,7 @@ describe('AuthService', () => {
     ).rejects.toThrow('Failed to retrieve user with email: invaliduser@nihr.ac.uk')
   })
 
-  test('removeWSO2UserRole throws error when getUser fails', async () => {
+  test('updateWSO2UserRole throws error when getUser fails', async () => {
     const mockZodError = new ZodError<GetUserResponse>([])
 
     const mockFailureResponse: ParsedGetUserFailureResponse = {
@@ -253,7 +253,7 @@ describe('AuthService', () => {
     ).rejects.toThrow('Failed to retrieve user with email: invaliduser@nihr.ac.uk')
   })
 
-  test('assignWSO2UserRole throws error when user is undefined in getUser response', async () => {
+  test('updateWSO2UserRole throws error when user is undefined in getUser response', async () => {
     const mockSuccessResponse: ParsedGetUserResponse = {
       success: true,
       data: mockEmptyGetUserResponse,
@@ -266,7 +266,7 @@ describe('AuthService', () => {
     ).rejects.toThrow('No user found with email: mockuser@nihr.ac.uk')
   })
 
-  test('removeWSO2UserRole throws error when user is undefined in getUser response', async () => {
+  test('updateWSO2UserRole throws error when user is undefined in getUser response', async () => {
     const mockResponse: ParsedGetUserResponse = {
       success: true,
       data: mockEmptyGetUserResponse,
@@ -279,20 +279,7 @@ describe('AuthService', () => {
     ).rejects.toThrow('No user found with email: mockuser@nihr.ac.uk')
   })
 
-  test('handles case when userResponse.data is undefined', async () => {
-    const mockResponse: ParsedGetUserResponse = {
-      success: true,
-      data: undefined as unknown as GetUserResponse,
-    }
-
-    jest.spyOn(requests, 'getUser').mockResolvedValueOnce(mockResponse)
-
-    const result = await authService.getUser('mockuser@nihr.ac.uk')
-
-    expect(result).toEqual(mockResponse)
-  })
-
-  test('handles case when userResponse.data.Resources is undefined', async () => {
+  test('updateWSO2UserRole throws an error when Resources is undefined', async () => {
     const mockResponse: ParsedGetUserResponse = {
       success: true,
       data: {
@@ -303,43 +290,8 @@ describe('AuthService', () => {
 
     jest.spyOn(requests, 'getUser').mockResolvedValueOnce(mockResponse)
 
-    const result = await authService.getUser('mockuser@nihr.ac.uk')
-
-    expect(result).toEqual(mockResponse)
-  })
-
-  test('handles case when userResponse.data.Resources is an empty array', async () => {
-    const mockResponse: ParsedGetUserResponse = {
-      success: true,
-      data: {
-        ...mockEmptyGetUserResponse,
-        Resources: [],
-      },
-    }
-
-    jest.spyOn(requests, 'getUser').mockResolvedValueOnce(mockResponse)
-
-    await expect(authService.getUser('mockuser@nihr.ac.uk')).resolves.toEqual(mockResponse)
-  })
-
-  test('returns the first user when userResponse.data.Resources contains users', async () => {
-    const mockResponse: ParsedGetUserResponse = {
-      success: true,
-      data: {
-        ...mockEmptyGetUserResponse,
-        Resources: [
-          {
-            id: 'user-123',
-            userName: 'mockuser',
-          },
-        ],
-      },
-    }
-
-    jest.spyOn(requests, 'getUser').mockResolvedValueOnce(mockResponse)
-
-    const result = await authService.getUser('mockuser@nihr.ac.uk')
-
-    expect(result).toEqual(mockResponse)
+    await expect(
+      authService.updateWSO2UserRole('mockuser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648', 'add')
+    ).rejects.toThrow('No user found with email: mockuser@nihr.ac.uk')
   })
 })

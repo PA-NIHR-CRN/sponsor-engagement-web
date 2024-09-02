@@ -30,22 +30,6 @@ const api = rateLimit(
   }
 )
 
-async function getUserByEmail(email: string) {
-  const userResponse = await requests.getUser(email)
-
-  if (!userResponse.success) {
-    throw new Error(`Failed to retrieve user with email: ${email}`)
-  }
-
-  const user = userResponse.data.Resources?.[0]
-
-  if (!user) {
-    throw new Error(`No user found with email: ${email}`)
-  }
-
-  return user
-}
-
 type Infer<T extends ZodType> = z.infer<T>
 
 /**
@@ -131,7 +115,17 @@ export const requests = {
     return createUserResponseSchema.safeParse(response.data)
   },
   updateWSO2UserRole: async (email: string, role: string, operation: 'add' | 'remove') => {
-    const user = await getUserByEmail(email)
+    const userResponse = await requests.getUser(email)
+
+    if (!userResponse.success) {
+      throw new Error(`Failed to retrieve user with email: ${email}`)
+    }
+
+    const user = userResponse.data.Resources?.[0]
+
+    if (!user) {
+      throw new Error(`No user found with email: ${email}`)
+    }
 
     const roleUpdateData = {
       schemas: ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
