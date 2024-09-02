@@ -8,22 +8,44 @@ import { ErrorInline } from '../ErrorInline/ErrorInline'
 interface TextInputProps extends React.HTMLProps<HTMLInputElement> {
   name: string
   label?: string
+  labelSize?: 's' | 'm' | 'l'
   hint?: ReactNode
   required?: boolean
   errors?: FieldErrors
   autocomplete?: string
   defaultValue?: string
   className?: string
+  labelClassName?: string
+  inputClassName?: string
 }
 
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
-  ({ label, errors, hint, defaultValue, required = true, autocomplete, className, ...rest }, ref) => {
+  (
+    {
+      label,
+      labelSize = 's',
+      errors,
+      hint,
+      defaultValue,
+      required = true,
+      autocomplete,
+      className,
+      labelClassName,
+      inputClassName,
+      ...rest
+    },
+    ref
+  ) => {
     const error = errors?.[rest.name]
     return (
       <div className={clsx('govuk-form-group', { 'govuk-form-group--error': Boolean(error) }, className)}>
         <div className="govuk-label-wrapper">
           {label ? (
-            <label className="govuk-label govuk-label--s" htmlFor={rest.name} id={`${rest.name}-label`}>
+            <label
+              className={clsx('govuk-label', `govuk-label--${labelSize}`, 'govuk-date-input__label', labelClassName)}
+              htmlFor={rest.name}
+              id={`${rest.name}-label`}
+            >
               {label}
             </label>
           ) : null}
@@ -45,7 +67,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           aria-invalid={error ? 'true' : 'false'}
           aria-required={required}
           autoComplete={autocomplete}
-          className={clsx('govuk-input', { 'govuk-input--error': Boolean(error) })}
+          className={clsx('govuk-input', { 'govuk-input--error': Boolean(error) }, inputClassName)}
           defaultValue={defaultValue}
           id={rest.name}
           type="text"

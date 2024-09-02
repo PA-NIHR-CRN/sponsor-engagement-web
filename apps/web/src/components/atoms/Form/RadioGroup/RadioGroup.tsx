@@ -4,12 +4,14 @@ import { Children, cloneElement, forwardRef, isValidElement } from 'react'
 import type { FieldErrors } from 'react-hook-form'
 
 import { ErrorInline } from '../ErrorInline/ErrorInline'
+import type { FieldsetProps } from '../Fieldset/Fieldset'
 import { Fieldset } from '../Fieldset/Fieldset'
 import type { RadioProps } from '../Radio/Radio'
 
 interface RadioGroupProps {
   children: ReactNode
   label?: string
+  labelSize?: FieldsetProps['legendSize']
   name: string
   hint?: ReactNode
   required?: boolean
@@ -18,7 +20,7 @@ interface RadioGroupProps {
 }
 
 export const RadioGroup = forwardRef<HTMLInputElement, RadioGroupProps>(
-  ({ children, label, errors, hint, defaultValue, required = true, ...rest }, ref) => {
+  ({ children, label, labelSize = 's', errors, hint, defaultValue, required = true, ...rest }, ref) => {
     const error = errors[rest.name]
 
     return (
@@ -33,7 +35,7 @@ export const RadioGroup = forwardRef<HTMLInputElement, RadioGroupProps>(
           aria-invalid={error ? 'true' : 'false'}
           aria-required={required}
           legend={label}
-          legendSize="s"
+          legendSize={labelSize}
           role="radiogroup"
         >
           <div className="govuk-radios" data-module="govuk-radios">
