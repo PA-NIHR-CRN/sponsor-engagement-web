@@ -15,15 +15,20 @@ import Warning from '@/components/atoms/Warning/Warning'
 import { RequestSupport } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
+import {
+  COMMERCIAL_GUIDANCE_TEXT,
+  NON_COMMERCIAL_GUIDANCE_TEXT,
+  PAGE_TITLE,
+  studyStatuses,
+} from '@/constants/editStudyForm'
+import { TEXTAREA_MAX_CHARACTERS } from '@/constants/forms'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
 import { getValuesFromSearchParams } from '@/utils/form'
 import type { StudyInputs } from '@/utils/schemas'
 import { studySchema } from '@/utils/schemas'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
-import { COMMERCIAL_GUIDANCE_TEXT, NON_COMMERCIAL_GUIDANCE_TEXT, PAGE_TITLE, studyStatuses } from './constants'
-
-// Dummy content before retrieving data
+// Dummy content to use before retrieving data from API
 const sponsorOrgName: string | undefined = 'F. Hoffmann-La Roche Ltd (FORTREA DEVELOPMENT LIMITED)'
 const shortStudyTitle: string | undefined = 'Study to test safety/efficacy of CIT treatment in NSCLC patients'
 const studyRoute: 'Commercial' | 'Not Commercial ' = 'Commercial'
@@ -31,11 +36,10 @@ const studyRoute: 'Commercial' | 'Not Commercial ' = 'Commercial'
 export type EditStudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
 export default function EditStudy({ query, study }: EditStudyProps) {
-  const { register, formState, setError, handleSubmit, getValues, control } = useForm<StudyInputs>({
+  const { register, formState, setError, handleSubmit, control, watch } = useForm<StudyInputs>({
     resolver: zodResolver(studySchema),
     defaultValues: {
       ...getValuesFromSearchParams(studySchema, query),
-      furtherInformation: 'yes',
       studyId: String(study.id),
     },
   })
@@ -55,7 +59,13 @@ export default function EditStudy({ query, study }: EditStudyProps) {
 
   const { defaultValues } = formState
 
-  console.log({ values: getValues() })
+  // Watch & update the character count for the "Further information" textarea
+  const furtherInformationText = watch('furtherInformation') ?? ''
+  const remainingCharacters =
+    furtherInformationText.length >= TEXTAREA_MAX_CHARACTERS
+      ? 0
+      : TEXTAREA_MAX_CHARACTERS - furtherInformationText.length
+
   return (
     <Container>
       <div className="lg:flex lg:gap-6">
@@ -125,7 +135,6 @@ export default function EditStudy({ query, study }: EditStudyProps) {
                       errors={errors}
                       label="Planned opening to recruitment date"
                       name={name}
-                      // onBlur={onBlur}
                       onChange={onChange}
                       ref={ref}
                       value={value}
@@ -135,30 +144,71 @@ export default function EditStudy({ query, study }: EditStudyProps) {
               />
 
               {/* Actual opening to recruitment date */}
-              {/* <DateInput
-                errors={errors}
-                label="Actual opening to recruitment date"
-                {...register('actualOpeningDate')}
-              /> */}
+              <Controller
+                control={control}
+                name="actualOpeningDate"
+                render={({ field }) => {
+                  const { value, onChange, ref, name } = field
+
+                  return (
+                    <DateInput
+                      errors={errors}
+                      label="Actual opening to recruitment date"
+                      name={name}
+                      onChange={onChange}
+                      ref={ref}
+                      value={value}
+                    />
+                  )
+                }}
+              />
 
               {/* Planned closure to recruitment date */}
-              {/* <DateInput
-                errors={errors}
-                label="Planned closure to recruitment date"
-                {...register('plannedClosureToRecruitmentDate')}
-              /> */}
+              <Controller
+                control={control}
+                name="plannedClosureToRecruitmentDate"
+                render={({ field }) => {
+                  const { value, onChange, ref, name } = field
+
+                  return (
+                    <DateInput
+                      errors={errors}
+                      label="Planned closure to recruitment date"
+                      name={name}
+                      onChange={onChange}
+                      ref={ref}
+                      value={value}
+                    />
+                  )
+                }}
+              />
 
               {/* Actual closure to recruitment date */}
-              {/* <DateInput
-                errors={errors}
-                label="Actual closure to recruitment date"
-                {...register('actualClosureToRecruitmentDate')}
-              /> */}
+              <Controller
+                control={control}
+                name="actualClosureToRecruitmentDate"
+                render={({ field }) => {
+                  const { value, onChange, ref, name } = field
 
+                  return (
+                    <DateInput
+                      errors={errors}
+                      label="Actual closure to recruitment date"
+                      name={name}
+                      onChange={onChange}
+                      ref={ref}
+                      value={value}
+                    />
+                  )
+                }}
+              />
+
+              {/* UK recruitment target */}
               <TextInput
                 defaultValue={defaultValues?.recruitmentTarget}
                 errors={errors}
                 hint="Changes to the UK recruitment target will be committed to CPMS after manual review. "
+                inputClassName="govuk-input--width-10"
                 label="UK recruitment target"
                 labelSize="m"
                 type="number"
@@ -171,12 +221,14 @@ export default function EditStudy({ query, study }: EditStudyProps) {
                 })}
               />
 
+              {/* Further information */}
               <Textarea
                 defaultValue={defaultValues?.furtherInformation}
                 errors={errors}
                 hint="If needed, provide further context or justification for changes made above."
                 label="Further information"
                 labelSize="m"
+                remainingCharacters={remainingCharacters}
                 {...register('furtherInformation')}
               />
 

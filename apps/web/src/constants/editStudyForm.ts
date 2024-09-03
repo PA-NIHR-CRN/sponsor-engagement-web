@@ -1,5 +1,3 @@
-import type { StudyInputs } from '@/utils/schemas'
-
 export const PAGE_TITLE = 'Update study data'
 export const NON_COMMERCIAL_GUIDANCE_TEXT =
   'Changes to study status and UK recruitment target will be committed to CPMS after review. All other changes will be committed directly without manual review.'
@@ -38,13 +36,3 @@ export const studyStatuses = [
     id: '6',
   },
 ]
-
-export const initialValues: Omit<StudyInputs, 'studyId'> = {
-  status: undefined,
-  plannedOpeningDate: undefined,
-  actualOpeningDate: undefined,
-  plannedClosureToRecruitmentDate: undefined,
-  actualClosureToRecruitmentDate: undefined,
-  recruitmentTarget: undefined,
-  furtherInformation: undefined,
-}
