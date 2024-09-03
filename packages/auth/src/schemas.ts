@@ -60,10 +60,10 @@ export const getUserResponseSchema = z.object({
             z.union([
               z.object({
                 display: z.string(),
-                value: z.string(),
-                $ref: z.string(),
+                value: z.string().optional(),
+                $ref: z.string().optional(),
               }),
-              z.string(), // To handle cases where "groups" can contain strings like "test"
+              z.string(),
             ])
           )
           .optional(),
