@@ -9,6 +9,7 @@ import { Controller, useForm } from 'react-hook-form'
 
 import { ErrorSummary, Fieldset, Form, Radio, RadioGroup } from '@/components/atoms'
 import { DateInput } from '@/components/atoms/Form/DateInput/DateInput'
+import { parseISODateIntoParts } from '@/components/atoms/Form/DateInput/utils'
 import { Textarea } from '@/components/atoms/Form/Textarea/Textarea'
 import { TextInput } from '@/components/atoms/Form/TextInput/TextInput'
 import Warning from '@/components/atoms/Warning/Warning'
@@ -130,6 +131,8 @@ export default function EditStudy({ query, study }: EditStudyProps) {
                 render={({ field }) => {
                   const { value, onChange, ref, name } = field
 
+                  const dateValueParts = parseISODateIntoParts(value)
+
                   return (
                     <DateInput
                       errors={errors}
@@ -137,7 +140,7 @@ export default function EditStudy({ query, study }: EditStudyProps) {
                       name={name}
                       onChange={onChange}
                       ref={ref}
-                      value={value}
+                      value={dateValueParts}
                     />
                   )
                 }}
@@ -150,6 +153,8 @@ export default function EditStudy({ query, study }: EditStudyProps) {
                 render={({ field }) => {
                   const { value, onChange, ref, name } = field
 
+                  const dateValueParts = parseISODateIntoParts(value)
+
                   return (
                     <DateInput
                       errors={errors}
@@ -157,7 +162,7 @@ export default function EditStudy({ query, study }: EditStudyProps) {
                       name={name}
                       onChange={onChange}
                       ref={ref}
-                      value={value}
+                      value={dateValueParts}
                     />
                   )
                 }}
@@ -170,6 +175,8 @@ export default function EditStudy({ query, study }: EditStudyProps) {
                 render={({ field }) => {
                   const { value, onChange, ref, name } = field
 
+                  const dateValueParts = parseISODateIntoParts(value)
+
                   return (
                     <DateInput
                       errors={errors}
@@ -177,7 +184,7 @@ export default function EditStudy({ query, study }: EditStudyProps) {
                       name={name}
                       onChange={onChange}
                       ref={ref}
-                      value={value}
+                      value={dateValueParts}
                     />
                   )
                 }}
@@ -190,6 +197,8 @@ export default function EditStudy({ query, study }: EditStudyProps) {
                 render={({ field }) => {
                   const { value, onChange, ref, name } = field
 
+                  const dateValueParts = parseISODateIntoParts(value)
+
                   return (
                     <DateInput
                       errors={errors}
@@ -197,7 +206,7 @@ export default function EditStudy({ query, study }: EditStudyProps) {
                       name={name}
                       onChange={onChange}
                       ref={ref}
-                      value={value}
+                      value={dateValueParts}
                     />
                   )
                 }}

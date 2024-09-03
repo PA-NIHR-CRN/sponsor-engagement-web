@@ -5,40 +5,33 @@ import type { FieldErrors } from 'react-hook-form'
 import { ErrorInline } from '../ErrorInline/ErrorInline'
 import { Fieldset } from '../Fieldset/Fieldset'
 import { TextInput } from '../TextInput/TextInput'
+import type { DateFieldType, DateInputValue } from './utils'
+import { constructISODateFromParts, initialDateInputState } from './utils'
 
 interface DateInputProps {
   label?: string
   name: string
-  value?: string
+  value?: DateInputValue
   required?: boolean
   errors: FieldErrors
   onChange: (value?: string) => void
 }
 
-export const parseIntoDateParts = (date?: string) => {
-  if (!date) return { year: '', month: '', day: '' }
-
-  const [year, month, day] = date.split('-')
-  return { year, month, day }
-}
-
 export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
-  ({ label, errors, required, value = '', onChange, ...rest }, ref) => {
+  ({ label, errors, required, value = { ...initialDateInputState }, onChange, ...rest }, ref) => {
     const error = errors[rest.name]
 
-    const dateInputValue = parseIntoDateParts(value)
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { name, value: inputValue } = e.target
-      const currentDateParts = parseIntoDateParts(value)
+    const handleInputChange = (event: React.FormEvent<HTMLInputElement>, type: DateFieldType) => {
+      const { value: inputValue } = event.currentTarget
 
       const newDate = {
-        ...currentDateParts,
-        [name]: inputValue,
+        ...value,
+        [type]: inputValue,
       }
 
-      const formattedDate = `${newDate.year || ''}-${newDate.month || ''}-${newDate.day || ''}`
+      const formattedDate = constructISODateFromParts(newDate)
 
+      // Reset to undefined if values have been removed
       if (formattedDate === '--') {
         onChange(undefined)
         return
@@ -64,42 +57,51 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
               <TextInput
                 errors={errors}
                 inputClassName="govuk-input--width-2"
+                inputMode="numeric"
                 label="Day"
                 labelClassName="font-normal"
-                onChange={handleInputChange}
+                onChange={(e) => {
+                  handleInputChange(e, 'day')
+                }}
                 ref={ref}
                 required={required}
-                value={dateInputValue.day}
+                value={value.day}
                 {...rest}
-                name="day"
+                name={`${rest.name}-day`}
               />
             </div>
             <div className="govuk-date-input__item">
               <TextInput
                 errors={errors}
                 inputClassName="govuk-input--width-2"
+                inputMode="numeric"
                 label="Month"
                 labelClassName="font-normal"
-                onChange={handleInputChange}
+                onChange={(e) => {
+                  handleInputChange(e, 'month')
+                }}
                 ref={ref}
                 required={required}
-                value={dateInputValue.month}
+                value={value.month}
                 {...rest}
-                name="month"
+                name={`${rest.name}-month`}
               />
             </div>
             <div className="govuk-date-input__item">
               <TextInput
                 errors={errors}
                 inputClassName="govuk-input--width-4"
+                inputMode="numeric"
                 label="Year"
                 labelClassName="font-normal"
-                onChange={handleInputChange}
+                onChange={(e) => {
+                  handleInputChange(e, 'year')
+                }}
                 ref={ref}
                 required={required}
-                value={dateInputValue.year}
+                value={value.year}
                 {...rest}
-                name="year"
+                name={`${rest.name}-year`}
               />
             </div>
           </div>
