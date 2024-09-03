@@ -13,7 +13,7 @@ interface TextInputProps extends React.HTMLProps<HTMLInputElement> {
   required?: boolean
   errors?: FieldErrors
   autocomplete?: string
-  defaultValue?: string
+  defaultValue?: string | number
   className?: string
   labelClassName?: string
   inputClassName?: string

@@ -1,10 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Container } from '@nihr-ui/frontend'
 import clsx from 'clsx'
+import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
 import { type ReactElement, useCallback } from 'react'
 import type { FieldError } from 'react-hook-form'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 
 import { ErrorSummary, Fieldset, Form, Radio, RadioGroup } from '@/components/atoms'
 import { DateInput } from '@/components/atoms/Form/DateInput/DateInput'
@@ -13,28 +14,30 @@ import { TextInput } from '@/components/atoms/Form/TextInput/TextInput'
 import Warning from '@/components/atoms/Warning/Warning'
 import { RequestSupport } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
+import { Roles } from '@/constants'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
+import { getValuesFromSearchParams } from '@/utils/form'
 import type { StudyInputs } from '@/utils/schemas'
-import { assessmentSchema, studySchema } from '@/utils/schemas'
+import { studySchema } from '@/utils/schemas'
+import { withServerSideProps } from '@/utils/withServerSideProps'
 
-import {
-  COMMERCIAL_GUIDANCE_TEXT,
-  initialValues,
-  NON_COMMERCIAL_GUIDANCE_TEXT,
-  PAGE_TITLE,
-  studyStatuses,
-} from './constants'
+import { COMMERCIAL_GUIDANCE_TEXT, NON_COMMERCIAL_GUIDANCE_TEXT, PAGE_TITLE, studyStatuses } from './constants'
 
 // Dummy content before retrieving data
 const sponsorOrgName: string | undefined = 'F. Hoffmann-La Roche Ltd (FORTREA DEVELOPMENT LIMITED)'
 const shortStudyTitle: string | undefined = 'Study to test safety/efficacy of CIT treatment in NSCLC patients'
 const studyRoute: 'Commercial' | 'Not Commercial ' = 'Commercial'
-const studyId = '10633'
 
-export default function EditStudyPage() {
-  const { register, formState, setError, handleSubmit, getValues } = useForm<StudyInputs>({
+export type EditStudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
+
+export default function EditStudy({ query, study }: EditStudyProps) {
+  const { register, formState, setError, handleSubmit, getValues, control } = useForm<StudyInputs>({
     resolver: zodResolver(studySchema),
-    defaultValues: { ...initialValues, studyId: String(studyId) },
+    defaultValues: {
+      ...getValuesFromSearchParams(studySchema, query),
+      furtherInformation: 'yes',
+      studyId: String(study.id),
+    },
   })
 
   const handleFoundError = useCallback(
@@ -45,7 +48,7 @@ export default function EditStudyPage() {
   )
 
   const { errors } = useFormErrorHydration<StudyInputs>({
-    schema: assessmentSchema,
+    schema: studySchema,
     formState,
     onFoundError: handleFoundError,
   })
@@ -89,6 +92,8 @@ export default function EditStudyPage() {
           >
             <ErrorSummary errors={errors} />
 
+            <input type="hidden" {...register('studyId')} defaultValue={defaultValues?.studyId} />
+
             <Fieldset>
               {/* Status */}
               <RadioGroup
@@ -97,7 +102,11 @@ export default function EditStudyPage() {
                 hint="Changes to the study status will be committed to CPMS after manual review."
                 label="Study status"
                 labelSize="m"
-                {...register('status')}
+                {...register('status', {
+                  setValueAs: (value) => {
+                    if (value !== null) return value
+                  },
+                })}
               >
                 {studyStatuses.map((status) => (
                   <Radio hint={status.description} key={status.id} label={status.name} value={status.name} />
@@ -105,41 +114,60 @@ export default function EditStudyPage() {
               </RadioGroup>
 
               {/* Planned opening to recruitment date */}
-              <DateInput
-                errors={errors}
-                label="Planned opening to recruitment date"
-                {...register('plannedOpeningDate', {})}
+              <Controller
+                control={control}
+                name="plannedOpeningDate"
+                render={({ field }) => {
+                  const { value, onChange, ref, name } = field
+
+                  return (
+                    <DateInput
+                      errors={errors}
+                      label="Planned opening to recruitment date"
+                      name={name}
+                      // onBlur={onBlur}
+                      onChange={onChange}
+                      ref={ref}
+                      value={value}
+                    />
+                  )
+                }}
               />
 
               {/* Actual opening to recruitment date */}
-              <DateInput
+              {/* <DateInput
                 errors={errors}
                 label="Actual opening to recruitment date"
                 {...register('actualOpeningDate')}
-              />
+              /> */}
 
               {/* Planned closure to recruitment date */}
-              <DateInput
+              {/* <DateInput
                 errors={errors}
                 label="Planned closure to recruitment date"
                 {...register('plannedClosureToRecruitmentDate')}
-              />
+              /> */}
 
               {/* Actual closure to recruitment date */}
-              <DateInput
+              {/* <DateInput
                 errors={errors}
                 label="Actual closure to recruitment date"
                 {...register('actualClosureToRecruitmentDate')}
-              />
+              /> */}
 
               <TextInput
-                // defaultValue={String(defaultValues?.recruitmentTarget)}
+                defaultValue={defaultValues?.recruitmentTarget}
                 errors={errors}
                 hint="Changes to the UK recruitment target will be committed to CPMS after manual review. "
                 label="UK recruitment target"
                 labelSize="m"
+                type="number"
                 {...register('recruitmentTarget', {
-                  setValueAs: (v: string) => parseInt(v),
+                  setValueAs: (value) => {
+                    if (value === '' || Number.isNaN(Number(value))) return undefined
+
+                    return Number(value)
+                  },
                 })}
               />
 
@@ -160,7 +188,7 @@ export default function EditStudyPage() {
                 <button className={clsx('govuk-button', { 'pointer-events-none': formState.isLoading })} type="submit">
                   Update
                 </button>
-                <Link className="govuk-button govuk-button--secondary" href={`/studies/${studyId}`}>
+                <Link className="govuk-button govuk-button--secondary" href={`/studies/${study.id}`}>
                   Cancel
                 </Link>
               </div>
@@ -176,6 +204,25 @@ export default function EditStudyPage() {
   )
 }
 
-EditStudyPage.getLayout = function getLayout(page: ReactElement) {
+EditStudy.getLayout = function getLayout(page: ReactElement) {
   return <RootLayout heading={PAGE_TITLE}>{page}</RootLayout>
 }
+
+export const getServerSideProps = withServerSideProps(Roles.SponsorContact, (context) => {
+  const studyId = context.query.studyId
+
+  if (!studyId) {
+    return {
+      redirect: {
+        destination: '/404',
+      },
+    }
+  }
+
+  return {
+    props: {
+      query: context.query,
+      study: { id: studyId as string },
+    },
+  }
+})
