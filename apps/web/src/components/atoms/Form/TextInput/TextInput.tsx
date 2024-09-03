@@ -17,6 +17,7 @@ interface TextInputProps extends React.HTMLProps<HTMLInputElement> {
   className?: string
   labelClassName?: string
   inputClassName?: string
+  disabled?: boolean
 }
 
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
@@ -32,6 +33,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
       className,
       labelClassName,
       inputClassName,
+      disabled,
       ...rest
     },
     ref
@@ -61,6 +63,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
             [`${rest.name}-hint`]: hint,
             [`${rest.name}-error`]: error,
           })}
+          aria-disabled={disabled}
           aria-errormessage={clsx({
             [`${rest.name}-error`]: error,
           })}
@@ -69,6 +72,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           autoComplete={autocomplete}
           className={clsx('govuk-input', { 'govuk-input--error': Boolean(error) }, inputClassName)}
           defaultValue={defaultValue}
+          disabled={disabled}
           id={rest.name}
           type="text"
           {...rest}

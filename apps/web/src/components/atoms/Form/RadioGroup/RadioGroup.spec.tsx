@@ -71,3 +71,25 @@ test('Renders correctly with errors and hint', () => {
   const hintElement = getByText(hint)
   expect(hintElement).toBeInTheDocument()
 })
+
+test('Renders correctly in disabled state', () => {
+  const label = 'Radio Group Label'
+  const name = 'radioGroup'
+  const hint = 'Radio group hint'
+  const defaultValue = 'option1'
+
+  const { getByLabelText, getByRole } = render(
+    <RadioGroup defaultValue={defaultValue} disabled errors={{} as FieldErrors} hint={hint} label={label} name={name}>
+      <Radio label="option1" value="option1" />
+    </RadioGroup>
+  )
+
+  const radioElement = getByLabelText('option1') as HTMLInputElement
+  expect(radioElement).toBeInTheDocument()
+  expect(radioElement).toHaveAttribute('aria-disabled', 'true')
+  expect(radioElement).toBeDisabled()
+
+  const fieldSetElement = getByRole('radiogroup', { name: label })
+  expect(fieldSetElement).toBeInTheDocument()
+  expect(fieldSetElement).toHaveAttribute('aria-disabled', 'true')
+})

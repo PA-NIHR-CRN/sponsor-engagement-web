@@ -6,7 +6,7 @@ import { ErrorInline } from '../ErrorInline/ErrorInline'
 import { Fieldset } from '../Fieldset/Fieldset'
 import { TextInput } from '../TextInput/TextInput'
 import type { DateFieldType, DateInputValue } from './utils'
-import { constructISODateFromParts, initialDateInputState } from './utils'
+import { initialDateInputState } from './utils'
 
 interface DateInputProps {
   label?: string
@@ -14,11 +14,12 @@ interface DateInputProps {
   value?: DateInputValue
   required?: boolean
   errors: FieldErrors
-  onChange: (value?: string) => void
+  disabled?: boolean
+  onChange: (value: DateInputValue) => void
 }
 
 export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
-  ({ label, errors, required, value = { ...initialDateInputState }, onChange, ...rest }, ref) => {
+  ({ label, errors, required, value = { ...initialDateInputState }, onChange, disabled, ...rest }, ref) => {
     const error = errors[rest.name]
 
     const handleInputChange = (event: React.FormEvent<HTMLInputElement>, type: DateFieldType) => {
@@ -29,15 +30,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
         [type]: inputValue,
       }
 
-      const formattedDate = constructISODateFromParts(newDate)
-
-      // Reset to undefined if values have been removed
-      if (formattedDate === '--') {
-        onChange(undefined)
-        return
-      }
-
-      onChange(formattedDate)
+      onChange(newDate)
     }
 
     return (
@@ -46,10 +39,13 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
           aria-describedby={clsx({
             [`${rest.name}-error`]: error,
           })}
+          aria-disabled={disabled}
+          disabled={disabled}
           legend={label}
           name={rest.name}
           role="group"
         >
+          {/* Create a function to determine which errors to show */}
           <ErrorInline errors={errors} name={rest.name} />
 
           <div className="govuk-date-input">
@@ -67,6 +63,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 required={required}
                 value={value.day}
                 {...rest}
+                disabled={disabled}
                 name={`${rest.name}-day`}
               />
             </div>
@@ -84,12 +81,13 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 required={required}
                 value={value.month}
                 {...rest}
+                disabled={disabled}
                 name={`${rest.name}-month`}
               />
             </div>
             <div className="govuk-date-input__item">
               <TextInput
-                errors={errors}
+                errors={errors[rest.name] as FieldErrors}
                 inputClassName="govuk-input--width-4"
                 inputMode="numeric"
                 label="Year"
@@ -101,6 +99,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 required={required}
                 value={value.year}
                 {...rest}
+                disabled={disabled}
                 name={`${rest.name}-year`}
               />
             </div>

@@ -9,7 +9,6 @@ import { Controller, useForm } from 'react-hook-form'
 
 import { ErrorSummary, Fieldset, Form, Radio, RadioGroup } from '@/components/atoms'
 import { DateInput } from '@/components/atoms/Form/DateInput/DateInput'
-import { parseISODateIntoParts } from '@/components/atoms/Form/DateInput/utils'
 import { Textarea } from '@/components/atoms/Form/Textarea/Textarea'
 import { TextInput } from '@/components/atoms/Form/TextInput/TextInput'
 import Warning from '@/components/atoms/Warning/Warning'
@@ -118,6 +117,7 @@ export default function EditStudy({ query, study }: EditStudyProps) {
                     if (value !== null) return value
                   },
                 })}
+                disabled
               >
                 {studyStatuses.map((status) => (
                   <Radio hint={status.description} key={status.id} label={status.name} value={status.name} />
@@ -131,8 +131,6 @@ export default function EditStudy({ query, study }: EditStudyProps) {
                 render={({ field }) => {
                   const { value, onChange, ref, name } = field
 
-                  const dateValueParts = parseISODateIntoParts(value)
-
                   return (
                     <DateInput
                       errors={errors}
@@ -140,7 +138,7 @@ export default function EditStudy({ query, study }: EditStudyProps) {
                       name={name}
                       onChange={onChange}
                       ref={ref}
-                      value={dateValueParts}
+                      value={value}
                     />
                   )
                 }}
@@ -153,16 +151,15 @@ export default function EditStudy({ query, study }: EditStudyProps) {
                 render={({ field }) => {
                   const { value, onChange, ref, name } = field
 
-                  const dateValueParts = parseISODateIntoParts(value)
-
                   return (
                     <DateInput
+                      disabled
                       errors={errors}
                       label="Actual opening to recruitment date"
                       name={name}
                       onChange={onChange}
                       ref={ref}
-                      value={dateValueParts}
+                      value={value}
                     />
                   )
                 }}
@@ -175,16 +172,15 @@ export default function EditStudy({ query, study }: EditStudyProps) {
                 render={({ field }) => {
                   const { value, onChange, ref, name } = field
 
-                  const dateValueParts = parseISODateIntoParts(value)
-
                   return (
                     <DateInput
+                      disabled
                       errors={errors}
                       label="Planned closure to recruitment date"
                       name={name}
                       onChange={onChange}
                       ref={ref}
-                      value={dateValueParts}
+                      value={value}
                     />
                   )
                 }}
@@ -197,16 +193,15 @@ export default function EditStudy({ query, study }: EditStudyProps) {
                 render={({ field }) => {
                   const { value, onChange, ref, name } = field
 
-                  const dateValueParts = parseISODateIntoParts(value)
-
                   return (
                     <DateInput
+                      disabled
                       errors={errors}
                       label="Actual closure to recruitment date"
                       name={name}
                       onChange={onChange}
                       ref={ref}
-                      value={dateValueParts}
+                      value={value}
                     />
                   )
                 }}
@@ -215,6 +210,7 @@ export default function EditStudy({ query, study }: EditStudyProps) {
               {/* UK recruitment target */}
               <TextInput
                 defaultValue={defaultValues?.recruitmentTarget}
+                disabled
                 errors={errors}
                 hint="Changes to the UK recruitment target will be committed to CPMS after manual review. "
                 inputClassName="govuk-input--width-10"
@@ -233,6 +229,7 @@ export default function EditStudy({ query, study }: EditStudyProps) {
               {/* Further information */}
               <Textarea
                 defaultValue={defaultValues?.furtherInformation}
+                disabled
                 errors={errors}
                 hint="If needed, provide further context or justification for changes made above."
                 label="Further information"

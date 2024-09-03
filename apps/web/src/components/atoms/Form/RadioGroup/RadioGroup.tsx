@@ -17,10 +17,11 @@ interface RadioGroupProps {
   required?: boolean
   errors: FieldErrors
   defaultValue: string | undefined
+  disabled?: boolean
 }
 
 export const RadioGroup = forwardRef<HTMLInputElement, RadioGroupProps>(
-  ({ children, label, labelSize = 's', errors, hint, defaultValue, required = true, ...rest }, ref) => {
+  ({ children, label, labelSize = 's', errors, hint, defaultValue, required = true, disabled, ...rest }, ref) => {
     const error = errors[rest.name]
 
     return (
@@ -29,11 +30,13 @@ export const RadioGroup = forwardRef<HTMLInputElement, RadioGroupProps>(
           aria-describedby={clsx({
             [`${rest.name}-error`]: error,
           })}
+          aria-disabled={disabled}
           aria-errormessage={clsx({
             [`${rest.name}-error`]: error,
           })}
           aria-invalid={error ? 'true' : 'false'}
           aria-required={required}
+          disabled={disabled}
           legend={label}
           legendSize={labelSize}
           role="radiogroup"
@@ -62,6 +65,7 @@ export const RadioGroup = forwardRef<HTMLInputElement, RadioGroupProps>(
                     defaultChecked: defaultValue === child.props.value,
                     'aria-required': required,
                     'aria-invalid': error ? 'true' : 'false',
+                    'aria-disabled': disabled,
                   } as RadioProps)}
                 </>
               ) : null

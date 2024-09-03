@@ -5,8 +5,11 @@ import { TEXTAREA_MAX_CHARACTERS } from '@/constants/forms'
 export type StudyInputs = z.infer<typeof studySchema>
 
 const dateSchema = z
-  .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/)
+  .object({
+    year: z.string().length(4),
+    day: z.string().length(2),
+    month: z.string().length(2),
+  })
   .optional()
 
 export const studySchema = z.object({
