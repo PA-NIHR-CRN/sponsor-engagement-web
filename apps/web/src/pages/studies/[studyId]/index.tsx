@@ -7,7 +7,7 @@ import type { ReactElement } from 'react'
 
 import { AssessmentHistory, getAssessmentHistoryFromStudy, RequestSupport, StudyDetails } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
-import { Roles } from '@/constants'
+import { EDIT_STUDY_ROLE, Roles } from '@/constants'
 import { ASSESSMENT_PAGE, STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/routes'
 import { getStudyById } from '@/lib/studies'
 import { formatDate } from '@/utils/date'
@@ -36,12 +36,14 @@ const renderBackLink = () => (
 
 export type StudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function Study({ study, assessments, showEditStudyFeature }: StudyProps) {
+export default function Study({ user, study, assessments }: StudyProps) {
   const router = useRouter()
 
   const { organisationsByRole } = study
 
   const supportOrgName = organisationsByRole.CRO ?? organisationsByRole.CTU
+
+  const showEditStudyFeature = Boolean(user?.wso2Roles.includes(EDIT_STUDY_ROLE))
 
   return (
     <Container>
@@ -192,16 +194,11 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     }
   }
 
-  const userEmail = session.user?.email || ''
-
-  const editStudyAllowList = process.env.EDIT_STUDY_ALLOW_LIST?.split(',') || []
-
   return {
     props: {
       user: session.user,
       assessments: getAssessmentHistoryFromStudy(study),
       study,
-      showEditStudyFeature: editStudyAllowList.includes(userEmail),
     },
   }
 })
