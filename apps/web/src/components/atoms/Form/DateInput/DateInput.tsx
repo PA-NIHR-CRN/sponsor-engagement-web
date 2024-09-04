@@ -45,17 +45,17 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
           name={rest.name}
           role="group"
         >
-          {/* Create a function to determine which errors to show */}
           <ErrorInline errors={errors} name={rest.name} />
 
           <div className="govuk-date-input">
             <div className="govuk-date-input__item">
               <TextInput
-                errors={errors}
                 inputClassName="govuk-input--width-2"
                 inputMode="numeric"
                 label="Day"
                 labelClassName="font-normal"
+                maxLength={2}
+                minLength={1}
                 onChange={(e) => {
                   handleInputChange(e, 'day')
                 }}
@@ -69,7 +69,6 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
             </div>
             <div className="govuk-date-input__item">
               <TextInput
-                errors={errors}
                 inputClassName="govuk-input--width-2"
                 inputMode="numeric"
                 label="Month"
@@ -82,16 +81,19 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 value={value.month}
                 {...rest}
                 disabled={disabled}
+                maxLength={2}
+                minLength={1}
                 name={`${rest.name}-month`}
               />
             </div>
             <div className="govuk-date-input__item">
               <TextInput
-                errors={errors[rest.name] as FieldErrors}
                 inputClassName="govuk-input--width-4"
                 inputMode="numeric"
                 label="Year"
                 labelClassName="font-normal"
+                maxLength={4}
+                minLength={4}
                 onChange={(e) => {
                   handleInputChange(e, 'year')
                 }}
