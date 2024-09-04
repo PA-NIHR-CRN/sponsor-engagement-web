@@ -1,3 +1,4 @@
+import type { Wso2GroupOperation } from './constants/constants'
 import { requests } from './handlers'
 
 /**
@@ -55,21 +56,10 @@ export class AuthService {
    *
    * @param userId - New wso2 role to user
    * @param userName - New wso2 username
-   * @param role - New wso2 role
+   * @param group - New wso2 group
    * @returns
    */
-  async assignWSO2UserRole(email: string, role: string) {
-    return requests.assignWSO2UserRole(email, role)
-  }
-
-  /**
-   *
-   * @param userId - wso2 role to remove
-   * @param userName - wso2 username
-   * @param role - wso2 role
-   * @returns
-   */
-  async removeWSO2UserRole(email: string, role: string) {
-    return requests.removeWSO2UserRole(email, role)
+  async updateWSO2UserGroup(email: string, group: string, operation: Wso2GroupOperation) {
+    return requests.updateWSO2UserGroup(email, group, operation)
   }
 }
