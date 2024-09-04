@@ -108,6 +108,22 @@ test.describe('View core study details - @se_27', () => {
     })
   })
 
+  test('As a Sponsor I can navigate back from Study Details page to Studies Page by clicking back link - @se_181_ac1', async ({
+    studyDetailsPage,
+    studiesPage,
+  }) => {
+    await test.step(`Given I have navigated to the Study Details Page for a Study with SE Id ${startingStudyId}`, async () => {
+      await studyDetailsPage.goto(startingStudyId.toString())
+      await studyDetailsPage.assertOnStudyDetailsPage(startingStudyId.toString())
+    })
+    await test.step(`When I click on 'All studies' link`, async () => {
+      await studyDetailsPage.allStudiesLink.click()
+    })
+    await test.step('Then I am taken to the Studies page', async () => {
+      await studiesPage.assertOnStudiesPage()
+    })
+  })
+
   test('The value `None available` appears where the Protocol Reference Number value is null - @se_27_protocolRef', async ({
     studyDetailsPage,
   }) => {

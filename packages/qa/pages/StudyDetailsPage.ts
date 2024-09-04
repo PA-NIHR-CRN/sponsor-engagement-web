@@ -44,10 +44,6 @@ export default class StudyDetailsPage {
   readonly tablePlannedClosureDateValue: Locator
   readonly tableActualClosureDateHeader: Locator
   readonly tableActualClosureDateValue: Locator
-  readonly tableNetworkTargetHeader: Locator
-  readonly tableNetworkTargetValue: Locator
-  readonly tableNetworkTotalHeader: Locator
-  readonly tableNetworkTotalValue: Locator
   readonly tableUkTargetHeader: Locator
   readonly tableUkTargetValue: Locator
   readonly tableUkTotalHeader: Locator
@@ -74,6 +70,7 @@ export default class StudyDetailsPage {
   readonly secondSponsorAssessmentTrack: Locator
   readonly dueIndicator: Locator
   readonly dueIndicatorSupportingText: Locator
+  readonly allStudiesLink: Locator
 
   //Initialize Page Objects
   constructor(page: Page) {
@@ -82,7 +79,7 @@ export default class StudyDetailsPage {
     //Locators
     this.pageTitle = page.locator('h2[class="govuk-heading-l govuk-!-margin-bottom-1"]')
     this.progressHeader = page.locator('h3[class="govuk-heading-m govuk-!-margin-bottom-1 p-0"]', {
-      hasText: 'Progress Summary',
+      hasText: 'Summary of study’s progress (UK)',
     })
     this.progressSection = page.locator('table[class="govuk-table govuk-!-margin-top-3"]')
     this.assessmentHeader = page.locator('h3[class="govuk-heading-m govuk-!-margin-bottom-1 p-0"]', {
@@ -90,7 +87,7 @@ export default class StudyDetailsPage {
     })
     this.aboutHeader = page.locator('h3[class="govuk-heading-m govuk-!-margin-bottom-3"]')
     this.aboutSection = page.locator('table[class="govuk-table govuk-!-margin-bottom-3"]')
-    this.guidanceText = page.locator('div[class="w-full"] p').nth(0)
+    this.guidanceText = page.locator('div[class="govuk-inset-text mt-7"]')
     this.sponsorOrgSubTitle = page.locator('span[class="govuk-body-m mb-0 text-darkGrey"]')
     this.progressSummarySubTitle = page.locator('span[class="govuk-body-s text-darkGrey"]')
     this.assessButton = page.locator('a[class="govuk-button w-auto govuk-!-margin-bottom-0"]')
@@ -130,11 +127,9 @@ export default class StudyDetailsPage {
       hasText: 'Actual closure to recruitment date',
     })
     this.tableActualClosureDateValue = this.tableActualClosureDateHeader.locator('..').locator('td')
-    this.tableNetworkTargetHeader = page.locator('th[scope="row"]', { hasText: 'Network recruitment target' })
-    this.tableNetworkTargetValue = this.tableNetworkTargetHeader.locator('..').locator('td')
-    this.tableNetworkTotalHeader = page.locator('th[scope="row"]', { hasText: 'Total network recruitment to date' })
-    this.tableNetworkTotalValue = this.tableNetworkTotalHeader.locator('..').locator('td')
-    this.tableUkTargetHeader = page.locator('th[scope="row"]', { hasText: 'UK recruitment target' })
+    this.tableUkTargetHeader = page.locator('th[scope="row"]', {
+      hasText: 'UK recruitment target (excluding private site)',
+    })
     this.tableUkTargetValue = this.tableUkTargetHeader.locator('..').locator('td')
     this.tableUkTotalHeader = page.locator('th[scope="row"]', { hasText: 'Total UK recruitment to date' })
     this.tableUkTotalValue = this.tableUkTotalHeader.locator('..').locator('td')
@@ -167,6 +162,7 @@ export default class StudyDetailsPage {
     this.secondSponsorAssessmentTrack = this.secondSponsorAssessmentText.locator('strong')
     this.dueIndicator = page.locator('span[class="govuk-tag govuk-tag--red mr-2"]')
     this.dueIndicatorSupportingText = this.dueIndicator.locator('..')
+    this.allStudiesLink = page.locator('a[class="govuk-back-link"]')
   }
 
   //Page Methods
@@ -287,7 +283,7 @@ export default class StudyDetailsPage {
   async assertGuidanceText() {
     await expect(this.guidanceText).toBeVisible()
     await expect(this.guidanceText).toHaveText(
-      'You can review the progress of this study at any time. You will need to assess if the study is on or off track and if any NIHR RDN support is needed.'
+      'Check the study data and provide updates where necessary. Based on the summary, assess if your study is on or off track and what action you need to take.'
     )
   }
 
@@ -326,7 +322,7 @@ export default class StudyDetailsPage {
 
   async assertProgressSummarySectionPresent() {
     await expect(this.progressHeader).toBeVisible()
-    await expect(this.progressHeader).toHaveText('Progress Summary')
+    await expect(this.progressHeader).toHaveText('Summary of study’s progress (UK)')
     await expect(this.progressSection).toBeVisible()
   }
 
@@ -392,23 +388,6 @@ export default class StudyDetailsPage {
       await expect(this.tableActualClosureDateValue).toHaveText('-')
     }
   }
-
-  async assertNetworkTarget(expectedTarget: number) {
-    await expect(this.tableNetworkTargetHeader).toBeVisible()
-    await expect(this.tableNetworkTargetValue).toBeVisible()
-    if (expectedTarget != null) {
-      await expect(this.tableNetworkTargetValue).toHaveText(expectedTarget.toString())
-    } else {
-      await expect(this.tableNetworkTargetValue).toHaveText('-')
-    }
-  }
-
-  async assertNetworkTotal(expectedTotal: number) {
-    await expect(this.tableNetworkTotalHeader).toBeVisible()
-    await expect(this.tableNetworkTotalValue).toBeVisible()
-    await expect(this.tableNetworkTotalValue).toHaveText(expectedTotal.toString())
-  }
-
   async assertUkTarget(expectedTarget: number) {
     await expect(this.tableUkTargetHeader).toBeVisible()
     await expect(this.tableUkTargetValue).toBeVisible()

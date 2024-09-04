@@ -7,8 +7,8 @@ import type { ReactElement } from 'react'
 
 import { AssessmentHistory, getAssessmentHistoryFromStudy, RequestSupport, StudyDetails } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
-import { Roles } from '@/constants'
-import { SUPPORT_PAGE } from '@/constants/routes'
+import { EDIT_STUDY_ROLE, Roles } from '@/constants'
+import { ASSESSMENT_PAGE, STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/routes'
 import { getStudyById } from '@/lib/studies'
 import { formatDate } from '@/utils/date'
 import { withServerSideProps } from '@/utils/withServerSideProps'
@@ -24,14 +24,26 @@ const renderNotificationBanner = (success: boolean) =>
     </NotificationBanner>
   ) : null
 
+const renderBackLink = () => (
+  <div className="ml-8 govuk-!-padding-top-3">
+    <Container>
+      <Link className="govuk-back-link" href="/studies">
+        All studies
+      </Link>
+    </Container>
+  </div>
+)
+
 export type StudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function Study({ study, assessments }: StudyProps) {
+export default function Study({ user, study, assessments }: StudyProps) {
   const router = useRouter()
 
   const { organisationsByRole } = study
 
   const supportOrgName = organisationsByRole.CRO ?? organisationsByRole.CTU
+
+  const showEditStudyFeature = Boolean(user?.wso2Roles.includes(EDIT_STUDY_ROLE))
 
   return (
     <Container>
@@ -51,31 +63,40 @@ export default function Study({ study, assessments }: StudyProps) {
             {Boolean(supportOrgName) && ` (${supportOrgName})`}
           </span>
 
-          <div className="flex items-center govuk-!-margin-bottom-4 govuk-!-margin-top-4 gap-6">
-            <Link className="govuk-button w-auto govuk-!-margin-bottom-0" href={`/assessments/${study.id}`}>
-              Assess
-            </Link>
+          <div className="flex flex-col govuk-!-margin-bottom-4 govuk-!-margin-top-4 gap-6">
             {Boolean(study.isDueAssessment) && (
               <div>
                 <span className="govuk-tag govuk-tag--red mr-2">Due</span>
                 This study needs a new sponsor assessment.
               </div>
             )}
+            <div className="flex gap-4">
+              <Link className="govuk-button w-auto govuk-!-margin-bottom-0" href={`${ASSESSMENT_PAGE}/${study.id}`}>
+                Assess study
+              </Link>
+              {showEditStudyFeature ? (
+                <Link
+                  className="govuk-button govuk-button--secondary w-auto govuk-!-margin-bottom-0"
+                  href={`${STUDIES_PAGE}/${study.id}/edit`}
+                >
+                  Edit study data
+                </Link>
+              ) : null}
+            </div>
           </div>
 
-          <p>
-            You can review the progress of this study at any time. You will need to assess if the study is on or off
-            track and if any <Link href={`${SUPPORT_PAGE}?returnPath=${router.asPath}`}>NIHR RDN support</Link> is
-            needed.
-          </p>
+          <div className="govuk-inset-text mt-7">
+            Check the study data and provide updates where necessary. Based on the summary, assess if your study is on
+            or off track and what action you need to take.
+          </div>
 
-          {/* Progress summary */}
-          <h3 className="govuk-heading-m govuk-!-margin-bottom-1 p-0">Progress Summary</h3>
+          {/* Summary of study’s progress (UK) */}
+          <h3 className="govuk-heading-m govuk-!-margin-bottom-1 p-0">Summary of study’s progress (UK)</h3>
           <span className="govuk-body-s text-darkGrey">
             Based on the latest data uploaded to CPMS by the study team.
           </span>
           <Table className="govuk-!-margin-top-3">
-            <Table.Caption className="govuk-visually-hidden">Progress summary</Table.Caption>
+            <Table.Caption className="govuk-visually-hidden">Summary of study’s progress (UK)</Table.Caption>
             <Table.Body>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Study Status</Table.CellHeader>
@@ -115,16 +136,13 @@ export default function Study({ study, assessments }: StudyProps) {
                   </Table.Cell>
                 </Table.Row>
               )}
+
               <Table.Row>
-                <Table.CellHeader className="w-1/3">
-                  {study.route === 'Commercial' ? 'Network' : 'UK'} recruitment target
-                </Table.CellHeader>
+                <Table.CellHeader className="w-1/3">UK recruitment target (excluding private site)</Table.CellHeader>
                 <Table.Cell>{study.sampleSize ?? '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.CellHeader className="w-1/3">
-                  Total {study.route === 'Commercial' ? 'network' : 'UK'} recruitment to date
-                </Table.CellHeader>
+                <Table.CellHeader className="w-1/3">Total UK recruitment to date</Table.CellHeader>
                 <Table.Cell>{study.totalRecruitmentToDate ?? '-'}</Table.Cell>
               </Table.Row>
             </Table.Body>
@@ -146,7 +164,11 @@ export default function Study({ study, assessments }: StudyProps) {
 }
 
 Study.getLayout = function getLayout(page: ReactElement, { user }: StudyProps) {
-  return <RootLayout user={user}>{page}</RootLayout>
+  return (
+    <RootLayout backLink={renderBackLink()} user={user}>
+      {page}
+    </RootLayout>
+  )
 }
 
 export const getServerSideProps = withServerSideProps(Roles.SponsorContact, async (context, session) => {

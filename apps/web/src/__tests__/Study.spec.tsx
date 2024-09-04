@@ -10,7 +10,11 @@ import { Mock } from 'ts-mockery'
 import { render, screen, within } from '@/config/TestUtils'
 
 import { prismaMock } from '../__mocks__/prisma'
-import { userWithContactManagerRole, userWithSponsorContactRole } from '../__mocks__/session'
+import {
+  userWithContactManagerRole,
+  userWithSponsorContactRole,
+  userWithSponsorContactRoleAndEditStudyRole,
+} from '../__mocks__/session'
 import { SIGN_IN_PAGE, SUPPORT_PAGE } from '../constants/routes'
 import type { StudyProps } from '../pages/studies/[studyId]'
 import Study, { getServerSideProps } from '../pages/studies/[studyId]'
@@ -174,6 +178,8 @@ describe('Study page', () => {
   jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRole)
 
   test('Default layout', async () => {
+    jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRoleAndEditStudyRole)
+
     prismaMock.$transaction.mockResolvedValueOnce([mockStudy])
 
     await mockRouter.push('/study/123')
@@ -198,24 +204,25 @@ describe('Study page', () => {
     expect(screen.getByText('Test Organisation', { selector: 'span' })).toBeInTheDocument()
 
     // Assess study
-    expect(screen.getByRole('link', { name: 'Assess' })).toHaveProperty(
+    expect(screen.getByRole('link', { name: 'Assess study' })).toHaveProperty(
       'href',
       `http://localhost/assessments/${mockStudy.id}`
     )
 
+    // Edit study data
+    expect(screen.getByRole('link', { name: 'Edit study data' })).toHaveProperty(
+      'href',
+      `http://localhost/studies/${mockStudy.id}/edit`
+    )
     expect(screen.queryByText('Due')).not.toBeInTheDocument()
 
-    expect(screen.getByText(/You can review the progress of this study at any time./)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'NIHR RDN support' })).toHaveAttribute(
-      'href',
-      `${SUPPORT_PAGE}?returnPath=/study/123`
-    )
+    expect(screen.getByText(/Check the study data and provide updates where necessary./)).toBeInTheDocument()
 
-    // Progress summary
-    expect(screen.getByRole('heading', { name: 'Progress Summary', level: 3 })).toBeInTheDocument()
+    // Summary of study’s progress (UK)
+    expect(screen.getByRole('heading', { name: 'Summary of study’s progress (UK)', level: 3 })).toBeInTheDocument()
     expect(screen.getByText(/Based on the latest data uploaded to CPMS by the study team./)).toBeInTheDocument()
 
-    const progressSummaryTable = screen.getByRole('table', { name: 'Progress summary' })
+    const progressSummaryTable = screen.getByRole('table', { name: 'Summary of study’s progress (UK)' })
 
     const progressHeaders = within(progressSummaryTable).getAllByRole('rowheader')
     expect(progressHeaders.map((header) => header.textContent)).toEqual([
@@ -226,8 +233,8 @@ describe('Study page', () => {
       'Planned closure to recruitment date',
       'Actual closure to recruitment date',
       'Estimated reopening date',
-      'Network recruitment target',
-      'Total network recruitment to date',
+      'UK recruitment target (excluding private site)',
+      'Total UK recruitment to date',
     ])
 
     const progressRows = within(progressSummaryTable).getAllByRole('row')
@@ -369,7 +376,7 @@ describe('Study page', () => {
 
     render(Study.getLayout(<Study {...props} />, { ...props }))
 
-    const summaryTable = screen.getByRole('table', { name: 'Progress summary' })
+    const summaryTable = screen.getByRole('table', { name: 'Summary of study’s progress (UK)' })
 
     const rowHeader = within(summaryTable).getByRole('rowheader', { name: 'Estimated reopening date' })
     expect(rowHeader).toBeInTheDocument()
@@ -388,7 +395,7 @@ describe('Study page', () => {
 
     expect(screen.queryByText('Network recruitment target')).not.toBeInTheDocument()
     expect(screen.queryByText('Total network recruitment to date')).not.toBeInTheDocument()
-    expect(screen.getByText('UK recruitment target')).toBeInTheDocument()
+    expect(screen.getByText('UK recruitment target (excluding private site)')).toBeInTheDocument()
     expect(screen.getByText('Total UK recruitment to date')).toBeInTheDocument()
   })
 
