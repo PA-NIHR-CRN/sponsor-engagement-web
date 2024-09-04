@@ -10,7 +10,11 @@ import { Mock } from 'ts-mockery'
 import { render, screen, within } from '@/config/TestUtils'
 
 import { prismaMock } from '../__mocks__/prisma'
-import { userWithContactManagerRole, userWithSponsorContactRole } from '../__mocks__/session'
+import {
+  userWithContactManagerRole,
+  userWithSponsorContactRole,
+  userWithSponsorContactRoleAndEditStudyRole,
+} from '../__mocks__/session'
 import { SIGN_IN_PAGE, SUPPORT_PAGE } from '../constants/routes'
 import type { StudyProps } from '../pages/studies/[studyId]'
 import Study, { getServerSideProps } from '../pages/studies/[studyId]'
@@ -174,8 +178,7 @@ describe('Study page', () => {
   jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRole)
 
   test('Default layout', async () => {
-    const originalEnv = process.env.EDIT_STUDY_ALLOW_LIST
-    process.env.EDIT_STUDY_ALLOW_LIST = userWithSponsorContactRole.user?.email
+    jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRoleAndEditStudyRole)
 
     prismaMock.$transaction.mockResolvedValueOnce([mockStudy])
 
@@ -294,8 +297,6 @@ describe('Study page', () => {
       'href',
       `${SUPPORT_PAGE}?returnPath=/study/123`
     )
-
-    process.env.EDIT_STUDY_ALLOW_LIST = originalEnv
   })
 
   test('Due assessment', async () => {

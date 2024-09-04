@@ -22,6 +22,5 @@ declare namespace NodeJS {
     CONTENTFUL_PREVIEW_ACCESS_TOKEN: string
     AWS_SECRET_NAME: string
     AWS_REGION: string
-    EDIT_STUDY_ALLOW_LIST: string | undefined
   }
 }

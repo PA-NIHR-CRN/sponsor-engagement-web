@@ -12,6 +12,7 @@ import {
   AUTH_PROVIDER_NAME,
   AUTH_PROVIDER_TYPE,
   AUTH_SESSION_EXPIRY_FALLBACK,
+  EDIT_STUDY_ROLE,
   ODP_ROLE,
 } from '@/constants/auth'
 import { getUserOrganisations } from '@/lib/organisations'
@@ -191,8 +192,19 @@ export const authOptions: AuthOptions = {
               return false
             })
 
+            const hasEditStudyRole = groups.some((group) => {
+              if (typeof group === 'object' && group.display) {
+                return group.display === EDIT_STUDY_ROLE
+              }
+              return false
+            })
+
             if (hasODPSponsorEngagementTool) {
               session.user.wso2Roles.push(ODP_ROLE)
+            }
+
+            if (hasEditStudyRole) {
+              session.user.wso2Roles.push(EDIT_STUDY_ROLE)
             }
           }
         }
