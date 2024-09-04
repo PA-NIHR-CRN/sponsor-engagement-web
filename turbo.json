@@ -31,7 +31,8 @@
         "CONTENTFUL_BANNER_ENTRY_ID",
         "CONTENTFUL_PREVIEW_MODE",
         "CONTENTFUL_PREVIEW_ACCESS_TOKEN",
-        "ODP_ROLE_GROUP_ID"
+        "ODP_ROLE_GROUP_ID",
+        "ODP_DASHBOARD_LINK"
       ]
     },
     "start": {},
@@ -70,7 +71,8 @@
         "CONTENTFUL_BANNER_ENTRY_ID",
         "CONTENTFUL_PREVIEW_MODE",
         "CONTENTFUL_PREVIEW_ACCESS_TOKEN",
-        "ODP_ROLE_GROUP_ID"
+        "ODP_ROLE_GROUP_ID",
+        "ODP_DASHBOARD_LINK"
       ]
     },
     "test:ci": {
@@ -107,7 +109,8 @@
         "CONTENTFUL_BANNER_ENTRY_ID",
         "CONTENTFUL_PREVIEW_MODE",
         "CONTENTFUL_PREVIEW_ACCESS_TOKEN",
-        "ODP_ROLE_GROUP_ID"
+        "ODP_ROLE_GROUP_ID",
+        "ODP_DASHBOARD_LINK"
       ]
     },
     "db:generate": { "cache": false },
