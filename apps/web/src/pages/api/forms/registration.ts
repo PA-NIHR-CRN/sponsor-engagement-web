@@ -1,9 +1,9 @@
 import { authService } from '@nihr-ui/auth'
+import { Wso2GroupOperation } from '@nihr-ui/auth/src/constants/constants'
 import { logger } from '@nihr-ui/logger'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { ZodError } from 'zod'
 
-import { Wso2GroupsOperations } from '@/constants'
 import { REGISTRATION_CONFIRMATION_PAGE, REGISTRATION_PAGE } from '@/constants/routes'
 import { getUserWithRolesAndOrgs } from '@/lib/organisations'
 import { prismaClient } from '@/lib/prisma'
@@ -11,11 +11,11 @@ import { isContactManagerAndSponsorContact, isSponsorContact } from '@/utils/aut
 import type { RegistrationInputs } from '@/utils/schemas'
 import { registrationSchema } from '@/utils/schemas'
 
-export async function assignRoleToUser(email: string, role: string) {
+export async function assignGroupToUser(email: string, group: string) {
   try {
-    await authService.updateWSO2UserRole(email, role, Wso2GroupsOperations.Add)
-  } catch (roleError) {
-    logger.error(`Failed to assign role ${role} to user ${email}: ${roleError}`)
+    await authService.updateWSO2UserGroup(email, group, Wso2GroupOperation.Add)
+  } catch (groupError) {
+    logger.error(`Failed to assign role ${group} to user ${email}: ${groupError}`)
   }
 }
 
@@ -81,7 +81,7 @@ export default async (req: ExtendedNextApiRequest, res: NextApiResponse) => {
 
       const isEligibleForOdpRole = await isUserEligibleForOdpRole(id)
       if (isEligibleForOdpRole) {
-        await assignRoleToUser(user.email, ODP_ROLE_GROUP_ID)
+        await assignGroupToUser(user.email, ODP_ROLE_GROUP_ID)
       }
 
       return res.redirect(302, REGISTRATION_CONFIRMATION_PAGE)

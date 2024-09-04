@@ -174,7 +174,7 @@ export const authOptions: AuthOptions = {
         const roles = await prismaClient.userRole.findMany({ where: { userId, isDeleted: false } })
         session.user.roles = roles.map((role) => role.roleId)
         session.user.organisations = await getUserOrganisations(userId)
-        session.user.wso2Roles = []
+        session.user.groups = []
 
         const userResponse = await authService.getUser(email)
         if (userResponse.success) {
@@ -192,7 +192,7 @@ export const authOptions: AuthOptions = {
             })
 
             if (hasODPSponsorEngagementTool) {
-              session.user.wso2Roles.push(ODP_ROLE)
+              session.user.groups.push(ODP_ROLE)
             }
           }
         }

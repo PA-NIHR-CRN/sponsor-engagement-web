@@ -10,6 +10,7 @@ import {
   refreshTokenResponseSchema,
   updateGroupResponseSchema,
 } from './schemas'
+import type { Wso2GroupOperation } from './constants/constants'
 
 const { IDG_API_URL, IDG_API_USERNAME, IDG_API_PASSWORD } = process.env
 
@@ -114,7 +115,7 @@ export const requests = {
     const response = await api.post<Infer<typeof createUserResponseSchema>>(`/scim2/Users`, data)
     return createUserResponseSchema.safeParse(response.data)
   },
-  updateWSO2UserRole: async (email: string, role: string, operation: 'add' | 'remove') => {
+  updateWSO2UserGroup: async (email: string, group: string, operation: Wso2GroupOperation) => {
     const userResponse = await requests.getUser(email)
 
     if (!userResponse.success) {
@@ -127,7 +128,7 @@ export const requests = {
       throw new Error(`No user found with email: ${email}`)
     }
 
-    const roleUpdateData = {
+    const groupUpdateData = {
       schemas: ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
       Operations: [
         {
@@ -143,7 +144,7 @@ export const requests = {
       ],
     }
 
-    const response = await api.patch(`/scim2/Groups/${role}`, roleUpdateData)
+    const response = await api.patch(`/scim2/Groups/${group}`, groupUpdateData)
 
     return updateGroupResponseSchema.safeParse(response.data)
   },

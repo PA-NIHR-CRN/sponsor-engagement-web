@@ -1,10 +1,11 @@
 import { authService } from '@nihr-ui/auth'
+import { Wso2GroupOperation } from '@nihr-ui/auth/src/constants/constants'
 import { emailService } from '@nihr-ui/email'
 import { logger } from '@nihr-ui/logger'
 import { emailTemplates } from '@nihr-ui/templates/sponsor-engagement'
 import type { NextApiRequest } from 'next'
 
-import { Roles, Wso2GroupsOperations } from '@/constants'
+import { Roles } from '@/constants'
 import { getUserOrganisationById } from '@/lib/organisations'
 import { prismaClient } from '@/lib/prisma'
 import type { OrganisationRemoveContactInputs } from '@/utils/schemas'
@@ -17,11 +18,11 @@ export interface ExtendedNextApiRequest extends NextApiRequest {
   body: OrganisationRemoveContactInputs
 }
 
-export async function updateWSO2UserRole(email: string, role: string) {
+export async function updateWSO2UserGroup(email: string, group: string) {
   try {
-    await authService.updateWSO2UserRole(email, role, Wso2GroupsOperations.Remove)
-  } catch (roleError) {
-    logger.error(`Failed to remove role ${role} from user ${email}: ${roleError}`)
+    await authService.updateWSO2UserGroup(email, group, Wso2GroupOperation.Remove)
+  } catch (groupError) {
+    logger.error(`Failed to remove group ${group} from user ${email}: ${groupError}`)
   }
 }
 
@@ -63,7 +64,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
 
     const isEligibleForOdpRole = await isUserEligibleForOdpRole(user.id)
     if (!isEligibleForOdpRole) {
-      await updateWSO2UserRole(user.email, ODP_ROLE_GROUP_ID)
+      await updateWSO2UserGroup(user.email, ODP_ROLE_GROUP_ID)
     }
 
     if (user.email) {
