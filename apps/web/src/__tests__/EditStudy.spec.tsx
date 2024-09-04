@@ -1,9 +1,11 @@
 import type { GetServerSidePropsContext } from 'next'
 import { getServerSession } from 'next-auth/next'
+import mockRouter from 'next-router-mock'
 import { Mock } from 'ts-mockery'
 
 import { userWithSponsorContactRole } from '@/__mocks__/session'
 import { render, screen, within } from '@/config/TestUtils'
+import { SUPPORT_PAGE } from '@/constants/routes'
 import EditStudy, { type EditStudyProps, getServerSideProps } from '@/pages/studies/[studyId]/edit'
 
 jest.mock('next-auth/next')
@@ -16,10 +18,28 @@ const mockStudy = {
   studyRoute: 'Commercial',
 }
 
+describe('getServerSideProps', () => {
+  const getServerSessionMock = jest.mocked(getServerSession)
+
+  test('redirects to 404 page if no study id provided', async () => {
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: {} })
+    getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+
+    const result = await getServerSideProps(context)
+    expect(result).toEqual({
+      redirect: {
+        destination: '/404',
+      },
+    })
+  })
+})
+
 describe('Edit study page', () => {
   jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRole)
 
   test('Default layout', async () => {
+    await mockRouter.push('/assessments/123')
+
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
 
     const { props } = (await getServerSideProps(context)) as {
@@ -28,8 +48,11 @@ describe('Edit study page', () => {
 
     render(EditStudy.getLayout(<EditStudy {...props} />, { ...props }))
 
-    // Title
+    // Header title
     expect(screen.getByRole('heading', { level: 1, name: 'Update study data' })).toBeInTheDocument()
+
+    // Page title
+    expect(screen.getByRole('heading', { level: 2, name: 'Page title: Update study data' })).toBeInTheDocument()
 
     // Sponsor
     expect(screen.getByText(mockStudy.sponsorOrgName, { selector: 'span' })).toBeInTheDocument()
@@ -37,13 +60,25 @@ describe('Edit study page', () => {
     // Study title
     expect(screen.getByText(mockStudy.shortStudyTitle, { selector: 'span' })).toBeInTheDocument()
 
-    // Guidance text
+    // Guidance text for Commercial
     expect(
       screen.getByText(
         'Changes to study status will be committed to CPMS after review. All other changes will be committed directly without manual review.',
         { selector: 'div' }
       )
     ).toBeInTheDocument()
+
+    // Support
+    expect(screen.getByRole('heading', { level: 3, name: 'Request NIHR RDN support' })).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'Sponsors or their delegates can request NIHR RDN support with their research study at any time.'
+      )
+    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Request support' })).toHaveAttribute(
+      'href',
+      `${SUPPORT_PAGE}?returnPath=/assessments/123`
+    )
 
     // Form Input - Status
     const statusFieldset = screen.getByRole('radiogroup', { name: 'Study status' })
@@ -107,7 +142,7 @@ describe('Edit study page', () => {
     const furtherInformation = screen.getByLabelText('Further information')
     expect(furtherInformation).toBeInTheDocument()
     expect(furtherInformation).toHaveAccessibleDescription(
-      'You have 400 characters remaining If needed, provide further context or justification for changes made above.'
+      'You have 0 characters remaining If needed, provide further context or justification for changes made above.'
     )
 
     // Warning text

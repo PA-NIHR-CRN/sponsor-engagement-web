@@ -3,11 +3,10 @@ import { Container } from '@nihr-ui/frontend'
 import clsx from 'clsx'
 import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
-import { type ReactElement, useCallback } from 'react'
-import type { FieldError } from 'react-hook-form'
+import { type ReactElement } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
-import { ErrorSummary, Fieldset, Form, Radio, RadioGroup } from '@/components/atoms'
+import { Fieldset, Form, Radio, RadioGroup } from '@/components/atoms'
 import { DateInput } from '@/components/atoms/Form/DateInput/DateInput'
 import { Textarea } from '@/components/atoms/Form/Textarea/Textarea'
 import { TextInput } from '@/components/atoms/Form/TextInput/TextInput'
@@ -21,8 +20,6 @@ import {
   PAGE_TITLE,
   studyStatuses,
 } from '@/constants/editStudyForm'
-import { TEXTAREA_MAX_CHARACTERS } from '@/constants/forms'
-import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
 import { getValuesFromSearchParams } from '@/utils/form'
 import type { StudyInputs } from '@/utils/schemas'
 import { studySchema } from '@/utils/schemas'
@@ -33,7 +30,7 @@ import { withServerSideProps } from '@/utils/withServerSideProps'
 export type EditStudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
 export default function EditStudy({ query, study }: EditStudyProps) {
-  const { register, formState, setError, handleSubmit, control, watch } = useForm<StudyInputs>({
+  const { register, formState, handleSubmit, control } = useForm<StudyInputs>({
     resolver: zodResolver(studySchema),
     defaultValues: {
       ...getValuesFromSearchParams(studySchema, query),
@@ -41,27 +38,7 @@ export default function EditStudy({ query, study }: EditStudyProps) {
     },
   })
 
-  const handleFoundError = useCallback(
-    (field: keyof StudyInputs, error: FieldError) => {
-      setError(field, error)
-    },
-    [setError]
-  )
-
-  const { errors } = useFormErrorHydration<StudyInputs>({
-    schema: studySchema,
-    formState,
-    onFoundError: handleFoundError,
-  })
-
   const { defaultValues } = formState
-
-  // Watch & update the character count for the "Further information" textarea
-  const furtherInformationText = watch('furtherInformation') ?? ''
-  const remainingCharacters =
-    furtherInformationText.length >= TEXTAREA_MAX_CHARACTERS
-      ? 0
-      : TEXTAREA_MAX_CHARACTERS - furtherInformationText.length
 
   return (
     <Container>
@@ -90,22 +67,18 @@ export default function EditStudy({ query, study }: EditStudyProps) {
             action=""
             handleSubmit={handleSubmit}
             method="post"
-            onError={(message: string) => {
-              setError('root.serverError', {
-                type: '400',
-                message,
-              })
+            onError={() => {
+              //TODO: Temporary until validation and error states are implemented
+              console.log('error')
             }}
           >
-            <ErrorSummary errors={errors} />
-
             <input type="hidden" {...register('studyId')} defaultValue={defaultValues?.studyId} />
 
             <Fieldset>
               {/* Status */}
               <RadioGroup
                 defaultValue={defaultValues?.status}
-                errors={errors}
+                errors={{}}
                 hint="Changes to the study status will be committed to CPMS after manual review."
                 label="Study status"
                 labelSize="m"
@@ -130,7 +103,7 @@ export default function EditStudy({ query, study }: EditStudyProps) {
 
                   return (
                     <DateInput
-                      errors={errors}
+                      errors={{}}
                       label="Planned opening to recruitment date"
                       name={name}
                       onChange={onChange}
@@ -151,7 +124,7 @@ export default function EditStudy({ query, study }: EditStudyProps) {
                   return (
                     <DateInput
                       disabled
-                      errors={errors}
+                      errors={{}}
                       label="Actual opening to recruitment date"
                       name={name}
                       onChange={onChange}
@@ -172,7 +145,7 @@ export default function EditStudy({ query, study }: EditStudyProps) {
                   return (
                     <DateInput
                       disabled
-                      errors={errors}
+                      errors={{}}
                       label="Planned closure to recruitment date"
                       name={name}
                       onChange={onChange}
@@ -193,7 +166,7 @@ export default function EditStudy({ query, study }: EditStudyProps) {
                   return (
                     <DateInput
                       disabled
-                      errors={errors}
+                      errors={{}}
                       label="Actual closure to recruitment date"
                       name={name}
                       onChange={onChange}
@@ -208,30 +181,24 @@ export default function EditStudy({ query, study }: EditStudyProps) {
               <TextInput
                 defaultValue={defaultValues?.recruitmentTarget}
                 disabled
-                errors={errors}
+                errors={{}}
                 hint="Changes to the UK recruitment target will be committed to CPMS after manual review. "
                 inputClassName="govuk-input--width-10"
                 label="UK recruitment target"
                 labelSize="m"
                 type="number"
-                {...register('recruitmentTarget', {
-                  setValueAs: (value) => {
-                    if (value === '' || Number.isNaN(Number(value))) return undefined
-
-                    return Number(value)
-                  },
-                })}
+                {...register('recruitmentTarget')}
               />
 
               {/* Further information */}
               <Textarea
                 defaultValue={defaultValues?.furtherInformation}
                 disabled
-                errors={errors}
+                errors={{}}
                 hint="If needed, provide further context or justification for changes made above."
                 label="Further information"
                 labelSize="m"
-                remainingCharacters={remainingCharacters}
+                remainingCharacters={0} // Add functionality in validation & error ticket
                 {...register('furtherInformation')}
               />
 
