@@ -29,9 +29,6 @@ import { studySchema } from '@/utils/schemas'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
 // Dummy content to use before retrieving data from API
-const sponsorOrgName: string | undefined = 'F. Hoffmann-La Roche Ltd (FORTREA DEVELOPMENT LIMITED)'
-const shortStudyTitle: string | undefined = 'Study to test safety/efficacy of CIT treatment in NSCLC patients'
-const studyRoute: 'Commercial' | 'Not Commercial ' = 'Commercial'
 
 export type EditStudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
@@ -76,17 +73,17 @@ export default function EditStudy({ query, study }: EditStudyProps) {
           </h2>
           <span className="govuk-body-m mb-0 text-darkGrey">
             <span className="govuk-visually-hidden">Study sponsor: </span>
-            {sponsorOrgName ?? '-'}
+            {study.sponsorOrgName ?? '-'}
           </span>
           <span className="govuk-heading-m text-primary">
             <span className="govuk-visually-hidden">Study short title: </span>
-            {shortStudyTitle ?? '-'}
+            {study.shortStudyTitle ?? '-'}
           </span>
 
           <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
 
           <div className="govuk-inset-text">
-            {studyRoute === 'Commercial' ? COMMERCIAL_GUIDANCE_TEXT : NON_COMMERCIAL_GUIDANCE_TEXT}
+            {study.studyRoute === 'Commercial' ? COMMERCIAL_GUIDANCE_TEXT : NON_COMMERCIAL_GUIDANCE_TEXT}
           </div>
 
           <Form
@@ -262,11 +259,15 @@ export default function EditStudy({ query, study }: EditStudyProps) {
   )
 }
 
-EditStudy.getLayout = function getLayout(page: ReactElement) {
-  return <RootLayout heading={PAGE_TITLE}>{page}</RootLayout>
+EditStudy.getLayout = function getLayout(page: ReactElement, { user }: EditStudyProps) {
+  return (
+    <RootLayout heading={PAGE_TITLE} user={user}>
+      {page}
+    </RootLayout>
+  )
 }
 
-export const getServerSideProps = withServerSideProps(Roles.SponsorContact, (context) => {
+export const getServerSideProps = withServerSideProps(Roles.SponsorContact, (context, session) => {
   const studyId = context.query.studyId
 
   if (!studyId) {
@@ -279,8 +280,15 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, (con
 
   return {
     props: {
+      user: session.user,
       query: context.query,
-      study: { id: studyId as string },
+      study: {
+        id: studyId as string,
+        // Temporary until data is pulled through
+        shortStudyTitle: 'Study to test safety/efficacy of CIT treatment in NSCLC patients' as string | undefined,
+        sponsorOrgName: 'F. Hoffmann-La Roche Ltd (FORTREA DEVELOPMENT LIMITED)' as string | undefined,
+        studyRoute: 'Commercial' as 'Commercial' | 'Not Commercial',
+      },
     },
   }
 })
