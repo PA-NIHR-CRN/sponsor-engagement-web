@@ -153,11 +153,9 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
 
     const savedRegistrationToken = user.registrationToken
 
-    if (!isNewUser) {
-      const isEligibleForOdpRole = await isUserEligibleForOdpRole(user.id)
-      if (isEligibleForOdpRole) {
-        await assignGroupToUser(user.email, ODP_ROLE_GROUP_ID)
-      }
+    const isEligibleForOdpRole = await isUserEligibleForOdpRole(user.id)
+    if (isEligibleForOdpRole) {
+      await assignGroupToUser(user.email, ODP_ROLE_GROUP_ID)
     }
 
     await emailService.sendEmail({

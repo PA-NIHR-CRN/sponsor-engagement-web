@@ -32,6 +32,8 @@ import { getFiltersFromQuery } from '@/utils/filters'
 import { pluraliseStudy } from '@/utils/pluralise'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
+const { ODP_DASHBOARD_LINK = '' } = process.env
+
 const renderNotificationBanner = (success: boolean) =>
   success ? (
     <NotificationBanner heading="The study assessment was successfully saved" success>
@@ -188,7 +190,7 @@ export default function Studies({
                 <a
                   aria-label="Access dashboard (Opens in a new tab)"
                   className="govuk-button mb-0"
-                  href="https://sense.odp.nihr.ac.uk/sense/app/5726efde-5ca6-45a9-a600-7b3178760ed6/overview"
+                  href={ODP_DASHBOARD_LINK}
                   rel="noopener noreferrer"
                   target="_blank"
                 >
