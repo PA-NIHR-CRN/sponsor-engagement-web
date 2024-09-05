@@ -12,6 +12,7 @@ interface TextInputProps extends React.HTMLProps<HTMLInputElement> {
   hint?: ReactNode
   required?: boolean
   errors?: FieldErrors
+  displayInlineError?: boolean
   autocomplete?: string
   defaultValue?: string | number
   className?: string
@@ -26,6 +27,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
       label,
       labelSize = 's',
       errors,
+      displayInlineError = true,
       hint,
       defaultValue,
       required = true,
@@ -44,7 +46,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
         <div className="govuk-label-wrapper">
           {label ? (
             <label
-              className={clsx('govuk-label', `govuk-label--${labelSize}`, 'govuk-date-input__label', labelClassName)}
+              className={clsx('govuk-label', `govuk-label--${labelSize}`, labelClassName)}
               htmlFor={rest.name}
               id={`${rest.name}-label`}
             >
@@ -57,7 +59,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
             </div>
           ) : null}
         </div>
-        {errors ? <ErrorInline errors={errors} name={rest.name} /> : null}
+        {errors && displayInlineError ? <ErrorInline errors={errors} name={rest.name} /> : null}
         <input
           aria-describedby={clsx({
             [`${rest.name}-hint`]: hint,

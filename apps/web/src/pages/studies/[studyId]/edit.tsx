@@ -25,8 +25,6 @@ import type { StudyInputs } from '@/utils/schemas'
 import { studySchema } from '@/utils/schemas'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
-// Dummy content to use before retrieving data from API
-
 export type EditStudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
 export default function EditStudy({ query, study }: EditStudyProps) {
@@ -198,7 +196,7 @@ export default function EditStudy({ query, study }: EditStudyProps) {
                 hint="If needed, provide further context or justification for changes made above."
                 label="Further information"
                 labelSize="m"
-                remainingCharacters={0} // Add functionality in validation & error ticket
+                remainingCharacters={0} // TODO: Add functionality in validation & error ticket
                 {...register('furtherInformation')}
               />
 
@@ -251,7 +249,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, (con
       query: context.query,
       study: {
         id: studyId as string,
-        // Temporary until data is pulled through
+        // TODO: Temporary until data is pulled through
         shortStudyTitle: 'Study to test safety/efficacy of CIT treatment in NSCLC patients' as string | undefined,
         sponsorOrgName: 'F. Hoffmann-La Roche Ltd (FORTREA DEVELOPMENT LIMITED)' as string | undefined,
         studyRoute: 'Commercial' as 'Commercial' | 'Not Commercial',
