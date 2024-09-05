@@ -38,7 +38,7 @@ describe('Edit study page', () => {
   jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRole)
 
   test('Default layout', async () => {
-    await mockRouter.push('/assessments/123')
+    await mockRouter.push('/studies/123')
 
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
 
@@ -77,7 +77,7 @@ describe('Edit study page', () => {
     ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Request support' })).toHaveAttribute(
       'href',
-      `${SUPPORT_PAGE}?returnPath=/assessments/123`
+      `${SUPPORT_PAGE}?returnPath=/studies/123`
     )
 
     // Form Input - Status
