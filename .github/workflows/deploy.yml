@@ -358,7 +358,7 @@ jobs:
         run: |
           echo "Using registry ${{ env.ECR_REGISTRY }}"
           echo "Tagging image with ${{ env.IMAGE_NAME_TAG}} and ${{ env.IMAGE_SHA_TAG }}"
-          docker build -f apps/web/Dockerfile --build-arg NEXT_PUBLIC_ODP_DASHBOARD_LINK=${{ env.CRNCCD_SECRET_UAT_SE_APP_CONFIG_NEXT_PUBLIC_ODP_DASHBOARD_LINK }} --build-arg NEXT_PUBLIC_GTM_ID=${{ env.CRNCCS_SECRET_UAT_SE_APP_CONFIG_NEXT_PUBLIC_GTM_ID }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
+          docker build -f apps/web/Dockerfile --build-arg NEXT_PUBLIC_ODP_DASHBOARD_LINK=${{ env.CRNCCS_SECRET_UAT_SE_APP_CONFIG_NEXT_PUBLIC_ODP_DASHBOARD_LINK }} --build-arg NEXT_PUBLIC_GTM_ID=${{ env.CRNCCS_SECRET_UAT_SE_APP_CONFIG_NEXT_PUBLIC_GTM_ID }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG" >> "$GITHUB_OUTPUT"
 
@@ -441,7 +441,7 @@ jobs:
         run: |
           echo "Using registry ${{ env.ECR_REGISTRY }}"
           echo "Tagging image with ${{ env.IMAGE_NAME_TAG}} and ${{ env.IMAGE_SHA_TAG }}"
-          docker build -f apps/web/Dockerfile --build-arg NEXT_PUBLIC_ODP_DASHBOARD_LINK=${{ env.CRNCCD_SECRET_OAT_SE_APP_CONFIG_NEXT_PUBLIC_ODP_DASHBOARD_LINK }} --build-arg NEXT_PUBLIC_GTM_ID=${{ env.CRNCCP_SECRET_OAT_SE_APP_CONFIG_NEXT_PUBLIC_GTM_ID }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
+          docker build -f apps/web/Dockerfile --build-arg NEXT_PUBLIC_ODP_DASHBOARD_LINK=${{ env.CRNCCP_SECRET_OAT_SE_APP_CONFIG_NEXT_PUBLIC_ODP_DASHBOARD_LINK }} --build-arg NEXT_PUBLIC_GTM_ID=${{ env.CRNCCP_SECRET_OAT_SE_APP_CONFIG_NEXT_PUBLIC_GTM_ID }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG" >> "$GITHUB_OUTPUT"
       - name: Run database migrations
@@ -523,7 +523,7 @@ jobs:
         run: |
           echo "Using registry ${{ env.ECR_REGISTRY }}"
           echo "Tagging image with ${{ env.IMAGE_NAME_TAG}} and ${{ env.IMAGE_SHA_TAG }}"
-          docker build -f apps/web/Dockerfile NEXT_PUBLIC_ODP_DASHBOARD_LINK=${{ env.CRNCCD_SECRET_PROD_SE_APP_CONFIG_NEXT_PUBLIC_ODP_DASHBOARD_LINK }} --build-arg NEXT_PUBLIC_GTM_ID=${{ env.CRNCCP_SECRET_PROD_SE_APP_CONFIG_NEXT_PUBLIC_GTM_ID }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
+          docker build -f apps/web/Dockerfile NEXT_PUBLIC_ODP_DASHBOARD_LINK=${{ env.CRNCCP_SECRET_PROD_SE_APP_CONFIG_NEXT_PUBLIC_ODP_DASHBOARD_LINK }} --build-arg NEXT_PUBLIC_GTM_ID=${{ env.CRNCCP_SECRET_PROD_SE_APP_CONFIG_NEXT_PUBLIC_GTM_ID }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG .
           docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA_TAG" >> "$GITHUB_OUTPUT"
       - name: Run database migrations
