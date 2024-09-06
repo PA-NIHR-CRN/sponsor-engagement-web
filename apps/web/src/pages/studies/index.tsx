@@ -5,7 +5,7 @@ import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
-import { type ReactElement } from 'react'
+import type { ReactElement } from 'react'
 
 import type { OrderType } from '@/@types/filters'
 import type { TypeBannerSkeleton } from '@/@types/generated'
