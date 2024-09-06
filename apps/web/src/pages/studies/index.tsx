@@ -32,8 +32,6 @@ import { getFiltersFromQuery } from '@/utils/filters'
 import { pluraliseStudy } from '@/utils/pluralise'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
-const { NEXT_PUBLIC_ODP_DASHBOARD_LINK = '' } = process.env
-
 const renderNotificationBanner = (success: boolean) =>
   success ? (
     <NotificationBanner heading="The study assessment was successfully saved" success>
@@ -55,9 +53,10 @@ export default function Studies({
   entry,
 }: StudiesProps) {
   const router = useRouter()
-
   const { isLoading, handleFilterChange } = useFormListeners()
   const isOdpUser = user.groups.includes(ODP_ROLE)
+  const dashboardLink = process.env.NEXT_PUBLIC_ODP_DASHBOARD_LINK || ''
+
   const titleResultsText =
     totalItems === 0
       ? `(no matching search results)`
@@ -118,9 +117,6 @@ export default function Studies({
               totalItems
             )} found (${totalItemsDue} due for assessment)`}</p>
             <div className="govuk-form-group mt-2 items-center justify-end md:my-0 md:flex">
-              {/* Show filters */}
-              {/* <div>{showFiltersButton()}</div> */}
-              {/* Sort by */}
               <div className="items-center whitespace-nowrap md:flex">
                 <Sort defaultOrder={filters.order} form="filters-form" />
               </div>
@@ -190,7 +186,7 @@ export default function Studies({
                 <a
                   aria-label="Access dashboard (Opens in a new tab)"
                   className="govuk-button mb-0"
-                  href={NEXT_PUBLIC_ODP_DASHBOARD_LINK}
+                  href={dashboardLink}
                   rel="noopener noreferrer"
                   target="_blank"
                 >
