@@ -5,7 +5,7 @@ import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
-import type { ReactElement } from 'react'
+import { type ReactElement, useEffect, useState } from 'react'
 
 import type { OrderType } from '@/@types/filters'
 import type { TypeBannerSkeleton } from '@/@types/generated'
@@ -32,8 +32,6 @@ import { getFiltersFromQuery } from '@/utils/filters'
 import { pluraliseStudy } from '@/utils/pluralise'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
-const { NEXT_PUBLIC_ODP_DASHBOARD_LINK = '' } = process.env
-
 const renderNotificationBanner = (success: boolean) =>
   success ? (
     <NotificationBanner heading="The study assessment was successfully saved" success>
@@ -56,8 +54,19 @@ export default function Studies({
 }: StudiesProps) {
   const router = useRouter()
 
+  const [dashboardLink, setDashboardLink] = useState('')
+  const [isClient, setIsClient] = useState(false)
+
   const { isLoading, handleFilterChange } = useFormListeners()
   const isOdpUser = user.groups.includes(ODP_ROLE)
+
+  const linkFromEnv = process.env.NEXT_PUBLIC_ODP_DASHBOARD_LINK || ''
+
+  useEffect(() => {
+    setIsClient(true)
+    setDashboardLink(linkFromEnv)
+  }, [linkFromEnv])
+
   const titleResultsText =
     totalItems === 0
       ? `(no matching search results)`
@@ -118,9 +127,6 @@ export default function Studies({
               totalItems
             )} found (${totalItemsDue} due for assessment)`}</p>
             <div className="govuk-form-group mt-2 items-center justify-end md:my-0 md:flex">
-              {/* Show filters */}
-              {/* <div>{showFiltersButton()}</div> */}
-              {/* Sort by */}
               <div className="items-center whitespace-nowrap md:flex">
                 <Sort defaultOrder={filters.order} form="filters-form" />
               </div>
@@ -181,7 +187,7 @@ export default function Studies({
           </Card>
           <div className="lg:sticky top-4 mt-4">
             <RequestSupport />
-            {isOdpUser ? (
+            {isOdpUser && isClient ? (
               <Card className="mt-4" data-testid="export-study-data" filled padding={4}>
                 <h3 className="govuk-heading-m">Access Sponsor RDN Portfolio Dashboard</h3>
                 <p>
@@ -190,7 +196,7 @@ export default function Studies({
                 <a
                   aria-label="Access dashboard (Opens in a new tab)"
                   className="govuk-button mb-0"
-                  href={NEXT_PUBLIC_ODP_DASHBOARD_LINK}
+                  href={dashboardLink}
                   rel="noopener noreferrer"
                   target="_blank"
                 >
