@@ -5,7 +5,7 @@ import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
-import { type ReactElement, useEffect, useState } from 'react'
+import { type ReactElement } from 'react'
 
 import type { OrderType } from '@/@types/filters'
 import type { TypeBannerSkeleton } from '@/@types/generated'
@@ -53,19 +53,9 @@ export default function Studies({
   entry,
 }: StudiesProps) {
   const router = useRouter()
-
-  const [dashboardLink, setDashboardLink] = useState('')
-  const [isClient, setIsClient] = useState(false)
-
   const { isLoading, handleFilterChange } = useFormListeners()
   const isOdpUser = user.groups.includes(ODP_ROLE)
-
-  const linkFromEnv = process.env.NEXT_PUBLIC_ODP_DASHBOARD_LINK || ''
-
-  useEffect(() => {
-    setIsClient(true)
-    setDashboardLink(linkFromEnv)
-  }, [linkFromEnv])
+  const dashboardLink = process.env.NEXT_PUBLIC_ODP_DASHBOARD_LINK || ''
 
   const titleResultsText =
     totalItems === 0
@@ -187,7 +177,7 @@ export default function Studies({
           </Card>
           <div className="lg:sticky top-4 mt-4">
             <RequestSupport />
-            {isOdpUser && isClient ? (
+            {isOdpUser ? (
               <Card className="mt-4" data-testid="export-study-data" filled padding={4}>
                 <h3 className="govuk-heading-m">Access Sponsor RDN Portfolio Dashboard</h3>
                 <p>
