@@ -32,7 +32,7 @@ import { getFiltersFromQuery } from '@/utils/filters'
 import { pluraliseStudy } from '@/utils/pluralise'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
-const { ODP_DASHBOARD_LINK = '' } = process.env
+const { NEXT_PUBLIC_ODP_DASHBOARD_LINK = '' } = process.env
 
 const renderNotificationBanner = (success: boolean) =>
   success ? (
@@ -190,7 +190,7 @@ export default function Studies({
                 <a
                   aria-label="Access dashboard (Opens in a new tab)"
                   className="govuk-button mb-0"
-                  href={ODP_DASHBOARD_LINK}
+                  href={NEXT_PUBLIC_ODP_DASHBOARD_LINK}
                   rel="noopener noreferrer"
                   target="_blank"
                 >

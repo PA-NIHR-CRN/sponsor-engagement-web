@@ -32,7 +32,7 @@
         "CONTENTFUL_PREVIEW_MODE",
         "CONTENTFUL_PREVIEW_ACCESS_TOKEN",
         "ODP_ROLE_GROUP_ID",
-        "ODP_DASHBOARD_LINK"
+        "NEXT_PUBLIC_ODP_DASHBOARD_LINK"
       ]
     },
     "start": {},
@@ -72,7 +72,7 @@
         "CONTENTFUL_PREVIEW_MODE",
         "CONTENTFUL_PREVIEW_ACCESS_TOKEN",
         "ODP_ROLE_GROUP_ID",
-        "ODP_DASHBOARD_LINK"
+        "NEXT_PUBLIC_ODP_DASHBOARD_LINK"
       ]
     },
     "test:ci": {
@@ -110,7 +110,7 @@
         "CONTENTFUL_PREVIEW_MODE",
         "CONTENTFUL_PREVIEW_ACCESS_TOKEN",
         "ODP_ROLE_GROUP_ID",
-        "ODP_DASHBOARD_LINK"
+        "NEXT_PUBLIC_ODP_DASHBOARD_LINK"
       ]
     },
     "db:generate": { "cache": false },
