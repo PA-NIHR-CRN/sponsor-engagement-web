@@ -79,16 +79,16 @@ test.describe('Access Study Details Page and view Summary - @se_26', () => {
       await studiesPage.goto()
       await studiesPage.assertOnStudiesPage()
     })
-    await test.step(`When I click the Title of any Study on the Study List`, async () => {
+    await test.step(`When I click the View Study button of any Study on the Study List`, async () => {
       studyListItemToClick = await studiesPage.selectRandomStudyListItemIndex()
-      studyIdSelected = await studiesPage.getStudyIdFromListTitle(studyListItemToClick)
+      studyIdSelected = await studiesPage.getStudyIdFromListViewButton(studyListItemToClick)
       studyDetails = await seDatabaseReq(`SELECT Study.shortTitle, Organisation.name AS sponsorName FROM Study
             INNER JOIN StudyOrganisation
             ON StudyOrganisation.studyId = Study.id 
             INNER JOIN Organisation
             ON StudyOrganisation.organisationId = Organisation.id 
             WHERE Study.id = ${studyIdSelected} AND StudyOrganisation.organisationRoleId = 1;`)
-      studiesPage.studyListItemTitle.nth(studyListItemToClick).click()
+      studiesPage.viewStudyButton.nth(studyListItemToClick).click()
     })
     await test.step(`Then I am taken to the Details page for Study with SE Id ${studyIdSelected}`, async () => {
       await studyDetailsPage.assertOnStudyDetailsPage(studyIdSelected)

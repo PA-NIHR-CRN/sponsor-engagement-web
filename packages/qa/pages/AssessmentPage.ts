@@ -171,12 +171,6 @@ export default class AssessmentPage {
     await expect(this.page).toHaveURL(`assessments/${studyId}`)
   }
 
-  async assertOnAssessmentPageViaStudyList(studyId: string) {
-    await expect(this.pageTitle).toBeVisible()
-    await expect(this.pageTitle).toHaveText('Assess progress of a study')
-    await expect(this.page).toHaveURL(`assessments/${studyId}?returnUrl=studies`)
-  }
-
   async assertIntroText() {
     await expect(this.introText).toBeVisible()
     await expect(this.introText).toContainText(
