@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 
+import type { DateInputValue } from '@/components/atoms/Form/DateInput/types'
 import { SE_GDPR_COOKIE_EXPIRY_MONTHS } from '@/constants/cookies'
 
 import { DATE_FORMAT, DATE_FORMAT_SHORT } from '../constants'
@@ -25,4 +26,16 @@ export const constructDatePartsFromDate = (date?: Date | null) => {
   const year = date.getFullYear().toString()
 
   return { year, month, day }
+}
+
+export const constructDateObjFromParts = (dateParts?: DateInputValue) => {
+  if (!dateParts) return undefined
+
+  if (Object.values(dateParts).find((value) => Number.isNaN(Number(value)))) {
+    return undefined
+  }
+
+  const { year, month, day } = dateParts
+
+  return new Date(Number(year), Number(month), Number(day))
 }

@@ -4,7 +4,7 @@ import clsx from 'clsx'
 import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
 import { type ReactElement } from 'react'
-import { Controller, SubmitHandler, useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 
 import { Fieldset, Form, Radio, RadioGroup } from '@/components/atoms'
 import { DateInput } from '@/components/atoms/Form/DateInput/DateInput'
@@ -21,16 +21,16 @@ import {
   studyStatuses,
 } from '@/constants/editStudyForm'
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
-import { mapCPMSStudyToPrismaStudy, updateStudy } from '@/lib/studies'
+import { updateStudy } from '@/lib/studies'
 import { mapStudyToStudyFormInput } from '@/utils/editStudyForm'
-import type { StudyInputs } from '@/utils/schemas'
+import type { EditStudyInputs } from '@/utils/schemas'
 import { studySchema } from '@/utils/schemas'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
 export type EditStudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
 export default function EditStudy({ study }: EditStudyProps) {
-  const { register, formState, handleSubmit, control, getValues } = useForm<StudyInputs>({
+  const { register, formState, handleSubmit, control } = useForm<EditStudyInputs>({
     resolver: zodResolver(studySchema),
     defaultValues: {
       ...mapStudyToStudyFormInput(study),
@@ -42,8 +42,6 @@ export default function EditStudy({ study }: EditStudyProps) {
   const supportOrgName = organisationsByRole.CRO ?? organisationsByRole.CTU
 
   const { defaultValues } = formState
-
-  console.log({ values: getValues() })
 
   return (
     <Container>
