@@ -9,6 +9,7 @@ import { ErrorInline } from '../ErrorInline/ErrorInline'
 
 interface TextareaProps {
   label: string
+  labelSize?: 's' | 'm' | 'l'
   name: string
   hint?: ReactNode
   required?: boolean
@@ -18,13 +19,13 @@ interface TextareaProps {
 }
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ label, errors, hint, remainingCharacters, defaultValue, required = true, ...rest }, ref) => {
+  ({ label, labelSize = 's', errors, hint, remainingCharacters, defaultValue, required = true, ...rest }, ref) => {
     const error = errors[rest.name]
 
     return (
       <div className={clsx('govuk-form-group', { 'govuk-form-group--error': Boolean(error) })}>
         <div className="govuk-label-wrapper">
-          <label className="govuk-label govuk-label--s" htmlFor={rest.name} id={`${rest.name}-label`}>
+          <label className={`govuk-label govuk-label--${labelSize}`} htmlFor={rest.name} id={`${rest.name}-label`}>
             {label}
           </label>
           {hint ? (

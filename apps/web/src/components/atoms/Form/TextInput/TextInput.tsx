@@ -8,22 +8,48 @@ import { ErrorInline } from '../ErrorInline/ErrorInline'
 interface TextInputProps extends React.HTMLProps<HTMLInputElement> {
   name: string
   label?: string
+  labelSize?: 's' | 'm' | 'l'
   hint?: ReactNode
   required?: boolean
   errors?: FieldErrors
+  displayInlineError?: boolean
   autocomplete?: string
-  defaultValue?: string
+  defaultValue?: string | number
   className?: string
+  labelClassName?: string
+  inputClassName?: string
+  disabled?: boolean
 }
 
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
-  ({ label, errors, hint, defaultValue, required = true, autocomplete, className, ...rest }, ref) => {
+  (
+    {
+      label,
+      labelSize = 's',
+      errors,
+      displayInlineError = true,
+      hint,
+      defaultValue,
+      required = true,
+      autocomplete,
+      className,
+      labelClassName,
+      inputClassName,
+      disabled,
+      ...rest
+    },
+    ref
+  ) => {
     const error = errors?.[rest.name]
     return (
       <div className={clsx('govuk-form-group', { 'govuk-form-group--error': Boolean(error) }, className)}>
         <div className="govuk-label-wrapper">
           {label ? (
-            <label className="govuk-label govuk-label--s" htmlFor={rest.name} id={`${rest.name}-label`}>
+            <label
+              className={clsx('govuk-label', `govuk-label--${labelSize}`, labelClassName)}
+              htmlFor={rest.name}
+              id={`${rest.name}-label`}
+            >
               {label}
             </label>
           ) : null}
@@ -33,20 +59,22 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
             </div>
           ) : null}
         </div>
-        {errors ? <ErrorInline errors={errors} name={rest.name} /> : null}
+        {errors && displayInlineError ? <ErrorInline errors={errors} name={rest.name} /> : null}
         <input
           aria-describedby={clsx({
             [`${rest.name}-hint`]: hint,
             [`${rest.name}-error`]: error,
           })}
+          aria-disabled={disabled}
           aria-errormessage={clsx({
             [`${rest.name}-error`]: error,
           })}
           aria-invalid={error ? 'true' : 'false'}
           aria-required={required}
           autoComplete={autocomplete}
-          className={clsx('govuk-input', { 'govuk-input--error': Boolean(error) })}
+          className={clsx('govuk-input', { 'govuk-input--error': Boolean(error) }, inputClassName)}
           defaultValue={defaultValue}
+          disabled={disabled}
           id={rest.name}
           type="text"
           {...rest}
