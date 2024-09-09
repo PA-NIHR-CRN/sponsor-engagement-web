@@ -42,6 +42,8 @@ const envSchema = z
     CONTENTFUL_PREVIEW_ACCESS_TOKEN: z.string(),
     AWS_SECRET_NAME: z.string(),
     AWS_REGION: z.string(),
+    ODP_ROLE_GROUP_ID: z.string(),
+    NEXT_PUBLIC_ODP_DASHBOARD_LINK: z.string(),
   })
   .required()
 
