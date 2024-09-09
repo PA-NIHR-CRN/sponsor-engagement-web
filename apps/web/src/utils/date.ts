@@ -28,6 +28,9 @@ export const constructDatePartsFromDate = (date?: Date | null) => {
   return { year, month, day }
 }
 
+/**
+ * Creates a Date object from its' date parts - year, month and day
+ */
 export const constructDateObjFromParts = (dateParts?: DateInputValue) => {
   if (!dateParts) return undefined
 
@@ -37,5 +40,5 @@ export const constructDateObjFromParts = (dateParts?: DateInputValue) => {
 
   const { year, month, day } = dateParts
 
-  return new Date(Number(year), Number(month), Number(day))
+  return new Date(`${Number(year)}-${Number(month)}-${Number(day)}`)
 }

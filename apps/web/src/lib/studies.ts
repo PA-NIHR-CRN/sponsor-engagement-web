@@ -1,4 +1,5 @@
 import type { Study } from '@/@types/studies'
+import { getErrorMessage } from '@/utils/error'
 
 import type { OrderType } from '../@types/filters'
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
@@ -280,7 +281,7 @@ export const mapCPMSStudyToPrismaStudy = (study: Study): UpdateStudyInput => {
     chiefInvestigatorLastName: study.ChiefInvestigatorLastName,
     managingSpeciality: study.ManagingSpecialty,
     totalRecruitmentToDate: study.TotalRecruitmentToDate,
-    // TODO: Look at the mapping for the data - why does new Date(ISO_STRING) goes back one day ?
+    // TODO: Look at the mapping for the data
     plannedOpeningDate: study.PlannedOpeningDate ? new Date(study.PlannedOpeningDate) : null,
     plannedClosureDate: study.PlannedClosureToRecruitmentDate ? new Date(study.PlannedClosureToRecruitmentDate) : null,
     actualOpeningDate: study.ActualOpeningDate ? new Date(study.ActualOpeningDate) : null,
@@ -324,8 +325,10 @@ export const updateStudy = async (studyId: number, studyData: UpdateStudyInput) 
       },
     }
   } catch (error) {
+    const errorMessage = getErrorMessage(error)
     return {
       data: null,
+      error: errorMessage,
     }
   }
 }

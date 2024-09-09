@@ -21,7 +21,7 @@ import {
   studyStatuses,
 } from '@/constants/editStudyForm'
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
-import { updateStudy } from '@/lib/studies'
+import { mapCPMSStudyToPrismaStudy, updateStudy } from '@/lib/studies'
 import { mapStudyToStudyFormInput } from '@/utils/editStudyForm'
 import type { EditStudyInputs } from '@/utils/schemas'
 import { studySchema } from '@/utils/schemas'
@@ -250,7 +250,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
 
   const { study: studyInCPMS } = await getStudyByIdFromCPMS(studyId as string)
 
-  // // If there is an error fetching from CPMS, do we want to attempt to get from SE DB before redirecting to 500?
+  // If there is an error fetching from CPMS, do we want to attempt to get from SE DB before redirecting to 500?
   if (!studyInCPMS) {
     return {
       redirect: {
