@@ -1,3 +1,5 @@
+import type { Study } from '@/@types/studies'
+
 import type { OrderType } from '../@types/filters'
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
 import { type OrganisationRoleShortName, organisationRoleShortName } from './organisations'
@@ -259,4 +261,71 @@ export const getStudiesForExport = async (organisationIds: number[]) => {
   }
 
   return prismaClient.study.findMany(query)
+}
+
+export type UpdateStudyInput = Prisma.StudyUpdateInput
+
+export const mapCPMSStudyToPrismaStudy = (study: Study): UpdateStudyInput => {
+  return {
+    cpmsId: study.Id,
+    title: study.Title,
+    shortTitle: study.ShortName,
+    studyStatus: study.StudyStatus,
+    recordStatus: study.StudyRecordStatus,
+    route: study.StudyRoute,
+    irasId: study.IrasId,
+    protocolReferenceNumber: study.ProtocolReferenceNumber,
+    sampleSize: study.SampleSize,
+    chiefInvestigatorFirstName: study.ChiefInvestigatorFirstName,
+    chiefInvestigatorLastName: study.ChiefInvestigatorLastName,
+    managingSpeciality: study.ManagingSpecialty,
+    totalRecruitmentToDate: study.TotalRecruitmentToDate,
+    // TODO: Look at the mapping for the data - why does new Date(ISO_STRING) goes back one day ?
+    plannedOpeningDate: study.PlannedOpeningDate ? new Date(study.PlannedOpeningDate) : null,
+    plannedClosureDate: study.PlannedClosureToRecruitmentDate ? new Date(study.PlannedClosureToRecruitmentDate) : null,
+    actualOpeningDate: study.ActualOpeningDate ? new Date(study.ActualOpeningDate) : null,
+    actualClosureDate: study.ActualClosureToRecruitmentDate ? new Date(study.ActualClosureToRecruitmentDate) : null,
+    isDueAssessment: false,
+    isDeleted: false,
+  }
+}
+
+export const updateStudy = async (studyId: number, studyData: UpdateStudyInput) => {
+  try {
+    const study = await prismaClient.study.update({
+      where: {
+        cpmsId: studyId,
+      },
+      data: { ...studyData },
+      include: {
+        organisations: {
+          where: {
+            isDeleted: false,
+          },
+          include: {
+            organisation: true,
+            organisationRole: true,
+          },
+        },
+      },
+    })
+
+    // Map organisation roles along with the name of the organisation to quickly check for a CTU / CRO if applicable
+    const organisationsByRole = Object.fromEntries(
+      study.organisations.map((organisation) => {
+        return [organisationRoleShortName[organisation.organisationRole.name], organisation.organisation.name]
+      })
+    ) as Partial<Record<OrganisationRoleShortName, string>>
+
+    return {
+      data: {
+        ...study,
+        organisationsByRole,
+      },
+    }
+  } catch (error) {
+    return {
+      data: null,
+    }
+  }
 }

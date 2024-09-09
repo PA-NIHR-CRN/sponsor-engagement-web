@@ -13,8 +13,8 @@ export const studySchema = z.object({
   status: z.string().optional(),
   plannedOpeningDate: dateSchema.optional(),
   actualOpeningDate: dateSchema.optional(),
-  plannedClosureToRecruitmentDate: dateSchema.optional(),
-  actualClosureToRecruitmentDate: dateSchema.optional(),
+  plannedClosureDate: dateSchema.optional(),
+  actualClosureDate: dateSchema.optional(),
   recruitmentTarget: z.number().optional(),
   furtherInformation: z.string().optional(),
 })
