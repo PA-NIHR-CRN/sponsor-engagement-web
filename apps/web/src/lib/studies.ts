@@ -268,26 +268,16 @@ export type UpdateStudyInput = Prisma.StudyUpdateInput
 
 export const mapCPMSStudyToPrismaStudy = (study: Study): UpdateStudyInput => {
   return {
-    cpmsId: study.Id,
-    title: study.Title,
-    shortTitle: study.ShortName,
+    cpmsId: study.StudyId,
+    shortTitle: study.StudyShortName,
     studyStatus: study.StudyStatus,
-    recordStatus: study.StudyRecordStatus,
     route: study.StudyRoute,
-    irasId: study.IrasId,
-    protocolReferenceNumber: study.ProtocolReferenceNumber,
-    sampleSize: study.SampleSize,
-    chiefInvestigatorFirstName: study.ChiefInvestigatorFirstName,
-    chiefInvestigatorLastName: study.ChiefInvestigatorLastName,
-    managingSpeciality: study.ManagingSpecialty,
-    totalRecruitmentToDate: study.TotalRecruitmentToDate,
-    // TODO: Look at the mapping for the data
+    sampleSize: study.UkRecruitmentTarget,
+    totalRecruitmentToDate: study.UkRecruitmentTargetToDate,
     plannedOpeningDate: study.PlannedOpeningDate ? new Date(study.PlannedOpeningDate) : null,
     plannedClosureDate: study.PlannedClosureToRecruitmentDate ? new Date(study.PlannedClosureToRecruitmentDate) : null,
     actualOpeningDate: study.ActualOpeningDate ? new Date(study.ActualOpeningDate) : null,
     actualClosureDate: study.ActualClosureToRecruitmentDate ? new Date(study.ActualClosureToRecruitmentDate) : null,
-    isDueAssessment: false,
-    isDeleted: false,
   }
 }
 

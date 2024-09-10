@@ -9,7 +9,7 @@ interface GetStudyFromCPMSResponse {
   error?: string
 }
 
-export const getStudyByIdFromCPMS = async (studyId: string): Promise<GetStudyFromCPMSResponse> => {
+export const getStudyByIdFromCPMS = async (studyId: number): Promise<GetStudyFromCPMSResponse> => {
   const { CPMS_API_URL, CPMS_API_USERNAME, CPMS_API_PASSWORD } = process.env
 
   try {

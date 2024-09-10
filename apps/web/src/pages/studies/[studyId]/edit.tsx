@@ -21,7 +21,7 @@ import {
   studyStatuses,
 } from '@/constants/editStudyForm'
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
-import { mapCPMSStudyToPrismaStudy, updateStudy } from '@/lib/studies'
+import { getStudyById, mapCPMSStudyToPrismaStudy, updateStudy } from '@/lib/studies'
 import { mapStudyToStudyFormInput } from '@/utils/editStudyForm'
 import type { EditStudyInputs } from '@/utils/schemas'
 import { studySchema } from '@/utils/schemas'
@@ -238,9 +238,9 @@ EditStudy.getLayout = function getLayout(page: ReactElement, { user }: EditStudy
 }
 
 export const getServerSideProps = withServerSideProps(Roles.SponsorContact, async (context, session) => {
-  const studyId = context.query.studyId
+  const seStudyRecord = await getStudyById(Number(context.query.studyId))
 
-  if (!studyId) {
+  if (!seStudyRecord) {
     return {
       redirect: {
         destination: '/404',
@@ -248,7 +248,16 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     }
   }
 
-  const { study: studyInCPMS } = await getStudyByIdFromCPMS(studyId as string)
+  const cpmsId = seStudyRecord.data?.cpmsId
+
+  if (!cpmsId) {
+    return {
+      redirect: {
+        destination: '/404',
+      },
+    }
+  }
+  const { study: studyInCPMS } = await getStudyByIdFromCPMS(cpmsId)
 
   // If there is an error fetching from CPMS, do we want to attempt to get from SE DB before redirecting to 500?
   if (!studyInCPMS) {
@@ -259,7 +268,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     }
   }
 
-  const { data: study } = await updateStudy(Number(studyId), mapCPMSStudyToPrismaStudy(studyInCPMS))
+  const { data: study } = await updateStudy(Number(cpmsId), mapCPMSStudyToPrismaStudy(studyInCPMS))
 
   if (!study) {
     return {

@@ -4,37 +4,20 @@ export interface CPMSStudyResponse {
   Result: Study
 }
 
-// TODO: Discuss with Peter the types
 export interface Study {
-  Id: number
-  StudyId: string
-  ShortName: string
-  Title: string
-  StudyStatus: Status
+  StudyId: number
+  StudyRoute: string
   StudyShortName: string
-  StudyRecordStatus: StudyRecordStatus
-  StudyRoute: StudyRoute
+  StudyStatus: string
   PlannedOpeningDate: string
+  ActualOpeningDate: string
   PlannedClosureToRecruitmentDate: string
   ActualClosureToRecruitmentDate: string
-  EstimatedReopeningDate: null
-  UkRecruitmentTarget: null
+  EstimatedReopeningDate: string | null
+  UkRecruitmentTarget: number
   UkRecruitmentTargetToDate: number
-  IrasId: null | string
-  ProtocolReferenceNumber: null | string
-  SampleSize: number | null
-  ChiefInvestigatorFirstName: null | string
-  ChiefInvestigatorLastName: null | string
-  ManagingSpecialty: ManagingSpecialty
-  QualificationDate: null | string
-  TotalRecruitmentToDate: number | null
-  PlannedRecruitmentStartDate: null | string
-  PlannedRecruitmentEndDate: null | string
-  ActualOpeningDate: null | string
-  ActualClosureDate: null | string
-  StudyEvaluationCategories: StudyEvaluationCategory[]
-  StudySponsors: StudySponsor[]
-  StudyFunders: StudyFunder[]
+  StudyEvaluations: any[]
+  ChangeHistory: any[]
 }
 
 export enum StudyRecordStatus {
