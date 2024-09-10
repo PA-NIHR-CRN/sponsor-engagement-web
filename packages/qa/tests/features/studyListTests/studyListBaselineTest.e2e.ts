@@ -38,7 +38,7 @@ test.describe('Baseline Study List Page for Sponsor Contact - @se_22 se_22_basel
     })
   })
 
-  test('As a Sponsor Contact I see the expected Study List Page Layout - @se_22_baseline_ac2_layout', async ({
+  test('As a Sponsor Contact I see the expected Study List Page Layout - @se_22_baseline_ac2_layout, @se_180_ac1', async ({
     studiesPage,
   }) => {
     await test.step('Given I have navigated to the Studies Page', async () => {
@@ -53,11 +53,11 @@ test.describe('Baseline Study List Page for Sponsor Contact - @se_22 se_22_basel
     await test.step('And there is Introductory Guidance text setting the Context for the SE Tool', async () => {
       await studiesPage.assertIntroGuideTxt()
     })
-    await test.step('And I can see an expandible help section titled `Why am I being asked to assess studies?`', async () => {
-      await studiesPage.assertExpandibleSectionPresent()
+    await test.step('And I can see an expandable help section titled `Why am I being asked to assess studies?`', async () => {
+      await studiesPage.assertExpandableSectionPresent()
     })
     await test.step('And the section is collapsed by default', async () => {
-      await studiesPage.assertExpandibleSectionState('collapsed')
+      await studiesPage.assertExpandableSectionState('collapsed')
     })
   })
 
@@ -70,23 +70,23 @@ test.describe('Baseline Study List Page for Sponsor Contact - @se_22 se_22_basel
     await test.step('When I am on the Studies Page', async () => {
       await studiesPage.assertOnStudiesPage()
     })
-    await test.step('Then I can see an expandible section titled `Why am I being asked to assess studies?`', async () => {
-      await studiesPage.assertExpandibleSectionPresent()
+    await test.step('Then I can see an expandable section titled `Why am I being asked to assess studies?`', async () => {
+      await studiesPage.assertExpandableSectionPresent()
     })
     await test.step('When I click the collapsed help section', async () => {
       await studiesPage.expandCollapseSection.locator('span').click()
     })
     await test.step('Then the section expands', async () => {
-      await studiesPage.assertExpandibleSectionState('expanded')
+      await studiesPage.assertExpandableSectionState('expanded')
     })
     await test.step('And the expanded section contain the expected information', async () => {
-      await studiesPage.assertExpandibleSectionTxt()
+      await studiesPage.assertExpandableSectionTxt()
     })
     await test.step('When I click the expanded help section', async () => {
       await studiesPage.expandCollapseSection.locator('span').click()
     })
     await test.step('Then the section collapses again', async () => {
-      await studiesPage.assertExpandibleSectionState('collapsed')
+      await studiesPage.assertExpandableSectionState('collapsed')
     })
   })
 

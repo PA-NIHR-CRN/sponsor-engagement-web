@@ -118,12 +118,12 @@ export default class StudiesPage {
     )
   }
 
-  async assertExpandibleSectionPresent() {
+  async assertExpandableSectionPresent() {
     await expect(this.expandCollapseSection).toBeVisible()
     await expect(this.expandCollapseSection.locator('summary')).toHaveText('Why am I being asked to assess studies?')
   }
 
-  async assertExpandibleSectionState(state: string) {
+  async assertExpandableSectionState(state: string) {
     if (state.toLowerCase() == 'collapsed') {
       await expect(this.expandCollapseSectionContents).toBeHidden()
     } else {
@@ -131,7 +131,7 @@ export default class StudiesPage {
     }
   }
 
-  async assertExpandibleSectionTxt() {
+  async assertExpandableSectionTxt() {
     await expect(this.expandCollapseSectionContents.locator('p')).toHaveText(
       'NIHR RDN asks sponsors or their delegates to review and assess study progress for UK studies when:'
     )

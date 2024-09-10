@@ -233,7 +233,7 @@ describe('Study page', () => {
       'Planned closure to recruitment date',
       'Actual closure to recruitment date',
       'Estimated reopening date',
-      'UK recruitment target (excluding private site)',
+      'UK recruitment target (excluding private sites)',
       'Total UK recruitment to date',
     ])
 
@@ -395,7 +395,7 @@ describe('Study page', () => {
 
     expect(screen.queryByText('Network recruitment target')).not.toBeInTheDocument()
     expect(screen.queryByText('Total network recruitment to date')).not.toBeInTheDocument()
-    expect(screen.getByText('UK recruitment target (excluding private site)')).toBeInTheDocument()
+    expect(screen.getByText('UK recruitment target (excluding private sites)')).toBeInTheDocument()
     expect(screen.getByText('Total UK recruitment to date')).toBeInTheDocument()
   })
 

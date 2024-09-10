@@ -70,7 +70,10 @@ test.beforeAll('Setup Tests', async () => {
 test.describe('Access Study Details Page and view Summary - @se_26', () => {
   test.use({ storageState: '.auth/sponsorContact.json' })
 
-  test('As a Sponsor I can access the Study Details page  - @se_26_ac1', async ({ studiesPage, studyDetailsPage }) => {
+  test('As a Sponsor I can access the Study Details page  - @se_26_ac1, @se_180_ac3, @se_181_ac3', async ({
+    studiesPage,
+    studyDetailsPage,
+  }) => {
     let studyListItemToClick: number
     let studyIdSelected: string = ''
     let studyDetails: RowDataPacket[]
@@ -119,7 +122,7 @@ test.describe('Access Study Details Page and view Summary - @se_26', () => {
     })
   })
 
-  test('As a Sponsor I can see the Summary of study’s progress (UK) of a Specific Study - @se_26_ac2', async ({
+  test('As a Sponsor I can see the Summary of study’s progress (UK) of a Specific Study - @se_26_ac2, @se_181_ac4', async ({
     studyDetailsPage,
   }) => {
     await test.step(`Given I have navigated to the Study Details Page for a Commercial Study with SE Id ${startingStudyId}`, async () => {
