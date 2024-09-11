@@ -240,7 +240,7 @@ EditStudy.getLayout = function getLayout(page: ReactElement, { user }: EditStudy
 export const getServerSideProps = withServerSideProps(Roles.SponsorContact, async (context, session) => {
   const seStudyRecord = await getStudyById(Number(context.query.studyId))
 
-  if (!seStudyRecord) {
+  if (!seStudyRecord.data) {
     return {
       redirect: {
         destination: '/404',
@@ -248,7 +248,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     }
   }
 
-  const cpmsId = seStudyRecord.data?.cpmsId
+  const cpmsId = seStudyRecord.data.cpmsId
 
   if (!cpmsId) {
     return {
