@@ -3,7 +3,8 @@ import { Mock } from 'ts-mockery'
 
 import { prismaMock } from '../__mocks__/prisma'
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
-import { getStudiesForOrgs, getStudyById } from './studies'
+import type { UpdateStudyInput } from './studies'
+import { getStudiesForOrgs, getStudyById, updateStudy } from './studies'
 
 describe('getStudiesForOrgs', () => {
   const mockStudies = [Mock.of<Study>({ id: 1, title: 'Study 1' }), Mock.of<Study>({ id: 2, title: 'Study 2' })]
@@ -295,5 +296,68 @@ describe('getStudyById', () => {
         },
       },
     })
+  })
+})
+
+describe('UpdateStudy', () => {
+  const studyId = 1212
+  const mockStudyInputs = Mock.of<UpdateStudyInput>({ cpmsId: studyId, title: 'Study 1' })
+  const mockUpdatedStudy = {
+    ...mockStudyInputs,
+    organisations: [
+      {
+        organisation: {
+          name: 'Pfizer clinical trials',
+        },
+        organisationRole: {
+          name: 'Managing Clinical Trials Unit',
+        },
+      },
+    ],
+  }
+
+  it('correctly updates and returns the study with given id', async () => {
+    prismaMock.study.update.mockResolvedValueOnce(mockUpdatedStudy)
+
+    const result = await updateStudy(studyId, mockStudyInputs)
+
+    expect(result).toEqual({
+      data: {
+        ...mockUpdatedStudy,
+        organisationsByRole: { CTU: 'Pfizer clinical trials' },
+      },
+    })
+
+    expect(prismaMock.study.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          cpmsId: studyId,
+        },
+        data: { ...mockStudyInputs },
+        include: {
+          organisations: {
+            where: {
+              isDeleted: false,
+            },
+            include: {
+              organisation: true,
+              organisationRole: true,
+            },
+          },
+        },
+      })
+    )
+
+    expect(result.data?.cpmsId).toEqual(mockUpdatedStudy.cpmsId)
+    expect(result.data?.title).toEqual(mockUpdatedStudy.title)
+  })
+
+  it('returns the correct error message when there is an error', async () => {
+    const errorMessage = 'Oh no, an error!'
+
+    prismaMock.study.update.mockRejectedValueOnce(new Error(errorMessage))
+
+    const result = await updateStudy(studyId, mockStudyInputs)
+    expect(result).toEqual({ data: null, error: errorMessage })
   })
 })

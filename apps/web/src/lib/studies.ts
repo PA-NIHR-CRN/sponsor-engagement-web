@@ -1,3 +1,6 @@
+import type { Study } from '@/@types/studies'
+import { getErrorMessage } from '@/utils/error'
+
 import type { OrderType } from '../@types/filters'
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
 import { type OrganisationRoleShortName, organisationRoleShortName } from './organisations'
@@ -259,4 +262,63 @@ export const getStudiesForExport = async (organisationIds: number[]) => {
   }
 
   return prismaClient.study.findMany(query)
+}
+
+export type UpdateStudyInput = Prisma.StudyUpdateInput
+
+export const mapCPMSStudyToPrismaStudy = (study: Study): UpdateStudyInput => {
+  return {
+    cpmsId: study.StudyId,
+    shortTitle: study.StudyShortName,
+    studyStatus: study.StudyStatus,
+    route: study.StudyRoute,
+    sampleSize: study.UkRecruitmentTarget,
+    totalRecruitmentToDate: study.UkRecruitmentTargetToDate,
+    plannedOpeningDate: study.PlannedOpeningDate ? new Date(study.PlannedOpeningDate) : null,
+    plannedClosureDate: study.PlannedClosureToRecruitmentDate ? new Date(study.PlannedClosureToRecruitmentDate) : null,
+    actualOpeningDate: study.ActualOpeningDate ? new Date(study.ActualOpeningDate) : null,
+    actualClosureDate: study.ActualClosureToRecruitmentDate ? new Date(study.ActualClosureToRecruitmentDate) : null,
+  }
+}
+
+export const updateStudy = async (studyId: number, studyData: UpdateStudyInput) => {
+  try {
+    const study = await prismaClient.study.update({
+      where: {
+        cpmsId: studyId,
+      },
+      data: { ...studyData },
+      include: {
+        organisations: {
+          where: {
+            isDeleted: false,
+          },
+          include: {
+            organisation: true,
+            organisationRole: true,
+          },
+        },
+      },
+    })
+
+    // Map organisation roles along with the name of the organisation to quickly check for a CTU / CRO if applicable
+    const organisationsByRole = Object.fromEntries(
+      study.organisations.map((organisation) => {
+        return [organisationRoleShortName[organisation.organisationRole.name], organisation.organisation.name]
+      })
+    ) as Partial<Record<OrganisationRoleShortName, string>>
+
+    return {
+      data: {
+        ...study,
+        organisationsByRole,
+      },
+    }
+  } catch (error) {
+    const errorMessage = getErrorMessage(error)
+    return {
+      data: null,
+      error: errorMessage,
+    }
+  }
 }
