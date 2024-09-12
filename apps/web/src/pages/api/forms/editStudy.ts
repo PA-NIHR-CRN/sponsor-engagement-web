@@ -33,7 +33,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
       ...(actualClosureDate && { ActualClosureToRecruitmentDate: constructDateObjFromParts(actualClosureDate) }),
     })
 
-    const requestUrl = `${CPMS_API_URL}/studies/${id}/engagement-info`
+    const requestUrl = `${CPMS_API_URL}/studies/${studyId}/engagement-info`
 
     const { data } = await axios.put<CPMSStudyResponse>(requestUrl, body, {
       headers: {

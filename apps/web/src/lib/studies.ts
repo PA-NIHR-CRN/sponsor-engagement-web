@@ -266,7 +266,7 @@ export const getStudiesForExport = async (organisationIds: number[]) => {
 
 export type UpdateStudyInput = Prisma.StudyUpdateInput
 
-export const mapApiStatusToUiStatus = (apiStatus: string): string => {
+export const mapCPMSStatusToSEStatus = (cpmsStatus: string): string => {
   const statusMap: { [key: string]: string } = {
     'In Setup': 'In Setup',
     'In Setup, Approval Received': 'In setup',
@@ -281,14 +281,14 @@ export const mapApiStatusToUiStatus = (apiStatus: string): string => {
     'Withdrawn During Setup': 'Withdrawn',
   }
 
-  return statusMap[apiStatus] || apiStatus
+  return statusMap[cpmsStatus] || cpmsStatus
 }
 
 export const mapCPMSStudyToPrismaStudy = (study: Study): UpdateStudyInput => {
   return {
     cpmsId: study.StudyId,
     shortTitle: study.StudyShortName,
-    studyStatus: mapApiStatusToUiStatus(study.StudyStatus),
+    studyStatus: mapCPMSStatusToSEStatus(study.StudyStatus),
     route: study.StudyRoute,
     sampleSize: study.UkRecruitmentTarget,
     totalRecruitmentToDate: study.UkRecruitmentTargetToDate,
