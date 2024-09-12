@@ -138,7 +138,7 @@ export default function Study({ user, study, assessments }: StudyProps) {
               )}
 
               <Table.Row>
-                <Table.CellHeader className="w-1/3">UK recruitment target (excluding private site)</Table.CellHeader>
+                <Table.CellHeader className="w-1/3">UK recruitment target (excluding private sites)</Table.CellHeader>
                 <Table.Cell>{study.sampleSize ?? '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>

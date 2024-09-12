@@ -6,6 +6,7 @@ import LoginPage from '../pages/LoginPage'
 import StudiesPage from '../pages/StudiesPage'
 import OrganisationsPage from '../pages/OrganisationsPage'
 import StudyDetailsPage from '../pages/StudyDetailsPage'
+import StudyUpdatePage from '../pages/StudyUpdatePage'
 import AssessmentPage from '../pages/AssessmentPage'
 import RequestSupportPage from '../pages/RequestSupportPage'
 import OrganisationDetailsPage from '../pages/OrganisationDetailsPage'
@@ -19,6 +20,7 @@ type CustomFixtures = {
   studiesPage: StudiesPage
   organisationsPage: OrganisationsPage
   studyDetailsPage: StudyDetailsPage
+  studyUpdatePage: StudyUpdatePage
   assessmentPage: AssessmentPage
   requestSupportPage: RequestSupportPage
   organisationDetailsPage: OrganisationDetailsPage
@@ -47,6 +49,10 @@ export const test = base.extend<CustomFixtures>({
 
   studyDetailsPage: async ({ page }, use) => {
     await use(new StudyDetailsPage(page))
+  },
+
+  studyUpdatePage: async ({ page }, use) => {
+    await use(new StudyUpdatePage(page))
   },
 
   assessmentPage: async ({ page }, use) => {
