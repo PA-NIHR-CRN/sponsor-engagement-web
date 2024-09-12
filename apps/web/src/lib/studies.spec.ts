@@ -300,31 +300,50 @@ describe('getStudyById', () => {
 })
 
 describe('UpdateStudy', () => {
+  type StudyWithOrganisations = Prisma.StudyGetPayload<{
+    include: {
+      organisations: {
+        include: {
+          organisation: true
+          organisationRole: true
+        }
+      }
+    }
+  }>
+
   const studyId = 1212
   const mockStudyInputs = Mock.of<UpdateStudyInput>({ cpmsId: studyId, title: 'Study 1' })
-  const mockUpdatedStudy = {
-    ...mockStudyInputs,
+
+  const mockActualStudy = Mock.of<StudyWithOrganisations>({
+    id: studyId,
+    title: mockStudyInputs.title as string,
+    cpmsId: mockStudyInputs.cpmsId as number,
+    isDueAssessment: true,
+    createdAt: new Date('2001-01-01'),
+    managingSpeciality: 'Cancer',
     organisations: [
       {
         organisation: {
-          name: 'Pfizer clinical trials',
+          id: 1212,
+          name: 'Test Organisation',
         },
         organisationRole: {
-          name: 'Managing Clinical Trials Unit',
+          id: 1213,
+          name: 'Clinical Research Sponsor',
         },
       },
     ],
-  }
+  })
 
   it('correctly updates and returns the study with given id', async () => {
-    prismaMock.study.update.mockResolvedValueOnce(mockUpdatedStudy)
+    prismaMock.study.update.mockResolvedValueOnce(mockActualStudy)
 
     const result = await updateStudy(studyId, mockStudyInputs)
 
     expect(result).toEqual({
       data: {
-        ...mockUpdatedStudy,
-        organisationsByRole: { CTU: 'Pfizer clinical trials' },
+        ...mockActualStudy,
+        organisationsByRole: { Sponsor: mockActualStudy.organisations[0].organisation.name },
       },
     })
 
@@ -348,8 +367,8 @@ describe('UpdateStudy', () => {
       })
     )
 
-    expect(result.data?.cpmsId).toEqual(mockUpdatedStudy.cpmsId)
-    expect(result.data?.title).toEqual(mockUpdatedStudy.title)
+    expect(result.data?.cpmsId).toEqual(mockActualStudy.cpmsId)
+    expect(result.data?.title).toEqual(mockActualStudy.title)
   })
 
   it('returns the correct error message when there is an error', async () => {
