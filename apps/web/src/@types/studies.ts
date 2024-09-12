@@ -14,9 +14,9 @@ export interface Study {
   PlannedClosureToRecruitmentDate: string
   ActualClosureToRecruitmentDate: string
   EstimatedReopeningDate: string | null
-  UkRecruitmentTarget: number
+  TotalRecruitmentToDate: number
   UkRecruitmentTargetToDate: number
-  StudyEvaluations: any[]
+  StudyEvaluationCategories: StudyEvaluationCategory[]
 }
 
 export enum StudyRecordStatus {

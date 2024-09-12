@@ -134,7 +134,7 @@ describe('Studies page', () => {
     // Description
     expect(
       screen.getByText(
-        'The NIHR RDN tracks the progress of research studies in its portfolio using data provided by study teams. Sponsors or their delegates need to assess if studies are on or off track and if any NIHR RDN support is needed.'
+        'Review study data and provide data updates where necessary. You will also be able to assess if studies are on or off track, and decide if any NIHR RDN support is needed.'
       )
     ).toBeInTheDocument()
 
@@ -200,10 +200,7 @@ describe('Studies page', () => {
     expect(withinFirstStudy.getByText('Off Track on 1 January 2001')).toBeInTheDocument()
 
     // Study assessment CTA
-    expect(withinFirstStudy.getByRole('link', { name: 'Assess' })).toHaveAttribute(
-      'href',
-      '/assessments/mocked-id?returnUrl=studies'
-    )
+    expect(withinFirstStudy.getByRole('link', { name: 'View study' })).toHaveAttribute('href', '/studies/mocked-id')
 
     // Pagination
     const pagination = screen.getByRole('navigation', { name: 'results' })

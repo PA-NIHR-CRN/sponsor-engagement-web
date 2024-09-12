@@ -9,9 +9,8 @@ describe('StudyList Component', () => {
   const defaultProps: StudyListProps = {
     sponsorOrgName: 'Sponsor ABC',
     shortTitle: 'Study XYZ',
-    shortTitleHref: '/study/xyz',
+    studyHref: '/studies/xyz',
     lastAsessmentDate: '2023-09-30',
-    assessmentHref: '/assessments/xyz',
     trackStatus: 'On track',
     trackStatusHref: '/track/on',
     indications: ['Indication ABC'],
@@ -28,16 +27,16 @@ describe('StudyList Component', () => {
     const lastAssessmentDateElement = screen.getByText('on 2023-09-30')
     const indicationHeading = screen.getByText('Study data indicates')
     const indicationElement = screen.getByText('Indication ABC')
-    const assessButtonElement = screen.getByText('Assess')
+    const viewStudyButtonElement = screen.getByText('View study')
 
     expect(sponsorNameElement).toBeInTheDocument()
-    expect(shortTitleElement).toHaveAttribute('href', defaultProps.shortTitleHref)
+    expect(shortTitleElement).toBeInTheDocument()
     expect(lastAssessmentTrackStatusElement).toHaveAttribute('href', defaultProps.trackStatusHref)
     expect(lastAssessmentDateHeading).toBeInTheDocument()
     expect(lastAssessmentDateElement).toBeInTheDocument()
     expect(indicationHeading).toBeInTheDocument()
     expect(indicationElement).toBeInTheDocument()
-    expect(assessButtonElement).toHaveAttribute('href', defaultProps.assessmentHref)
+    expect(viewStudyButtonElement).toHaveAttribute('href', defaultProps.studyHref)
   })
 
   test('renders "Due" tag when assessmentDue is true', () => {

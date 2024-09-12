@@ -22,7 +22,7 @@ import {
 import { RootLayout } from '@/components/organisms'
 import CmsNotificationBanner from '@/components/organisms/CmsNotificationBanner/CmsNotificationBanner'
 import { ODP_ROLE, Roles, STUDIES_PER_PAGE } from '@/constants'
-import { SUPPORT_PAGE } from '@/constants/routes'
+import { STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/routes'
 import { useFormListeners } from '@/hooks/useFormListeners'
 import { getNotificationBanner } from '@/lib/contentful/contentfulService'
 import { getSponsorOrgName, getSupportOrgName } from '@/lib/organisations'
@@ -83,9 +83,8 @@ export default function Studies({
           </div>
 
           <p className="govuk-body">
-            The NIHR RDN tracks the progress of research studies in its portfolio using data provided by study teams.
-            Sponsors or their delegates need to assess if studies are on or off track and if any NIHR RDN support is
-            needed.
+            Review study data and provide data updates where necessary. You will also be able to assess if studies are
+            on or off track, and decide if any NIHR RDN support is needed.
           </p>
 
           <Details className="[&>summary]:text-blue" heading="Why am I being asked to assess studies?">
@@ -136,14 +135,13 @@ export default function Studies({
                       <li key={study.id}>
                         <StudyList
                           assessmentDue={Boolean(study.isDueAssessment)}
-                          assessmentHref={`/assessments/${study.id}?returnUrl=studies`}
                           indications={study.evaluationCategories
                             .map((evalCategory) => evalCategory.indicatorType)
                             .filter((evalCategory, index, items) => items.indexOf(evalCategory) === index)}
                           lastAsessmentDate={study.lastAssessment ? formatDate(study.lastAssessment.createdAt) : ''}
                           shortTitle={study.shortTitle}
-                          shortTitleHref={`/studies/${study.id}`}
                           sponsorOrgName={getSponsorOrgName(study.organisations)}
+                          studyHref={`${STUDIES_PAGE}/${study.id}`}
                           supportOrgName={getSupportOrgName(study.organisations)}
                           trackStatus={study.lastAssessment?.status.name}
                         />

@@ -28,7 +28,7 @@ const renderNotificationBanner = (success: boolean) =>
 const renderBackLink = () => (
   <div className="ml-8 govuk-!-padding-top-3">
     <Container>
-      <Link className="govuk-back-link" href="/studies">
+      <Link className="govuk-back-link govuk-!-font-size-19 font-light" href="/studies">
         All studies
       </Link>
     </Container>
@@ -105,8 +105,10 @@ export default function Study({ user, study, studyInCPMS, assessments }: StudyPr
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Study data indicates</Table.CellHeader>
                 <Table.Cell>
-                  {studyInCPMS.StudyEvaluations.length
-                    ? studyInCPMS.StudyEvaluations.map((evalCategory) => evalCategory.indicatorValue).join(', ')
+                  {studyInCPMS.StudyEvaluationCategories.length
+                    ? studyInCPMS.StudyEvaluationCategories.map(
+                        (evalCategory) => evalCategory.EvaluationCategoryValue
+                      ).join(', ')
                     : 'This study is progressing as planned'}
                 </Table.Cell>
               </Table.Row>
@@ -136,12 +138,12 @@ export default function Study({ user, study, studyInCPMS, assessments }: StudyPr
                   {studyInCPMS.ActualOpeningDate ? formatDate(studyInCPMS.ActualClosureToRecruitmentDate) : '-'}
                 </Table.Cell>
               </Table.Row>
-              {studyInCPMS.StudyStatus === 'Suspended' && Boolean(studyInCPMS.StudyEvaluations.length) && (
+              {studyInCPMS.StudyStatus === 'Suspended' && Boolean(studyInCPMS.StudyEvaluationCategories.length) && (
                 <Table.Row>
                   <Table.CellHeader className="w-1/3">Estimated reopening date</Table.CellHeader>
                   <Table.Cell>
-                    {studyInCPMS.StudyEvaluations[0].expectedReopenDate
-                      ? formatDate(studyInCPMS.StudyEvaluations[0].expectedReopenDate)
+                    {studyInCPMS.StudyEvaluationCategories[0].ExpectedReopenDate
+                      ? formatDate(studyInCPMS.StudyEvaluationCategories[0].ExpectedReopenDate)
                       : '-'}
                   </Table.Cell>
                 </Table.Row>
@@ -149,7 +151,7 @@ export default function Study({ user, study, studyInCPMS, assessments }: StudyPr
 
               <Table.Row>
                 <Table.CellHeader className="w-1/3">UK recruitment target (excluding private site)</Table.CellHeader>
-                <Table.Cell>{studyInCPMS.UkRecruitmentTarget ?? '-'}</Table.Cell>
+                <Table.Cell>{studyInCPMS.TotalRecruitmentToDate ?? '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Total UK recruitment to date</Table.CellHeader>

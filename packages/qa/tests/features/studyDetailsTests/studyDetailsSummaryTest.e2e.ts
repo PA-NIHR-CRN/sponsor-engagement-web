@@ -70,7 +70,10 @@ test.beforeAll('Setup Tests', async () => {
 test.describe('Access Study Details Page and view Summary - @se_26', () => {
   test.use({ storageState: '.auth/sponsorContact.json' })
 
-  test('As a Sponsor I can access the Study Details page  - @se_26_ac1', async ({ studiesPage, studyDetailsPage }) => {
+  test('As a Sponsor I can access the Study Details page  - @se_26_ac1, @se_180_ac3, @se_181_ac3', async ({
+    studiesPage,
+    studyDetailsPage,
+  }) => {
     let studyListItemToClick: number
     let studyIdSelected: string = ''
     let studyDetails: RowDataPacket[]
@@ -79,16 +82,16 @@ test.describe('Access Study Details Page and view Summary - @se_26', () => {
       await studiesPage.goto()
       await studiesPage.assertOnStudiesPage()
     })
-    await test.step(`When I click the Title of any Study on the Study List`, async () => {
+    await test.step(`When I click the View Study button of any Study on the Study List`, async () => {
       studyListItemToClick = await studiesPage.selectRandomStudyListItemIndex()
-      studyIdSelected = await studiesPage.getStudyIdFromListTitle(studyListItemToClick)
+      studyIdSelected = await studiesPage.getStudyIdFromListViewButton(studyListItemToClick)
       studyDetails = await seDatabaseReq(`SELECT Study.shortTitle, Organisation.name AS sponsorName FROM Study
             INNER JOIN StudyOrganisation
             ON StudyOrganisation.studyId = Study.id 
             INNER JOIN Organisation
             ON StudyOrganisation.organisationId = Organisation.id 
             WHERE Study.id = ${studyIdSelected} AND StudyOrganisation.organisationRoleId = 1;`)
-      studiesPage.studyListItemTitle.nth(studyListItemToClick).click()
+      studiesPage.viewStudyButton.nth(studyListItemToClick).click()
     })
     await test.step(`Then I am taken to the Details page for Study with SE Id ${studyIdSelected}`, async () => {
       await studyDetailsPage.assertOnStudyDetailsPage(studyIdSelected)
@@ -119,7 +122,7 @@ test.describe('Access Study Details Page and view Summary - @se_26', () => {
     })
   })
 
-  test('As a Sponsor I can see the Summary of study’s progress (UK) of a Specific Study - @se_26_ac2', async ({
+  test('As a Sponsor I can see the Summary of study’s progress (UK) of a Specific Study - @se_26_ac2, @se_181_ac4', async ({
     studyDetailsPage,
   }) => {
     await test.step(`Given I have navigated to the Study Details Page for a Commercial Study with SE Id ${startingStudyId}`, async () => {

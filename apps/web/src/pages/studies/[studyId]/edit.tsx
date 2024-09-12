@@ -16,7 +16,13 @@ import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
 import { GENERIC_STUDIES_GUIDANCE_TEXT, PAGE_TITLE, studyStatuses } from '@/constants/editStudyForm'
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
-import { getStudyById, mapCPMSStudyToPrismaStudy, updateStudy } from '@/lib/studies'
+import {
+  getStudyById,
+  mapCPMSStudyEvalToPrismaEval,
+  mapCPMSStudyToPrismaStudy,
+  updateEvaluationCategories,
+  updateStudy,
+} from '@/lib/studies'
 import { mapStudyToStudyFormInput } from '@/utils/editStudyForm'
 import type { EditStudyInputs } from '@/utils/schemas'
 import { studySchema } from '@/utils/schemas'
@@ -250,9 +256,8 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
       },
     }
   }
-  const { study: studyInCPMS } = await getStudyByIdFromCPMS(cpmsId)
+  const { study: studyInCPMS } = await getStudyByIdFromCPMS(Number(cpmsId))
 
-  // If there is an error fetching from CPMS, do we want to attempt to get from SE DB before redirecting to 500?
   if (!studyInCPMS) {
     return {
       redirect: {
@@ -271,10 +276,36 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     }
   }
 
+  const studyEvalsInCPMS = studyInCPMS.StudyEvaluationCategories
+  const currentStudyEvalsInSE = study.evaluationCategories
+
+  // Soft delete evaluations in SE that are no longer returned from CPMS
+  const studyEvalIdsToDelete = currentStudyEvalsInSE
+    .filter(
+      (seEval) =>
+        !studyEvalsInCPMS.some(({ EvaluationCategoryValue }) => EvaluationCategoryValue === seEval.indicatorValue)
+    )
+    .map(({ id }) => id)
+
+  const mappedStudyEvalsInCPMS = studyEvalsInCPMS.map((studyEval) => mapCPMSStudyEvalToPrismaEval(studyEval))
+  const { data: updatedStudyEvals } = await updateEvaluationCategories(
+    seStudyRecord.data.id,
+    mappedStudyEvalsInCPMS,
+    studyEvalIdsToDelete
+  )
+
+  if (!updatedStudyEvals) {
+    return {
+      redirect: {
+        destination: '/500',
+      },
+    }
+  }
+
   return {
     props: {
       user: session.user,
-      study,
+      study: { ...study, evaluationCategories: updatedStudyEvals },
     },
   }
 })

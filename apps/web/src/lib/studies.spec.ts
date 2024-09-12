@@ -1,10 +1,11 @@
-import { Prisma, type Study } from 'database'
+import type { Study } from 'database'
+import { Prisma } from 'database'
 import { Mock } from 'ts-mockery'
 
 import { prismaMock } from '../__mocks__/prisma'
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
 import type { UpdateStudyInput } from './studies'
-import { getStudiesForOrgs, getStudyById, updateStudy } from './studies'
+import { getStudiesForOrgs, getStudyById, updateEvaluationCategories, updateStudy } from './studies'
 
 describe('getStudiesForOrgs', () => {
   const mockStudies = [Mock.of<Study>({ id: 1, title: 'Study 1' }), Mock.of<Study>({ id: 2, title: 'Study 2' })]
@@ -299,32 +300,51 @@ describe('getStudyById', () => {
   })
 })
 
-describe('UpdateStudy', () => {
+describe('updateStudy', () => {
+  type StudyWithOrganisations = Prisma.StudyGetPayload<{
+    include: {
+      organisations: {
+        include: {
+          organisation: true
+          organisationRole: true
+        }
+      }
+    }
+  }>
+
   const studyId = 1212
   const mockStudyInputs = Mock.of<UpdateStudyInput>({ cpmsId: studyId, title: 'Study 1' })
-  const mockUpdatedStudy = {
-    ...mockStudyInputs,
+
+  const mockActualStudy = Mock.of<StudyWithOrganisations>({
+    id: studyId,
+    title: mockStudyInputs.title as string,
+    cpmsId: mockStudyInputs.cpmsId as number,
+    isDueAssessment: true,
+    createdAt: new Date('2001-01-01'),
+    managingSpeciality: 'Cancer',
     organisations: [
       {
         organisation: {
-          name: 'Pfizer clinical trials',
+          id: 1212,
+          name: 'Test Organisation',
         },
         organisationRole: {
-          name: 'Managing Clinical Trials Unit',
+          id: 1213,
+          name: 'Clinical Research Sponsor',
         },
       },
     ],
-  }
+  })
 
   it('correctly updates and returns the study with given id', async () => {
-    prismaMock.study.update.mockResolvedValueOnce(mockUpdatedStudy)
+    prismaMock.study.update.mockResolvedValueOnce(mockActualStudy)
 
     const result = await updateStudy(studyId, mockStudyInputs)
 
     expect(result).toEqual({
       data: {
-        ...mockUpdatedStudy,
-        organisationsByRole: { CTU: 'Pfizer clinical trials' },
+        ...mockActualStudy,
+        organisationsByRole: { Sponsor: mockActualStudy.organisations[0].organisation.name },
       },
     })
 
@@ -344,12 +364,15 @@ describe('UpdateStudy', () => {
               organisationRole: true,
             },
           },
+          evaluationCategories: {
+            select: { id: true, indicatorValue: true },
+          },
         },
       })
     )
 
-    expect(result.data?.cpmsId).toEqual(mockUpdatedStudy.cpmsId)
-    expect(result.data?.title).toEqual(mockUpdatedStudy.title)
+    expect(result.data?.cpmsId).toEqual(mockActualStudy.cpmsId)
+    expect(result.data?.title).toEqual(mockActualStudy.title)
   })
 
   it('returns the correct error message when there is an error', async () => {
@@ -358,6 +381,191 @@ describe('UpdateStudy', () => {
     prismaMock.study.update.mockRejectedValueOnce(new Error(errorMessage))
 
     const result = await updateStudy(studyId, mockStudyInputs)
+    expect(result).toEqual({ data: null, error: errorMessage })
+  })
+})
+
+describe('updateEvaluationCategories', () => {
+  const mockStudyId = 9282382
+
+  const mockEvaluationCategoriesResponse = Mock.of<Prisma.StudyEvaluationCategoryGetPayload<undefined>>({
+    studyId: 18108,
+    indicatorType: 'Missed milestone',
+    indicatorValue: 'Study is past planned opening date',
+    sampleSize: 3,
+    totalRecruitmentToDate: 0,
+    plannedOpeningDate: new Date('2020-10-09T23:00:00.000Z'),
+    plannedClosureDate: new Date('2020-10-09T23:00:00.000Z'),
+    actualOpeningDate: new Date('2020-10-09T23:00:00.000Z'),
+    actualClosureDate: null,
+    expectedReopenDate: null,
+    createdAt: new Date('2020-10-09T23:00:00.000Z'),
+    updatedAt: new Date('2020-10-09T23:00:00.000Z'),
+    isDeleted: false,
+  })
+
+  it('correctly updates and returns an evaluation when no deletion is required and there is a single evaluation record', async () => {
+    prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce({
+      ...mockEvaluationCategoriesResponse,
+      id: 484022,
+    })
+
+    const result = await updateEvaluationCategories(mockStudyId, [mockEvaluationCategoriesResponse], [])
+
+    expect(result).toEqual({ data: [{ ...mockEvaluationCategoriesResponse, id: 484022 }], error: null })
+
+    expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(1)
+    expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          studyId_indicatorValue: {
+            studyId: mockStudyId,
+            indicatorValue: mockEvaluationCategoriesResponse.indicatorValue,
+          },
+        },
+        update: mockEvaluationCategoriesResponse,
+        create: mockEvaluationCategoriesResponse,
+      })
+    )
+
+    expect(prismaMock.studyEvaluationCategory.updateMany).not.toHaveBeenCalled()
+  })
+
+  it('correctly updates and returns evaluations when no deletion is required and there are multiple evaluations', async () => {
+    const mockEvaluationCategoriesResponseTwo = Mock.of<Prisma.StudyEvaluationCategoryGetPayload<undefined>>({
+      studyId: 934834,
+      indicatorType: 'Missed milestone',
+      indicatorValue: 'Study is past planned opening date',
+      sampleSize: 3,
+      totalRecruitmentToDate: 0,
+      plannedOpeningDate: new Date('2020-10-09T23:00:00.000Z'),
+      plannedClosureDate: new Date('2020-10-09T23:00:00.000Z'),
+      actualOpeningDate: new Date('2020-10-09T23:00:00.000Z'),
+      actualClosureDate: null,
+      expectedReopenDate: null,
+      createdAt: new Date('2020-10-09T23:00:00.000Z'),
+      updatedAt: new Date('2020-10-09T23:00:00.000Z'),
+      isDeleted: false,
+    })
+
+    prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce({
+      ...mockEvaluationCategoriesResponse,
+      id: 484022,
+    })
+    prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce({
+      ...mockEvaluationCategoriesResponseTwo,
+      id: 484023,
+    })
+
+    const result = await updateEvaluationCategories(
+      mockStudyId,
+      [mockEvaluationCategoriesResponse, mockEvaluationCategoriesResponseTwo],
+      []
+    )
+
+    expect(result).toEqual({
+      data: [
+        { ...mockEvaluationCategoriesResponse, id: 484022 },
+        {
+          ...mockEvaluationCategoriesResponseTwo,
+          id: 484023,
+        },
+      ],
+      error: null,
+    })
+
+    expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(2)
+    expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          studyId_indicatorValue: {
+            studyId: mockStudyId,
+            indicatorValue: mockEvaluationCategoriesResponse.indicatorValue,
+          },
+        },
+        update: mockEvaluationCategoriesResponse,
+        create: mockEvaluationCategoriesResponse,
+      })
+    )
+    expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          studyId_indicatorValue: {
+            studyId: mockStudyId,
+            indicatorValue: mockEvaluationCategoriesResponseTwo.indicatorValue,
+          },
+        },
+        update: mockEvaluationCategoriesResponseTwo,
+        create: mockEvaluationCategoriesResponseTwo,
+      })
+    )
+
+    expect(prismaMock.studyEvaluationCategory.updateMany).not.toHaveBeenCalled()
+  })
+
+  it('correctly updates and deletes a given evaluation, when deletion is required', async () => {
+    const studyEvalToDelete = 2323232
+
+    prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce({
+      ...mockEvaluationCategoriesResponse,
+      id: 484022,
+    })
+
+    const result = await updateEvaluationCategories(
+      mockStudyId,
+      [mockEvaluationCategoriesResponse],
+      [studyEvalToDelete]
+    )
+
+    expect(result).toEqual({ data: [{ ...mockEvaluationCategoriesResponse, id: 484022 }], error: null })
+
+    expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(1)
+    expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          studyId_indicatorValue: {
+            studyId: mockStudyId,
+            indicatorValue: mockEvaluationCategoriesResponse.indicatorValue,
+          },
+        },
+        update: mockEvaluationCategoriesResponse,
+        create: mockEvaluationCategoriesResponse,
+      })
+    )
+
+    expect(prismaMock.studyEvaluationCategory.updateMany).toHaveBeenCalledTimes(1)
+    expect(prismaMock.studyEvaluationCategory.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: { in: [studyEvalToDelete] }, isDeleted: false },
+        data: { isDeleted: true },
+      })
+    )
+  })
+
+  it('returns the correct error message when there is an error updating a study evaluation', async () => {
+    const errorMessage = 'Oh no, an error!'
+
+    prismaMock.studyEvaluationCategory.upsert.mockRejectedValueOnce(new Error(errorMessage))
+
+    const result = await updateEvaluationCategories(mockStudyId, [mockEvaluationCategoriesResponse], [])
+    expect(result).toEqual({ data: null, error: errorMessage })
+  })
+
+  it('returns the correct error message when there is an error deleting a study evaluation', async () => {
+    const studyEvalToDelete = 2323232
+    const errorMessage = 'Oh no, an error!'
+
+    prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce({
+      ...mockEvaluationCategoriesResponse,
+      id: 484022,
+    })
+    prismaMock.studyEvaluationCategory.updateMany.mockRejectedValueOnce(new Error(errorMessage))
+
+    const result = await updateEvaluationCategories(
+      mockStudyId,
+      [mockEvaluationCategoriesResponse],
+      [studyEvalToDelete]
+    )
     expect(result).toEqual({ data: null, error: errorMessage })
   })
 })

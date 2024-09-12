@@ -66,7 +66,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
       await studiesPage.assertDueIndicatorDisplayed(0, true)
     })
     await test.step('And if I enter the Study Details page for the Study', async () => {
-      await studiesPage.studyListItemTitle.nth(0).click()
+      await studiesPage.viewStudyButton.nth(0).click()
       await studyDetailsPage.assertOnStudyDetailsPage(nullOpeningDateStudyId.toString())
     })
     await test.step('Then the Study Details page will also display a `Due` indicator', async () => {
@@ -115,7 +115,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
       await studiesPage.assertDueIndicatorDisplayed(0, true)
     })
     await test.step('And if I enter the Study Details page for the Study', async () => {
-      await studiesPage.studyListItemTitle.nth(0).click()
+      await studiesPage.viewStudyButton.nth(0).click()
       await studyDetailsPage.assertOnStudyDetailsPage(hasOpeningDateStudyId.toString())
     })
     await test.step('Then the Study Details page will also display a `Due` indicator', async () => {
@@ -154,7 +154,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
       await studiesPage.assertDueIndicatorDisplayed(0, true)
     })
     await test.step('And if I enter the Study Details page for the Study', async () => {
-      await studiesPage.studyListItemTitle.nth(0).click()
+      await studiesPage.viewStudyButton.nth(0).click()
       await studyDetailsPage.assertOnStudyDetailsPage(noPrevAssessmentStudyId.toString())
     })
     await test.step('Then the Study Details page will also display a `Due` indicator', async () => {
@@ -186,7 +186,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
       await studiesPage.assertDueIndicatorDisplayed(0, false)
     })
     await test.step('And if I enter the Study Details page for the Study', async () => {
-      await studiesPage.studyListItemTitle.nth(0).click()
+      await studiesPage.viewStudyButton.nth(0).click()
       await studyDetailsPage.assertOnStudyDetailsPage(noRisksStudyId.toString())
     })
     await test.step('Then the Study Details page will also not display a `Due` indicator', async () => {
@@ -216,7 +216,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
       await studiesPage.assertDueIndicatorDisplayed(0, true)
     })
     await test.step('And if I enter the Study Details page for the Study', async () => {
-      await studiesPage.studyListItemTitle.nth(0).click()
+      await studiesPage.viewStudyButton.nth(0).click()
       await studyDetailsPage.assertOnStudyDetailsPage(provideAssessmentStudyId.toString())
     })
     await test.step('And the Study Details page also displays a `Due` indicator', async () => {

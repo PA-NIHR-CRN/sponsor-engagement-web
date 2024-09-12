@@ -51,6 +51,7 @@ export default class StudyDetailsPage {
   readonly tableEstimatedReopenDateHeader: Locator
   readonly tableEstimatedReopenDateValue: Locator
   readonly assessButton: Locator
+  readonly editStudyDataButton: Locator
   readonly assessSuccessAlertBox: Locator
   readonly assessSuccessAlertBoxTitle: Locator
   readonly noAssessmentValue: Locator
@@ -91,6 +92,9 @@ export default class StudyDetailsPage {
     this.sponsorOrgSubTitle = page.locator('span[class="govuk-body-m mb-0 text-darkGrey"]')
     this.progressSummarySubTitle = page.locator('span[class="govuk-body-s text-darkGrey"]')
     this.assessButton = page.locator('a[class="govuk-button w-auto govuk-!-margin-bottom-0"]')
+    this.editStudyDataButton = page.locator(
+      'a[class="govuk-button govuk-button--secondary w-auto govuk-!-margin-bottom-0"]'
+    )
     // About Study Table Values
     this.tableFullTitleHeader = page.locator('th[scope="row"]', { hasText: 'Study full title' })
     this.tableFullTitleValue = this.tableFullTitleHeader.locator('..').locator('td')
@@ -128,7 +132,7 @@ export default class StudyDetailsPage {
     })
     this.tableActualClosureDateValue = this.tableActualClosureDateHeader.locator('..').locator('td')
     this.tableUkTargetHeader = page.locator('th[scope="row"]', {
-      hasText: 'UK recruitment target (excluding private site)',
+      hasText: 'UK recruitment target (excluding private sites)',
     })
     this.tableUkTargetValue = this.tableUkTargetHeader.locator('..').locator('td')
     this.tableUkTotalHeader = page.locator('th[scope="row"]', { hasText: 'Total UK recruitment to date' })
