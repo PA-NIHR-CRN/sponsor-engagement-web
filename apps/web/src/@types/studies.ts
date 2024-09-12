@@ -17,7 +17,6 @@ export interface Study {
   UkRecruitmentTarget: number
   UkRecruitmentTargetToDate: number
   StudyEvaluations: any[]
-  ChangeHistory: any[]
 }
 
 export enum StudyRecordStatus {

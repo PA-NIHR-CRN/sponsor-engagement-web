@@ -4,6 +4,7 @@ import { constructDatePartsFromDate } from './date'
 import type { EditStudyInputs } from './schemas'
 
 export const mapStudyToStudyFormInput = (study: EditStudyProps['study']): EditStudyInputs => ({
+  id: study.id,
   status: study.studyStatus, // TODO: this will need to be mapped
   recruitmentTarget: study.sampleSize ?? undefined,
   studyId: study.cpmsId.toString(),
