@@ -14,12 +14,7 @@ import Warning from '@/components/atoms/Warning/Warning'
 import { RequestSupport } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
-import {
-  COMMERCIAL_GUIDANCE_TEXT,
-  NON_COMMERCIAL_GUIDANCE_TEXT,
-  PAGE_TITLE,
-  studyStatuses,
-} from '@/constants/editStudyForm'
+import { GENERIC_STUDIES_GUIDANCE_TEXT, PAGE_TITLE, studyStatuses } from '@/constants/editStudyForm'
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
 import { getStudyById, mapCPMSStudyToPrismaStudy, updateStudy } from '@/lib/studies'
 import { mapStudyToStudyFormInput } from '@/utils/editStudyForm'
@@ -62,9 +57,7 @@ export default function EditStudy({ study }: EditStudyProps) {
 
           <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
 
-          <div className="govuk-inset-text">
-            {study.route === 'Commercial' ? COMMERCIAL_GUIDANCE_TEXT : NON_COMMERCIAL_GUIDANCE_TEXT}
-          </div>
+          <div className="govuk-inset-text">{GENERIC_STUDIES_GUIDANCE_TEXT}</div>
 
           <Form
             action="/api/forms/editStudy"

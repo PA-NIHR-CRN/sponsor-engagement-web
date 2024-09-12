@@ -268,7 +268,9 @@ export type UpdateStudyInput = Prisma.StudyUpdateInput
 
 export const mapCPMSStatusToSEStatus = (cpmsStatus: string): string => {
   const statusMap: { [key: string]: string } = {
-    'In Setup': 'In Setup',
+    'Pre-Setup': 'In etup',
+    'In Setup': 'In setup',
+    'In Setup, Pending NHS Permission': 'In setup',
     'In Setup, Approval Received': 'In setup',
     'In Setup, Pending Approval': 'In setup',
     'Open to Recruitment': 'Open to recruitment',
