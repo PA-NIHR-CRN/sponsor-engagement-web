@@ -1,4 +1,4 @@
-import type { Study } from '@/@types/studies'
+import type { Study, StudyEvaluationCategory } from '@/@types/studies'
 import { getErrorMessage } from '@/utils/error'
 
 import type { OrderType } from '../@types/filters'
@@ -272,7 +272,7 @@ export const mapCPMSStudyToPrismaStudy = (study: Study): UpdateStudyInput => {
     shortTitle: study.StudyShortName,
     studyStatus: study.StudyStatus,
     route: study.StudyRoute,
-    sampleSize: study.UkRecruitmentTarget,
+    sampleSize: study.TotalRecruitmentToDate,
     totalRecruitmentToDate: study.UkRecruitmentTargetToDate,
     plannedOpeningDate: study.PlannedOpeningDate ? new Date(study.PlannedOpeningDate) : null,
     plannedClosureDate: study.PlannedClosureToRecruitmentDate ? new Date(study.PlannedClosureToRecruitmentDate) : null,
@@ -281,11 +281,11 @@ export const mapCPMSStudyToPrismaStudy = (study: Study): UpdateStudyInput => {
   }
 }
 
-export const updateStudy = async (studyId: number, studyData: UpdateStudyInput) => {
+export const updateStudy = async (cpmsId: number, studyData: UpdateStudyInput) => {
   try {
     const study = await prismaClient.study.update({
       where: {
-        cpmsId: studyId,
+        cpmsId,
       },
       data: { ...studyData },
       include: {
@@ -297,6 +297,9 @@ export const updateStudy = async (studyId: number, studyData: UpdateStudyInput) 
             organisation: true,
             organisationRole: true,
           },
+        },
+        evaluationCategories: {
+          select: { id: true, indicatorValue: true },
         },
       },
     })
@@ -316,6 +319,63 @@ export const updateStudy = async (studyId: number, studyData: UpdateStudyInput) 
     }
   } catch (error) {
     const errorMessage = getErrorMessage(error)
+    return {
+      data: null,
+      error: errorMessage,
+    }
+  }
+}
+
+export type UpdateStudyEvalInput = Prisma.StudyEvaluationCategoryUpdateInput
+
+export const updateEvaluationCategories = async (
+  studyId: number,
+  studyEvaluationsToUpsert: StudyEvaluationCategory[],
+  studyEvaluationIdsToDelete: number[]
+) => {
+  try {
+    // Add evaluation categories
+    const evaluationCategoryInputs = studyEvaluationsToUpsert.map((category) => {
+      const evaluationCategoryData = {
+        studyId,
+        indicatorType: category.EvaluationCategoryType,
+        indicatorValue: category.EvaluationCategoryValue,
+        sampleSize: category.SampleSize,
+        totalRecruitmentToDate: category.TotalRecruitmentToDate,
+        plannedOpeningDate: category.PlannedRecruitmentStartDate
+          ? new Date(category.PlannedRecruitmentStartDate)
+          : null,
+        plannedClosureDate: category.PlannedRecruitmentEndDate ? new Date(category.PlannedRecruitmentEndDate) : null,
+        actualOpeningDate: category.ActualOpeningDate ? new Date(category.ActualOpeningDate) : null,
+        actualClosureDate: category.ActualClosureDate ? new Date(category.ActualClosureDate) : null,
+        expectedReopenDate: category.ExpectedReopenDate ? new Date(category.ExpectedReopenDate) : null,
+        isDeleted: false,
+      }
+
+      return prismaClient.studyEvaluationCategory.upsert({
+        where: {
+          studyId_indicatorValue: {
+            studyId,
+            indicatorValue: category.EvaluationCategoryValue,
+          },
+        },
+        update: evaluationCategoryData,
+        create: evaluationCategoryData,
+      })
+    })
+
+    const evaluationCategories = await Promise.all(evaluationCategoryInputs)
+
+    // Delete evaluation categories
+    await prismaClient.studyEvaluationCategory.updateMany({
+      where: { id: { in: studyEvaluationIdsToDelete }, isDeleted: false },
+      data: { isDeleted: true },
+    })
+
+    return { data: evaluationCategories, error: null }
+  } catch (error) {
+    const errorMessage = getErrorMessage(error)
+
     return {
       data: null,
       error: errorMessage,
