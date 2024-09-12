@@ -21,7 +21,13 @@ import {
   studyStatuses,
 } from '@/constants/editStudyForm'
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
-import { getStudyById, mapCPMSStudyToPrismaStudy, updateEvaluationCategories, updateStudy } from '@/lib/studies'
+import {
+  getStudyById,
+  mapCPMSStudyEvalToPrisma,
+  mapCPMSStudyToPrismaStudy,
+  updateEvaluationCategories,
+  updateStudy,
+} from '@/lib/studies'
 import { mapStudyToStudyFormInput } from '@/utils/editStudyForm'
 import type { EditStudyInputs } from '@/utils/schemas'
 import { studySchema } from '@/utils/schemas'
@@ -288,9 +294,10 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     )
     .map(({ id }) => id)
 
+  const mappedStudyEvalsInCPMS = studyEvalsInCPMS.map((studyEval) => mapCPMSStudyEvalToPrisma(studyEval))
   const { data: updatedStudyEvals } = await updateEvaluationCategories(
     seStudyRecord.data.id,
-    studyEvalsInCPMS,
+    mappedStudyEvalsInCPMS,
     studyEvalIdsToDelete
   )
 

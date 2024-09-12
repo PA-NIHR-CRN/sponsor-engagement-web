@@ -266,20 +266,18 @@ export const getStudiesForExport = async (organisationIds: number[]) => {
 
 export type UpdateStudyInput = Prisma.StudyUpdateInput
 
-export const mapCPMSStudyToPrismaStudy = (study: Study): UpdateStudyInput => {
-  return {
-    cpmsId: study.StudyId,
-    shortTitle: study.StudyShortName,
-    studyStatus: study.StudyStatus,
-    route: study.StudyRoute,
-    sampleSize: study.TotalRecruitmentToDate,
-    totalRecruitmentToDate: study.UkRecruitmentTargetToDate,
-    plannedOpeningDate: study.PlannedOpeningDate ? new Date(study.PlannedOpeningDate) : null,
-    plannedClosureDate: study.PlannedClosureToRecruitmentDate ? new Date(study.PlannedClosureToRecruitmentDate) : null,
-    actualOpeningDate: study.ActualOpeningDate ? new Date(study.ActualOpeningDate) : null,
-    actualClosureDate: study.ActualClosureToRecruitmentDate ? new Date(study.ActualClosureToRecruitmentDate) : null,
-  }
-}
+export const mapCPMSStudyToPrismaStudy = (study: Study): UpdateStudyInput => ({
+  cpmsId: study.StudyId,
+  shortTitle: study.StudyShortName,
+  studyStatus: study.StudyStatus,
+  route: study.StudyRoute,
+  sampleSize: study.TotalRecruitmentToDate,
+  totalRecruitmentToDate: study.UkRecruitmentTargetToDate,
+  plannedOpeningDate: study.PlannedOpeningDate ? new Date(study.PlannedOpeningDate) : null,
+  plannedClosureDate: study.PlannedClosureToRecruitmentDate ? new Date(study.PlannedClosureToRecruitmentDate) : null,
+  actualOpeningDate: study.ActualOpeningDate ? new Date(study.ActualOpeningDate) : null,
+  actualClosureDate: study.ActualClosureToRecruitmentDate ? new Date(study.ActualClosureToRecruitmentDate) : null,
+})
 
 export const updateStudy = async (cpmsId: number, studyData: UpdateStudyInput) => {
   try {
@@ -326,51 +324,52 @@ export const updateStudy = async (cpmsId: number, studyData: UpdateStudyInput) =
   }
 }
 
-export type UpdateStudyEvalInput = Prisma.StudyEvaluationCategoryUpdateInput
+export const mapCPMSStudyEvalToPrisma = (studyEvaluation: StudyEvaluationCategory) => ({
+  indicatorType: studyEvaluation.EvaluationCategoryType,
+  indicatorValue: studyEvaluation.EvaluationCategoryValue,
+  sampleSize: studyEvaluation.SampleSize,
+  totalRecruitmentToDate: studyEvaluation.TotalRecruitmentToDate,
+  plannedOpeningDate: studyEvaluation.PlannedRecruitmentStartDate
+    ? new Date(studyEvaluation.PlannedRecruitmentStartDate)
+    : null,
+  plannedClosureDate: studyEvaluation.PlannedRecruitmentEndDate
+    ? new Date(studyEvaluation.PlannedRecruitmentEndDate)
+    : null,
+  actualOpeningDate: studyEvaluation.ActualOpeningDate ? new Date(studyEvaluation.ActualOpeningDate) : null,
+  actualClosureDate: studyEvaluation.ActualClosureDate ? new Date(studyEvaluation.ActualClosureDate) : null,
+  expectedReopenDate: studyEvaluation.ExpectedReopenDate ? new Date(studyEvaluation.ExpectedReopenDate) : null,
+  isDeleted: false,
+})
 
 export const updateEvaluationCategories = async (
   studyId: number,
-  studyEvaluationsToUpsert: StudyEvaluationCategory[],
+  studyEvaluationsToUpsert: Prisma.StudyEvaluationCategoryCreateWithoutStudyInput[],
   studyEvaluationIdsToDelete: number[]
 ) => {
   try {
     // Add evaluation categories
     const evaluationCategoryInputs = studyEvaluationsToUpsert.map((category) => {
-      const evaluationCategoryData = {
-        studyId,
-        indicatorType: category.EvaluationCategoryType,
-        indicatorValue: category.EvaluationCategoryValue,
-        sampleSize: category.SampleSize,
-        totalRecruitmentToDate: category.TotalRecruitmentToDate,
-        plannedOpeningDate: category.PlannedRecruitmentStartDate
-          ? new Date(category.PlannedRecruitmentStartDate)
-          : null,
-        plannedClosureDate: category.PlannedRecruitmentEndDate ? new Date(category.PlannedRecruitmentEndDate) : null,
-        actualOpeningDate: category.ActualOpeningDate ? new Date(category.ActualOpeningDate) : null,
-        actualClosureDate: category.ActualClosureDate ? new Date(category.ActualClosureDate) : null,
-        expectedReopenDate: category.ExpectedReopenDate ? new Date(category.ExpectedReopenDate) : null,
-        isDeleted: false,
-      }
-
       return prismaClient.studyEvaluationCategory.upsert({
         where: {
           studyId_indicatorValue: {
             studyId,
-            indicatorValue: category.EvaluationCategoryValue,
+            indicatorValue: category.indicatorValue,
           },
         },
-        update: evaluationCategoryData,
-        create: evaluationCategoryData,
+        update: category,
+        create: { studyId, ...category },
       })
     })
 
     const evaluationCategories = await Promise.all(evaluationCategoryInputs)
 
     // Delete evaluation categories
-    await prismaClient.studyEvaluationCategory.updateMany({
-      where: { id: { in: studyEvaluationIdsToDelete }, isDeleted: false },
-      data: { isDeleted: true },
-    })
+    if (studyEvaluationIdsToDelete.length > 0) {
+      await prismaClient.studyEvaluationCategory.updateMany({
+        where: { id: { in: studyEvaluationIdsToDelete }, isDeleted: false },
+        data: { isDeleted: true },
+      })
+    }
 
     return { data: evaluationCategories, error: null }
   } catch (error) {
