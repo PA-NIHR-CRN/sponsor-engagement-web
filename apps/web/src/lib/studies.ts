@@ -324,7 +324,7 @@ export const updateStudy = async (cpmsId: number, studyData: UpdateStudyInput) =
   }
 }
 
-export const mapCPMSStudyEvalToPrisma = (studyEvaluation: StudyEvaluationCategory) => ({
+export const mapCPMSStudyEvalToPrismaEval = (studyEvaluation: StudyEvaluationCategory) => ({
   indicatorType: studyEvaluation.EvaluationCategoryType,
   indicatorValue: studyEvaluation.EvaluationCategoryValue,
   sampleSize: studyEvaluation.SampleSize,

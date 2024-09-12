@@ -23,7 +23,7 @@ import {
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
 import {
   getStudyById,
-  mapCPMSStudyEvalToPrisma,
+  mapCPMSStudyEvalToPrismaEval,
   mapCPMSStudyToPrismaStudy,
   updateEvaluationCategories,
   updateStudy,
@@ -294,7 +294,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     )
     .map(({ id }) => id)
 
-  const mappedStudyEvalsInCPMS = studyEvalsInCPMS.map((studyEval) => mapCPMSStudyEvalToPrisma(studyEval))
+  const mappedStudyEvalsInCPMS = studyEvalsInCPMS.map((studyEval) => mapCPMSStudyEvalToPrismaEval(studyEval))
   const { data: updatedStudyEvals } = await updateEvaluationCategories(
     seStudyRecord.data.id,
     mappedStudyEvalsInCPMS,
