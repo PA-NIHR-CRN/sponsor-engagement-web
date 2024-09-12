@@ -9,9 +9,10 @@ import { AssessmentHistory, getAssessmentHistoryFromStudy, RequestSupport, Study
 import { RootLayout } from '@/components/organisms'
 import { EDIT_STUDY_ROLE, Roles } from '@/constants'
 import { ASSESSMENT_PAGE, STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/routes'
-import { getStudyById } from '@/lib/studies'
+import { getStudyById, mapCPMSStudyToPrismaStudy, updateStudy } from '@/lib/studies'
 import { formatDate } from '@/utils/date'
 import { withServerSideProps } from '@/utils/withServerSideProps'
+import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
 
 const renderNotificationBanner = (success: boolean) =>
   success ? (
@@ -36,9 +37,8 @@ const renderBackLink = () => (
 
 export type StudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function Study({ user, study, assessments }: StudyProps) {
+export default function Study({ user, study, studyInCPMS, assessments }: StudyProps) {
   const router = useRouter()
-
   const { organisationsByRole } = study
 
   const supportOrgName = organisationsByRole.CRO ?? organisationsByRole.CTU
@@ -112,7 +112,7 @@ export default function Study({ user, study, assessments }: StudyProps) {
               </Table.Row>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Planned opening date</Table.CellHeader>
-                <Table.Cell>{study.plannedOpeningDate ? formatDate(study.plannedOpeningDate) : '-'}</Table.Cell>
+                <Table.Cell>{study.plannedOpeningDate ? formatDate(studyInCPMS.PlannedOpeningDate) : '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Actual opening date</Table.CellHeader>
@@ -194,11 +194,32 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     }
   }
 
+  const { study: studyInCPMS } = await getStudyByIdFromCPMS(study.cpmsId)
+
+  if (!studyInCPMS) {
+    return {
+      redirect: {
+        destination: '/500',
+      },
+    }
+  }
+
+  const { data: updatedStudy } = await updateStudy(study.cpmsId, mapCPMSStudyToPrismaStudy(studyInCPMS))
+
+  if (!updatedStudy) {
+    return {
+      redirect: {
+        destination: '/500',
+      },
+    }
+  }
+
   return {
     props: {
       user: session.user,
       assessments: getAssessmentHistoryFromStudy(study),
       study,
+      studyInCPMS,
     },
   }
 })
