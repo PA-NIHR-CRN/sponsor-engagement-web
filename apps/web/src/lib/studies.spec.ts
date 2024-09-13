@@ -2,10 +2,19 @@ import type { Study } from 'database'
 import { Prisma } from 'database'
 import { Mock } from 'ts-mockery'
 
+import { mockCPMSStudy } from '@/mocks/studies'
+
 import { prismaMock } from '../__mocks__/prisma'
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
 import type { UpdateStudyInput } from './studies'
-import { getStudiesForOrgs, getStudyById, updateEvaluationCategories, updateStudy } from './studies'
+import {
+  getStudiesForOrgs,
+  getStudyById,
+  mapCPMSStudyEvalToPrismaEval,
+  mapCPMSStudyToPrismaStudy,
+  updateEvaluationCategories,
+  updateStudy,
+} from './studies'
 
 describe('getStudiesForOrgs', () => {
   const mockStudies = [Mock.of<Study>({ id: 1, title: 'Study 1' }), Mock.of<Study>({ id: 2, title: 'Study 2' })]
@@ -567,5 +576,80 @@ describe('updateEvaluationCategories', () => {
       [studyEvalToDelete]
     )
     expect(result).toEqual({ data: null, error: errorMessage })
+  })
+})
+
+describe('mapCPMSStudyToPrismaStudy', () => {
+  const mockMappedStudy = {
+    cpmsId: mockCPMSStudy.StudyId,
+    shortTitle: mockCPMSStudy.StudyShortName,
+    studyStatus: mockCPMSStudy.StudyStatus,
+    route: mockCPMSStudy.StudyRoute,
+    sampleSize: mockCPMSStudy.TotalRecruitmentToDate,
+    totalRecruitmentToDate: mockCPMSStudy.UkRecruitmentTargetToDate,
+    plannedOpeningDate: new Date(mockCPMSStudy.PlannedOpeningDate),
+    plannedClosureDate: new Date(mockCPMSStudy.PlannedClosureToRecruitmentDate),
+    actualOpeningDate: new Date(mockCPMSStudy.ActualOpeningDate),
+    actualClosureDate: new Date(mockCPMSStudy.ActualClosureToRecruitmentDate),
+  }
+
+  it('correctly maps data when all fields exist', () => {
+    const result = mapCPMSStudyToPrismaStudy(mockCPMSStudy)
+    expect(result).toStrictEqual(mockMappedStudy)
+  })
+
+  it('correctly maps date fields when they do not exist', () => {
+    const result = mapCPMSStudyToPrismaStudy({
+      ...mockCPMSStudy,
+      PlannedOpeningDate: '',
+      PlannedClosureToRecruitmentDate: '',
+      ActualOpeningDate: '',
+      ActualClosureToRecruitmentDate: '',
+    })
+    expect(result).toStrictEqual({
+      ...mockMappedStudy,
+      actualClosureDate: null,
+      actualOpeningDate: null,
+      plannedClosureDate: null,
+      plannedOpeningDate: null,
+    })
+  })
+})
+
+describe('mapCPMSStudyEvalToPrismaEval', () => {
+  const mockCPMSEvals = mockCPMSStudy.StudyEvaluationCategories[0]
+
+  const mockMappedEval = {
+    indicatorType: mockCPMSEvals.EvaluationCategoryType,
+    indicatorValue: mockCPMSEvals.EvaluationCategoryValue,
+    sampleSize: mockCPMSEvals.SampleSize,
+    totalRecruitmentToDate: mockCPMSEvals.TotalRecruitmentToDate,
+    plannedOpeningDate: new Date(mockCPMSEvals.PlannedRecruitmentStartDate as string),
+    plannedClosureDate: new Date(mockCPMSEvals.PlannedRecruitmentEndDate as string),
+    actualOpeningDate: new Date(mockCPMSEvals.ActualOpeningDate as string),
+    actualClosureDate: new Date(mockCPMSEvals.ActualClosureDate as string),
+    expectedReopenDate: new Date(mockCPMSEvals.ExpectedReopenDate as string),
+    isDeleted: false,
+  }
+  it('correctly maps data when all fields exist', () => {
+    const result = mapCPMSStudyEvalToPrismaEval(mockCPMSEvals)
+    expect(result).toStrictEqual(mockMappedEval)
+  })
+
+  it('correctly maps date fields when they do not exist', () => {
+    const result = mapCPMSStudyEvalToPrismaEval({
+      ...mockCPMSEvals,
+      PlannedRecruitmentStartDate: '',
+      PlannedRecruitmentEndDate: '',
+      ActualOpeningDate: '',
+      ActualClosureDate: '',
+    })
+    expect(result).toStrictEqual({
+      ...mockMappedEval,
+      plannedOpeningDate: null,
+      plannedClosureDate: null,
+      actualOpeningDate: null,
+      actualClosureDate: null,
+    })
   })
 })

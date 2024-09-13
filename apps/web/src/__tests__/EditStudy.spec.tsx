@@ -1,3 +1,4 @@
+import axios from 'axios'
 import type { GetServerSidePropsContext } from 'next'
 import { getServerSession } from 'next-auth/next'
 import mockRouter from 'next-router-mock'
@@ -6,24 +7,55 @@ import { Mock } from 'ts-mockery'
 import { userWithSponsorContactRole } from '@/__mocks__/session'
 import { render, screen, within } from '@/config/TestUtils'
 import { SUPPORT_PAGE } from '@/constants/routes'
+import { mockCPMSStudy, mockStudyWithRelations } from '@/mocks/studies'
 import EditStudy, { type EditStudyProps, getServerSideProps } from '@/pages/studies/[studyId]/edit'
 
-jest.mock('next-auth/next')
+import { prismaMock } from '../__mocks__/prisma'
 
-const mockStudyId = '123'
+jest.mock('next-auth/next')
+jest.mock('axios')
+const mockedGetAxios = jest.mocked(axios.get)
+
+const mockStudyId = mockStudyWithRelations.id.toString()
 const mockStudy = {
   studyId: mockStudyId,
   shortStudyTitle: 'Study to test safety/efficacy of CIT treatment in NSCLC patients',
   sponsorOrgName: 'F. Hoffmann-La Roche Ltd (FORTREA DEVELOPMENT LIMITED)',
   studyRoute: 'Commercial',
 }
+const mockCPMSResponse = {
+  StatusCode: 200,
+  Result: mockCPMSStudy,
+}
+
+const env = { ...process.env }
+const mockedEnvVars = {
+  apiUrl: 'cpms-api',
+  apiUsername: 'testuser',
+  apiPassword: 'testpwd',
+}
 
 describe('getServerSideProps', () => {
   const getServerSessionMock = jest.mocked(getServerSession)
 
-  test('redirects to 404 page if no study id provided', async () => {
-    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: {} })
+  beforeEach(() => {
+    jest.resetAllMocks()
+  })
+
+  beforeAll(() => {
+    process.env.CPMS_API_URL = mockedEnvVars.apiUrl
+    process.env.CPMS_API_USERNAME = mockedEnvVars.apiUsername
+    process.env.CPMS_API_PASSWORD = mockedEnvVars.apiPassword
+  })
+
+  afterAll(() => {
+    process.env = env
+  })
+
+  test('redirects to 404 page if no study found', async () => {
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { study: mockStudyId } })
     getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+    prismaMock.$transaction.mockResolvedValueOnce([])
 
     const result = await getServerSideProps(context)
     expect(result).toEqual({
@@ -31,6 +63,146 @@ describe('getServerSideProps', () => {
         destination: '/404',
       },
     })
+
+    expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
+  })
+
+  test('redirects to 404 if no cpmsId exists in returned study', async () => {
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { study: mockStudyId } })
+    getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+    prismaMock.$transaction.mockResolvedValueOnce([{ ...mockStudyWithRelations, cpmsId: undefined }])
+
+    const result = await getServerSideProps(context)
+    expect(result).toEqual({
+      redirect: {
+        destination: '/404',
+      },
+    })
+
+    expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
+  })
+
+  test('redirects to 500 if no study found in CPMS', async () => {
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { study: mockStudyId } })
+    getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
+    mockedGetAxios.mockResolvedValueOnce({ data: {} })
+
+    const result = await getServerSideProps(context)
+    expect(result).toEqual({
+      redirect: {
+        destination: '/500',
+      },
+    })
+
+    expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
+    expect(mockedGetAxios).toHaveBeenCalledTimes(1)
+  })
+
+  test('redirects to 500 if request to update study in SE fails', async () => {
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { study: mockStudyId } })
+    getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
+    mockedGetAxios.mockResolvedValueOnce({ data: mockCPMSResponse })
+    prismaMock.study.update.mockRejectedValueOnce(new Error('Oh no an error'))
+
+    const result = await getServerSideProps(context)
+    expect(result).toEqual({
+      redirect: {
+        destination: '/500',
+      },
+    })
+
+    expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
+    expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
+    expect(mockedGetAxios).toHaveBeenCalledTimes(1)
+  })
+
+  test('redirects to 500 if request fails to update study evaluations in SE', async () => {
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { study: mockStudyId } })
+    getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
+    mockedGetAxios.mockResolvedValueOnce({ data: mockCPMSResponse })
+    prismaMock.study.update.mockResolvedValueOnce(mockStudyWithRelations)
+    prismaMock.studyEvaluationCategory.upsert.mockRejectedValueOnce(new Error('Oh no an error'))
+
+    const result = await getServerSideProps(context)
+    expect(result).toEqual({
+      redirect: {
+        destination: '/500',
+      },
+    })
+
+    expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
+    expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
+    expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(2)
+    expect(mockedGetAxios).toHaveBeenCalledTimes(1)
+  })
+
+  test('should return correct study and evaluations when all requests are successful', async () => {
+    const mappedCPMSStudyEvals = [
+      {
+        id: 43343,
+        studyId: Number(mockStudyId),
+        indicatorType: 'Recruitment concerns',
+        indicatorValue: 'Recruitment target met',
+        sampleSize: 444,
+        totalRecruitmentToDate: 683,
+        plannedOpeningDate: new Date('2018-03-01T00:00:00'),
+        plannedClosureDate: new Date('2025-03-31T00:00:00'),
+        actualOpeningDate: new Date('2018-03-01T00:00:00'),
+        actualClosureDate: new Date('2003-02-28T00:00:00'),
+        expectedReopenDate: new Date('2003-02-28T00:00:00'),
+        isDeleted: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: 32321,
+        studyId: Number(mockStudyId),
+        indicatorType: 'Recruitment concerns',
+        indicatorValue: 'No recruitment in past 6 months',
+        sampleSize: 444,
+        totalRecruitmentToDate: 683,
+        plannedOpeningDate: new Date('2018-03-01T00:00:00'),
+        plannedClosureDate: new Date('2025-03-31T00:00:00'),
+        actualOpeningDate: new Date('2018-03-01T00:00:00'),
+        actualClosureDate: null,
+        expectedReopenDate: null,
+        isDeleted: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ]
+
+    const organisationsByRole = {
+      Sponsor: 'Test Organisation',
+    }
+
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { study: mockStudyId } })
+    getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+    prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
+    mockedGetAxios.mockResolvedValueOnce({ data: mockCPMSResponse })
+    prismaMock.study.update.mockResolvedValueOnce(mockStudyWithRelations)
+    prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[0])
+    prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[1])
+
+    const result = await getServerSideProps(context)
+    expect(result).toEqual({
+      props: {
+        user: userWithSponsorContactRole.user,
+        study: {
+          ...mockStudyWithRelations,
+          evaluationCategories: mappedCPMSStudyEvals,
+          organisationsByRole,
+        },
+      },
+    })
+
+    expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
+    expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
+    expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(2)
+    expect(mockedGetAxios).toHaveBeenCalledTimes(1)
   })
 })
 
@@ -158,3 +330,5 @@ describe('Edit study page', () => {
     expect(screen.getByRole('link', { name: 'Cancel' })).toHaveAttribute('href', `/studies/${mockStudyId}`)
   })
 })
+
+// TODO: Confirm behaviour when there are no evals in CPMS - should return empty array
