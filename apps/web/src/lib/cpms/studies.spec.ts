@@ -17,13 +17,10 @@ const mockStudyId = Number(mockCPMSStudy.StudyId)
 
 describe('getStudyByIdFromCPMS', () => {
   beforeEach(() => {
-    jest.resetAllMocks()
-  })
-
-  beforeAll(() => {
     process.env.CPMS_API_URL = mockedEnvVars.apiUrl
     process.env.CPMS_API_USERNAME = mockedEnvVars.apiUsername
     process.env.CPMS_API_PASSWORD = mockedEnvVars.apiPassword
+    jest.resetAllMocks()
   })
 
   afterAll(() => {
@@ -78,7 +75,7 @@ describe('getStudyByIdFromCPMS', () => {
   it.each(['CPMS_API_URL', 'CPMS_API_USERNAME', 'CPMS_API_PASSWORD'])(
     'should throw an error when % environment variable does not exist',
     async (environmentVariable: string) => {
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- listed keys are save to delete
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- listed values are safe to delete
       delete process.env[environmentVariable]
 
       const result = await getStudyByIdFromCPMS(mockStudyId)

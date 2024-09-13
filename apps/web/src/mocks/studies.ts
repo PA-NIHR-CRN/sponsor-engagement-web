@@ -84,13 +84,14 @@ export const mockStudiesForExport = Array.from({ length: 3 }).map((_, index) =>
 export const mockCPMSStudy = Mock.of<Study>({
   StudyId: 622,
   StudyShortName: 'BS06',
-  StudyStatus: 'Closed to Recruitment, In Follow Up',
+  StudyStatus: 'Suspended',
   StudyRoute: 'Non-commercial',
   PlannedOpeningDate: '2003-02-28T00:00:00',
   PlannedClosureToRecruitmentDate: '2003-02-28T00:00:00',
   ActualOpeningDate: '1991-09-01T00:00:00',
   ActualClosureToRecruitmentDate: '2003-02-28T00:00:00',
   TotalRecruitmentToDate: 683,
+  UkRecruitmentTargetToDate: 121,
   StudyEvaluationCategories: [
     {
       EvaluationCategoryType: 'Recruitment concerns',
@@ -169,7 +170,7 @@ export const mockStudyWithRelations = Mock.of<StudyWithRelations>({
       },
       organisationRole: {
         id: simpleFaker.number.int(),
-        name: 'Clinical Research Sponsor',
+        name: 'Contract Research Organisation',
       },
     },
   ],

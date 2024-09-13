@@ -10,8 +10,9 @@ import type { UpdateStudyInput } from './studies'
 import {
   getStudiesForOrgs,
   getStudyById,
-  mapCPMSStudyEvalToPrismaEval,
-  mapCPMSStudyToPrismaStudy,
+  mapCPMSStatusToSEStatus,
+  mapCPMSStudyEvalToSEEval,
+  mapCPMSStudyToSEStudy,
   updateEvaluationCategories,
   updateStudy,
 } from './studies'
@@ -579,7 +580,7 @@ describe('updateEvaluationCategories', () => {
   })
 })
 
-describe('mapCPMSStudyToPrismaStudy', () => {
+describe('mapCPMSStudyToSEStudy', () => {
   const mockMappedStudy = {
     cpmsId: mockCPMSStudy.StudyId,
     shortTitle: mockCPMSStudy.StudyShortName,
@@ -594,12 +595,12 @@ describe('mapCPMSStudyToPrismaStudy', () => {
   }
 
   it('correctly maps data when all fields exist', () => {
-    const result = mapCPMSStudyToPrismaStudy(mockCPMSStudy)
+    const result = mapCPMSStudyToSEStudy(mockCPMSStudy)
     expect(result).toStrictEqual(mockMappedStudy)
   })
 
   it('correctly maps date fields when they do not exist', () => {
-    const result = mapCPMSStudyToPrismaStudy({
+    const result = mapCPMSStudyToSEStudy({
       ...mockCPMSStudy,
       PlannedOpeningDate: '',
       PlannedClosureToRecruitmentDate: '',
@@ -616,7 +617,7 @@ describe('mapCPMSStudyToPrismaStudy', () => {
   })
 })
 
-describe('mapCPMSStudyEvalToPrismaEval', () => {
+describe('mapCPMSStudyEvalToSEEval', () => {
   const mockCPMSEvals = mockCPMSStudy.StudyEvaluationCategories[0]
 
   const mockMappedEval = {
@@ -632,12 +633,12 @@ describe('mapCPMSStudyEvalToPrismaEval', () => {
     isDeleted: false,
   }
   it('correctly maps data when all fields exist', () => {
-    const result = mapCPMSStudyEvalToPrismaEval(mockCPMSEvals)
+    const result = mapCPMSStudyEvalToSEEval(mockCPMSEvals)
     expect(result).toStrictEqual(mockMappedEval)
   })
 
   it('correctly maps date fields when they do not exist', () => {
-    const result = mapCPMSStudyEvalToPrismaEval({
+    const result = mapCPMSStudyEvalToSEEval({
       ...mockCPMSEvals,
       PlannedRecruitmentStartDate: '',
       PlannedRecruitmentEndDate: '',
@@ -651,5 +652,23 @@ describe('mapCPMSStudyEvalToPrismaEval', () => {
       actualOpeningDate: null,
       actualClosureDate: null,
     })
+  })
+})
+
+describe('mapCPMSStatusToSEStatus', () => {
+  it.each([
+    ['Pre-Setup', 'In setup'],
+    ['In Setup, Pending NHS Permission', 'In setup'],
+    ['Closed to Recruitment', 'Closed'],
+    ['Withdrawn During Setup', 'Withdrawn'],
+  ])('correctly maps known statuses', (inputValue: string, expectedValue: string) => {
+    const result = mapCPMSStatusToSEStatus(inputValue)
+    expect(result).toEqual(expectedValue)
+  })
+
+  it('correctly return the input value when a mapping does not exist', () => {
+    const mockUnknownStatus = 'unknown'
+    const result = mapCPMSStatusToSEStatus(mockUnknownStatus)
+    expect(result).toEqual(mockUnknownStatus)
   })
 })
