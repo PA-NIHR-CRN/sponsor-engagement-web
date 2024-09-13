@@ -22,8 +22,15 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
     assert(CPMS_API_USERNAME)
     assert(CPMS_API_PASSWORD)
 
-    const { studyId, plannedClosureDate, plannedOpeningDate, actualClosureDate, actualOpeningDate, ...studyData } =
-      studySchema.parse(req.body)
+    const {
+      studyId,
+      cpmsId,
+      plannedClosureDate,
+      plannedOpeningDate,
+      actualClosureDate,
+      actualOpeningDate,
+      ...studyData
+    } = studySchema.parse(req.body)
 
     const body = JSON.stringify({
       ...studyData,
@@ -33,7 +40,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
       ...(actualClosureDate && { ActualClosureToRecruitmentDate: constructDateObjFromParts(actualClosureDate) }),
     })
 
-    const requestUrl = `${CPMS_API_URL}/studies/${studyId}/engagement-info`
+    const requestUrl = `${CPMS_API_URL}/studies/${cpmsId}/engagement-info`
 
     const { data } = await axios.put<CPMSStudyResponse>(requestUrl, body, {
       headers: {

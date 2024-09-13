@@ -63,7 +63,7 @@ describe('Edit study page', () => {
     // Guidance text for Commercial
     expect(
       screen.getByText(
-        'Changes to study status will be committed to CPMS after review. All other changes will be committed directly without manual review.',
+        'Changes to the study status, the key dates and recruitment targets will be communicated to RDN, where possible, your changes will update the study record automatically in CPMS, other changes might be subject to review by the RDN team.',
         { selector: 'div' }
       )
     ).toBeInTheDocument()
@@ -92,17 +92,17 @@ describe('Edit study page', () => {
 
     expect(within(statusFieldset).getByLabelText('Open to recruitment')).toBeInTheDocument()
     expect(within(statusFieldset).getByLabelText('Open to recruitment')).toHaveAccessibleDescription(
-      'Ready (open) to recruit participants in at least one UK site.'
+      'Ready (open) to recruit participants in at least one UK site. Provide an actual opening date below.'
     )
 
     expect(within(statusFieldset).getByLabelText('Closed, in follow-up')).toBeInTheDocument()
     expect(within(statusFieldset).getByLabelText('Closed, in follow-up')).toHaveAccessibleDescription(
-      'Ongoing, (i.e. participants are being treated or observed), but recruitment is complete.'
+      'Ongoing, (i.e. participants are being treated or observed), but recruitment is complete. Provide an actual closure date below.'
     )
 
     expect(within(statusFieldset).getByLabelText('Closed')).toBeInTheDocument()
     expect(within(statusFieldset).getByLabelText('Closed')).toHaveAccessibleDescription(
-      'Completed recruitment and any subsequent patient related activities (follow up).'
+      'Completed recruitment and any subsequent patient related activities (follow up). Provide an actual closure date below.'
     )
 
     expect(within(statusFieldset).getByLabelText('Withdrawn')).toBeInTheDocument()
@@ -112,7 +112,7 @@ describe('Edit study page', () => {
 
     expect(within(statusFieldset).getByLabelText('Suspended')).toBeInTheDocument()
     expect(within(statusFieldset).getByLabelText('Suspended')).toHaveAccessibleDescription(
-      'Recruitment of participants has halted, but may resume.'
+      'Recruitment of participants has halted, but may resume. Provide an estimated re-opening date below.'
     )
 
     // Form Input - Planned open recruitment date

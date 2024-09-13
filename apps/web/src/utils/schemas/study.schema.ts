@@ -7,7 +7,8 @@ const dateSchema = z.object({
 })
 
 export const studySchema = z.object({
-  studyId: z.string(),
+  studyId: z.number(),
+  cpmsId: z.string(),
   status: z.string().optional(),
   plannedOpeningDate: dateSchema.optional(),
   actualOpeningDate: dateSchema.optional(),

@@ -14,8 +14,8 @@ export interface Study {
   PlannedClosureToRecruitmentDate: string
   ActualClosureToRecruitmentDate: string
   EstimatedReopeningDate: string | null
-  TotalRecruitmentToDate: number
-  UkRecruitmentTargetToDate: number
+  TotalRecruitmentToDate: number | null
+  UkRecruitmentTargetToDate: number | null
   StudyEvaluationCategories: StudyEvaluationCategory[]
 }
 
