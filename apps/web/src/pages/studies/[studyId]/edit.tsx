@@ -74,7 +74,7 @@ export default function EditStudy({ study }: EditStudyProps) {
               console.log('error', error)
             }}
           >
-            <input type="hidden" {...register('cpmsStudyId')} defaultValue={defaultValues?.cpmsStudyId} />
+            <input type="hidden" {...register('cpmsId')} defaultValue={defaultValues?.cpmsId} />
 
             <Fieldset>
               {/* Status */}
