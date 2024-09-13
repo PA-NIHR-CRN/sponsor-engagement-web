@@ -9,10 +9,10 @@ import { AssessmentHistory, getAssessmentHistoryFromStudy, RequestSupport, Study
 import { RootLayout } from '@/components/organisms'
 import { EDIT_STUDY_ROLE, Roles } from '@/constants'
 import { ASSESSMENT_PAGE, STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/routes'
+import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
 import { getStudyById, mapCPMSStudyToPrismaStudy, updateStudy } from '@/lib/studies'
 import { formatDate } from '@/utils/date'
 import { withServerSideProps } from '@/utils/withServerSideProps'
-import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
 
 const renderNotificationBanner = (success: boolean) =>
   success ? (

@@ -267,7 +267,7 @@ export const getStudiesForExport = async (organisationIds: number[]) => {
 export type UpdateStudyInput = Prisma.StudyUpdateInput
 
 export const mapCPMSStatusToSEStatus = (cpmsStatus: string): string => {
-  const statusMap: { [key: string]: string } = {
+  const statusMap: Record<string, string> = {
     'Pre-Setup': 'In setup',
     'In Setup': 'In setup',
     'In Setup, Pending NHS Permission': 'In setup',
