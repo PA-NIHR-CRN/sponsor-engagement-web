@@ -289,7 +289,7 @@ export const mapCPMSStatusToSEStatus = (cpmsStatus: string): string => {
 export const mapCPMSStudyToPrismaStudy = (study: Study): UpdateStudyInput => ({
   cpmsId: study.StudyId,
   shortTitle: study.StudyShortName,
-  studyStatus: study.StudyStatus,
+  studyStatus: mapCPMSStatusToSEStatus(study.StudyStatus),
   route: study.StudyRoute,
   sampleSize: study.TotalRecruitmentToDate,
   totalRecruitmentToDate: study.UkRecruitmentTargetToDate,
