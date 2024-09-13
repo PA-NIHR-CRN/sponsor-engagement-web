@@ -22,8 +22,15 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
     assert(CPMS_API_USERNAME)
     assert(CPMS_API_PASSWORD)
 
-    const { id, studyId, plannedClosureDate, plannedOpeningDate, actualClosureDate, actualOpeningDate, ...studyData } =
-      studySchema.parse(req.body)
+    const {
+      seId,
+      cpmsStudyId,
+      plannedClosureDate,
+      plannedOpeningDate,
+      actualClosureDate,
+      actualOpeningDate,
+      ...studyData
+    } = studySchema.parse(req.body)
 
     const body = JSON.stringify({
       ...studyData,
@@ -33,7 +40,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
       ...(actualClosureDate && { ActualClosureToRecruitmentDate: constructDateObjFromParts(actualClosureDate) }),
     })
 
-    const requestUrl = `${CPMS_API_URL}/studies/${studyId}/engagement-info`
+    const requestUrl = `${CPMS_API_URL}/studies/${cpmsStudyId}/engagement-info`
 
     const { data } = await axios.put<CPMSStudyResponse>(requestUrl, body, {
       headers: {
@@ -47,11 +54,11 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
       throw new Error('An error occured fetching study from CPMS')
     }
 
-    return res.redirect(302, `/studies/${id}?success=2`)
+    return res.redirect(302, `/studies/${seId}?success=2`)
   } catch (e) {
     const searchParams = new URLSearchParams({ fatal: '1' })
-    const id = req.body.id
+    const seId = req.body.seId
 
-    return res.redirect(302, `/studies/${id}/?${searchParams.toString()}`)
+    return res.redirect(302, `/studies/${seId}/?${searchParams.toString()}`)
   }
 })

@@ -4,10 +4,10 @@ import { constructDatePartsFromDate } from './date'
 import type { EditStudyInputs } from './schemas'
 
 export const mapStudyToStudyFormInput = (study: EditStudyProps['study']): EditStudyInputs => ({
-  id: study.id,
+  seId: study.id,
   status: study.studyStatus,
   recruitmentTarget: study.sampleSize ?? undefined,
-  studyId: study.cpmsId.toString(),
+  cpmsStudyId: study.cpmsId.toString(),
   plannedOpeningDate: constructDatePartsFromDate(study.plannedOpeningDate),
   plannedClosureDate: constructDatePartsFromDate(study.plannedClosureDate),
   actualOpeningDate: constructDatePartsFromDate(study.actualOpeningDate),

@@ -142,7 +142,7 @@ export default function Study({ user, study, studyInCPMS, assessments }: StudyPr
                 <Table.Row>
                   <Table.CellHeader className="w-1/3">Estimated reopening date</Table.CellHeader>
                   <Table.Cell>
-                    {studyInCPMS.StudyEvaluationCategories[0].ExpectedReopenDate
+                    {studyInCPMS.StudyEvaluationCategories[0]?.ExpectedReopenDate
                       ? formatDate(studyInCPMS.StudyEvaluationCategories[0].ExpectedReopenDate)
                       : '-'}
                   </Table.Cell>
@@ -150,7 +150,7 @@ export default function Study({ user, study, studyInCPMS, assessments }: StudyPr
               )}
 
               <Table.Row>
-                <Table.CellHeader className="w-1/3">UK recruitment target (excluding private site)</Table.CellHeader>
+                <Table.CellHeader className="w-1/3">UK recruitment target (excluding private sites)</Table.CellHeader>
                 <Table.Cell>{studyInCPMS.TotalRecruitmentToDate ?? '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
