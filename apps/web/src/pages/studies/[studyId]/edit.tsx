@@ -40,7 +40,7 @@ export default function EditStudy({ study }: EditStudyProps) {
 
   const { organisationsByRole } = study
 
-  const supportOrgName = organisationsByRole.CRO ?? organisationsByRole.CTU
+  const supportOrgName = organisationsByRole.CRO ?? organisationsByRole.CTU ?? organisationsByRole.Sponsor
 
   const { defaultValues } = formState
 

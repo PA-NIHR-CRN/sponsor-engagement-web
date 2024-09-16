@@ -36,6 +36,7 @@ model Study {
   updatedAt                  DateTime                  @updatedAt
   isDueAssessment            Boolean?                  @default(false)
   isDeleted                  Boolean?                  @default(false)
+  StudyUpdates               StudyUpdates[]
 
   @@index([cpmsId])
 }
@@ -85,6 +86,8 @@ model User {
   updatedRoles          UserRole[]           @relation(name: "updatedRoles")
   assessments           Assessment[]
   assessmentReminders   AssessmentReminder[]
+  createdStudyUpdates   StudyUpdates[]       @relation(name: "createdStudyUpdates")
+  modifiedStudyUpdates  StudyUpdates[]       @relation(name: "modifiedStudyUpdates")
 }
 
 model UserRole {
@@ -203,6 +206,37 @@ model AssessmentReminder {
   messageId String?
   sentAt    DateTime?
   createdAt DateTime  @default(now())
+}
+
+model StudyUpdates {
+  id                              Int                   @id @default(autoincrement())
+  study                           Study                 @relation(fields: [studyId], references: [id])
+  studyId                         Int
+  studyStatus                     String // @db.VarChar()
+  plannedOpeningDate              DateTime?
+  actualOpeningDate               DateTime?
+  plannedClosureToRecruitmentDate DateTime?
+  actualClosureToRecruitmentDate  DateTime?
+  estimatedReopeningDate          DateTime?
+  ukRecruitmentTarget             Int?
+  studyUpdateType                 SysRefStudyUpdateType @relation(fields: [studyUpdateTypeId], references: [id])
+  studyUpdateTypeId               Int
+  comment                         String? //@db.VarChar()
+  isDeleted                       Boolean?              @default(false) @db.TinyInt()
+  LSN                             Bytes?                @db.Binary(10)
+  createdAt                       DateTime              @default(now())
+  createdBy                       User                  @relation("createdStudyUpdates", fields: [createdyById], references: [id])
+  createdyById                    Int
+  modifiedAt                      DateTime              @updatedAt
+  modifiedBy                      User                  @relation("modifiedStudyUpdates", fields: [modifiedById], references: [id])
+  modifiedById                    Int
+}
+
+model SysRefStudyUpdateType {
+  id           Int            @id @default(autoincrement())
+  name         String
+  description  String         @db.Text
+  StudyUpdates StudyUpdates[]
 }
 
 model SysRefRole {
