@@ -45,7 +45,7 @@ describe('getStudyByIdFromCPMS', () => {
     })
   })
 
-  it('should return error when CPMS does not return a 200 status code', async () => {
+  it('should return an error when CPMS does not return a 200 status code', async () => {
     const mockErrorResponseData = {
       StatusCode: 500,
       Result: {},
@@ -60,7 +60,7 @@ describe('getStudyByIdFromCPMS', () => {
     expect(mockedGetAxios).toHaveBeenCalledTimes(1)
   })
 
-  it('should return error when request to CPMS throws an error', async () => {
+  it('should return an error when request to CPMS throws an error', async () => {
     const mockErrorMessage = 'Oh no, an error'
 
     mockedGetAxios.mockRejectedValueOnce(new Error(mockErrorMessage))
@@ -80,7 +80,7 @@ describe('getStudyByIdFromCPMS', () => {
 
       const result = await getStudyByIdFromCPMS(mockStudyId)
 
-      expect(result.error?.includes(`${environmentVariable} is not defined`)).toB
+      expect(result.error?.includes(`${environmentVariable} is not defined`)).toEqual(true)
     }
   )
 })

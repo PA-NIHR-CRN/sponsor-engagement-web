@@ -666,7 +666,7 @@ describe('mapCPMSStatusToSEStatus', () => {
     expect(result).toEqual(expectedValue)
   })
 
-  it('correctly return the input value when a mapping does not exist', () => {
+  it('correctly returns the input value when a mapping does not exist', () => {
     const mockUnknownStatus = 'unknown'
     const result = mapCPMSStatusToSEStatus(mockUnknownStatus)
     expect(result).toEqual(mockUnknownStatus)
