@@ -9,6 +9,7 @@ export interface Study {
   StudyRoute: string
   StudyShortName: string
   StudyStatus: string
+  SampleSize: number | null
   PlannedOpeningDate: string
   ActualOpeningDate: string
   PlannedClosureToRecruitmentDate: string
