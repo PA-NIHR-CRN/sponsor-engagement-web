@@ -1,3 +1,5 @@
+import type { OrganisationRoleShortName } from '@/lib/organisations'
+
 export interface CPMSStudyResponse {
   Version: string
   StatusCode: number
@@ -5,6 +7,7 @@ export interface CPMSStudyResponse {
 }
 
 export interface Study {
+  Title: string
   StudyId: number
   StudyRoute: string
   StudyShortName: string
@@ -17,6 +20,13 @@ export interface Study {
   TotalRecruitmentToDate: number | null
   UkRecruitmentTargetToDate: number | null
   StudyEvaluationCategories: StudyEvaluationCategory[]
+  ProtocolReferenceNumber: number
+  IrasId: number
+  ManagingSpecialty: string
+  ChiefInvestigatorFirstName: string
+  ChiefInvestigatorLastName: string
+  StudySponsors: StudySponsor[]
+  organisationsByRole?: Partial<Record<OrganisationRoleShortName, string>>
 }
 
 export enum StudyRecordStatus {

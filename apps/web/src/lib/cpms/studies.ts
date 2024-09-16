@@ -4,6 +4,9 @@ import axios from 'axios'
 
 import type { CPMSStudyResponse, Study } from '@/@types/studies'
 
+import type { OrganisationRoleShortName} from '../organisations';
+import {organisationRoleShortName } from '../organisations'
+
 interface GetStudyFromCPMSResponse {
   study: Study | null
   error?: string
@@ -25,8 +28,20 @@ export const getStudyByIdFromCPMS = async (studyId: number): Promise<GetStudyFro
     if (data.StatusCode !== 200) {
       throw new Error('An error occured fetching study from CPMS')
     }
+    let study = data.Result
 
-    return { study: data.Result }
+    const organisationsByRole = Object.fromEntries(
+      study.StudySponsors.map((StudySponsor) => {
+        return [organisationRoleShortName[StudySponsor.OrganisationRole], StudySponsor.OrganisationName]
+      })
+    ) as Partial<Record<OrganisationRoleShortName, string>>
+
+    study = {
+      ...study,
+      organisationsByRole,
+    }
+
+    return { study }
   } catch (e) {
     const error = e instanceof Error ? e.message : String(e)
 
