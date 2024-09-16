@@ -96,7 +96,6 @@ export default function Assessment({
               <AccordionTrigger>Show study details</AccordionTrigger>
               <AccordionContent>
                 <StudyDetails study={study} studyInCPMS={studyInCPMS} />
-                {/* <StudyDetails study={studyInCPMS?.StudyId ? studyInCPMS : study} /> */}
               </AccordionContent>
             </AccordionItem>
           </Accordion>
