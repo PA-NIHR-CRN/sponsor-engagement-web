@@ -118,6 +118,41 @@ export const mockCPMSStudy = Mock.of<Study>({
   ],
 })
 
+export const mappedCPMSStudyEvals = [
+  {
+    id: 43343,
+    studyId: mockCPMSStudy.StudyId,
+    indicatorType: mockCPMSStudy.StudyEvaluationCategories[0].EvaluationCategoryType,
+    indicatorValue: mockCPMSStudy.StudyEvaluationCategories[0].EvaluationCategoryValue,
+    sampleSize: mockCPMSStudy.StudyEvaluationCategories[0].SampleSize,
+    totalRecruitmentToDate: mockCPMSStudy.StudyEvaluationCategories[0].TotalRecruitmentToDate,
+    plannedOpeningDate: new Date(mockCPMSStudy.StudyEvaluationCategories[0].PlannedRecruitmentStartDate as string),
+    plannedClosureDate: new Date(mockCPMSStudy.StudyEvaluationCategories[0].PlannedRecruitmentEndDate as string),
+    actualOpeningDate: new Date(mockCPMSStudy.StudyEvaluationCategories[0].ActualOpeningDate as string),
+    actualClosureDate: new Date(mockCPMSStudy.StudyEvaluationCategories[0].ActualClosureDate as string),
+    expectedReopenDate: new Date(mockCPMSStudy.StudyEvaluationCategories[0].ExpectedReopenDate as string),
+    isDeleted: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    id: 32321,
+    studyId: mockCPMSStudy.StudyId,
+    indicatorType: mockCPMSStudy.StudyEvaluationCategories[1].EvaluationCategoryType,
+    indicatorValue: mockCPMSStudy.StudyEvaluationCategories[1].EvaluationCategoryValue,
+    sampleSize: mockCPMSStudy.StudyEvaluationCategories[1].SampleSize,
+    totalRecruitmentToDate: mockCPMSStudy.StudyEvaluationCategories[1].TotalRecruitmentToDate,
+    plannedOpeningDate: new Date(mockCPMSStudy.StudyEvaluationCategories[1].PlannedRecruitmentStartDate as string),
+    plannedClosureDate: new Date(mockCPMSStudy.StudyEvaluationCategories[1].PlannedRecruitmentEndDate as string),
+    actualOpeningDate: new Date(mockCPMSStudy.StudyEvaluationCategories[1].ActualOpeningDate as string),
+    actualClosureDate: new Date(mockCPMSStudy.StudyEvaluationCategories[1].ActualClosureDate as string),
+    expectedReopenDate: new Date(mockCPMSStudy.StudyEvaluationCategories[1].ExpectedReopenDate as string),
+    isDeleted: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+]
+
 type StudyWithRelations = Prisma.StudyGetPayload<{
   include: {
     title: true
@@ -216,3 +251,12 @@ export const mockStudyWithRelations = Mock.of<StudyWithRelations>({
     },
   ],
 })
+
+export const mockMappedAssessment = {
+  createdAt: '1 January 2001',
+  createdBy: 'mockeduser@nihr.ac.uk',
+  furtherInformation: ['Mocked list item 1', 'Mocked list item 2', 'Mocked list item 3'],
+  furtherInformationText: 'Testing some further information',
+  id: 1,
+  status: 'Off track',
+}

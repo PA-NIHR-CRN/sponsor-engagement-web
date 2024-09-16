@@ -7,7 +7,7 @@ import { Mock } from 'ts-mockery'
 import { userWithSponsorContactRole } from '@/__mocks__/session'
 import { render, screen, within } from '@/config/TestUtils'
 import { SUPPORT_PAGE } from '@/constants/routes'
-import { mockCPMSStudy, mockStudyWithRelations } from '@/mocks/studies'
+import { mappedCPMSStudyEvals, mockCPMSStudy, mockStudyWithRelations } from '@/mocks/studies'
 import EditStudy, { type EditStudyProps, getServerSideProps } from '@/pages/studies/[studyId]/edit'
 
 import { prismaMock } from '../__mocks__/prisma'
@@ -23,40 +23,6 @@ const mockCPMSResponse = {
   StatusCode: 200,
   Result: mockCPMSStudy,
 }
-const mappedCPMSStudyEvals = [
-  {
-    id: 43343,
-    studyId: Number(mockStudyId),
-    indicatorType: 'Recruitment concerns',
-    indicatorValue: 'Recruitment target met',
-    sampleSize: 444,
-    totalRecruitmentToDate: 683,
-    plannedOpeningDate: new Date('2018-03-01T00:00:00'),
-    plannedClosureDate: new Date('2025-03-31T00:00:00'),
-    actualOpeningDate: new Date('2018-03-01T00:00:00'),
-    actualClosureDate: new Date('2003-02-28T00:00:00'),
-    expectedReopenDate: new Date('2003-02-28T00:00:00'),
-    isDeleted: false,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: 32321,
-    studyId: Number(mockStudyId),
-    indicatorType: 'Recruitment concerns',
-    indicatorValue: 'No recruitment in past 6 months',
-    sampleSize: 444,
-    totalRecruitmentToDate: 683,
-    plannedOpeningDate: new Date('2018-03-01T00:00:00'),
-    plannedClosureDate: new Date('2025-03-31T00:00:00'),
-    actualOpeningDate: new Date('2018-03-01T00:00:00'),
-    actualClosureDate: null,
-    expectedReopenDate: null,
-    isDeleted: false,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-]
 
 const env = { ...process.env }
 const mockedEnvVars = {
@@ -103,7 +69,7 @@ describe('EditStudy', () => {
 
   describe('getServerSideProps', () => {
     test('redirects to 404 page if no study found', async () => {
-      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { study: mockStudyId } })
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
       getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
       prismaMock.$transaction.mockResolvedValueOnce([])
 
@@ -118,7 +84,7 @@ describe('EditStudy', () => {
     })
 
     test('redirects to 404 if no cpmsId exists in returned study', async () => {
-      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { study: mockStudyId } })
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
       getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
       prismaMock.$transaction.mockResolvedValueOnce([{ ...mockStudyWithRelations, cpmsId: undefined }])
 
@@ -133,7 +99,7 @@ describe('EditStudy', () => {
     })
 
     test('redirects to 500 if no study found in CPMS', async () => {
-      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { study: mockStudyId } })
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
       getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
       prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
       mockedGetAxios.mockResolvedValueOnce({ data: {} })
@@ -150,7 +116,7 @@ describe('EditStudy', () => {
     })
 
     test('redirects to 500 if request to update study in SE fails', async () => {
-      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { study: mockStudyId } })
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
       getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
       prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
       mockedGetAxios.mockResolvedValueOnce({ data: mockCPMSResponse })
@@ -169,7 +135,7 @@ describe('EditStudy', () => {
     })
 
     test('redirects to 500 if request fails to update study evaluations in SE', async () => {
-      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { study: mockStudyId } })
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
       getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
       prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
       mockedGetAxios.mockResolvedValueOnce({ data: mockCPMSResponse })
@@ -194,7 +160,7 @@ describe('EditStudy', () => {
         CRO: 'Test Organisation',
       }
 
-      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { study: mockStudyId } })
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
       getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
       prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
       mockedGetAxios.mockResolvedValueOnce({ data: mockCPMSResponse })

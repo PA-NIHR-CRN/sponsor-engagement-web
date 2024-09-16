@@ -9,7 +9,7 @@ import { NextSeo } from 'next-seo'
 import { Mock } from 'ts-mockery'
 
 import { render, screen, within } from '@/config/TestUtils'
-import { mockCPMSStudy, mockStudyWithRelations } from '@/mocks/studies'
+import { mappedCPMSStudyEvals, mockCPMSStudy, mockMappedAssessment, mockStudyWithRelations } from '@/mocks/studies'
 
 import { prismaMock } from '../__mocks__/prisma'
 import {
@@ -84,6 +84,8 @@ const renderPage = async (
   prismaMock.$transaction.mockResolvedValueOnce([mockGetStudyResponse])
   mockedGetAxios.mockResolvedValueOnce({ data: { StatusCode: 200, Result: mockGetCPMSStudyResponse } })
   prismaMock.study.update.mockResolvedValueOnce(mockStudy)
+  prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[0])
+  prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[1])
 
   await mockRouter.push(mockUrl)
 
@@ -159,6 +161,96 @@ describe('Study', () => {
           destination: '/404',
         },
       })
+    })
+
+    test('redirects to 500 page if no study found in cpms', async () => {
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
+      getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+      prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
+      mockedGetAxios.mockResolvedValueOnce({ data: {} })
+
+      const result = await getServerSideProps(context)
+      expect(result).toEqual({
+        redirect: {
+          destination: '/500',
+        },
+      })
+
+      expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
+      expect(mockedGetAxios).toHaveBeenCalledTimes(1)
+    })
+
+    test('redirects to 500 if fails to update study', async () => {
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
+      getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+      prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
+      mockedGetAxios.mockResolvedValueOnce({ data: { StatusCode: 200, Result: mockCPMSStudy } })
+      prismaMock.study.update.mockRejectedValueOnce(new Error('Oh no an error'))
+
+      const result = await getServerSideProps(context)
+      expect(result).toEqual({
+        redirect: {
+          destination: '/500',
+        },
+      })
+
+      expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
+      expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
+      expect(mockedGetAxios).toHaveBeenCalledTimes(1)
+    })
+
+    test('redirects to 500 if request fails to update study evaluations in SE', async () => {
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
+      getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+      prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
+      mockedGetAxios.mockResolvedValueOnce({ data: { StatusCode: 200, Result: mockCPMSStudy } })
+      prismaMock.study.update.mockResolvedValueOnce(mockStudyWithRelations)
+      prismaMock.studyEvaluationCategory.upsert.mockRejectedValueOnce(new Error('Oh no an error'))
+
+      const result = await getServerSideProps(context)
+      expect(result).toEqual({
+        redirect: {
+          destination: '/500',
+        },
+      })
+
+      expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
+      expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
+      expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(2)
+      expect(mockedGetAxios).toHaveBeenCalledTimes(1)
+    })
+
+    test('returns correct study and evaluations when all requests are successful', async () => {
+      const organisationsByRole = {
+        CRO: 'Test Organisation',
+      }
+
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
+      getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+      prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
+      mockedGetAxios.mockResolvedValueOnce({ data: { StatusCode: 200, Result: mockCPMSStudy } })
+      prismaMock.study.update.mockResolvedValueOnce(mockStudyWithRelations)
+      prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[0])
+      prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[1])
+
+      const result = await getServerSideProps(context)
+      expect(result).toEqual({
+        props: {
+          user: userWithSponsorContactRole.user,
+          assessments: [mockMappedAssessment],
+          study: {
+            ...mockStudyWithRelations,
+            evaluationCategories: mappedCPMSStudyEvals,
+            organisationsByRole,
+          },
+          studyInCPMS: mockCPMSStudy,
+        },
+      })
+
+      expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
+      expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
+      expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(2)
+      expect(mockedGetAxios).toHaveBeenCalledTimes(1)
     })
   })
 

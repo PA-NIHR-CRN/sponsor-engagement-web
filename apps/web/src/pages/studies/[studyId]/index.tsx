@@ -10,7 +10,13 @@ import { RootLayout } from '@/components/organisms'
 import { EDIT_STUDY_ROLE, Roles } from '@/constants'
 import { ASSESSMENT_PAGE, STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/routes'
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
-import { getStudyById, mapCPMSStudyToSEStudy, updateStudy } from '@/lib/studies'
+import {
+  getStudyById,
+  mapCPMSStudyEvalToSEEval,
+  mapCPMSStudyToSEStudy,
+  updateEvaluationCategories,
+  updateStudy,
+} from '@/lib/studies'
 import { formatDate } from '@/utils/date'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
@@ -226,11 +232,37 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     }
   }
 
+  const studyEvalsInCPMS = studyInCPMS.StudyEvaluationCategories
+  const currentStudyEvalsInSE = updatedStudy.evaluationCategories
+
+  // Soft delete evaluations in SE that are no longer returned from CPMS
+  const studyEvalIdsToDelete = currentStudyEvalsInSE
+    .filter(
+      (seEval) =>
+        !studyEvalsInCPMS.some(({ EvaluationCategoryValue }) => EvaluationCategoryValue === seEval.indicatorValue)
+    )
+    .map(({ id }) => id)
+
+  const mappedStudyEvalsInCPMS = studyEvalsInCPMS.map((studyEval) => mapCPMSStudyEvalToSEEval(studyEval))
+  const { data: updatedStudyEvals } = await updateEvaluationCategories(
+    study.id,
+    mappedStudyEvalsInCPMS,
+    studyEvalIdsToDelete
+  )
+
+  if (!updatedStudyEvals) {
+    return {
+      redirect: {
+        destination: '/500',
+      },
+    }
+  }
+
   return {
     props: {
       user: session.user,
       assessments: getAssessmentHistoryFromStudy(study),
-      study,
+      study: { ...study, evaluationCategories: updatedStudyEvals },
       studyInCPMS,
     },
   }
