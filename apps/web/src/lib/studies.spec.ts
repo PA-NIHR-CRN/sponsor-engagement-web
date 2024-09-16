@@ -2,10 +2,20 @@ import type { Study } from 'database'
 import { Prisma } from 'database'
 import { Mock } from 'ts-mockery'
 
+import { mockCPMSStudy } from '@/mocks/studies'
+
 import { prismaMock } from '../__mocks__/prisma'
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
 import type { UpdateStudyInput } from './studies'
-import { getStudiesForOrgs, getStudyById, updateEvaluationCategories, updateStudy } from './studies'
+import {
+  getStudiesForOrgs,
+  getStudyById,
+  mapCPMSStatusToSEStatus,
+  mapCPMSStudyEvalToSEEval,
+  mapCPMSStudyToSEStudy,
+  updateEvaluationCategories,
+  updateStudy,
+} from './studies'
 
 describe('getStudiesForOrgs', () => {
   const mockStudies = [Mock.of<Study>({ id: 1, title: 'Study 1' }), Mock.of<Study>({ id: 2, title: 'Study 2' })]
@@ -567,5 +577,98 @@ describe('updateEvaluationCategories', () => {
       [studyEvalToDelete]
     )
     expect(result).toEqual({ data: null, error: errorMessage })
+  })
+})
+
+describe('mapCPMSStudyToSEStudy', () => {
+  const mockMappedStudy = {
+    cpmsId: mockCPMSStudy.StudyId,
+    shortTitle: mockCPMSStudy.StudyShortName,
+    studyStatus: mockCPMSStudy.StudyStatus,
+    route: mockCPMSStudy.StudyRoute,
+    sampleSize: mockCPMSStudy.TotalRecruitmentToDate,
+    totalRecruitmentToDate: mockCPMSStudy.UkRecruitmentTargetToDate,
+    plannedOpeningDate: new Date(mockCPMSStudy.PlannedOpeningDate),
+    plannedClosureDate: new Date(mockCPMSStudy.PlannedClosureToRecruitmentDate),
+    actualOpeningDate: new Date(mockCPMSStudy.ActualOpeningDate),
+    actualClosureDate: new Date(mockCPMSStudy.ActualClosureToRecruitmentDate),
+  }
+
+  it('correctly maps data when all fields exist', () => {
+    const result = mapCPMSStudyToSEStudy(mockCPMSStudy)
+    expect(result).toStrictEqual(mockMappedStudy)
+  })
+
+  it('correctly maps date fields when they do not exist', () => {
+    const result = mapCPMSStudyToSEStudy({
+      ...mockCPMSStudy,
+      PlannedOpeningDate: '',
+      PlannedClosureToRecruitmentDate: '',
+      ActualOpeningDate: '',
+      ActualClosureToRecruitmentDate: '',
+    })
+    expect(result).toStrictEqual({
+      ...mockMappedStudy,
+      actualClosureDate: null,
+      actualOpeningDate: null,
+      plannedClosureDate: null,
+      plannedOpeningDate: null,
+    })
+  })
+})
+
+describe('mapCPMSStudyEvalToSEEval', () => {
+  const mockCPMSEvals = mockCPMSStudy.StudyEvaluationCategories[0]
+
+  const mockMappedEval = {
+    indicatorType: mockCPMSEvals.EvaluationCategoryType,
+    indicatorValue: mockCPMSEvals.EvaluationCategoryValue,
+    sampleSize: mockCPMSEvals.SampleSize,
+    totalRecruitmentToDate: mockCPMSEvals.TotalRecruitmentToDate,
+    plannedOpeningDate: new Date(mockCPMSEvals.PlannedRecruitmentStartDate as string),
+    plannedClosureDate: new Date(mockCPMSEvals.PlannedRecruitmentEndDate as string),
+    actualOpeningDate: new Date(mockCPMSEvals.ActualOpeningDate as string),
+    actualClosureDate: new Date(mockCPMSEvals.ActualClosureDate as string),
+    expectedReopenDate: new Date(mockCPMSEvals.ExpectedReopenDate as string),
+    isDeleted: false,
+  }
+  it('correctly maps data when all fields exist', () => {
+    const result = mapCPMSStudyEvalToSEEval(mockCPMSEvals)
+    expect(result).toStrictEqual(mockMappedEval)
+  })
+
+  it('correctly maps date fields when they do not exist', () => {
+    const result = mapCPMSStudyEvalToSEEval({
+      ...mockCPMSEvals,
+      PlannedRecruitmentStartDate: '',
+      PlannedRecruitmentEndDate: '',
+      ActualOpeningDate: '',
+      ActualClosureDate: '',
+    })
+    expect(result).toStrictEqual({
+      ...mockMappedEval,
+      plannedOpeningDate: null,
+      plannedClosureDate: null,
+      actualOpeningDate: null,
+      actualClosureDate: null,
+    })
+  })
+})
+
+describe('mapCPMSStatusToSEStatus', () => {
+  it.each([
+    ['Pre-Setup', 'In setup'],
+    ['In Setup, Pending NHS Permission', 'In setup'],
+    ['Closed to Recruitment', 'Closed'],
+    ['Withdrawn During Setup', 'Withdrawn'],
+  ])('correctly maps known statuses', (inputValue: string, expectedValue: string) => {
+    const result = mapCPMSStatusToSEStatus(inputValue)
+    expect(result).toEqual(expectedValue)
+  })
+
+  it('correctly returns the input value when a mapping does not exist', () => {
+    const mockUnknownStatus = 'unknown'
+    const result = mapCPMSStatusToSEStatus(mockUnknownStatus)
+    expect(result).toEqual(mockUnknownStatus)
   })
 })

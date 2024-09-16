@@ -286,7 +286,7 @@ export const mapCPMSStatusToSEStatus = (cpmsStatus: string): string => {
   return statusMap[cpmsStatus] || cpmsStatus
 }
 
-export const mapCPMSStudyToPrismaStudy = (study: Study): UpdateStudyInput => ({
+export const mapCPMSStudyToSEStudy = (study: Study): UpdateStudyInput => ({
   cpmsId: study.StudyId,
   shortTitle: study.StudyShortName,
   studyStatus: mapCPMSStatusToSEStatus(study.StudyStatus),
@@ -344,7 +344,7 @@ export const updateStudy = async (cpmsId: number, studyData: UpdateStudyInput) =
   }
 }
 
-export const mapCPMSStudyEvalToPrismaEval = (studyEvaluation: StudyEvaluationCategory) => ({
+export const mapCPMSStudyEvalToSEEval = (studyEvaluation: StudyEvaluationCategory) => ({
   indicatorType: studyEvaluation.EvaluationCategoryType,
   indicatorValue: studyEvaluation.EvaluationCategoryValue,
   sampleSize: studyEvaluation.SampleSize,

@@ -4,10 +4,10 @@ import axios from 'axios'
 
 import type { CPMSStudyResponse, Study } from '@/@types/studies'
 
-import type { OrganisationRoleShortName} from '../organisations';
-import {organisationRoleShortName } from '../organisations'
+import type { OrganisationRoleShortName } from '../organisations'
+import { organisationRoleShortName } from '../organisations'
 
-interface GetStudyFromCPMSResponse {
+export interface GetStudyFromCPMSResponse {
   study: Study | null
   error?: string
 }
@@ -16,9 +16,9 @@ export const getStudyByIdFromCPMS = async (studyId: number): Promise<GetStudyFro
   const { CPMS_API_URL, CPMS_API_USERNAME, CPMS_API_PASSWORD } = process.env
 
   try {
-    assert(CPMS_API_URL)
-    assert(CPMS_API_USERNAME)
-    assert(CPMS_API_PASSWORD)
+    assert(CPMS_API_URL, 'CPMS_API_URL is not defined')
+    assert(CPMS_API_USERNAME, 'CPMS_API_USERNAME is not defined')
+    assert(CPMS_API_PASSWORD, 'CPMS_API_PASSWORD is not defined')
 
     const requestUrl = `${CPMS_API_URL}/studies/${studyId}/engagement-info`
     const { data } = await axios.get<CPMSStudyResponse>(requestUrl, {
