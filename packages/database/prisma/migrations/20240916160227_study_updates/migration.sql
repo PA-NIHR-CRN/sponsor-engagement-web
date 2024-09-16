@@ -10,9 +10,9 @@ CREATE TABLE `StudyUpdates` (
     `estimatedReopeningDate` DATETIME(3) NULL,
     `ukRecruitmentTarget` INTEGER NULL,
     `studyUpdateTypeId` INTEGER NOT NULL,
-    `comment` VARCHAR(191) NULL,
+    `comment` VARCHAR(500) NULL,
     `isDeleted` BOOLEAN NULL DEFAULT false,
-    `LSN` BINARY(10) NOT NULL,
+    `LSN` BINARY(10) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `createdyById` INTEGER NOT NULL,
     `modifiedAt` DATETIME(3) NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE `StudyUpdates` (
 CREATE TABLE `SysRefStudyUpdateType` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
-    `description` VARCHAR(191) NOT NULL,
+    `description` TEXT NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
