@@ -286,13 +286,13 @@ export const mapCPMSStatusToSEStatus = (cpmsStatus: string): string => {
   return statusMap[cpmsStatus] || cpmsStatus
 }
 
-export const mapCPMSStudyToPrismaStudy = (study: Study): UpdateStudyInput => ({
+export const mapCPMSStudyToSEStudy = (study: Study): UpdateStudyInput => ({
   cpmsId: study.StudyId,
   shortTitle: study.StudyShortName,
   studyStatus: mapCPMSStatusToSEStatus(study.StudyStatus),
   route: study.StudyRoute,
-  sampleSize: study.TotalRecruitmentToDate,
-  totalRecruitmentToDate: study.UkRecruitmentTargetToDate,
+  sampleSize: study.SampleSize,
+  totalRecruitmentToDate: study.TotalRecruitmentToDate,
   plannedOpeningDate: study.PlannedOpeningDate ? new Date(study.PlannedOpeningDate) : null,
   plannedClosureDate: study.PlannedClosureToRecruitmentDate ? new Date(study.PlannedClosureToRecruitmentDate) : null,
   actualOpeningDate: study.ActualOpeningDate ? new Date(study.ActualOpeningDate) : null,
@@ -344,7 +344,7 @@ export const updateStudy = async (cpmsId: number, studyData: UpdateStudyInput) =
   }
 }
 
-export const mapCPMSStudyEvalToPrismaEval = (studyEvaluation: StudyEvaluationCategory) => ({
+export const mapCPMSStudyEvalToSEEval = (studyEvaluation: StudyEvaluationCategory) => ({
   indicatorType: studyEvaluation.EvaluationCategoryType,
   indicatorValue: studyEvaluation.EvaluationCategoryValue,
   sampleSize: studyEvaluation.SampleSize,

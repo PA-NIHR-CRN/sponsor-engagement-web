@@ -22,7 +22,7 @@ const customJestConfig: Config = {
   reporters: ['default', 'jest-junit'],
   testPathIgnorePatterns: ['.vscode'],
   coverageReporters: ['json-summary', 'text', 'html', 'lcov'],
-  coveragePathIgnorePatterns: ['node_modules', 'src/utils/schemas/env.schema.js'],
+  coveragePathIgnorePatterns: ['node_modules', 'src/utils/schemas/env.schema.js', 'src/@types'],
   coverageThreshold: {
     global: {
       lines: 89,
