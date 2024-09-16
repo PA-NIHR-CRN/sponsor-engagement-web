@@ -299,7 +299,7 @@ describe('Study', () => {
         'Planned closure to recruitment date',
         'Actual closure to recruitment date',
         'Estimated reopening date',
-        'UK recruitment target (excluding private sites)',
+        'UK recruitment target',
         'Total UK recruitment to date',
       ])
 
