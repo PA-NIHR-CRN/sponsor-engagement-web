@@ -18,8 +18,8 @@ import { GENERIC_STUDIES_GUIDANCE_TEXT, PAGE_TITLE, studyStatuses } from '@/cons
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
 import {
   getStudyById,
-  mapCPMSStudyEvalToPrismaEval,
-  mapCPMSStudyToPrismaStudy,
+  mapCPMSStudyEvalToSEEval,
+  mapCPMSStudyToSEStudy,
   updateEvaluationCategories,
   updateStudy,
 } from '@/lib/studies'
@@ -266,7 +266,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     }
   }
 
-  const { data: study } = await updateStudy(Number(cpmsId), mapCPMSStudyToPrismaStudy(studyInCPMS))
+  const { data: study } = await updateStudy(Number(cpmsId), mapCPMSStudyToSEStudy(studyInCPMS))
 
   if (!study) {
     return {
@@ -287,7 +287,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     )
     .map(({ id }) => id)
 
-  const mappedStudyEvalsInCPMS = studyEvalsInCPMS.map((studyEval) => mapCPMSStudyEvalToPrismaEval(studyEval))
+  const mappedStudyEvalsInCPMS = studyEvalsInCPMS.map((studyEval) => mapCPMSStudyEvalToSEEval(studyEval))
   const { data: updatedStudyEvals } = await updateEvaluationCategories(
     seStudyRecord.data.id,
     mappedStudyEvalsInCPMS,
