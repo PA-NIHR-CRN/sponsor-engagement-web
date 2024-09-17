@@ -161,11 +161,11 @@ export default function Study({ user, study, studyInCPMS, assessments }: StudyPr
                     ? 'UK recruitment target (excluding private sites)'
                     : 'UK recruitment target'}
                 </Table.CellHeader>
-                <Table.Cell>{studyInCPMS.TotalRecruitmentToDate ?? '-'}</Table.Cell>
+                <Table.Cell>{studyInCPMS.SampleSize ?? '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Total UK recruitment to date</Table.CellHeader>
-                <Table.Cell>{studyInCPMS.UkRecruitmentTargetToDate ?? '-'}</Table.Cell>
+                <Table.Cell>{studyInCPMS.TotalRecruitmentToDate ?? '-'}</Table.Cell>
               </Table.Row>
             </Table.Body>
           </Table>

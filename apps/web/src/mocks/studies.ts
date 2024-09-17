@@ -92,6 +92,7 @@ export const mockCPMSStudy = Mock.of<Study>({
   ActualClosureToRecruitmentDate: '2003-02-28T00:00:00',
   EstimatedReopeningDate: '2003-02-28T00:00:00',
   TotalRecruitmentToDate: 683,
+  SampleSize: 121,
   UkRecruitmentTargetToDate: 121,
   StudyEvaluationCategories: [
     {

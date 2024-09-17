@@ -312,8 +312,8 @@ describe('Study', () => {
         '28 February 2003',
         '28 February 2003',
         '28 February 2003',
+        `${mockCPMSStudy.SampleSize}`,
         `${mockCPMSStudy.TotalRecruitmentToDate}`,
-        `${mockCPMSStudy.UkRecruitmentTargetToDate}`,
       ])
 
       // Sponsor assessment history
