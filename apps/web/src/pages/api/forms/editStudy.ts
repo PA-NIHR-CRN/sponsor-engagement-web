@@ -29,6 +29,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
       plannedOpeningDate,
       actualClosureDate,
       actualOpeningDate,
+      estimatedReopeningDate,
       ...studyData
     } = studySchema.parse(req.body)
 
@@ -38,6 +39,9 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
       ...(actualOpeningDate && { ActualOpeningDate: constructDateObjFromParts(actualOpeningDate) }),
       ...(plannedClosureDate && { PlannedClosureToRecruitmentDate: constructDateObjFromParts(plannedClosureDate) }),
       ...(actualClosureDate && { ActualClosureToRecruitmentDate: constructDateObjFromParts(actualClosureDate) }),
+      ...(estimatedReopeningDate && {
+        EstimatedReopeningDate: constructDateObjFromParts(estimatedReopeningDate),
+      }),
     })
 
     const requestUrl = `${CPMS_API_URL}/studies/${cpmsId}/engagement-info`
