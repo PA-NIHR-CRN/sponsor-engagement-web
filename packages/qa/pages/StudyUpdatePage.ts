@@ -130,18 +130,12 @@ export default class StudyUpdatePage {
     await expect(this.studyTitle).toHaveText(`Study short title: ${expectedTitle}`)
   }
 
-  async assertGuidanceText(studyType: string) {
+  async assertGuidanceText() {
     await expect(this.guidanceText).toBeVisible()
-    if ((studyType = 'Commercial')) {
-      await expect(this.guidanceText).toHaveText(
-        'Changes to the study status, the key dates and recruitment targets will be communicated to RDN, where possible, your changes will update the study record automatically in CPMS, other changes might be subject to review by the RDN team.'
-      )
-    } else {
-      await expect(this.guidanceText).toHaveText(
-        'Changes to the study status, the key dates and recruitment targets will be communicated to RDN, where possible, your changes will update the study record automatically in CPMS, other changes might be subject to review by the RDN team.'
-      )
-    }
-  } // TODO: remove condition if no need for alt text based on study type
+    await expect(this.guidanceText).toHaveText(
+      'Changes to the study status, the key dates and recruitment targets will be communicated to RDN, where possible, your changes will update the study record automatically in CPMS, other changes might be subject to review by the RDN team.'
+    )
+  }
 
   async assertStudyStatusSection() {
     await expect(this.statusRadioInSetup).toBeVisible()
@@ -206,11 +200,12 @@ export default class StudyUpdatePage {
     await expect(this.actualClosureMM).toBeVisible()
     await expect(this.actualClosureYYYY).toBeVisible()
 
-    if (status in ['Withdrawn in Pre-Setup', 'Withdrawn During Setup']) {
-      // await expect(this.estimatedReopenDD).toBeVisible()
-      // await expect(this.estimatedReopenMM).toBeVisible()
-      // await expect(this.estimatedReopenYYYY).toBeVisible()
-    }
+    // TODO: enable this condition once dev has caught up
+    // if (status in ['Withdrawn in Pre-Setup', 'Withdrawn During Setup']) {
+    await expect(this.estimatedReopenDD).toBeVisible()
+    await expect(this.estimatedReopenMM).toBeVisible()
+    await expect(this.estimatedReopenYYYY).toBeVisible()
+    // }
   }
 
   async assertRecruitmentTargetInput() {

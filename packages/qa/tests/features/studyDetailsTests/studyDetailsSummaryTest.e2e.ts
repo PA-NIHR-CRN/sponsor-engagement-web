@@ -138,7 +138,6 @@ test.describe('Access Study Details Page and view Summary - @se_26', () => {
       await studyDetailsPage.assertProgressSummarySectionSubtitle()
     })
     await test.step('Then I can see the Studies Status', async () => {
-      // await studyDetailsPage.assertStudyStatus(studyProgressDetails[0].studyStatus) // TODO
       await studyDetailsPage.assertStudyStatus(getStudyResponse.StudyStatus)
     })
     await test.step('And I can see the latest Study Data Indicators', async () => {
