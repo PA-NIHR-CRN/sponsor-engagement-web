@@ -12,5 +12,6 @@ export const mapStudyToStudyFormInput = (study: EditStudyProps['study']): EditSt
   plannedClosureDate: constructDatePartsFromDate(study.plannedClosureDate),
   actualOpeningDate: constructDatePartsFromDate(study.actualOpeningDate),
   actualClosureDate: constructDatePartsFromDate(study.actualClosureDate),
+  estimatedReopeningDate: constructDatePartsFromDate(study.estimatedReopeningDate),
   furtherInformation: '', // TODO: is there a field for this
 })
