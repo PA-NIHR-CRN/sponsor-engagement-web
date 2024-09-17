@@ -14,7 +14,7 @@ CREATE TABLE `StudyUpdates` (
     `isDeleted` BOOLEAN NULL DEFAULT false,
     `LSN` BINARY(10) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `createdyById` INTEGER NOT NULL,
+    `createdById` INTEGER NOT NULL,
     `modifiedAt` DATETIME(3) NOT NULL,
     `modifiedById` INTEGER NOT NULL,
 
@@ -37,7 +37,7 @@ ALTER TABLE `StudyUpdates` ADD CONSTRAINT `StudyUpdates_studyId_fkey` FOREIGN KE
 ALTER TABLE `StudyUpdates` ADD CONSTRAINT `StudyUpdates_studyUpdateTypeId_fkey` FOREIGN KEY (`studyUpdateTypeId`) REFERENCES `SysRefStudyUpdateType`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `StudyUpdates` ADD CONSTRAINT `StudyUpdates_createdyById_fkey` FOREIGN KEY (`createdyById`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `StudyUpdates` ADD CONSTRAINT `StudyUpdates_createdById_fkey` FOREIGN KEY (`createdById`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `StudyUpdates` ADD CONSTRAINT `StudyUpdates_modifiedById_fkey` FOREIGN KEY (`modifiedById`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
