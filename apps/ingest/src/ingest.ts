@@ -48,6 +48,7 @@ const createStudies = async () => {
       plannedClosureDate: study.PlannedRecruitmentEndDate ? new Date(study.PlannedRecruitmentEndDate) : null,
       actualOpeningDate: study.ActualOpeningDate ? new Date(study.ActualOpeningDate) : null,
       actualClosureDate: study.ActualClosureDate ? new Date(study.ActualClosureDate) : null,
+      estimatedReopeningDate: study.EstimatedReopeningDate ? new Date(study.EstimatedReopeningDate) : null,
       isDueAssessment: false,
       isDeleted: false,
     }

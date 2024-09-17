@@ -337,7 +337,6 @@ export const updateStudy = async (cpmsId: number, studyData: UpdateStudyInput) =
       },
     }
   } catch (error) {
-    console.log({ error })
     const errorMessage = getErrorMessage(error)
     return {
       data: null,

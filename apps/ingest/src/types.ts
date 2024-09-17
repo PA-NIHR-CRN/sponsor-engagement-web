@@ -61,6 +61,7 @@ export interface Study {
   PlannedRecruitmentEndDate: null | string
   ActualOpeningDate: null | string
   ActualClosureDate: null | string
+  EstimatedReopeningDate: null | string
   StudyEvaluationCategories: StudyEvaluationCategory[]
   StudySponsors: StudySponsor[]
   StudyFunders: StudyFunder[]
