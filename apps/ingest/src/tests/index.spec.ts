@@ -101,6 +101,7 @@ describe('ingest', () => {
       plannedClosureDate: expect.any(Date),
       actualOpeningDate: expect.any(Date),
       actualClosureDate: expect.any(Date),
+      estimatedReopeningDate: expect.any(Date),
       isDeleted: false,
     }
 
