@@ -1,7 +1,5 @@
 import * as z from 'zod'
 
-export type StudyInputs = z.infer<typeof studySchema>
-
 const dateSchema = z.object({
   year: z.string(),
   day: z.string(),
@@ -9,12 +7,16 @@ const dateSchema = z.object({
 })
 
 export const studySchema = z.object({
-  studyId: z.string(),
+  studyId: z.number(),
+  cpmsId: z.string(),
   status: z.string().optional(),
   plannedOpeningDate: dateSchema.optional(),
   actualOpeningDate: dateSchema.optional(),
-  plannedClosureToRecruitmentDate: dateSchema.optional(),
-  actualClosureToRecruitmentDate: dateSchema.optional(),
+  plannedClosureDate: dateSchema.optional(),
+  actualClosureDate: dateSchema.optional(),
+  estimatedReopeningDate: dateSchema.optional(),
   recruitmentTarget: z.number().optional(),
   furtherInformation: z.string().optional(),
 })
+
+export type EditStudyInputs = z.infer<typeof studySchema>

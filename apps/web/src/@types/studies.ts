@@ -1,8 +1,38 @@
-import type { Prisma } from 'database'
+export interface CPMSStudyResponse {
+  Version: string
+  StatusCode: number
+  Result: Study
+}
+
+export interface Study {
+  StudyId: number
+  StudyRoute: string
+  StudyShortName: string
+  StudyStatus: string
+  SampleSize: number | null
+  PlannedOpeningDate: string
+  ActualOpeningDate: string
+  PlannedClosureToRecruitmentDate: string
+  ActualClosureToRecruitmentDate: string
+  EstimatedReopeningDate: string | null
+  TotalRecruitmentToDate: number | null
+  UkRecruitmentTargetToDate: number | null
+  StudyEvaluationCategories: StudyEvaluationCategory[]
+}
 
 export enum StudyRecordStatus {
   Live = 'SRS_LIVE@2.16.840.1.113883.2.1.3.8.5.2.4.230',
   LiveChangesPendingApproval = 'SRS_LIVE_PDGCHGS@2.16.840.1.113883.2.1.3.8.5.2.4.230',
+}
+
+export enum Status {
+  ClosedToRecruitmentFollowUpComplete = 'Closed to Recruitment, Follow Up Complete',
+  ClosedToRecruitmentInFollowUp = 'Closed to Recruitment, In Follow Up',
+  ClosedToRecruitmentNoFollowUp = 'Closed to Recruitment, No Follow Up',
+  InSetupNHSPermissionReceived = 'In Setup, NHS Permission Received',
+  OpenWithRecruitment = 'Open, With Recruitment',
+  Suspended = 'Suspended',
+  WithdrawnDuringSetup = 'Withdrawn During Setup',
 }
 
 export enum StudyStatus {
@@ -16,25 +46,6 @@ export enum StudyStatus {
   SuspendedActivelyRecruiting = 'STDY_STS_CPMS_SPNDED_OPN_ACTVLY_RECRTG@2.16.840.1.113883.2.1.3.8.5.2.4.68',
 }
 
-export type StudyWithRelationships = Prisma.StudyGetPayload<{
-  include: {
-    organisations: {
-      include: {
-        organisation: true
-        organisationRole: true
-      }
-    }
-    funders: {
-      include: {
-        organisation: true
-      }
-    }
-    evaluationCategories: {
-      select: { id: true; indicatorValue: true }
-    }
-  }
-}>
-
 export interface ResultResult {
   Result: string
   Errors: null
@@ -42,29 +53,28 @@ export interface ResultResult {
   Entity: null
 }
 
-export interface Study {
-  Id: number
-  ShortName: string
-  Title: string
-  StudyStatus: Status
-  StudyRecordStatus: StudyRecordStatus
-  StudyRoute: StudyRoute
-  IrasId: null | string
-  ProtocolReferenceNumber: null | string
-  SampleSize: number | null
-  ChiefInvestigatorFirstName: null | string
-  ChiefInvestigatorLastName: null | string
-  ManagingSpecialty: ManagingSpecialty
-  QualificationDate: null | string
-  TotalRecruitmentToDate: number | null
-  PlannedRecruitmentStartDate: null | string
-  PlannedRecruitmentEndDate: null | string
-  ActualOpeningDate: null | string
-  ActualClosureDate: null | string
-  EstimatedReopeningDate: null | string
-  StudyEvaluationCategories: StudyEvaluationCategory[]
-  StudySponsors: StudySponsor[]
-  StudyFunders: StudyFunder[]
+export enum StudyRoute {
+  Commercial = 'Commercial',
+  NonCommercial = 'Non-commercial',
+}
+
+export interface StudySponsor {
+  OrganisationName: string
+  OrganisationRole: StudySponsorOrganisationRole
+  OrganisationRTSIdentifier: string
+  OrganisationRoleRTSIdentifier: StudySponsorOrganisationRoleRTSIdentifier
+}
+
+export enum StudySponsorOrganisationRole {
+  ClinicalResearchSponsor = 'Clinical Research Sponsor ',
+  ContractResearchOrganisation = 'Contract Research Organisation',
+  ManagingClinicalTrialsUnit = 'Managing Clinical Trials Unit',
+}
+
+export enum StudySponsorOrganisationRoleRTSIdentifier {
+  ContractResearchOrganisation = 'CRO@2.16.840.1.113883.2.1.3.8.5.11.1.107',
+  ClinicalResearchSponsor = 'CRSPNSR@2.16.840.1.113883.5.110',
+  ClinicalTrialsUnit = 'MNG_CTU@2.16.840.1.113883.2.1.3.8.5.11.1.107',
 }
 
 export enum ManagingSpecialty {
@@ -98,16 +108,6 @@ export enum ManagingSpecialty {
   TraumaAndEmergencyCare = 'Trauma and Emergency Care',
 }
 
-export enum Status {
-  ClosedToRecruitmentFollowUpComplete = 'Closed to Recruitment, Follow Up Complete',
-  ClosedToRecruitmentInFollowUp = 'Closed to Recruitment, In Follow Up',
-  ClosedToRecruitmentNoFollowUp = 'Closed to Recruitment, No Follow Up',
-  InSetupNHSPermissionReceived = 'In Setup, NHS Permission Received',
-  OpenWithRecruitment = 'Open, With Recruitment',
-  Suspended = 'Suspended',
-  WithdrawnDuringSetup = 'Withdrawn During Setup',
-}
-
 export interface StudyEvaluationCategory {
   EvaluationCategoryType: string
   EvaluationCategoryValue: string
@@ -118,16 +118,6 @@ export interface StudyEvaluationCategory {
   ActualOpeningDate: string | null
   ActualClosureDate: string | null
   ExpectedReopenDate: string | null
-}
-
-export enum EvaluationCategoryType {
-  Milestone = 'Milestone',
-  Recruitment = 'Recruitment',
-}
-
-export enum EvaluationCategoryValue {
-  StudyIsBehindPlannedRecruitment = 'Study is behind planned recruitment',
-  StudyIsPastPlannedOpeningDate = 'Study is past planned opening date',
 }
 
 export interface StudyFunder {
@@ -145,28 +135,4 @@ export enum StudyFunderOrganisationRole {
 
 export enum StudyFunderOrganisationRoleRTSIdentifier {
   Crfndr216840111388321385111107 = 'CRFNDR@2.16.840.1.113883.2.1.3.8.5.11.1.107',
-}
-
-export enum StudyRoute {
-  Commercial = 'Commercial',
-  NonCommercial = 'Non-commercial',
-}
-
-export interface StudySponsor {
-  OrganisationName: string
-  OrganisationRole: StudySponsorOrganisationRole
-  OrganisationRTSIdentifier: string
-  OrganisationRoleRTSIdentifier: StudySponsorOrganisationRoleRTSIdentifier
-}
-
-export enum StudySponsorOrganisationRole {
-  ClinicalResearchSponsor = 'Clinical Research Sponsor ',
-  ContractResearchOrganisation = 'Contract Research Organisation',
-  ManagingClinicalTrialsUnit = 'Managing Clinical Trials Unit',
-}
-
-export enum StudySponsorOrganisationRoleRTSIdentifier {
-  ContractResearchOrganisation = 'CRO@2.16.840.1.113883.2.1.3.8.5.11.1.107',
-  ClinicalResearchSponsor = 'CRSPNSR@2.16.840.1.113883.5.110',
-  ClinicalTrialsUnit = 'MNG_CTU@2.16.840.1.113883.2.1.3.8.5.11.1.107',
 }

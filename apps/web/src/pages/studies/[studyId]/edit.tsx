@@ -14,27 +14,33 @@ import Warning from '@/components/atoms/Warning/Warning'
 import { RequestSupport } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
+import { GENERIC_STUDIES_GUIDANCE_TEXT, PAGE_TITLE, studyStatuses } from '@/constants/editStudyForm'
+import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
 import {
-  COMMERCIAL_GUIDANCE_TEXT,
-  NON_COMMERCIAL_GUIDANCE_TEXT,
-  PAGE_TITLE,
-  studyStatuses,
-} from '@/constants/editStudyForm'
-import { getValuesFromSearchParams } from '@/utils/form'
-import type { StudyInputs } from '@/utils/schemas'
+  getStudyById,
+  mapCPMSStudyEvalToSEEval,
+  mapCPMSStudyToSEStudy,
+  updateEvaluationCategories,
+  updateStudy,
+} from '@/lib/studies'
+import { mapStudyToStudyFormInput } from '@/utils/editStudyForm'
+import type { EditStudyInputs } from '@/utils/schemas'
 import { studySchema } from '@/utils/schemas'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
 export type EditStudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function EditStudy({ query, study }: EditStudyProps) {
-  const { register, formState, handleSubmit, control } = useForm<StudyInputs>({
+export default function EditStudy({ study }: EditStudyProps) {
+  const { register, formState, handleSubmit, control } = useForm<EditStudyInputs>({
     resolver: zodResolver(studySchema),
     defaultValues: {
-      ...getValuesFromSearchParams(studySchema, query),
-      studyId: String(study.id),
+      ...mapStudyToStudyFormInput(study),
     },
   })
+
+  const { organisationsByRole } = study
+
+  const supportOrgName = organisationsByRole.CRO ?? organisationsByRole.CTU ?? organisationsByRole.Sponsor
 
   const { defaultValues } = formState
 
@@ -48,29 +54,27 @@ export default function EditStudy({ query, study }: EditStudyProps) {
           </h2>
           <span className="govuk-body-m mb-0 text-darkGrey">
             <span className="govuk-visually-hidden">Study sponsor: </span>
-            {study.sponsorOrgName ?? '-'}
+            {supportOrgName || '-'}
           </span>
           <span className="govuk-heading-m text-primary">
             <span className="govuk-visually-hidden">Study short title: </span>
-            {study.shortStudyTitle ?? '-'}
+            {study.shortTitle || '-'}
           </span>
 
           <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
 
-          <div className="govuk-inset-text">
-            {study.studyRoute === 'Commercial' ? COMMERCIAL_GUIDANCE_TEXT : NON_COMMERCIAL_GUIDANCE_TEXT}
-          </div>
+          <div className="govuk-inset-text">{GENERIC_STUDIES_GUIDANCE_TEXT}</div>
 
           <Form
-            action=""
+            action="/api/forms/editStudy"
             handleSubmit={handleSubmit}
             method="post"
-            onError={() => {
+            onError={(error) => {
               //TODO: Temporary until validation and error states are implemented
-              console.log('error')
+              console.log('error', error)
             }}
           >
-            <input type="hidden" {...register('studyId')} defaultValue={defaultValues?.studyId} />
+            <input type="hidden" {...register('cpmsId')} defaultValue={defaultValues?.cpmsId} />
 
             <Fieldset>
               {/* Status */}
@@ -88,7 +92,7 @@ export default function EditStudy({ query, study }: EditStudyProps) {
                 disabled
               >
                 {studyStatuses.map((status) => (
-                  <Radio hint={status.description} key={status.id} label={status.name} value={status.name} />
+                  <Radio hint={status.description} key={status.id} label={status.name} value={status.value} />
                 ))}
               </RadioGroup>
 
@@ -136,7 +140,7 @@ export default function EditStudy({ query, study }: EditStudyProps) {
               {/* Planned closure to recruitment date */}
               <Controller
                 control={control}
-                name="plannedClosureToRecruitmentDate"
+                name="plannedClosureDate"
                 render={({ field }) => {
                   const { value, onChange, ref, name } = field
 
@@ -157,7 +161,7 @@ export default function EditStudy({ query, study }: EditStudyProps) {
               {/* Actual closure to recruitment date */}
               <Controller
                 control={control}
-                name="actualClosureToRecruitmentDate"
+                name="actualClosureDate"
                 render={({ field }) => {
                   const { value, onChange, ref, name } = field
 
@@ -166,6 +170,27 @@ export default function EditStudy({ query, study }: EditStudyProps) {
                       disabled
                       errors={{}}
                       label="Actual closure to recruitment date"
+                      name={name}
+                      onChange={onChange}
+                      ref={ref}
+                      value={value}
+                    />
+                  )
+                }}
+              />
+
+              {/* Estimated reopening date*/}
+              <Controller
+                control={control}
+                name="estimatedReopeningDate"
+                render={({ field }) => {
+                  const { value, onChange, ref, name } = field
+
+                  return (
+                    <DateInput
+                      disabled
+                      errors={{}}
+                      label="Estimated reopening date"
                       name={name}
                       onChange={onChange}
                       ref={ref}
@@ -232,10 +257,10 @@ EditStudy.getLayout = function getLayout(page: ReactElement, { user }: EditStudy
   )
 }
 
-export const getServerSideProps = withServerSideProps(Roles.SponsorContact, (context, session) => {
-  const studyId = context.query.studyId
+export const getServerSideProps = withServerSideProps(Roles.SponsorContact, async (context, session) => {
+  const seStudyRecord = await getStudyById(Number(context.query.studyId))
 
-  if (!studyId) {
+  if (!seStudyRecord.data) {
     return {
       redirect: {
         destination: '/404',
@@ -243,17 +268,65 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, (con
     }
   }
 
+  const cpmsId = seStudyRecord.data.cpmsId
+
+  if (!cpmsId) {
+    return {
+      redirect: {
+        destination: '/404',
+      },
+    }
+  }
+  const { study: studyInCPMS } = await getStudyByIdFromCPMS(Number(cpmsId))
+
+  if (!studyInCPMS) {
+    return {
+      redirect: {
+        destination: '/500',
+      },
+    }
+  }
+
+  const { data: study } = await updateStudy(Number(cpmsId), mapCPMSStudyToSEStudy(studyInCPMS))
+
+  if (!study) {
+    return {
+      redirect: {
+        destination: '/500',
+      },
+    }
+  }
+
+  const studyEvalsInCPMS = studyInCPMS.StudyEvaluationCategories
+  const currentStudyEvalsInSE = study.evaluationCategories
+
+  // Soft delete evaluations in SE that are no longer returned from CPMS
+  const studyEvalIdsToDelete = currentStudyEvalsInSE
+    .filter(
+      (seEval) =>
+        !studyEvalsInCPMS.some(({ EvaluationCategoryValue }) => EvaluationCategoryValue === seEval.indicatorValue)
+    )
+    .map(({ id }) => id)
+
+  const mappedStudyEvalsInCPMS = studyEvalsInCPMS.map((studyEval) => mapCPMSStudyEvalToSEEval(studyEval))
+  const { data: updatedStudyEvals } = await updateEvaluationCategories(
+    seStudyRecord.data.id,
+    mappedStudyEvalsInCPMS,
+    studyEvalIdsToDelete
+  )
+
+  if (!updatedStudyEvals) {
+    return {
+      redirect: {
+        destination: '/500',
+      },
+    }
+  }
+
   return {
     props: {
       user: session.user,
-      query: context.query,
-      study: {
-        id: studyId as string,
-        // TODO: Temporary until data is pulled through
-        shortStudyTitle: 'Study to test safety/efficacy of CIT treatment in NSCLC patients' as string | undefined,
-        sponsorOrgName: 'F. Hoffmann-La Roche Ltd (FORTREA DEVELOPMENT LIMITED)' as string | undefined,
-        studyRoute: 'Commercial' as 'Commercial' | 'Not Commercial',
-      },
+      study: { ...study, evaluationCategories: updatedStudyEvals },
     },
   }
 })
