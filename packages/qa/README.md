@@ -5,13 +5,13 @@ Written in Typescript, using Playwright
 ## --------------------SETUP--------------------
 
 Install Node on your local machine. e.g. If using a Mac `brew install node`  
-Or Download and Install from here https://nodejs.org/en/download/
+Or Download and Install from [here](https://nodejs.org/en/download/)
 
 Clone repo to local directory
 From the projects root folder  
 Run the command `npm i` to install Playwright and other dependencies
 
-Playwright Getting Started Documentation - https://playwright.dev/docs/intro
+Playwright Getting Started [Documentation](https://playwright.dev/docs/intro)
 
 ## --------------------RUN TESTS LOCALLY--------------------
 
@@ -29,14 +29,11 @@ Note: some tests require specific content that is currently only available in th
 
 Before executing the tests for the first time
 From within the **packages/qa** project folder, create a `.env` file from the `.env.example` and update its values
-The test account passwords can be found in the following document: https://docs.google.com/document/d/1J9I1b4hb28rd9vl34Oe7XPCeZqk8yVsyG84KJgXS6k0/edit?pli=1
+The test account passwords can be found in the following [document](https://docs.google.com/document/d/1J9I1b4hb28rd9vl34Oe7XPCeZqk8yVsyG84KJgXS6k0/edit?pli=1)
 
-To execute the tests  
-From the projects root folder  
-Run the command
-Or  
-From the **packages/qa** project folder  
-Run the command `npx playwright test`  
+To execute the tests from the projects root folder run the command:
+
+Or from the **packages/qa** project folder run the command: `npx playwright test`  
 Results will print to the console
 
 To see HTML report generated once the test run has finished,  
@@ -45,9 +42,9 @@ Will open a browser tab with report showing test results
 
 To run individual tests or a specific group of tests:
 
-- run using the test tag command 'npx playwright test --grep <tag name>' e.g. npx playwright test --grep @frf_22_ac2_6
-- add the '.only' method on any individual tests blocks, e.g. test.only("Test Name"{...});
-- add the '.only' method on any describe blocks, e.g. test.describe.only("Test Group Name"{ test("Test Name"{...} )});
+- run using the test tag command `npx playwright test --grep <tag name>` e.g. `npx playwright test --grep @frf_22_ac2_6`
+- add the `.only` method on any individual tests blocks, e.g. `test.only("Test Name"{...});`
+- add the `.only` method on any describe blocks, e.g. `test.describe.only("Test Group Name"{ test("Test Name"{...} )});`
 
 Playwright Testing Documentation - https://playwright.dev/docs/api/class-test
 
@@ -55,20 +52,20 @@ Playwright Testing Documentation - https://playwright.dev/docs/api/class-test
 
 Go to `playwright.config.ts` file  
 The SponsorEngagement project within the **projects** array has a property called **testIgnore**  
-Which is set to ignore all tests that fall within the **accessibiltyTests** folder.  
+Which is set to ignore all tests that fall within the **accessibilityTests** folder.  
 This is so that the accessibility tests are not included in the day to day runs.
 
-To include the accessibilty tests in the run simply comment out this line.  
-Alternatively, to run only the Accessibilty tests,  
+To include the accessibility tests in the run simply comment out this line.  
+Alternatively, to run only the accessibility tests,  
 change the property from testIgnore to **testMatch**
 
 **DO NOT ADD, COMMIT OR PUSH THIS CHANGE TO GITHUB**
 
-You could also do any of the the following to run all the accessibilty tests, or specific ones
+You could also do any of the the following to run all the accessibility tests, or specific ones
 
-- run using the test tag command 'npx playwright test --grep <tag name>' e.g. npx playwright test --grep @accessibility
-- add the '.only' method on any individual tests blocks, e.g. test.only("Test Name"{...});
-- add the '.only' method on any describe blocks, e.g. test.describe.only("Test Group Name"{ test("Test Name"{...} )});
+- run using the test tag command `npx playwright test --grep <tag name>` e.g. `npx playwright test --grep @accessibility`
+- add the `.only` method on any individual tests blocks, e.g. `test.only("Test Name"{...});`
+- add the `.only` method on any describe blocks, e.g. `test.describe.only("Test Group Name"{ test("Test Name"{...} )});`
 
 ## --------------------RUN TESTS LOCALLY in OTHER BROWSERS & DEVICES -----------------
 
@@ -85,7 +82,7 @@ With a value that is set to ignore all tests that fall within the **tests** fold
 To enable tests to run using the config from other project objects  
 Simply comment out the line with the **testIgnore** property for the relevant project  
 Or change its value so that it no longer ignores all tests  
-For example its value could be changed to only ignore the accessibiltyTests folder  
+For example its value could be changed to only ignore the accessibilityTests folder  
 In the same way the SponsorEngagement project is set up  
 If you wish to run only the selected project, and not include the default SponsorEngagement project  
 You would also be required to change its **testIgnore** value to ignore all tests before running
@@ -101,15 +98,14 @@ The SE E2E tests must all pass, before the deployment to UAT can be triggered.
 This is part of the **Deploy Web App** workflow
 
 To trigger the test run manually  
-Go the the repo's GitHub actions page - https://github.com/PA-NIHR-CRN/sponsor-engagement-web/actions  
+Go the the repo's [GitHub actions page](https://github.com/PA-NIHR-CRN/sponsor-engagement-web/actions)
 Select **Sponsor Engagement E2E Tests** from the workflow's options on the left  
 Set the **Upload test report** input field to either true or false, default value is false  
 This value dictates whether the HTML test report is published to a GitHub Page and the Managed Services Slack channel  
-Set the **Select which Tests** input field to either 'all' or '@<test_tag>' e.g. @frf_13, default is all  
-This value dictates which tests are included in the run,  
-'all' will run everything, @<test_tag will run any tests with that tag
+Set the **Select which Tests** input field to either `all` or `@<test_tag>` e.g. `@frf_13`, default is all  
+This value dictates which tests are included in the run, `all` will run everything, `@<test_tag>` will run any tests with that tag
 
-GitHub Page is found here - https://pa-nihr-crn.github.io/sponsor-engagement-web/  
+GitHub Page is found [here](https://pa-nihr-crn.github.io/sponsor-engagement-web/)
 The GitHub page stores and displays the latest published HTML test report  
 Setting this value to true will therefore overwrite the currently stored report
 
@@ -126,7 +122,7 @@ As The Playwright Trace Viewer must be loaded over the http:// or https:// proto
 When a report is to be published to the GitHub page this will trigger a different Actions workflow  
 This workflow is called **pages-build-deployment**  
 It is configured to run off the `gh-pages` branch  
-This configuration can be seen in the repo settings - https://github.com/PA-NIHR-CRN/sponsor-engagement-web/settings/pages  
+This configuration can be seen in the repo [settings](https://github.com/PA-NIHR-CRN/sponsor-engagement-web/settings/pages)
 Any change to the `gh-pages` pages branch will trigger the workflow  
 If the **Upload test report** input is not false,  
 Then the `Download HTML Report Artifact` & `Publish to GH Pages` steps in the `playwright.yml` file are executed  
@@ -171,8 +167,8 @@ Clicking the trace object (the image) takes you into the API call logs relevant 
 **NOTE THAT THIS ONLY WORKS IF VIEWING THE REPORT OVER HTTP(S), FOR EXAMPLE ON A GITHUB PAGE OR LOCALHOST**  
 It shows the requests made and the responses recieved on the left, and Call, Console, Network & Source tabs on the right  
 Clicking on a request or response will show details for it on the right, relevant to the tab selected  
-The Call tab shows details such as request duration, request method, parameters and header logs, as shown below  
-  
+The Call tab shows details such as request duration, request method, parameters and header logs, as shown below
+
 <img width="1669" alt="reportTraceCall" src="https://user-images.githubusercontent.com/57842230/199381854-80a34827-0192-44d0-ba0f-816f11f12f91.png">
   
 The Console tab shows anything output to the console for the request/response  
