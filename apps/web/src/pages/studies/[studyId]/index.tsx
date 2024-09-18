@@ -49,7 +49,7 @@ export default function Study({ user, study, studyInCPMS, assessments }: StudyPr
 
   const supportOrgName = organisationsByRole.CRO ?? organisationsByRole.CTU
 
-  const showEditStudyFeature = Boolean(user?.wso2Roles.includes(EDIT_STUDY_ROLE))
+  const showEditStudyFeature = Boolean(user?.groups.includes(EDIT_STUDY_ROLE))
 
   return (
     <Container>

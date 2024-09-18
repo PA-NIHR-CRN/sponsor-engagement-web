@@ -10,6 +10,7 @@ import {
   refreshTokenResponseSchema,
   updateGroupResponseSchema,
 } from './schemas'
+import type { Wso2GroupOperation } from './constants/constants'
 
 const { IDG_API_URL, IDG_API_USERNAME, IDG_API_PASSWORD } = process.env
 
@@ -114,7 +115,7 @@ export const requests = {
     const response = await api.post<Infer<typeof createUserResponseSchema>>(`/scim2/Users`, data)
     return createUserResponseSchema.safeParse(response.data)
   },
-  assignWSO2UserRole: async (email: string, role: string) => {
+  updateWSO2UserGroup: async (email: string, group: string, operation: Wso2GroupOperation) => {
     const userResponse = await requests.getUser(email)
 
     if (!userResponse.success) {
@@ -127,11 +128,11 @@ export const requests = {
       throw new Error(`No user found with email: ${email}`)
     }
 
-    const roleUpdateData = {
+    const groupUpdateData = {
       schemas: ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
       Operations: [
         {
-          op: 'add',
+          op: operation,
           path: 'members',
           value: [
             {
@@ -143,40 +144,7 @@ export const requests = {
       ],
     }
 
-    const response = await api.patch(`/scim2/Groups/${role}`, roleUpdateData)
-
-    return updateGroupResponseSchema.safeParse(response.data)
-  },
-  removeWSO2UserRole: async (email: string, role: string) => {
-    const userResponse = await requests.getUser(email)
-
-    if (!userResponse.success) {
-      throw new Error(`Failed to retrieve user with email: ${email}`)
-    }
-
-    const user = userResponse.data.Resources?.[0]
-
-    if (!user) {
-      throw new Error(`No user found with email: ${email}`)
-    }
-
-    const roleUpdateData = {
-      schemas: ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
-      Operations: [
-        {
-          op: 'remove',
-          path: 'members',
-          value: [
-            {
-              display: user.userName, // The user's username
-              value: user.id, // The user's SCIM ID
-            },
-          ],
-        },
-      ],
-    }
-
-    const response = await api.patch(`/scim2/Groups/${role}`, roleUpdateData)
+    const response = await api.patch(`/scim2/Groups/${group}`, groupUpdateData)
 
     return updateGroupResponseSchema.safeParse(response.data)
   },

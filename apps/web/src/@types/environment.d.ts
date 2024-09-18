@@ -22,5 +22,7 @@ declare namespace NodeJS {
     CONTENTFUL_PREVIEW_ACCESS_TOKEN: string
     AWS_SECRET_NAME: string
     AWS_REGION: string
+    ODP_ROLE_GROUP_ID: string
+    NEXT_PUBLIC_ODP_DASHBOARD_LINK: string
   }
 }
