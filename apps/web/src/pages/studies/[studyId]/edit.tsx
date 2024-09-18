@@ -89,7 +89,6 @@ export default function EditStudy({ study }: EditStudyProps) {
                     if (value !== null) return value
                   },
                 })}
-                disabled
               >
                 {studyStatuses.map((status) => (
                   <Radio hint={status.description} key={status.id} label={status.name} value={status.value} />
@@ -125,7 +124,6 @@ export default function EditStudy({ study }: EditStudyProps) {
 
                   return (
                     <DateInput
-                      disabled
                       errors={{}}
                       label="Actual opening to recruitment date"
                       name={name}
@@ -146,7 +144,6 @@ export default function EditStudy({ study }: EditStudyProps) {
 
                   return (
                     <DateInput
-                      disabled
                       errors={{}}
                       label="Planned closure to recruitment date"
                       name={name}
@@ -167,7 +164,6 @@ export default function EditStudy({ study }: EditStudyProps) {
 
                   return (
                     <DateInput
-                      disabled
                       errors={{}}
                       label="Actual closure to recruitment date"
                       name={name}
@@ -188,7 +184,6 @@ export default function EditStudy({ study }: EditStudyProps) {
 
                   return (
                     <DateInput
-                      disabled
                       errors={{}}
                       label="Estimated reopening date"
                       name={name}
@@ -203,7 +198,6 @@ export default function EditStudy({ study }: EditStudyProps) {
               {/* UK recruitment target */}
               <TextInput
                 defaultValue={defaultValues?.recruitmentTarget}
-                disabled
                 errors={{}}
                 hint="Changes to the UK recruitment target will be committed to CPMS after manual review. "
                 inputClassName="govuk-input--width-10"
@@ -216,7 +210,6 @@ export default function EditStudy({ study }: EditStudyProps) {
               {/* Further information */}
               <Textarea
                 defaultValue={defaultValues?.furtherInformation}
-                disabled
                 errors={{}}
                 hint="If needed, provide further context or justification for changes made above."
                 label="Further information"
