@@ -276,6 +276,10 @@ describe('EditStudy', () => {
       const actualClosingDateFieldset = screen.getByRole('group', { name: 'Actual closure to recruitment date' })
       expect(actualClosingDateFieldset).toBeInTheDocument()
 
+      // Form Input - Estimated reopening date
+      const estimatedReopeningDate = screen.getByRole('group', { name: 'Estimated reopening date' })
+      expect(estimatedReopeningDate).toBeInTheDocument()
+
       // Form Input - UK Recruitment target
       const ukRecruitmentTarget = screen.getByLabelText('UK recruitment target')
       expect(ukRecruitmentTarget).toBeInTheDocument()

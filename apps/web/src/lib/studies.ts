@@ -297,6 +297,7 @@ export const mapCPMSStudyToSEStudy = (study: Study): UpdateStudyInput => ({
   plannedClosureDate: study.PlannedClosureToRecruitmentDate ? new Date(study.PlannedClosureToRecruitmentDate) : null,
   actualOpeningDate: study.ActualOpeningDate ? new Date(study.ActualOpeningDate) : null,
   actualClosureDate: study.ActualClosureToRecruitmentDate ? new Date(study.ActualClosureToRecruitmentDate) : null,
+  estimatedReopeningDate: study.EstimatedReopeningDate ? new Date(study.EstimatedReopeningDate) : null,
 })
 
 export const updateStudy = async (cpmsId: number, studyData: UpdateStudyInput) => {

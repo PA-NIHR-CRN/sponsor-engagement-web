@@ -1,6 +1,7 @@
 import { RowDataPacket } from 'mysql2'
 import { test } from '../../../hooks/CustomFixtures'
 import { seDatabaseReq } from '../../../utils/DbRequests'
+import { getStudyEngagementInfo } from '../../../utils/ApiRequests'
 
 const testUserId = 6
 const startingOrgId = 9
@@ -12,6 +13,7 @@ let studyProgressDetails: RowDataPacket[]
 let nonCommStudyProgressDetails: RowDataPacket[]
 let croCtuStudySponsorName: RowDataPacket[]
 let croCtuStudyCroCtuName: RowDataPacket[]
+let getStudyResponse: JSON
 //Must ensure that specific SE study Id's below remain in the SE Tool on Test
 const nullValuesStudyId = 17103
 const noConcernsStudyId = 17122
@@ -27,7 +29,7 @@ test.beforeAll('Setup Tests', async () => {
   startingStudyId = randomStudyIdSelected[0].id
 
   studyProgressDetails =
-    await seDatabaseReq(`SELECT studyStatus, Study.plannedOpeningDate, Study.actualOpeningDate, Study.plannedClosureDate,
+    await seDatabaseReq(`SELECT studyStatus, Study.plannedOpeningDate, Study.actualOpeningDate, Study.plannedClosureDate, Study.cpmsId,
     Study.actualClosureDate, Study.sampleSize, Study.totalRecruitmentToDate, StudyEvaluationCategory.indicatorValue, StudyEvaluationCategory.isDeleted 
     FROM Study 
     LEFT JOIN StudyEvaluationCategory
@@ -65,6 +67,8 @@ test.beforeAll('Setup Tests', async () => {
     ON StudyOrganisation.organisationId = Organisation.id
     WHERE StudyOrganisation.studyId = ${croCtuOrgRelationshipStudyId}
     AND StudyOrganisation.organisationRoleId IN (3,4);`)
+
+  getStudyResponse = await getStudyEngagementInfo(studyProgressDetails[0].cpmsId)
 })
 
 test.describe('Access Study Details Page and view Summary - @se_26', () => {
@@ -134,7 +138,7 @@ test.describe('Access Study Details Page and view Summary - @se_26', () => {
       await studyDetailsPage.assertProgressSummarySectionSubtitle()
     })
     await test.step('Then I can see the Studies Status', async () => {
-      await studyDetailsPage.assertStudyStatus(studyProgressDetails[0].studyStatus)
+      await studyDetailsPage.assertStudyStatus(getStudyResponse.StudyStatus)
     })
     await test.step('And I can see the latest Study Data Indicators', async () => {
       await studyDetailsPage.assertDataIndicators(studyProgressDetails)
@@ -152,7 +156,7 @@ test.describe('Access Study Details Page and view Summary - @se_26', () => {
       await studyDetailsPage.assertActualClosureDate(studyProgressDetails)
     })
     await test.step('And I can see the Studies UK Recruitment Target', async () => {
-      await studyDetailsPage.assertUkTarget(studyProgressDetails[0].sampleSize)
+      await studyDetailsPage.assertUkTarget(studyProgressDetails[0].sampleSize, studyProgressDetails[0].route)
     })
     await test.step('And I can see the Studies UK Recruitment Total', async () => {
       await studyDetailsPage.assertUkTotal(studyProgressDetails[0].totalRecruitmentToDate)
@@ -208,7 +212,7 @@ test.describe('Access Study Details Page and view Summary - @se_26', () => {
       await studyDetailsPage.assertActualClosureDate(nullStudyProgressValues)
     })
     await test.step('And I can see the Studies UK Recruitment Target has a `-` icon', async () => {
-      await studyDetailsPage.assertUkTarget(nullStudyProgressValues[0].sampleSize)
+      await studyDetailsPage.assertUkTarget(nullStudyProgressValues[0].sampleSize, studyProgressDetails[0].route)
     })
   })
 
@@ -264,7 +268,10 @@ test.describe('Access Study Details Page and view Summary - @se_26', () => {
       await studyDetailsPage.assertStudyRoute('Non-Commercial', nonCommStudyProgressDetails[0].route)
     })
     await test.step('Then I can see the Studies Network Recruitment Target', async () => {
-      await studyDetailsPage.assertUkTarget(nonCommStudyProgressDetails[0].sampleSize)
+      await studyDetailsPage.assertUkTarget(
+        nonCommStudyProgressDetails[0].sampleSize,
+        nonCommStudyProgressDetails[0].route
+      )
     })
     await test.step('And I can see the Studies Network Recruitment Total', async () => {
       await studyDetailsPage.assertUkTotal(nonCommStudyProgressDetails[0].totalRecruitmentToDate)

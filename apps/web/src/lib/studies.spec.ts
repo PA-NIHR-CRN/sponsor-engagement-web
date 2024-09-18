@@ -592,6 +592,7 @@ describe('mapCPMSStudyToSEStudy', () => {
     plannedClosureDate: new Date(mockCPMSStudy.PlannedClosureToRecruitmentDate),
     actualOpeningDate: new Date(mockCPMSStudy.ActualOpeningDate),
     actualClosureDate: new Date(mockCPMSStudy.ActualClosureToRecruitmentDate),
+    estimatedReopeningDate: new Date(mockCPMSStudy.EstimatedReopeningDate as string),
   }
 
   it('correctly maps data when all fields exist', () => {
@@ -606,6 +607,7 @@ describe('mapCPMSStudyToSEStudy', () => {
       PlannedClosureToRecruitmentDate: '',
       ActualOpeningDate: '',
       ActualClosureToRecruitmentDate: '',
+      EstimatedReopeningDate: '',
     })
     expect(result).toStrictEqual({
       ...mockMappedStudy,
@@ -613,6 +615,7 @@ describe('mapCPMSStudyToSEStudy', () => {
       actualOpeningDate: null,
       plannedClosureDate: null,
       plannedOpeningDate: null,
+      estimatedReopeningDate: null,
     })
   })
 })

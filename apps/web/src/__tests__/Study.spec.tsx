@@ -299,7 +299,7 @@ describe('Study', () => {
         'Planned closure to recruitment date',
         'Actual closure to recruitment date',
         'Estimated reopening date',
-        'UK recruitment target (excluding private sites)',
+        'UK recruitment target',
         'Total UK recruitment to date',
       ])
 
@@ -312,8 +312,8 @@ describe('Study', () => {
         '28 February 2003',
         '28 February 2003',
         '28 February 2003',
+        `${mockCPMSStudy.SampleSize}`,
         `${mockCPMSStudy.TotalRecruitmentToDate}`,
-        `${mockCPMSStudy.UkRecruitmentTargetToDate}`,
       ])
 
       // Sponsor assessment history

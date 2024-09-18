@@ -136,7 +136,7 @@ test.describe('View core study details - @se_27', () => {
       await studyDetailsPage.editStudyDataButton.click()
     })
     await test.step('Then I am taken to the Update study data page', async () => {
-      await studyUpdatePage.assertOnUpdateStudyPage()
+      await studyUpdatePage.assertOnUpdateStudyPage(startingStudyId.toString())
     })
   })
 

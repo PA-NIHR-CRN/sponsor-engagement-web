@@ -25,6 +25,7 @@ model Study {
   plannedClosureDate         DateTime?
   actualOpeningDate          DateTime?
   actualClosureDate          DateTime?
+  estimatedReopeningDate     DateTime?
   totalRecruitmentToDate     Int?
   assessments                Assessment[]
   organisations              StudyOrganisation[]

@@ -179,6 +179,27 @@ export default function EditStudy({ study }: EditStudyProps) {
                 }}
               />
 
+              {/* Estimated reopening date*/}
+              <Controller
+                control={control}
+                name="estimatedReopeningDate"
+                render={({ field }) => {
+                  const { value, onChange, ref, name } = field
+
+                  return (
+                    <DateInput
+                      disabled
+                      errors={{}}
+                      label="Estimated reopening date"
+                      name={name}
+                      onChange={onChange}
+                      ref={ref}
+                      value={value}
+                    />
+                  )
+                }}
+              />
+
               {/* UK recruitment target */}
               <TextInput
                 defaultValue={defaultValues?.recruitmentTarget}
