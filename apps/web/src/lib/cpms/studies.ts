@@ -4,9 +4,6 @@ import axios from 'axios'
 
 import type { CPMSStudyResponse, Study } from '@/@types/studies'
 
-import type { OrganisationRoleShortName } from '../organisations'
-import { organisationRoleShortName } from '../organisations'
-
 export interface GetStudyFromCPMSResponse {
   study: Study | null
   error?: string
@@ -30,15 +27,8 @@ export const getStudyByIdFromCPMS = async (studyId: number): Promise<GetStudyFro
     }
     let study = data.Result
 
-    const organisationsByRole = Object.fromEntries(
-      study.StudySponsors.map((StudySponsor) => {
-        return [organisationRoleShortName[StudySponsor.OrganisationRole], StudySponsor.OrganisationName]
-      })
-    ) as Partial<Record<OrganisationRoleShortName, string>>
-
     study = {
       ...study,
-      organisationsByRole,
     }
 
     return { study }

@@ -67,13 +67,13 @@ export function StudyDetails({ study, studyInCPMS }: StudyDetailsProps) {
         {normalizedStudyData.studyRoute === 'Commercial' && (
           <Table.Row>
             <Table.CellHeader className="w-1/3">Protocol reference number</Table.CellHeader>
-            <Table.Cell>{normalizedStudyData.protocolReferenceNumber}</Table.Cell>
+            <Table.Cell>{normalizedStudyData.protocolReferenceNumber ?? 'None available'}</Table.Cell>
           </Table.Row>
         )}
 
         <Table.Row>
           <Table.CellHeader className="w-1/3">IRAS ID</Table.CellHeader>
-          <Table.Cell>{normalizedStudyData.irasId}</Table.Cell>
+          <Table.Cell>{normalizedStudyData.irasId ?? 'None available'}</Table.Cell>
         </Table.Row>
 
         <Table.Row>
