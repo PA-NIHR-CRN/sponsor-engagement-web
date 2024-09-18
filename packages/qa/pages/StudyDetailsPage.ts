@@ -393,6 +393,7 @@ export default class StudyDetailsPage {
       await expect(this.tableActualClosureDateValue).toHaveText('-')
     }
   }
+
   async assertUkTarget(expectedTarget: number, studyRoute: string) {
     await expect(this.tableUkTargetHeader).toBeVisible()
     if (studyRoute === 'Non-commercial') {
