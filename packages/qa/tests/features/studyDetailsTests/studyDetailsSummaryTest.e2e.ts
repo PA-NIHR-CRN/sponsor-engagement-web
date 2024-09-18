@@ -159,7 +159,10 @@ test.describe('Access Study Details Page and view Summary - @se_26', () => {
       await studyDetailsPage.assertUkTarget(studyProgressDetails[0].sampleSize, studyProgressDetails[0].route)
     })
     await test.step('And I can see the Studies UK Recruitment Total', async () => {
-      await studyDetailsPage.assertUkTotal(studyProgressDetails[0].totalRecruitmentToDate)
+      await studyDetailsPage.assertUkTotal(
+        studyProgressDetails[0].totalRecruitmentToDate,
+        studyProgressDetails[0].route
+      )
     })
   })
 
@@ -274,7 +277,10 @@ test.describe('Access Study Details Page and view Summary - @se_26', () => {
       )
     })
     await test.step('And I can see the Studies Network Recruitment Total', async () => {
-      await studyDetailsPage.assertUkTotal(nonCommStudyProgressDetails[0].totalRecruitmentToDate)
+      await studyDetailsPage.assertUkTotal(
+        nonCommStudyProgressDetails[0].totalRecruitmentToDate,
+        nonCommStudyProgressDetails[0].route
+      )
     })
   })
 })
