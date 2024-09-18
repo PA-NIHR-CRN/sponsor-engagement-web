@@ -2,7 +2,7 @@ import { simpleFaker } from '@faker-js/faker'
 import type { Prisma } from 'database'
 import { Mock } from 'ts-mockery'
 
-import type { Study } from '@/@types/studies'
+import { type Study, StudySponsorOrganisationRole, StudySponsorOrganisationRoleRTSIdentifier } from '@/@types/studies'
 import type { StudyForExport } from '@/lib/studies'
 
 export const mockStudiesForExport = Array.from({ length: 3 }).map((_, index) =>
@@ -83,15 +83,21 @@ export const mockStudiesForExport = Array.from({ length: 3 }).map((_, index) =>
 
 export const mockCPMSStudy = Mock.of<Study>({
   StudyId: 622,
+  IrasId: 1212,
   StudyShortName: 'BS06',
   StudyStatus: 'Suspended',
   StudyRoute: 'Non-commercial',
+  ProtocolReferenceNumber: 8282,
   PlannedOpeningDate: '2003-02-28T00:00:00',
   PlannedClosureToRecruitmentDate: '2003-02-28T00:00:00',
   ActualOpeningDate: '1991-09-01T00:00:00',
   ActualClosureToRecruitmentDate: '2003-02-28T00:00:00',
   TotalRecruitmentToDate: 683,
   UkRecruitmentTargetToDate: 121,
+  Title: 'A PHASE 2B',
+  ManagingSpecialty: 'Musculoskeletal Disorders',
+  ChiefInvestigatorFirstName: 'John',
+  ChiefInvestigatorLastName: 'Smith',
   StudyEvaluationCategories: [
     {
       EvaluationCategoryType: 'Recruitment concerns',
@@ -114,6 +120,14 @@ export const mockCPMSStudy = Mock.of<Study>({
       ActualOpeningDate: '2018-03-01T00:00:00',
       ActualClosureDate: null,
       ExpectedReopenDate: null,
+    },
+  ],
+  StudySponsors: [
+    {
+      OrganisationName: 'Pfizer Inc.',
+      OrganisationRole: StudySponsorOrganisationRole.ClinicalResearchSponsor,
+      OrganisationRTSIdentifier: '69033 NY@1.2.840.1',
+      OrganisationRoleRTSIdentifier: StudySponsorOrganisationRoleRTSIdentifier.ClinicalResearchSponsor,
     },
   ],
 })

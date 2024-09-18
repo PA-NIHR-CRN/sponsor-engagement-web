@@ -9,6 +9,7 @@ export interface StudyDetailsProps {
 }
 
 function normalizeStudyData(study: StudyDetailsProps['study'], studyInCPMS: StudyDetailsProps['studyInCPMS']) {
+  const defaultText = 'None available'
   const {
     title: studyTitle,
     protocolReferenceNumber: studyProtocol,
@@ -33,7 +34,7 @@ function normalizeStudyData(study: StudyDetailsProps['study'], studyInCPMS: Stud
     StudyRoute: cpmsRoute,
   } = studyInCPMS
 
-  let chiefInvestigator = 'None available'
+  let chiefInvestigator = defaultText
 
   if (cpmsCIFirstName && cpmsCILastName) {
     chiefInvestigator = `${cpmsCIFirstName} ${cpmsCILastName}`
@@ -42,8 +43,8 @@ function normalizeStudyData(study: StudyDetailsProps['study'], studyInCPMS: Stud
   }
   return {
     title: cpmsTitle || studyTitle,
-    protocolReferenceNumber: cpmsProtocol || studyProtocol,
-    irasId: cpmsIrasId || studyIrasId,
+    protocolReferenceNumber: cpmsProtocol || studyProtocol || defaultText,
+    irasId: cpmsIrasId || studyIrasId || defaultText,
     cpmsId: cpmsStudyId || studyCpmsId,
     organisationsByRole: cpmsOrgs || studyOrgs,
     managingSpecialty: cpmsManagingSpecialty || studyManagingSpecialty,

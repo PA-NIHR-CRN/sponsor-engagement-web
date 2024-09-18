@@ -27,7 +27,7 @@ describe('getStudyByIdFromCPMS', () => {
     process.env = env
   })
 
-  it('should return study when API request is successful', async () => {
+  it('should return study and map organisation roles when API request is successful', async () => {
     const mockResponse = {
       StatusCode: 200,
       Result: mockCPMSStudy,
@@ -37,7 +37,14 @@ describe('getStudyByIdFromCPMS', () => {
 
     const result = await getStudyByIdFromCPMS(mockStudyId)
 
-    expect(result).toStrictEqual({ study: mockResponse.Result })
+    expect(result).toStrictEqual({
+      study: {
+        ...mockResponse.Result,
+        organisationsByRole: {
+          Sponsor: mockResponse.Result.StudySponsors[0].OrganisationName,
+        },
+      },
+    })
 
     expect(mockedGetAxios).toHaveBeenCalledTimes(1)
     expect(mockedGetAxios).toHaveBeenCalledWith(`${mockedEnvVars.apiUrl}/studies/${mockStudyId}/engagement-info`, {
