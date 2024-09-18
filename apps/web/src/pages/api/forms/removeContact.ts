@@ -1,4 +1,5 @@
 import { authService } from '@nihr-ui/auth'
+import { Wso2GroupOperation } from '@nihr-ui/auth/src/constants/constants'
 import { emailService } from '@nihr-ui/email'
 import { logger } from '@nihr-ui/logger'
 import { emailTemplates } from '@nihr-ui/templates/sponsor-engagement'
@@ -17,11 +18,11 @@ export interface ExtendedNextApiRequest extends NextApiRequest {
   body: OrganisationRemoveContactInputs
 }
 
-export async function removeWSO2UserRole(email: string, role: string) {
+export async function updateWSO2UserGroup(email: string, group: string) {
   try {
-    await authService.removeWSO2UserRole(email, role)
-  } catch (roleError) {
-    logger.error(`Failed to remove role ${role} from user ${email}: ${roleError}`)
+    await authService.updateWSO2UserGroup(email, group, Wso2GroupOperation.Remove)
+  } catch (groupError) {
+    logger.error(`Failed to remove group ${group} from user ${email}: ${groupError}`)
   }
 }
 
@@ -63,7 +64,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
 
     const isEligibleForOdpRole = await isUserEligibleForOdpRole(user.id)
     if (!isEligibleForOdpRole) {
-      await removeWSO2UserRole(user.email, ODP_ROLE_GROUP_ID)
+      await updateWSO2UserGroup(user.email, ODP_ROLE_GROUP_ID)
     }
 
     if (user.email) {
