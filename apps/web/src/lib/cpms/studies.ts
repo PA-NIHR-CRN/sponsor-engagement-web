@@ -25,13 +25,8 @@ export const getStudyByIdFromCPMS = async (studyId: number): Promise<GetStudyFro
     if (data.StatusCode !== 200) {
       throw new Error('An error occured fetching study from CPMS')
     }
-    let study = data.Result
 
-    study = {
-      ...study,
-    }
-
-    return { study }
+    return { study: data.Result }
   } catch (e) {
     const error = e instanceof Error ? e.message : String(e)
 
