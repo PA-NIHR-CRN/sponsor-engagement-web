@@ -166,7 +166,11 @@ export default function Study({ user, study, studyInCPMS, assessments }: StudyPr
                 <Table.Cell>{studyInCPMS.SampleSize ?? '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.CellHeader className="w-1/3">Total UK recruitment to date</Table.CellHeader>
+                <Table.CellHeader className="w-1/3">
+                  {studyInCPMS.StudyRoute === 'Commercial'
+                    ? 'Total UK recruitment to date (excluding private sites)'
+                    : 'Total UK recruitment to date'}
+                </Table.CellHeader>
                 <Table.Cell>{studyInCPMS.TotalRecruitmentToDate ?? '-'}</Table.Cell>
               </Table.Row>
             </Table.Body>
