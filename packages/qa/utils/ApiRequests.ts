@@ -1,14 +1,15 @@
 import axios from 'axios'
 
+const baseUrl = process.env.SE_TEST_API_URL
+const username = process.env.SE_TEST_API_USERNAME
+const password = process.env.SE_TEST_API_PASSWORD
+
 export async function getStudyEngagementInfo(studyId: string) {
-  const baseUrl = process.env.SE_TEST_API_URL
-  const username = process.env.SE_TEST_API_USERNAME
-  const password = process.env.SE_TEST_API_PASSWORD
   const apiUrl = `${baseUrl}api/v1/studies/${studyId}/engagement-info`
 
   // check if the environment variables are set
   if (!username || !password || !baseUrl) {
-    throw new Error('SE API username or password or url is not set in environment variables.')
+    throw new Error('SE API username, password or url is not set in environment variables.')
   }
 
   try {

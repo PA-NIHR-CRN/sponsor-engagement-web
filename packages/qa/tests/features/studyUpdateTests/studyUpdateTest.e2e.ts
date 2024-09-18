@@ -61,7 +61,7 @@ test.describe('Update study data page - @se_166', () => {
     })
 
     await test.step(`And I see introductory guidance copy explaining how the updates are going to be applied`, async () => {
-      await studyUpdatePage.assertGuidanceText(getStudyResponse.StudyRoute)
+      await studyUpdatePage.assertGuidanceText()
     })
   })
 

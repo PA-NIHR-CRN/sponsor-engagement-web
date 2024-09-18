@@ -261,6 +261,9 @@ jobs:
           CPMS_TEST_DB_SERVER: ${{ secrets.CPMS_TEST_DB_SERVER }}
           SE_TEST_DB_PASSWORD: ${{ secrets.SE_TEST_DB_PASSWORD }}
           SE_TEST_DB_HOST: ${{ secrets.SE_TEST_DB_HOST }}
+          SE_TEST_API_URL: ${{ CPMS_API_BASE_URL }}
+          SE_TEST_API_USERNAME: ${{ secrets.CPMS_API_USERNAME }}
+          SE_TEST_API_PASSWORD: ${{ secrets.CPMS_API_PASSWORD }}
           SPONSOR_CONTACT_PASS: ${{ secrets.SPONSOR_CONTACT_PASS }}
           SPONSOR_CONTACT_MANAGER_PASS: ${{ secrets.SPONSOR_CONTACT_MANAGER_PASS }}
           CONTACT_MANAGER_PASS: ${{ secrets.CONTACT_MANAGER_PASS }}
