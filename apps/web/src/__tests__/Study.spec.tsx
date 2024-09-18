@@ -243,12 +243,7 @@ describe('Study', () => {
             evaluationCategories: mappedCPMSStudyEvals,
             organisationsByRole,
           },
-          studyInCPMS: {
-            ...mockCPMSStudy,
-            organisationsByRole: {
-              Sponsor: mockCPMSStudy.StudySponsors[0].OrganisationName,
-            },
-          },
+          studyInCPMS: mockCPMSStudy,
         },
       })
 
@@ -350,7 +345,7 @@ describe('Study', () => {
         mockCPMSStudy.Title,
         mockCPMSStudy.IrasId.toString(),
         mockCPMSStudy.StudyId.toString(),
-        mockCPMSStudy.StudySponsors[0].OrganisationName,
+        mockStudy.organisations[0].organisation.name,
         mockCPMSStudy.ManagingSpecialty,
         `${mockCPMSStudy.ChiefInvestigatorFirstName} ${mockCPMSStudy.ChiefInvestigatorLastName}`,
       ])

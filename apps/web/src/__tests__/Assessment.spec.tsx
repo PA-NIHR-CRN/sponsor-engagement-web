@@ -351,7 +351,7 @@ describe('Assessment', () => {
         mockCPMSStudy.Title,
         mockCPMSStudy.IrasId.toString(),
         `${mockCPMSStudy.StudyId}`,
-        mockCPMSStudy.StudySponsors[0].OrganisationName,
+        study.organisations[0].organisation.name,
         mockCPMSStudy.ManagingSpecialty,
         `${mockCPMSStudy.ChiefInvestigatorFirstName} ${mockCPMSStudy.ChiefInvestigatorLastName}`,
       ])
