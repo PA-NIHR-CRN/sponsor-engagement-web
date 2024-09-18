@@ -38,7 +38,7 @@ test.beforeAll('Setup Tests', async () => {
   getStudyResponse = await getStudyEngagementInfo(studyCoreDetails[0].cpmsId)
 })
 
-test.describe('Update study data page - @se_166', () => {
+test.describe('Update study data page - @se_166 @wip', () => {
   test.use({ storageState: '.auth/sponsorContact.json' })
 
   test('As a Sponsor I can see the page header, study information and guidance section - @se_166_ac1', async ({
