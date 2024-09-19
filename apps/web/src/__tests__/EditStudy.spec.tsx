@@ -291,7 +291,7 @@ describe('EditStudy', () => {
       const furtherInformation = screen.getByLabelText('Further information')
       expect(furtherInformation).toBeInTheDocument()
       expect(furtherInformation).toHaveAccessibleDescription(
-        'You have 0 characters remaining If needed, provide further context or justification for changes made above.'
+        'You have 500 characters remaining If needed, provide further context or justification for changes made above.'
       )
 
       // Warning text
