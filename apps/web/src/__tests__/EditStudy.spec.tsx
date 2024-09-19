@@ -72,7 +72,7 @@ describe('EditStudy', () => {
       const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
       getServerSessionMock.mockResolvedValueOnce({
         ...userWithSponsorContactRole,
-        user: { ...userWithSponsorContactRole.user, wso2Roles: [] },
+        user: { ...userWithSponsorContactRole.user, groups: [] },
       })
 
       const result = await getServerSideProps(context)
