@@ -52,13 +52,14 @@ jobs:
     - name: Run All SE E2E Tests
       working-directory: ./packages/qa
       if: github.event.inputs.test-tag == '' || github.event.inputs.test-tag == 'all'
-      run: npx playwright test
+      run: npx playwright test --grep-invert "@wip"
       env:
           E2E_BASE_URL: ${{ vars.E2E_BASE_URL }}
           CPMS_TEST_DB_PASSWORD: ${{ secrets.CPMS_TEST_DB_PASSWORD }}
           CPMS_TEST_DB_SERVER: ${{ secrets.CPMS_TEST_DB_SERVER }}
           SE_TEST_DB_PASSWORD: ${{ secrets.SE_TEST_DB_PASSWORD }}
           SE_TEST_DB_HOST: ${{ secrets.SE_TEST_DB_HOST }}
+          SE_TEST_API_URL: ${{ CPMS_API_BASE_URL }}
           SE_TEST_API_USERNAME: ${{ secrets.CPMS_API_USERNAME }}
           SE_TEST_API_PASSWORD: ${{ secrets.CPMS_API_PASSWORD }}
           SPONSOR_CONTACT_PASS: ${{ secrets.SPONSOR_CONTACT_PASS }}
@@ -75,6 +76,7 @@ jobs:
           CPMS_TEST_DB_SERVER: ${{ secrets.CPMS_TEST_DB_SERVER }}
           SE_TEST_DB_PASSWORD: ${{ secrets.SE_TEST_DB_PASSWORD }}
           SE_TEST_DB_HOST: ${{ secrets.SE_TEST_DB_HOST }}
+          SE_TEST_API_URL: ${{ CPMS_API_BASE_URL }}
           SE_TEST_API_USERNAME: ${{ secrets.CPMS_API_USERNAME }}
           SE_TEST_API_PASSWORD: ${{ secrets.CPMS_API_PASSWORD }}
           SPONSOR_CONTACT_PASS: ${{ secrets.SPONSOR_CONTACT_PASS }}

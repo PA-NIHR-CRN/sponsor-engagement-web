@@ -42,6 +42,8 @@ const envSchema = z
     CONTENTFUL_PREVIEW_ACCESS_TOKEN: z.string(),
     AWS_SECRET_NAME: z.string(),
     AWS_REGION: z.string(),
+    ODP_ROLE_GROUP_ID: z.string(),
+    NEXT_PUBLIC_ODP_DASHBOARD_LINK: z.string(),
   })
   .required()
 
@@ -69,6 +71,8 @@ const validateEnv = () => {
     CONTENTFUL_PREVIEW_ACCESS_TOKEN: process.env.CONTENTFUL_PREVIEW_ACCESS_TOKEN,
     AWS_SECRET_NAME: process.env.AWS_SECRET_NAME,
     AWS_REGION: process.env.AWS_REGION,
+    ODP_ROLE_GROUP_ID: process.env.ODP_ROLE_GROUP_ID,
+    NEXT_PUBLIC_ODP_DASHBOARD_LINK: process.env.NEXT_PUBLIC_ODP_DASHBOARD_LINK,
   })
   if (!result.success) {
     console.error('Environment variable validation error:', JSON.stringify(result.error.flatten()))

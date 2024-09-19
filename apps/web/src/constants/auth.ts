@@ -27,6 +27,10 @@ export enum Roles {
   ContactManager = 2,
 }
 
+export enum OrganisationRoleNames {
+  ClinicalResearchSponsor = 'Clinical Research Sponsor',
+}
+
 export const PASSWORD_MIN_LENGTH = 12
 
 export const ODP_ROLE = 'ODP_SponsorEngagementTool'

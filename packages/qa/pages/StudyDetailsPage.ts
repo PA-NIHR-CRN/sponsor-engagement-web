@@ -136,7 +136,7 @@ export default class StudyDetailsPage {
     // })
     this.tableUkTargetHeader = page.locator('th[data-testid="uk-recruitment-target-label"]')
     this.tableUkTargetValue = this.tableUkTargetHeader.locator('..').locator('td')
-    this.tableUkTotalHeader = page.locator('th[scope="row"]', { hasText: 'Total UK recruitment to date' })
+    this.tableUkTotalHeader = page.locator('th[data-testid="total-uk-recruitment-label"]')
     this.tableUkTotalValue = this.tableUkTotalHeader.locator('..').locator('td')
     this.tableEstimatedReopenDateHeader = page.locator('th[scope="row"]', { hasText: 'Estimated reopening date' })
     this.tableEstimatedReopenDateValue = this.tableEstimatedReopenDateHeader.locator('..').locator('td')
@@ -393,6 +393,7 @@ export default class StudyDetailsPage {
       await expect(this.tableActualClosureDateValue).toHaveText('-')
     }
   }
+
   async assertUkTarget(expectedTarget: number, studyRoute: string) {
     await expect(this.tableUkTargetHeader).toBeVisible()
     if (studyRoute === 'Non-commercial') {
@@ -408,8 +409,13 @@ export default class StudyDetailsPage {
     }
   }
 
-  async assertUkTotal(expectedTotal: number) {
+  async assertUkTotal(expectedTotal: number, studyRoute: string) {
     await expect(this.tableUkTotalHeader).toBeVisible()
+    if (studyRoute === 'Non-commercial') {
+      await expect(this.tableUkTotalHeader).toHaveText('Total UK recruitment to date')
+    } else {
+      await expect(this.tableUkTotalHeader).toHaveText('Total UK recruitment to date (excluding private sites)')
+    }
     await expect(this.tableUkTotalValue).toBeVisible()
     await expect(this.tableUkTotalValue).toHaveText(expectedTotal.toString())
   }

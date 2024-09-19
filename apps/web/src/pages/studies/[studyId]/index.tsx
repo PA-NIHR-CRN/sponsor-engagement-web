@@ -49,7 +49,7 @@ export default function Study({ user, study, studyInCPMS, assessments }: StudyPr
 
   const supportOrgName = organisationsByRole.CRO ?? organisationsByRole.CTU
 
-  const showEditStudyFeature = Boolean(user?.wso2Roles.includes(EDIT_STUDY_ROLE))
+  const showEditStudyFeature = Boolean(user?.groups.includes(EDIT_STUDY_ROLE))
 
   return (
     <Container>
@@ -166,7 +166,11 @@ export default function Study({ user, study, studyInCPMS, assessments }: StudyPr
                 <Table.Cell>{studyInCPMS.SampleSize ?? '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.CellHeader className="w-1/3">Total UK recruitment to date</Table.CellHeader>
+                <Table.CellHeader className="w-1/3" data-testid="total-uk-recruitment-label">
+                  {studyInCPMS.StudyRoute === 'Commercial'
+                    ? 'Total UK recruitment to date (excluding private sites)'
+                    : 'Total UK recruitment to date'}
+                </Table.CellHeader>
                 <Table.Cell>{studyInCPMS.TotalRecruitmentToDate ?? '-'}</Table.Cell>
               </Table.Row>
             </Table.Body>
