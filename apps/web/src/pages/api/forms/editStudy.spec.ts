@@ -11,7 +11,7 @@ import { userWithSponsorContactRole } from '@/__mocks__/session'
 import { StudyUpdateType } from '@/constants'
 import type { EditStudyInputs } from '@/utils/schemas'
 
-import { mockCPMSStudy } from '../../../mocks/studies'
+import { mockCPMSStudy, mockCPMSUpdateInput } from '../../../mocks/studies'
 import type { ExtendedNextApiRequest } from './editStudy'
 import api from './editStudy'
 
@@ -43,7 +43,40 @@ const mockedEnvVars = {
   apiPassword: 'testpwd',
 }
 
-const mockStudyUpdate = {
+const body: EditStudyInputs = {
+  studyId: mockStudyId,
+  cpmsId: mockCPMSStudy.StudyId.toString(),
+  status: mockCPMSStudy.StudyStatus,
+  plannedOpeningDate: {
+    day: '28',
+    month: '02',
+    year: '2003',
+  },
+  actualClosureDate: {
+    day: '28',
+    month: '02',
+    year: '2003',
+  },
+  actualOpeningDate: {
+    day: '01',
+    month: '09',
+    year: '1991',
+  },
+  plannedClosureDate: {
+    day: '28',
+    month: '02',
+    year: '2003',
+  },
+  estimatedReopeningDate: {
+    day: '28',
+    month: '02',
+    year: '2003',
+  },
+  recruitmentTarget: mockCPMSStudy.SampleSize?.toString(),
+  furtherInformation: '',
+}
+
+const mockStudyUpdateResponse = {
   id: 3232,
   studyId: mockStudyId,
   studyStatus: mockCPMSStudy.StudyStatus,
@@ -56,50 +89,32 @@ const mockStudyUpdate = {
   estimatedReopeningDate: new Date(mockCPMSStudy.EstimatedReopeningDate as string),
 }
 
-const mockCPMSBody = {
-  StudyStatus: mockCPMSStudy.StudyStatus,
-  SampleSize: mockCPMSStudy.SampleSize,
-  PlannedOpeningDate: new Date(mockCPMSStudy.PlannedOpeningDate as string),
-  ActualOpeningDate: new Date(mockCPMSStudy.ActualOpeningDate as string),
-  PlannedClosureToRecruitmentDate: new Date(mockCPMSStudy.PlannedClosureToRecruitmentDate as string),
-  ActualClosureToRecruitmentDate: new Date(mockCPMSStudy.ActualClosureToRecruitmentDate as string),
-  EstimatedReopeningDate: new Date(mockCPMSStudy.EstimatedReopeningDate as string),
+const mockStudyUpdateInput = {
+  studyStatus: body.status,
+  plannedOpeningDate: mockStudyUpdateResponse.plannedOpeningDate,
+  actualOpeningDate: mockStudyUpdateResponse.actualOpeningDate,
+  plannedClosureToRecruitmentDate: mockStudyUpdateResponse.plannedClosureToRecruitmentDate,
+  actualClosureToRecruitmentDate: mockStudyUpdateResponse.actualClosureToRecruitmentDate,
+  estimatedReopeningDate: mockStudyUpdateResponse.estimatedReopeningDate,
+  ukRecruitmentTarget: Number(mockStudyUpdateResponse.ukRecruitmentTarget),
+  comment: mockStudyUpdateResponse.comment,
+  study: {
+    connect: {
+      id: body.studyId,
+    },
+  },
+  studyUpdateType: {
+    connect: { id: StudyUpdateType.Proposed },
+  },
+  createdBy: {
+    connect: { id: userWithSponsorContactRole.user?.id as number },
+  },
+  modifiedBy: {
+    connect: { id: userWithSponsorContactRole.user?.id as number },
+  },
 }
 
 describe('Succesfully edit study', () => {
-  const body: EditStudyInputs = {
-    studyId: mockStudyId,
-    cpmsId: mockCPMSStudy.StudyId.toString(),
-    status: mockCPMSStudy.StudyStatus,
-    plannedOpeningDate: {
-      day: '28',
-      month: '02',
-      year: '2003',
-    },
-    actualClosureDate: {
-      day: '28',
-      month: '02',
-      year: '2003',
-    },
-    actualOpeningDate: {
-      day: '01',
-      month: '09',
-      year: '1991',
-    },
-    plannedClosureDate: {
-      day: '28',
-      month: '02',
-      year: '2003',
-    },
-    estimatedReopeningDate: {
-      day: '28',
-      month: '02',
-      year: '2003',
-    },
-    recruitmentTarget: mockCPMSStudy.SampleSize?.toString(),
-    furtherInformation: '',
-  }
-
   beforeEach(() => {
     jest.resetAllMocks()
     jest.mocked(getServerSession).mockResolvedValueOnce(userWithSponsorContactRole)
@@ -134,7 +149,9 @@ describe('Succesfully edit study', () => {
 
   describe('Feature flag, ENABLE_DIRECT_STUDY_UPDATES, disabled', () => {
     test('creates an entry in the studyUpdates table, does not call CPMS and redirects back to study details page with the correct params', async () => {
-      prismaMock.studyUpdates.create.mockResolvedValueOnce(mockStudyUpdate as Prisma.StudyUpdatesGetPayload<undefined>)
+      prismaMock.studyUpdates.create.mockResolvedValueOnce(
+        mockStudyUpdateResponse as Prisma.StudyUpdatesGetPayload<undefined>
+      )
 
       const response = await testHandler(api, { method: 'POST', body })
 
@@ -143,30 +160,7 @@ describe('Succesfully edit study', () => {
 
       expect(prismaMock.studyUpdates.create).toHaveBeenCalledTimes(1)
       expect(prismaMock.studyUpdates.create).toHaveBeenCalledWith({
-        data: {
-          studyStatus: body.status,
-          plannedOpeningDate: mockStudyUpdate.plannedOpeningDate,
-          actualOpeningDate: mockStudyUpdate.actualOpeningDate,
-          plannedClosureToRecruitmentDate: mockStudyUpdate.plannedClosureToRecruitmentDate,
-          actualClosureToRecruitmentDate: mockStudyUpdate.actualClosureToRecruitmentDate,
-          estimatedReopeningDate: mockStudyUpdate.estimatedReopeningDate,
-          ukRecruitmentTarget: Number(mockStudyUpdate.ukRecruitmentTarget),
-          comment: mockStudyUpdate.comment,
-          study: {
-            connect: {
-              id: body.studyId,
-            },
-          },
-          studyUpdateType: {
-            connect: { id: StudyUpdateType.Proposed },
-          },
-          createdBy: {
-            connect: { id: userWithSponsorContactRole.user?.id as number },
-          },
-          modifiedBy: {
-            connect: { id: userWithSponsorContactRole.user?.id as number },
-          },
-        },
+        data: mockStudyUpdateInput,
       })
 
       expect(mockedPutAxios).not.toHaveBeenCalled()
@@ -193,8 +187,10 @@ describe('Succesfully edit study', () => {
       process.env.ENABLE_DIRECT_STUDY_UPDATES = env.ENABLE_DIRECT_STUDY_UPDATES
     })
 
-    test('creates an entry in the studyUpdates table, callsCPMS and redirects back to study details page with the correct params', async () => {
-      prismaMock.studyUpdates.create.mockResolvedValueOnce(mockStudyUpdate as Prisma.StudyUpdatesGetPayload<undefined>)
+    test('creates an entry in the studyUpdates table, calls CPMS and redirects back to study details page with the correct params', async () => {
+      prismaMock.studyUpdates.create.mockResolvedValueOnce(
+        mockStudyUpdateResponse as Prisma.StudyUpdatesGetPayload<undefined>
+      )
       mockedPutAxios.mockResolvedValueOnce({ data: mockCPMSResponse })
 
       const response = await testHandler(api, { method: 'POST', body })
@@ -204,36 +200,13 @@ describe('Succesfully edit study', () => {
 
       expect(prismaMock.studyUpdates.create).toHaveBeenCalledTimes(1)
       expect(prismaMock.studyUpdates.create).toHaveBeenCalledWith({
-        data: {
-          studyStatus: body.status,
-          plannedOpeningDate: mockStudyUpdate.plannedOpeningDate,
-          actualOpeningDate: mockStudyUpdate.actualOpeningDate,
-          plannedClosureToRecruitmentDate: mockStudyUpdate.plannedClosureToRecruitmentDate,
-          actualClosureToRecruitmentDate: mockStudyUpdate.actualClosureToRecruitmentDate,
-          estimatedReopeningDate: mockStudyUpdate.estimatedReopeningDate,
-          ukRecruitmentTarget: Number(mockStudyUpdate.ukRecruitmentTarget),
-          comment: mockStudyUpdate.comment,
-          study: {
-            connect: {
-              id: body.studyId,
-            },
-          },
-          studyUpdateType: {
-            connect: { id: StudyUpdateType.Proposed },
-          },
-          createdBy: {
-            connect: { id: userWithSponsorContactRole.user?.id as number },
-          },
-          modifiedBy: {
-            connect: { id: userWithSponsorContactRole.user?.id as number },
-          },
-        },
+        data: mockStudyUpdateInput,
       })
 
       expect(mockedPutAxios).toHaveBeenCalledTimes(1)
       expect(mockedPutAxios).toHaveBeenCalledWith(
         `${mockedEnvVars.apiUrl}/studies/${body.cpmsId}/engagement-info`,
-        JSON.stringify(mockCPMSBody),
+        JSON.stringify(mockCPMSUpdateInput),
         {
           headers: {
             'Content-Type': 'application/json',
@@ -245,7 +218,9 @@ describe('Succesfully edit study', () => {
     })
 
     test('should redirect correctly when the network request to CPMS fails', async () => {
-      prismaMock.studyUpdates.create.mockResolvedValueOnce(mockStudyUpdate as Prisma.StudyUpdatesGetPayload<undefined>)
+      prismaMock.studyUpdates.create.mockResolvedValueOnce(
+        mockStudyUpdateResponse as Prisma.StudyUpdatesGetPayload<undefined>
+      )
       mockedPutAxios.mockRejectedValueOnce(new Error())
       const response = await testHandler(api, { method: 'POST', body })
 
@@ -256,7 +231,9 @@ describe('Succesfully edit study', () => {
     })
 
     test('should redirect correctly when CPMS returns a non-200 status code', async () => {
-      prismaMock.studyUpdates.create.mockResolvedValueOnce(mockStudyUpdate as Prisma.StudyUpdatesGetPayload<undefined>)
+      prismaMock.studyUpdates.create.mockResolvedValueOnce(
+        mockStudyUpdateResponse as Prisma.StudyUpdatesGetPayload<undefined>
+      )
       mockedPutAxios.mockResolvedValueOnce({ data: { ...mockCPMSResponse, StatusCode: 500 } })
       const response = await testHandler(api, { method: 'POST', body })
 

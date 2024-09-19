@@ -59,9 +59,9 @@ export const updateStudyInCPMS = async (
   const { CPMS_API_URL, CPMS_API_USERNAME, CPMS_API_PASSWORD } = process.env
 
   try {
-    assert(CPMS_API_URL)
-    assert(CPMS_API_USERNAME)
-    assert(CPMS_API_PASSWORD)
+    assert(CPMS_API_URL, 'CPMS_API_URL is not defined')
+    assert(CPMS_API_USERNAME, 'CPMS_API_USERNAME is not defined')
+    assert(CPMS_API_PASSWORD, 'CPMS_API_PASSWORD is not defined')
 
     const body = JSON.stringify(studyData)
 
@@ -89,7 +89,7 @@ export const updateStudyInCPMS = async (
   }
 }
 
-export const mapSEStudyToCPMSStudy = (study: EditStudyInputs): UpdateStudyInput => ({
+export const mapEditStudyInputToCPMSStudy = (study: EditStudyInputs): UpdateStudyInput => ({
   StudyStatus: study.status,
   SampleSize: study.recruitmentTarget ? Number(study.recruitmentTarget) : null,
   PlannedOpeningDate: constructDateObjFromParts(study.plannedOpeningDate)?.toISOString() ?? null,

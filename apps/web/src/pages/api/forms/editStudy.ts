@@ -4,7 +4,7 @@ import type { Prisma } from 'database'
 import type { NextApiRequest } from 'next'
 
 import { Roles, StudyUpdateType } from '@/constants'
-import { mapSEStudyToCPMSStudy, updateStudyInCPMS } from '@/lib/cpms/studies'
+import { mapEditStudyInputToCPMSStudy, updateStudyInCPMS } from '@/lib/cpms/studies'
 import { prismaClient } from '@/lib/prisma'
 import { constructDateObjFromParts } from '@/utils/date'
 import type { EditStudyInputs } from '@/utils/schemas'
@@ -40,7 +40,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
       plannedClosureToRecruitmentDate: formattedPlannedClosureDate,
       actualClosureToRecruitmentDate: formattedActualClosureDate,
       estimatedReopeningDate: formattedEstimatedReopeningDate,
-      ukRecruitmentTarget: Number(studyData.recruitmentTarget),
+      ukRecruitmentTarget: studyData.recruitmentTarget ? Number(studyData.recruitmentTarget) : undefined,
       comment: studyData.furtherInformation,
       study: {
         connect: {
@@ -65,7 +65,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
 
     // TO DO: Update feature flag usage to override CPMS validate response
     if (enableDirectStudyUpdatesFeature) {
-      const cpmsStudyInput = mapSEStudyToCPMSStudy(studyData)
+      const cpmsStudyInput = mapEditStudyInputToCPMSStudy(studyData)
 
       const { study, error } = await updateStudyInCPMS(Number(studyData.cpmsId), cpmsStudyInput)
 
