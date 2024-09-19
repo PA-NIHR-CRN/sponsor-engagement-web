@@ -15,6 +15,7 @@ import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
 import { TEXTAREA_MAX_CHARACTERS } from '@/constants/forms'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
+import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
 import { prismaClient } from '@/lib/prisma'
 import { getStudyById } from '@/lib/studies'
 import { getValuesFromSearchParams } from '@/utils/form'
@@ -27,6 +28,7 @@ export type AssessmentProps = InferGetServerSidePropsType<typeof getServerSidePr
 export default function Assessment({
   query,
   study,
+  studyInCPMS,
   statuses,
   furtherInformation,
   returnUrl,
@@ -93,7 +95,7 @@ export default function Assessment({
             <AccordionItem className="border-none" value="details-1">
               <AccordionTrigger>Show study details</AccordionTrigger>
               <AccordionContent>
-                <StudyDetails study={study} />
+                <StudyDetails study={study} studyInCPMS={studyInCPMS} />
               </AccordionContent>
             </AccordionItem>
           </Accordion>
@@ -214,11 +216,22 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     }
   }
 
+  const { study: studyInCPMS } = await getStudyByIdFromCPMS(study.cpmsId)
+
+  if (!studyInCPMS) {
+    return {
+      redirect: {
+        destination: '/500',
+      },
+    }
+  }
+
   return {
     props: {
       query: context.query,
       user: session.user,
       study,
+      studyInCPMS,
       assessments: getAssessmentHistoryFromStudy(study),
       statuses: statusRefData.map(({ id, name, description }) => ({ id, name, description })),
       furtherInformation: furtherInformationRefData.map(({ id, name }) => ({ id, name })),

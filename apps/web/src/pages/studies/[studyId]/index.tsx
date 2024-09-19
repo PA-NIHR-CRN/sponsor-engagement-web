@@ -181,7 +181,7 @@ export default function Study({ user, study, studyInCPMS, assessments }: StudyPr
 
           {/* About this study */}
           <h3 className="govuk-heading-m govuk-!-margin-bottom-3">About this study</h3>
-          <StudyDetails study={study} />
+          <StudyDetails study={study} studyInCPMS={studyInCPMS} />
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
           <RequestSupport showCallToAction sticky />
