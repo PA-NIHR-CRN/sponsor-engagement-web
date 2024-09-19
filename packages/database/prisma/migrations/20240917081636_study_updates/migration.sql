@@ -41,3 +41,8 @@ ALTER TABLE `StudyUpdates` ADD CONSTRAINT `StudyUpdates_createdById_fkey` FOREIG
 
 -- AddForeignKey
 ALTER TABLE `StudyUpdates` ADD CONSTRAINT `StudyUpdates_modifiedById_fkey` FOREIGN KEY (`modifiedById`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- Seed data
+INSERT INTO `SysRefStudyUpdateType` (`id`, `name`, `description`) VALUES
+  (1, 'Direct', 'An update that is directly applied to CPMS'),
+  (2, 'Proposed', 'An update that is proposed by a user to be reviewed by RDN');

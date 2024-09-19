@@ -68,26 +68,6 @@ async function main() {
 
   logger.info('→ Assessment further information created ✓')
 
-  const studyUpdateTypes = [
-    {
-      id: 1,
-      name: 'Direct',
-      description: 'An update that is directly applied to CPMS',
-    },
-    {
-      id: 2,
-      name: 'Proposed',
-      description: 'An update that is proposd by a user to be reviewed by RDN',
-    },
-  ]
-
-  await prisma.sysRefStudyUpdateType.createMany({
-    data: studyUpdateTypes,
-    skipDuplicates: true,
-  })
-
-  logger.info(`→ Study update types created ✓`)
-
   logger.info('✓ Database seed end')
 }
 main()
