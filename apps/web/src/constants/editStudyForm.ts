@@ -51,3 +51,8 @@ export const studyStatuses = [
     value: StudyStatus.Suspended,
   },
 ]
+
+/**
+ * Max amount of characters for furtherInformation text
+ */
+export const FURTHER_INFO_MAX_CHARACTERS = 500

@@ -4,7 +4,7 @@ import { faker } from '@faker-js/faker'
 import { ZodError } from 'zod'
 import type { z, SafeParseReturnType } from 'zod'
 import { AuthService } from './auth-service'
-import {
+import type {
   checkSessionResponseSchema,
   createUserResponseSchema,
   getUserResponseSchema,
@@ -12,6 +12,7 @@ import {
   updateGroupResponseSchema,
 } from './schemas'
 import { requests } from './handlers'
+import { Wso2GroupOperation } from './constants/constants'
 
 // Define types inferred from Zod schemas
 type GetUserResponse = z.infer<typeof getUserResponseSchema>
@@ -184,7 +185,11 @@ describe('AuthService', () => {
   })
 
   test('assigning WSO2 user role succeeds', async () => {
-    const res = await authService.assignWSO2UserRole('mockuser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
+    const res = await authService.updateWSO2UserGroup(
+      'mockuser@nihr.ac.uk',
+      'd6500611-5cf5-4230-8695-5a63329e2648',
+      Wso2GroupOperation.Add
+    )
 
     expect(res.success).toBeTruthy()
 
@@ -194,7 +199,11 @@ describe('AuthService', () => {
   })
 
   test('removing WSO2 user role succeeds', async () => {
-    const res = await authService.removeWSO2UserRole('mockuser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
+    const res = await authService.updateWSO2UserGroup(
+      'mockuser@nihr.ac.uk',
+      'd6500611-5cf5-4230-8695-5a63329e2648',
+      Wso2GroupOperation.Remove
+    )
 
     expect(res.success).toBeTruthy()
 
@@ -205,17 +214,25 @@ describe('AuthService', () => {
 
   test('assigning WSO2 user role fails when user is not found', async () => {
     await expect(
-      authService.assignWSO2UserRole('nonexistent@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
+      authService.updateWSO2UserGroup(
+        'nonexistent@nihr.ac.uk',
+        'd6500611-5cf5-4230-8695-5a63329e2648',
+        Wso2GroupOperation.Add
+      )
     ).rejects.toThrow('No user found with email: nonexistent@nihr.ac.uk')
   })
 
   test('removing WSO2 user role fails when user is not found', async () => {
     await expect(
-      authService.removeWSO2UserRole('nonexistent@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
+      authService.updateWSO2UserGroup(
+        'nonexistent@nihr.ac.uk',
+        'd6500611-5cf5-4230-8695-5a63329e2648',
+        Wso2GroupOperation.Remove
+      )
     ).rejects.toThrow('No user found with email: nonexistent@nihr.ac.uk')
   })
 
-  test('assignWSO2UserRole throws error when getUser fails', async () => {
+  test('updateWSO2UserGroup throws error when getUser fails', async () => {
     const mockZodError = new ZodError<GetUserResponse>([])
 
     const mockFailureResponse: ParsedGetUserFailureResponse = {
@@ -226,11 +243,15 @@ describe('AuthService', () => {
     jest.spyOn(requests, 'getUser').mockResolvedValueOnce(mockFailureResponse)
 
     await expect(
-      authService.assignWSO2UserRole('invaliduser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
+      authService.updateWSO2UserGroup(
+        'invaliduser@nihr.ac.uk',
+        'd6500611-5cf5-4230-8695-5a63329e2648',
+        Wso2GroupOperation.Add
+      )
     ).rejects.toThrow('Failed to retrieve user with email: invaliduser@nihr.ac.uk')
   })
 
-  test('removeWSO2UserRole throws error when getUser fails', async () => {
+  test('updateWSO2UserGroup throws error when getUser fails', async () => {
     const mockZodError = new ZodError<GetUserResponse>([])
 
     const mockFailureResponse: ParsedGetUserFailureResponse = {
@@ -241,11 +262,15 @@ describe('AuthService', () => {
     jest.spyOn(requests, 'getUser').mockResolvedValueOnce(mockFailureResponse)
 
     await expect(
-      authService.removeWSO2UserRole('invaliduser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
+      authService.updateWSO2UserGroup(
+        'invaliduser@nihr.ac.uk',
+        'd6500611-5cf5-4230-8695-5a63329e2648',
+        Wso2GroupOperation.Remove
+      )
     ).rejects.toThrow('Failed to retrieve user with email: invaliduser@nihr.ac.uk')
   })
 
-  test('assignWSO2UserRole throws error when user is undefined in getUser response', async () => {
+  test('updateWSO2UserGroup throws error when user is undefined in getUser response', async () => {
     const mockSuccessResponse: ParsedGetUserResponse = {
       success: true,
       data: mockEmptyGetUserResponse,
@@ -254,11 +279,15 @@ describe('AuthService', () => {
     jest.spyOn(requests, 'getUser').mockResolvedValueOnce(mockSuccessResponse)
 
     await expect(
-      authService.assignWSO2UserRole('mockuser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
+      authService.updateWSO2UserGroup(
+        'mockuser@nihr.ac.uk',
+        'd6500611-5cf5-4230-8695-5a63329e2648',
+        Wso2GroupOperation.Add
+      )
     ).rejects.toThrow('No user found with email: mockuser@nihr.ac.uk')
   })
 
-  test('removeWSO2UserRole throws error when user is undefined in getUser response', async () => {
+  test('updateWSO2UserGroup throws error when user is undefined in getUser response', async () => {
     const mockResponse: ParsedGetUserResponse = {
       success: true,
       data: mockEmptyGetUserResponse,
@@ -267,7 +296,31 @@ describe('AuthService', () => {
     jest.spyOn(requests, 'getUser').mockResolvedValueOnce(mockResponse)
 
     await expect(
-      authService.removeWSO2UserRole('mockuser@nihr.ac.uk', 'd6500611-5cf5-4230-8695-5a63329e2648')
+      authService.updateWSO2UserGroup(
+        'mockuser@nihr.ac.uk',
+        'd6500611-5cf5-4230-8695-5a63329e2648',
+        Wso2GroupOperation.Remove
+      )
+    ).rejects.toThrow('No user found with email: mockuser@nihr.ac.uk')
+  })
+
+  test('updateWSO2UserGroup throws an error when Resources is undefined', async () => {
+    const mockResponse: ParsedGetUserResponse = {
+      success: true,
+      data: {
+        ...mockEmptyGetUserResponse,
+        Resources: undefined,
+      },
+    }
+
+    jest.spyOn(requests, 'getUser').mockResolvedValueOnce(mockResponse)
+
+    await expect(
+      authService.updateWSO2UserGroup(
+        'mockuser@nihr.ac.uk',
+        'd6500611-5cf5-4230-8695-5a63329e2648',
+        Wso2GroupOperation.Add
+      )
     ).rejects.toThrow('No user found with email: mockuser@nihr.ac.uk')
   })
 })

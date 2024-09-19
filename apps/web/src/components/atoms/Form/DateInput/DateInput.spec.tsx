@@ -30,19 +30,19 @@ test('renders three inputs with correct attributes and no error', () => {
   const dayInput = getByLabelText('Day')
   expect(dayInput).toBeInTheDocument()
   expect(dayInput).toHaveAttribute('name', 'day')
-  expect(dayInput).toHaveValue('')
+  expect(dayInput).toHaveValue(null)
 
   // Month input field
   const monthInput = getByLabelText('Month')
   expect(monthInput).toBeInTheDocument()
   expect(monthInput).toHaveAttribute('name', 'month')
-  expect(dayInput).toHaveValue('')
+  expect(dayInput).toHaveValue(null)
 
   // Year input field
   const yearInput = getByLabelText('Year')
   expect(yearInput).toBeInTheDocument()
   expect(yearInput).toHaveAttribute('name', 'year')
-  expect(dayInput).toHaveValue('')
+  expect(dayInput).toHaveValue(null)
 
   // Error
   const errorElement = queryByRole('alert')
@@ -50,7 +50,7 @@ test('renders three inputs with correct attributes and no error', () => {
 })
 
 test('renders three inputs with correct value', () => {
-  const value = { year: '2021', month: '09', day: '01' }
+  const value = { year: '2021', month: '09', day: '1' }
 
   const { getByLabelText } = render(
     <DateInput errors={{}} label="Date input label" name="input-name" onChange={mockOnChange} value={value} />
@@ -58,17 +58,17 @@ test('renders three inputs with correct value', () => {
   // Day input field value
   const dayInput = getByLabelText('Day')
   expect(dayInput).toBeInTheDocument()
-  expect(dayInput).toHaveValue(value.day)
+  expect(dayInput).toHaveValue(Number(value.day))
 
   // Month input field value
   const monthInput = getByLabelText('Month')
   expect(monthInput).toBeInTheDocument()
-  expect(monthInput).toHaveValue(value.month)
+  expect(monthInput).toHaveValue(Number(value.month))
 
   // Year input field value
   const yearInput = getByLabelText('Year')
   expect(yearInput).toBeInTheDocument()
-  expect(yearInput).toHaveValue(value.year)
+  expect(yearInput).toHaveValue(Number(value.year))
 })
 
 test.each(['Day', 'Month', 'Year'])('renders correctly with field level errors', (dateField: string) => {

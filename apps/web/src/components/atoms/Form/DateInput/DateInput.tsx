@@ -76,6 +76,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 onChange={handleInputChange}
                 ref={ref}
                 required={required}
+                type="number"
                 value={value.day}
                 {...rest}
                 disabled={disabled}
@@ -93,6 +94,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 onChange={handleInputChange}
                 ref={ref}
                 required={required}
+                type="number"
                 value={value.month}
                 {...rest}
                 disabled={disabled}
@@ -114,6 +116,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 onChange={handleInputChange}
                 ref={ref}
                 required={required}
+                type="number"
                 value={value.year}
                 {...rest}
                 disabled={disabled}

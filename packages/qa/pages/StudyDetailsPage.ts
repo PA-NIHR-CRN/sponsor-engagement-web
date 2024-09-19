@@ -131,11 +131,12 @@ export default class StudyDetailsPage {
       hasText: 'Actual closure to recruitment date',
     })
     this.tableActualClosureDateValue = this.tableActualClosureDateHeader.locator('..').locator('td')
-    this.tableUkTargetHeader = page.locator('th[scope="row"]', {
-      hasText: 'UK recruitment target (excluding private sites)',
-    })
+    // this.tableUkTargetHeader = page.locator('th[scope="row"]', {
+    //   hasText: 'UK recruitment target (excluding private sites)',
+    // })
+    this.tableUkTargetHeader = page.locator('th[data-testid="uk-recruitment-target-label"]')
     this.tableUkTargetValue = this.tableUkTargetHeader.locator('..').locator('td')
-    this.tableUkTotalHeader = page.locator('th[scope="row"]', { hasText: 'Total UK recruitment to date' })
+    this.tableUkTotalHeader = page.locator('th[data-testid="total-uk-recruitment-label"]')
     this.tableUkTotalValue = this.tableUkTotalHeader.locator('..').locator('td')
     this.tableEstimatedReopenDateHeader = page.locator('th[scope="row"]', { hasText: 'Estimated reopening date' })
     this.tableEstimatedReopenDateValue = this.tableEstimatedReopenDateHeader.locator('..').locator('td')
@@ -166,7 +167,7 @@ export default class StudyDetailsPage {
     this.secondSponsorAssessmentTrack = this.secondSponsorAssessmentText.locator('strong')
     this.dueIndicator = page.locator('span[class="govuk-tag govuk-tag--red mr-2"]')
     this.dueIndicatorSupportingText = this.dueIndicator.locator('..')
-    this.allStudiesLink = page.locator('a[class="govuk-back-link"]')
+    this.allStudiesLink = page.locator('a[href="/studies"]')
   }
 
   //Page Methods
@@ -392,8 +393,14 @@ export default class StudyDetailsPage {
       await expect(this.tableActualClosureDateValue).toHaveText('-')
     }
   }
-  async assertUkTarget(expectedTarget: number) {
+
+  async assertUkTarget(expectedTarget: number, studyRoute: string) {
     await expect(this.tableUkTargetHeader).toBeVisible()
+    if (studyRoute === 'Non-commercial') {
+      await expect(this.tableUkTargetHeader).toHaveText('UK recruitment target')
+    } else {
+      await expect(this.tableUkTargetHeader).toHaveText('UK recruitment target (excluding private sites)')
+    }
     await expect(this.tableUkTargetValue).toBeVisible()
     if (expectedTarget != null) {
       await expect(this.tableUkTargetValue).toHaveText(expectedTarget.toString())
@@ -402,8 +409,13 @@ export default class StudyDetailsPage {
     }
   }
 
-  async assertUkTotal(expectedTotal: number) {
+  async assertUkTotal(expectedTotal: number, studyRoute: string) {
     await expect(this.tableUkTotalHeader).toBeVisible()
+    if (studyRoute === 'Non-commercial') {
+      await expect(this.tableUkTotalHeader).toHaveText('Total UK recruitment to date')
+    } else {
+      await expect(this.tableUkTotalHeader).toHaveText('Total UK recruitment to date (excluding private sites)')
+    }
     await expect(this.tableUkTotalValue).toBeVisible()
     await expect(this.tableUkTotalValue).toHaveText(expectedTotal.toString())
   }
