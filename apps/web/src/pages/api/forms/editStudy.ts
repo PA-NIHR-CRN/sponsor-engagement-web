@@ -4,6 +4,7 @@ import type { Prisma } from 'database'
 import type { NextApiRequest } from 'next'
 
 import { Roles, StudyUpdateType } from '@/constants'
+import { mapSEStudyToCPMSStudy, updateStudyInCPMS } from '@/lib/cpms/studies'
 import { prismaClient } from '@/lib/prisma'
 import { constructDateObjFromParts } from '@/utils/date'
 import type { EditStudyInputs } from '@/utils/schemas'
@@ -15,29 +16,22 @@ export interface ExtendedNextApiRequest extends NextApiRequest {
 }
 
 export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, async (req, res, session) => {
-  const { CPMS_API_URL, CPMS_API_USERNAME, CPMS_API_PASSWORD } = process.env
+  const { CPMS_API_URL, CPMS_API_USERNAME, CPMS_API_PASSWORD, ENABLE_DIRECT_STUDY_UPDATES } = process.env
+
+  const enableDirectStudyUpdatesFeature = ENABLE_DIRECT_STUDY_UPDATES?.toLowerCase() === 'true'
 
   try {
     assert(CPMS_API_URL)
     assert(CPMS_API_USERNAME)
     assert(CPMS_API_PASSWORD)
 
-    const {
-      studyId,
-      // cpmsId,
-      plannedClosureDate,
-      plannedOpeningDate,
-      actualClosureDate,
-      actualOpeningDate,
-      estimatedReopeningDate,
-      ...studyData
-    } = studySchema.parse(req.body)
+    const studyData = studySchema.parse(req.body)
 
-    const formattedPlannedOpeningDate = constructDateObjFromParts(plannedOpeningDate)
-    const formattedActualOpeningDate = constructDateObjFromParts(actualOpeningDate)
-    const formattedPlannedClosureDate = constructDateObjFromParts(plannedClosureDate)
-    const formattedActualClosureDate = constructDateObjFromParts(actualClosureDate)
-    const formattedEstimatedReopeningDate = constructDateObjFromParts(estimatedReopeningDate)
+    const formattedPlannedOpeningDate = constructDateObjFromParts(studyData.plannedOpeningDate)
+    const formattedActualOpeningDate = constructDateObjFromParts(studyData.actualOpeningDate)
+    const formattedPlannedClosureDate = constructDateObjFromParts(studyData.plannedClosureDate)
+    const formattedActualClosureDate = constructDateObjFromParts(studyData.actualClosureDate)
+    const formattedEstimatedReopeningDate = constructDateObjFromParts(studyData.estimatedReopeningDate)
 
     const studyUpdate: Prisma.StudyUpdatesCreateInput = {
       studyStatus: studyData.status,
@@ -50,7 +44,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
       comment: studyData.furtherInformation,
       study: {
         connect: {
-          id: studyId,
+          id: studyData.studyId,
         },
       },
       studyUpdateType: {
@@ -69,25 +63,18 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
       data: studyUpdate,
     })
 
-    // const body = {
-    //   ...studyData,
-    //   ...(plannedOpeningDate && { PlannedOpeningDate: formattedPlannedOpeningDate }),
-    //   ...(actualOpeningDate && { ActualOpeningDate: formattedActualOpeningDate }),
-    //   ...(plannedClosureDate && { PlannedClosureToRecruitmentDate: formattedPlannedClosureDate }),
-    //   ...(actualClosureDate && { ActualClosureToRecruitmentDate: formattedActualClosureDate }),
-    //   ...(estimatedReopeningDate && {
-    //     EstimatedReopeningDate: formattedEstimatedReopeningDate,
-    //   }),
-    // }
+    // TO DO: Update feature flag usage to override CPMS validate response
+    if (enableDirectStudyUpdatesFeature) {
+      const cpmsStudyInput = mapSEStudyToCPMSStudy(studyData)
 
-    // Only update CPMS if it is a direct change
-    // const { study, error } = await updateStudyInCPMS(Number(cpmsId), body)
+      const { study, error } = await updateStudyInCPMS(Number(studyData.cpmsId), cpmsStudyInput)
 
-    // if (!study) {
-    //   throw new Error(error)
-    // }
+      if (!study) {
+        throw new Error(error)
+      }
+    }
 
-    return res.redirect(302, `/studies/${studyId}?success=2`)
+    return res.redirect(302, `/studies/${studyData.studyId}?success=2`)
   } catch (e) {
     const searchParams = new URLSearchParams({ fatal: '1' })
     const studyId = req.body.studyId

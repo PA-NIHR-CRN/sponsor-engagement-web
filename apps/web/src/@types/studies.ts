@@ -10,10 +10,10 @@ export interface Study {
   StudyShortName: string
   StudyStatus: string
   SampleSize: number | null
-  PlannedOpeningDate: string
-  ActualOpeningDate: string
-  PlannedClosureToRecruitmentDate: string
-  ActualClosureToRecruitmentDate: string
+  PlannedOpeningDate: string | null
+  ActualOpeningDate: string | null
+  PlannedClosureToRecruitmentDate: string | null
+  ActualClosureToRecruitmentDate: string | null
   EstimatedReopeningDate: string | null
   TotalRecruitmentToDate: number | null
   UkRecruitmentTargetToDate: number | null
