@@ -6,7 +6,7 @@ import type { EditStudyInputs } from './schemas'
 export const mapStudyToStudyFormInput = (study: EditStudyProps['study']): EditStudyInputs => ({
   studyId: study.id,
   status: study.studyStatus,
-  recruitmentTarget: study.sampleSize ?? undefined,
+  recruitmentTarget: study.sampleSize?.toString() ?? undefined,
   cpmsId: study.cpmsId.toString(),
   plannedOpeningDate: constructDatePartsFromDate(study.plannedOpeningDate),
   plannedClosureDate: constructDatePartsFromDate(study.plannedClosureDate),
