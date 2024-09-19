@@ -3,3 +3,12 @@ export enum StudySponsorOrganisationRoleRTSIdentifier {
   ClinicalResearchSponsor = 'CRSPNSR@2.16.840.1.113883.5.110',
   ClinicalTrialsUnit = 'MNG_CTU@2.16.840.1.113883.2.1.3.8.5.11.1.107',
 }
+
+/**
+ * The type of a study update - Direct/Proposed
+ * This should match the values in SysRefStudyUpdateType table
+ */
+export enum StudyUpdateType {
+  Direct = 1,
+  Proposed = 2,
+}
