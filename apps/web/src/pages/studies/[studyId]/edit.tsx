@@ -14,7 +14,12 @@ import Warning from '@/components/atoms/Warning/Warning'
 import { RequestSupport } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
-import { GENERIC_STUDIES_GUIDANCE_TEXT, PAGE_TITLE, studyStatuses } from '@/constants/editStudyForm'
+import {
+  FURTHER_INFO_MAX_CHARACTERS,
+  GENERIC_STUDIES_GUIDANCE_TEXT,
+  PAGE_TITLE,
+  studyStatuses,
+} from '@/constants/editStudyForm'
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
 import {
   getStudyById,
@@ -31,7 +36,7 @@ import { withServerSideProps } from '@/utils/withServerSideProps'
 export type EditStudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
 export default function EditStudy({ study }: EditStudyProps) {
-  const { register, formState, handleSubmit, control } = useForm<EditStudyInputs>({
+  const { register, formState, handleSubmit, control, watch } = useForm<EditStudyInputs>({
     resolver: zodResolver(studySchema),
     defaultValues: {
       ...mapStudyToStudyFormInput(study),
@@ -43,6 +48,13 @@ export default function EditStudy({ study }: EditStudyProps) {
   const supportOrgName = organisationsByRole.CRO ?? organisationsByRole.CTU ?? organisationsByRole.Sponsor
 
   const { defaultValues } = formState
+
+  // Watch & update the character count for the "Further information" textarea
+  const furtherInformationText = watch('furtherInformation') ?? ''
+  const remainingCharacters =
+    furtherInformationText.length >= FURTHER_INFO_MAX_CHARACTERS
+      ? 0
+      : FURTHER_INFO_MAX_CHARACTERS - furtherInformationText.length
 
   return (
     <Container>
@@ -214,8 +226,9 @@ export default function EditStudy({ study }: EditStudyProps) {
                 hint="If needed, provide further context or justification for changes made above."
                 label="Further information"
                 labelSize="m"
-                remainingCharacters={0} // TODO: Add functionality in validation & error ticket
+                remainingCharacters={remainingCharacters}
                 {...register('furtherInformation')}
+                maxLength={FURTHER_INFO_MAX_CHARACTERS}
               />
 
               <Warning>
