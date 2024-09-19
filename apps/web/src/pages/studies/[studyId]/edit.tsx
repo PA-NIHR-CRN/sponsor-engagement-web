@@ -13,7 +13,7 @@ import { TextInput } from '@/components/atoms/Form/TextInput/TextInput'
 import Warning from '@/components/atoms/Warning/Warning'
 import { RequestSupport } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
-import { Roles } from '@/constants'
+import { EDIT_STUDY_ROLE, Roles } from '@/constants'
 import {
   FURTHER_INFO_MAX_CHARACTERS,
   GENERIC_STUDIES_GUIDANCE_TEXT,
@@ -264,6 +264,16 @@ EditStudy.getLayout = function getLayout(page: ReactElement, { user }: EditStudy
 }
 
 export const getServerSideProps = withServerSideProps(Roles.SponsorContact, async (context, session) => {
+  const canEditStudy = Boolean(session.user?.groups.includes(EDIT_STUDY_ROLE))
+
+  if (!canEditStudy) {
+    return {
+      redirect: {
+        destination: '/404',
+      },
+    }
+  }
+
   const seStudyRecord = await getStudyById(Number(context.query.studyId))
 
   if (!seStudyRecord.data) {
