@@ -227,7 +227,7 @@ describe('/api/forms/editStudy', () => {
       expect(mockedPutAxios).not.toHaveBeenCalled()
     })
 
-    test('should redirect correctly when the request to create a studyUpdates entry fails', async () => {
+    test('should redirect correctly when the request to create an entry in the studyUpdates table fails', async () => {
       mockedPostAxios.mockResolvedValueOnce({ data: getMockValidateStudyResponse(StudyUpdateRoute.Direct) })
       prismaMock.studyUpdates.create.mockRejectedValueOnce(new Error(''))
 
