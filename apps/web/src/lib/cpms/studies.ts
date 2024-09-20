@@ -2,7 +2,7 @@ import assert from 'node:assert'
 
 import axios from 'axios'
 
-import type { CPMSStudyResponse, Study } from '@/@types/studies'
+import type { CPMSStudyResponse, CPMSValidateStudyResponse, CPMSValidationResult, Study } from '@/@types/studies'
 import { constructDateObjFromParts } from '@/utils/date'
 import type { EditStudyInputs } from '@/utils/schemas'
 
@@ -98,3 +98,45 @@ export const mapEditStudyInputToCPMSStudy = (study: EditStudyInputs): UpdateStud
   ActualClosureToRecruitmentDate: constructDateObjFromParts(study.actualClosureDate)?.toISOString() ?? null,
   EstimatedReopeningDate: constructDateObjFromParts(study.estimatedReopeningDate)?.toISOString() ?? null,
 })
+
+export interface ValidateStudyUpdateResponse {
+  validationResult: CPMSValidationResult | null
+  error?: string
+}
+
+export const validateStudyUpdate = async (
+  cpmsId: number,
+  studyData: UpdateStudyInput
+): Promise<ValidateStudyUpdateResponse> => {
+  const { CPMS_API_URL, CPMS_API_USERNAME, CPMS_API_PASSWORD } = process.env
+
+  try {
+    assert(CPMS_API_URL, 'CPMS_API_URL is not defined')
+    assert(CPMS_API_USERNAME, 'CPMS_API_USERNAME is not defined')
+    assert(CPMS_API_PASSWORD, 'CPMS_API_PASSWORD is not defined')
+
+    const body = JSON.stringify(studyData)
+
+    const requestUrl = `${CPMS_API_URL}/studies/${cpmsId}/engagement-info/validate`
+
+    const { data } = await axios.post<CPMSValidateStudyResponse>(requestUrl, body, {
+      headers: {
+        username: CPMS_API_USERNAME,
+        password: CPMS_API_PASSWORD,
+        'Content-Type': 'application/json',
+      },
+    })
+
+    if (data.StatusCode !== 200) {
+      throw new Error('An error occured validating study in CPMS')
+    }
+
+    return {
+      validationResult: data.Result,
+    }
+  } catch (e) {
+    const error = e instanceof Error ? e.message : String(e)
+
+    return { validationResult: null, error }
+  }
+}
