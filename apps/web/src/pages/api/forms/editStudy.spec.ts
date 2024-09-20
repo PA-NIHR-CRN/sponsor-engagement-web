@@ -114,7 +114,7 @@ const mockStudyUpdateInput = {
   },
 }
 
-describe('Succesfully edit study', () => {
+describe('/api/forms/editStudy', () => {
   beforeEach(() => {
     jest.resetAllMocks()
     jest.mocked(getServerSession).mockResolvedValueOnce(userWithSponsorContactRole)
