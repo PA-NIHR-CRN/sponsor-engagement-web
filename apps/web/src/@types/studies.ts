@@ -6,6 +6,21 @@ export interface CPMSStudyResponse {
   Result: Study
 }
 
+export enum StudyUpdateRoute {
+  Direct = 'Direct',
+  Proposed = 'Proposed',
+}
+
+export interface CPMSValidationResult {
+  StudyUpdateRoute: StudyUpdateRoute
+}
+
+export interface CPMSValidateStudyResponse {
+  Version: string
+  StatusCode: number
+  Result: CPMSValidationResult
+}
+
 export interface Study {
   Title: string
   StudyId: number

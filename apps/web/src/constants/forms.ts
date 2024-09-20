@@ -11,3 +11,12 @@ export const FORM_ERRORS = {
   2: 'The email address you have entered already exists for a user assigned to this organisation, so the user has not been added',
   3: "The user has been assigned to the organisation, but the invite email has not been sent as the user's email domain is not in the allowed list for testing",
 } as Record<number, string>
+
+/**
+ * Success messages for different form submissions
+ */
+export const FORM_SUCCESS_MESSAGES = {
+  1: 'The study assessment was successfully saved',
+  2: 'Your study data changes have been received. These will now be reviewed by the appropriate team and applied to the study in due course. Until then, previous study data values will be displayed here.', // Proposed study updates
+  3: 'Your study data changes have been applied. All changes have been accepted by CPMS and do not require any manual review.', // Direct study updates
+} as Record<number, string>
