@@ -8,6 +8,7 @@ import { createRequest, createResponse } from 'node-mocks-http'
 
 import { prismaMock } from '@/__mocks__/prisma'
 import { userWithSponsorContactRole } from '@/__mocks__/session'
+import { StudyUpdateRoute } from '@/@types/studies'
 import { StudyUpdateType } from '@/constants'
 import type { EditStudyInputs } from '@/utils/schemas'
 
@@ -19,6 +20,7 @@ jest.mock('axios')
 jest.mock('next-auth/next')
 jest.mock('@nihr-ui/logger')
 const mockedPutAxios = jest.mocked(axios.put)
+const mockedPostAxios = jest.mocked(axios.post)
 
 type ApiRequest = ExtendedNextApiRequest
 type ApiResponse = NextApiResponse
@@ -31,10 +33,17 @@ const testHandler = async (handler: typeof api, options: RequestOptions) => {
 
 const mockStudyId = 1211
 
-const mockCPMSResponse = {
+const mockUpdateCPMSResponse = {
   StatusCode: 200,
   Result: mockCPMSStudy,
 }
+
+const getMockValidateStudyResponse = (studyUpdateRoute: StudyUpdateRoute) => ({
+  StatusCode: 200,
+  Result: {
+    StudyUpdateRoute: studyUpdateRoute,
+  },
+})
 
 const env = { ...process.env }
 const mockedEnvVars = {
@@ -89,7 +98,7 @@ const mockStudyUpdateResponse = {
   estimatedReopeningDate: new Date(mockCPMSStudy.EstimatedReopeningDate as string),
 }
 
-const mockStudyUpdateInput = {
+const getMockStudyUpdateInput = (isDirect: boolean) => ({
   studyStatus: body.status,
   plannedOpeningDate: mockStudyUpdateResponse.plannedOpeningDate,
   actualOpeningDate: mockStudyUpdateResponse.actualOpeningDate,
@@ -104,7 +113,7 @@ const mockStudyUpdateInput = {
     },
   },
   studyUpdateType: {
-    connect: { id: StudyUpdateType.Proposed },
+    connect: { id: isDirect ? StudyUpdateType.Direct : StudyUpdateType.Proposed },
   },
   createdBy: {
     connect: { id: userWithSponsorContactRole.user?.id as number },
@@ -112,7 +121,7 @@ const mockStudyUpdateInput = {
   modifiedBy: {
     connect: { id: userWithSponsorContactRole.user?.id as number },
   },
-}
+})
 
 describe('/api/forms/editStudy', () => {
   beforeEach(() => {
@@ -131,42 +140,95 @@ describe('/api/forms/editStudy', () => {
     process.env = env
   })
 
-  test.each(['CPMS_API_URL', 'CPMS_API_USERNAME', 'CPMS_API_PASSWORD'])(
-    'should redirect correctly when there are no environemnt variables',
-    async (environmentVariable: string) => {
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- listed values are safe to delete
-      delete process.env[environmentVariable]
+  test('should redirect correctly when request to validate study fails', async () => {
+    mockedPostAxios.mockRejectedValueOnce(new Error('Oh no, an error'))
 
-      mockedPutAxios.mockRejectedValueOnce(new Error())
-      const response = await testHandler(api, { method: 'POST', body })
+    const response = await testHandler(api, { method: 'POST', body })
 
-      expect(response.statusCode).toBe(302)
-      expect(response._getRedirectUrl()).toBe(`/editStudy/${body.studyId}?fatal=1`)
+    expect(response.statusCode).toBe(302)
+    expect(response._getRedirectUrl()).toBe(`/editStudy/${body.studyId}?fatal=1`)
 
-      expect(mockedPutAxios).not.toHaveBeenCalled()
-    }
-  )
+    expect(mockedPostAxios).toHaveBeenCalledTimes(1)
+  })
+
+  test('should redirect correctly when request to validate study returns a non-200 status code', async () => {
+    mockedPostAxios.mockResolvedValueOnce({ data: { StatusCode: 500 } })
+
+    const response = await testHandler(api, { method: 'POST', body })
+
+    expect(response.statusCode).toBe(302)
+    expect(response._getRedirectUrl()).toBe(`/editStudy/${body.studyId}?fatal=1`)
+
+    expect(mockedPostAxios).toHaveBeenCalledTimes(1)
+  })
 
   describe('Feature flag, ENABLE_DIRECT_STUDY_UPDATES, disabled', () => {
-    test('creates an entry in the studyUpdates table, does not call CPMS and redirects back to study details page with the correct params', async () => {
+    test('when the update type is proposed, creates an entry in the studyUpdates table, with a proposed update type, does not call CPMS and redirects back to study details page with the correct params', async () => {
       prismaMock.studyUpdates.create.mockResolvedValueOnce(
         mockStudyUpdateResponse as Prisma.StudyUpdatesGetPayload<undefined>
       )
+      mockedPostAxios.mockResolvedValueOnce({ data: getMockValidateStudyResponse(StudyUpdateRoute.Proposed) })
 
       const response = await testHandler(api, { method: 'POST', body })
 
       expect(response.statusCode).toBe(302)
       expect(response._getRedirectUrl()).toBe(`/studies/${body.studyId}?success=2`)
 
+      expect(mockedPostAxios).toHaveBeenCalledTimes(1)
+      expect(mockedPostAxios).toHaveBeenCalledWith(
+        `${mockedEnvVars.apiUrl}/studies/${body.cpmsId}/engagement-info/validate`,
+        JSON.stringify(mockCPMSUpdateInput),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            username: mockedEnvVars.apiUsername,
+            password: mockedEnvVars.apiPassword,
+          },
+        }
+      )
+
       expect(prismaMock.studyUpdates.create).toHaveBeenCalledTimes(1)
       expect(prismaMock.studyUpdates.create).toHaveBeenCalledWith({
-        data: mockStudyUpdateInput,
+        data: getMockStudyUpdateInput(false),
       })
 
       expect(mockedPutAxios).not.toHaveBeenCalled()
     })
 
-    test('should redirect correctly when fails to update studyUpdates table', async () => {
+    test('when the update type is direct, creates an entry in the studyUpdates table, with a proposed update type, does not call CPMS and redirects back to study details page with the correct params', async () => {
+      prismaMock.studyUpdates.create.mockResolvedValueOnce(
+        mockStudyUpdateResponse as Prisma.StudyUpdatesGetPayload<undefined>
+      )
+      mockedPostAxios.mockResolvedValueOnce({ data: getMockValidateStudyResponse(StudyUpdateRoute.Direct) })
+
+      const response = await testHandler(api, { method: 'POST', body })
+
+      expect(response.statusCode).toBe(302)
+      expect(response._getRedirectUrl()).toBe(`/studies/${body.studyId}?success=2`)
+
+      expect(mockedPostAxios).toHaveBeenCalledTimes(1)
+      expect(mockedPostAxios).toHaveBeenCalledWith(
+        `${mockedEnvVars.apiUrl}/studies/${body.cpmsId}/engagement-info/validate`,
+        JSON.stringify(mockCPMSUpdateInput),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            username: mockedEnvVars.apiUsername,
+            password: mockedEnvVars.apiPassword,
+          },
+        }
+      )
+
+      expect(prismaMock.studyUpdates.create).toHaveBeenCalledTimes(1)
+      expect(prismaMock.studyUpdates.create).toHaveBeenCalledWith({
+        data: getMockStudyUpdateInput(false),
+      })
+
+      expect(mockedPutAxios).not.toHaveBeenCalled()
+    })
+
+    test('should redirect correctly when the request to create a studyUpdates entry fails', async () => {
+      mockedPostAxios.mockResolvedValueOnce({ data: getMockValidateStudyResponse(StudyUpdateRoute.Direct) })
       prismaMock.studyUpdates.create.mockRejectedValueOnce(new Error(''))
 
       const response = await testHandler(api, { method: 'POST', body })
@@ -187,20 +249,34 @@ describe('/api/forms/editStudy', () => {
       process.env.ENABLE_DIRECT_STUDY_UPDATES = env.ENABLE_DIRECT_STUDY_UPDATES
     })
 
-    test('creates an entry in the studyUpdates table, calls CPMS and redirects back to study details page with the correct params', async () => {
+    test('when the update is direct, creates an entry in the studyUpdates table, calls CPMS and redirects back to study details page with the correct params', async () => {
       prismaMock.studyUpdates.create.mockResolvedValueOnce(
         mockStudyUpdateResponse as Prisma.StudyUpdatesGetPayload<undefined>
       )
-      mockedPutAxios.mockResolvedValueOnce({ data: mockCPMSResponse })
+      mockedPutAxios.mockResolvedValueOnce({ data: mockUpdateCPMSResponse })
+      mockedPostAxios.mockResolvedValueOnce({ data: getMockValidateStudyResponse(StudyUpdateRoute.Direct) })
 
       const response = await testHandler(api, { method: 'POST', body })
 
       expect(response.statusCode).toBe(302)
-      expect(response._getRedirectUrl()).toBe(`/studies/${body.studyId}?success=2`)
+      expect(response._getRedirectUrl()).toBe(`/studies/${body.studyId}?success=3`)
+
+      expect(mockedPostAxios).toHaveBeenCalledTimes(1)
+      expect(mockedPostAxios).toHaveBeenCalledWith(
+        `${mockedEnvVars.apiUrl}/studies/${body.cpmsId}/engagement-info/validate`,
+        JSON.stringify(mockCPMSUpdateInput),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            username: mockedEnvVars.apiUsername,
+            password: mockedEnvVars.apiPassword,
+          },
+        }
+      )
 
       expect(prismaMock.studyUpdates.create).toHaveBeenCalledTimes(1)
       expect(prismaMock.studyUpdates.create).toHaveBeenCalledWith({
-        data: mockStudyUpdateInput,
+        data: getMockStudyUpdateInput(true),
       })
 
       expect(mockedPutAxios).toHaveBeenCalledTimes(1)
@@ -222,6 +298,7 @@ describe('/api/forms/editStudy', () => {
         mockStudyUpdateResponse as Prisma.StudyUpdatesGetPayload<undefined>
       )
       mockedPutAxios.mockRejectedValueOnce(new Error())
+      mockedPostAxios.mockResolvedValueOnce({ data: getMockValidateStudyResponse(StudyUpdateRoute.Direct) })
       const response = await testHandler(api, { method: 'POST', body })
 
       expect(response.statusCode).toBe(302)
@@ -234,7 +311,9 @@ describe('/api/forms/editStudy', () => {
       prismaMock.studyUpdates.create.mockResolvedValueOnce(
         mockStudyUpdateResponse as Prisma.StudyUpdatesGetPayload<undefined>
       )
-      mockedPutAxios.mockResolvedValueOnce({ data: { ...mockCPMSResponse, StatusCode: 500 } })
+      mockedPutAxios.mockResolvedValueOnce({ data: { ...mockUpdateCPMSResponse, StatusCode: 500 } })
+      mockedPostAxios.mockResolvedValueOnce({ data: getMockValidateStudyResponse(StudyUpdateRoute.Direct) })
+
       const response = await testHandler(api, { method: 'POST', body })
 
       expect(response.statusCode).toBe(302)
