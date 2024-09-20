@@ -333,7 +333,6 @@ describe('Study', () => {
       const aboutHeaders = within(aboutStudyTable).getAllByRole('rowheader')
       expect(aboutHeaders.map((header) => header.textContent)).toEqual([
         'Study full title',
-        'Protocol reference number',
         'IRAS ID',
         'CPMS ID',
         'Sponsor',
@@ -343,13 +342,12 @@ describe('Study', () => {
 
       const aboutRows = within(aboutStudyTable).getAllByRole('row')
       expect(aboutRows.map((row) => within(row).getByRole('cell').textContent)).toEqual([
-        mockStudy.title,
-        mockStudy.protocolReferenceNumber,
-        mockStudy.irasId,
-        `${mockStudy.cpmsId}`,
+        mockCPMSStudy.Title,
+        mockCPMSStudy.IrasId.toString(),
+        mockCPMSStudy.StudyId.toString(),
         mockStudy.organisations[0].organisation.name,
-        mockStudy.managingSpeciality,
-        `${mockStudy.chiefInvestigatorFirstName} ${mockStudy.chiefInvestigatorLastName}`,
+        mockCPMSStudy.ManagingSpecialty,
+        `${mockCPMSStudy.ChiefInvestigatorFirstName} ${mockCPMSStudy.ChiefInvestigatorLastName}`,
       ])
 
       // Support

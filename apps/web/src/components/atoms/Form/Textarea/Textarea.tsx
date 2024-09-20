@@ -16,10 +16,24 @@ interface TextareaProps {
   errors: FieldErrors
   defaultValue: string | undefined
   remainingCharacters?: number
+  maxLength?: number
 }
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ label, labelSize = 's', errors, hint, remainingCharacters, defaultValue, required = true, ...rest }, ref) => {
+  (
+    {
+      label,
+      labelSize = 's',
+      errors,
+      hint,
+      remainingCharacters,
+      defaultValue,
+      required = true,
+      maxLength = TEXTAREA_MAX_CHARACTERS,
+      ...rest
+    },
+    ref
+  ) => {
     const error = errors[rest.name]
 
     return (
@@ -51,7 +65,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           })}
           defaultValue={defaultValue}
           id={rest.name}
-          maxLength={TEXTAREA_MAX_CHARACTERS}
+          maxLength={maxLength}
           {...rest}
           ref={ref}
           rows={5}
