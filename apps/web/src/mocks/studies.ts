@@ -134,6 +134,16 @@ export const mockCPMSStudy = Mock.of<Study>({
   ],
 })
 
+export const mockCPMSUpdateInput = {
+  StudyStatus: mockCPMSStudy.StudyStatus,
+  SampleSize: mockCPMSStudy.SampleSize,
+  PlannedOpeningDate: new Date(mockCPMSStudy.PlannedOpeningDate as string).toISOString(),
+  ActualOpeningDate: new Date(mockCPMSStudy.ActualOpeningDate as string).toISOString(),
+  PlannedClosureToRecruitmentDate: new Date(mockCPMSStudy.PlannedClosureToRecruitmentDate as string).toISOString(),
+  ActualClosureToRecruitmentDate: new Date(mockCPMSStudy.ActualClosureToRecruitmentDate as string).toISOString(),
+  EstimatedReopeningDate: new Date(mockCPMSStudy.EstimatedReopeningDate as string).toISOString(),
+}
+
 export const mappedCPMSStudyEvals = [
   {
     id: 43343,

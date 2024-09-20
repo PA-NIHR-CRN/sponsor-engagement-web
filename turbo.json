@@ -35,7 +35,8 @@
         "NEXT_PUBLIC_ODP_DASHBOARD_LINK",
         "CPMS_API_URL",
         "CPMS_API_USERNAME",
-        "CPMS_API_PASSWORD"
+        "CPMS_API_PASSWORD",
+        "ENABLE_DIRECT_STUDY_UPDATES"
       ]
     },
     "start": {},
@@ -78,7 +79,8 @@
         "NEXT_PUBLIC_ODP_DASHBOARD_LINK",
         "CPMS_API_URL",
         "CPMS_API_USERNAME",
-        "CPMS_API_PASSWORD"
+        "CPMS_API_PASSWORD",
+        "ENABLE_DIRECT_STUDY_UPDATES"
       ]
     },
     "test:ci": {
@@ -119,7 +121,8 @@
         "NEXT_PUBLIC_ODP_DASHBOARD_LINK",
         "CPMS_API_URL",
         "CPMS_API_USERNAME",
-        "CPMS_API_PASSWORD"
+        "CPMS_API_PASSWORD",
+        "ENABLE_DIRECT_STUDY_UPDATES"
       ]
     },
     "db:generate": { "cache": false },
