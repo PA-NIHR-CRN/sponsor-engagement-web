@@ -1,11 +1,11 @@
 import { Table } from '@nihr-ui/frontend'
 
 import type { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
-import type { getStudyById } from '@/lib/studies'
+import type { getStudyById, updateStudy } from '@/lib/studies'
 
 export interface StudyDetailsProps {
-  study: NonNullable<Awaited<ReturnType<typeof getStudyById>>['data']>
-  studyInCPMS: NonNullable<Awaited<ReturnType<typeof getStudyByIdFromCPMS>>['study']>
+  study: NonNullable<Awaited<ReturnType<typeof getStudyById | typeof updateStudy>>['data']>
+  studyInCPMS: Awaited<ReturnType<typeof getStudyByIdFromCPMS>>['study']
 }
 
 function normalizeStudyData(study: StudyDetailsProps['study'], studyInCPMS: StudyDetailsProps['studyInCPMS']) {
@@ -31,7 +31,7 @@ function normalizeStudyData(study: StudyDetailsProps['study'], studyInCPMS: Stud
     ChiefInvestigatorFirstName: cpmsCIFirstName,
     ChiefInvestigatorLastName: cpmsCILastName,
     StudyRoute: cpmsRoute,
-  } = studyInCPMS
+  } = studyInCPMS ?? {}
 
   let chiefInvestigator = 'None available'
 

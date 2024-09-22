@@ -295,54 +295,42 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
   }
   const { study: studyInCPMS } = await getStudyByIdFromCPMS(Number(cpmsId))
 
-  if (!studyInCPMS) {
-    return {
-      redirect: {
-        destination: '/500',
-      },
-    }
-  }
+  if (studyInCPMS) {
+    const { data: updatedStudy } = await updateStudy(Number(cpmsId), mapCPMSStudyToSEStudy(studyInCPMS))
 
-  const { data: study } = await updateStudy(Number(cpmsId), mapCPMSStudyToSEStudy(studyInCPMS))
+    // If update to study fails, do not update study evals.
+    if (updatedStudy) {
+      const studyEvalsInCPMS = studyInCPMS.StudyEvaluationCategories
+      const currentStudyEvalsInSE = updatedStudy.evaluationCategories
 
-  if (!study) {
-    return {
-      redirect: {
-        destination: '/500',
-      },
-    }
-  }
+      // Soft delete evaluations in SE that are no longer returned from CPMS
+      const studyEvalIdsToDelete = currentStudyEvalsInSE
+        .filter(
+          (seEval) =>
+            !studyEvalsInCPMS.some(({ EvaluationCategoryValue }) => EvaluationCategoryValue === seEval.indicatorValue)
+        )
+        .map(({ id }) => id)
 
-  const studyEvalsInCPMS = studyInCPMS.StudyEvaluationCategories
-  const currentStudyEvalsInSE = study.evaluationCategories
+      const mappedStudyEvalsInCPMS = studyEvalsInCPMS.map((studyEval) => mapCPMSStudyEvalToSEEval(studyEval))
+      const { data: updatedStudyEvals } = await updateEvaluationCategories(
+        seStudyRecord.data.id,
+        mappedStudyEvalsInCPMS,
+        studyEvalIdsToDelete
+      )
 
-  // Soft delete evaluations in SE that are no longer returned from CPMS
-  const studyEvalIdsToDelete = currentStudyEvalsInSE
-    .filter(
-      (seEval) =>
-        !studyEvalsInCPMS.some(({ EvaluationCategoryValue }) => EvaluationCategoryValue === seEval.indicatorValue)
-    )
-    .map(({ id }) => id)
-
-  const mappedStudyEvalsInCPMS = studyEvalsInCPMS.map((studyEval) => mapCPMSStudyEvalToSEEval(studyEval))
-  const { data: updatedStudyEvals } = await updateEvaluationCategories(
-    seStudyRecord.data.id,
-    mappedStudyEvalsInCPMS,
-    studyEvalIdsToDelete
-  )
-
-  if (!updatedStudyEvals) {
-    return {
-      redirect: {
-        destination: '/500',
-      },
+      return {
+        props: {
+          user: session.user,
+          study: { ...updatedStudy, evaluationCategories: updatedStudyEvals ?? mappedStudyEvalsInCPMS },
+        },
+      }
     }
   }
 
   return {
     props: {
       user: session.user,
-      study: { ...study, evaluationCategories: updatedStudyEvals },
+      study: seStudyRecord.data,
     },
   }
 })

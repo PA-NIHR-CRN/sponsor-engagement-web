@@ -218,14 +218,6 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
 
   const { study: studyInCPMS } = await getStudyByIdFromCPMS(study.cpmsId)
 
-  if (!studyInCPMS) {
-    return {
-      redirect: {
-        destination: '/500',
-      },
-    }
-  }
-
   return {
     props: {
       query: context.query,
