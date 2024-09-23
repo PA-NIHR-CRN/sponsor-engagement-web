@@ -23,8 +23,10 @@ import {
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
 import {
   getStudyById,
+  mapCPMSStatusToFormStatus,
   mapCPMSStudyEvalToSEEval,
   mapCPMSStudyToSEStudy,
+  mapFormStatusToCPMSStatus,
   updateEvaluationCategories,
   updateStudy,
 } from '@/lib/studies'
@@ -90,22 +92,38 @@ export default function EditStudy({ study }: EditStudyProps) {
 
             <Fieldset>
               {/* Status */}
-              <RadioGroup
-                defaultValue={defaultValues?.status}
-                errors={{}}
-                hint="Changes to the study status will be committed to CPMS after manual review."
-                label="Study status"
-                labelSize="m"
-                {...register('status', {
-                  setValueAs: (value) => {
-                    if (value !== null) return value
-                  },
-                })}
-              >
-                {studyStatuses.map((status) => (
-                  <Radio hint={status.description} key={status.id} label={status.name} value={status.value} />
-                ))}
-              </RadioGroup>
+              <Controller
+                control={control}
+                name="status"
+                render={({ field }) => {
+                  const { name, onChange, value, ref } = field
+
+                  const mappedSEStatusValue = mapCPMSStatusToFormStatus(value)
+
+                  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                    if (e.target.defaultValue) {
+                      const mappedStatus = mapFormStatusToCPMSStatus(e.target.defaultValue)
+                      onChange(mappedStatus)
+                    }
+                  }
+                  return (
+                    <RadioGroup
+                      defaultValue={mappedSEStatusValue}
+                      errors={{}}
+                      hint="Changes to the study status will be committed to CPMS after manual review."
+                      label="Study status"
+                      labelSize="m"
+                      name={name}
+                      onChange={handleOnChange}
+                      ref={ref}
+                    >
+                      {studyStatuses.map((status) => (
+                        <Radio hint={status.description} key={status.id} label={status.name} value={status.value} />
+                      ))}
+                    </RadioGroup>
+                  )
+                }}
+              />
 
               {/* Planned opening to recruitment date */}
               <Controller

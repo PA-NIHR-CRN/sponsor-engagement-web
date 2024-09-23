@@ -87,6 +87,6 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
     const searchParams = new URLSearchParams({ fatal: '1' })
     const studyId = req.body.studyId
 
-    return res.redirect(302, `/editStudy/${studyId}?${searchParams.toString()}`)
+    return res.redirect(302, `/studies/${studyId}/edit?${searchParams.toString()}`)
   }
 })
