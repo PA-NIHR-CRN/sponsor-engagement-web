@@ -1,4 +1,5 @@
 import type { Study, StudyEvaluationCategory } from '@/@types/studies'
+import { FormStudyStatus } from '@/constants/editStudyForm'
 import { getErrorMessage } from '@/utils/error'
 
 import type { OrderType } from '../@types/filters'
@@ -266,7 +267,7 @@ export const getStudiesForExport = async (organisationIds: number[]) => {
 
 export type UpdateStudyInput = Prisma.StudyUpdateInput
 
-export const mapCPMSStatusToSEStatus = (cpmsStatus: string): string => {
+export const mapCPMSStatusToFormStatus = (cpmsStatus: string): string => {
   const statusMap: Record<string, string> = {
     'Pre-Setup': 'In setup',
     'In Setup': 'In setup',
@@ -286,10 +287,23 @@ export const mapCPMSStatusToSEStatus = (cpmsStatus: string): string => {
   return statusMap[cpmsStatus] || cpmsStatus
 }
 
+export const mapFormStatusToCPMSStatus = (status: string): string => {
+  const statusMap = {
+    [FormStudyStatus.InSetup]: 'In Setup',
+    [FormStudyStatus.Closed]: 'Closed to Recruitment, Follow Up Complete',
+    [FormStudyStatus.ClosedFollowUp]: 'Closed to Recruitment, In Follow Up',
+    [FormStudyStatus.OpenToRecruitment]: 'Open to Recruitment',
+    [FormStudyStatus.Suspended]: 'Suspended (from Open to Recruitment)',
+    [FormStudyStatus.Withdrawn]: 'Withdrawn During Setup',
+  }
+
+  return statusMap[status] || status
+}
+
 export const mapCPMSStudyToSEStudy = (study: Study): UpdateStudyInput => ({
   cpmsId: study.StudyId,
   shortTitle: study.StudyShortName,
-  studyStatus: mapCPMSStatusToSEStatus(study.StudyStatus),
+  studyStatus: study.StudyStatus,
   route: study.StudyRoute,
   sampleSize: study.SampleSize,
   totalRecruitmentToDate: study.TotalRecruitmentToDate,
