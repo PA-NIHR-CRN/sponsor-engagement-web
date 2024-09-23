@@ -60,7 +60,7 @@ const normaliseStudyData = (study: StudyProps['study'], studyInCPMS: StudyProps[
           study.evaluationCategories.map((evalCategory) => evalCategory.indicatorValue),
           study.evaluationCategories[0].expectedReopenDate,
         ]
-      : [undefined]
+      : [undefined, undefined]
   return {
     shortTitle: studyInCPMS?.StudyShortName || study.shortTitle,
     studyStatus: studyInCPMS?.StudyStatus || study.studyStatus,
