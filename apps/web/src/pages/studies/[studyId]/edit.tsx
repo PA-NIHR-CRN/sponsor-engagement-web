@@ -3,10 +3,11 @@ import { Container } from '@nihr-ui/frontend'
 import clsx from 'clsx'
 import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
-import { type ReactElement } from 'react'
+import { type ReactElement, useCallback } from 'react'
+import type { FieldError } from 'react-hook-form'
 import { Controller, useForm } from 'react-hook-form'
 
-import { Fieldset, Form, Radio, RadioGroup } from '@/components/atoms'
+import { ErrorSummary, Fieldset, Form, Radio, RadioGroup } from '@/components/atoms'
 import { DateInput } from '@/components/atoms/Form/DateInput/DateInput'
 import { Textarea } from '@/components/atoms/Form/Textarea/Textarea'
 import { TextInput } from '@/components/atoms/Form/TextInput/TextInput'
@@ -20,6 +21,7 @@ import {
   PAGE_TITLE,
   studyStatuses,
 } from '@/constants/editStudyForm'
+import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
 import {
   getStudyById,
@@ -38,7 +40,7 @@ import { withServerSideProps } from '@/utils/withServerSideProps'
 export type EditStudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
 export default function EditStudy({ study }: EditStudyProps) {
-  const { register, formState, handleSubmit, control, watch } = useForm<EditStudyInputs>({
+  const { register, formState, handleSubmit, control, watch, setError } = useForm<EditStudyInputs>({
     resolver: zodResolver(studySchema),
     defaultValues: {
       ...mapStudyToStudyFormInput(study),
@@ -57,6 +59,19 @@ export default function EditStudy({ study }: EditStudyProps) {
     furtherInformationText.length >= FURTHER_INFO_MAX_CHARACTERS
       ? 0
       : FURTHER_INFO_MAX_CHARACTERS - furtherInformationText.length
+
+  const handleFoundError = useCallback(
+    (field: keyof EditStudyInputs, error: FieldError) => {
+      setError(field, error)
+    },
+    [setError]
+  )
+
+  const { errors } = useFormErrorHydration<EditStudyInputs>({
+    schema: studySchema,
+    formState,
+    onFoundError: handleFoundError,
+  })
 
   return (
     <Container>
@@ -83,11 +98,15 @@ export default function EditStudy({ study }: EditStudyProps) {
             action="/api/forms/editStudy"
             handleSubmit={handleSubmit}
             method="post"
-            onError={(error) => {
-              //TODO: Temporary until validation and error states are implemented
-              console.log('error', error)
+            onError={(message: string) => {
+              setError('root.serverError', {
+                type: '400',
+                message,
+              })
             }}
           >
+            <ErrorSummary errors={errors} />
+
             <input type="hidden" {...register('cpmsId')} defaultValue={defaultValues?.cpmsId} />
 
             <Fieldset>
