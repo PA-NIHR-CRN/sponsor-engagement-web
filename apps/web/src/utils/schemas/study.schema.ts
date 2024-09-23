@@ -9,13 +9,13 @@ const dateSchema = z.object({
 export const studySchema = z.object({
   studyId: z.number(),
   cpmsId: z.string(),
-  status: z.string().optional(),
+  status: z.string(),
   plannedOpeningDate: dateSchema.optional(),
   actualOpeningDate: dateSchema.optional(),
   plannedClosureDate: dateSchema.optional(),
   actualClosureDate: dateSchema.optional(),
   estimatedReopeningDate: dateSchema.optional(),
-  recruitmentTarget: z.number().optional(),
+  recruitmentTarget: z.string().optional(),
   furtherInformation: z.string().optional(),
 })
 

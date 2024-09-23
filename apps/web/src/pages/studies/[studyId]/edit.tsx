@@ -13,8 +13,13 @@ import { TextInput } from '@/components/atoms/Form/TextInput/TextInput'
 import Warning from '@/components/atoms/Warning/Warning'
 import { RequestSupport } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
-import { Roles } from '@/constants'
-import { GENERIC_STUDIES_GUIDANCE_TEXT, PAGE_TITLE, studyStatuses } from '@/constants/editStudyForm'
+import { EDIT_STUDY_ROLE, Roles } from '@/constants'
+import {
+  FURTHER_INFO_MAX_CHARACTERS,
+  GENERIC_STUDIES_GUIDANCE_TEXT,
+  PAGE_TITLE,
+  studyStatuses,
+} from '@/constants/editStudyForm'
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
 import {
   getStudyById,
@@ -31,7 +36,7 @@ import { withServerSideProps } from '@/utils/withServerSideProps'
 export type EditStudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
 export default function EditStudy({ study }: EditStudyProps) {
-  const { register, formState, handleSubmit, control } = useForm<EditStudyInputs>({
+  const { register, formState, handleSubmit, control, watch } = useForm<EditStudyInputs>({
     resolver: zodResolver(studySchema),
     defaultValues: {
       ...mapStudyToStudyFormInput(study),
@@ -43,6 +48,13 @@ export default function EditStudy({ study }: EditStudyProps) {
   const supportOrgName = organisationsByRole.CRO ?? organisationsByRole.CTU ?? organisationsByRole.Sponsor
 
   const { defaultValues } = formState
+
+  // Watch & update the character count for the "Further information" textarea
+  const furtherInformationText = watch('furtherInformation') ?? ''
+  const remainingCharacters =
+    furtherInformationText.length >= FURTHER_INFO_MAX_CHARACTERS
+      ? 0
+      : FURTHER_INFO_MAX_CHARACTERS - furtherInformationText.length
 
   return (
     <Container>
@@ -89,7 +101,6 @@ export default function EditStudy({ study }: EditStudyProps) {
                     if (value !== null) return value
                   },
                 })}
-                disabled
               >
                 {studyStatuses.map((status) => (
                   <Radio hint={status.description} key={status.id} label={status.name} value={status.value} />
@@ -125,7 +136,6 @@ export default function EditStudy({ study }: EditStudyProps) {
 
                   return (
                     <DateInput
-                      disabled
                       errors={{}}
                       label="Actual opening to recruitment date"
                       name={name}
@@ -146,7 +156,6 @@ export default function EditStudy({ study }: EditStudyProps) {
 
                   return (
                     <DateInput
-                      disabled
                       errors={{}}
                       label="Planned closure to recruitment date"
                       name={name}
@@ -167,7 +176,6 @@ export default function EditStudy({ study }: EditStudyProps) {
 
                   return (
                     <DateInput
-                      disabled
                       errors={{}}
                       label="Actual closure to recruitment date"
                       name={name}
@@ -188,7 +196,6 @@ export default function EditStudy({ study }: EditStudyProps) {
 
                   return (
                     <DateInput
-                      disabled
                       errors={{}}
                       label="Estimated reopening date"
                       name={name}
@@ -203,7 +210,6 @@ export default function EditStudy({ study }: EditStudyProps) {
               {/* UK recruitment target */}
               <TextInput
                 defaultValue={defaultValues?.recruitmentTarget}
-                disabled
                 errors={{}}
                 hint="Changes to the UK recruitment target will be committed to CPMS after manual review. "
                 inputClassName="govuk-input--width-10"
@@ -216,13 +222,13 @@ export default function EditStudy({ study }: EditStudyProps) {
               {/* Further information */}
               <Textarea
                 defaultValue={defaultValues?.furtherInformation}
-                disabled
                 errors={{}}
                 hint="If needed, provide further context or justification for changes made above."
                 label="Further information"
                 labelSize="m"
-                remainingCharacters={0} // TODO: Add functionality in validation & error ticket
+                remainingCharacters={remainingCharacters}
                 {...register('furtherInformation')}
+                maxLength={FURTHER_INFO_MAX_CHARACTERS}
               />
 
               <Warning>
@@ -258,6 +264,16 @@ EditStudy.getLayout = function getLayout(page: ReactElement, { user }: EditStudy
 }
 
 export const getServerSideProps = withServerSideProps(Roles.SponsorContact, async (context, session) => {
+  const canEditStudy = Boolean(session.user?.groups.includes(EDIT_STUDY_ROLE))
+
+  if (!canEditStudy) {
+    return {
+      redirect: {
+        destination: '/404',
+      },
+    }
+  }
+
   const seStudyRecord = await getStudyById(Number(context.query.studyId))
 
   if (!seStudyRecord.data) {

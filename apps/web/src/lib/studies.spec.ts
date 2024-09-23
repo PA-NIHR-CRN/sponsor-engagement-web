@@ -588,10 +588,10 @@ describe('mapCPMSStudyToSEStudy', () => {
     route: mockCPMSStudy.StudyRoute,
     sampleSize: mockCPMSStudy.SampleSize,
     totalRecruitmentToDate: mockCPMSStudy.TotalRecruitmentToDate,
-    plannedOpeningDate: new Date(mockCPMSStudy.PlannedOpeningDate),
-    plannedClosureDate: new Date(mockCPMSStudy.PlannedClosureToRecruitmentDate),
-    actualOpeningDate: new Date(mockCPMSStudy.ActualOpeningDate),
-    actualClosureDate: new Date(mockCPMSStudy.ActualClosureToRecruitmentDate),
+    plannedOpeningDate: new Date(mockCPMSStudy.PlannedOpeningDate as string),
+    plannedClosureDate: new Date(mockCPMSStudy.PlannedClosureToRecruitmentDate as string),
+    actualOpeningDate: new Date(mockCPMSStudy.ActualOpeningDate as string),
+    actualClosureDate: new Date(mockCPMSStudy.ActualClosureToRecruitmentDate as string),
     estimatedReopeningDate: new Date(mockCPMSStudy.EstimatedReopeningDate as string),
   }
 

@@ -333,7 +333,6 @@ describe('Study', () => {
       const aboutHeaders = within(aboutStudyTable).getAllByRole('rowheader')
       expect(aboutHeaders.map((header) => header.textContent)).toEqual([
         'Study full title',
-        'Protocol reference number',
         'IRAS ID',
         'CPMS ID',
         'Sponsor',
@@ -343,13 +342,12 @@ describe('Study', () => {
 
       const aboutRows = within(aboutStudyTable).getAllByRole('row')
       expect(aboutRows.map((row) => within(row).getByRole('cell').textContent)).toEqual([
-        mockStudy.title,
-        mockStudy.protocolReferenceNumber,
-        mockStudy.irasId,
-        `${mockStudy.cpmsId}`,
+        mockCPMSStudy.Title,
+        mockCPMSStudy.IrasId.toString(),
+        mockCPMSStudy.StudyId.toString(),
         mockStudy.organisations[0].organisation.name,
-        mockStudy.managingSpeciality,
-        `${mockStudy.chiefInvestigatorFirstName} ${mockStudy.chiefInvestigatorLastName}`,
+        mockCPMSStudy.ManagingSpecialty,
+        `${mockCPMSStudy.ChiefInvestigatorFirstName} ${mockCPMSStudy.ChiefInvestigatorLastName}`,
       ])
 
       // Support
@@ -417,23 +415,6 @@ describe('Study', () => {
       expect(rowHeader).toBeInTheDocument()
       expect(rowHeader.nextSibling).toHaveTextContent('-')
     })
-
-    test('Success banner shows after redirection from the assessment form', async () => {
-      await renderPage(undefined, '?success=1')
-
-      // Title
-      expect(
-        screen.getByRole('heading', { level: 2, name: `Study short title: ${mockCPMSStudy.StudyShortName}` })
-      ).toBeInTheDocument()
-
-      // Banner
-      const banner = screen.getByRole('alert', { name: 'Success' })
-      expect(within(banner).getByText('The study assessment was successfully saved')).toBeInTheDocument()
-      expect(within(banner).getByRole('link', { name: 'NIHR RDN support' })).toHaveAttribute('href', SUPPORT_PAGE)
-      expect(within(banner).getByRole('link', { name: 'NIHR RDN support' }).parentElement).toHaveTextContent(
-        'Request NIHR RDN support for this study.'
-      )
-    })
   })
 
   describe('Sponsor assessment history accordion', () => {
@@ -500,5 +481,34 @@ describe('Study', () => {
 
       expect(screen.getByText('Testing some further information')).toBeInTheDocument()
     })
+  })
+
+  describe('Success banner', () => {
+    test.each([
+      ['1', 'The study assessment was successfully saved'],
+      [
+        '2',
+        'Your study data changes have been received. These will now be reviewed by the appropriate team and applied to the study in due course. Until then, previous study data values will be displayed here.',
+      ],
+      [
+        '3',
+        'Your study data changes have been applied. All changes have been accepted by CPMS and do not require any manual review.',
+      ],
+    ])(
+      'should show the correct success message when success type is %s',
+      async (successType: string, successMessage: string) => {
+        await renderPage(undefined, `?success=${successType}`)
+
+        const banner = screen.getByRole('alert', { name: 'Success' })
+        expect(within(banner).getByText(successMessage)).toBeInTheDocument()
+
+        if (successType === '1') {
+          expect(within(banner).getByRole('link', { name: 'NIHR RDN support' })).toHaveAttribute('href', SUPPORT_PAGE)
+          expect(within(banner).getByRole('link', { name: 'NIHR RDN support' }).parentElement).toHaveTextContent(
+            'Request NIHR RDN support for this study.'
+          )
+        }
+      }
+    )
   })
 })

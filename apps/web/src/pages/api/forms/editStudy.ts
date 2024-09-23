@@ -1,10 +1,10 @@
-import assert from 'node:assert'
-
-import axios from 'axios'
+import type { Prisma } from 'database'
 import type { NextApiRequest } from 'next'
 
-import type { CPMSStudyResponse } from '@/@types/studies'
-import { Roles } from '@/constants'
+import { StudyUpdateRoute } from '@/@types/studies'
+import { Roles, StudyUpdateType } from '@/constants'
+import { mapEditStudyInputToCPMSStudy, updateStudyInCPMS, validateStudyUpdate } from '@/lib/cpms/studies'
+import { prismaClient } from '@/lib/prisma'
 import { constructDateObjFromParts } from '@/utils/date'
 import type { EditStudyInputs } from '@/utils/schemas'
 import { studySchema } from '@/utils/schemas'
@@ -14,51 +14,75 @@ export interface ExtendedNextApiRequest extends NextApiRequest {
   body: EditStudyInputs
 }
 
-export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, async (req, res) => {
-  const { CPMS_API_URL, CPMS_API_USERNAME, CPMS_API_PASSWORD } = process.env
+export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, async (req, res, session) => {
+  const { ENABLE_DIRECT_STUDY_UPDATES } = process.env
+
+  const enableDirectStudyUpdatesFeature = ENABLE_DIRECT_STUDY_UPDATES?.toLowerCase() === 'true'
 
   try {
-    assert(CPMS_API_URL)
-    assert(CPMS_API_USERNAME)
-    assert(CPMS_API_PASSWORD)
+    const studyData = studySchema.parse(req.body)
+    const cpmsStudyInput = mapEditStudyInputToCPMSStudy(studyData)
 
-    const {
-      studyId,
-      cpmsId,
-      plannedClosureDate,
-      plannedOpeningDate,
-      actualClosureDate,
-      actualOpeningDate,
-      estimatedReopeningDate,
-      ...studyData
-    } = studySchema.parse(req.body)
+    const { validationResult, error: validateStudyError } = await validateStudyUpdate(
+      Number(studyData.cpmsId),
+      cpmsStudyInput
+    )
 
-    const body = JSON.stringify({
-      ...studyData,
-      ...(plannedOpeningDate && { PlannedOpeningDate: constructDateObjFromParts(plannedOpeningDate) }),
-      ...(actualOpeningDate && { ActualOpeningDate: constructDateObjFromParts(actualOpeningDate) }),
-      ...(plannedClosureDate && { PlannedClosureToRecruitmentDate: constructDateObjFromParts(plannedClosureDate) }),
-      ...(actualClosureDate && { ActualClosureToRecruitmentDate: constructDateObjFromParts(actualClosureDate) }),
-      ...(estimatedReopeningDate && {
-        EstimatedReopeningDate: constructDateObjFromParts(estimatedReopeningDate),
-      }),
-    })
-
-    const requestUrl = `${CPMS_API_URL}/studies/${cpmsId}/engagement-info`
-
-    const { data } = await axios.put<CPMSStudyResponse>(requestUrl, body, {
-      headers: {
-        username: CPMS_API_USERNAME,
-        password: CPMS_API_PASSWORD,
-        'Content-Type': 'application/json',
-      },
-    })
-
-    if (data.StatusCode !== 200) {
-      throw new Error('An error occured fetching study from CPMS')
+    if (!validationResult) {
+      throw new Error(validateStudyError)
     }
 
-    return res.redirect(302, `/studies/${studyId}?success=2`)
+    // When feature flag is enabled, we use the response from the validate endpoint to determine the update type
+    // Otherwise, we override this so we do not send any updates to CPMS
+    const isDirectUpdate = enableDirectStudyUpdatesFeature
+      ? validationResult.StudyUpdateRoute === StudyUpdateRoute.Direct
+      : false
+
+    const formattedPlannedOpeningDate = constructDateObjFromParts(studyData.plannedOpeningDate)
+    const formattedActualOpeningDate = constructDateObjFromParts(studyData.actualOpeningDate)
+    const formattedPlannedClosureDate = constructDateObjFromParts(studyData.plannedClosureDate)
+    const formattedActualClosureDate = constructDateObjFromParts(studyData.actualClosureDate)
+    const formattedEstimatedReopeningDate = constructDateObjFromParts(studyData.estimatedReopeningDate)
+
+    const studyUpdate: Prisma.StudyUpdatesCreateInput = {
+      studyStatus: studyData.status,
+      plannedOpeningDate: formattedPlannedOpeningDate,
+      actualOpeningDate: formattedActualOpeningDate,
+      plannedClosureToRecruitmentDate: formattedPlannedClosureDate,
+      actualClosureToRecruitmentDate: formattedActualClosureDate,
+      estimatedReopeningDate: formattedEstimatedReopeningDate,
+      ukRecruitmentTarget: studyData.recruitmentTarget ? Number(studyData.recruitmentTarget) : undefined,
+      comment: studyData.furtherInformation,
+      study: {
+        connect: {
+          id: studyData.studyId,
+        },
+      },
+      studyUpdateType: {
+        connect: { id: isDirectUpdate ? StudyUpdateType.Direct : StudyUpdateType.Proposed },
+      },
+      createdBy: {
+        connect: { id: session.user.id },
+      },
+      modifiedBy: {
+        connect: { id: session.user.id },
+      },
+    }
+
+    // Both proposed and direct changes are saved to SE
+    await prismaClient.studyUpdates.create({
+      data: studyUpdate,
+    })
+
+    if (isDirectUpdate) {
+      const { study, error: updateStudyError } = await updateStudyInCPMS(Number(studyData.cpmsId), cpmsStudyInput)
+
+      if (!study) {
+        throw new Error(updateStudyError)
+      }
+    }
+
+    return res.redirect(302, `/studies/${studyData.studyId}?success=${isDirectUpdate ? 3 : 2}`)
   } catch (e) {
     const searchParams = new URLSearchParams({ fatal: '1' })
     const studyId = req.body.studyId

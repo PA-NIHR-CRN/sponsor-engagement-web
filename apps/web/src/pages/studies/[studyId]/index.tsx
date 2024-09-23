@@ -8,6 +8,7 @@ import type { ReactElement } from 'react'
 import { AssessmentHistory, getAssessmentHistoryFromStudy, RequestSupport, StudyDetails } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
 import { EDIT_STUDY_ROLE, Roles } from '@/constants'
+import { FORM_SUCCESS_MESSAGES } from '@/constants/forms'
 import { ASSESSMENT_PAGE, STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/routes'
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
 import {
@@ -20,14 +21,18 @@ import {
 import { formatDate } from '@/utils/date'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
-const renderNotificationBanner = (success: boolean) =>
-  success ? (
-    <NotificationBanner heading="The study assessment was successfully saved" success>
-      Request{' '}
-      <Link className="govuk-notification-banner__link" href={SUPPORT_PAGE}>
-        NIHR RDN support
-      </Link>{' '}
-      for this study.
+const renderNotificationBanner = (success: string | undefined, showRequestSupportLink: boolean) =>
+  success || !Number.isNaN(Number(success)) ? (
+    <NotificationBanner heading={FORM_SUCCESS_MESSAGES[Number(success)]} success>
+      {showRequestSupportLink ? (
+        <>
+          Request{' '}
+          <Link className="govuk-notification-banner__link" href={SUPPORT_PAGE}>
+            NIHR RDN support
+          </Link>{' '}
+          for this study.
+        </>
+      ) : null}
     </NotificationBanner>
   ) : null
 
@@ -45,6 +50,7 @@ export type StudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
 export default function Study({ user, study, studyInCPMS, assessments }: StudyProps) {
   const router = useRouter()
+  const successType = router.query.success as string
   const { organisationsByRole } = study
 
   const supportOrgName = organisationsByRole.CRO ?? organisationsByRole.CTU
@@ -56,7 +62,7 @@ export default function Study({ user, study, studyInCPMS, assessments }: StudyPr
       <NextSeo title={`Study Progress Review - ${studyInCPMS.StudyShortName}`} />
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
-          {renderNotificationBanner(Boolean(router.query.success))}
+          {renderNotificationBanner(successType, successType === '1')}
 
           <h2 className="govuk-heading-l govuk-!-margin-bottom-1">
             <span className="govuk-visually-hidden">Study short title: </span>
@@ -181,7 +187,7 @@ export default function Study({ user, study, studyInCPMS, assessments }: StudyPr
 
           {/* About this study */}
           <h3 className="govuk-heading-m govuk-!-margin-bottom-3">About this study</h3>
-          <StudyDetails study={study} />
+          <StudyDetails study={study} studyInCPMS={studyInCPMS} />
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
           <RequestSupport showCallToAction sticky />

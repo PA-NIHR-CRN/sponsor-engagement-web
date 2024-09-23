@@ -2,6 +2,7 @@ import React from 'react'
 import { Mock } from 'ts-mockery'
 
 import { render, screen, within } from '@/config/TestUtils'
+import { mockCPMSStudy } from '@/mocks/studies'
 
 import type { StudyDetailsProps } from './StudyDetails'
 import { StudyDetails } from './StudyDetails'
@@ -23,6 +24,7 @@ describe('StudyDetails Component', () => {
       chiefInvestigatorFirstName: 'John',
       chiefInvestigatorLastName: 'Doe',
     },
+    studyInCPMS: mockCPMSStudy,
   })
 
   test('renders study details with default props', () => {
@@ -45,14 +47,14 @@ describe('StudyDetails Component', () => {
 
     const aboutRows = within(table).getAllByRole('row')
     expect(aboutRows.map((row) => within(row).getByRole('cell').textContent)).toEqual([
-      'Study Title',
-      'IRAS456',
-      '12345',
+      mockCPMSStudy.Title,
+      mockCPMSStudy.IrasId.toString(),
+      mockCPMSStudy.StudyId.toString(),
       'Sponsor Org',
       'CTU Org',
       'CRO Org',
-      'Specialty Name',
-      'John Doe',
+      mockCPMSStudy.ManagingSpecialty,
+      `${mockCPMSStudy.ChiefInvestigatorFirstName} ${mockCPMSStudy.ChiefInvestigatorLastName}`,
     ])
   })
 
@@ -71,6 +73,7 @@ describe('StudyDetails Component', () => {
         chiefInvestigatorFirstName: null,
         chiefInvestigatorLastName: null,
       },
+      studyInCPMS: {},
     })
 
     render(<StudyDetails {...props} />)
@@ -115,6 +118,7 @@ describe('StudyDetails Component', () => {
         chiefInvestigatorFirstName: null,
         chiefInvestigatorLastName: null,
       },
+      studyInCPMS: {},
     })
 
     render(<StudyDetails {...props} />)
@@ -154,6 +158,7 @@ describe('StudyDetails Component', () => {
           CRO: 'CRO Org',
         },
       },
+      studyInCPMS: {},
     })
 
     render(<StudyDetails {...props} />)

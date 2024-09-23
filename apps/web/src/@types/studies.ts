@@ -1,23 +1,48 @@
+import type { OrganisationRoleShortName } from '@/lib/organisations'
+
 export interface CPMSStudyResponse {
   Version: string
   StatusCode: number
   Result: Study
 }
 
+export enum StudyUpdateRoute {
+  Direct = 'Direct',
+  Proposed = 'Proposed',
+}
+
+export interface CPMSValidationResult {
+  StudyUpdateRoute: StudyUpdateRoute
+}
+
+export interface CPMSValidateStudyResponse {
+  Version: string
+  StatusCode: number
+  Result: CPMSValidationResult
+}
+
 export interface Study {
+  Title: string
   StudyId: number
   StudyRoute: string
   StudyShortName: string
   StudyStatus: string
   SampleSize: number | null
-  PlannedOpeningDate: string
-  ActualOpeningDate: string
-  PlannedClosureToRecruitmentDate: string
-  ActualClosureToRecruitmentDate: string
+  PlannedOpeningDate: string | null
+  ActualOpeningDate: string | null
+  PlannedClosureToRecruitmentDate: string | null
+  ActualClosureToRecruitmentDate: string | null
   EstimatedReopeningDate: string | null
   TotalRecruitmentToDate: number | null
   UkRecruitmentTargetToDate: number | null
   StudyEvaluationCategories: StudyEvaluationCategory[]
+  ProtocolReferenceNumber: number
+  IrasId: number
+  ManagingSpecialty: string
+  ChiefInvestigatorFirstName: string
+  ChiefInvestigatorLastName: string
+  StudySponsors: StudySponsor[]
+  organisationsByRole?: Partial<Record<OrganisationRoleShortName, string>>
 }
 
 export enum StudyRecordStatus {
@@ -66,7 +91,7 @@ export interface StudySponsor {
 }
 
 export enum StudySponsorOrganisationRole {
-  ClinicalResearchSponsor = 'Clinical Research Sponsor ',
+  ClinicalResearchSponsor = 'Clinical Research Sponsor',
   ContractResearchOrganisation = 'Contract Research Organisation',
   ManagingClinicalTrialsUnit = 'Managing Clinical Trials Unit',
 }

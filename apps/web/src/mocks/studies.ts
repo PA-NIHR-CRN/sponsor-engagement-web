@@ -2,7 +2,12 @@ import { simpleFaker } from '@faker-js/faker'
 import type { Prisma } from 'database'
 import { Mock } from 'ts-mockery'
 
-import type { Study } from '@/@types/studies'
+import type { CPMSValidationResult, Study } from '@/@types/studies'
+import {
+  StudySponsorOrganisationRole,
+  StudySponsorOrganisationRoleRTSIdentifier,
+  StudyUpdateRoute,
+} from '@/@types/studies'
 import type { StudyForExport } from '@/lib/studies'
 
 export const mockStudiesForExport = Array.from({ length: 3 }).map((_, index) =>
@@ -81,11 +86,17 @@ export const mockStudiesForExport = Array.from({ length: 3 }).map((_, index) =>
   })
 )
 
+export const mockCPMSValidationResult = Mock.of<CPMSValidationResult>({
+  StudyUpdateRoute: StudyUpdateRoute.Direct,
+})
+
 export const mockCPMSStudy = Mock.of<Study>({
   StudyId: 622,
+  IrasId: 1212,
   StudyShortName: 'BS06',
   StudyStatus: 'Suspended',
   StudyRoute: 'Non-commercial',
+  ProtocolReferenceNumber: 8282,
   PlannedOpeningDate: '2003-02-28T00:00:00',
   PlannedClosureToRecruitmentDate: '2003-02-28T00:00:00',
   ActualOpeningDate: '1991-09-01T00:00:00',
@@ -94,6 +105,10 @@ export const mockCPMSStudy = Mock.of<Study>({
   TotalRecruitmentToDate: 683,
   SampleSize: 121,
   UkRecruitmentTargetToDate: 121,
+  Title: 'A PHASE 2B',
+  ManagingSpecialty: 'Musculoskeletal Disorders',
+  ChiefInvestigatorFirstName: 'John',
+  ChiefInvestigatorLastName: 'Smith',
   StudyEvaluationCategories: [
     {
       EvaluationCategoryType: 'Recruitment concerns',
@@ -118,7 +133,25 @@ export const mockCPMSStudy = Mock.of<Study>({
       ExpectedReopenDate: null,
     },
   ],
+  StudySponsors: [
+    {
+      OrganisationName: 'Pfizer Inc.',
+      OrganisationRole: StudySponsorOrganisationRole.ClinicalResearchSponsor,
+      OrganisationRTSIdentifier: '69033 NY@1.2.840.1',
+      OrganisationRoleRTSIdentifier: StudySponsorOrganisationRoleRTSIdentifier.ClinicalResearchSponsor,
+    },
+  ],
 })
+
+export const mockCPMSUpdateInput = {
+  StudyStatus: mockCPMSStudy.StudyStatus,
+  SampleSize: mockCPMSStudy.SampleSize,
+  PlannedOpeningDate: new Date(mockCPMSStudy.PlannedOpeningDate as string).toISOString(),
+  ActualOpeningDate: new Date(mockCPMSStudy.ActualOpeningDate as string).toISOString(),
+  PlannedClosureToRecruitmentDate: new Date(mockCPMSStudy.PlannedClosureToRecruitmentDate as string).toISOString(),
+  ActualClosureToRecruitmentDate: new Date(mockCPMSStudy.ActualClosureToRecruitmentDate as string).toISOString(),
+  EstimatedReopeningDate: new Date(mockCPMSStudy.EstimatedReopeningDate as string).toISOString(),
+}
 
 export const mappedCPMSStudyEvals = [
   {
