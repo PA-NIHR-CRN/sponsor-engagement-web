@@ -90,7 +90,12 @@ test.describe('Update study data page - @se_166 @wip', () => {
       await studyUpdatePage.assertStudyStatusSection()
     })
     await test.step(`And I can choose from the following status options`, async () => {
-      // TODO: add ability to select radio buttons when enabled
+      await studyUpdatePage.statusRadioInSetup.click()
+      await studyUpdatePage.statusRadioOpenRec.click()
+      await studyUpdatePage.statusRadioClosedInFollow.click()
+      await studyUpdatePage.statusRadioClosed.click()
+      await studyUpdatePage.statusRadioWithdrawn.click()
+      await studyUpdatePage.statusRadioSuspended.click()
     })
   })
 
@@ -102,7 +107,10 @@ test.describe('Update study data page - @se_166 @wip', () => {
       await studyUpdatePage.assertStudyDateSelections(getStudyResponse.StudyRoute)
     })
     await test.step(`And I can update the following date options`, async () => {
-      // TODO: add ability to select dates when enabled
+      await studyUpdatePage.fillStudyDates(0)
+      await studyUpdatePage.fillStudyDates(1)
+      await studyUpdatePage.fillStudyDates(2)
+      await studyUpdatePage.fillStudyDates(3)
     })
   })
 
@@ -114,7 +122,7 @@ test.describe('Update study data page - @se_166 @wip', () => {
       await studyUpdatePage.assertRecruitmentTargetInput()
     })
     await test.step(`And I can update the study recruitment target figure`, async () => {
-      // TODO: add ability to change figure when enabled
+      await studyUpdatePage.ukRecruitmentTarget.fill('123')
     })
   })
 
@@ -126,7 +134,7 @@ test.describe('Update study data page - @se_166 @wip', () => {
       await studyUpdatePage.assertFurtherInfoInput()
     })
     await test.step(`And I can update the study further information text`, async () => {
-      // TODO: add ability to change text when enabled
+      await studyUpdatePage.furtherInfo.fill('This is my lovely test text')
     })
   })
 

@@ -30,6 +30,19 @@ export function convertIsoDateToDisplayDate(inputDate: Date): string {
   return day + ' ' + month + ' ' + year
 }
 
+export function convertIsoDateToDisplayDateV2(inputDate: Date): string {
+  if (!inputDate) {
+    return '-'
+  }
+
+  const dateObj = new Date(inputDate)
+  const day = dateObj.getDate()
+  const month = dateObj.toLocaleString('default', { month: 'long' })
+  const year = dateObj.getFullYear()
+
+  return `${day} ${month} ${year}`
+}
+
 export function convertIsoDateToDisplayTime(inputDateTime: Date): string {
   const hour = String(inputDateTime.getHours()).padStart(2, '0')
   const minutes = String(inputDateTime.getMinutes()).padStart(2, '0')

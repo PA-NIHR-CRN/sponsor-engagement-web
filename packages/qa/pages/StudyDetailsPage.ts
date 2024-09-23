@@ -1,5 +1,9 @@
 import { expect, Locator, Page } from '@playwright/test'
-import { confirmStringNotNull, convertIsoDateToDisplayDate } from '../utils/UtilFunctions'
+import {
+  confirmStringNotNull,
+  convertIsoDateToDisplayDate,
+  convertIsoDateToDisplayDateV2,
+} from '../utils/UtilFunctions'
 import { RowDataPacket } from 'mysql2'
 
 //Declare Page Objects
@@ -424,10 +428,10 @@ export default class StudyDetailsPage {
     expect(expectedDataIndicators).toHaveLength(0)
   }
 
-  async checkStudyHasNullValues(expectedValues: RowDataPacket[]) {
-    expect(expectedValues[0].actualOpeningDate).toBeNull()
-    expect(expectedValues[0].actualClosureDate).toBeNull()
-    expect(expectedValues[0].sampleSize).toBeNull()
+  async checkStudyHasNullValues(actualOpen: string, actualClose: string, sample: string) {
+    expect(actualOpen).toBeNull()
+    expect(actualClose).toBeNull()
+    expect(sample).toBeNull()
   }
 
   async assertStudyStatusSuspended(expectedStatus: string) {
@@ -559,5 +563,101 @@ export default class StudyDetailsPage {
       await expect(this.dueIndicator).toBeHidden()
       await expect(this.dueIndicatorSupportingText).toBeHidden()
     }
+  }
+
+  // new getStudyInCpms methods
+
+  async assertStudyShortTitleV2(expectedShortTitle: string) {
+    await expect(this.pageTitle).toBeVisible()
+    await expect(this.pageTitle).toHaveText(`Study short title: ${expectedShortTitle}`)
+  }
+
+  async assertStudySponsorSubTitleV2(studySponsors: any) {
+    const findSelectedObject = (sponsors: any[]) => {
+      const cro = sponsors.find((sponsor) => sponsor.OrganisationRole === 'Contract Research Organisation')
+      const ctu = sponsors.find((sponsor) => sponsor.OrganisationRole === 'Managing Clinical Trials Unit')
+      const sponsor = sponsors.find((sponsor) => sponsor.OrganisationRole === 'Clinical Research Sponsor ')
+
+      if (cro) {
+        return `${sponsor.OrganisationName} (${cro.OrganisationName})`
+      } else if (ctu) {
+        return `${sponsor.OrganisationName} (${ctu.OrganisationName})`
+      } else if (sponsor) {
+        return sponsor.OrganisationName
+      }
+    }
+
+    const expectedSponsor = findSelectedObject(studySponsors)
+
+    await expect(this.sponsorOrgSubTitle).toBeVisible()
+    await expect(this.sponsorOrgSubTitle).toHaveText(`Study sponsor: ${expectedSponsor}`)
+  }
+
+  async assertDataIndicatorsV2(expectedDataIndicators: any) {
+    const extractDataIndicators = (indicators: any[]) => {
+      if (indicators && indicators.length > 0) {
+        // extracting the 'EvaluationCategoryValue' from each object and joining them with commas
+        const categoryValues = indicators.map((indicator) => indicator.EvaluationCategoryValue).join(', ')
+        return categoryValues
+      }
+      // else return default
+      return 'This study is progressing as planned'
+    }
+
+    const expectedSponsor = extractDataIndicators(expectedDataIndicators)
+    await expect(this.tableDataIndicatesValue).toBeVisible()
+    await expect(this.tableDataIndicatesValue).toHaveText(expectedSponsor)
+  }
+
+  async assertPlannedOpeningDateV2(date: Date) {
+    const expectedDate = convertIsoDateToDisplayDateV2(date)
+    await expect(this.tablePlannedOpeningDateHeader).toBeVisible()
+    await expect(this.tablePlannedOpeningDateValue).toBeVisible()
+    await expect(this.tablePlannedOpeningDateValue).toHaveText(expectedDate)
+  }
+
+  async assertActualOpeningDateV2(date: Date) {
+    const expectedDate = convertIsoDateToDisplayDateV2(date)
+    await expect(this.tableActualOpeningDateHeader).toBeVisible()
+    await expect(this.tableActualOpeningDateValue).toBeVisible()
+    await expect(this.tableActualOpeningDateValue).toHaveText(expectedDate)
+  }
+
+  async assertPlannedClosureDateV2(date: Date) {
+    const expectedDate = convertIsoDateToDisplayDateV2(date)
+    await expect(this.tablePlannedClosureDateHeader).toBeVisible()
+    await expect(this.tablePlannedClosureDateValue).toBeVisible()
+    await expect(this.tablePlannedClosureDateValue).toHaveText(expectedDate)
+  }
+
+  async assertActualClosureDateV2(date: Date) {
+    const expectedDate = convertIsoDateToDisplayDateV2(date)
+    await expect(this.tableActualClosureDateHeader).toBeVisible()
+    await expect(this.tableActualClosureDateValue).toBeVisible()
+    await expect(this.tableActualClosureDateValue).toHaveText(expectedDate)
+  }
+
+  async assertEstimatedReopenDateV2(date: Date) {
+    const expectedDate = convertIsoDateToDisplayDateV2(date)
+    await expect(this.tableEstimatedReopenDateHeader).toBeVisible()
+    await expect(this.tableEstimatedReopenDateValue).toBeVisible()
+    await expect(this.tableEstimatedReopenDateValue).toHaveText(expectedDate)
+  }
+
+  async assertStudySponsorV2(studySponsor: any) {
+    const findSelectedObject = (sponsors: any[]) => {
+      const sponsor = sponsors.find((sponsor) => sponsor.OrganisationRole === 'Clinical Research Sponsor ')
+
+      if (sponsor) {
+        return sponsor.OrganisationName
+      } else {
+        return '-'
+      }
+    }
+
+    const expectedSponsor = findSelectedObject(studySponsor)
+
+    await expect(this.tableSponsorValue).toBeVisible()
+    await expect(this.tableSponsorValue).toHaveText(expectedSponsor)
   }
 }
