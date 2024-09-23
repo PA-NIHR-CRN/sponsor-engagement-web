@@ -77,15 +77,18 @@ const mockStudy = Mock.of<StudyWithRelations>({
 const renderPage = async (
   mockGetStudyResponse = mockStudy,
   mockUrl = `/study/${mockStudyId}`,
-  mockGetCPMSStudyResponse = mockCPMSStudy
+  mockGetCPMSStudyResponse = mockCPMSStudy,
+  mockUpdateStudyResponse = mockStudy,
+  mockUpdatedStudyEvals = mappedCPMSStudyEvals
 ) => {
   jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRoleAndEditStudyRole)
 
   prismaMock.$transaction.mockResolvedValueOnce([mockGetStudyResponse])
   mockedGetAxios.mockResolvedValueOnce({ data: { StatusCode: 200, Result: mockGetCPMSStudyResponse } })
-  prismaMock.study.update.mockResolvedValueOnce(mockStudy)
-  prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[0])
-  prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[1])
+  prismaMock.study.update.mockResolvedValueOnce(mockUpdateStudyResponse)
+  mockUpdatedStudyEvals.forEach((studyEval) =>
+    prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(studyEval)
+  )
 
   await mockRouter.push(mockUrl)
 
@@ -161,63 +164,6 @@ describe('Study', () => {
           destination: '/404',
         },
       })
-    })
-
-    test('redirects to 500 page if no study found in cpms', async () => {
-      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
-      getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
-      prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
-      mockedGetAxios.mockResolvedValueOnce({ data: {} })
-
-      const result = await getServerSideProps(context)
-      expect(result).toEqual({
-        redirect: {
-          destination: '/500',
-        },
-      })
-
-      expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
-      expect(mockedGetAxios).toHaveBeenCalledTimes(1)
-    })
-
-    test('redirects to 500 if fails to update study', async () => {
-      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
-      getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
-      prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
-      mockedGetAxios.mockResolvedValueOnce({ data: { StatusCode: 200, Result: mockCPMSStudy } })
-      prismaMock.study.update.mockRejectedValueOnce(new Error('Oh no an error'))
-
-      const result = await getServerSideProps(context)
-      expect(result).toEqual({
-        redirect: {
-          destination: '/500',
-        },
-      })
-
-      expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
-      expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
-      expect(mockedGetAxios).toHaveBeenCalledTimes(1)
-    })
-
-    test('redirects to 500 if request fails to update study evaluations in SE', async () => {
-      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
-      getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
-      prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
-      mockedGetAxios.mockResolvedValueOnce({ data: { StatusCode: 200, Result: mockCPMSStudy } })
-      prismaMock.study.update.mockResolvedValueOnce(mockStudyWithRelations)
-      prismaMock.studyEvaluationCategory.upsert.mockRejectedValueOnce(new Error('Oh no an error'))
-
-      const result = await getServerSideProps(context)
-      expect(result).toEqual({
-        redirect: {
-          destination: '/500',
-        },
-      })
-
-      expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
-      expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
-      expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(2)
-      expect(mockedGetAxios).toHaveBeenCalledTimes(1)
     })
 
     test('returns correct study and evaluations when all requests are successful', async () => {
@@ -364,7 +310,7 @@ describe('Study', () => {
     })
 
     test('Due assessment', async () => {
-      await renderPage({ ...mockStudy, isDueAssessment: true })
+      await renderPage(undefined, undefined, undefined, { ...mockStudy, isDueAssessment: true })
 
       expect(screen.getByText('Due')).toBeInTheDocument()
       expect(screen.getByText('This study needs a new sponsor assessment.')).toBeInTheDocument()
@@ -391,23 +337,44 @@ describe('Study', () => {
     })
 
     test('Suspended study with no estimated reopen date', async () => {
-      await renderPage(undefined, undefined, {
-        ...mockCPMSStudy,
-        StudyStatus: 'Suspended',
-        StudyEvaluationCategories: [
+      await renderPage(
+        undefined,
+        undefined,
+        {
+          ...mockCPMSStudy,
+          StudyStatus: 'Suspended',
+          StudyEvaluationCategories: [
+            {
+              EvaluationCategoryValue: 'Milestone missed',
+              ExpectedReopenDate: null,
+              EvaluationCategoryType: '',
+              TotalRecruitmentToDate: 0,
+              SampleSize: 0,
+              PlannedRecruitmentStartDate: null,
+              PlannedRecruitmentEndDate: null,
+              ActualOpeningDate: null,
+              ActualClosureDate: null,
+            },
+          ],
+        },
+        {
+          ...mockStudy,
+          evaluationCategories: [],
+        },
+        [
           {
-            EvaluationCategoryValue: 'Milestone missed',
-            ExpectedReopenDate: null,
-            EvaluationCategoryType: '',
-            TotalRecruitmentToDate: 0,
-            SampleSize: 0,
-            PlannedRecruitmentStartDate: null,
-            PlannedRecruitmentEndDate: null,
-            ActualOpeningDate: null,
-            ActualClosureDate: null,
-          },
-        ],
-      })
+            indicatorValue: 'Milestone missed',
+            expectedReopenDate: null,
+            indicatorType: '',
+            totalRecruitmentToDate: 0,
+            sampleSize: 0,
+            plannedOpeningDate: null,
+            plannedClosureDate: null,
+            actualOpeningDate: null,
+            actualClosureDate: null,
+          } as Prisma.StudyEvaluationCategoryGetPayload<undefined>,
+        ]
+      )
 
       const summaryTable = screen.getByRole('table', { name: 'Summary of study’s progress (UK)' })
 

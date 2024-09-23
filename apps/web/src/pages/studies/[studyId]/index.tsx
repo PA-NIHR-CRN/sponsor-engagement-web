@@ -45,23 +45,28 @@ const renderBackLink = () => (
 export type StudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
 const normaliseStudyData = (study: StudyProps['study'], studyInCPMS: StudyProps['studyInCPMS']) => {
-  const cpmsStudyEvalCategories =
+  const [cpmsStudyEvalCategories, cpmsExpectedReopenDate] =
     studyInCPMS?.StudyEvaluationCategories && studyInCPMS.StudyEvaluationCategories.length > 0
-      ? studyInCPMS.StudyEvaluationCategories.map((evalCategory) => evalCategory.EvaluationCategoryValue)
-      : undefined
+      ? [
+          studyInCPMS.StudyEvaluationCategories.map((evalCategory) => evalCategory.EvaluationCategoryValue),
+          studyInCPMS.StudyEvaluationCategories[0].ExpectedReopenDate,
+        ]
+      : [undefined, undefined]
 
-  const seStudyEvalCategories =
+  const [seStudyEvalCategories, seExpectedReopenDate] =
     study.evaluationCategories.length > 0
-      ? // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- both types include this value
-        study.evaluationCategories.map((evalCategory) => evalCategory.indicatorValue)
-      : undefined
+      ? [
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- both types include this value
+          study.evaluationCategories.map((evalCategory) => evalCategory.indicatorValue),
+          study.evaluationCategories[0].expectedReopenDate,
+        ]
+      : [undefined]
   return {
     shortTitle: studyInCPMS?.StudyShortName || study.shortTitle,
     studyStatus: studyInCPMS?.StudyStatus || study.studyStatus,
     studyRoute: studyInCPMS?.StudyRoute || study.route,
     evaluationCategoryValues: cpmsStudyEvalCategories ?? seStudyEvalCategories ?? [],
-    expectedReopeningDate:
-      studyInCPMS?.StudyEvaluationCategories[0]?.ExpectedReopenDate ?? study.evaluationCategories[0].expectedReopenDate,
+    expectedReopeningDate: cpmsExpectedReopenDate ?? seExpectedReopenDate,
     plannedOpeningDate: studyInCPMS?.PlannedOpeningDate ?? study.plannedOpeningDate,
     actualOpeningDate: studyInCPMS?.ActualOpeningDate ?? study.actualOpeningDate,
     actualClosureDate: studyInCPMS?.ActualClosureToRecruitmentDate ?? study.actualClosureDate,

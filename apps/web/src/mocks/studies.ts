@@ -144,7 +144,7 @@ export const mockCPMSUpdateInput = {
   EstimatedReopeningDate: new Date(mockCPMSStudy.EstimatedReopeningDate as string).toISOString(),
 }
 
-export const mappedCPMSStudyEvals = [
+export const mappedCPMSStudyEvals: Prisma.StudyEvaluationCategoryGetPayload<undefined>[] = [
   {
     id: 43343,
     studyId: mockCPMSStudy.StudyId,
