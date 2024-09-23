@@ -96,7 +96,7 @@ export default function EditStudy({ study }: EditStudyProps) {
                 control={control}
                 name="status"
                 render={({ field }) => {
-                  const { name, onChange, value } = field
+                  const { name, onChange, value, ref } = field
 
                   const mappedSEStatusValue = mapCPMSStatusToFormStatus(value)
 
@@ -115,6 +115,7 @@ export default function EditStudy({ study }: EditStudyProps) {
                       labelSize="m"
                       name={name}
                       onChange={handleOnChange}
+                      ref={ref}
                     >
                       {studyStatuses.map((status) => (
                         <Radio hint={status.description} key={status.id} label={status.name} value={status.value} />
