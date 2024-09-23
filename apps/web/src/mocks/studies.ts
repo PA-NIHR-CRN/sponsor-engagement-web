@@ -120,8 +120,8 @@ export const mockCPMSStudy = Mock.of<Study>({
       PlannedRecruitmentStartDate: '2018-03-01T00:00:00',
       PlannedRecruitmentEndDate: '2025-03-31T00:00:00',
       ActualOpeningDate: '2018-03-01T00:00:00',
-      ActualClosureDate: null,
-      ExpectedReopenDate: null,
+      ActualClosureDate: '2003-02-28T00:00:00',
+      ExpectedReopenDate: '2003-02-28T00:00:00',
     },
   ],
   StudySponsors: [

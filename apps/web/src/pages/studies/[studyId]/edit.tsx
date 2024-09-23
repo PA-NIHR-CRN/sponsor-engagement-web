@@ -295,42 +295,49 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
   }
   const { study: studyInCPMS } = await getStudyByIdFromCPMS(Number(cpmsId))
 
-  if (studyInCPMS) {
-    const { data: updatedStudy } = await updateStudy(Number(cpmsId), mapCPMSStudyToSEStudy(studyInCPMS))
-
-    // If update to study fails, do not update study evals.
-    if (updatedStudy) {
-      const studyEvalsInCPMS = studyInCPMS.StudyEvaluationCategories
-      const currentStudyEvalsInSE = updatedStudy.evaluationCategories
-
-      // Soft delete evaluations in SE that are no longer returned from CPMS
-      const studyEvalIdsToDelete = currentStudyEvalsInSE
-        .filter(
-          (seEval) =>
-            !studyEvalsInCPMS.some(({ EvaluationCategoryValue }) => EvaluationCategoryValue === seEval.indicatorValue)
-        )
-        .map(({ id }) => id)
-
-      const mappedStudyEvalsInCPMS = studyEvalsInCPMS.map((studyEval) => mapCPMSStudyEvalToSEEval(studyEval))
-      const { data: updatedStudyEvals } = await updateEvaluationCategories(
-        seStudyRecord.data.id,
-        mappedStudyEvalsInCPMS,
-        studyEvalIdsToDelete
-      )
-
-      return {
-        props: {
-          user: session.user,
-          study: { ...updatedStudy, evaluationCategories: updatedStudyEvals ?? mappedStudyEvalsInCPMS },
-        },
-      }
+  if (!studyInCPMS) {
+    return {
+      props: {
+        user: session.user,
+        study: seStudyRecord.data,
+      },
     }
   }
+
+  const studyEvalsInCPMS = studyInCPMS.StudyEvaluationCategories
+  const mappedStudyEvalsInCPMS = studyEvalsInCPMS.map((studyEval) => mapCPMSStudyEvalToSEEval(studyEval))
+
+  const { data: updatedStudy } = await updateStudy(Number(cpmsId), mapCPMSStudyToSEStudy(studyInCPMS))
+
+  if (!updatedStudy) {
+    return {
+      props: {
+        user: session.user,
+        study: { ...seStudyRecord.data, evaluationCategories: mappedStudyEvalsInCPMS },
+      },
+    }
+  }
+
+  const currentStudyEvalsInSE = updatedStudy.evaluationCategories
+
+  // Soft delete evaluations in SE that are no longer returned from CPMS
+  const studyEvalIdsToDelete = currentStudyEvalsInSE
+    .filter(
+      (seEval) =>
+        !studyEvalsInCPMS.some(({ EvaluationCategoryValue }) => EvaluationCategoryValue === seEval.indicatorValue)
+    )
+    .map(({ id }) => id)
+
+  const { data: updatedStudyEvals } = await updateEvaluationCategories(
+    seStudyRecord.data.id,
+    mappedStudyEvalsInCPMS,
+    studyEvalIdsToDelete
+  )
 
   return {
     props: {
       user: session.user,
-      study: seStudyRecord.data,
+      study: { ...updatedStudy, evaluationCategories: updatedStudyEvals ?? mappedStudyEvalsInCPMS },
     },
   }
 })
