@@ -1,10 +1,12 @@
 import { Table } from '@nihr-ui/frontend'
+import type { Prisma } from '@prisma/client'
 
 import type { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
-import type { getStudyById, updateStudy } from '@/lib/studies'
+import type { getStudyById } from '@/lib/studies'
 
 export interface StudyDetailsProps {
-  study: NonNullable<Awaited<ReturnType<typeof getStudyById | typeof updateStudy>>['data']>
+  study: Prisma.StudyGetPayload<undefined> &
+    Pick<NonNullable<Awaited<ReturnType<typeof getStudyById>>['data']>, 'organisationsByRole'>
   studyInCPMS: Awaited<ReturnType<typeof getStudyByIdFromCPMS>>['study']
 }
 

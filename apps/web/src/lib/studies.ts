@@ -6,6 +6,20 @@ import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
 import { type OrganisationRoleShortName, organisationRoleShortName } from './organisations'
 import { Prisma, prismaClient } from './prisma'
 
+export type StudyEvalsWithoutGeneratedValues = Prisma.StudyEvaluationCategoryGetPayload<{
+  select: {
+    indicatorType: true
+    indicatorValue: true
+    sampleSize: true
+    totalRecruitmentToDate: true
+    plannedOpeningDate: true
+    plannedClosureDate: true
+    actualOpeningDate: true
+    actualClosureDate: true
+    expectedReopenDate: true
+  }
+}>
+
 const sortMap = {
   'due-assessment': { isDueAssessment: Prisma.SortOrder.desc },
   'last-assessment-asc': {

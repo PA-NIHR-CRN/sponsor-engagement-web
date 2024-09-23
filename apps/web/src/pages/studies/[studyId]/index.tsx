@@ -10,6 +10,7 @@ import { RootLayout } from '@/components/organisms'
 import { EDIT_STUDY_ROLE, Roles } from '@/constants'
 import { ASSESSMENT_PAGE, STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/routes'
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
+import type { StudyEvalsWithoutGeneratedValues } from '@/lib/studies'
 import {
   getStudyById,
   mapCPMSStudyEvalToSEEval,
@@ -43,6 +44,33 @@ const renderBackLink = () => (
 
 export type StudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
+const normaliseStudyData = (study: StudyProps['study'], studyInCPMS: StudyProps['studyInCPMS']) => {
+  const cpmsStudyEvalCategories =
+    studyInCPMS?.StudyEvaluationCategories && studyInCPMS.StudyEvaluationCategories.length > 0
+      ? studyInCPMS.StudyEvaluationCategories.map((evalCategory) => evalCategory.EvaluationCategoryValue)
+      : undefined
+
+  const seStudyEvalCategories =
+    study.evaluationCategories.length > 0
+      ? // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- both types include this value
+        study.evaluationCategories.map((evalCategory) => evalCategory.indicatorValue)
+      : undefined
+  return {
+    shortTitle: studyInCPMS?.StudyShortName || study.shortTitle,
+    studyStatus: studyInCPMS?.StudyStatus || study.studyStatus,
+    studyRoute: studyInCPMS?.StudyRoute || study.route,
+    evaluationCategoryValues: cpmsStudyEvalCategories ?? seStudyEvalCategories ?? [],
+    expectedReopeningDate:
+      studyInCPMS?.StudyEvaluationCategories[0]?.ExpectedReopenDate ?? study.evaluationCategories[0].expectedReopenDate,
+    plannedOpeningDate: studyInCPMS?.PlannedOpeningDate ?? study.plannedOpeningDate,
+    actualOpeningDate: studyInCPMS?.ActualOpeningDate ?? study.actualOpeningDate,
+    actualClosureDate: studyInCPMS?.ActualClosureToRecruitmentDate ?? study.actualClosureDate,
+    plannedClosureDate: studyInCPMS?.PlannedClosureToRecruitmentDate ?? study.plannedClosureDate,
+    sampleSize: studyInCPMS?.SampleSize ?? study.sampleSize,
+    totalRecruitmentToDate: studyInCPMS?.TotalRecruitmentToDate ?? study.totalRecruitmentToDate,
+  }
+}
+
 export default function Study({ user, study, studyInCPMS, assessments }: StudyProps) {
   const router = useRouter()
   const { organisationsByRole } = study
@@ -51,16 +79,18 @@ export default function Study({ user, study, studyInCPMS, assessments }: StudyPr
 
   const showEditStudyFeature = Boolean(user?.groups.includes(EDIT_STUDY_ROLE))
 
+  const normalisedStudyData = normaliseStudyData(study, studyInCPMS)
+
   return (
     <Container>
-      <NextSeo title={`Study Progress Review - ${studyInCPMS.StudyShortName}`} />
+      <NextSeo title={`Study Progress Review - ${normalisedStudyData.shortTitle}`} />
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
           {renderNotificationBanner(Boolean(router.query.success))}
 
           <h2 className="govuk-heading-l govuk-!-margin-bottom-1">
             <span className="govuk-visually-hidden">Study short title: </span>
-            {studyInCPMS.StudyShortName}
+            {normalisedStudyData.shortTitle}
           </h2>
 
           <span className="govuk-body-m mb-0 text-darkGrey">
@@ -106,72 +136,67 @@ export default function Study({ user, study, studyInCPMS, assessments }: StudyPr
             <Table.Body>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Study Status</Table.CellHeader>
-                <Table.Cell>{studyInCPMS.StudyStatus}</Table.Cell>
+                <Table.Cell>{normalisedStudyData.studyStatus}</Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Study data indicates</Table.CellHeader>
                 <Table.Cell>
-                  {studyInCPMS.StudyEvaluationCategories.length
-                    ? studyInCPMS.StudyEvaluationCategories.map(
-                        (evalCategory) => evalCategory.EvaluationCategoryValue
-                      ).join(', ')
+                  {normalisedStudyData.evaluationCategoryValues.length
+                    ? normalisedStudyData.evaluationCategoryValues.join(', ')
                     : 'This study is progressing as planned'}
                 </Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Planned opening date</Table.CellHeader>
                 <Table.Cell>
-                  {studyInCPMS.PlannedOpeningDate ? formatDate(studyInCPMS.PlannedOpeningDate) : '-'}
+                  {normalisedStudyData.plannedOpeningDate ? formatDate(normalisedStudyData.plannedOpeningDate) : '-'}
                 </Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Actual opening date</Table.CellHeader>
                 <Table.Cell>
-                  {studyInCPMS.ActualOpeningDate ? formatDate(studyInCPMS.ActualOpeningDate) : '-'}
+                  {normalisedStudyData.actualOpeningDate ? formatDate(normalisedStudyData.actualOpeningDate) : '-'}
                 </Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Planned closure to recruitment date</Table.CellHeader>
                 <Table.Cell>
-                  {studyInCPMS.PlannedClosureToRecruitmentDate
-                    ? formatDate(studyInCPMS.PlannedClosureToRecruitmentDate)
-                    : '-'}
+                  {normalisedStudyData.plannedClosureDate ? formatDate(normalisedStudyData.plannedClosureDate) : '-'}
                 </Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Actual closure to recruitment date</Table.CellHeader>
                 <Table.Cell>
-                  {studyInCPMS.ActualClosureToRecruitmentDate
-                    ? formatDate(studyInCPMS.ActualClosureToRecruitmentDate)
-                    : '-'}
+                  {normalisedStudyData.actualClosureDate ? formatDate(normalisedStudyData.actualClosureDate) : '-'}
                 </Table.Cell>
               </Table.Row>
-              {studyInCPMS.StudyStatus === 'Suspended' && Boolean(studyInCPMS.StudyEvaluationCategories.length) && (
-                <Table.Row>
-                  <Table.CellHeader className="w-1/3">Estimated reopening date</Table.CellHeader>
-                  <Table.Cell>
-                    {studyInCPMS.StudyEvaluationCategories[0]?.ExpectedReopenDate
-                      ? formatDate(studyInCPMS.StudyEvaluationCategories[0].ExpectedReopenDate)
-                      : '-'}
-                  </Table.Cell>
-                </Table.Row>
-              )}
+              {normalisedStudyData.studyStatus === 'Suspended' &&
+                Boolean(normalisedStudyData.evaluationCategoryValues.length) && (
+                  <Table.Row>
+                    <Table.CellHeader className="w-1/3">Estimated reopening date</Table.CellHeader>
+                    <Table.Cell>
+                      {normalisedStudyData.expectedReopeningDate
+                        ? formatDate(normalisedStudyData.expectedReopeningDate)
+                        : '-'}
+                    </Table.Cell>
+                  </Table.Row>
+                )}
 
               <Table.Row>
                 <Table.CellHeader className="w-1/3" data-testid="uk-recruitment-target-label">
-                  {studyInCPMS.StudyRoute === 'Commercial'
+                  {normalisedStudyData.studyRoute === 'Commercial'
                     ? 'UK recruitment target (excluding private sites)'
                     : 'UK recruitment target'}
                 </Table.CellHeader>
-                <Table.Cell>{studyInCPMS.SampleSize ?? '-'}</Table.Cell>
+                <Table.Cell>{normalisedStudyData.sampleSize ?? '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.CellHeader className="w-1/3" data-testid="total-uk-recruitment-label">
-                  {studyInCPMS.StudyRoute === 'Commercial'
+                  {normalisedStudyData.studyRoute === 'Commercial'
                     ? 'Total UK recruitment to date (excluding private sites)'
                     : 'Total UK recruitment to date'}
                 </Table.CellHeader>
-                <Table.Cell>{studyInCPMS.TotalRecruitmentToDate ?? '-'}</Table.Cell>
+                <Table.Cell>{normalisedStudyData.totalRecruitmentToDate ?? '-'}</Table.Cell>
               </Table.Row>
             </Table.Body>
           </Table>
@@ -224,47 +249,40 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
 
   const { study: studyInCPMS } = await getStudyByIdFromCPMS(study.cpmsId)
 
-  if (!studyInCPMS) {
-    return {
-      redirect: {
-        destination: '/500',
-      },
-    }
-  }
+  if (studyInCPMS) {
+    const { data: updatedStudy } = await updateStudy(study.cpmsId, mapCPMSStudyToSEStudy(studyInCPMS))
 
-  const { data: updatedStudy } = await updateStudy(study.cpmsId, mapCPMSStudyToSEStudy(studyInCPMS))
+    // If update to study fails, do not update study evals.
+    if (updatedStudy) {
+      const studyEvalsInCPMS = studyInCPMS.StudyEvaluationCategories
+      const currentStudyEvalsInSE = updatedStudy.evaluationCategories
 
-  if (!updatedStudy) {
-    return {
-      redirect: {
-        destination: '/500',
-      },
-    }
-  }
+      // Soft delete evaluations in SE that are no longer returned from CPMS
+      const studyEvalIdsToDelete = currentStudyEvalsInSE
+        .filter(
+          (seEval) =>
+            !studyEvalsInCPMS.some(({ EvaluationCategoryValue }) => EvaluationCategoryValue === seEval.indicatorValue)
+        )
+        .map(({ id }) => id)
 
-  const studyEvalsInCPMS = studyInCPMS.StudyEvaluationCategories
-  const currentStudyEvalsInSE = updatedStudy.evaluationCategories
+      const mappedStudyEvalsInCPMS: StudyEvalsWithoutGeneratedValues[] = studyEvalsInCPMS.map((studyEval) =>
+        mapCPMSStudyEvalToSEEval(studyEval)
+      )
 
-  // Soft delete evaluations in SE that are no longer returned from CPMS
-  const studyEvalIdsToDelete = currentStudyEvalsInSE
-    .filter(
-      (seEval) =>
-        !studyEvalsInCPMS.some(({ EvaluationCategoryValue }) => EvaluationCategoryValue === seEval.indicatorValue)
-    )
-    .map(({ id }) => id)
+      const { data: updatedStudyEvals } = await updateEvaluationCategories(
+        study.id,
+        mappedStudyEvalsInCPMS,
+        studyEvalIdsToDelete
+      )
 
-  const mappedStudyEvalsInCPMS = studyEvalsInCPMS.map((studyEval) => mapCPMSStudyEvalToSEEval(studyEval))
-  const { data: updatedStudyEvals } = await updateEvaluationCategories(
-    study.id,
-    mappedStudyEvalsInCPMS,
-    studyEvalIdsToDelete
-  )
-
-  if (!updatedStudyEvals) {
-    return {
-      redirect: {
-        destination: '/500',
-      },
+      return {
+        props: {
+          user: session.user,
+          assessments: getAssessmentHistoryFromStudy(study),
+          study: { ...updatedStudy, evaluationCategories: updatedStudyEvals ?? mappedStudyEvalsInCPMS },
+          studyInCPMS,
+        },
+      }
     }
   }
 
@@ -272,7 +290,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     props: {
       user: session.user,
       assessments: getAssessmentHistoryFromStudy(study),
-      study: { ...study, evaluationCategories: updatedStudyEvals },
+      study,
       studyInCPMS,
     },
   }

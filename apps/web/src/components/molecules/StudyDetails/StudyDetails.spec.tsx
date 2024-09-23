@@ -14,7 +14,6 @@ describe('StudyDetails Component', () => {
       protocolReferenceNumber: 'Protocol123',
       irasId: 'IRAS456',
       cpmsId: 12345,
-      organisations: [{ organisation: { name: 'Sponsor Org' } }],
       organisationsByRole: {
         Sponsor: 'Sponsor Org',
         CTU: 'CTU Org',
@@ -65,7 +64,6 @@ describe('StudyDetails Component', () => {
         protocolReferenceNumber: null,
         irasId: null,
         cpmsId: 12345,
-        organisations: [{ organisation: { name: 'Sponsor Org' } }],
         organisationsByRole: {
           Sponsor: 'Sponsor Org',
         },
@@ -109,7 +107,6 @@ describe('StudyDetails Component', () => {
         protocolReferenceNumber: '123',
         irasId: null,
         cpmsId: 12345,
-        organisations: [{ organisation: { name: 'Sponsor Org' } }],
         organisationsByRole: {
           Sponsor: 'Sponsor Org',
         },
