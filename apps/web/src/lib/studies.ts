@@ -279,7 +279,7 @@ export const mapCPMSStatusToFormStatus = (cpmsStatus: string): string => {
     'Closed to Recruitment': 'Closed',
     'Closed to Recruitment, In Follow Up': 'Closed, in follow up',
     'Closed to Recruitment, Follow Up Complete': 'Closed',
-    Suspended: 'Suspended',
+    'Suspended (from Open, With Recruitment)': 'Suspended',
     'Suspended (from Open to Recruitment)': 'Suspended',
     'Withdrawn in Pre-Setup': 'Withdrawn',
     'Withdrawn During Setup': 'Withdrawn',
@@ -294,7 +294,7 @@ export const mapFormStatusToCPMSStatus = (status: string): string => {
     [FormStudyStatus.Closed]: 'Closed to Recruitment, Follow Up Complete',
     [FormStudyStatus.ClosedFollowUp]: 'Closed to Recruitment, In Follow Up',
     [FormStudyStatus.OpenToRecruitment]: 'Open to Recruitment',
-    [FormStudyStatus.Suspended]: 'Suspended (from Open to Recruitment)',
+    [FormStudyStatus.Suspended]: 'Suspended (from Open, With Recruitment)',
     [FormStudyStatus.Withdrawn]: 'Withdrawn During Setup',
   }
 
