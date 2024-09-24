@@ -46,7 +46,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
     const formattedEstimatedReopeningDate = constructDateObjFromParts(studyData.estimatedReopeningDate)
 
     const studyUpdate: Prisma.StudyUpdatesCreateInput = {
-      ...(isDirectUpdate && { studyStatus: studyData.status }),
+      studyStatus: isDirectUpdate ? studyData.status : null,
       studyStatusGroup: mapCPMSStatusToFormStatus(studyData.status),
       plannedOpeningDate: formattedPlannedOpeningDate,
       actualOpeningDate: formattedActualOpeningDate,

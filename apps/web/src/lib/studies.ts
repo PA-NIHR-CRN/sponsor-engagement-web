@@ -280,6 +280,7 @@ export const mapCPMSStatusToFormStatus = (cpmsStatus: string): string => {
     'Closed to Recruitment, In Follow Up': 'Closed, in follow up',
     'Closed to Recruitment, Follow Up Complete': 'Closed',
     Suspended: 'Suspended',
+    'Suspended (from Open to Recruitment)': 'Suspended',
     'Withdrawn in Pre-Setup': 'Withdrawn',
     'Withdrawn During Setup': 'Withdrawn',
   }
