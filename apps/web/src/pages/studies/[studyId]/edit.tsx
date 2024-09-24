@@ -129,7 +129,6 @@ export default function EditStudy({ study }: EditStudyProps) {
                     <RadioGroup
                       defaultValue={mappedSEStatusValue}
                       errors={{}}
-                      hint="Changes to the study status will be committed to CPMS after manual review."
                       label="Study status"
                       labelSize="m"
                       name={name}
@@ -248,7 +247,6 @@ export default function EditStudy({ study }: EditStudyProps) {
               <TextInput
                 defaultValue={defaultValues?.recruitmentTarget}
                 errors={{}}
-                hint="Changes to the UK recruitment target will be committed to CPMS after manual review. "
                 inputClassName="govuk-input--width-10"
                 label="UK recruitment target"
                 labelSize="m"
