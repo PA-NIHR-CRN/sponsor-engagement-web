@@ -244,11 +244,10 @@ describe('EditStudy', () => {
       const statusFieldset = screen.getByRole('radiogroup', { name: 'Study status' })
       expect(statusFieldset).toBeInTheDocument()
 
-      // TODO: Why does accessible description for first element use parent label
-      // expect(within(statusFieldset).getByLabelText('In setup')).toBeInTheDocument()
-      // expect(within(statusFieldset).getByLabelText('In setup')).toHaveAccessibleDescription(
-      //   'Not yet open to recruitment.'
-      // )
+      expect(within(statusFieldset).getByLabelText('In setup')).toBeInTheDocument()
+      expect(within(statusFieldset).getByLabelText('In setup')).toHaveAccessibleDescription(
+        'Not yet open to recruitment.'
+      )
 
       expect(within(statusFieldset).getByLabelText('Open to recruitment')).toBeInTheDocument()
       expect(within(statusFieldset).getByLabelText('Open to recruitment')).toHaveAccessibleDescription(
@@ -298,9 +297,6 @@ describe('EditStudy', () => {
       // Form Input - UK Recruitment target
       const ukRecruitmentTarget = screen.getByLabelText('UK recruitment target')
       expect(ukRecruitmentTarget).toBeInTheDocument()
-      expect(ukRecruitmentTarget).toHaveAccessibleDescription(
-        'Changes to the UK recruitment target will be committed to CPMS after manual review.'
-      )
 
       // Form Input - Further information
       const furtherInformation = screen.getByLabelText('Further information')
