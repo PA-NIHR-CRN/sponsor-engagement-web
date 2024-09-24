@@ -100,7 +100,7 @@ const mockStudyUpdateResponse = {
 }
 
 const getMockStudyUpdateInput = (isDirect: boolean) => ({
-  ...(isDirect && { studyStatus: body.status }),
+  studyStatus: isDirect ? body.status : null,
   studyStatusGroup: mockStudyUpdateResponse.studyStatusGroup,
   plannedOpeningDate: mockStudyUpdateResponse.plannedOpeningDate,
   actualOpeningDate: mockStudyUpdateResponse.actualOpeningDate,
