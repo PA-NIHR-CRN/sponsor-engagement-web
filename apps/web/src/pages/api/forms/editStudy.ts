@@ -5,6 +5,7 @@ import { StudyUpdateRoute } from '@/@types/studies'
 import { Roles, StudyUpdateType } from '@/constants'
 import { mapEditStudyInputToCPMSStudy, updateStudyInCPMS, validateStudyUpdate } from '@/lib/cpms/studies'
 import { prismaClient } from '@/lib/prisma'
+import { mapCPMSStatusToFormStatus } from '@/lib/studies'
 import { constructDateObjFromParts } from '@/utils/date'
 import type { EditStudyInputs } from '@/utils/schemas'
 import { studySchema } from '@/utils/schemas'
@@ -45,7 +46,8 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
     const formattedEstimatedReopeningDate = constructDateObjFromParts(studyData.estimatedReopeningDate)
 
     const studyUpdate: Prisma.StudyUpdatesCreateInput = {
-      studyStatus: studyData.status,
+      ...(isDirectUpdate && { studyStatus: studyData.status }),
+      studyStatusGroup: mapCPMSStatusToFormStatus(studyData.status),
       plannedOpeningDate: formattedPlannedOpeningDate,
       actualOpeningDate: formattedActualOpeningDate,
       plannedClosureToRecruitmentDate: formattedPlannedClosureDate,

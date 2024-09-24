@@ -89,6 +89,7 @@ const mockStudyUpdateResponse = {
   id: 3232,
   studyId: mockStudyId,
   studyStatus: mockCPMSStudy.StudyStatus,
+  studyStatusGroup: 'Suspended',
   ukRecruitmentTarget: mockCPMSStudy.SampleSize,
   comment: '',
   plannedOpeningDate: new Date(mockCPMSStudy.PlannedOpeningDate as string),
@@ -99,7 +100,8 @@ const mockStudyUpdateResponse = {
 }
 
 const getMockStudyUpdateInput = (isDirect: boolean) => ({
-  studyStatus: body.status,
+  ...(isDirect && { studyStatus: body.status }),
+  studyStatusGroup: mockStudyUpdateResponse.studyStatusGroup,
   plannedOpeningDate: mockStudyUpdateResponse.plannedOpeningDate,
   actualOpeningDate: mockStudyUpdateResponse.actualOpeningDate,
   plannedClosureToRecruitmentDate: mockStudyUpdateResponse.plannedClosureToRecruitmentDate,

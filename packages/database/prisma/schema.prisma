@@ -213,7 +213,8 @@ model StudyUpdates {
   id                              Int                   @id @default(autoincrement())
   study                           Study                 @relation(fields: [studyId], references: [id])
   studyId                         Int
-  studyStatus                     String
+  studyStatus                     String?
+  studyStatusGroup                String
   plannedOpeningDate              DateTime?
   actualOpeningDate               DateTime?
   plannedClosureToRecruitmentDate DateTime?
