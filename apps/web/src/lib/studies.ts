@@ -288,17 +288,21 @@ export const mapCPMSStatusToFormStatus = (cpmsStatus: string): string => {
   return statusMap[cpmsStatus] || cpmsStatus
 }
 
-export const mapFormStatusToCPMSStatus = (status: string): string => {
+export const mapFormStatusToCPMSStatus = (newStatus: string, currentStatus: string): string => {
+  const isCurrentStatusOpenWithRecruitment = currentStatus === 'Open, With Recruitment'
+
   const statusMap = {
     [FormStudyStatus.InSetup]: 'In Setup',
     [FormStudyStatus.Closed]: 'Closed to Recruitment, Follow Up Complete',
     [FormStudyStatus.ClosedFollowUp]: 'Closed to Recruitment, In Follow Up',
     [FormStudyStatus.OpenToRecruitment]: 'Open to Recruitment',
-    [FormStudyStatus.Suspended]: 'Suspended (from Open, With Recruitment)',
+    [FormStudyStatus.Suspended]: isCurrentStatusOpenWithRecruitment
+      ? 'Suspended (from Open, With Recruitment)'
+      : 'Suspended (from Open to Recruitment)',
     [FormStudyStatus.Withdrawn]: 'Withdrawn During Setup',
   }
 
-  return statusMap[status] || status
+  return statusMap[newStatus] || newStatus
 }
 
 export const mapCPMSStudyToSEStudy = (study: Study): UpdateStudyInput => ({

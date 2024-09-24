@@ -102,7 +102,8 @@ export default function EditStudy({ study }: EditStudyProps) {
 
                   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                     if (e.target.defaultValue) {
-                      const mappedStatus = mapFormStatusToCPMSStatus(e.target.defaultValue)
+                      const originalStatus = study.studyStatus
+                      const mappedStatus = mapFormStatusToCPMSStatus(e.target.defaultValue, originalStatus)
                       onChange(mappedStatus)
                     }
                   }
