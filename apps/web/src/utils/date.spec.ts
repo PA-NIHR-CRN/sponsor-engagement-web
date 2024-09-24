@@ -38,6 +38,12 @@ describe('constructDateObjFromParts', () => {
     const result = constructDateObjFromParts(validDateParts)
     expect(result).toEqual(new Date('2021-02-15'))
   })
+
+  it.each(['year', 'month', 'day'])('should return undefined if %s is an empty string', (datePart: string) => {
+    const invalidDateParts = { year: '2021', month: '02', day: '01' }
+    const result = constructDateObjFromParts({ ...invalidDateParts, [datePart]: '' })
+    expect(result).toBeUndefined()
+  })
 })
 
 describe('constructDatePartsFromDate', () => {
