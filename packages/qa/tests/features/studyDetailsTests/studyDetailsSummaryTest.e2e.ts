@@ -11,9 +11,7 @@ let nonCommStudyId = 0
 let croCtuOrgRelationshipStudyId = 0
 let studyProgressDetails: RowDataPacket[]
 let nonCommStudyProgressDetails: RowDataPacket[]
-let croCtuStudySponsorName: RowDataPacket[]
-let croCtuStudyCroCtuName: RowDataPacket[]
-let getStudyResponse: JSON
+
 //Must ensure that specific SE study Id's below remain in the SE Tool on Test
 const nullValuesStudyId = 17103
 const noConcernsStudyId = 17122
@@ -48,27 +46,13 @@ test.beforeAll('Setup Tests', async () => {
     FROM Study WHERE Study.id = ${nonCommStudyId};`)
 
   const randomCroCtuStudyIdSelected = await seDatabaseReq(`SELECT DISTINCT studyId FROM StudyOrganisation
-  INNER JOIN Study ON Study.id = StudyOrganisation.studyId
-  WHERE StudyOrganisation.organisationId = ${startingOrgId} AND StudyOrganisation.organisationRoleId = 1 AND StudyOrganisation.isDeleted = 0
-  AND studyId in (SELECT DISTINCT studyId FROM StudyOrganisation 
-  WHERE ((StudyOrganisation.organisationRoleId = 3 OR StudyOrganisation.organisationRoleId = 4) AND StudyOrganisation.isDeleted = 0))
-  AND Study.isDeleted = 0
-  ORDER BY RAND() LIMIT 1;`)
+    INNER JOIN Study ON Study.id = StudyOrganisation.studyId
+    WHERE StudyOrganisation.organisationId = ${startingOrgId} AND StudyOrganisation.organisationRoleId = 1 AND StudyOrganisation.isDeleted = 0
+    AND studyId in (SELECT DISTINCT studyId FROM StudyOrganisation 
+    WHERE ((StudyOrganisation.organisationRoleId = 3 OR StudyOrganisation.organisationRoleId = 4) AND StudyOrganisation.isDeleted = 0))
+    AND Study.isDeleted = 0
+    ORDER BY RAND() LIMIT 1;`)
   croCtuOrgRelationshipStudyId = randomCroCtuStudyIdSelected[0].studyId
-
-  croCtuStudySponsorName = await seDatabaseReq(`SELECT Organisation.name FROM Organisation
-    INNER JOIN StudyOrganisation
-    ON StudyOrganisation.organisationId = Organisation.id
-    WHERE StudyOrganisation.studyId = ${croCtuOrgRelationshipStudyId}
-    AND StudyOrganisation.organisationRoleId = 1;`)
-
-  croCtuStudyCroCtuName = await seDatabaseReq(`SELECT Organisation.name FROM Organisation
-    INNER JOIN StudyOrganisation
-    ON StudyOrganisation.organisationId = Organisation.id
-    WHERE StudyOrganisation.studyId = ${croCtuOrgRelationshipStudyId}
-    AND StudyOrganisation.organisationRoleId IN (3,4);`)
-
-  getStudyResponse = await getStudyEngagementInfo(studyProgressDetails[0].cpmsId)
 })
 
 test.describe('Access Study Details Page and view Summary - @se_26 @wip', () => {
@@ -81,6 +65,7 @@ test.describe('Access Study Details Page and view Summary - @se_26 @wip', () => 
     let studyListItemToClick: number
     let studyIdSelected: string = ''
     let studyDetails: RowDataPacket[]
+    let getStudyInCpms: JSON
 
     await test.step(`Given I have navigated to the Study List Page`, async () => {
       await studiesPage.goto()
@@ -89,22 +74,20 @@ test.describe('Access Study Details Page and view Summary - @se_26 @wip', () => 
     await test.step(`When I click the View Study button of any Study on the Study List`, async () => {
       studyListItemToClick = await studiesPage.selectRandomStudyListItemIndex()
       studyIdSelected = await studiesPage.getStudyIdFromListViewButton(studyListItemToClick)
-      studyDetails = await seDatabaseReq(`SELECT Study.shortTitle, Organisation.name AS sponsorName FROM Study
-            INNER JOIN StudyOrganisation
-            ON StudyOrganisation.studyId = Study.id 
-            INNER JOIN Organisation
-            ON StudyOrganisation.organisationId = Organisation.id 
-            WHERE Study.id = ${studyIdSelected} AND StudyOrganisation.organisationRoleId = 1;`)
       studiesPage.viewStudyButton.nth(studyListItemToClick).click()
+
+      studyDetails = await seDatabaseReq(`
+        SELECT cpmsId FROM sponsorengagement.Study where id = ${studyIdSelected};`)
+      getStudyInCpms = await getStudyEngagementInfo(studyDetails[0].cpmsId)
     })
     await test.step(`Then I am taken to the Details page for Study with SE Id ${studyIdSelected}`, async () => {
       await studyDetailsPage.assertOnStudyDetailsPage(studyIdSelected)
     })
     await test.step('And the Page Title is the Study Short Title', async () => {
-      await studyDetailsPage.assertStudyShortTitle(studyDetails[0].shortTitle)
+      await studyDetailsPage.assertStudyShortTitleV2(getStudyInCpms.ShortName)
     })
     await test.step('And I can see Study Sponsor beneath the Study Short Title', async () => {
-      await studyDetailsPage.assertStudySponsorSubTitle(studyDetails[0].sponsorName)
+      await studyDetailsPage.assertStudySponsorSubTitleV2(getStudyInCpms.StudySponsors)
     })
     await test.step('And I am shown Introductory Guidance Text for the Details Page', async () => {
       await studyDetailsPage.assertGuidanceText()
@@ -114,21 +97,24 @@ test.describe('Access Study Details Page and view Summary - @se_26 @wip', () => 
   test('The Study Details page displays the Sponsor and any CRO/CTU Names in Page Sub-Title - @se_26_subtitle', async ({
     studyDetailsPage,
   }) => {
+    const studyDetails = await seDatabaseReq(`
+      SELECT cpmsId FROM sponsorengagement.Study where id = ${croCtuOrgRelationshipStudyId};`)
+    const getStudyInCpms = await getStudyEngagementInfo(studyDetails[0].cpmsId)
+
     await test.step(`Given I have navigated to the Study Details Page for the Study with SE Id ${croCtuOrgRelationshipStudyId}`, async () => {
       await studyDetailsPage.goto(croCtuOrgRelationshipStudyId.toString())
       await studyDetailsPage.assertOnStudyDetailsPage(croCtuOrgRelationshipStudyId.toString())
     })
-    await test.step('When I can see Study Sponsor beneath the Study Short Title', async () => {
-      await studyDetailsPage.assertStudySponsorSubTitle(croCtuStudySponsorName[0].name)
-    })
-    await test.step('Then I can see the CRO/CTU displayed in Brackets alongside the Sponsor', async () => {
-      await studyDetailsPage.assertStudyCroCtuSubTitle(croCtuStudyCroCtuName[0].name)
+    await test.step('Then I can see Study Sponsor beneath the Study Short Title including the CRO/CTU in Brackets', async () => {
+      await studyDetailsPage.assertStudySponsorSubTitleV2(getStudyInCpms.StudySponsors)
     })
   })
 
   test('As a Sponsor I can see the Summary of study’s progress (UK) of a Specific Study - @se_26_ac2, @se_181_ac4', async ({
     studyDetailsPage,
   }) => {
+    const getStudyInCpms = await getStudyEngagementInfo(studyProgressDetails[0].cpmsId)
+
     await test.step(`Given I have navigated to the Study Details Page for a Commercial Study with SE Id ${startingStudyId}`, async () => {
       await studyDetailsPage.goto(startingStudyId.toString())
       await studyDetailsPage.assertOnStudyDetailsPage(startingStudyId.toString())
@@ -138,43 +124,38 @@ test.describe('Access Study Details Page and view Summary - @se_26 @wip', () => 
       await studyDetailsPage.assertProgressSummarySectionSubtitle()
     })
     await test.step('Then I can see the Studies Status', async () => {
-      await studyDetailsPage.assertStudyStatus(getStudyResponse.StudyStatus)
+      await studyDetailsPage.assertStudyStatus(getStudyInCpms.StudyStatus)
     })
     await test.step('And I can see the latest Study Data Indicators', async () => {
-      await studyDetailsPage.assertDataIndicators(studyProgressDetails)
+      await studyDetailsPage.assertDataIndicatorsV2(getStudyInCpms.StudyEvaluationCategories)
     })
     await test.step('And I can see the Studies Planned Opening Date', async () => {
-      await studyDetailsPage.assertPlannedOpeningDate(studyProgressDetails)
+      await studyDetailsPage.assertPlannedOpeningDateV2(getStudyInCpms.PlannedOpeningDate)
     })
     await test.step('And I can see the Studies Actual Opening Date', async () => {
-      await studyDetailsPage.assertActualOpeningDate(studyProgressDetails)
+      await studyDetailsPage.assertActualOpeningDateV2(getStudyInCpms.ActualOpeningDate)
     })
     await test.step('And I can see the Studies Planned Closure Date', async () => {
-      await studyDetailsPage.assertPlannedClosureDate(studyProgressDetails)
+      await studyDetailsPage.assertPlannedClosureDateV2(getStudyInCpms.PlannedClosureToRecruitmentDate)
     })
     await test.step('And I can see the Studies Actual Closure Date', async () => {
-      await studyDetailsPage.assertActualClosureDate(studyProgressDetails)
+      await studyDetailsPage.assertActualClosureDateV2(getStudyInCpms.ActualClosureDate)
     })
     await test.step('And I can see the Studies UK Recruitment Target', async () => {
-      await studyDetailsPage.assertUkTarget(studyProgressDetails[0].sampleSize, studyProgressDetails[0].route)
+      await studyDetailsPage.assertUkTarget(getStudyInCpms.SampleSize, getStudyInCpms.StudyRoute)
     })
     await test.step('And I can see the Studies UK Recruitment Total', async () => {
-      await studyDetailsPage.assertUkTotal(
-        studyProgressDetails[0].totalRecruitmentToDate,
-        studyProgressDetails[0].route
-      )
+      await studyDetailsPage.assertUkTotal(getStudyInCpms.TotalRecruitmentToDate, getStudyInCpms.StudyRoute)
     })
   })
 
   test('`This study is progressing as planned` displays when Study has No Concerns - @se_26_noConcerns', async ({
     studyDetailsPage,
   }) => {
-    const noConcernsStudyDetails =
-      await seDatabaseReq(`SELECT studyStatus, StudyEvaluationCategory.indicatorValue, StudyEvaluationCategory.isDeleted 
-    FROM Study 
-    LEFT JOIN StudyEvaluationCategory
-    ON StudyEvaluationCategory.studyId = Study.id
-    WHERE Study.id = ${noConcernsStudyId} AND StudyEvaluationCategory.isDeleted = 0;`)
+    const noConcernsStudyDetails = await seDatabaseReq(`
+      SELECT cpmsId FROM sponsorengagement.Study where id = ${noConcernsStudyId};`)
+    const getStudyInCpms = await getStudyEngagementInfo(noConcernsStudyDetails[0].cpmsId)
+
     await test.step(`Given I have navigated to the Study Details Page for the Study with SE Id ${noConcernsStudyId}`, async () => {
       await studyDetailsPage.goto(noConcernsStudyId.toString())
       await studyDetailsPage.assertOnStudyDetailsPage(noConcernsStudyId.toString())
@@ -183,20 +164,18 @@ test.describe('Access Study Details Page and view Summary - @se_26 @wip', () => 
       await studyDetailsPage.assertProgressSummarySectionPresent()
       await studyDetailsPage.assertProgressSummarySectionSubtitle()
     })
-    await test.step(`And the study has No Concerns`, async () => {
-      await studyDetailsPage.checkStudyHasNoConcerns(noConcernsStudyDetails)
-    })
     await test.step('Then I can see that Study data indicates `This study is progressing as planned`', async () => {
-      await studyDetailsPage.assertDataIndicators(noConcernsStudyDetails)
+      await studyDetailsPage.assertDataIndicatorsV2(getStudyInCpms.StudyEvaluationCategories)
     })
   })
 
   test('A `-` Icon is Displayed in Place of NULL Values, where Applicable - @se_26_nullValues', async ({
     studyDetailsPage,
   }) => {
-    const nullStudyProgressValues =
-      await seDatabaseReq(`SELECT Study.actualOpeningDate, Study.actualClosureDate, Study.sampleSize 
-    FROM Study WHERE Study.id = ${nullValuesStudyId};`)
+    const nullValuesStudyDetails = await seDatabaseReq(`
+      SELECT cpmsId FROM sponsorengagement.Study where id = ${nullValuesStudyId};`)
+    const getStudyInCpms = await getStudyEngagementInfo(nullValuesStudyDetails[0].cpmsId)
+
     await test.step(`Given I have navigated to the Study Details Page for a Commercial Study with SE Id ${nullValuesStudyId}`, async () => {
       await studyDetailsPage.goto(nullValuesStudyId.toString())
       await studyDetailsPage.assertOnStudyDetailsPage(nullValuesStudyId.toString())
@@ -206,28 +185,30 @@ test.describe('Access Study Details Page and view Summary - @se_26 @wip', () => 
       await studyDetailsPage.assertProgressSummarySectionSubtitle()
     })
     await test.step(`And the study has NULL Values for Recruitment and Date fields`, async () => {
-      await studyDetailsPage.checkStudyHasNullValues(nullStudyProgressValues)
+      await studyDetailsPage.checkStudyHasNullValues(
+        getStudyInCpms.ActualOpeningDate,
+        getStudyInCpms.ActualClosureDate,
+        getStudyInCpms.SampleSize
+      )
     })
     await test.step('Then I can see the Studies Actual Opening Date has a `-` icon', async () => {
-      await studyDetailsPage.assertActualOpeningDate(nullStudyProgressValues)
+      await studyDetailsPage.assertActualOpeningDateV2(getStudyInCpms.ActualOpeningDate)
     })
     await test.step('And I can see the Studies Actual Closure Date has a `-` icon', async () => {
-      await studyDetailsPage.assertActualClosureDate(nullStudyProgressValues)
+      await studyDetailsPage.assertActualClosureDateV2(getStudyInCpms.ActualClosureDate)
     })
     await test.step('And I can see the Studies UK Recruitment Target has a `-` icon', async () => {
-      await studyDetailsPage.assertUkTarget(nullStudyProgressValues[0].sampleSize, studyProgressDetails[0].route)
+      await studyDetailsPage.assertUkTarget(getStudyInCpms.SampleSize, getStudyInCpms.StudyRoute)
     })
   })
 
   test('Estimated reopening date is only Displayed for Suspended Studies - @se_26_estimated', async ({
     studyDetailsPage,
   }) => {
-    const estimatedStudyProgressValues =
-      await seDatabaseReq(`SELECT Study.studyStatus, Study.route, StudyEvaluationCategory.expectedReopenDate
-    FROM Study 
-    LEFT JOIN StudyEvaluationCategory
-    ON StudyEvaluationCategory.studyId = Study.id
-    WHERE Study.id = ${estimatedReopenStudyId};`)
+    const estimatedStudyDetails = await seDatabaseReq(`
+      SELECT cpmsId FROM sponsorengagement.Study where id = ${estimatedReopenStudyId};`)
+    const getStudyInCpms = await getStudyEngagementInfo(estimatedStudyDetails[0].cpmsId)
+
     await test.step(`Given I have navigated to the Study Details Page for a Suspended Study with SE Id ${estimatedReopenStudyId}`, async () => {
       await studyDetailsPage.goto(estimatedReopenStudyId.toString())
       await studyDetailsPage.assertOnStudyDetailsPage(estimatedReopenStudyId.toString())
@@ -237,10 +218,10 @@ test.describe('Access Study Details Page and view Summary - @se_26 @wip', () => 
       await studyDetailsPage.assertProgressSummarySectionSubtitle()
     })
     await test.step('And the Studies Status is Suspended', async () => {
-      await studyDetailsPage.assertStudyStatusSuspended(estimatedStudyProgressValues[0].studyStatus)
+      await studyDetailsPage.assertStudyStatusSuspended(getStudyInCpms.StudyStatus)
     })
     await test.step('Then I can see the Studies Estimated Reopening Date', async () => {
-      await studyDetailsPage.assertEstimatedReopenDatePresent(estimatedStudyProgressValues)
+      await studyDetailsPage.assertEstimatedReopenDateV2(getStudyInCpms.EstimatedReopeningDate)
     })
     await test.step(`Given I have navigated to the Study Details Page for a Non-Suspended Study with SE Id ${noConcernsStudyId}`, async () => {
       await studyDetailsPage.goto(noConcernsStudyId.toString())
@@ -259,6 +240,10 @@ test.describe('Access Study Details Page and view Summary - @se_26 @wip', () => 
     studyDetailsPage,
   }) => {
     await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${nonCommOrgId} WHERE userId = ${testUserId}`)
+    const nonCommStudyDetails = await seDatabaseReq(`
+      SELECT cpmsId FROM sponsorengagement.Study where id = ${nonCommStudyId};`)
+    const getStudyInCpms = await getStudyEngagementInfo(nonCommStudyDetails[0].cpmsId)
+
     await test.step(`Given I have navigated to the Study Details Page for a Non-Commercial Study with SE Id ${nonCommStudyId}`, async () => {
       await studyDetailsPage.goto(nonCommStudyId.toString())
       await studyDetailsPage.assertOnStudyDetailsPage(nonCommStudyId.toString())
@@ -268,19 +253,13 @@ test.describe('Access Study Details Page and view Summary - @se_26 @wip', () => 
       await studyDetailsPage.assertProgressSummarySectionSubtitle()
     })
     await test.step(`And the Study is Non-Commercial`, async () => {
-      await studyDetailsPage.assertStudyRoute('Non-Commercial', nonCommStudyProgressDetails[0].route)
+      await studyDetailsPage.assertStudyRoute('Non-Commercial', getStudyInCpms.StudyRoute)
     })
     await test.step('Then I can see the Studies Network Recruitment Target', async () => {
-      await studyDetailsPage.assertUkTarget(
-        nonCommStudyProgressDetails[0].sampleSize,
-        nonCommStudyProgressDetails[0].route
-      )
+      await studyDetailsPage.assertUkTarget(getStudyInCpms.SampleSize, getStudyInCpms.StudyRoute)
     })
     await test.step('And I can see the Studies Network Recruitment Total', async () => {
-      await studyDetailsPage.assertUkTotal(
-        nonCommStudyProgressDetails[0].totalRecruitmentToDate,
-        nonCommStudyProgressDetails[0].route
-      )
+      await studyDetailsPage.assertUkTotal(getStudyInCpms.TotalRecruitmentToDate, getStudyInCpms.StudyRoute)
     })
   })
 })

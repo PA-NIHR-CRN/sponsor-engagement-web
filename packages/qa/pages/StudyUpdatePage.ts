@@ -59,7 +59,7 @@ export default class StudyUpdatePage {
 
     //Form
     this.statusRadioInSetup = page.locator('#status')
-    this.statusHintInSetup = page.locator('#status-hint').nth(1)
+    this.statusHintInSetup = page.locator('#status-hint').first()
     this.statusRadioOpenRec = page.locator('#status-1')
     this.statusHintOpenRec = page.locator('#status-1-hint')
     this.statusRadioClosedInFollow = page.locator('#status-2')
@@ -216,12 +216,12 @@ export default class StudyUpdatePage {
     await expect(this.furtherInfo).toBeVisible()
   }
 
-  async assertStudyDate(plannedOpeningDate: string, dateType: number) {
+  async assertStudyDate(date: string, dateType: number) {
     // dateType: [0 = PlannedOpeningDate, 1 = ActualOpeningDate, 2 = PlannedClosureToRecruitmentDate, 3 = ActualClosureToRecruitmentDate, 4 = estimatedReopening]
-    if (plannedOpeningDate) {
-      const yyyy = plannedOpeningDate.substring(0, 4)
-      let mm = plannedOpeningDate.substring(5, 7)
-      let dd = plannedOpeningDate.substring(8, 10)
+    if (date) {
+      const yyyy = date.substring(0, 4)
+      let mm = date.substring(5, 7)
+      let dd = date.substring(8, 10)
       mm = parseInt(mm, 10).toString()
       dd = parseInt(dd, 10).toString()
 
@@ -233,6 +233,13 @@ export default class StudyUpdatePage {
       await expect(this.page.locator('#month').nth(dateType)).toHaveValue('')
       await expect(this.page.locator('#year').nth(dateType)).toHaveValue('')
     }
+  }
+
+  async fillStudyDates(dateType: number) {
+    // dateType: [0 = PlannedOpeningDate, 1 = ActualOpeningDate, 2 = PlannedClosureToRecruitmentDate, 3 = ActualClosureToRecruitmentDate, 4 = estimatedReopening]
+    await this.page.locator('#day').nth(dateType).fill('12')
+    await this.page.locator('#month').nth(dateType).fill('06')
+    await this.page.locator('#year').nth(dateType).fill('2024')
   }
 
   async assertRecruitmentTarget(target: string) {
