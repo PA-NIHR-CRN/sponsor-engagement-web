@@ -89,6 +89,7 @@ const mockStudyUpdateResponse = {
   id: 3232,
   studyId: mockStudyId,
   studyStatus: mockCPMSStudy.StudyStatus,
+  studyStatusGroup: 'Suspended',
   ukRecruitmentTarget: mockCPMSStudy.SampleSize,
   comment: '',
   plannedOpeningDate: new Date(mockCPMSStudy.PlannedOpeningDate as string),
@@ -99,7 +100,8 @@ const mockStudyUpdateResponse = {
 }
 
 const getMockStudyUpdateInput = (isDirect: boolean) => ({
-  studyStatus: body.status,
+  studyStatus: isDirect ? body.status : null,
+  studyStatusGroup: mockStudyUpdateResponse.studyStatusGroup,
   plannedOpeningDate: mockStudyUpdateResponse.plannedOpeningDate,
   actualOpeningDate: mockStudyUpdateResponse.actualOpeningDate,
   plannedClosureToRecruitmentDate: mockStudyUpdateResponse.plannedClosureToRecruitmentDate,
@@ -146,7 +148,7 @@ describe('/api/forms/editStudy', () => {
     const response = await testHandler(api, { method: 'POST', body })
 
     expect(response.statusCode).toBe(302)
-    expect(response._getRedirectUrl()).toBe(`/editStudy/${body.studyId}?fatal=1`)
+    expect(response._getRedirectUrl()).toBe(`/studies/${body.studyId}/edit?fatal=1`)
 
     expect(mockedPostAxios).toHaveBeenCalledTimes(1)
   })
@@ -157,7 +159,7 @@ describe('/api/forms/editStudy', () => {
     const response = await testHandler(api, { method: 'POST', body })
 
     expect(response.statusCode).toBe(302)
-    expect(response._getRedirectUrl()).toBe(`/editStudy/${body.studyId}?fatal=1`)
+    expect(response._getRedirectUrl()).toBe(`/studies/${body.studyId}/edit?fatal=1`)
 
     expect(mockedPostAxios).toHaveBeenCalledTimes(1)
   })
@@ -234,7 +236,7 @@ describe('/api/forms/editStudy', () => {
       const response = await testHandler(api, { method: 'POST', body })
 
       expect(response.statusCode).toBe(302)
-      expect(response._getRedirectUrl()).toBe(`/editStudy/${body.studyId}?fatal=1`)
+      expect(response._getRedirectUrl()).toBe(`/studies/${body.studyId}/edit?fatal=1`)
 
       expect(prismaMock.studyUpdates.create).toHaveBeenCalledTimes(1)
     })
@@ -302,7 +304,7 @@ describe('/api/forms/editStudy', () => {
       const response = await testHandler(api, { method: 'POST', body })
 
       expect(response.statusCode).toBe(302)
-      expect(response._getRedirectUrl()).toBe(`/editStudy/${body.studyId}?fatal=1`)
+      expect(response._getRedirectUrl()).toBe(`/studies/${body.studyId}/edit?fatal=1`)
 
       expect(mockedPutAxios).toHaveBeenCalledTimes(1)
     })
@@ -317,7 +319,7 @@ describe('/api/forms/editStudy', () => {
       const response = await testHandler(api, { method: 'POST', body })
 
       expect(response.statusCode).toBe(302)
-      expect(response._getRedirectUrl()).toBe(`/editStudy/${body.studyId}?fatal=1`)
+      expect(response._getRedirectUrl()).toBe(`/studies/${body.studyId}/edit?fatal=1`)
 
       expect(mockedPutAxios).toHaveBeenCalledTimes(1)
     })

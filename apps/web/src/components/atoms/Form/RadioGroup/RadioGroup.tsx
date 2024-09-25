@@ -18,10 +18,14 @@ interface RadioGroupProps {
   errors: FieldErrors
   defaultValue: string | undefined
   disabled?: boolean
+  onChange?: (e: React.ChangeEvent<EventTarget>) => void
 }
 
 export const RadioGroup = forwardRef<HTMLInputElement, RadioGroupProps>(
-  ({ children, label, labelSize = 's', errors, hint, defaultValue, required = true, disabled, ...rest }, ref) => {
+  (
+    { children, label, labelSize = 's', errors, hint, defaultValue, required = true, disabled, onChange, ...rest },
+    ref
+  ) => {
     const error = errors[rest.name]
 
     return (
@@ -39,6 +43,7 @@ export const RadioGroup = forwardRef<HTMLInputElement, RadioGroupProps>(
           disabled={disabled}
           legend={label}
           legendSize={labelSize}
+          onChange={onChange}
           role="radiogroup"
         >
           <div className="govuk-radios" data-module="govuk-radios">
