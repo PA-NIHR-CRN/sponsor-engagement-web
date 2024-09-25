@@ -26,14 +26,7 @@ test.beforeAll('Setup Tests', async () => {
   startingStudyId = randomStudyIdSelected[0].id
 
   studyCoreDetails = await seDatabaseReq(`
-    SELECT title, shortTitle, protocolReferenceNumber, irasId, cpmsId, managingSpeciality, 
-    Organisation.name AS sponsorName, chiefInvestigatorFirstName, chiefInvestigatorLastName FROM Study 
-    INNER JOIN StudyOrganisation
-    ON StudyOrganisation.studyId = Study.id
-    INNER JOIN Organisation
-    ON Organisation.id = StudyOrganisation.organisationId
-    WHERE Study.id = ${startingStudyId} AND StudyOrganisation.organisationRoleId = 1 AND Study.isDeleted = 0;
-  `)
+    SELECT cpmsId FROM sponsorengagement.Study where id = ${startingStudyId};`)
 
   getStudyResponse = await getStudyEngagementInfo(studyCoreDetails[0].cpmsId)
 })

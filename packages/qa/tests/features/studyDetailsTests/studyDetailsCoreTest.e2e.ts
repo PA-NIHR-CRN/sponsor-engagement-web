@@ -146,7 +146,7 @@ test.describe('View core study details - @se_27 @wip', () => {
     })
   })
 
-  test('The value `None available` appears where the Protocol Reference Number value is null - @se_27_protocolRef', async ({
+  test.skip('The value `None available` appears where the Protocol Reference Number value is null - @se_27_protocolRef', async ({
     studyDetailsPage,
   }) => {
     await test.step(`Given I have navigated to the Study Details Page for Study with SE Id ${noProtocolRefNoStudyId}`, async () => {

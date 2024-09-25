@@ -59,7 +59,7 @@ export default class StudyUpdatePage {
 
     //Form
     this.statusRadioInSetup = page.locator('#status')
-    this.statusHintInSetup = page.locator('#status-hint').nth(1)
+    this.statusHintInSetup = page.locator('#status-hint').first()
     this.statusRadioOpenRec = page.locator('#status-1')
     this.statusHintOpenRec = page.locator('#status-1-hint')
     this.statusRadioClosedInFollow = page.locator('#status-2')

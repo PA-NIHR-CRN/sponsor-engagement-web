@@ -76,6 +76,7 @@ export default class StudyDetailsPage {
   readonly dueIndicator: Locator
   readonly dueIndicatorSupportingText: Locator
   readonly allStudiesLink: Locator
+  readonly sponsorAssessmentHistory: Locator
 
   //Initialize Page Objects
   constructor(page: Page) {
@@ -135,9 +136,6 @@ export default class StudyDetailsPage {
       hasText: 'Actual closure to recruitment date',
     })
     this.tableActualClosureDateValue = this.tableActualClosureDateHeader.locator('..').locator('td')
-    // this.tableUkTargetHeader = page.locator('th[scope="row"]', {
-    //   hasText: 'UK recruitment target (excluding private sites)',
-    // })
     this.tableUkTargetHeader = page.locator('th[data-testid="uk-recruitment-target-label"]')
     this.tableUkTargetValue = this.tableUkTargetHeader.locator('..').locator('td')
     this.tableUkTotalHeader = page.locator('th[data-testid="total-uk-recruitment-label"]')
@@ -157,8 +155,11 @@ export default class StudyDetailsPage {
     this.secondSponsorAssessmentFurtherInfoBullets = this.secondSponsorAssessmentFurtherInfo.locator('ul li')
     this.firstSponsorAssessmentFurtherInfoText = this.firstSponsorAssessmentFurtherInfo.locator('p')
     this.secondSponsorAssessmentFurtherInfoText = this.secondSponsorAssessmentFurtherInfo.locator('p')
-    this.firstSponsorAssessmentRow = page.locator('button[id="radix-:r2:"]')
-    this.secondSponsorAssessmentRow = page.locator('button[id="radix-:r4:"]')
+    this.sponsorAssessmentHistory = page.locator('[class="govuk-!-margin-bottom-6"]') // TODO: temp fix need to use data-testid
+    // this.firstSponsorAssessmentRow = page.locator('button[id^="radix-:r2:"]')
+    this.firstSponsorAssessmentRow = this.sponsorAssessmentHistory.locator('button')
+    // this.secondSponsorAssessmentRow = page.locator('button[id="radix-:r4:"]')
+    this.secondSponsorAssessmentRow = this.sponsorAssessmentHistory.locator('button').nth(1)
     this.firstSponsorAssessmentDate = this.firstSponsorAssessmentRow.locator('div')
     this.secondSponsorAssessmentDate = this.secondSponsorAssessmentRow.locator('div')
     this.firstSponsorAssessmentText = this.firstSponsorAssessmentRow.locator(
