@@ -1,6 +1,7 @@
 export * from './AssessmentHistory/AssessmentHistory'
 export * from './cards/RequestSupport/RequestSupport'
 export * from './cards/StudyList/StudyList'
+export * from './EditHistory/EditHistory'
 export * from './Filters/Filters'
 export * from './Header/Header'
 export * from './List/List'
