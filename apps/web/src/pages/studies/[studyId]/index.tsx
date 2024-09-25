@@ -5,7 +5,13 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import type { ReactElement } from 'react'
 
-import { AssessmentHistory, getAssessmentHistoryFromStudy, RequestSupport, StudyDetails } from '@/components/molecules'
+import {
+  AssessmentHistory,
+  EditHistory,
+  getAssessmentHistoryFromStudy,
+  RequestSupport,
+  StudyDetails,
+} from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
 import { EDIT_STUDY_ROLE, Roles } from '@/constants'
 import { FORM_SUCCESS_MESSAGES } from '@/constants/forms'
@@ -57,6 +63,8 @@ export default function Study({ user, study, studyInCPMS, assessments }: StudyPr
 
   const showEditStudyFeature = Boolean(user?.groups.includes(EDIT_STUDY_ROLE))
 
+  const showEditHistoryFeature = process.env.NEXT_PUBLIC_ENABLE_EDIT_HISTORY_FEATURE?.toLowerCase() === 'true'
+
   return (
     <Container>
       <NextSeo title={`Study Progress Review - ${studyInCPMS.StudyShortName}`} />
@@ -107,6 +115,7 @@ export default function Study({ user, study, studyInCPMS, assessments }: StudyPr
           <span className="govuk-body-s text-darkGrey">
             Based on the latest data uploaded to CPMS by the study team.
           </span>
+          {showEditHistoryFeature ? <EditHistory /> : null}
           <Table className="govuk-!-margin-top-3">
             <Table.Caption className="govuk-visually-hidden">Summary of study’s progress (UK)</Table.Caption>
             <Table.Body>
