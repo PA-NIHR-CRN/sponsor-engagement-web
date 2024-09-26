@@ -22,8 +22,8 @@ describe('formatDate', () => {
 })
 
 describe('constructDateObjFromParts', () => {
-  it('should return undefined if input is undefined', () => {
-    const result = constructDateObjFromParts(undefined)
+  it.each([undefined, null])('should return undefined if input is %s', (value: undefined | null) => {
+    const result = constructDateObjFromParts(value)
     expect(result).toBeUndefined()
   })
 

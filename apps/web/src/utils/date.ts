@@ -31,7 +31,7 @@ export const constructDatePartsFromDate = (date?: Date | null) => {
 /**
  * Creates a Date object from its' date parts - year, month and day
  */
-export const constructDateObjFromParts = (dateParts?: DateInputValue) => {
+export const constructDateObjFromParts = (dateParts?: DateInputValue | null) => {
   if (!dateParts) return undefined
 
   const containsAllValidNumbers = Object.values(dateParts).every(

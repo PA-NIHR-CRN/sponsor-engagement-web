@@ -9,6 +9,7 @@ import { Controller, useForm } from 'react-hook-form'
 
 import { ErrorSummary, Fieldset, Form } from '@/components/atoms'
 import { DateInput } from '@/components/atoms/Form/DateInput/DateInput'
+import type { DateInputValue } from '@/components/atoms/Form/DateInput/types'
 import { Textarea } from '@/components/atoms/Form/Textarea/Textarea'
 import { TextInput } from '@/components/atoms/Form/TextInput/TextInput'
 import Warning from '@/components/atoms/Warning/Warning'
@@ -67,6 +68,12 @@ function mapErrorObject(obj: FieldErrors): FieldErrors {
   return result
 }
 
+const transformDateValue = (input?: DateInputValue | null) => ({
+  day: input?.day ?? '',
+  month: input?.month ?? '',
+  year: input?.year ?? '',
+})
+
 export default function EditStudy({ study }: EditStudyProps) {
   const { register, formState, handleSubmit, control, watch, setError } = useForm<EditStudyInputs>({
     resolver: zodResolver(studySchema),
@@ -104,11 +111,11 @@ export default function EditStudy({ study }: EditStudyProps) {
   })
 
   useEffect(() => {
-    // console.log('hitting use effect', formState.errors)
+    console.log('hitting use effect', errors)
     const mappedRes = mapErrorObject(errors)
 
     setMappedErrors(mappedRes)
-    // console.log({ mappedRes })
+    console.log({ mappedRes })
   }, [errors])
 
   return (
@@ -187,14 +194,19 @@ export default function EditStudy({ study }: EditStudyProps) {
                 render={({ field }) => {
                   const { value, onChange, ref, name } = field
 
+                  const handleInputChange = (input: DateInputValue) => {
+                    const allFieldsEmpty = Object.values(input).every((val) => val === '')
+                    onChange(allFieldsEmpty ? null : input)
+                  }
+
                   return (
                     <DateInput
                       errors={mappedErrors}
                       label="Planned opening to recruitment date"
                       name={name}
-                      onChange={onChange}
+                      onChange={handleInputChange}
                       ref={ref}
-                      value={value}
+                      value={transformDateValue(value)}
                     />
                   )
                 }}
@@ -207,14 +219,19 @@ export default function EditStudy({ study }: EditStudyProps) {
                 render={({ field }) => {
                   const { value, onChange, ref, name } = field
 
+                  const handleInputChange = (input: DateInputValue) => {
+                    const allFieldsEmpty = Object.values(input).every((val) => val === '')
+                    onChange(allFieldsEmpty ? null : input)
+                  }
+
                   return (
                     <DateInput
-                      errors={{}}
+                      errors={mappedErrors}
                       label="Actual opening to recruitment date"
                       name={name}
-                      onChange={onChange}
+                      onChange={handleInputChange}
                       ref={ref}
-                      value={value}
+                      value={transformDateValue(value)}
                     />
                   )
                 }}
@@ -227,14 +244,19 @@ export default function EditStudy({ study }: EditStudyProps) {
                 render={({ field }) => {
                   const { value, onChange, ref, name } = field
 
+                  const handleInputChange = (input: DateInputValue) => {
+                    const allFieldsEmpty = Object.values(input).every((val) => val === '')
+                    onChange(allFieldsEmpty ? null : input)
+                  }
+
                   return (
                     <DateInput
-                      errors={{}}
+                      errors={mappedErrors}
                       label="Planned closure to recruitment date"
                       name={name}
-                      onChange={onChange}
+                      onChange={handleInputChange}
                       ref={ref}
-                      value={value}
+                      value={transformDateValue(value)}
                     />
                   )
                 }}
@@ -247,14 +269,19 @@ export default function EditStudy({ study }: EditStudyProps) {
                 render={({ field }) => {
                   const { value, onChange, ref, name } = field
 
+                  const handleInputChange = (input: DateInputValue) => {
+                    const allFieldsEmpty = Object.values(input).every((val) => val === '')
+                    onChange(allFieldsEmpty ? null : input)
+                  }
+
                   return (
                     <DateInput
-                      errors={{}}
+                      errors={mappedErrors}
                       label="Actual closure to recruitment date"
                       name={name}
-                      onChange={onChange}
+                      onChange={handleInputChange}
                       ref={ref}
-                      value={value}
+                      value={transformDateValue(value)}
                     />
                   )
                 }}
@@ -267,14 +294,19 @@ export default function EditStudy({ study }: EditStudyProps) {
                 render={({ field }) => {
                   const { value, onChange, ref, name } = field
 
+                  const handleInputChange = (input: DateInputValue) => {
+                    const allFieldsEmpty = Object.values(input).every((val) => val === '')
+                    onChange(allFieldsEmpty ? null : input)
+                  }
+
                   return (
                     <DateInput
-                      errors={{}}
+                      errors={mappedErrors}
                       label="Estimated reopening date"
                       name={name}
-                      onChange={onChange}
+                      onChange={handleInputChange}
                       ref={ref}
-                      value={value}
+                      value={transformDateValue(value)}
                     />
                   )
                 }}
