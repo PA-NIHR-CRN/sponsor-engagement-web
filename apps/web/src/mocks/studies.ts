@@ -129,8 +129,8 @@ export const mockCPMSStudy = Mock.of<Study>({
       PlannedRecruitmentStartDate: '2018-03-01T00:00:00',
       PlannedRecruitmentEndDate: '2025-03-31T00:00:00',
       ActualOpeningDate: '2018-03-01T00:00:00',
-      ActualClosureDate: null,
-      ExpectedReopenDate: null,
+      ActualClosureDate: '2003-02-28T00:00:00',
+      ExpectedReopenDate: '2003-02-28T00:00:00',
     },
   ],
   StudySponsors: [
@@ -153,7 +153,7 @@ export const mockCPMSUpdateInput = {
   EstimatedReopeningDate: new Date(mockCPMSStudy.EstimatedReopeningDate as string).toISOString(),
 }
 
-export const mappedCPMSStudyEvals = [
+export const mappedCPMSStudyEvals: Prisma.StudyEvaluationCategoryGetPayload<undefined>[] = [
   {
     id: 43343,
     studyId: mockCPMSStudy.StudyId,

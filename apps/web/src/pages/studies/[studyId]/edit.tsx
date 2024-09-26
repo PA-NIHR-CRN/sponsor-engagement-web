@@ -136,9 +136,11 @@ export default function EditStudy({ study }: EditStudyProps) {
             action="/api/forms/editStudy"
             handleSubmit={handleSubmit}
             method="post"
-            onError={(error) => {
-              //TODO: Temporary until validation and error states are implemented
-              console.log('error', error)
+            onError={(message: string) => {
+              setError('root.serverError', {
+                type: '400',
+                message,
+              })
             }}
           >
             <ErrorSummary errors={mappedErrors} />
@@ -155,7 +157,8 @@ export default function EditStudy({ study }: EditStudyProps) {
 
                   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                     if (e.target.defaultValue) {
-                      const mappedStatus = mapFormStatusToCPMSStatus(e.target.defaultValue)
+                      const originalStatus = study.studyStatus
+                      const mappedStatus = mapFormStatusToCPMSStatus(e.target.defaultValue, originalStatus)
                       onChange(mappedStatus)
                     }
                   }
@@ -163,7 +166,6 @@ export default function EditStudy({ study }: EditStudyProps) {
                     <RadioGroup
                       defaultValue={mappedSEStatusValue}
                       errors={{}}
-                      hint="Changes to the study status will be committed to CPMS after manual review."
                       label="Study status"
                       labelSize="m"
                       name={name}
@@ -282,7 +284,6 @@ export default function EditStudy({ study }: EditStudyProps) {
               <TextInput
                 defaultValue={defaultValues?.recruitmentTarget}
                 errors={{}}
-                hint="Changes to the UK recruitment target will be committed to CPMS after manual review. "
                 inputClassName="govuk-input--width-10"
                 label="UK recruitment target"
                 labelSize="m"
@@ -345,9 +346,9 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     }
   }
 
-  const seStudyRecord = await getStudyById(Number(context.query.studyId))
+  const { data: study } = await getStudyById(Number(context.query.studyId))
 
-  if (!seStudyRecord.data) {
+  if (!study) {
     return {
       redirect: {
         destination: '/404',
@@ -355,8 +356,9 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     }
   }
 
-  const cpmsId = seStudyRecord.data.cpmsId
+  const cpmsId = study.cpmsId
 
+  // CPMS ID is required to update a study
   if (!cpmsId) {
     return {
       redirect: {
@@ -368,24 +370,28 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
 
   if (!studyInCPMS) {
     return {
-      redirect: {
-        destination: '/500',
-      },
-    }
-  }
-
-  const { data: study } = await updateStudy(Number(cpmsId), mapCPMSStudyToSEStudy(studyInCPMS))
-
-  if (!study) {
-    return {
-      redirect: {
-        destination: '/500',
+      props: {
+        user: session.user,
+        study,
       },
     }
   }
 
   const studyEvalsInCPMS = studyInCPMS.StudyEvaluationCategories
-  const currentStudyEvalsInSE = study.evaluationCategories
+  const mappedStudyEvalsInCPMS = studyEvalsInCPMS.map((studyEval) => mapCPMSStudyEvalToSEEval(studyEval))
+
+  const { data: updatedStudy } = await updateStudy(Number(cpmsId), mapCPMSStudyToSEStudy(studyInCPMS))
+
+  if (!updatedStudy) {
+    return {
+      props: {
+        user: session.user,
+        study,
+      },
+    }
+  }
+
+  const currentStudyEvalsInSE = updatedStudy.evaluationCategories
 
   // Soft delete evaluations in SE that are no longer returned from CPMS
   const studyEvalIdsToDelete = currentStudyEvalsInSE
@@ -395,25 +401,16 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     )
     .map(({ id }) => id)
 
-  const mappedStudyEvalsInCPMS = studyEvalsInCPMS.map((studyEval) => mapCPMSStudyEvalToSEEval(studyEval))
   const { data: updatedStudyEvals } = await updateEvaluationCategories(
-    seStudyRecord.data.id,
+    study.id,
     mappedStudyEvalsInCPMS,
     studyEvalIdsToDelete
   )
 
-  if (!updatedStudyEvals) {
-    return {
-      redirect: {
-        destination: '/500',
-      },
-    }
-  }
-
   return {
     props: {
       user: session.user,
-      study: { ...study, evaluationCategories: updatedStudyEvals },
+      study: { ...updatedStudy, evaluationCategories: updatedStudyEvals ?? study.evaluationCategories },
     },
   }
 })

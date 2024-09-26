@@ -1,3 +1,4 @@
+import userEvent from '@testing-library/user-event'
 import axios from 'axios'
 import type { GetServerSidePropsContext } from 'next'
 import { getServerSession } from 'next-auth/next'
@@ -30,9 +31,13 @@ const mockedEnvVars = {
   apiUsername: 'testuser',
   apiPassword: 'testpwd',
 }
+
+const organisationsByRole = {
+  CRO: 'Test Organisation',
+}
 const getServerSessionMock = jest.mocked(getServerSession)
 
-const renderPage = async (mockEditAxiosRequest = false) => {
+const renderPage = async (mockEditAxiosResponseUrl?: string, mockRouterPushUrl = `/studies/${mockStudyId}`) => {
   const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
   getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
   prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
@@ -40,10 +45,10 @@ const renderPage = async (mockEditAxiosRequest = false) => {
   prismaMock.study.update.mockResolvedValueOnce(mockStudyWithRelations)
   prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[0])
   prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[1])
-  if (mockEditAxiosRequest) {
-    mockedPostAxios.mockResolvedValueOnce({ request: { responseURL: `/studies/${mockStudyId}` } })
+  if (mockEditAxiosResponseUrl) {
+    mockedPostAxios.mockResolvedValueOnce({ request: { responseURL: mockEditAxiosResponseUrl } })
   }
-  await mockRouter.push(`/studies/${mockStudyId}`)
+  await mockRouter.push(mockRouterPushUrl)
 
   const { props } = (await getServerSideProps(context)) as {
     props: EditStudyProps
@@ -82,6 +87,7 @@ describe('EditStudy', () => {
         },
       })
     })
+
     test('redirects to 404 page if no study found', async () => {
       const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
       getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
@@ -97,7 +103,7 @@ describe('EditStudy', () => {
       expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
     })
 
-    test('redirects to 404 if no cpmsId exists in returned study', async () => {
+    test('redirect to 404 page if no cpmsId exists in returned study', async () => {
       const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
       getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
       prismaMock.$transaction.mockResolvedValueOnce([{ ...mockStudyWithRelations, cpmsId: undefined }])
@@ -112,68 +118,7 @@ describe('EditStudy', () => {
       expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
     })
 
-    test('redirects to 500 if no study found in CPMS', async () => {
-      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
-      getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
-      prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
-      mockedGetAxios.mockResolvedValueOnce({ data: {} })
-
-      const result = await getServerSideProps(context)
-      expect(result).toEqual({
-        redirect: {
-          destination: '/500',
-        },
-      })
-
-      expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
-      expect(mockedGetAxios).toHaveBeenCalledTimes(1)
-    })
-
-    test('redirects to 500 if request to update study in SE fails', async () => {
-      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
-      getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
-      prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
-      mockedGetAxios.mockResolvedValueOnce({ data: mockCPMSResponse })
-      prismaMock.study.update.mockRejectedValueOnce(new Error('Oh no an error'))
-
-      const result = await getServerSideProps(context)
-      expect(result).toEqual({
-        redirect: {
-          destination: '/500',
-        },
-      })
-
-      expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
-      expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
-      expect(mockedGetAxios).toHaveBeenCalledTimes(1)
-    })
-
-    test('redirects to 500 if request fails to update study evaluations in SE', async () => {
-      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
-      getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
-      prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
-      mockedGetAxios.mockResolvedValueOnce({ data: mockCPMSResponse })
-      prismaMock.study.update.mockResolvedValueOnce(mockStudyWithRelations)
-      prismaMock.studyEvaluationCategory.upsert.mockRejectedValueOnce(new Error('Oh no an error'))
-
-      const result = await getServerSideProps(context)
-      expect(result).toEqual({
-        redirect: {
-          destination: '/500',
-        },
-      })
-
-      expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
-      expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
-      expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(2)
-      expect(mockedGetAxios).toHaveBeenCalledTimes(1)
-    })
-
     test('should return correct study and evaluations when all requests are successful', async () => {
-      const organisationsByRole = {
-        CRO: 'Test Organisation',
-      }
-
       const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
       getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
       prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
@@ -198,6 +143,76 @@ describe('EditStudy', () => {
       expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
       expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(2)
       expect(mockedGetAxios).toHaveBeenCalledTimes(1)
+    })
+
+    test('when request to CPMS fails, should not update study in SE and return correct data', async () => {
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
+      getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+      prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
+      mockedGetAxios.mockRejectedValueOnce(new Error('Oh no, an error!'))
+
+      const result = await getServerSideProps(context)
+      expect(result).toEqual({
+        props: {
+          user: userWithSponsorContactRole.user,
+          study: { ...mockStudyWithRelations, organisationsByRole },
+        },
+      })
+
+      expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
+      expect(mockedGetAxios).toHaveBeenCalledTimes(1)
+      expect(prismaMock.study.update).not.toHaveBeenCalled()
+      expect(prismaMock.studyEvaluationCategory.upsert).not.toHaveBeenCalled()
+    })
+
+    test('when request to update study fails, should fallback to SE data and return the correct study evals', async () => {
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
+      getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+      prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
+      mockedGetAxios.mockResolvedValueOnce({ data: mockCPMSResponse })
+      prismaMock.study.update.mockRejectedValueOnce(new Error('Oh no, an error!'))
+
+      const result = await getServerSideProps(context)
+      expect(result).toEqual({
+        props: {
+          user: userWithSponsorContactRole.user,
+          study: {
+            ...mockStudyWithRelations,
+            organisationsByRole,
+          },
+        },
+      })
+
+      expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
+      expect(mockedGetAxios).toHaveBeenCalledTimes(1)
+      expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
+      expect(prismaMock.studyEvaluationCategory.upsert).not.toHaveBeenCalled()
+    })
+
+    test('when request to update study evals fails, should return the updated study and correct study evals', async () => {
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
+      getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+      prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
+      mockedGetAxios.mockResolvedValueOnce({ data: mockCPMSResponse })
+      prismaMock.study.update.mockResolvedValueOnce(mockStudyWithRelations)
+      prismaMock.studyEvaluationCategory.upsert.mockRejectedValueOnce(new Error('Oh no, an error!'))
+
+      const result = await getServerSideProps(context)
+
+      expect(result).toEqual({
+        props: {
+          user: userWithSponsorContactRole.user,
+          study: {
+            ...mockStudyWithRelations,
+            organisationsByRole,
+          },
+        },
+      })
+
+      expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
+      expect(mockedGetAxios).toHaveBeenCalledTimes(1)
+      expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
+      expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(2)
     })
   })
 
@@ -243,11 +258,10 @@ describe('EditStudy', () => {
       const statusFieldset = screen.getByRole('radiogroup', { name: 'Study status' })
       expect(statusFieldset).toBeInTheDocument()
 
-      // TODO: Why does accessible description for first element use parent label
-      // expect(within(statusFieldset).getByLabelText('In setup')).toBeInTheDocument()
-      // expect(within(statusFieldset).getByLabelText('In setup')).toHaveAccessibleDescription(
-      //   'Not yet open to recruitment.'
-      // )
+      expect(within(statusFieldset).getByLabelText('In setup')).toBeInTheDocument()
+      expect(within(statusFieldset).getByLabelText('In setup')).toHaveAccessibleDescription(
+        'Not yet open to recruitment.'
+      )
 
       expect(within(statusFieldset).getByLabelText('Open to recruitment')).toBeInTheDocument()
       expect(within(statusFieldset).getByLabelText('Open to recruitment')).toHaveAccessibleDescription(
@@ -297,9 +311,6 @@ describe('EditStudy', () => {
       // Form Input - UK Recruitment target
       const ukRecruitmentTarget = screen.getByLabelText('UK recruitment target')
       expect(ukRecruitmentTarget).toBeInTheDocument()
-      expect(ukRecruitmentTarget).toHaveAccessibleDescription(
-        'Changes to the UK recruitment target will be committed to CPMS after manual review.'
-      )
 
       // Form Input - Further information
       const furtherInformation = screen.getByLabelText('Further information')
@@ -319,6 +330,24 @@ describe('EditStudy', () => {
 
       // Cancel CTA
       expect(screen.getByRole('link', { name: 'Cancel' })).toHaveAttribute('href', `/studies/${mockStudyId}`)
+    })
+  })
+
+  describe('Form submission failures', () => {
+    test('Fatal server error shows an error at the top of the page', async () => {
+      const errorResponseUrl = '/studies/123/edit?fatal=1'
+      await renderPage(errorResponseUrl, errorResponseUrl)
+
+      expect(screen.getByRole('heading', { level: 1, name: 'Update study data' })).toBeInTheDocument()
+
+      await userEvent.click(screen.getByRole('button', { name: 'Update' }))
+
+      expect(mockRouter.asPath).toBe(errorResponseUrl)
+
+      const alert = screen.getByRole('alert')
+      expect(
+        within(alert).getByText('An unexpected error occurred whilst processing the form, please try again later.')
+      ).toBeInTheDocument()
     })
   })
 })

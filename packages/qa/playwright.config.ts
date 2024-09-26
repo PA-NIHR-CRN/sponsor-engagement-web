@@ -1,4 +1,7 @@
 import { devices, PlaywrightTestConfig } from '@playwright/test'
+import * as dotenv from 'dotenv'
+
+dotenv.config()
 
 const config: PlaywrightTestConfig = {
   testDir: './tests/features',
@@ -7,13 +10,13 @@ const config: PlaywrightTestConfig = {
   testIgnore: '**/apps/**',
   reporter: [
     ['list', { printSteps: true }],
-    ['html', { outputFolder: './test-report' }],
+    ['html', { outputFolder: './test-report', open: 'never' }],
   ],
   globalSetup: './hooks/GlobalSetup.ts',
   globalTeardown: './hooks/GlobalTeardown.ts',
   timeout: 30000,
   workers: 1, // to enforce serial execution
-  retries: 2,
+  retries: process.env.LOCAL_DEV ? 0 : 2, // enforce retried only in ci
   projects: [
     // Setup project for Authorization
     {

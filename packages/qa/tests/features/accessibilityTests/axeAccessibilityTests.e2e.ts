@@ -10,16 +10,16 @@ let registrationToken = ''
 test.beforeAll('Setup Tests', async () => {
   await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
   const randomStudyIdSelected = await seDatabaseReq(`SELECT Study.id FROM Study 
-INNER JOIN StudyOrganisation
-ON Study.id = StudyOrganisation.studyId
-WHERE StudyOrganisation.organisationId = ${startingOrgId} AND StudyOrganisation.isDeleted = 0 
-AND Study.isDueAssessment = 1 AND Study.isDeleted = 0
-ORDER BY RAND() LIMIT 1;`)
+    INNER JOIN StudyOrganisation
+    ON Study.id = StudyOrganisation.studyId
+    WHERE StudyOrganisation.organisationId = ${startingOrgId} AND StudyOrganisation.isDeleted = 0 
+    AND Study.isDueAssessment = 1 AND Study.isDeleted = 0
+    ORDER BY RAND() LIMIT 1;`)
   startingStudyId = randomStudyIdSelected[0].id
 
   const randomUserOrgIdSelected = await seDatabaseReq(`SELECT id FROM UserOrganisation
-  WHERE organisationId = ${startingOrgId} AND isDeleted = 0
-  ORDER BY RAND() LIMIT 1;`)
+    WHERE organisationId = ${startingOrgId} AND isDeleted = 0
+    ORDER BY RAND() LIMIT 1;`)
   userOrgRecordId = randomUserOrgIdSelected[0].id
 
   const randomRegTokenSelected = await seDatabaseReq(
@@ -84,7 +84,7 @@ test.describe('Study Accessibility Tests - @accessibility @accessibility_sponsor
     })
   })
 
-  test('Scan Assessment Page with AXE Tool @access_assessement', async ({
+  test('Scan Assessment Page with AXE Tool @access_assessment', async ({
     assessmentPage,
     makeAxeBuilder,
   }, testInfo) => {
@@ -141,6 +141,34 @@ test.describe('Study Accessibility Tests - @accessibility @accessibility_sponsor
     })
 
     await test.step('Then I should recieve no issue up to WCAG 2.1 AA Standard', async () => {
+      expect(axeScanResults.violations).toEqual([])
+    })
+  })
+
+  test('Scan Study Update Page with AXE Tool @access_support', async ({
+    studyUpdatePage,
+    makeAxeBuilder,
+  }, testInfo) => {
+    const axeScanner = makeAxeBuilder()
+    let axeScanResults = await axeScanner.analyze()
+    await test.step('Given I have navigated to the Study Update Page', async () => {
+      await studyUpdatePage.goto(startingStudyId.toString())
+      await studyUpdatePage.assertOnUpdateStudyPage(startingStudyId.toString())
+    })
+
+    await test.step('When I scan the Study Update Page for Accessibility Errors', async () => {
+      axeScanResults = await axeScanner
+        .options({ reporter: 'v2' })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+        .analyze()
+    })
+
+    await testInfo.attach('accessibility-scan-results', {
+      body: JSON.stringify(axeScanResults, null, 2),
+      contentType: 'application/json',
+    })
+
+    await test.step('Then I should receive no issue up to WCAG 2.1 AA Standard', async () => {
       expect(axeScanResults.violations).toEqual([])
     })
   })

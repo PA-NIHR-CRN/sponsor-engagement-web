@@ -5,12 +5,19 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import type { ReactElement } from 'react'
 
-import { AssessmentHistory, getAssessmentHistoryFromStudy, RequestSupport, StudyDetails } from '@/components/molecules'
+import {
+  AssessmentHistory,
+  EditHistory,
+  getAssessmentHistoryFromStudy,
+  RequestSupport,
+  StudyDetails,
+} from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
 import { EDIT_STUDY_ROLE, Roles } from '@/constants'
 import { FORM_SUCCESS_MESSAGES } from '@/constants/forms'
 import { ASSESSMENT_PAGE, STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/routes'
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
+import type { StudyEvalsWithoutGeneratedValues } from '@/lib/studies'
 import {
   getStudyById,
   mapCPMSStudyEvalToSEEval,
@@ -48,7 +55,7 @@ const renderBackLink = () => (
 
 export type StudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function Study({ user, study, studyInCPMS, assessments }: StudyProps) {
+export default function Study({ user, study, assessments }: StudyProps) {
   const router = useRouter()
   const successType = router.query.success as string
   const { organisationsByRole } = study
@@ -57,16 +64,18 @@ export default function Study({ user, study, studyInCPMS, assessments }: StudyPr
 
   const showEditStudyFeature = Boolean(user?.groups.includes(EDIT_STUDY_ROLE))
 
+  const showEditHistoryFeature = process.env.NEXT_PUBLIC_ENABLE_EDIT_HISTORY_FEATURE?.toLowerCase() === 'true'
+
   return (
     <Container>
-      <NextSeo title={`Study Progress Review - ${studyInCPMS.StudyShortName}`} />
+      <NextSeo title={`Study Progress Review - ${study.shortTitle}`} />
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
           {renderNotificationBanner(successType, successType === '1')}
 
           <h2 className="govuk-heading-l govuk-!-margin-bottom-1">
             <span className="govuk-visually-hidden">Study short title: </span>
-            {studyInCPMS.StudyShortName}
+            {study.shortTitle}
           </h2>
 
           <span className="govuk-body-m mb-0 text-darkGrey">
@@ -107,57 +116,44 @@ export default function Study({ user, study, studyInCPMS, assessments }: StudyPr
           <span className="govuk-body-s text-darkGrey">
             Based on the latest data uploaded to CPMS by the study team.
           </span>
+          {showEditHistoryFeature ? <EditHistory /> : null}
           <Table className="govuk-!-margin-top-3">
             <Table.Caption className="govuk-visually-hidden">Summary of study’s progress (UK)</Table.Caption>
             <Table.Body>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Study Status</Table.CellHeader>
-                <Table.Cell>{studyInCPMS.StudyStatus}</Table.Cell>
+                <Table.Cell>{study.studyStatus}</Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Study data indicates</Table.CellHeader>
                 <Table.Cell>
-                  {studyInCPMS.StudyEvaluationCategories.length
-                    ? studyInCPMS.StudyEvaluationCategories.map(
-                        (evalCategory) => evalCategory.EvaluationCategoryValue
-                      ).join(', ')
+                  {study.evaluationCategories.length
+                    ? study.evaluationCategories.map((evalCategory) => evalCategory.indicatorValue).join(', ')
                     : 'This study is progressing as planned'}
                 </Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Planned opening date</Table.CellHeader>
-                <Table.Cell>
-                  {studyInCPMS.PlannedOpeningDate ? formatDate(studyInCPMS.PlannedOpeningDate) : '-'}
-                </Table.Cell>
+                <Table.Cell>{study.plannedOpeningDate ? formatDate(study.plannedOpeningDate) : '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Actual opening date</Table.CellHeader>
-                <Table.Cell>
-                  {studyInCPMS.ActualOpeningDate ? formatDate(studyInCPMS.ActualOpeningDate) : '-'}
-                </Table.Cell>
+                <Table.Cell>{study.actualOpeningDate ? formatDate(study.actualOpeningDate) : '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Planned closure to recruitment date</Table.CellHeader>
-                <Table.Cell>
-                  {studyInCPMS.PlannedClosureToRecruitmentDate
-                    ? formatDate(studyInCPMS.PlannedClosureToRecruitmentDate)
-                    : '-'}
-                </Table.Cell>
+                <Table.Cell>{study.plannedClosureDate ? formatDate(study.plannedClosureDate) : '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Actual closure to recruitment date</Table.CellHeader>
-                <Table.Cell>
-                  {studyInCPMS.ActualClosureToRecruitmentDate
-                    ? formatDate(studyInCPMS.ActualClosureToRecruitmentDate)
-                    : '-'}
-                </Table.Cell>
+                <Table.Cell>{study.actualClosureDate ? formatDate(study.actualClosureDate) : '-'}</Table.Cell>
               </Table.Row>
-              {studyInCPMS.StudyStatus === 'Suspended' && Boolean(studyInCPMS.StudyEvaluationCategories.length) && (
+              {study.studyStatus === 'Suspended' && Boolean(study.evaluationCategories.length) && (
                 <Table.Row>
                   <Table.CellHeader className="w-1/3">Estimated reopening date</Table.CellHeader>
                   <Table.Cell>
-                    {studyInCPMS.StudyEvaluationCategories[0]?.ExpectedReopenDate
-                      ? formatDate(studyInCPMS.StudyEvaluationCategories[0].ExpectedReopenDate)
+                    {study.evaluationCategories[0].expectedReopenDate
+                      ? formatDate(study.evaluationCategories[0].expectedReopenDate)
                       : '-'}
                   </Table.Cell>
                 </Table.Row>
@@ -165,19 +161,19 @@ export default function Study({ user, study, studyInCPMS, assessments }: StudyPr
 
               <Table.Row>
                 <Table.CellHeader className="w-1/3" data-testid="uk-recruitment-target-label">
-                  {studyInCPMS.StudyRoute === 'Commercial'
+                  {study.route === 'Commercial'
                     ? 'UK recruitment target (excluding private sites)'
                     : 'UK recruitment target'}
                 </Table.CellHeader>
-                <Table.Cell>{studyInCPMS.SampleSize ?? '-'}</Table.Cell>
+                <Table.Cell>{study.sampleSize ?? '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.CellHeader className="w-1/3" data-testid="total-uk-recruitment-label">
-                  {studyInCPMS.StudyRoute === 'Commercial'
+                  {study.route === 'Commercial'
                     ? 'Total UK recruitment to date (excluding private sites)'
                     : 'Total UK recruitment to date'}
                 </Table.CellHeader>
-                <Table.Cell>{studyInCPMS.TotalRecruitmentToDate ?? '-'}</Table.Cell>
+                <Table.Cell>{study.totalRecruitmentToDate ?? '-'}</Table.Cell>
               </Table.Row>
             </Table.Body>
           </Table>
@@ -187,7 +183,7 @@ export default function Study({ user, study, studyInCPMS, assessments }: StudyPr
 
           {/* About this study */}
           <h3 className="govuk-heading-m govuk-!-margin-bottom-3">About this study</h3>
-          <StudyDetails study={study} studyInCPMS={studyInCPMS} />
+          <StudyDetails study={study} />
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
           <RequestSupport showCallToAction sticky />
@@ -232,23 +228,31 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
 
   if (!studyInCPMS) {
     return {
-      redirect: {
-        destination: '/500',
-      },
-    }
-  }
-
-  const { data: updatedStudy } = await updateStudy(study.cpmsId, mapCPMSStudyToSEStudy(studyInCPMS))
-
-  if (!updatedStudy) {
-    return {
-      redirect: {
-        destination: '/500',
+      props: {
+        user: session.user,
+        assessments: getAssessmentHistoryFromStudy(study),
+        study,
       },
     }
   }
 
   const studyEvalsInCPMS = studyInCPMS.StudyEvaluationCategories
+  const mappedStudyEvalsInCPMS: StudyEvalsWithoutGeneratedValues[] = studyEvalsInCPMS.map((studyEval) =>
+    mapCPMSStudyEvalToSEEval(studyEval)
+  )
+
+  const { data: updatedStudy } = await updateStudy(study.cpmsId, mapCPMSStudyToSEStudy(studyInCPMS))
+
+  if (!updatedStudy) {
+    return {
+      props: {
+        user: session.user,
+        assessments: getAssessmentHistoryFromStudy(study),
+        study,
+      },
+    }
+  }
+
   const currentStudyEvalsInSE = updatedStudy.evaluationCategories
 
   // Soft delete evaluations in SE that are no longer returned from CPMS
@@ -259,27 +263,17 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     )
     .map(({ id }) => id)
 
-  const mappedStudyEvalsInCPMS = studyEvalsInCPMS.map((studyEval) => mapCPMSStudyEvalToSEEval(studyEval))
   const { data: updatedStudyEvals } = await updateEvaluationCategories(
     study.id,
     mappedStudyEvalsInCPMS,
     studyEvalIdsToDelete
   )
 
-  if (!updatedStudyEvals) {
-    return {
-      redirect: {
-        destination: '/500',
-      },
-    }
-  }
-
   return {
     props: {
       user: session.user,
       assessments: getAssessmentHistoryFromStudy(study),
-      study: { ...study, evaluationCategories: updatedStudyEvals },
-      studyInCPMS,
+      study: { ...updatedStudy, evaluationCategories: updatedStudyEvals ?? study.evaluationCategories },
     },
   }
 })

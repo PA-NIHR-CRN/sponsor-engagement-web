@@ -34,7 +34,11 @@ export const constructDatePartsFromDate = (date?: Date | null) => {
 export const constructDateObjFromParts = (dateParts?: DateInputValue) => {
   if (!dateParts) return undefined
 
-  if (Object.values(dateParts).find((value) => Number.isNaN(Number(value)))) {
+  const containsAllValidNumbers = Object.values(dateParts).every(
+    (val: string) => !Number.isNaN(Number(val)) && val.trim() !== ''
+  )
+
+  if (!containsAllValidNumbers) {
     return undefined
   }
 

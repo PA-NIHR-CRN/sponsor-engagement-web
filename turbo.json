@@ -36,7 +36,8 @@
         "CPMS_API_URL",
         "CPMS_API_USERNAME",
         "CPMS_API_PASSWORD",
-        "ENABLE_DIRECT_STUDY_UPDATES"
+        "ENABLE_DIRECT_STUDY_UPDATES",
+        "NEXT_PUBLIC_ENABLE_EDIT_HISTORY_FEATURE"
       ]
     },
     "start": {},
@@ -80,7 +81,8 @@
         "CPMS_API_URL",
         "CPMS_API_USERNAME",
         "CPMS_API_PASSWORD",
-        "ENABLE_DIRECT_STUDY_UPDATES"
+        "ENABLE_DIRECT_STUDY_UPDATES",
+        "NEXT_PUBLIC_ENABLE_EDIT_HISTORY_FEATURE"
       ]
     },
     "test:ci": {
@@ -122,7 +124,8 @@
         "CPMS_API_URL",
         "CPMS_API_USERNAME",
         "CPMS_API_PASSWORD",
-        "ENABLE_DIRECT_STUDY_UPDATES"
+        "ENABLE_DIRECT_STUDY_UPDATES",
+        "NEXT_PUBLIC_ENABLE_EDIT_HISTORY_FEATURE"
       ]
     },
     "db:generate": { "cache": false },
