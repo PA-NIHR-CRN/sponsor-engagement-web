@@ -10,7 +10,7 @@ import type { UpdateStudyInput } from './studies'
 import {
   getStudiesForOrgs,
   getStudyById,
-  mapCPMSStatusToSEStatus,
+  mapCPMSStatusToFormStatus,
   mapCPMSStudyEvalToSEEval,
   mapCPMSStudyToSEStudy,
   updateEvaluationCategories,
@@ -658,20 +658,20 @@ describe('mapCPMSStudyEvalToSEEval', () => {
   })
 })
 
-describe('mapCPMSStatusToSEStatus', () => {
+describe('mapCPMSStatusToFormStatus', () => {
   it.each([
     ['Pre-Setup', 'In setup'],
     ['In Setup, Pending NHS Permission', 'In setup'],
     ['Closed to Recruitment', 'Closed'],
     ['Withdrawn During Setup', 'Withdrawn'],
   ])('correctly maps known statuses', (inputValue: string, expectedValue: string) => {
-    const result = mapCPMSStatusToSEStatus(inputValue)
+    const result = mapCPMSStatusToFormStatus(inputValue)
     expect(result).toEqual(expectedValue)
   })
 
   it('correctly returns the input value when a mapping does not exist', () => {
     const mockUnknownStatus = 'unknown'
-    const result = mapCPMSStatusToSEStatus(mockUnknownStatus)
+    const result = mapCPMSStatusToFormStatus(mockUnknownStatus)
     expect(result).toEqual(mockUnknownStatus)
   })
 })

@@ -1,11 +1,11 @@
-import assert from 'node:assert'
-
 import type { Prisma } from 'database'
 import type { NextApiRequest } from 'next'
 
+import { StudyUpdateRoute } from '@/@types/studies'
 import { Roles, StudyUpdateType } from '@/constants'
-import { mapEditStudyInputToCPMSStudy, updateStudyInCPMS } from '@/lib/cpms/studies'
+import { mapEditStudyInputToCPMSStudy, updateStudyInCPMS, validateStudyUpdate } from '@/lib/cpms/studies'
 import { prismaClient } from '@/lib/prisma'
+import { mapCPMSStatusToFormStatus } from '@/lib/studies'
 import { constructDateObjFromParts } from '@/utils/date'
 import type { EditStudyInputs } from '@/utils/schemas'
 import { studySchema } from '@/utils/schemas'
@@ -16,16 +16,28 @@ export interface ExtendedNextApiRequest extends NextApiRequest {
 }
 
 export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, async (req, res, session) => {
-  const { CPMS_API_URL, CPMS_API_USERNAME, CPMS_API_PASSWORD, ENABLE_DIRECT_STUDY_UPDATES } = process.env
+  const { ENABLE_DIRECT_STUDY_UPDATES } = process.env
 
   const enableDirectStudyUpdatesFeature = ENABLE_DIRECT_STUDY_UPDATES?.toLowerCase() === 'true'
 
   try {
-    assert(CPMS_API_URL)
-    assert(CPMS_API_USERNAME)
-    assert(CPMS_API_PASSWORD)
-
     const studyData = studySchema.parse(req.body)
+    const cpmsStudyInput = mapEditStudyInputToCPMSStudy(studyData)
+
+    const { validationResult, error: validateStudyError } = await validateStudyUpdate(
+      Number(studyData.cpmsId),
+      cpmsStudyInput
+    )
+
+    if (!validationResult) {
+      throw new Error(validateStudyError)
+    }
+
+    // When feature flag is enabled, we use the response from the validate endpoint to determine the update type
+    // Otherwise, we override this so we do not send any updates to CPMS
+    const isDirectUpdate = enableDirectStudyUpdatesFeature
+      ? validationResult.StudyUpdateRoute === StudyUpdateRoute.Direct
+      : false
 
     const formattedPlannedOpeningDate = constructDateObjFromParts(studyData.plannedOpeningDate)
     const formattedActualOpeningDate = constructDateObjFromParts(studyData.actualOpeningDate)
@@ -34,7 +46,8 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
     const formattedEstimatedReopeningDate = constructDateObjFromParts(studyData.estimatedReopeningDate)
 
     const studyUpdate: Prisma.StudyUpdatesCreateInput = {
-      studyStatus: studyData.status,
+      studyStatus: isDirectUpdate ? studyData.status : null,
+      studyStatusGroup: mapCPMSStatusToFormStatus(studyData.status),
       plannedOpeningDate: formattedPlannedOpeningDate,
       actualOpeningDate: formattedActualOpeningDate,
       plannedClosureToRecruitmentDate: formattedPlannedClosureDate,
@@ -48,7 +61,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
         },
       },
       studyUpdateType: {
-        connect: { id: StudyUpdateType.Proposed },
+        connect: { id: isDirectUpdate ? StudyUpdateType.Direct : StudyUpdateType.Proposed },
       },
       createdBy: {
         connect: { id: session.user.id },
@@ -63,22 +76,19 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
       data: studyUpdate,
     })
 
-    // TO DO: Update feature flag usage to override CPMS validate response
-    if (enableDirectStudyUpdatesFeature) {
-      const cpmsStudyInput = mapEditStudyInputToCPMSStudy(studyData)
-
-      const { study, error } = await updateStudyInCPMS(Number(studyData.cpmsId), cpmsStudyInput)
+    if (isDirectUpdate) {
+      const { study, error: updateStudyError } = await updateStudyInCPMS(Number(studyData.cpmsId), cpmsStudyInput)
 
       if (!study) {
-        throw new Error(error)
+        throw new Error(updateStudyError)
       }
     }
 
-    return res.redirect(302, `/studies/${studyData.studyId}?success=2`)
+    return res.redirect(302, `/studies/${studyData.studyId}?success=${isDirectUpdate ? 3 : 2}`)
   } catch (e) {
     const searchParams = new URLSearchParams({ fatal: '1' })
     const studyId = req.body.studyId
 
-    return res.redirect(302, `/editStudy/${studyId}?${searchParams.toString()}`)
+    return res.redirect(302, `/studies/${studyId}/edit?${searchParams.toString()}`)
   }
 })

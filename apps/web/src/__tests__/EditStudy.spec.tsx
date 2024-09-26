@@ -1,3 +1,4 @@
+import userEvent from '@testing-library/user-event'
 import axios from 'axios'
 import type { GetServerSidePropsContext } from 'next'
 import { getServerSession } from 'next-auth/next'
@@ -36,7 +37,7 @@ const organisationsByRole = {
 }
 const getServerSessionMock = jest.mocked(getServerSession)
 
-const renderPage = async (mockEditAxiosRequest = false) => {
+const renderPage = async (mockEditAxiosResponseUrl?: string, mockRouterPushUrl = `/studies/${mockStudyId}`) => {
   const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
   getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
   prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
@@ -44,10 +45,10 @@ const renderPage = async (mockEditAxiosRequest = false) => {
   prismaMock.study.update.mockResolvedValueOnce(mockStudyWithRelations)
   prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[0])
   prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[1])
-  if (mockEditAxiosRequest) {
-    mockedPostAxios.mockResolvedValueOnce({ request: { responseURL: `/studies/${mockStudyId}` } })
+  if (mockEditAxiosResponseUrl) {
+    mockedPostAxios.mockResolvedValueOnce({ request: { responseURL: mockEditAxiosResponseUrl } })
   }
-  await mockRouter.push(`/studies/${mockStudyId}`)
+  await mockRouter.push(mockRouterPushUrl)
 
   const { props } = (await getServerSideProps(context)) as {
     props: EditStudyProps
@@ -257,11 +258,10 @@ describe('EditStudy', () => {
       const statusFieldset = screen.getByRole('radiogroup', { name: 'Study status' })
       expect(statusFieldset).toBeInTheDocument()
 
-      // TODO: Why does accessible description for first element use parent label
-      // expect(within(statusFieldset).getByLabelText('In setup')).toBeInTheDocument()
-      // expect(within(statusFieldset).getByLabelText('In setup')).toHaveAccessibleDescription(
-      //   'Not yet open to recruitment.'
-      // )
+      expect(within(statusFieldset).getByLabelText('In setup')).toBeInTheDocument()
+      expect(within(statusFieldset).getByLabelText('In setup')).toHaveAccessibleDescription(
+        'Not yet open to recruitment.'
+      )
 
       expect(within(statusFieldset).getByLabelText('Open to recruitment')).toBeInTheDocument()
       expect(within(statusFieldset).getByLabelText('Open to recruitment')).toHaveAccessibleDescription(
@@ -311,9 +311,6 @@ describe('EditStudy', () => {
       // Form Input - UK Recruitment target
       const ukRecruitmentTarget = screen.getByLabelText('UK recruitment target')
       expect(ukRecruitmentTarget).toBeInTheDocument()
-      expect(ukRecruitmentTarget).toHaveAccessibleDescription(
-        'Changes to the UK recruitment target will be committed to CPMS after manual review.'
-      )
 
       // Form Input - Further information
       const furtherInformation = screen.getByLabelText('Further information')
@@ -333,6 +330,24 @@ describe('EditStudy', () => {
 
       // Cancel CTA
       expect(screen.getByRole('link', { name: 'Cancel' })).toHaveAttribute('href', `/studies/${mockStudyId}`)
+    })
+  })
+
+  describe('Form submission failures', () => {
+    test('Fatal server error shows an error at the top of the page', async () => {
+      const errorResponseUrl = '/studies/123/edit?fatal=1'
+      await renderPage(errorResponseUrl, errorResponseUrl)
+
+      expect(screen.getByRole('heading', { level: 1, name: 'Update study data' })).toBeInTheDocument()
+
+      await userEvent.click(screen.getByRole('button', { name: 'Update' }))
+
+      expect(mockRouter.asPath).toBe(errorResponseUrl)
+
+      const alert = screen.getByRole('alert')
+      expect(
+        within(alert).getByText('An unexpected error occurred whilst processing the form, please try again later.')
+      ).toBeInTheDocument()
     })
   })
 })

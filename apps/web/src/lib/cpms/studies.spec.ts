@@ -3,12 +3,13 @@ import axios from 'axios'
 import { constructDateObjFromParts } from '@/utils/date'
 import type { EditStudyInputs } from '@/utils/schemas'
 
-import { mockCPMSStudy, mockCPMSUpdateInput } from '../../mocks/studies'
-import { getStudyByIdFromCPMS, mapEditStudyInputToCPMSStudy, updateStudyInCPMS } from './studies'
+import { mockCPMSStudy, mockCPMSUpdateInput, mockCPMSValidationResult } from '../../mocks/studies'
+import { getStudyByIdFromCPMS, mapEditStudyInputToCPMSStudy, updateStudyInCPMS, validateStudyUpdate } from './studies'
 
 jest.mock('axios')
 const mockedGetAxios = jest.mocked(axios.get)
 const mockedPutAxios = jest.mocked(axios.put)
+const mockedPostAxios = jest.mocked(axios.post)
 
 jest.mock('../../utils/date')
 const mockConstructDateObjFromParts = constructDateObjFromParts as jest.MockedFunction<typeof constructDateObjFromParts>
@@ -164,6 +165,84 @@ describe('updateStudyInCPMS', () => {
       delete process.env[environmentVariable]
 
       const result = await updateStudyInCPMS(mockStudyId, mockCPMSUpdateInput)
+
+      expect(result.error?.includes(`${environmentVariable} is not defined`)).toEqual(true)
+    }
+  )
+})
+
+describe('validateStudyUpdate', () => {
+  beforeEach(() => {
+    process.env.CPMS_API_URL = mockedEnvVars.apiUrl
+    process.env.CPMS_API_USERNAME = mockedEnvVars.apiUsername
+    process.env.CPMS_API_PASSWORD = mockedEnvVars.apiPassword
+    jest.resetAllMocks()
+  })
+
+  afterAll(() => {
+    process.env = env
+  })
+
+  it('should return validation result when API request is successful', async () => {
+    const mockResponse = {
+      StatusCode: 200,
+      Result: mockCPMSValidationResult,
+    }
+
+    mockedPostAxios.mockResolvedValueOnce({ data: mockResponse })
+
+    const result = await validateStudyUpdate(mockStudyId, mockCPMSUpdateInput)
+
+    expect(result).toStrictEqual({ validationResult: mockResponse.Result })
+
+    expect(mockedPostAxios).toHaveBeenCalledTimes(1)
+    expect(mockedPostAxios).toHaveBeenCalledWith(
+      `${mockedEnvVars.apiUrl}/studies/${mockStudyId}/engagement-info/validate`,
+      JSON.stringify(mockCPMSUpdateInput),
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          username: mockedEnvVars.apiUsername,
+          password: mockedEnvVars.apiPassword,
+        },
+      }
+    )
+  })
+
+  it('should return an error when CPMS does not return a 200 status code', async () => {
+    const mockErrorResponseData = {
+      StatusCode: 500,
+      Result: {},
+    }
+
+    mockedPostAxios.mockResolvedValueOnce({ data: mockErrorResponseData })
+
+    const result = await validateStudyUpdate(mockStudyId, mockCPMSUpdateInput)
+
+    expect(result).toEqual({ validationResult: null, error: 'An error occured validating study in CPMS' })
+
+    expect(mockedPostAxios).toHaveBeenCalledTimes(1)
+  })
+
+  it('should return an error when request to CPMS throws an error', async () => {
+    const mockErrorMessage = 'Oh no, an error'
+
+    mockedPostAxios.mockRejectedValueOnce(new Error(mockErrorMessage))
+
+    const result = await validateStudyUpdate(mockStudyId, mockCPMSUpdateInput)
+
+    expect(result).toEqual({ validationResult: null, error: mockErrorMessage })
+
+    expect(mockedPostAxios).toHaveBeenCalledTimes(1)
+  })
+
+  it.each(['CPMS_API_URL', 'CPMS_API_USERNAME', 'CPMS_API_PASSWORD'])(
+    'should throw an error when % environment variable does not exist',
+    async (environmentVariable: string) => {
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- listed values are safe to delete
+      delete process.env[environmentVariable]
+
+      const result = await validateStudyUpdate(mockStudyId, mockCPMSUpdateInput)
 
       expect(result.error?.includes(`${environmentVariable} is not defined`)).toEqual(true)
     }

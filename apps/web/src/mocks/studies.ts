@@ -2,7 +2,12 @@ import { simpleFaker } from '@faker-js/faker'
 import type { Prisma } from 'database'
 import { Mock } from 'ts-mockery'
 
-import { type Study, StudySponsorOrganisationRole, StudySponsorOrganisationRoleRTSIdentifier } from '@/@types/studies'
+import type { CPMSValidationResult, Study } from '@/@types/studies'
+import {
+  StudySponsorOrganisationRole,
+  StudySponsorOrganisationRoleRTSIdentifier,
+  StudyUpdateRoute,
+} from '@/@types/studies'
 import type { StudyForExport } from '@/lib/studies'
 
 export const mockStudiesForExport = Array.from({ length: 3 }).map((_, index) =>
@@ -80,6 +85,10 @@ export const mockStudiesForExport = Array.from({ length: 3 }).map((_, index) =>
     },
   })
 )
+
+export const mockCPMSValidationResult = Mock.of<CPMSValidationResult>({
+  StudyUpdateRoute: StudyUpdateRoute.Direct,
+})
 
 export const mockCPMSStudy = Mock.of<Study>({
   StudyId: 622,

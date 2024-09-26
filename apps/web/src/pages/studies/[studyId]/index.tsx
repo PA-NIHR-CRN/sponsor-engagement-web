@@ -5,9 +5,16 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import type { ReactElement } from 'react'
 
-import { AssessmentHistory, getAssessmentHistoryFromStudy, RequestSupport, StudyDetails } from '@/components/molecules'
+import {
+  AssessmentHistory,
+  EditHistory,
+  getAssessmentHistoryFromStudy,
+  RequestSupport,
+  StudyDetails,
+} from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
 import { EDIT_STUDY_ROLE, Roles } from '@/constants'
+import { FORM_SUCCESS_MESSAGES } from '@/constants/forms'
 import { ASSESSMENT_PAGE, STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/routes'
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
 import type { StudyEvalsWithoutGeneratedValues } from '@/lib/studies'
@@ -21,14 +28,18 @@ import {
 import { formatDate } from '@/utils/date'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
-const renderNotificationBanner = (success: boolean) =>
-  success ? (
-    <NotificationBanner heading="The study assessment was successfully saved" success>
-      Request{' '}
-      <Link className="govuk-notification-banner__link" href={SUPPORT_PAGE}>
-        NIHR RDN support
-      </Link>{' '}
-      for this study.
+const renderNotificationBanner = (success: string | undefined, showRequestSupportLink: boolean) =>
+  success || !Number.isNaN(Number(success)) ? (
+    <NotificationBanner heading={FORM_SUCCESS_MESSAGES[Number(success)]} success>
+      {showRequestSupportLink ? (
+        <>
+          Request{' '}
+          <Link className="govuk-notification-banner__link" href={SUPPORT_PAGE}>
+            NIHR RDN support
+          </Link>{' '}
+          for this study.
+        </>
+      ) : null}
     </NotificationBanner>
   ) : null
 
@@ -46,18 +57,21 @@ export type StudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
 export default function Study({ user, study, assessments }: StudyProps) {
   const router = useRouter()
+  const successType = router.query.success as string
   const { organisationsByRole } = study
 
   const supportOrgName = organisationsByRole.CRO ?? organisationsByRole.CTU
 
   const showEditStudyFeature = Boolean(user?.groups.includes(EDIT_STUDY_ROLE))
 
+  const showEditHistoryFeature = process.env.NEXT_PUBLIC_ENABLE_EDIT_HISTORY_FEATURE?.toLowerCase() === 'true'
+
   return (
     <Container>
       <NextSeo title={`Study Progress Review - ${study.shortTitle}`} />
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
-          {renderNotificationBanner(Boolean(router.query.success))}
+          {renderNotificationBanner(successType, successType === '1')}
 
           <h2 className="govuk-heading-l govuk-!-margin-bottom-1">
             <span className="govuk-visually-hidden">Study short title: </span>
@@ -102,6 +116,7 @@ export default function Study({ user, study, assessments }: StudyProps) {
           <span className="govuk-body-s text-darkGrey">
             Based on the latest data uploaded to CPMS by the study team.
           </span>
+          {showEditHistoryFeature ? <EditHistory /> : null}
           <Table className="govuk-!-margin-top-3">
             <Table.Caption className="govuk-visually-hidden">Summary of study’s progress (UK)</Table.Caption>
             <Table.Body>

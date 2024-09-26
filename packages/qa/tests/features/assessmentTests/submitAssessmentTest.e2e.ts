@@ -13,9 +13,9 @@ test.beforeEach('Setup Tests', async () => {
     `SELECT id FROM Assessment WHERE studyId = ${noAssessmentStudyId};`
   )
   for (let index = 0; index < allAssessmentIdsForStudy.length; index++) {
-    const assesmentId = allAssessmentIdsForStudy[index].id
-    await seDatabaseReq(`DELETE FROM AssessmentFurtherInformation WHERE assessmentId = ${assesmentId};`)
-    await seDatabaseReq(`DELETE FROM Assessment WHERE id = ${assesmentId};`)
+    const assessmentId = allAssessmentIdsForStudy[index].id
+    await seDatabaseReq(`DELETE FROM AssessmentFurtherInformation WHERE assessmentId = ${assessmentId};`)
+    await seDatabaseReq(`DELETE FROM Assessment WHERE id = ${assessmentId};`)
   }
   await seDatabaseReq(`UPDATE Study SET isDueAssessment = 1 WHERE id = ${noAssessmentStudyId};`)
 })
