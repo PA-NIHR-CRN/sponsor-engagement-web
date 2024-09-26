@@ -28,6 +28,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
     const dayError = errors[`${rest.name}-day`]
     const monthError = errors[`${rest.name}-month`]
     const yearError = errors[`${rest.name}-year`]
+    const overallError = errors[rest.name]
 
     const handleInputChange = (event: React.FormEvent<HTMLInputElement>, type: keyof DateInputValue) => {
       const { value: inputValue } = event.currentTarget
@@ -43,7 +44,8 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
     return (
       <div
         className={clsx('govuk-form-group', {
-          'govuk-form-group--error': Boolean(dayError) || Boolean(monthError) || Boolean(yearError),
+          'govuk-form-group--error':
+            Boolean(dayError) || Boolean(monthError) || Boolean(yearError) || Boolean(overallError),
         })}
       >
         <Fieldset
@@ -51,9 +53,11 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
             [`${rest.name}.day-error`]: dayError,
             [`${rest.name}.month-error`]: monthError,
             [`${rest.name}.year-error`]: yearError,
+            [`${rest.name}-error`]: overallError,
           })}
           aria-disabled={disabled}
           disabled={disabled}
+          id={rest.name}
           legend={label}
           name={rest.name}
           role="group"
@@ -67,7 +71,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
             <div className="govuk-date-input__item">
               <TextInput
                 displayInlineError={false}
-                errors={errors}
+                errors={overallError ? { [`${rest.name}-day`]: overallError } : errors}
                 inputClassName="govuk-input--width-2"
                 label="Day"
                 labelClassName="font-normal"
@@ -89,7 +93,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
             <div className="govuk-date-input__item">
               <TextInput
                 displayInlineError={false}
-                errors={errors}
+                errors={overallError ? { [`${rest.name}-month`]: overallError } : errors}
                 inputClassName="govuk-input--width-2"
                 label="Month"
                 labelClassName="font-normal"
@@ -111,7 +115,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
             <div className="govuk-date-input__item">
               <TextInput
                 displayInlineError={false}
-                errors={errors}
+                errors={overallError ? { [`${rest.name}-year`]: overallError } : errors}
                 inputClassName="govuk-input--width-4"
                 label="Year"
                 labelClassName="font-normal"

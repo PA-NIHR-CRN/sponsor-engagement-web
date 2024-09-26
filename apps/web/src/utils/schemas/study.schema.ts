@@ -1,23 +1,47 @@
 import * as z from 'zod'
 
-const dateSchema = (fieldName: string) =>
-  z.object({
-    year: z.string().refine((arg) => !(Number(arg) < 1950), `${fieldName} requires a valid year`),
-    day: z.string().refine((arg) => !(Number(arg) < 1 || Number(arg) > 31), `${fieldName} requires a valid day`),
-    month: z.string().refine((arg) => !(Number(arg) < 1 || Number(arg) > 12), `${fieldName} requires a valid month`),
-  })
+import { validateAllDates } from '../editStudyForm'
 
-export const studySchema = z.object({
-  studyId: z.number(),
-  cpmsId: z.string(),
-  status: z.string(),
-  plannedOpeningDate: dateSchema('Planned opening to recruitment date').optional().nullable(),
-  actualOpeningDate: dateSchema('Actual opening to recruitment date').optional().nullable(),
-  plannedClosureDate: dateSchema('Planned closure to recruitment date').optional().nullable(),
-  actualClosureDate: dateSchema('Actual closure to recruitment date').optional().nullable(),
-  estimatedReopeningDate: dateSchema('Estimate reopening date').optional(),
-  recruitmentTarget: z.string().optional(),
-  furtherInformation: z.string().optional(),
+const dateSchema = z.object({
+  year: z.string(),
+  day: z.string(),
+  month: z.string(),
 })
+
+export const studySchema = z
+  .object({
+    studyId: z.number(),
+    cpmsId: z.string(),
+    status: z.string(),
+    plannedOpeningDate: dateSchema.optional().nullable(),
+    actualOpeningDate: dateSchema.optional().nullable(),
+    plannedClosureDate: dateSchema.optional().nullable(),
+    actualClosureDate: dateSchema.optional().nullable(),
+    estimatedReopeningDate: dateSchema.optional().nullable(),
+    recruitmentTarget: z.string().optional(),
+    furtherInformation: z.string().optional(),
+  })
+  .superRefine((values, ctx) => {
+    // Basic date validation for all date fields
+    validateAllDates(ctx, values)
+
+    // Status based validation
+    // if (values.status === 'Closed to Recruitment, In Follow Up') {
+    //   const dateObject = constructDateObjFromParts(values.estimatedReopeningDate)
+    //   if (!dateObject) {
+    //     ctx.addIssue({
+    //       code: z.ZodIssueCode.custom,
+    //       message: 'Estimated reopening date required when changing status to Closed, in follow up',
+    //       path: ['estimatedReopeningDate'],
+    //     })
+    //   } else if (dateObject < new Date()) {
+    //     ctx.addIssue({
+    //       code: z.ZodIssueCode.custom,
+    //       message: 'Estimated reopening date is required to be in the future',
+    //       path: ['estimatedReopeningDate'],
+    //     })
+    //   }
+    // }
+  })
 
 export type EditStudyInputs = z.infer<typeof studySchema>

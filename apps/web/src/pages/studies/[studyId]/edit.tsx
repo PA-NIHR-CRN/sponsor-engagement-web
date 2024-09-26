@@ -3,8 +3,8 @@ import { Container } from '@nihr-ui/frontend'
 import clsx from 'clsx'
 import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
-import { type ReactElement, useCallback, useEffect, useState } from 'react'
-import type { FieldError, FieldErrors, FieldErrorsImpl, Merge } from 'react-hook-form'
+import { type ReactElement, useCallback } from 'react'
+import type { FieldError } from 'react-hook-form'
 import { Controller, useForm } from 'react-hook-form'
 
 import { ErrorSummary, Fieldset, Form, Radio, RadioGroup } from '@/components/atoms'
@@ -40,41 +40,6 @@ import { withServerSideProps } from '@/utils/withServerSideProps'
 
 export type EditStudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-const dateFieldNames: Partial<keyof EditStudyInputs>[] = [
-  'actualOpeningDate',
-  'plannedClosureDate',
-  'plannedOpeningDate',
-]
-
-function mapErrorObject(obj: FieldErrors): FieldErrors {
-  const result: FieldErrors = {}
-
-  function flattenDateFields(
-    parentKey: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- type taken from rhf
-    value: FieldError | Merge<FieldError, FieldErrorsImpl<any>> | undefined
-  ) {
-    for (const key in value) {
-      if (typeof value[key] === 'object') {
-        const newKey = `${parentKey}-${key}`
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- looping through value, so value[key] is safe
-        result[newKey] = value[key]
-      }
-    }
-  }
-
-  // Date fields have nested error messages that needs to be flattened
-  for (const key in obj) {
-    if (dateFieldNames.includes(key as keyof EditStudyInputs)) {
-      flattenDateFields(key, obj[key])
-    } else {
-      result[key] = obj[key]
-    }
-  }
-
-  return result
-}
-
 const transformDateValue = (input?: DateInputValue | null) => ({
   day: input?.day ?? '',
   month: input?.month ?? '',
@@ -87,9 +52,9 @@ export default function EditStudy({ study }: EditStudyProps) {
     defaultValues: {
       ...mapStudyToStudyFormInput(study),
     },
+    mode: 'onSubmit',
+    reValidateMode: 'onSubmit',
   })
-
-  const [mappedErrors, setMappedErrors] = useState({})
 
   const { organisationsByRole } = study
 
@@ -116,14 +81,6 @@ export default function EditStudy({ study }: EditStudyProps) {
     formState,
     onFoundError: handleFoundError,
   })
-
-  useEffect(() => {
-    console.log('hitting use effect', errors)
-    const mappedRes = mapErrorObject(errors)
-
-    setMappedErrors(mappedRes)
-    console.log({ mappedRes })
-  }, [errors])
 
   return (
     <Container>
@@ -157,7 +114,7 @@ export default function EditStudy({ study }: EditStudyProps) {
               })
             }}
           >
-            <ErrorSummary errors={mappedErrors} />
+            <ErrorSummary errors={errors} />
             <input type="hidden" {...register('cpmsId')} defaultValue={defaultValues?.cpmsId} />
             <Fieldset>
               {/* Status */}
@@ -201,17 +158,15 @@ export default function EditStudy({ study }: EditStudyProps) {
                 render={({ field }) => {
                   const { value, onChange, ref, name } = field
 
-                  const handleInputChange = (input: DateInputValue) => {
-                    const allFieldsEmpty = Object.values(input).every((val) => val === '')
-                    onChange(allFieldsEmpty ? null : input)
-                  }
-
                   return (
                     <DateInput
-                      errors={mappedErrors}
+                      errors={errors}
                       label="Planned opening to recruitment date"
                       name={name}
-                      onChange={handleInputChange}
+                      onChange={(input) => {
+                        const allFieldsEmpty = Object.values(input).every((val) => val === '')
+                        onChange(allFieldsEmpty ? null : input)
+                      }}
                       ref={ref}
                       value={transformDateValue(value)}
                     />
@@ -226,17 +181,15 @@ export default function EditStudy({ study }: EditStudyProps) {
                 render={({ field }) => {
                   const { value, onChange, ref, name } = field
 
-                  const handleInputChange = (input: DateInputValue) => {
-                    const allFieldsEmpty = Object.values(input).every((val) => val === '')
-                    onChange(allFieldsEmpty ? null : input)
-                  }
-
                   return (
                     <DateInput
-                      errors={mappedErrors}
+                      errors={errors}
                       label="Actual opening to recruitment date"
                       name={name}
-                      onChange={handleInputChange}
+                      onChange={(input) => {
+                        const allFieldsEmpty = Object.values(input).every((val) => val === '')
+                        onChange(allFieldsEmpty ? null : input)
+                      }}
                       ref={ref}
                       value={transformDateValue(value)}
                     />
@@ -251,17 +204,15 @@ export default function EditStudy({ study }: EditStudyProps) {
                 render={({ field }) => {
                   const { value, onChange, ref, name } = field
 
-                  const handleInputChange = (input: DateInputValue) => {
-                    const allFieldsEmpty = Object.values(input).every((val) => val === '')
-                    onChange(allFieldsEmpty ? null : input)
-                  }
-
                   return (
                     <DateInput
-                      errors={mappedErrors}
+                      errors={errors}
                       label="Planned closure to recruitment date"
                       name={name}
-                      onChange={handleInputChange}
+                      onChange={(input) => {
+                        const allFieldsEmpty = Object.values(input).every((val) => val === '')
+                        onChange(allFieldsEmpty ? null : input)
+                      }}
                       ref={ref}
                       value={transformDateValue(value)}
                     />
@@ -276,17 +227,15 @@ export default function EditStudy({ study }: EditStudyProps) {
                 render={({ field }) => {
                   const { value, onChange, ref, name } = field
 
-                  const handleInputChange = (input: DateInputValue) => {
-                    const allFieldsEmpty = Object.values(input).every((val) => val === '')
-                    onChange(allFieldsEmpty ? null : input)
-                  }
-
                   return (
                     <DateInput
-                      errors={mappedErrors}
+                      errors={errors}
                       label="Actual closure to recruitment date"
                       name={name}
-                      onChange={handleInputChange}
+                      onChange={(input) => {
+                        const allFieldsEmpty = Object.values(input).every((val) => val === '')
+                        onChange(allFieldsEmpty ? null : input)
+                      }}
                       ref={ref}
                       value={transformDateValue(value)}
                     />
@@ -301,17 +250,15 @@ export default function EditStudy({ study }: EditStudyProps) {
                 render={({ field }) => {
                   const { value, onChange, ref, name } = field
 
-                  const handleInputChange = (input: DateInputValue) => {
-                    const allFieldsEmpty = Object.values(input).every((val) => val === '')
-                    onChange(allFieldsEmpty ? null : input)
-                  }
-
                   return (
                     <DateInput
-                      errors={mappedErrors}
+                      errors={errors}
                       label="Estimated reopening date"
                       name={name}
-                      onChange={handleInputChange}
+                      onChange={(input) => {
+                        const allFieldsEmpty = Object.values(input).every((val) => val === '')
+                        onChange(allFieldsEmpty ? null : input)
+                      }}
                       ref={ref}
                       value={transformDateValue(value)}
                     />
