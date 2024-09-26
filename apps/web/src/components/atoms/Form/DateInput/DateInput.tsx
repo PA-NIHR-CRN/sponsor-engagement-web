@@ -69,7 +69,6 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 displayInlineError={false}
                 errors={errors}
                 inputClassName="govuk-input--width-2"
-                inputMode="numeric"
                 label="Day"
                 labelClassName="font-normal"
                 maxLength={2}
@@ -79,13 +78,12 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 }}
                 ref={ref}
                 required={required}
-                type="text"
+                type="number"
                 value={value.day}
                 {...rest}
                 disabled={disabled}
                 id={`${rest.name}-day`}
                 name={`${rest.name}-day`}
-                pattern="[0-9]*"
               />
             </div>
             <div className="govuk-date-input__item">
@@ -93,7 +91,6 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 displayInlineError={false}
                 errors={errors}
                 inputClassName="govuk-input--width-2"
-                inputMode="numeric"
                 label="Month"
                 labelClassName="font-normal"
                 onChange={(e) => {
@@ -101,7 +98,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 }}
                 ref={ref}
                 required={required}
-                type="text"
+                type="number"
                 value={value.month}
                 {...rest}
                 disabled={disabled}
@@ -109,7 +106,6 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 maxLength={2}
                 minLength={1}
                 name={`${rest.name}-month`}
-                pattern="[0-9]*"
               />
             </div>
             <div className="govuk-date-input__item">
@@ -117,7 +113,6 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 displayInlineError={false}
                 errors={errors}
                 inputClassName="govuk-input--width-4"
-                inputMode="numeric"
                 label="Year"
                 labelClassName="font-normal"
                 maxLength={4}
@@ -127,13 +122,12 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 }}
                 ref={ref}
                 required={required}
-                type="text"
+                type="number"
                 value={value.year}
                 {...rest}
                 disabled={disabled}
                 id={`${rest.name}-year`}
                 name={`${rest.name}-year`}
-                pattern="[0-9]*"
               />
             </div>
           </div>
