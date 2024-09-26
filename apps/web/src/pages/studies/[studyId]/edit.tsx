@@ -7,7 +7,7 @@ import { type ReactElement, useCallback, useEffect, useState } from 'react'
 import type { FieldError, FieldErrors, FieldErrorsImpl, Merge } from 'react-hook-form'
 import { Controller, useForm } from 'react-hook-form'
 
-import { ErrorSummary, Fieldset, Form } from '@/components/atoms'
+import { ErrorSummary, Fieldset, Form, Radio, RadioGroup } from '@/components/atoms'
 import { DateInput } from '@/components/atoms/Form/DateInput/DateInput'
 import type { DateInputValue } from '@/components/atoms/Form/DateInput/types'
 import { Textarea } from '@/components/atoms/Form/Textarea/Textarea'
@@ -16,13 +16,20 @@ import Warning from '@/components/atoms/Warning/Warning'
 import { RequestSupport } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
 import { EDIT_STUDY_ROLE, Roles } from '@/constants'
-import { FURTHER_INFO_MAX_CHARACTERS, GENERIC_STUDIES_GUIDANCE_TEXT, PAGE_TITLE } from '@/constants/editStudyForm'
+import {
+  FURTHER_INFO_MAX_CHARACTERS,
+  GENERIC_STUDIES_GUIDANCE_TEXT,
+  PAGE_TITLE,
+  studyStatuses,
+} from '@/constants/editStudyForm'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
 import {
   getStudyById,
+  mapCPMSStatusToFormStatus,
   mapCPMSStudyEvalToSEEval,
   mapCPMSStudyToSEStudy,
+  mapFormStatusToCPMSStatus,
   updateEvaluationCategories,
   updateStudy,
 } from '@/lib/studies'
@@ -50,7 +57,7 @@ function mapErrorObject(obj: FieldErrors): FieldErrors {
     for (const key in value) {
       if (typeof value[key] === 'object') {
         const newKey = `${parentKey}-${key}`
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- TODO: look into
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- looping through value, so value[key] is safe
         result[newKey] = value[key]
       }
     }
@@ -154,7 +161,7 @@ export default function EditStudy({ study }: EditStudyProps) {
             <input type="hidden" {...register('cpmsId')} defaultValue={defaultValues?.cpmsId} />
             <Fieldset>
               {/* Status */}
-              {/* <Controller
+              <Controller
                 control={control}
                 name="status"
                 render={({ field }) => {
@@ -185,7 +192,7 @@ export default function EditStudy({ study }: EditStudyProps) {
                     </RadioGroup>
                   )
                 }}
-              /> */}
+              />
 
               {/* Planned opening to recruitment date */}
               <Controller
