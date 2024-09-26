@@ -2,7 +2,6 @@ import React from 'react'
 import { Mock } from 'ts-mockery'
 
 import { render, screen, within } from '@/config/TestUtils'
-import { mockCPMSStudy } from '@/mocks/studies'
 
 import type { StudyDetailsProps } from './StudyDetails'
 import { StudyDetails } from './StudyDetails'
@@ -14,7 +13,6 @@ describe('StudyDetails Component', () => {
       protocolReferenceNumber: 'Protocol123',
       irasId: 'IRAS456',
       cpmsId: 12345,
-      organisations: [{ organisation: { name: 'Sponsor Org' } }],
       organisationsByRole: {
         Sponsor: 'Sponsor Org',
         CTU: 'CTU Org',
@@ -24,7 +22,6 @@ describe('StudyDetails Component', () => {
       chiefInvestigatorFirstName: 'John',
       chiefInvestigatorLastName: 'Doe',
     },
-    studyInCPMS: mockCPMSStudy,
   })
 
   test('renders study details with default props', () => {
@@ -47,14 +44,14 @@ describe('StudyDetails Component', () => {
 
     const aboutRows = within(table).getAllByRole('row')
     expect(aboutRows.map((row) => within(row).getByRole('cell').textContent)).toEqual([
-      mockCPMSStudy.Title,
-      mockCPMSStudy.IrasId.toString(),
-      mockCPMSStudy.StudyId.toString(),
+      defaultProps.study.title,
+      defaultProps.study.irasId,
+      defaultProps.study.cpmsId.toString(),
       'Sponsor Org',
       'CTU Org',
       'CRO Org',
-      mockCPMSStudy.ManagingSpecialty,
-      `${mockCPMSStudy.ChiefInvestigatorFirstName} ${mockCPMSStudy.ChiefInvestigatorLastName}`,
+      defaultProps.study.managingSpeciality,
+      `${defaultProps.study.chiefInvestigatorFirstName} ${defaultProps.study.chiefInvestigatorLastName}`,
     ])
   })
 
@@ -65,7 +62,6 @@ describe('StudyDetails Component', () => {
         protocolReferenceNumber: null,
         irasId: null,
         cpmsId: 12345,
-        organisations: [{ organisation: { name: 'Sponsor Org' } }],
         organisationsByRole: {
           Sponsor: 'Sponsor Org',
         },
@@ -73,7 +69,6 @@ describe('StudyDetails Component', () => {
         chiefInvestigatorFirstName: null,
         chiefInvestigatorLastName: null,
       },
-      studyInCPMS: {},
     })
 
     render(<StudyDetails {...props} />)
@@ -109,7 +104,6 @@ describe('StudyDetails Component', () => {
         protocolReferenceNumber: '123',
         irasId: null,
         cpmsId: 12345,
-        organisations: [{ organisation: { name: 'Sponsor Org' } }],
         organisationsByRole: {
           Sponsor: 'Sponsor Org',
         },
@@ -118,7 +112,6 @@ describe('StudyDetails Component', () => {
         chiefInvestigatorFirstName: null,
         chiefInvestigatorLastName: null,
       },
-      studyInCPMS: {},
     })
 
     render(<StudyDetails {...props} />)
@@ -158,7 +151,6 @@ describe('StudyDetails Component', () => {
           CRO: 'CRO Org',
         },
       },
-      studyInCPMS: {},
     })
 
     render(<StudyDetails {...props} />)

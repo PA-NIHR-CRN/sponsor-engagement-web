@@ -1,7 +1,6 @@
 import { simpleFaker } from '@faker-js/faker'
 import { logger } from '@nihr-ui/logger'
 import userEvent from '@testing-library/user-event'
-import axios from 'axios'
 import type { Prisma } from 'database'
 import type { GetServerSidePropsContext } from 'next'
 import { getServerSession } from 'next-auth/next'
@@ -10,7 +9,6 @@ import { NextSeo } from 'next-seo'
 import { Mock } from 'ts-mockery'
 
 import { render, screen, within } from '@/config/TestUtils'
-import { mockCPMSStudy } from '@/mocks/studies'
 
 import { prismaMock } from '../__mocks__/prisma'
 import { userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
@@ -23,8 +21,6 @@ jest.mock('next-auth/next')
 jest.mock('next-seo')
 jest.mock('axios')
 jest.mock('@nihr-ui/logger')
-
-const mockedGetAxios = jest.mocked(axios.get)
 
 type StudyWithRelations = Prisma.StudyGetPayload<{
   include: {
@@ -112,10 +108,7 @@ const study = Mock.of<StudyWithRelations>({
     },
   ],
 })
-const mockCPMSResponse = {
-  StatusCode: 200,
-  Result: mockCPMSStudy,
-}
+
 const env = { ...process.env }
 const mockedEnvVars = {
   apiUrl: 'cpms-api',
@@ -131,7 +124,6 @@ const renderPage = async (
   jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRole)
   prismaMock.$transaction.mockResolvedValueOnce([firstStudyResponse])
   prismaMock.$transaction.mockResolvedValueOnce([sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
-  mockedGetAxios.mockResolvedValueOnce({ data: mockCPMSResponse })
 
   await mockRouter.push(url)
 
@@ -348,12 +340,16 @@ describe('Assessment', () => {
 
       const aboutRows = within(table).getAllByRole('row')
       expect(aboutRows.map((row) => within(row).getByRole('cell').textContent)).toEqual([
-        mockCPMSStudy.Title,
-        mockCPMSStudy.IrasId.toString(),
-        `${mockCPMSStudy.StudyId}`,
+        study.title,
+        study.irasId ?? 'None available',
+        study.cpmsId.toString(),
         study.organisations[0].organisation.name,
-        mockCPMSStudy.ManagingSpecialty,
-        `${mockCPMSStudy.ChiefInvestigatorFirstName} ${mockCPMSStudy.ChiefInvestigatorLastName}`,
+        study.managingSpeciality,
+        `${
+          study.chiefInvestigatorFirstName
+            ? `${study.chiefInvestigatorFirstName}, ${study.chiefInvestigatorLastName}`
+            : 'None available'
+        }`,
       ])
     })
   })
