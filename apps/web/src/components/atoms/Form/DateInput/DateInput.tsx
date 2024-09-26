@@ -25,16 +25,16 @@ const initialDateInputState: DateInputValue = {
 
 export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
   ({ label, errors, required, value = { ...initialDateInputState }, onChange, disabled, ...rest }, ref) => {
-    const dayError = errors.day
-    const monthError = errors.month
-    const yearError = errors.year
+    const dayError = errors[`${rest.name}-day`]
+    const monthError = errors[`${rest.name}-month`]
+    const yearError = errors[`${rest.name}-year`]
 
-    const handleInputChange = (event: React.FormEvent<HTMLInputElement>) => {
-      const { name: fieldName, value: inputValue } = event.currentTarget
+    const handleInputChange = (event: React.FormEvent<HTMLInputElement>, type: keyof DateInputValue) => {
+      const { value: inputValue } = event.currentTarget
 
       const newDate = {
         ...value,
-        [fieldName]: inputValue,
+        [type]: inputValue,
       }
 
       onChange(newDate)
@@ -58,9 +58,10 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
           name={rest.name}
           role="group"
         >
-          <ErrorInline errors={errors} name="day" />
-          <ErrorInline errors={errors} name="month" />
-          <ErrorInline errors={errors} name="year" />
+          <ErrorInline errors={errors} name={`${rest.name}-day`} />
+          <ErrorInline errors={errors} name={`${rest.name}-month`} />
+          <ErrorInline errors={errors} name={`${rest.name}-year`} />
+          <ErrorInline errors={errors} name={rest.name} />
 
           <div className="govuk-date-input">
             <div className="govuk-date-input__item">
@@ -73,14 +74,18 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 labelClassName="font-normal"
                 maxLength={2}
                 minLength={1}
-                onChange={handleInputChange}
+                onChange={(e) => {
+                  handleInputChange(e, 'day')
+                }}
                 ref={ref}
                 required={required}
-                type="number"
+                type="text"
                 value={value.day}
                 {...rest}
                 disabled={disabled}
-                name="day"
+                id={`${rest.name}-day`}
+                name={`${rest.name}-day`}
+                pattern="[0-9]*"
               />
             </div>
             <div className="govuk-date-input__item">
@@ -91,16 +96,20 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 inputMode="numeric"
                 label="Month"
                 labelClassName="font-normal"
-                onChange={handleInputChange}
+                onChange={(e) => {
+                  handleInputChange(e, 'month')
+                }}
                 ref={ref}
                 required={required}
-                type="number"
+                type="text"
                 value={value.month}
                 {...rest}
                 disabled={disabled}
+                id={`${rest.name}-month`}
                 maxLength={2}
                 minLength={1}
-                name="month"
+                name={`${rest.name}-month`}
+                pattern="[0-9]*"
               />
             </div>
             <div className="govuk-date-input__item">
@@ -113,14 +122,18 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 labelClassName="font-normal"
                 maxLength={4}
                 minLength={4}
-                onChange={handleInputChange}
+                onChange={(e) => {
+                  handleInputChange(e, 'year')
+                }}
                 ref={ref}
                 required={required}
-                type="number"
+                type="text"
                 value={value.year}
                 {...rest}
                 disabled={disabled}
-                name="year"
+                id={`${rest.name}-year`}
+                name={`${rest.name}-year`}
+                pattern="[0-9]*"
               />
             </div>
           </div>

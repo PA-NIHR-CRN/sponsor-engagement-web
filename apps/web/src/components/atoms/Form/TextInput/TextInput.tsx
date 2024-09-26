@@ -75,7 +75,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           className={clsx('govuk-input', { 'govuk-input--error': Boolean(error) }, inputClassName)}
           defaultValue={defaultValue}
           disabled={disabled}
-          id={rest.name}
+          id={rest.id ? rest.id : rest.name}
           type="text"
           {...rest}
           ref={ref}

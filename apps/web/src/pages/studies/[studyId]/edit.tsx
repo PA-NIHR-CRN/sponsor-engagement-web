@@ -3,10 +3,11 @@ import { Container } from '@nihr-ui/frontend'
 import clsx from 'clsx'
 import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
-import { type ReactElement } from 'react'
+import { type ReactElement, useCallback, useEffect, useState } from 'react'
+import type { FieldError, FieldErrors, FieldErrorsImpl, Merge } from 'react-hook-form'
 import { Controller, useForm } from 'react-hook-form'
 
-import { Fieldset, Form, Radio, RadioGroup } from '@/components/atoms'
+import { ErrorSummary, Fieldset, Form } from '@/components/atoms'
 import { DateInput } from '@/components/atoms/Form/DateInput/DateInput'
 import { Textarea } from '@/components/atoms/Form/Textarea/Textarea'
 import { TextInput } from '@/components/atoms/Form/TextInput/TextInput'
@@ -14,19 +15,13 @@ import Warning from '@/components/atoms/Warning/Warning'
 import { RequestSupport } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
 import { EDIT_STUDY_ROLE, Roles } from '@/constants'
-import {
-  FURTHER_INFO_MAX_CHARACTERS,
-  GENERIC_STUDIES_GUIDANCE_TEXT,
-  PAGE_TITLE,
-  studyStatuses,
-} from '@/constants/editStudyForm'
+import { FURTHER_INFO_MAX_CHARACTERS, GENERIC_STUDIES_GUIDANCE_TEXT, PAGE_TITLE } from '@/constants/editStudyForm'
+import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
 import {
   getStudyById,
-  mapCPMSStatusToFormStatus,
   mapCPMSStudyEvalToSEEval,
   mapCPMSStudyToSEStudy,
-  mapFormStatusToCPMSStatus,
   updateEvaluationCategories,
   updateStudy,
 } from '@/lib/studies'
@@ -37,13 +32,50 @@ import { withServerSideProps } from '@/utils/withServerSideProps'
 
 export type EditStudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
+const dateFieldNames: Partial<keyof EditStudyInputs>[] = [
+  'actualOpeningDate',
+  'plannedClosureDate',
+  'plannedOpeningDate',
+]
+
+function mapErrorObject(obj: FieldErrors): FieldErrors {
+  const result: FieldErrors = {}
+
+  function flattenDateFields(
+    parentKey: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- type taken from rhf
+    value: FieldError | Merge<FieldError, FieldErrorsImpl<any>> | undefined
+  ) {
+    for (const key in value) {
+      if (typeof value[key] === 'object') {
+        const newKey = `${parentKey}-${key}`
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- TODO: look into
+        result[newKey] = value[key]
+      }
+    }
+  }
+
+  // Date fields have nested error messages that needs to be flattened
+  for (const key in obj) {
+    if (dateFieldNames.includes(key as keyof EditStudyInputs)) {
+      flattenDateFields(key, obj[key])
+    } else {
+      result[key] = obj[key]
+    }
+  }
+
+  return result
+}
+
 export default function EditStudy({ study }: EditStudyProps) {
-  const { register, formState, handleSubmit, control, watch } = useForm<EditStudyInputs>({
+  const { register, formState, handleSubmit, control, watch, setError } = useForm<EditStudyInputs>({
     resolver: zodResolver(studySchema),
     defaultValues: {
       ...mapStudyToStudyFormInput(study),
     },
   })
+
+  const [mappedErrors, setMappedErrors] = useState({})
 
   const { organisationsByRole } = study
 
@@ -57,6 +89,27 @@ export default function EditStudy({ study }: EditStudyProps) {
     furtherInformationText.length >= FURTHER_INFO_MAX_CHARACTERS
       ? 0
       : FURTHER_INFO_MAX_CHARACTERS - furtherInformationText.length
+
+  const handleFoundError = useCallback(
+    (field: keyof EditStudyInputs, error: FieldError) => {
+      setError(field, error)
+    },
+    [setError]
+  )
+
+  const { errors } = useFormErrorHydration<EditStudyInputs>({
+    schema: studySchema,
+    formState,
+    onFoundError: handleFoundError,
+  })
+
+  useEffect(() => {
+    // console.log('hitting use effect', formState.errors)
+    const mappedRes = mapErrorObject(errors)
+
+    setMappedErrors(mappedRes)
+    // console.log({ mappedRes })
+  }, [errors])
 
   return (
     <Container>
@@ -88,11 +141,11 @@ export default function EditStudy({ study }: EditStudyProps) {
               console.log('error', error)
             }}
           >
+            <ErrorSummary errors={mappedErrors} />
             <input type="hidden" {...register('cpmsId')} defaultValue={defaultValues?.cpmsId} />
-
             <Fieldset>
               {/* Status */}
-              <Controller
+              {/* <Controller
                 control={control}
                 name="status"
                 render={({ field }) => {
@@ -123,7 +176,7 @@ export default function EditStudy({ study }: EditStudyProps) {
                     </RadioGroup>
                   )
                 }}
-              />
+              /> */}
 
               {/* Planned opening to recruitment date */}
               <Controller
@@ -134,7 +187,7 @@ export default function EditStudy({ study }: EditStudyProps) {
 
                   return (
                     <DateInput
-                      errors={{}}
+                      errors={mappedErrors}
                       label="Planned opening to recruitment date"
                       name={name}
                       onChange={onChange}
