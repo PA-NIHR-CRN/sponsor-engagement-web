@@ -44,39 +44,7 @@ const renderBackLink = () => (
 
 export type StudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-const normaliseStudyData = (study: StudyProps['study'], studyInCPMS: StudyProps['studyInCPMS']) => {
-  const [cpmsStudyEvalCategories, cpmsExpectedReopenDate] =
-    studyInCPMS?.StudyEvaluationCategories && studyInCPMS.StudyEvaluationCategories.length > 0
-      ? [
-          studyInCPMS.StudyEvaluationCategories.map((evalCategory) => evalCategory.EvaluationCategoryValue),
-          studyInCPMS.StudyEvaluationCategories[0].ExpectedReopenDate,
-        ]
-      : [undefined, undefined]
-
-  const [seStudyEvalCategories, seExpectedReopenDate] =
-    study.evaluationCategories.length > 0
-      ? [
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- both types include this value
-          study.evaluationCategories.map((evalCategory) => evalCategory.indicatorValue),
-          study.evaluationCategories[0].expectedReopenDate,
-        ]
-      : [undefined, undefined]
-  return {
-    shortTitle: studyInCPMS?.StudyShortName || study.shortTitle,
-    studyStatus: studyInCPMS?.StudyStatus || study.studyStatus,
-    studyRoute: studyInCPMS?.StudyRoute || study.route,
-    evaluationCategoryValues: cpmsStudyEvalCategories ?? seStudyEvalCategories ?? [],
-    expectedReopeningDate: cpmsExpectedReopenDate ?? seExpectedReopenDate,
-    plannedOpeningDate: studyInCPMS?.PlannedOpeningDate ?? study.plannedOpeningDate,
-    actualOpeningDate: studyInCPMS?.ActualOpeningDate ?? study.actualOpeningDate,
-    actualClosureDate: studyInCPMS?.ActualClosureToRecruitmentDate ?? study.actualClosureDate,
-    plannedClosureDate: studyInCPMS?.PlannedClosureToRecruitmentDate ?? study.plannedClosureDate,
-    sampleSize: studyInCPMS?.SampleSize ?? study.sampleSize,
-    totalRecruitmentToDate: studyInCPMS?.TotalRecruitmentToDate ?? study.totalRecruitmentToDate,
-  }
-}
-
-export default function Study({ user, study, studyInCPMS, assessments }: StudyProps) {
+export default function Study({ user, study, assessments }: StudyProps) {
   const router = useRouter()
   const { organisationsByRole } = study
 
@@ -84,18 +52,16 @@ export default function Study({ user, study, studyInCPMS, assessments }: StudyPr
 
   const showEditStudyFeature = Boolean(user?.groups.includes(EDIT_STUDY_ROLE))
 
-  const normalisedStudyData = normaliseStudyData(study, studyInCPMS)
-
   return (
     <Container>
-      <NextSeo title={`Study Progress Review - ${normalisedStudyData.shortTitle}`} />
+      <NextSeo title={`Study Progress Review - ${study.shortTitle}`} />
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
           {renderNotificationBanner(Boolean(router.query.success))}
 
           <h2 className="govuk-heading-l govuk-!-margin-bottom-1">
             <span className="govuk-visually-hidden">Study short title: </span>
-            {normalisedStudyData.shortTitle}
+            {study.shortTitle}
           </h2>
 
           <span className="govuk-body-m mb-0 text-darkGrey">
@@ -141,67 +107,58 @@ export default function Study({ user, study, studyInCPMS, assessments }: StudyPr
             <Table.Body>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Study Status</Table.CellHeader>
-                <Table.Cell>{normalisedStudyData.studyStatus}</Table.Cell>
+                <Table.Cell>{study.studyStatus}</Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Study data indicates</Table.CellHeader>
                 <Table.Cell>
-                  {normalisedStudyData.evaluationCategoryValues.length
-                    ? normalisedStudyData.evaluationCategoryValues.join(', ')
+                  {study.evaluationCategories.length
+                    ? study.evaluationCategories.map((evalCategory) => evalCategory.indicatorValue).join(', ')
                     : 'This study is progressing as planned'}
                 </Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Planned opening date</Table.CellHeader>
-                <Table.Cell>
-                  {normalisedStudyData.plannedOpeningDate ? formatDate(normalisedStudyData.plannedOpeningDate) : '-'}
-                </Table.Cell>
+                <Table.Cell>{study.plannedOpeningDate ? formatDate(study.plannedOpeningDate) : '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Actual opening date</Table.CellHeader>
-                <Table.Cell>
-                  {normalisedStudyData.actualOpeningDate ? formatDate(normalisedStudyData.actualOpeningDate) : '-'}
-                </Table.Cell>
+                <Table.Cell>{study.actualOpeningDate ? formatDate(study.actualOpeningDate) : '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Planned closure to recruitment date</Table.CellHeader>
-                <Table.Cell>
-                  {normalisedStudyData.plannedClosureDate ? formatDate(normalisedStudyData.plannedClosureDate) : '-'}
-                </Table.Cell>
+                <Table.Cell>{study.plannedClosureDate ? formatDate(study.plannedClosureDate) : '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Actual closure to recruitment date</Table.CellHeader>
-                <Table.Cell>
-                  {normalisedStudyData.actualClosureDate ? formatDate(normalisedStudyData.actualClosureDate) : '-'}
-                </Table.Cell>
+                <Table.Cell>{study.actualClosureDate ? formatDate(study.actualClosureDate) : '-'}</Table.Cell>
               </Table.Row>
-              {normalisedStudyData.studyStatus === 'Suspended' &&
-                Boolean(normalisedStudyData.evaluationCategoryValues.length) && (
-                  <Table.Row>
-                    <Table.CellHeader className="w-1/3">Estimated reopening date</Table.CellHeader>
-                    <Table.Cell>
-                      {normalisedStudyData.expectedReopeningDate
-                        ? formatDate(normalisedStudyData.expectedReopeningDate)
-                        : '-'}
-                    </Table.Cell>
-                  </Table.Row>
-                )}
+              {study.studyStatus === 'Suspended' && Boolean(study.evaluationCategories.length) && (
+                <Table.Row>
+                  <Table.CellHeader className="w-1/3">Estimated reopening date</Table.CellHeader>
+                  <Table.Cell>
+                    {study.evaluationCategories[0].expectedReopenDate
+                      ? formatDate(study.evaluationCategories[0].expectedReopenDate)
+                      : '-'}
+                  </Table.Cell>
+                </Table.Row>
+              )}
 
               <Table.Row>
                 <Table.CellHeader className="w-1/3" data-testid="uk-recruitment-target-label">
-                  {normalisedStudyData.studyRoute === 'Commercial'
+                  {study.route === 'Commercial'
                     ? 'UK recruitment target (excluding private sites)'
                     : 'UK recruitment target'}
                 </Table.CellHeader>
-                <Table.Cell>{normalisedStudyData.sampleSize ?? '-'}</Table.Cell>
+                <Table.Cell>{study.sampleSize ?? '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.CellHeader className="w-1/3" data-testid="total-uk-recruitment-label">
-                  {normalisedStudyData.studyRoute === 'Commercial'
+                  {study.route === 'Commercial'
                     ? 'Total UK recruitment to date (excluding private sites)'
                     : 'Total UK recruitment to date'}
                 </Table.CellHeader>
-                <Table.Cell>{normalisedStudyData.totalRecruitmentToDate ?? '-'}</Table.Cell>
+                <Table.Cell>{study.totalRecruitmentToDate ?? '-'}</Table.Cell>
               </Table.Row>
             </Table.Body>
           </Table>
@@ -211,7 +168,7 @@ export default function Study({ user, study, studyInCPMS, assessments }: StudyPr
 
           {/* About this study */}
           <h3 className="govuk-heading-m govuk-!-margin-bottom-3">About this study</h3>
-          <StudyDetails study={study} studyInCPMS={studyInCPMS} />
+          <StudyDetails study={study} />
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
           <RequestSupport showCallToAction sticky />
@@ -260,7 +217,6 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
         user: session.user,
         assessments: getAssessmentHistoryFromStudy(study),
         study,
-        studyInCPMS,
       },
     }
   }
@@ -277,8 +233,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
       props: {
         user: session.user,
         assessments: getAssessmentHistoryFromStudy(study),
-        study: { ...study, evaluationCategories: mappedStudyEvalsInCPMS },
-        studyInCPMS,
+        study,
       },
     }
   }
@@ -303,8 +258,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     props: {
       user: session.user,
       assessments: getAssessmentHistoryFromStudy(study),
-      study: { ...updatedStudy, evaluationCategories: updatedStudyEvals ?? mappedStudyEvalsInCPMS },
-      studyInCPMS,
+      study: { ...updatedStudy, evaluationCategories: updatedStudyEvals ?? study.evaluationCategories },
     },
   }
 })

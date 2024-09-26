@@ -36,13 +36,6 @@ const organisationsByRole = {
 }
 const getServerSessionMock = jest.mocked(getServerSession)
 
-const mappedCPMSStudyEvalsWithoutGeneratedValues = mappedCPMSStudyEvals.map((studyEval) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- not required fields
-  const { studyId, createdAt, updatedAt, id, ...restOfFields } = studyEval
-
-  return restOfFields
-})
-
 const renderPage = async (mockEditAxiosRequest = false) => {
   const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
   getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
@@ -109,7 +102,7 @@ describe('EditStudy', () => {
       expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
     })
 
-    test('redirects to 404 if no cpmsId exists in returned study', async () => {
+    test('redirect to 404 page if no cpmsId exists in returned study', async () => {
       const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
       getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
       prismaMock.$transaction.mockResolvedValueOnce([{ ...mockStudyWithRelations, cpmsId: undefined }])
@@ -185,7 +178,6 @@ describe('EditStudy', () => {
           study: {
             ...mockStudyWithRelations,
             organisationsByRole,
-            evaluationCategories: mappedCPMSStudyEvalsWithoutGeneratedValues,
           },
         },
       })
@@ -212,7 +204,6 @@ describe('EditStudy', () => {
           study: {
             ...mockStudyWithRelations,
             organisationsByRole,
-            evaluationCategories: mappedCPMSStudyEvalsWithoutGeneratedValues,
           },
         },
       })

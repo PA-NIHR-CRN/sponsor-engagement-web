@@ -78,13 +78,6 @@ const organisationsByRole = {
   CRO: 'Test Organisation',
 }
 
-const mappedCPMSStudyEvalsWithoutGeneratedValues = mappedCPMSStudyEvals.map((studyEval) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- not required fields
-  const { studyId, createdAt, updatedAt, id, ...restOfFields } = studyEval
-
-  return restOfFields
-})
-
 const renderPage = async (
   mockGetStudyResponse = mockStudy,
   mockUrl = `/study/${mockStudyId}`,
@@ -196,7 +189,6 @@ describe('Study', () => {
             evaluationCategories: mappedCPMSStudyEvals,
             organisationsByRole,
           },
-          studyInCPMS: mockCPMSStudy,
         },
       })
 
@@ -221,7 +213,6 @@ describe('Study', () => {
             ...mockStudyWithRelations,
             organisationsByRole,
           },
-          studyInCPMS: null,
         },
       })
 
@@ -246,9 +237,7 @@ describe('Study', () => {
           study: {
             ...mockStudyWithRelations,
             organisationsByRole,
-            evaluationCategories: mappedCPMSStudyEvalsWithoutGeneratedValues,
           },
-          studyInCPMS: mockCPMSStudy,
         },
       })
 
@@ -275,9 +264,7 @@ describe('Study', () => {
           study: {
             ...mockStudyWithRelations,
             organisationsByRole,
-            evaluationCategories: mappedCPMSStudyEvalsWithoutGeneratedValues,
           },
-          studyInCPMS: mockCPMSStudy,
         },
       })
 
@@ -293,11 +280,11 @@ describe('Study', () => {
       await renderPage()
 
       // SEO
-      expect(NextSeo).toHaveBeenCalledWith({ title: `Study Progress Review - ${mockCPMSStudy.StudyShortName}` }, {})
+      expect(NextSeo).toHaveBeenCalledWith({ title: `Study Progress Review - ${mockStudy.shortTitle}` }, {})
 
       // Title
       expect(
-        screen.getByRole('heading', { level: 2, name: `Study short title: ${mockCPMSStudy.StudyShortName}` })
+        screen.getByRole('heading', { level: 2, name: `Study short title: ${mockStudy.shortTitle}` })
       ).toBeInTheDocument()
 
       // Organisation
@@ -333,21 +320,21 @@ describe('Study', () => {
         'Planned closure to recruitment date',
         'Actual closure to recruitment date',
         'Estimated reopening date',
-        'UK recruitment target',
-        'Total UK recruitment to date',
+        'UK recruitment target (excluding private sites)',
+        'Total UK recruitment to date (excluding private sites)',
       ])
 
       const progressRows = within(progressSummaryTable).getAllByRole('row')
       expect(progressRows.map((row) => within(row).getByRole('cell').textContent)).toEqual([
-        mockCPMSStudy.StudyStatus,
-        `${mockCPMSStudy.StudyEvaluationCategories[0].EvaluationCategoryValue}, ${mockCPMSStudy.StudyEvaluationCategories[1].EvaluationCategoryValue}`,
+        mockStudy.studyStatus,
+        `${mappedCPMSStudyEvals[0].indicatorValue}, ${mappedCPMSStudyEvals[1].indicatorValue}`,
+        '1 January 2001',
+        '1 January 2001',
+        '1 January 2001',
+        '1 January 2001',
         '28 February 2003',
-        '1 September 1991',
-        '28 February 2003',
-        '28 February 2003',
-        '28 February 2003',
-        `${mockCPMSStudy.SampleSize}`,
-        `${mockCPMSStudy.TotalRecruitmentToDate}`,
+        `${mockStudy.sampleSize}`,
+        `${mockStudy.totalRecruitmentToDate}`,
       ])
 
       // Sponsor assessment history
@@ -367,6 +354,7 @@ describe('Study', () => {
       const aboutHeaders = within(aboutStudyTable).getAllByRole('rowheader')
       expect(aboutHeaders.map((header) => header.textContent)).toEqual([
         'Study full title',
+        'Protocol reference number',
         'IRAS ID',
         'CPMS ID',
         'Sponsor',
@@ -376,12 +364,13 @@ describe('Study', () => {
 
       const aboutRows = within(aboutStudyTable).getAllByRole('row')
       expect(aboutRows.map((row) => within(row).getByRole('cell').textContent)).toEqual([
-        mockCPMSStudy.Title,
-        mockCPMSStudy.IrasId.toString(),
-        mockCPMSStudy.StudyId.toString(),
+        mockStudy.title,
+        mockStudy.protocolReferenceNumber,
+        mockStudy.irasId,
+        mockStudy.cpmsId.toString(),
         mockStudy.organisations[0].organisation.name,
-        mockCPMSStudy.ManagingSpecialty,
-        `${mockCPMSStudy.ChiefInvestigatorFirstName} ${mockCPMSStudy.ChiefInvestigatorLastName}`,
+        mockStudy.managingSpeciality,
+        `${mockStudy.chiefInvestigatorFirstName} ${mockStudy.chiefInvestigatorLastName}`,
       ])
 
       // Support
@@ -428,40 +417,12 @@ describe('Study', () => {
       await renderPage(
         undefined,
         undefined,
-        {
-          ...mockCPMSStudy,
-          StudyStatus: 'Suspended',
-          StudyEvaluationCategories: [
-            {
-              EvaluationCategoryValue: 'Milestone missed',
-              ExpectedReopenDate: null,
-              EvaluationCategoryType: '',
-              TotalRecruitmentToDate: 0,
-              SampleSize: 0,
-              PlannedRecruitmentStartDate: null,
-              PlannedRecruitmentEndDate: null,
-              ActualOpeningDate: null,
-              ActualClosureDate: null,
-            },
-          ],
-        },
+        undefined,
         {
           ...mockStudy,
           evaluationCategories: [],
         },
-        [
-          {
-            indicatorValue: 'Milestone missed',
-            expectedReopenDate: null,
-            indicatorType: '',
-            totalRecruitmentToDate: 0,
-            sampleSize: 0,
-            plannedOpeningDate: null,
-            plannedClosureDate: null,
-            actualOpeningDate: null,
-            actualClosureDate: null,
-          } as Prisma.StudyEvaluationCategoryGetPayload<undefined>,
-        ]
+        [{ ...mappedCPMSStudyEvals[0], expectedReopenDate: null }, mappedCPMSStudyEvals[1]]
       )
 
       const summaryTable = screen.getByRole('table', { name: 'Summary of study’s progress (UK)' })
@@ -476,7 +437,7 @@ describe('Study', () => {
 
       // Title
       expect(
-        screen.getByRole('heading', { level: 2, name: `Study short title: ${mockCPMSStudy.StudyShortName}` })
+        screen.getByRole('heading', { level: 2, name: `Study short title: ${mockStudy.shortTitle}` })
       ).toBeInTheDocument()
 
       // Banner

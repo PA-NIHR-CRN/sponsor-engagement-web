@@ -274,9 +274,9 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     }
   }
 
-  const seStudyRecord = await getStudyById(Number(context.query.studyId))
+  const { data: study } = await getStudyById(Number(context.query.studyId))
 
-  if (!seStudyRecord.data) {
+  if (!study) {
     return {
       redirect: {
         destination: '/404',
@@ -284,8 +284,9 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     }
   }
 
-  const cpmsId = seStudyRecord.data.cpmsId
+  const cpmsId = study.cpmsId
 
+  // CPMS ID is required to update a study
   if (!cpmsId) {
     return {
       redirect: {
@@ -299,7 +300,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     return {
       props: {
         user: session.user,
-        study: seStudyRecord.data,
+        study,
       },
     }
   }
@@ -313,7 +314,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     return {
       props: {
         user: session.user,
-        study: { ...seStudyRecord.data, evaluationCategories: mappedStudyEvalsInCPMS },
+        study,
       },
     }
   }
@@ -329,7 +330,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     .map(({ id }) => id)
 
   const { data: updatedStudyEvals } = await updateEvaluationCategories(
-    seStudyRecord.data.id,
+    study.id,
     mappedStudyEvalsInCPMS,
     studyEvalIdsToDelete
   )
@@ -337,7 +338,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
   return {
     props: {
       user: session.user,
-      study: { ...updatedStudy, evaluationCategories: updatedStudyEvals ?? mappedStudyEvalsInCPMS },
+      study: { ...updatedStudy, evaluationCategories: updatedStudyEvals ?? study.evaluationCategories },
     },
   }
 })
