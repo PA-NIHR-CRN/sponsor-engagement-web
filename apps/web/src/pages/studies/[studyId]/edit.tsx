@@ -270,7 +270,7 @@ export default function EditStudy({ study }: EditStudyProps) {
               {/* UK recruitment target */}
               <TextInput
                 defaultValue={defaultValues?.recruitmentTarget}
-                errors={{}}
+                errors={errors}
                 inputClassName="govuk-input--width-10"
                 label="UK recruitment target"
                 labelSize="m"
@@ -281,7 +281,7 @@ export default function EditStudy({ study }: EditStudyProps) {
               {/* Further information */}
               <Textarea
                 defaultValue={defaultValues?.furtherInformation}
-                errors={{}}
+                errors={errors}
                 hint="If needed, provide further context or justification for changes made above."
                 label="Further information"
                 labelSize="m"
