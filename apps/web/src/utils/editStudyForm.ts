@@ -23,34 +23,31 @@ export const mapStudyToStudyFormInput = (study: EditStudyProps['study']): EditSt
  * Validates a date on the edit study form and sends errors to zod ctx
  */
 const validateDate = (fieldName: string, label: string, ctx: z.RefinementCtx, value?: DateInputValue | null) => {
-  if (Number(value?.day) < 1 || Number(value?.day) > 31) {
+  // If there does not exist a single date part, the value will be null
+  if (!value) return
+
+  if (Number(value.day) < 1 || Number(value.day) > 31) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: `${label} requires a valid day`,
       path: [`${fieldName}-day`],
     })
-
-    return z.NEVER
   }
 
-  if (Number(value?.month) < 1 || Number(value?.month) > 12) {
+  if (Number(value.month) < 1 || Number(value.month) > 12) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: `${label} requires a valid month`,
       path: [`${fieldName}-month`],
     })
-
-    return z.NEVER
   }
 
-  if (value?.year && value.year.length !== 4) {
+  if (value.year.length !== 4) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: `${label} requires a valid year`,
       path: [`${fieldName}-year`],
     })
-
-    return z.NEVER
   }
 }
 
@@ -70,7 +67,7 @@ export const validateAllDates = (ctx: z.RefinementCtx, values: EditStudyInputs) 
   const plannedClosureDate = values.plannedClosureDate
   validateDate('plannedClosureDate', 'Planned closure date', ctx, plannedClosureDate)
 
-  // Actual clsoure to recruitment date
+  // Actual closure to recruitment date
   const actualClosureDate = values.actualClosureDate
   validateDate('actualClosureDate', 'Actual closure date', ctx, actualClosureDate)
 

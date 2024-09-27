@@ -45,3 +45,5 @@ export const constructDateObjFromParts = (dateParts?: DateInputValue | null) => 
 
   return new Date(`${Number(year)}-${Number(month)}-${Number(day)}`)
 }
+
+export const areAllDatePartsEmpty = (dateParts: DateInputValue) => Object.values(dateParts).every((val) => val === '')

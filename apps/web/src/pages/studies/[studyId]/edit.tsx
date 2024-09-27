@@ -33,6 +33,7 @@ import {
   updateEvaluationCategories,
   updateStudy,
 } from '@/lib/studies'
+import { areAllDatePartsEmpty } from '@/utils/date'
 import { mapStudyToStudyFormInput } from '@/utils/editStudyForm'
 import type { EditStudyInputs } from '@/utils/schemas'
 import { studySchema } from '@/utils/schemas'
@@ -164,7 +165,7 @@ export default function EditStudy({ study }: EditStudyProps) {
                       label="Planned opening to recruitment date"
                       name={name}
                       onChange={(input) => {
-                        const allFieldsEmpty = Object.values(input).every((val) => val === '')
+                        const allFieldsEmpty = areAllDatePartsEmpty(input)
                         onChange(allFieldsEmpty ? null : input)
                       }}
                       ref={ref}
@@ -187,7 +188,7 @@ export default function EditStudy({ study }: EditStudyProps) {
                       label="Actual opening to recruitment date"
                       name={name}
                       onChange={(input) => {
-                        const allFieldsEmpty = Object.values(input).every((val) => val === '')
+                        const allFieldsEmpty = areAllDatePartsEmpty(input)
                         onChange(allFieldsEmpty ? null : input)
                       }}
                       ref={ref}
@@ -210,7 +211,7 @@ export default function EditStudy({ study }: EditStudyProps) {
                       label="Planned closure to recruitment date"
                       name={name}
                       onChange={(input) => {
-                        const allFieldsEmpty = Object.values(input).every((val) => val === '')
+                        const allFieldsEmpty = areAllDatePartsEmpty(input)
                         onChange(allFieldsEmpty ? null : input)
                       }}
                       ref={ref}
@@ -233,7 +234,7 @@ export default function EditStudy({ study }: EditStudyProps) {
                       label="Actual closure to recruitment date"
                       name={name}
                       onChange={(input) => {
-                        const allFieldsEmpty = Object.values(input).every((val) => val === '')
+                        const allFieldsEmpty = areAllDatePartsEmpty(input)
                         onChange(allFieldsEmpty ? null : input)
                       }}
                       ref={ref}
@@ -256,7 +257,7 @@ export default function EditStudy({ study }: EditStudyProps) {
                       label="Estimated reopening date"
                       name={name}
                       onChange={(input) => {
-                        const allFieldsEmpty = Object.values(input).every((val) => val === '')
+                        const allFieldsEmpty = areAllDatePartsEmpty(input)
                         onChange(allFieldsEmpty ? null : input)
                       }}
                       ref={ref}
