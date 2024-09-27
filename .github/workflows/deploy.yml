@@ -237,6 +237,11 @@ jobs:
           aws ec2 authorize-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for SE automation DB requests"}]}]'
 
       # TEMP CONFIG FOR TEST AUTOMATION
+      - name: Unset conflicting AWS region environment variables
+        run: |
+          unset AWS_REGION
+          unset AWS_DEFAULT_REGION
+
       - name: Configure AWS credentials (CPMS)
         uses: aws-actions/configure-aws-credentials@v3
         with:
@@ -248,7 +253,7 @@ jobs:
       - name: Add Github Actions IP to CPMS API security group (Test)
         run: |
           aws ec2 authorize-security-group-ingress --group-id ${{ secrets.SE_TEST_CPMS_API_SG_ID }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 443, "ToPort": 443, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for SE automation CPMS API requests"}]}]'
-      # 
+      #
 
       - name: Run All SE E2E Tests
         working-directory: ./packages/qa
