@@ -26,7 +26,7 @@ const validateDate = (fieldName: string, label: string, ctx: z.RefinementCtx, va
   if (Number(value?.day) < 1 || Number(value?.day) > 31) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: `${label} requies a valid day`,
+      message: `${label} requires a valid day`,
       path: [`${fieldName}-day`],
     })
 
@@ -36,17 +36,17 @@ const validateDate = (fieldName: string, label: string, ctx: z.RefinementCtx, va
   if (Number(value?.month) < 1 || Number(value?.month) > 12) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: `${label} requies a valid month`,
+      message: `${label} requires a valid month`,
       path: [`${fieldName}-month`],
     })
 
     return z.NEVER
   }
 
-  if (Number(value?.year) < 1950) {
+  if (value?.year && value.year.length !== 4) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: `${label} requies a valid year`,
+      message: `${label} requires a valid year`,
       path: [`${fieldName}-year`],
     })
 
