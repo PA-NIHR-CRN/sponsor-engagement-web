@@ -243,6 +243,7 @@ jobs:
           aws-access-key-id: ${{ secrets.NIHCRNCC_IAM_GITHUB_ACTIONS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.CRNCC_IAM_GITHUB_ACTIONS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-1
+          unset-current-credentials: true
 
       - name: Add Github Actions IP to CPMS API security group (Test)
         run: |
@@ -296,6 +297,7 @@ jobs:
           aws-access-key-id: ${{ secrets.NIHR_GITHUB_ACTIONS_IAM_ID }}
           aws-secret-access-key: ${{ secrets.NIHR_GITHUB_ACTIONS_IAM_SECRET }}
           aws-region: eu-west-2
+          unset-current-credentials: true
       # 
 
       - name: Remove Github Actions IP from LB security group (Test)
