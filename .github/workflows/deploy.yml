@@ -215,7 +215,7 @@ jobs:
         working-directory: ./packages/qa
         run: npm i
 
-      - name: Configure AWS credentials
+      - name: Configure AWS credentials (SE)
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.NIHR_GITHUB_ACTIONS_IAM_ID }}
@@ -236,10 +236,23 @@ jobs:
         run: |
           aws ec2 authorize-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for SE automation DB requests"}]}]'
 
+      # TEMP CONFIG FOR TEST AUTOMATION
+      - name: Configure AWS credentials (CPMS)
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.NIHCRNCC_IAM_GITHUB_ACTIONS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.CRNCC_IAM_GITHUB_ACTIONS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      - name: Add Github Actions IP to CPMS API security group (Test)
+        run: |
+          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.SE_TEST_CPMS_API_SG_ID }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 443, "ToPort": 443, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for SE automation CPMS API requests"}]}]'
+      # 
+
       - name: Run All SE E2E Tests
         working-directory: ./packages/qa
         if: github.event.inputs.test-tag == '' || github.event.inputs.test-tag == 'all'
-        run: npx playwright test --grep-invert "@wip"
+        run: npx playwright test --grep "@wip"
         env:
           E2E_BASE_URL: ${{ vars.E2E_BASE_URL }}
           CPMS_TEST_DB_PASSWORD: ${{ secrets.CPMS_TEST_DB_PASSWORD }}
@@ -271,6 +284,19 @@ jobs:
           SPONSOR_CONTACT_MANAGER_PASS: ${{ secrets.SPONSOR_CONTACT_MANAGER_PASS }}
           CONTACT_MANAGER_PASS: ${{ secrets.CONTACT_MANAGER_PASS }}
           SE_NO_LOCAL_ACCOUNT_PASS: ${{ secrets.SE_NO_LOCAL_ACCOUNT_PASS }}
+
+      # TEMP CONFIG FOR TEST AUTOMATION
+      - name: Remove Github Actions IP from CPMS API security group (Test)
+        run: |
+          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.SE_TEST_CPMS_API_SG_ID }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 443, "ToPort": 443, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "GitHub runner IP for SE automation CPMS API requests"}]}]'
+
+      - name: Configure AWS credentials (SE)
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.NIHR_GITHUB_ACTIONS_IAM_ID }}
+          aws-secret-access-key: ${{ secrets.NIHR_GITHUB_ACTIONS_IAM_SECRET }}
+          aws-region: eu-west-2
+      # 
 
       - name: Remove Github Actions IP from LB security group (Test)
         run: |

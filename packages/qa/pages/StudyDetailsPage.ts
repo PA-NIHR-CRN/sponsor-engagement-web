@@ -78,6 +78,9 @@ export default class StudyDetailsPage {
   readonly allStudiesLink: Locator
   readonly sponsorAssessmentHistory: Locator
 
+  readonly updateSuccessBanner: Locator
+  readonly updateSuccessContent: Locator
+
   //Initialize Page Objects
   constructor(page: Page) {
     this.page = page
@@ -173,6 +176,8 @@ export default class StudyDetailsPage {
     this.dueIndicator = page.locator('span[class="govuk-tag govuk-tag--red mr-2"]')
     this.dueIndicatorSupportingText = this.dueIndicator.locator('..')
     this.allStudiesLink = page.locator('a[href="/studies"]')
+    this.updateSuccessBanner = page.locator('.govuk-notification-banner.govuk-notification-banner--success')
+    this.updateSuccessContent = page.locator('.govuk-notification-banner__heading')
   }
 
   //Page Methods
@@ -660,5 +665,19 @@ export default class StudyDetailsPage {
 
     await expect(this.tableSponsorValue).toBeVisible()
     await expect(this.tableSponsorValue).toHaveText(expectedSponsor)
+  }
+
+  async assertStudyUpdatedSuccess(type: string) {
+    await expect(this.updateSuccessBanner).toBeVisible()
+    if (type === 'direct') {
+      await expect(this.updateSuccessContent).toHaveText(
+        'Your study data changes have been applied. All changes have been accepted by CPMS and do not require any manual review.'
+      )
+    }
+    if (type === 'proposed') {
+      await expect(this.updateSuccessContent).toHaveText(
+        'Your study data changes have been received. These will now be reviewed by the appropriate team and applied to the study in due course. Until then, previous study data values will be displayed here.'
+      )
+    }
   }
 }

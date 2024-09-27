@@ -1,4 +1,5 @@
 import { expect, Locator, Page } from '@playwright/test'
+import { RowDataPacket } from 'mysql2'
 
 //Declare Page Objects
 export default class StudyUpdatePage {
@@ -41,6 +42,8 @@ export default class StudyUpdatePage {
   readonly buttonUpdate: Locator
   readonly buttonCancel: Locator
   readonly requestSupport: Locator
+  readonly updateSuccessBanner: Locator
+  readonly updateSuccessContent: Locator
 
   //Initialize Page Objects
   constructor(page: Page) {
@@ -87,9 +90,11 @@ export default class StudyUpdatePage {
     this.estimatedReopenYYYY = page.locator('#year').nth(4)
     this.ukRecruitmentTarget = page.locator('#recruitmentTarget')
     this.furtherInfo = page.locator('#furtherInformation')
-    this.buttonUpdate = page.locator('.govuk-button')
+    this.buttonUpdate = page.locator('button.govuk-button:has-text("Update")')
     this.buttonCancel = page.locator('.govuk-button.govuk-button--secondary')
     this.requestSupport = page.locator('[data-testid="request-support"]')
+    this.updateSuccessBanner = page.locator('.govuk-notification-banner.govuk-notification-banner--success')
+    this.updateSuccessContent = page.locator('.govuk-notification-banner__heading')
   }
 
   //Page Methods
@@ -259,5 +264,17 @@ export default class StudyUpdatePage {
 
   async assertRdnSupport() {
     await expect(this.requestSupport).toBeVisible()
+  }
+
+  async assertSeDbUpdateProposed(dbStudyUpdate: RowDataPacket[], timeStamp: string) {
+    await expect(dbStudyUpdate.studyStatus).toBeNull()
+    await expect(dbStudyUpdate.comment).toBe(`se e2e auto test - ${timeStamp}`)
+    await expect(dbStudyUpdate.studyStatusGroup).toBe('Closed')
+  }
+
+  async assertSeDbUpdateDirect(dbStudyUpdate: RowDataPacket[], timeStamp: string) {
+    await expect(dbStudyUpdate.studyStatus).not.toBeNull()
+    await expect(dbStudyUpdate.comment).toBe(`se e2e auto test - ${timeStamp}`)
+    await expect(dbStudyUpdate.studyStatusGroup).not.toBeNull()
   }
 }
