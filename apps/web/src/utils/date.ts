@@ -17,7 +17,6 @@ export const getGDPRCookieExpiryDate = () => dayjs().add(SE_GDPR_COOKIE_EXPIRY_M
  * Gets the year, month and day from a Date object
  */
 
-// TODO: Check if I need to use UTC or not?
 export const constructDatePartsFromDate = (date?: Date | null) => {
   if (!date) return undefined
 
@@ -31,7 +30,7 @@ export const constructDatePartsFromDate = (date?: Date | null) => {
 /**
  * Creates a Date object from its' date parts - year, month and day
  */
-export const constructDateObjFromParts = (dateParts?: DateInputValue) => {
+export const constructDateObjFromParts = (dateParts?: DateInputValue | null) => {
   if (!dateParts) return undefined
 
   const containsAllValidNumbers = Object.values(dateParts).every(
@@ -46,3 +45,5 @@ export const constructDateObjFromParts = (dateParts?: DateInputValue) => {
 
   return new Date(`${Number(year)}-${Number(month)}-${Number(day)}`)
 }
+
+export const areAllDatePartsEmpty = (dateParts: DateInputValue) => Object.values(dateParts).every((val) => val === '')
