@@ -19,6 +19,9 @@ export const mapStudyToStudyFormInput = (study: EditStudyProps['study']): EditSt
   furtherInformation: '', // TODO: is there a field for this
 })
 
+/**
+ * Validates a date on the edit study form and sends errors to zod ctx
+ */
 const validateDate = (fieldName: string, label: string, ctx: z.RefinementCtx, value?: DateInputValue | null) => {
   if (Number(value?.day) < 1 || Number(value?.day) > 31) {
     ctx.addIssue({
@@ -26,6 +29,8 @@ const validateDate = (fieldName: string, label: string, ctx: z.RefinementCtx, va
       message: `${label} requies a valid day`,
       path: [`${fieldName}-day`],
     })
+
+    return z.NEVER
   }
 
   if (Number(value?.month) < 1 || Number(value?.month) > 12) {
@@ -34,6 +39,8 @@ const validateDate = (fieldName: string, label: string, ctx: z.RefinementCtx, va
       message: `${label} requies a valid month`,
       path: [`${fieldName}-month`],
     })
+
+    return z.NEVER
   }
 
   if (Number(value?.year) < 1950) {
@@ -42,9 +49,14 @@ const validateDate = (fieldName: string, label: string, ctx: z.RefinementCtx, va
       message: `${label} requies a valid year`,
       path: [`${fieldName}-year`],
     })
+
+    return z.NEVER
   }
 }
 
+/**
+ * Validates all dates on the edit study form and sends errors to zod ctx
+ */
 export const validateAllDates = (ctx: z.RefinementCtx, values: EditStudyInputs) => {
   // Planned opening to recruitment date
   const plannedOpeningDate = values.plannedOpeningDate

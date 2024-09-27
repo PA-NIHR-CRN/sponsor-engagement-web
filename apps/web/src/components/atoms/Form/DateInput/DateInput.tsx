@@ -71,12 +71,11 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
             <div className="govuk-date-input__item">
               <TextInput
                 displayInlineError={false}
+                // Conditional here is to trigger error state of input when there is an overall error
                 errors={overallError ? { [`${rest.name}-day`]: overallError } : errors}
                 inputClassName="govuk-input--width-2"
                 label="Day"
                 labelClassName="font-normal"
-                maxLength={2}
-                minLength={1}
                 onChange={(e) => {
                   handleInputChange(e, 'day')
                 }}
@@ -107,8 +106,6 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 {...rest}
                 disabled={disabled}
                 id={`${rest.name}-month`}
-                maxLength={2}
-                minLength={1}
                 name={`${rest.name}-month`}
               />
             </div>
@@ -119,8 +116,6 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 inputClassName="govuk-input--width-4"
                 label="Year"
                 labelClassName="font-normal"
-                maxLength={4}
-                minLength={4}
                 onChange={(e) => {
                   handleInputChange(e, 'year')
                 }}
