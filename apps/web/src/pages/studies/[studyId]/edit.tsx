@@ -275,7 +275,7 @@ export default function EditStudy({ study }: EditStudyProps) {
                 label="UK recruitment target"
                 labelSize="m"
                 type="number"
-                {...register('recruitmentTarget')}
+                {...register('recruitmentTarget', { valueAsNumber: true })}
               />
 
               {/* Further information */}

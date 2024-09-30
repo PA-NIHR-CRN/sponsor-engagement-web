@@ -19,13 +19,12 @@ export const studySchema = z
     actualClosureDate: dateSchema.optional().nullable(),
     estimatedReopeningDate: dateSchema.optional().nullable(),
     recruitmentTarget: z
-      .string()
+      .number({ invalid_type_error: 'Enter a valid UK recruitment target' })
       .optional()
-      .refine((value) => !(Number(value) < 0 || Number.isNaN(value)), 'Enter a valid UK recruitment target'),
+      .refine((value) => !(Number(value) < 0 || Number.isNaN(Number(value))), 'Enter a valid UK recruitment target'),
     furtherInformation: z.string().optional(),
   })
   .superRefine((values, ctx) => {
-    // Basic date validation for all date fields
     validateAllDates(ctx, values)
   })
 

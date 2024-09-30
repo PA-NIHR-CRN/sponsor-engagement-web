@@ -90,7 +90,7 @@ const body: EditStudyInputs = {
     month: '02',
     year: nextYearValue.toString(),
   },
-  recruitmentTarget: mockCPMSStudy.SampleSize?.toString(),
+  recruitmentTarget: mockCPMSStudy.SampleSize ?? undefined,
   furtherInformation: '',
 }
 

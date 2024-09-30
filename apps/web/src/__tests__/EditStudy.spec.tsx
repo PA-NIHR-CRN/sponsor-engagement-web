@@ -492,4 +492,23 @@ describe('EditStudy', () => {
       ).toBeInTheDocument()
     })
   })
+
+  it.each(['-e', '-3'])(
+    'should display an error message when UK recruitment target has an invalid value',
+    async (value: string) => {
+      await renderPage()
+      const ukRecruitmentTargetField = screen.getByLabelText('UK recruitment target')
+      expect(ukRecruitmentTargetField).toBeInTheDocument()
+
+      await userEvent.click(ukRecruitmentTargetField)
+      await userEvent.clear(ukRecruitmentTargetField)
+      await userEvent.paste(value)
+
+      await userEvent.click(screen.getByRole('button', { name: 'Update' }))
+
+      // Error message
+      const alert = screen.getByRole('alert')
+      expect(within(alert).getByText('Enter a valid UK recruitment target')).toBeInTheDocument()
+    }
+  )
 })
