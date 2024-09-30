@@ -6,7 +6,7 @@ on:
       - main
   workflow_dispatch:
 
-env:
+# env:
   # AWS_REGION: eu-west-2
 
 jobs:
@@ -193,7 +193,7 @@ jobs:
   #         wait-for-service-stability: true
 
   e2e-test:
-    needs: deploy-test
+    # needs: deploy-test
     environment: TEST
     name: 'Run E2E Tests'
     timeout-minutes: 15
@@ -241,15 +241,10 @@ jobs:
             --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for SE automation DB requests"}]}]'
 
       # TEMP CONFIG FOR TEST AUTOMATION
-      - name: Unset conflicting AWS region environment variables
-        run: |
-          unset AWS_REGION
-          unset AWS_DEFAULT_REGION
-
       - name: Configure AWS credentials (CPMS)
         uses: aws-actions/configure-aws-credentials@v3
         with:
-          aws-access-key-id: ${{ secrets.NIHCRNCC_IAM_GITHUB_ACTIONS_ACCESS_KEY_ID }}
+          aws-access-key-id: ${{ secrets.CRNCC_IAM_GITHUB_ACTIONS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.CRNCC_IAM_GITHUB_ACTIONS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-1
 
@@ -258,7 +253,7 @@ jobs:
           aws ec2 authorize-security-group-ingress \
             --group-id ${{ secrets.SE_TEST_CPMS_API_SG_ID }} \
             --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 443, "ToPort": 443, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for SE automation CPMS API requests"}]}]'
-      #
+      # 
 
       - name: Run All SE E2E Tests
         working-directory: ./packages/qa
@@ -298,6 +293,7 @@ jobs:
 
       # TEMP CONFIG FOR TEST AUTOMATION
       - name: Remove Github Actions IP from CPMS API security group (Test)
+        if: always()        
         run: |
           aws ec2 revoke-security-group-ingress \
             --group-id ${{ secrets.SE_TEST_CPMS_API_SG_ID }} \
@@ -312,10 +308,12 @@ jobs:
       # 
 
       - name: Remove Github Actions IP from LB security group (Test)
+        if: always()
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.LB_SG_TEST }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 443, "ToPort": 443, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for SE automation test run"}]}]'
 
       - name: Remove Github Actions IP from LB security group (Test)
+        if: always()
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.RDS_SG }} --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for SE automation DB requests"}]}]'
 

@@ -670,15 +670,11 @@ export default class StudyDetailsPage {
   async assertStudyUpdatedSuccess(type: string) {
     await expect(this.updateSuccessBanner).toBeVisible()
     if (type === 'direct') {
-      await expect(this.updateSuccessContent).toHaveText(
-        'Your study data changes have been applied. All changes have been accepted by CPMS and do not require any manual review.'
-        // 'Your study data changes have been accepted.' // new copy
-      )
+      await expect(this.updateSuccessContent).toHaveText('Your study data changes have been accepted.')
     }
     if (type === 'proposed') {
       await expect(this.updateSuccessContent).toHaveText(
-        'Your study data changes have been received. These will now be reviewed by the appropriate team and applied to the study in due course. Until then, previous study data values will be displayed here.'
-        // 'Your study data changes have been received. These will now be reviewed and applied to the study record. Until then, previous study data values will be displayed.' // new copy
+        'Your study data changes have been received. These will now be reviewed and applied to the study record. Until then, previous study data values will be displayed.'
       )
     }
   }
