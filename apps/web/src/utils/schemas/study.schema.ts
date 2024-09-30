@@ -18,7 +18,10 @@ export const studySchema = z
     plannedClosureDate: dateSchema.optional().nullable(),
     actualClosureDate: dateSchema.optional().nullable(),
     estimatedReopeningDate: dateSchema.optional().nullable(),
-    recruitmentTarget: z.string().optional(),
+    recruitmentTarget: z
+      .string()
+      .optional()
+      .refine((value) => !(Number(value) < 0 || Number.isNaN(value)), 'Enter a valid UK recruitment target'),
     furtherInformation: z.string().optional(),
   })
   .superRefine((values, ctx) => {
@@ -27,3 +30,8 @@ export const studySchema = z
   })
 
 export type EditStudyInputs = z.infer<typeof studySchema>
+
+export type DateFieldName = Pick<
+  EditStudyInputs,
+  'actualClosureDate' | 'estimatedReopeningDate' | 'plannedClosureDate' | 'plannedOpeningDate' | 'actualOpeningDate'
+>

@@ -1,7 +1,6 @@
 import dayjs from 'dayjs'
 import { z } from 'zod'
 
-import type { DateInputValue } from '@/components/atoms/Form/DateInput/types'
 import type { EditStudyProps } from '@/pages/studies/[studyId]/edit'
 
 import { constructDatePartsFromDate } from './date'
@@ -28,22 +27,43 @@ const fieldNameToLabelMapping: Record<keyof DateFieldName, string> = {
   estimatedReopeningDate: 'Estimated reopening date',
 }
 
+type DateRestrictions = 'requiredPast' | 'requiredCurrent' | 'requiredFuture'
+
+const dateValidationRules: Record<
+  keyof DateFieldName,
+  { restrictions: DateRestrictions[]; dependencies: { fieldName: keyof DateFieldName; requiredAfter?: boolean }[] }
+> = {
+  plannedOpeningDate: { restrictions: [], dependencies: [] },
+  actualOpeningDate: { restrictions: ['requiredPast', 'requiredCurrent'], dependencies: [] },
+  plannedClosureDate: {
+    restrictions: [],
+    dependencies: [
+      {
+        fieldName: 'plannedOpeningDate',
+        requiredAfter: true,
+      },
+      {
+        fieldName: 'actualOpeningDate',
+        requiredAfter: true,
+      },
+    ],
+  },
+  actualClosureDate: { restrictions: ['requiredPast', 'requiredCurrent'], dependencies: [] },
+  estimatedReopeningDate: { restrictions: ['requiredFuture'], dependencies: [] },
+}
+
 /**
  * Validates a date on the edit study form and sends errors to zod ctx
  */
-const validateDate = (
-  fieldName: keyof DateFieldName,
-  ctx: z.RefinementCtx,
-  value: DateInputValue | null | undefined,
-  requiredPast: boolean,
-  requiredCurrent: boolean,
-  requiredFuture: boolean,
-  requiredAfterSpecifiedDates: { date?: DateInputValue | null; fieldName: keyof DateFieldName }[]
-) => {
+const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, values: EditStudyInputs) => {
+  const value = values[fieldName]
+  const label = fieldNameToLabelMapping[fieldName]
+  const requiredPast = dateValidationRules[fieldName].restrictions.includes('requiredPast')
+  const requiredCurrent = dateValidationRules[fieldName].restrictions.includes('requiredCurrent')
+  const requiredFuture = dateValidationRules[fieldName].restrictions.includes('requiredFuture')
+
   // If there does not exist a single date part, the value will be null
   if (!value) return
-
-  const label = fieldNameToLabelMapping[fieldName]
 
   if (Number(value.day) < 1 || Number(value.day) > 31) {
     ctx.addIssue({
@@ -65,7 +85,7 @@ const validateDate = (
     })
   } else if (
     (requiredPast &&
-      dayjs(`${value.year}-${value.month.padStart(2, '0')}-${value.day.padStart(2, '0')}`).isAfter(dayjs())) ||
+      !dayjs(`${value.year}-${value.month.padStart(2, '0')}-${value.day.padStart(2, '0')}`).isBefore(dayjs())) ||
     (requiredCurrent && !dayjs().isSame(dayjs()))
   ) {
     ctx.addIssue({
@@ -75,23 +95,30 @@ const validateDate = (
     })
   } else if (
     requiredFuture &&
-    dayjs(`${value.year}-${value.month.padStart(2, '0')}-${value.day.padStart(2, '0')}`).isBefore(dayjs())
+    !dayjs(`${value.year}-${value.month.padStart(2, '0')}-${value.day.padStart(2, '0')}`).isAfter(dayjs())
   ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: `${label} must be in the future`,
       path: [fieldName],
     })
-  } else if (requiredAfterSpecifiedDates.length > 0) {
-    requiredAfterSpecifiedDates.forEach((specifiedDate) => {
-      const { date, fieldName: specifiedDateFieldName } = specifiedDate
+  } else if (dateValidationRules[fieldName].dependencies.length > 0) {
+    dateValidationRules[fieldName].dependencies.forEach((dateDependency) => {
+      const { fieldName: dateDependencyFieldName, requiredAfter } = dateDependency
 
-      const specifiedDateLabel = fieldNameToLabelMapping[specifiedDateFieldName]
+      const dateDependencyValue = values[dateDependencyFieldName]
+      const specifiedDateLabel = fieldNameToLabelMapping[dateDependencyFieldName]
 
       if (
-        date &&
+        requiredAfter &&
+        dateDependencyValue &&
         !dayjs(`${value.year}-${value.month.padStart(2, '0')}-${value.day.padStart(2, '0')}`).isAfter(
-          dayjs(`${date.year}-${date.month.padStart(2, '0')}-${date.day.padStart(2, '0')}`)
+          dayjs(
+            `${dateDependencyValue.year}-${dateDependencyValue.month.padStart(
+              2,
+              '0'
+            )}-${dateDependencyValue.day.padStart(2, '0')}`
+          )
         )
       ) {
         ctx.addIssue({
@@ -110,32 +137,7 @@ const validateDate = (
  * Validates all dates on the edit study form and sends errors to zod ctx
  */
 export const validateAllDates = (ctx: z.RefinementCtx, values: EditStudyInputs) => {
-  // Planned opening to recruitment date
-  const plannedOpeningDate = values.plannedOpeningDate
-  validateDate('plannedOpeningDate', ctx, plannedOpeningDate, false, false, false, [])
-
-  // Actual opening to recruitment date
-  const actualOpeningDate = values.actualOpeningDate
-  validateDate('actualOpeningDate', ctx, actualOpeningDate, true, true, false, [])
-
-  // Planned closure to recruitment date
-  const plannedClosureDate = values.plannedClosureDate
-  validateDate('plannedClosureDate', ctx, plannedClosureDate, false, false, false, [
-    {
-      fieldName: 'plannedClosureDate',
-      date: values.plannedOpeningDate,
-    },
-    {
-      fieldName: 'actualOpeningDate',
-      date: values.actualOpeningDate,
-    },
-  ])
-
-  // Actual closure to recruitment date
-  const actualClosureDate = values.actualClosureDate
-  validateDate('actualClosureDate', ctx, actualClosureDate, true, true, false, [])
-
-  // Estimate reopening to recruitment date
-  const estimatedReopeningDate = values.estimatedReopeningDate
-  validateDate('estimatedReopeningDate', ctx, estimatedReopeningDate, false, false, true, [])
+  Object.keys(fieldNameToLabelMapping).forEach((fieldName: keyof DateFieldName) => {
+    validateDate(fieldName, ctx, values)
+  })
 }
