@@ -17,6 +17,6 @@ export const FORM_ERRORS = {
  */
 export const FORM_SUCCESS_MESSAGES = {
   1: 'The study assessment was successfully saved',
-  2: 'Your study data changes have been received. These will now be reviewed by the appropriate team and applied to the study in due course. Until then, previous study data values will be displayed here.', // Proposed study updates
-  3: 'Your study data changes have been applied. All changes have been accepted by CPMS and do not require any manual review.', // Direct study updates
+  2: 'Your study data changes have been received. These will now be reviewed and applied to the study record. Until then, previous study data values will be displayed.', // Proposed study updates
+  3: 'Your study data changes have been accepted.', // Direct study updates
 } as Record<number, string>

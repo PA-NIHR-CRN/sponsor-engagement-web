@@ -350,4 +350,32 @@ describe('EditStudy', () => {
       ).toBeInTheDocument()
     })
   })
+
+  describe('Client side validation', () => {
+    it.each(['Day', 'Month', 'Day'])(
+      'when a date field includs an invalid %s, the respective input should be invalid and show an error at the top of the page on submit',
+      async (datePart: string) => {
+        await renderPage()
+
+        const plannedOpenDateFieldset = screen.getByRole('group', { name: 'Planned opening to recruitment date' })
+        expect(plannedOpenDateFieldset).toBeInTheDocument()
+        const datePartField = within(plannedOpenDateFieldset).getByLabelText(datePart)
+        expect(datePartField).toBeInTheDocument()
+
+        await userEvent.click(datePartField)
+        await userEvent.paste('50')
+
+        await userEvent.click(screen.getByRole('button', { name: 'Update' }))
+
+        // Error message
+        const alert = screen.getByRole('alert')
+        expect(
+          within(alert).getByText(`Planned opening date requires a valid ${datePart.toLowerCase()}`)
+        ).toBeInTheDocument()
+
+        // Invalid field
+        expect(datePartField).toHaveAttribute('aria-invalid', 'true')
+      }
+    )
+  })
 })

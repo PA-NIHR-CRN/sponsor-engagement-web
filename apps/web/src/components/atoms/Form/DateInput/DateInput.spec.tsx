@@ -29,20 +29,20 @@ test('renders three inputs with correct attributes and no error', () => {
   // Day input field
   const dayInput = getByLabelText('Day')
   expect(dayInput).toBeInTheDocument()
-  expect(dayInput).toHaveAttribute('name', 'day')
+  expect(dayInput).toHaveAttribute('name', `${name}-day`)
   expect(dayInput).toHaveValue(null)
 
   // Month input field
   const monthInput = getByLabelText('Month')
   expect(monthInput).toBeInTheDocument()
-  expect(monthInput).toHaveAttribute('name', 'month')
-  expect(dayInput).toHaveValue(null)
+  expect(monthInput).toHaveAttribute('name', `${name}-month`)
+  expect(monthInput).toHaveValue(null)
 
   // Year input field
   const yearInput = getByLabelText('Year')
   expect(yearInput).toBeInTheDocument()
-  expect(yearInput).toHaveAttribute('name', 'year')
-  expect(dayInput).toHaveValue(null)
+  expect(yearInput).toHaveAttribute('name', `${name}-year`)
+  expect(yearInput).toHaveValue(null)
 
   // Error
   const errorElement = queryByRole('alert')
@@ -72,20 +72,56 @@ test('renders three inputs with correct value', () => {
 })
 
 test.each(['Day', 'Month', 'Year'])('renders correctly with field level errors', (dateField: string) => {
+  const label = 'Date input label'
+  const name = 'input-name'
   const errors: FieldErrors = {
-    [dateField.toLowerCase()]: {
+    [`${name}-${dateField.toLowerCase()}`]: {
       message: 'Input error message',
       type: 'required',
     },
   }
-  const label = 'Date input label'
+
   const { getByText, getByLabelText } = render(
-    <DateInput errors={errors} label={label} name="input-name" onChange={mockOnChange} value={defaultValueState} />
+    <DateInput errors={errors} label={label} name={name} onChange={mockOnChange} value={defaultValueState} />
   )
 
   const inputElement = getByLabelText(dateField)
   expect(inputElement).toBeInTheDocument()
   expect(inputElement).toHaveAttribute('aria-invalid', 'true')
+
+  // Error message
+  const errorElement = getByText('Input error message')
+  expect(errorElement).toBeInTheDocument()
+})
+
+test('renders all inputs correctly when there is a overall error with the date', () => {
+  const label = 'Date input label'
+  const name = 'input-name'
+  const errors: FieldErrors = {
+    [name]: {
+      message: 'Input error message',
+      type: 'required',
+    },
+  }
+
+  const { getByText, getByLabelText } = render(
+    <DateInput errors={errors} label={label} name={name} onChange={mockOnChange} value={defaultValueState} />
+  )
+
+  // Day input aria-invalid
+  const dayInput = getByLabelText('Day')
+  expect(dayInput).toBeInTheDocument()
+  expect(dayInput).toHaveAttribute('aria-invalid', 'true')
+
+  // Month input aria-invalid
+  const monthInput = getByLabelText('Month')
+  expect(monthInput).toBeInTheDocument()
+  expect(monthInput).toHaveAttribute('aria-invalid', 'true')
+
+  // Year input aria-invalid
+  const yearInput = getByLabelText('Year')
+  expect(yearInput).toBeInTheDocument()
+  expect(yearInput).toHaveAttribute('aria-invalid', 'true')
 
   // Error message
   const errorElement = getByText('Input error message')

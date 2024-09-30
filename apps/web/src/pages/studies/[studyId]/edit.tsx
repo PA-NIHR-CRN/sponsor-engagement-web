@@ -9,6 +9,7 @@ import { Controller, useForm } from 'react-hook-form'
 
 import { ErrorSummary, Fieldset, Form, Radio, RadioGroup } from '@/components/atoms'
 import { DateInput } from '@/components/atoms/Form/DateInput/DateInput'
+import type { DateInputValue } from '@/components/atoms/Form/DateInput/types'
 import { Textarea } from '@/components/atoms/Form/Textarea/Textarea'
 import { TextInput } from '@/components/atoms/Form/TextInput/TextInput'
 import Warning from '@/components/atoms/Warning/Warning'
@@ -32,6 +33,7 @@ import {
   updateEvaluationCategories,
   updateStudy,
 } from '@/lib/studies'
+import { areAllDatePartsEmpty } from '@/utils/date'
 import { mapStudyToStudyFormInput } from '@/utils/editStudyForm'
 import type { EditStudyInputs } from '@/utils/schemas'
 import { studySchema } from '@/utils/schemas'
@@ -39,12 +41,20 @@ import { withServerSideProps } from '@/utils/withServerSideProps'
 
 export type EditStudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
+const transformDateValue = (input?: DateInputValue | null) => ({
+  day: input?.day ?? '',
+  month: input?.month ?? '',
+  year: input?.year ?? '',
+})
+
 export default function EditStudy({ study }: EditStudyProps) {
   const { register, formState, handleSubmit, control, watch, setError } = useForm<EditStudyInputs>({
     resolver: zodResolver(studySchema),
     defaultValues: {
       ...mapStudyToStudyFormInput(study),
     },
+    mode: 'onSubmit',
+    reValidateMode: 'onSubmit',
   })
 
   const { organisationsByRole } = study
@@ -106,9 +116,7 @@ export default function EditStudy({ study }: EditStudyProps) {
             }}
           >
             <ErrorSummary errors={errors} />
-
             <input type="hidden" {...register('cpmsId')} defaultValue={defaultValues?.cpmsId} />
-
             <Fieldset>
               {/* Status */}
               <Controller
@@ -153,12 +161,15 @@ export default function EditStudy({ study }: EditStudyProps) {
 
                   return (
                     <DateInput
-                      errors={{}}
+                      errors={errors}
                       label="Planned opening to recruitment date"
                       name={name}
-                      onChange={onChange}
+                      onChange={(input) => {
+                        const allFieldsEmpty = areAllDatePartsEmpty(input)
+                        onChange(allFieldsEmpty ? null : input)
+                      }}
                       ref={ref}
-                      value={value}
+                      value={transformDateValue(value)}
                     />
                   )
                 }}
@@ -173,12 +184,15 @@ export default function EditStudy({ study }: EditStudyProps) {
 
                   return (
                     <DateInput
-                      errors={{}}
+                      errors={errors}
                       label="Actual opening to recruitment date"
                       name={name}
-                      onChange={onChange}
+                      onChange={(input) => {
+                        const allFieldsEmpty = areAllDatePartsEmpty(input)
+                        onChange(allFieldsEmpty ? null : input)
+                      }}
                       ref={ref}
-                      value={value}
+                      value={transformDateValue(value)}
                     />
                   )
                 }}
@@ -193,12 +207,15 @@ export default function EditStudy({ study }: EditStudyProps) {
 
                   return (
                     <DateInput
-                      errors={{}}
+                      errors={errors}
                       label="Planned closure to recruitment date"
                       name={name}
-                      onChange={onChange}
+                      onChange={(input) => {
+                        const allFieldsEmpty = areAllDatePartsEmpty(input)
+                        onChange(allFieldsEmpty ? null : input)
+                      }}
                       ref={ref}
-                      value={value}
+                      value={transformDateValue(value)}
                     />
                   )
                 }}
@@ -213,12 +230,15 @@ export default function EditStudy({ study }: EditStudyProps) {
 
                   return (
                     <DateInput
-                      errors={{}}
+                      errors={errors}
                       label="Actual closure to recruitment date"
                       name={name}
-                      onChange={onChange}
+                      onChange={(input) => {
+                        const allFieldsEmpty = areAllDatePartsEmpty(input)
+                        onChange(allFieldsEmpty ? null : input)
+                      }}
                       ref={ref}
-                      value={value}
+                      value={transformDateValue(value)}
                     />
                   )
                 }}
@@ -233,12 +253,15 @@ export default function EditStudy({ study }: EditStudyProps) {
 
                   return (
                     <DateInput
-                      errors={{}}
+                      errors={errors}
                       label="Estimated reopening date"
                       name={name}
-                      onChange={onChange}
+                      onChange={(input) => {
+                        const allFieldsEmpty = areAllDatePartsEmpty(input)
+                        onChange(allFieldsEmpty ? null : input)
+                      }}
                       ref={ref}
-                      value={value}
+                      value={transformDateValue(value)}
                     />
                   )
                 }}

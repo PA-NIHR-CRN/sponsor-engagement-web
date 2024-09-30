@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import MockDate from 'mockdate'
 
-import { constructDateObjFromParts, constructDatePartsFromDate, formatDate } from './date'
+import { areAllDatePartsEmpty, constructDateObjFromParts, constructDatePartsFromDate, formatDate } from './date'
 
 beforeEach(() => {
   MockDate.set(new Date('2001-01-01'))
@@ -22,8 +22,8 @@ describe('formatDate', () => {
 })
 
 describe('constructDateObjFromParts', () => {
-  it('should return undefined if input is undefined', () => {
-    const result = constructDateObjFromParts(undefined)
+  it.each([undefined, null])('should return undefined if input is %s', (value: undefined | null) => {
+    const result = constructDateObjFromParts(value)
     expect(result).toBeUndefined()
   })
 
@@ -61,5 +61,14 @@ describe('constructDatePartsFromDate', () => {
     const date = new Date(2023, 8, 9)
     const result = constructDatePartsFromDate(date)
     expect(result).toEqual({ year: '2023', month: '9', day: '9' })
+  })
+})
+
+describe('areAllDatePartsEmpty', () => {
+  it('should return true if all date parts are empty', () => {
+    expect(areAllDatePartsEmpty({ day: '', month: '', year: '' })).toBe(true)
+  })
+  it('should return false if there exists a date part that is empty', () => {
+    expect(areAllDatePartsEmpty({ day: '10', month: '', year: '' })).toBe(false)
   })
 })

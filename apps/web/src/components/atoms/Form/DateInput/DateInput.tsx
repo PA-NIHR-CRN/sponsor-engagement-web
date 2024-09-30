@@ -25,16 +25,17 @@ const initialDateInputState: DateInputValue = {
 
 export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
   ({ label, errors, required, value = { ...initialDateInputState }, onChange, disabled, ...rest }, ref) => {
-    const dayError = errors.day
-    const monthError = errors.month
-    const yearError = errors.year
+    const dayError = errors[`${rest.name}-day`]
+    const monthError = errors[`${rest.name}-month`]
+    const yearError = errors[`${rest.name}-year`]
+    const overallError = errors[rest.name]
 
-    const handleInputChange = (event: React.FormEvent<HTMLInputElement>) => {
-      const { name: fieldName, value: inputValue } = event.currentTarget
+    const handleInputChange = (event: React.FormEvent<HTMLInputElement>, type: keyof DateInputValue) => {
+      const { value: inputValue } = event.currentTarget
 
       const newDate = {
         ...value,
-        [fieldName]: inputValue,
+        [type]: inputValue,
       }
 
       onChange(newDate)
@@ -43,7 +44,8 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
     return (
       <div
         className={clsx('govuk-form-group', {
-          'govuk-form-group--error': Boolean(dayError) || Boolean(monthError) || Boolean(yearError),
+          'govuk-form-group--error':
+            Boolean(dayError) || Boolean(monthError) || Boolean(yearError) || Boolean(overallError),
         })}
       >
         <Fieldset
@@ -51,76 +53,80 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
             [`${rest.name}.day-error`]: dayError,
             [`${rest.name}.month-error`]: monthError,
             [`${rest.name}.year-error`]: yearError,
+            [`${rest.name}-error`]: overallError,
           })}
           aria-disabled={disabled}
           disabled={disabled}
+          id={rest.name}
           legend={label}
           name={rest.name}
           role="group"
         >
-          <ErrorInline errors={errors} name="day" />
-          <ErrorInline errors={errors} name="month" />
-          <ErrorInline errors={errors} name="year" />
+          <ErrorInline errors={errors} name={`${rest.name}-day`} />
+          <ErrorInline errors={errors} name={`${rest.name}-month`} />
+          <ErrorInline errors={errors} name={`${rest.name}-year`} />
+          <ErrorInline errors={errors} name={rest.name} />
 
           <div className="govuk-date-input">
             <div className="govuk-date-input__item">
               <TextInput
                 displayInlineError={false}
-                errors={errors}
+                // Conditional here is to trigger error state of input when there is an overall error
+                errors={overallError ? { [`${rest.name}-day`]: overallError } : errors}
                 inputClassName="govuk-input--width-2"
-                inputMode="numeric"
                 label="Day"
                 labelClassName="font-normal"
-                maxLength={2}
-                minLength={1}
-                onChange={handleInputChange}
+                onChange={(e) => {
+                  handleInputChange(e, 'day')
+                }}
                 ref={ref}
                 required={required}
                 type="number"
                 value={value.day}
                 {...rest}
                 disabled={disabled}
-                name="day"
+                id={`${rest.name}-day`}
+                name={`${rest.name}-day`}
               />
             </div>
             <div className="govuk-date-input__item">
               <TextInput
                 displayInlineError={false}
-                errors={errors}
+                errors={overallError ? { [`${rest.name}-month`]: overallError } : errors}
                 inputClassName="govuk-input--width-2"
-                inputMode="numeric"
                 label="Month"
                 labelClassName="font-normal"
-                onChange={handleInputChange}
+                onChange={(e) => {
+                  handleInputChange(e, 'month')
+                }}
                 ref={ref}
                 required={required}
                 type="number"
                 value={value.month}
                 {...rest}
                 disabled={disabled}
-                maxLength={2}
-                minLength={1}
-                name="month"
+                id={`${rest.name}-month`}
+                name={`${rest.name}-month`}
               />
             </div>
             <div className="govuk-date-input__item">
               <TextInput
                 displayInlineError={false}
-                errors={errors}
+                errors={overallError ? { [`${rest.name}-year`]: overallError } : errors}
                 inputClassName="govuk-input--width-4"
-                inputMode="numeric"
                 label="Year"
                 labelClassName="font-normal"
-                maxLength={4}
-                minLength={4}
-                onChange={handleInputChange}
+                onChange={(e) => {
+                  handleInputChange(e, 'year')
+                }}
                 ref={ref}
                 required={required}
                 type="number"
                 value={value.year}
                 {...rest}
                 disabled={disabled}
-                name="year"
+                id={`${rest.name}-year`}
+                name={`${rest.name}-year`}
               />
             </div>
           </div>
