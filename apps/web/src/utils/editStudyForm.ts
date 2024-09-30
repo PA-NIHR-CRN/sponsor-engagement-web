@@ -65,6 +65,7 @@ const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, valu
   // If there does not exist a single date part, the value will be null
   if (!value) return
 
+  // Basic date validation
   if (Number(value.day) < 1 || Number(value.day) > 31) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -83,6 +84,8 @@ const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, valu
       message: `${label} requires a valid year`,
       path: [`${fieldName}-year`],
     })
+
+    // Specific date validation
   } else if (
     (requiredPast &&
       !dayjs(`${value.year}-${value.month.padStart(2, '0')}-${value.day.padStart(2, '0')}`).isBefore(dayjs())) ||
@@ -102,6 +105,8 @@ const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, valu
       message: `${label} must be in the future`,
       path: [fieldName],
     })
+
+    // Date dependency validation
   } else if (dateValidationRules[fieldName].dependencies.length > 0) {
     dateValidationRules[fieldName].dependencies.forEach((dateDependency) => {
       const { fieldName: dateDependencyFieldName, requiredAfter } = dateDependency
