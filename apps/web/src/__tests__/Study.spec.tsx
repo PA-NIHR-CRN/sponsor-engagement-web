@@ -504,12 +504,9 @@ describe('Study', () => {
       ['1', 'The study assessment was successfully saved'],
       [
         '2',
-        'Your study data changes have been received. These will now be reviewed by the appropriate team and applied to the study in due course. Until then, previous study data values will be displayed here.',
+        'Your study data changes have been received. These will now be reviewed and applied to the study record. Until then, previous study data values will be displayed.',
       ],
-      [
-        '3',
-        'Your study data changes have been applied. All changes have been accepted by CPMS and do not require any manual review.',
-      ],
+      ['3', 'Your study data changes have been accepted.'],
     ])(
       'should show the correct success message when success type is %s',
       async (successType: string, successMessage: string) => {
