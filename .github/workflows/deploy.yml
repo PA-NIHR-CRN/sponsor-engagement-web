@@ -193,7 +193,7 @@ jobs:
   #         wait-for-service-stability: true
 
   e2e-test:
-    needs: deploy-test
+    # needs: deploy-test
     environment: TEST
     name: 'Run E2E Tests'
     timeout-minutes: 15
