@@ -1,6 +1,8 @@
 import dayjs from 'dayjs'
 import { z } from 'zod'
 
+import { dateValidationRules, fieldNameToLabelMapping, FormStudyStatus } from '@/constants/editStudyForm'
+import { mapCPMSStatusToFormStatus } from '@/lib/studies'
 import type { EditStudyProps } from '@/pages/studies/[studyId]/edit'
 
 import { constructDatePartsFromDate } from './date'
@@ -9,6 +11,7 @@ import type { DateFieldName, EditStudyInputs } from './schemas'
 export const mapStudyToStudyFormInput = (study: EditStudyProps['study']): EditStudyInputs => ({
   studyId: study.id,
   status: study.studyStatus,
+  originalStatus: study.studyStatus,
   recruitmentTarget: study.sampleSize ?? undefined,
   cpmsId: study.cpmsId.toString(),
   plannedOpeningDate: constructDatePartsFromDate(study.plannedOpeningDate),
@@ -19,37 +22,42 @@ export const mapStudyToStudyFormInput = (study: EditStudyProps['study']): EditSt
   furtherInformation: '', // TODO: is there a field for this
 })
 
-const fieldNameToLabelMapping: Record<keyof DateFieldName, string> = {
-  plannedOpeningDate: 'Planned opening to recruitment date',
-  actualOpeningDate: 'Actual opening to recruitment date',
-  plannedClosureDate: 'Planned closure to recruitment date',
-  actualClosureDate: 'Actual closure to recruitment date',
-  estimatedReopeningDate: 'Estimated reopening date',
-}
-
-type DateRestrictions = 'requiredPast' | 'requiredCurrent' | 'requiredFuture'
-
-const dateValidationRules: Record<
-  keyof DateFieldName,
-  { restrictions: DateRestrictions[]; dependencies: { fieldName: keyof DateFieldName; requiredAfter?: boolean }[] }
-> = {
-  plannedOpeningDate: { restrictions: [], dependencies: [] },
-  actualOpeningDate: { restrictions: ['requiredPast', 'requiredCurrent'], dependencies: [] },
-  plannedClosureDate: {
-    restrictions: [],
-    dependencies: [
-      {
-        fieldName: 'plannedOpeningDate',
-        requiredAfter: true,
-      },
-      {
-        fieldName: 'actualOpeningDate',
-        requiredAfter: true,
-      },
+/**
+ * Mapping to see which date fields are mandatory given a status
+ */
+const mapStatusToMandatoryDateFields = (previousStatus: string | null, newStatus: string) => {
+  const mandatoryDateFieldsByStatus: Record<string, (keyof DateFieldName)[]> = {
+    [FormStudyStatus.InSetup]: ['plannedOpeningDate', 'plannedClosureDate'],
+    [FormStudyStatus.OpenToRecruitment]: ['plannedOpeningDate', 'actualOpeningDate', 'plannedClosureDate'],
+    [FormStudyStatus.Suspended]: [
+      'plannedOpeningDate',
+      'actualOpeningDate',
+      'plannedClosureDate',
+      'estimatedReopeningDate',
     ],
-  },
-  actualClosureDate: { restrictions: ['requiredPast', 'requiredCurrent'], dependencies: [] },
-  estimatedReopeningDate: { restrictions: ['requiredFuture'], dependencies: [] },
+    [FormStudyStatus.Withdrawn]: ['plannedOpeningDate', 'plannedClosureDate'],
+    [FormStudyStatus.Closed]: ['plannedOpeningDate', 'actualOpeningDate', 'plannedClosureDate', 'actualClosureDate'],
+    [FormStudyStatus.ClosedFollowUp]: [
+      'plannedOpeningDate',
+      'actualOpeningDate',
+      'plannedClosureDate',
+      'actualClosureDate',
+    ],
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- status might not exist in object
+  const mandatoryDates = mandatoryDateFieldsByStatus[newStatus] || []
+
+  // Exceptions - there are a small amount of scenarios that relies on the previous status
+  if (
+    (previousStatus === (FormStudyStatus.InSetup as string) && newStatus === (FormStudyStatus.Suspended as string)) ||
+    (previousStatus === (FormStudyStatus.Suspended as string) &&
+      newStatus === (FormStudyStatus.OpenToRecruitment as string))
+  ) {
+    return mandatoryDates.filter((value) => value !== 'actualOpeningDate')
+  }
+
+  return mandatoryDates
 }
 
 /**
@@ -57,13 +65,25 @@ const dateValidationRules: Record<
  */
 const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, values: EditStudyInputs) => {
   const value = values[fieldName]
+  const currentStatus = mapCPMSStatusToFormStatus(values.status)
+  const previousStatus = values.originalStatus ? mapCPMSStatusToFormStatus(values.originalStatus) : null
   const label = fieldNameToLabelMapping[fieldName]
   const requiredPast = dateValidationRules[fieldName].restrictions.includes('requiredPast')
   const requiredCurrent = dateValidationRules[fieldName].restrictions.includes('requiredCurrent')
   const requiredFuture = dateValidationRules[fieldName].restrictions.includes('requiredFuture')
 
-  // If there does not exist a single date part, the value will be null
-  if (!value) return
+  if (!value) {
+    // Status based validation
+    if (mapStatusToMandatoryDateFields(previousStatus, currentStatus).includes(fieldName)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `${fieldNameToLabelMapping[fieldName]} is a mandatory field`,
+        path: [fieldName],
+      })
+    }
+
+    return
+  }
 
   // Basic date validation
   if (Number(value.day) < 1 || Number(value.day) > 31) {

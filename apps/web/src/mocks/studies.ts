@@ -228,7 +228,7 @@ export const mockStudyWithRelations = Mock.of<StudyWithRelations>({
   chiefInvestigatorLastName: 'Smith',
   managingSpeciality: '',
   plannedOpeningDate: new Date('2001-01-01'),
-  plannedClosureDate: new Date('2001-01-01'),
+  plannedClosureDate: new Date('2001-01-02'),
   actualOpeningDate: new Date('2001-01-01'),
   actualClosureDate: new Date('2001-01-01'),
   totalRecruitmentToDate: 999,

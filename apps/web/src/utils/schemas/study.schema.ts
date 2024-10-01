@@ -14,6 +14,7 @@ export const studySchema = z
   .object({
     studyId: z.number(),
     cpmsId: z.string(),
+    originalStatus: z.string().optional().nullable(),
     status: z.string(),
     plannedOpeningDate: dateSchema.optional().nullable(),
     actualOpeningDate: dateSchema.optional().nullable(),
