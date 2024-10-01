@@ -37,12 +37,17 @@ const organisationsByRole = {
 }
 const getServerSessionMock = jest.mocked(getServerSession)
 
-const renderPage = async (mockEditAxiosResponseUrl?: string, mockRouterPushUrl = `/studies/${mockStudyId}`) => {
+const renderPage = async (
+  mockEditAxiosResponseUrl?: string,
+  mockRouterPushUrl = `/studies/${mockStudyId}`,
+  mockReturnedStudy = mockStudyWithRelations
+) => {
   const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
   getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
   prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
   mockedGetAxios.mockResolvedValueOnce({ data: mockCPMSResponse })
-  prismaMock.study.update.mockResolvedValueOnce(mockStudyWithRelations)
+  // Mock returned study is only passed through here because when all requests are successfull the updated study is returned
+  prismaMock.study.update.mockResolvedValueOnce(mockReturnedStudy)
   prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[0])
   prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[1])
   if (mockEditAxiosResponseUrl) {
@@ -336,7 +341,13 @@ describe('EditStudy', () => {
   describe('Form submission failures', () => {
     test('Fatal server error shows an error at the top of the page', async () => {
       const errorResponseUrl = '/studies/123/edit?fatal=1'
-      await renderPage(errorResponseUrl, errorResponseUrl)
+      await renderPage(errorResponseUrl, errorResponseUrl, {
+        ...mockStudyWithRelations,
+        actualClosureDate: null,
+        actualOpeningDate: null,
+        plannedClosureDate: null,
+        plannedOpeningDate: null,
+      })
 
       expect(screen.getByRole('heading', { level: 1, name: 'Update study data' })).toBeInTheDocument()
 
@@ -370,12 +381,134 @@ describe('EditStudy', () => {
         // Error message
         const alert = screen.getByRole('alert')
         expect(
-          within(alert).getByText(`Planned opening date requires a valid ${datePart.toLowerCase()}`)
+          within(alert).getByText(`Planned opening to recruitment date requires a valid ${datePart.toLowerCase()}`)
         ).toBeInTheDocument()
 
         // Invalid field
         expect(datePartField).toHaveAttribute('aria-invalid', 'true')
       }
     )
+
+    it('should display an error when actual opening to recruitment date is in the future and form is submitted', async () => {
+      const currentYear = new Date().getFullYear()
+
+      await renderPage()
+
+      const actualOpeningDateFieldSet = screen.getByRole('group', { name: 'Actual opening to recruitment date' })
+      expect(actualOpeningDateFieldSet).toBeInTheDocument()
+
+      const yearField = within(actualOpeningDateFieldSet).getByLabelText('Year')
+      expect(yearField).toBeInTheDocument()
+
+      await userEvent.click(yearField)
+      await userEvent.clear(yearField)
+      await userEvent.paste((currentYear + 1).toString())
+
+      await userEvent.click(screen.getByRole('button', { name: 'Update' }))
+
+      // Error message
+      const alert = screen.getByRole('alert')
+      expect(
+        within(alert).getByText('Actual opening to recruitment date must be today or in the past')
+      ).toBeInTheDocument()
+    })
+
+    it('should display an error when planned closure to recruitment date is before planned opening to recruitment date and form is submitted', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- in control of test data
+      const plannedOpeningDateYear = mockStudyWithRelations.plannedClosureDate!.getFullYear()
+
+      await renderPage()
+
+      const plannedClosureFieldSet = screen.getByRole('group', { name: 'Planned closure to recruitment date' })
+      expect(plannedClosureFieldSet).toBeInTheDocument()
+
+      const yearField = within(plannedClosureFieldSet).getByLabelText('Year')
+      expect(yearField).toBeInTheDocument()
+
+      await userEvent.click(yearField)
+      await userEvent.clear(yearField)
+      await userEvent.paste((plannedOpeningDateYear - 1).toString())
+
+      await userEvent.click(screen.getByRole('button', { name: 'Update' }))
+
+      // Error message
+      const alert = screen.getByRole('alert')
+      expect(
+        within(alert).getByText('Planned closure to recruitment date must be after Planned opening to recruitment date')
+      ).toBeInTheDocument()
+    })
+
+    it('should display an error when planned closure to recruitment date is before actual opening to recruitment date and form is submitted', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- in control of test data
+      const actualOpeningDateYear = mockStudyWithRelations.actualOpeningDate!.getFullYear()
+
+      await renderPage(undefined, undefined, {
+        ...mockStudyWithRelations,
+        plannedOpeningDate: null,
+      })
+
+      const plannedClosureFieldSet = screen.getByRole('group', { name: 'Planned closure to recruitment date' })
+      expect(plannedClosureFieldSet).toBeInTheDocument()
+
+      const yearField = within(plannedClosureFieldSet).getByLabelText('Year')
+      expect(yearField).toBeInTheDocument()
+
+      await userEvent.click(yearField)
+      await userEvent.clear(yearField)
+      await userEvent.paste((actualOpeningDateYear - 1).toString())
+
+      await userEvent.click(screen.getByRole('button', { name: 'Update' }))
+
+      // Error message
+      const alert = screen.getByRole('alert')
+      expect(
+        within(alert).getByText('Planned closure to recruitment date must be after Actual opening to recruitment date')
+      ).toBeInTheDocument()
+    })
+
+    it('should display an error when actual clsoure to recruitment date is in the future and form is submitted', async () => {
+      const currentYear = new Date().getFullYear()
+
+      await renderPage(undefined, undefined, {
+        ...mockStudyWithRelations,
+        plannedOpeningDate: null,
+      })
+      const actualClosureDateFieldSet = screen.getByRole('group', { name: 'Actual closure to recruitment date' })
+      expect(actualClosureDateFieldSet).toBeInTheDocument()
+
+      const yearField = within(actualClosureDateFieldSet).getByLabelText('Year')
+      expect(yearField).toBeInTheDocument()
+
+      await userEvent.click(yearField)
+      await userEvent.clear(yearField)
+      await userEvent.paste((currentYear + 1).toString())
+
+      await userEvent.click(screen.getByRole('button', { name: 'Update' }))
+
+      // Error message
+      const alert = screen.getByRole('alert')
+      expect(
+        within(alert).getByText('Actual closure to recruitment date must be today or in the past')
+      ).toBeInTheDocument()
+    })
   })
+
+  it.each(['-e', '-3', '19999999'])(
+    'should display an error message when UK recruitment target has an invalid value',
+    async (value: string) => {
+      await renderPage()
+      const ukRecruitmentTargetField = screen.getByLabelText('UK recruitment target')
+      expect(ukRecruitmentTargetField).toBeInTheDocument()
+
+      await userEvent.click(ukRecruitmentTargetField)
+      await userEvent.clear(ukRecruitmentTargetField)
+      await userEvent.paste(value)
+
+      await userEvent.click(screen.getByRole('button', { name: 'Update' }))
+
+      // Error message
+      const alert = screen.getByRole('alert')
+      expect(within(alert).getByText('Enter a valid UK target')).toBeInTheDocument()
+    }
+  )
 })
