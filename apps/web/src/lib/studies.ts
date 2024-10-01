@@ -1,4 +1,5 @@
 import type { Study, StudyEvaluationCategory } from '@/@types/studies'
+import { Status as CPMSStatus } from '@/@types/studies'
 import { FormStudyStatus } from '@/constants/editStudyForm'
 import { getErrorMessage } from '@/utils/error'
 
@@ -283,37 +284,38 @@ export type UpdateStudyInput = Prisma.StudyUpdateInput
 
 export const mapCPMSStatusToFormStatus = (cpmsStatus: string): string => {
   const statusMap: Record<string, string> = {
-    'Pre-Setup': 'In setup',
-    'In Setup': 'In setup',
-    'In Setup, Pending NHS Permission': 'In setup',
-    'In Setup, Approval Received': 'In setup',
-    'In Setup, Pending Approval': 'In setup',
-    'Open to Recruitment': 'Open to recruitment',
-    'Open, With Recruitment': 'Open to recruitment',
-    'Closed to Recruitment': 'Closed',
-    'Closed to Recruitment, In Follow Up': 'Closed, in follow up',
-    'Closed to Recruitment, Follow Up Complete': 'Closed',
-    'Suspended (from Open, With Recruitment)': 'Suspended',
-    'Suspended (from Open to Recruitment)': 'Suspended',
-    'Withdrawn in Pre-Setup': 'Withdrawn',
-    'Withdrawn During Setup': 'Withdrawn',
+    [CPMSStatus.PreSetup]: FormStudyStatus.InSetup,
+    [CPMSStatus.InSetup]: FormStudyStatus.InSetup,
+    [CPMSStatus.InSetupPendingNHSPermission]: FormStudyStatus.InSetup,
+    [CPMSStatus.InSetupApprovalReceived]: FormStudyStatus.InSetup,
+    [CPMSStatus.InSetupPendingApproval]: FormStudyStatus.InSetup,
+    [CPMSStatus.InSetupNHSPermissionReceived]: FormStudyStatus.InSetup,
+    [CPMSStatus.OpenToRecruitment]: FormStudyStatus.OpenToRecruitment,
+    [CPMSStatus.OpenWithRecruitment]: FormStudyStatus.OpenToRecruitment,
+    [CPMSStatus.ClosedToRecruitment]: FormStudyStatus.Closed,
+    [CPMSStatus.ClosedToRecruitmentInFollowUp]: FormStudyStatus.ClosedFollowUp,
+    [CPMSStatus.ClosedToRecruitmentFollowUpComplete]: FormStudyStatus.Closed,
+    [CPMSStatus.SuspendedFromOpenWithRecruitment]: FormStudyStatus.Suspended,
+    [CPMSStatus.SuspendedFromOpenToRecruitment]: FormStudyStatus.Suspended,
+    [CPMSStatus.WithdrawnInPreSetup]: FormStudyStatus.Withdrawn,
+    [CPMSStatus.WithdrawnDuringSetup]: FormStudyStatus.Withdrawn,
   }
 
   return statusMap[cpmsStatus] || cpmsStatus
 }
 
 export const mapFormStatusToCPMSStatus = (newStatus: string, currentStatus: string): string => {
-  const isCurrentStatusOpenWithRecruitment = currentStatus === 'Open, With Recruitment'
+  const isCurrentStatusOpenWithRecruitment = currentStatus === (CPMSStatus.OpenWithRecruitment as string)
 
   const statusMap = {
-    [FormStudyStatus.InSetup]: 'In Setup',
-    [FormStudyStatus.Closed]: 'Closed to Recruitment, Follow Up Complete',
-    [FormStudyStatus.ClosedFollowUp]: 'Closed to Recruitment, In Follow Up',
-    [FormStudyStatus.OpenToRecruitment]: 'Open to Recruitment',
+    [FormStudyStatus.InSetup]: CPMSStatus.InSetup,
+    [FormStudyStatus.Closed]: CPMSStatus.ClosedToRecruitmentFollowUpComplete,
+    [FormStudyStatus.ClosedFollowUp]: CPMSStatus.ClosedToRecruitmentInFollowUp,
+    [FormStudyStatus.OpenToRecruitment]: CPMSStatus.OpenToRecruitment,
     [FormStudyStatus.Suspended]: isCurrentStatusOpenWithRecruitment
-      ? 'Suspended (from Open, With Recruitment)'
-      : 'Suspended (from Open to Recruitment)',
-    [FormStudyStatus.Withdrawn]: 'Withdrawn During Setup',
+      ? CPMSStatus.SuspendedFromOpenWithRecruitment
+      : CPMSStatus.SuspendedFromOpenToRecruitment,
+    [FormStudyStatus.Withdrawn]: CPMSStatus.WithdrawnDuringSetup,
   }
 
   return statusMap[newStatus] || newStatus

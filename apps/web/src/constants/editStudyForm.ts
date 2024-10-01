@@ -1,3 +1,5 @@
+import type { DateFieldName } from '@/utils/schemas'
+
 export const PAGE_TITLE = 'Update study data'
 export const GENERIC_STUDIES_GUIDANCE_TEXT =
   'Changes to the study status, the key dates and recruitment targets will be communicated to RDN, where possible, your changes will update the study record automatically in CPMS, other changes might be subject to review by the RDN team.'
@@ -56,3 +58,39 @@ export const studyStatuses = [
  * Max amount of characters for furtherInformation text
  */
 export const FURTHER_INFO_MAX_CHARACTERS = 500
+
+export const fieldNameToLabelMapping: Record<keyof DateFieldName, string> = {
+  plannedOpeningDate: 'Planned opening to recruitment date',
+  actualOpeningDate: 'Actual opening to recruitment date',
+  plannedClosureDate: 'Planned closure to recruitment date',
+  actualClosureDate: 'Actual closure to recruitment date',
+  estimatedReopeningDate: 'Estimated reopening date',
+}
+
+export type DateRestrictions = 'requiredPast' | 'requiredCurrent' | 'requiredFuture'
+
+/**
+ * Date validation rules and dependencies
+ */
+export const dateValidationRules: Record<
+  keyof DateFieldName,
+  { restrictions: DateRestrictions[]; dependencies: { fieldName: keyof DateFieldName; requiredAfter?: boolean }[] }
+> = {
+  plannedOpeningDate: { restrictions: [], dependencies: [] },
+  actualOpeningDate: { restrictions: ['requiredPast', 'requiredCurrent'], dependencies: [] },
+  plannedClosureDate: {
+    restrictions: [],
+    dependencies: [
+      {
+        fieldName: 'plannedOpeningDate',
+        requiredAfter: true,
+      },
+      {
+        fieldName: 'actualOpeningDate',
+        requiredAfter: true,
+      },
+    ],
+  },
+  actualClosureDate: { restrictions: ['requiredPast', 'requiredCurrent'], dependencies: [] },
+  estimatedReopeningDate: { restrictions: ['requiredFuture'], dependencies: [] },
+}
