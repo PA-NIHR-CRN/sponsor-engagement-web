@@ -4,16 +4,12 @@ on:
   workflow_dispatch:
     inputs:
       publish-report:
-        description: 'Do you want to upload test report to GitHub Pages?
-          Note - Current report will be overwritten!
-          Accepts true or false'
+        description: "Upload report to GitHub Pages? Note - Current report will be overwritten! Accepts true or false"
         options: ['true', 'false']
         required: true
         default: 'true'
       test-tag:
-        description: "Select which Tests you want to run using `@<tag name>`.
-          For example: `@se_21`, `@se_21_login_contact_manager`.
-          To run all tests leave as default 'all'"
+        description: "Specify tests with tags. For example: `@se_21`. To run all tests leave as `all`"
         required: true
         default: "all"
 
@@ -160,14 +156,13 @@ jobs:
     runs-on: ubuntu-latest
     if: failure()
     steps:
-
-      - name: "Set Env Message to TEST"
       - uses: technote-space/workflow-conclusion-action@v3
+      - name: "Set Env Message to TEST"
         run: |
           echo "ENV_MSG=TEST" >> "$GITHUB_ENV"
       
       - name: Slack Notify
-        if: if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/se-phase-2'
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/se-phase-2'
         uses: rtCamp/action-slack-notify@v2.2.0
         env:
           SLACK_WEBHOOK: ${{ secrets.SE_SLACK_WEBHOOK }}
@@ -182,8 +177,8 @@ jobs:
     if: success()
     steps:
       
-      - name: "Set Env Message to TEST"
       - uses: technote-space/workflow-conclusion-action@v3
+      - name: "Set Env Message to TEST"
         run: |
           echo "ENV_MSG=TEST" >> "$GITHUB_ENV"
       
