@@ -9,3 +9,17 @@ export async function seDatabaseReq(query: string): Promise<RowDataPacket[]> {
     })
   })
 }
+
+export async function waitForSeDbRequest(query: string) {
+  let dbStudyUpdate: string | any[] = []
+
+  while (dbStudyUpdate.length === 0) {
+    dbStudyUpdate = await seDatabaseReq(query)
+
+    if (dbStudyUpdate.length !== 0) {
+      break
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+  }
+  return dbStudyUpdate
+}

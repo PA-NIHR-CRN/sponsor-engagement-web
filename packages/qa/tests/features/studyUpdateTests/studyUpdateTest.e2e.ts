@@ -31,7 +31,7 @@ test.beforeAll('Setup Tests', async () => {
   getStudyResponse = await getStudyEngagementInfo(studyCoreDetails[0].cpmsId)
 })
 
-test.describe('Update study data page - @se_166 @wip', () => {
+test.describe('Update study data page - @se_166', () => {
   test.use({ storageState: '.auth/sponsorContact.json' })
 
   test('As a Sponsor I can see the page header, study information and guidance section - @se_166_ac1', async ({
@@ -66,10 +66,10 @@ test.describe('Update study data page - @se_166 @wip', () => {
     })
     await test.step(`Then I should see all of the values on the page are defaulted to their current study details values`, async () => {
       await studyUpdatePage.assertStudyStatus(getStudyResponse.StudyStatus)
-      await studyUpdatePage.assertStudyDate(getStudyResponse.PlannedOpeningDate, 0)
-      await studyUpdatePage.assertStudyDate(getStudyResponse.ActualOpeningDate, 1)
-      await studyUpdatePage.assertStudyDate(getStudyResponse.PlannedClosureToRecruitmentDate, 2)
-      await studyUpdatePage.assertStudyDate(getStudyResponse.ActualClosureToRecruitmentDate, 3)
+      await studyUpdatePage.assertStudyDate(getStudyResponse.PlannedOpeningDate, 'plannedOpening')
+      await studyUpdatePage.assertStudyDate(getStudyResponse.ActualOpeningDate, 'actualOpening')
+      await studyUpdatePage.assertStudyDate(getStudyResponse.PlannedClosureToRecruitmentDate, 'plannedClosure')
+      await studyUpdatePage.assertStudyDate(getStudyResponse.ActualClosureToRecruitmentDate, 'actualClosure')
       await studyUpdatePage.assertRecruitmentTarget(getStudyResponse.SampleSize)
       // await studyUpdatePage.assertFurtherInfo(getStudyResponse.Comments)
     })
@@ -100,10 +100,10 @@ test.describe('Update study data page - @se_166 @wip', () => {
       await studyUpdatePage.assertStudyDateSelections(getStudyResponse.StudyRoute)
     })
     await test.step(`And I can update the following date options`, async () => {
-      await studyUpdatePage.fillStudyDates(0)
-      await studyUpdatePage.fillStudyDates(1)
-      await studyUpdatePage.fillStudyDates(2)
-      await studyUpdatePage.fillStudyDates(3)
+      await studyUpdatePage.fillStudyDates('plannedOpening')
+      await studyUpdatePage.fillStudyDates('actualOpening')
+      await studyUpdatePage.fillStudyDates('plannedClosure')
+      await studyUpdatePage.fillStudyDates('actualClosure')
     })
   })
 
