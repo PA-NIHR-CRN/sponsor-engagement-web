@@ -241,10 +241,10 @@ export default class StudyUpdatePage {
     }
   }
 
-  async fillStudyDates(dateType: string) {
-    await this.page.locator(`#${dateType}Date-day`).fill('12')
-    await this.page.locator(`#${dateType}Date-month`).fill('06')
-    await this.page.locator(`#${dateType}Date-year`).fill('2024')
+  async fillStudyDates(dateType: string, dd: string, mm: string, yyyy: string) {
+    await this.page.locator(`#${dateType}Date-day`).fill(dd)
+    await this.page.locator(`#${dateType}Date-month`).fill(mm)
+    await this.page.locator(`#${dateType}Date-year`).fill(yyyy)
   }
 
   async assertRecruitmentTarget(target: string) {
