@@ -9,7 +9,6 @@ const timeStamp = new Date().toISOString()
 
 let startingStudyId = 0
 let studyCoreDetails: RowDataPacket[]
-// let getStudyResponse: JSON
 
 test.beforeAll('Setup Tests', async () => {
   await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
@@ -25,8 +24,6 @@ test.beforeAll('Setup Tests', async () => {
   studyCoreDetails = await seDatabaseReq(`
     SELECT cpmsId FROM sponsorengagement.Study where id = ${startingStudyId};
   `)
-
-  // getStudyResponse = await getStudyEngagementInfo(studyCoreDetails[0].cpmsId)
 })
 
 test.describe('Update study and save changes locally in SE @se_184', () => {
@@ -44,7 +41,7 @@ test.describe('Update study and save changes locally in SE @se_184', () => {
       await studyUpdatePage.goto(startingStudyId.toString())
     })
 
-    await test.step(`When I update the study details with `, async () => {
+    await test.step(`When I update the study details with a proposed status change`, async () => {
       await studyUpdatePage.statusRadioClosed.click()
       await studyUpdatePage.furtherInfo.fill(`se e2e auto test - ${timeStamp}`)
       await studyUpdatePage.buttonUpdate.click()
@@ -60,7 +57,7 @@ test.describe('Update study and save changes locally in SE @se_184', () => {
     })
   })
 
-  test('As a sponsor contact I can make direct changed to the study data @se_185_direct', async ({
+  test('As a sponsor contact I can make direct changes to the study data @se_185_direct', async ({
     studyUpdatePage,
     studyDetailsPage,
   }) => {
