@@ -12,7 +12,7 @@ import { StudyUpdateRoute } from '@/@types/studies'
 import { StudyUpdateType } from '@/constants'
 import type { EditStudyInputs } from '@/utils/schemas'
 
-import { mockCPMSStudy, mockCPMSUpdateInput } from '../../../mocks/studies'
+import { mockCPMSStudy, mockCPMSUpdateInput as mockCPMSUpdate } from '../../../mocks/studies'
 import type { ExtendedNextApiRequest } from './editStudy'
 import api from './editStudy'
 
@@ -32,6 +32,15 @@ const testHandler = async (handler: typeof api, options: RequestOptions) => {
 }
 
 const mockStudyId = 1211
+
+const nextYearValue = new Date().getFullYear() + 1
+const mockEstimatedReopeningDateInFuture = new Date(mockCPMSStudy.EstimatedReopeningDate as string)
+mockEstimatedReopeningDateInFuture.setFullYear(nextYearValue)
+
+const mockCPMSUpdateInput = {
+  ...mockCPMSUpdate,
+  EstimatedReopeningDate: mockEstimatedReopeningDateInFuture,
+}
 
 const mockUpdateCPMSResponse = {
   StatusCode: 200,
@@ -74,14 +83,14 @@ const body: EditStudyInputs = {
   plannedClosureDate: {
     day: '28',
     month: '02',
-    year: '2003',
+    year: '2004',
   },
   estimatedReopeningDate: {
     day: '28',
     month: '02',
-    year: '2003',
+    year: nextYearValue.toString(),
   },
-  recruitmentTarget: mockCPMSStudy.SampleSize?.toString(),
+  recruitmentTarget: mockCPMSStudy.SampleSize ?? undefined,
   furtherInformation: '',
 }
 
@@ -96,7 +105,7 @@ const mockStudyUpdateResponse = {
   actualClosureToRecruitmentDate: new Date(mockCPMSStudy.ActualClosureToRecruitmentDate as string),
   actualOpeningDate: new Date(mockCPMSStudy.ActualOpeningDate as string),
   plannedClosureToRecruitmentDate: new Date(mockCPMSStudy.PlannedClosureToRecruitmentDate as string),
-  estimatedReopeningDate: new Date(mockCPMSStudy.EstimatedReopeningDate as string),
+  estimatedReopeningDate: mockEstimatedReopeningDateInFuture,
 }
 
 const getMockStudyUpdateInput = (isDirect: boolean) => ({
@@ -106,7 +115,7 @@ const getMockStudyUpdateInput = (isDirect: boolean) => ({
   actualOpeningDate: mockStudyUpdateResponse.actualOpeningDate,
   plannedClosureToRecruitmentDate: mockStudyUpdateResponse.plannedClosureToRecruitmentDate,
   actualClosureToRecruitmentDate: mockStudyUpdateResponse.actualClosureToRecruitmentDate,
-  estimatedReopeningDate: mockStudyUpdateResponse.estimatedReopeningDate,
+  estimatedReopeningDate: mockEstimatedReopeningDateInFuture,
   ukRecruitmentTarget: Number(mockStudyUpdateResponse.ukRecruitmentTarget),
   comment: mockStudyUpdateResponse.comment,
   study: {
