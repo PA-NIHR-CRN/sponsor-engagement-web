@@ -95,13 +95,13 @@ const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, valu
   } else if (!value.month) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: `${label} must include month`,
+      message: `${label} must include a month`,
       path: [`${fieldName}-month`],
     })
   } else if (!value.year) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: `${label} must include year`,
+      message: `${label} must include a year`,
       path: [`${fieldName}-year`],
     })
   }
@@ -125,7 +125,7 @@ const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, valu
   } else if (value.year.length !== 4) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: `${label} must include 4 numbers`,
+      message: 'Year must include 4 numbers',
       path: [`${fieldName}-year`],
     })
 
