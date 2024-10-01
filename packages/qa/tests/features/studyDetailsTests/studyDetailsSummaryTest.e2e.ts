@@ -55,7 +55,7 @@ test.beforeAll('Setup Tests', async () => {
   croCtuOrgRelationshipStudyId = randomCroCtuStudyIdSelected[0].studyId
 })
 
-test.describe('Access Study Details Page and view Summary - @se_26 @wip', () => {
+test.describe('Access Study Details Page and view Summary - @se_26', () => {
   test.use({ storageState: '.auth/sponsorContact.json' })
 
   test('As a Sponsor I can access the Study Details page  - @se_26_ac1, @se_180_ac3, @se_181_ac3', async ({

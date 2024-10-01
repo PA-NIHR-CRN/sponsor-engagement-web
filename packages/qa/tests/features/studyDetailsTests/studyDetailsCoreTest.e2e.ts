@@ -70,7 +70,7 @@ test.beforeAll('Setup Tests', async () => {
   ctuOrgName = ctuStudyOrg[0].name
 })
 
-test.describe('View core study details - @se_27 @wip', () => {
+test.describe('View core study details - @se_27', () => {
   test.use({ storageState: '.auth/sponsorContact.json' })
 
   test('As a Sponsor I can see the Core Study Details about a Specific Study - @se_27_ac1', async ({
