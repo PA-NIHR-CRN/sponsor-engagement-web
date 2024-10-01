@@ -44,6 +44,7 @@ export default class StudyUpdatePage {
   readonly requestSupport: Locator
   readonly updateSuccessBanner: Locator
   readonly updateSuccessContent: Locator
+  readonly updateValidationBanner: Locator
 
   //Initialize Page Objects
   constructor(page: Page) {
@@ -95,6 +96,7 @@ export default class StudyUpdatePage {
     this.requestSupport = page.locator('[data-testid="request-support"]')
     this.updateSuccessBanner = page.locator('.govuk-notification-banner.govuk-notification-banner--success')
     this.updateSuccessContent = page.locator('.govuk-notification-banner__heading')
+    this.updateValidationBanner = page.locator('')
   }
 
   //Page Methods
