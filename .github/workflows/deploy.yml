@@ -264,7 +264,7 @@ jobs:
 
       - name: Run All SE E2E Tests
         working-directory: ./packages/qa
-        if: github.event.inputs.test-tag == '' || github.event.inputs.test-tag == 'all'
+        if: success()
         run: npx playwright test
         env:
           E2E_BASE_URL: ${{ vars.E2E_BASE_URL }}
@@ -330,7 +330,7 @@ jobs:
           branch: gh-pages
 
       - name: Send slack message failure
-        if: failure() && github.ref == 'refs/heads/main'
+        if: failure() && github.ref == 'refs/heads/main' || github.ref == 'refs/heads/se-phase-2'
         uses: rtCamp/action-slack-notify@v2.2.0
         env:
           SLACK_WEBHOOK: ${{ secrets.SE_SLACK_WEBHOOK }}
@@ -339,7 +339,7 @@ jobs:
           SLACK_TITLE: 'Sponsor Engagement E2E UI Tests - ENV: TEST : FAILURE :x:'
 
       - name: Send slack message success
-        if: success() && github.ref == 'refs/heads/main'
+        if: success() && github.ref == 'refs/heads/main' || github.ref == 'refs/heads/se-phase-2'
         uses: rtCamp/action-slack-notify@v2.2.0
         env:
           SLACK_WEBHOOK: ${{ secrets.SE_SLACK_WEBHOOK }}
