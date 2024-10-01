@@ -160,12 +160,14 @@ jobs:
     runs-on: ubuntu-latest
     if: failure()
     steps:
-      - uses: technote-space/workflow-conclusion-action@v3
+
       - name: "Set Env Message to TEST"
+      - uses: technote-space/workflow-conclusion-action@v3
         run: |
           echo "ENV_MSG=TEST" >> "$GITHUB_ENV"
+      
       - name: Slack Notify
-        if: github.ref == 'refs/heads/main'
+        if: if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/se-phase-2'
         uses: rtCamp/action-slack-notify@v2.2.0
         env:
           SLACK_WEBHOOK: ${{ secrets.SE_SLACK_WEBHOOK }}
@@ -179,12 +181,14 @@ jobs:
     runs-on: ubuntu-latest
     if: success()
     steps:
-      - uses: technote-space/workflow-conclusion-action@v3
+      
       - name: "Set Env Message to TEST"
+      - uses: technote-space/workflow-conclusion-action@v3
         run: |
           echo "ENV_MSG=TEST" >> "$GITHUB_ENV"
+      
       - name: Slack Notify
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/se-phase-2'
         uses: rtCamp/action-slack-notify@v2.2.0
         env:
           SLACK_WEBHOOK: ${{ secrets.SE_SLACK_WEBHOOK }}
