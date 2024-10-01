@@ -131,8 +131,6 @@ const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, valu
           message: `${label} must be after ${specifiedDateLabel}`,
           path: [fieldName],
         })
-
-        z.NEVER
       }
     })
   }

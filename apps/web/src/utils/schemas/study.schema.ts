@@ -1,5 +1,7 @@
 import * as z from 'zod'
 
+import { UK_RECRUITMENT_TARGET_MAX_VALUE } from '@/constants/editStudyForm'
+
 import { validateAllDates } from '../editStudyForm'
 
 const dateSchema = z.object({
@@ -19,9 +21,13 @@ export const studySchema = z
     actualClosureDate: dateSchema.optional().nullable(),
     estimatedReopeningDate: dateSchema.optional().nullable(),
     recruitmentTarget: z
-      .number({ invalid_type_error: 'Enter a valid UK recruitment target' })
+      .number({ invalid_type_error: 'Enter a valid UK target' })
       .optional()
-      .refine((value) => !(Number(value) < 0 || Number.isNaN(Number(value))), 'Enter a valid UK recruitment target'),
+      .refine(
+        (value) =>
+          !(Number(value) < 0 || Number.isNaN(Number(value)) || Number(value) > UK_RECRUITMENT_TARGET_MAX_VALUE),
+        'Enter a valid UK target'
+      ),
     furtherInformation: z.string().optional(),
   })
   .superRefine((values, ctx) => {

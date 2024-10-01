@@ -56,3 +56,5 @@ export const studyStatuses = [
  * Max amount of characters for furtherInformation text
  */
 export const FURTHER_INFO_MAX_CHARACTERS = 500
+
+export const UK_RECRUITMENT_TARGET_MAX_VALUE = 9999999
