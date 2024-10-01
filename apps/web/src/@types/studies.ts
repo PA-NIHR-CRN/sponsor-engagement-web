@@ -51,13 +51,23 @@ export enum StudyRecordStatus {
 }
 
 export enum Status {
-  ClosedToRecruitmentFollowUpComplete = 'Closed to Recruitment, Follow Up Complete',
-  ClosedToRecruitmentInFollowUp = 'Closed to Recruitment, In Follow Up',
-  ClosedToRecruitmentNoFollowUp = 'Closed to Recruitment, No Follow Up',
+  PreSetup = 'Pre-Setup',
+  InSetup = 'In Setup',
+  InSetupPendingNHSPermission = 'In Setup, Pending NHS Permission',
+  InSetupApprovalReceived = 'In Setup, Approval Received',
+  InSetupPendingApproval = 'In Setup, Pending Approval',
   InSetupNHSPermissionReceived = 'In Setup, NHS Permission Received',
+  OpenToRecruitment = 'Open to Recruitment',
   OpenWithRecruitment = 'Open, With Recruitment',
+  ClosedToRecruitment = 'Closed to Recruitment',
+  ClosedToRecruitmentInFollowUp = 'Closed to Recruitment, In Follow Up',
+  ClosedToRecruitmentFollowUpComplete = 'Closed to Recruitment, Follow Up Complete',
+  ClosedToRecruitmentNoFollowUp = 'Closed to Recruitment, No Follow Up',
+  SuspendedFromOpenWithRecruitment = 'Suspended (from Open, With Recruitment)',
+  SuspendedFromOpenToRecruitment = 'Suspended (from Open to Recruitment)',
   Suspended = 'Suspended',
   WithdrawnDuringSetup = 'Withdrawn During Setup',
+  WithdrawnInPreSetup = 'Withdrawn in Pre-Setup',
 }
 
 export enum StudyStatus {

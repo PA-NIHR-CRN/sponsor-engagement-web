@@ -330,7 +330,7 @@ describe('Study', () => {
         `${mappedCPMSStudyEvals[0].indicatorValue}, ${mappedCPMSStudyEvals[1].indicatorValue}`,
         '1 January 2001',
         '1 January 2001',
-        '1 January 2001',
+        '2 January 2001',
         '1 January 2001',
         '28 February 2003',
         `${mockStudy.sampleSize}`,
