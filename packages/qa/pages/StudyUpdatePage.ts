@@ -1,4 +1,5 @@
 import { expect, Locator, Page } from '@playwright/test'
+import { RowDataPacket } from 'mysql2'
 
 //Declare Page Objects
 export default class StudyUpdatePage {
@@ -41,6 +42,8 @@ export default class StudyUpdatePage {
   readonly buttonUpdate: Locator
   readonly buttonCancel: Locator
   readonly requestSupport: Locator
+  readonly updateSuccessBanner: Locator
+  readonly updateSuccessContent: Locator
 
   //Initialize Page Objects
   constructor(page: Page) {
@@ -70,26 +73,28 @@ export default class StudyUpdatePage {
     this.statusHintWithdrawn = page.locator('#status-4-hint')
     this.statusRadioSuspended = page.locator('#status-5')
     this.statusHintSuspended = page.locator('#status-5-hint')
-    this.plannedOpeningDD = page.locator('#day').nth(0)
-    this.plannedOpeningMM = page.locator('#month').nth(0)
-    this.plannedOpeningYYYY = page.locator('#year').nth(0)
-    this.actualOpeningDD = page.locator('#day').nth(1)
-    this.actualOpeningMM = page.locator('#month').nth(1)
-    this.actualOpeningYYYY = page.locator('#year').nth(1)
-    this.plannedClosureDD = page.locator('#day').nth(2)
-    this.plannedClosureMM = page.locator('#month').nth(2)
-    this.plannedClosureYYYY = page.locator('#year').nth(2)
-    this.actualClosureDD = page.locator('#day').nth(3)
-    this.actualClosureMM = page.locator('#month').nth(3)
-    this.actualClosureYYYY = page.locator('#year').nth(3)
-    this.estimatedReopenDD = page.locator('#day').nth(4)
-    this.estimatedReopenMM = page.locator('#month').nth(4)
-    this.estimatedReopenYYYY = page.locator('#year').nth(4)
+    this.plannedOpeningDD = page.locator('#plannedOpeningDate-day')
+    this.plannedOpeningMM = page.locator('#plannedOpeningDate-month')
+    this.plannedOpeningYYYY = page.locator('#plannedOpeningDate-year')
+    this.actualOpeningDD = page.locator('#actualOpeningDate-day')
+    this.actualOpeningMM = page.locator('#actualOpeningDate-month')
+    this.actualOpeningYYYY = page.locator('#actualOpeningDate-year')
+    this.plannedClosureDD = page.locator('#plannedClosureDate-day')
+    this.plannedClosureMM = page.locator('#plannedClosureDate-month')
+    this.plannedClosureYYYY = page.locator('#plannedClosureDate-year')
+    this.actualClosureDD = page.locator('#actualClosureDate-day')
+    this.actualClosureMM = page.locator('#actualClosureDate-month')
+    this.actualClosureYYYY = page.locator('#actualClosureDate-year')
+    this.estimatedReopenDD = page.locator('#estimatedReopeningDate-day')
+    this.estimatedReopenMM = page.locator('#estimatedReopeningDate-month')
+    this.estimatedReopenYYYY = page.locator('#estimatedReopeningDate-year')
     this.ukRecruitmentTarget = page.locator('#recruitmentTarget')
     this.furtherInfo = page.locator('#furtherInformation')
-    this.buttonUpdate = page.locator('.govuk-button')
+    this.buttonUpdate = page.locator('button.govuk-button:has-text("Update")')
     this.buttonCancel = page.locator('.govuk-button.govuk-button--secondary')
     this.requestSupport = page.locator('[data-testid="request-support"]')
+    this.updateSuccessBanner = page.locator('.govuk-notification-banner.govuk-notification-banner--success')
+    this.updateSuccessContent = page.locator('.govuk-notification-banner__heading')
   }
 
   //Page Methods
@@ -216,8 +221,7 @@ export default class StudyUpdatePage {
     await expect(this.furtherInfo).toBeVisible()
   }
 
-  async assertStudyDate(date: string, dateType: number) {
-    // dateType: [0 = PlannedOpeningDate, 1 = ActualOpeningDate, 2 = PlannedClosureToRecruitmentDate, 3 = ActualClosureToRecruitmentDate, 4 = estimatedReopening]
+  async assertStudyDate(date: string, dateType: string) {
     if (date) {
       const yyyy = date.substring(0, 4)
       let mm = date.substring(5, 7)
@@ -225,21 +229,20 @@ export default class StudyUpdatePage {
       mm = parseInt(mm, 10).toString()
       dd = parseInt(dd, 10).toString()
 
-      await expect(this.page.locator('#day').nth(dateType)).toHaveValue(dd)
-      await expect(this.page.locator('#month').nth(dateType)).toHaveValue(mm)
-      await expect(this.page.locator('#year').nth(dateType)).toHaveValue(yyyy)
+      await expect(this.page.locator(`#${dateType}Date-day`)).toHaveValue(dd)
+      await expect(this.page.locator(`#${dateType}Date-month`)).toHaveValue(mm)
+      await expect(this.page.locator(`#${dateType}Date-year`)).toHaveValue(yyyy)
     } else {
-      await expect(this.page.locator('#day').nth(dateType)).toHaveValue('')
-      await expect(this.page.locator('#month').nth(dateType)).toHaveValue('')
-      await expect(this.page.locator('#year').nth(dateType)).toHaveValue('')
+      await expect(this.page.locator(`#${dateType}Date-day`)).toHaveValue('')
+      await expect(this.page.locator(`#${dateType}Date-month`)).toHaveValue('')
+      await expect(this.page.locator(`#${dateType}Date-year`)).toHaveValue('')
     }
   }
 
-  async fillStudyDates(dateType: number) {
-    // dateType: [0 = PlannedOpeningDate, 1 = ActualOpeningDate, 2 = PlannedClosureToRecruitmentDate, 3 = ActualClosureToRecruitmentDate, 4 = estimatedReopening]
-    await this.page.locator('#day').nth(dateType).fill('12')
-    await this.page.locator('#month').nth(dateType).fill('06')
-    await this.page.locator('#year').nth(dateType).fill('2024')
+  async fillStudyDates(dateType: string) {
+    await this.page.locator(`#${dateType}Date-day`).fill('12')
+    await this.page.locator(`#${dateType}Date-month`).fill('06')
+    await this.page.locator(`#${dateType}Date-year`).fill('2024')
   }
 
   async assertRecruitmentTarget(target: string) {
@@ -259,5 +262,17 @@ export default class StudyUpdatePage {
 
   async assertRdnSupport() {
     await expect(this.requestSupport).toBeVisible()
+  }
+
+  async assertSeDbUpdateProposed(dbStudyUpdate: RowDataPacket[], timeStamp: string) {
+    await expect(dbStudyUpdate.studyStatus).toBeNull()
+    await expect(dbStudyUpdate.comment).toBe(`se e2e auto test - ${timeStamp}`)
+    await expect(dbStudyUpdate.studyStatusGroup).toBe('Closed')
+  }
+
+  async assertSeDbUpdateDirect(dbStudyUpdate: RowDataPacket[], timeStamp: string) {
+    await expect(dbStudyUpdate.studyStatus).not.toBeNull()
+    await expect(dbStudyUpdate.comment).toBe(`se e2e auto test - ${timeStamp}`)
+    await expect(dbStudyUpdate.studyStatusGroup).not.toBeNull()
   }
 }

@@ -493,7 +493,7 @@ describe('EditStudy', () => {
     })
   })
 
-  it.each(['-e', '-3'])(
+  it.each(['-e', '-3', '19999999'])(
     'should display an error message when UK recruitment target has an invalid value',
     async (value: string) => {
       await renderPage()
@@ -508,7 +508,7 @@ describe('EditStudy', () => {
 
       // Error message
       const alert = screen.getByRole('alert')
-      expect(within(alert).getByText('Enter a valid UK recruitment target')).toBeInTheDocument()
+      expect(within(alert).getByText('Enter a valid UK target')).toBeInTheDocument()
     }
   )
 })
