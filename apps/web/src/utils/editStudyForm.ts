@@ -48,7 +48,7 @@ const mapStatusToMandatoryDateFields = (previousStatus: string | null, newStatus
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- status might not exist in object
   const mandatoryDates = mandatoryDateFieldsByStatus[newStatus] || []
 
-  // Exceptions - there are a some scenarios that rely on the previous status
+  // Exceptions - there are some scenarios that rely on the previous status
   if (
     (previousStatus === (FormStudyStatus.InSetup as string) && newStatus === (FormStudyStatus.Suspended as string)) ||
     (previousStatus === (FormStudyStatus.Suspended as string) &&
