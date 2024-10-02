@@ -100,10 +100,10 @@ test.describe('Update study data page - @se_166', () => {
       await studyUpdatePage.assertStudyDateSelections(getStudyResponse.StudyRoute)
     })
     await test.step(`And I can update the following date options`, async () => {
-      await studyUpdatePage.fillStudyDates('plannedOpening')
-      await studyUpdatePage.fillStudyDates('actualOpening')
-      await studyUpdatePage.fillStudyDates('plannedClosure')
-      await studyUpdatePage.fillStudyDates('actualClosure')
+      await studyUpdatePage.fillStudyDates('plannedOpening', '12', '06', '2025')
+      await studyUpdatePage.fillStudyDates('actualOpening', '12', '06', '2026')
+      await studyUpdatePage.fillStudyDates('plannedClosure', '12', '06', '2027')
+      await studyUpdatePage.fillStudyDates('actualClosure', '12', '06', '2028')
     })
   })
 
