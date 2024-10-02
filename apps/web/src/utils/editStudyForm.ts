@@ -68,8 +68,7 @@ const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, valu
   const currentStatus = mapCPMSStatusToFormStatus(values.status)
   const previousStatus = values.originalStatus ? mapCPMSStatusToFormStatus(values.originalStatus) : null
   const label = fieldNameToLabelMapping[fieldName]
-  const requiredPast = dateValidationRules[fieldName].restrictions.includes('requiredPast')
-  const requiredCurrent = dateValidationRules[fieldName].restrictions.includes('requiredCurrent')
+  const requiredPastOrCurrent = dateValidationRules[fieldName].restrictions.includes('requiredPastOrCurrent')
   const requiredFuture = dateValidationRules[fieldName].restrictions.includes('requiredFuture')
 
   if (!value) {
@@ -107,9 +106,9 @@ const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, valu
 
     // Specific date validation
   } else if (
-    (requiredPast &&
-      !dayjs(`${value.year}-${value.month.padStart(2, '0')}-${value.day.padStart(2, '0')}`).isBefore(dayjs())) ||
-    (requiredCurrent && !dayjs().isSame(dayjs()))
+    requiredPastOrCurrent &&
+    !dayjs(`${value.year}-${value.month.padStart(2, '0')}-${value.day.padStart(2, '0')}`).isBefore(dayjs()) &&
+    !dayjs(`${value.year}-${value.month.padStart(2, '0')}-${value.day.padStart(2, '0')}`).isSame(dayjs())
   ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
