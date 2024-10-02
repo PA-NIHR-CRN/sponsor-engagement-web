@@ -5,14 +5,14 @@ import { dateValidationRules, fieldNameToLabelMapping, FormStudyStatus } from '@
 import { mapCPMSStatusToFormStatus } from '@/lib/studies'
 import type { EditStudyProps } from '@/pages/studies/[studyId]/edit'
 
-import { constructDatePartsFromDate } from './date'
+import { constructDatePartsFromDate, getDaysInMonth } from './date'
 import type { DateFieldName, EditStudyInputs } from './schemas'
 
 export const mapStudyToStudyFormInput = (study: EditStudyProps['study']): EditStudyInputs => ({
   studyId: study.id,
   status: study.studyStatus,
   originalStatus: study.studyStatus,
-  recruitmentTarget: study.sampleSize ?? undefined,
+  recruitmentTarget: study.sampleSize?.toString() ?? undefined,
   cpmsId: study.cpmsId.toString(),
   plannedOpeningDate: constructDatePartsFromDate(study.plannedOpeningDate),
   plannedClosureDate: constructDatePartsFromDate(study.plannedClosureDate),
@@ -48,7 +48,7 @@ const mapStatusToMandatoryDateFields = (previousStatus: string | null, newStatus
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- status might not exist in object
   const mandatoryDates = mandatoryDateFieldsByStatus[newStatus] || []
 
-  // Exceptions - there are a small amount of scenarios that relies on the previous status
+  // Exceptions - there are some scenarios that rely on the previous status
   if (
     (previousStatus === (FormStudyStatus.InSetup as string) && newStatus === (FormStudyStatus.Suspended as string)) ||
     (previousStatus === (FormStudyStatus.Suspended as string) &&
@@ -73,7 +73,7 @@ const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, valu
   const requiredFuture = dateValidationRules[fieldName].restrictions.includes('requiredFuture')
 
   if (!value) {
-    // Status based validation
+    // Mandatory fields based on status
     if (mapStatusToMandatoryDateFields(previousStatus, currentStatus).includes(fieldName)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -85,8 +85,32 @@ const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, valu
     return
   }
 
+  // Checks to see if all date parts exist
+  if (!value.day) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `${label} must include a day`,
+      path: [`${fieldName}-day`],
+    })
+  } else if (!value.month) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `${label} must include a month`,
+      path: [`${fieldName}-month`],
+    })
+  } else if (!value.year) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `${label} must include a year`,
+      path: [`${fieldName}-year`],
+    })
+  }
+
   // Basic date validation
-  if (Number(value.day) < 1 || Number(value.day) > 31) {
+  else if (
+    Number(value.day) < 1 ||
+    Number(value.day) > (value.month ? getDaysInMonth(Number(value.month) - 1, Number(value.year)) : 31)
+  ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: `${label} requires a valid day`,
@@ -101,11 +125,11 @@ const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, valu
   } else if (value.year.length !== 4) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: `${label} requires a valid year`,
+      message: 'Year must include 4 numbers',
       path: [`${fieldName}-year`],
     })
 
-    // Specific date validation
+    // Custom date validation
   } else if (
     (requiredPast &&
       !dayjs(`${value.year}-${value.month.padStart(2, '0')}-${value.day.padStart(2, '0')}`).isBefore(dayjs())) ||

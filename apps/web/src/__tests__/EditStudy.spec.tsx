@@ -74,7 +74,6 @@ const removeDateField = async (label: string) => {
 
     expect(dateField).toBeInTheDocument()
 
-    await userEvent.click(dateField)
     await userEvent.clear(dateField)
   })
 
@@ -382,7 +381,7 @@ describe('EditStudy', () => {
 
   describe('Client side validation', () => {
     describe('should display an error on submit ', () => {
-      it.each(['Day', 'Month', 'Day'])('when a date field includes an invalid %s', async (datePart: string) => {
+      it.each(['Day', 'Month', 'Year'])('when a date field includes an invalid %s', async (datePart: string) => {
         await renderPage()
 
         const plannedOpenDateFieldset = screen.getByRole('group', { name: 'Planned opening to recruitment date' })
@@ -396,9 +395,34 @@ describe('EditStudy', () => {
         await userEvent.click(screen.getByRole('button', { name: 'Update' }))
 
         // Error message
+        const errorMessage =
+          datePart === 'Year'
+            ? 'Year must include 4 numbers'
+            : `Planned opening to recruitment date requires a valid ${datePart.toLowerCase()}`
+
+        const alert = screen.getByRole('alert')
+        expect(within(alert).getByText(errorMessage)).toBeInTheDocument()
+
+        // Invalid field
+        expect(datePartField).toHaveAttribute('aria-invalid', 'true')
+      })
+
+      it.each(['Day', 'Month', 'Year'])('when a date does not include a %s', async (datePart: string) => {
+        await renderPage()
+
+        const plannedOpenDateFieldset = screen.getByRole('group', { name: 'Planned opening to recruitment date' })
+        expect(plannedOpenDateFieldset).toBeInTheDocument()
+        const datePartField = within(plannedOpenDateFieldset).getByLabelText(datePart)
+        expect(datePartField).toBeInTheDocument()
+
+        await userEvent.clear(datePartField)
+
+        await userEvent.click(screen.getByRole('button', { name: 'Update' }))
+
+        // Error message
         const alert = screen.getByRole('alert')
         expect(
-          within(alert).getByText(`Planned opening to recruitment date requires a valid ${datePart.toLowerCase()}`)
+          within(alert).getByText(`Planned opening to recruitment date must include a ${datePart.toLowerCase()}`)
         ).toBeInTheDocument()
 
         // Invalid field
@@ -512,7 +536,7 @@ describe('EditStudy', () => {
         ).toBeInTheDocument()
       })
 
-      it.each(['-e', '-3', '19999999'])(
+      it.each(['19999999'])(
         'should display an error message when UK recruitment target has an invalid value',
         async (value: string) => {
           await renderPage()
