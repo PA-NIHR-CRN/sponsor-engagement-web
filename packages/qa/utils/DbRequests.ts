@@ -1,18 +1,8 @@
-// import { RowDataPacket } from 'mysql2'
-// import { seConnection } from './dbConfig'
-
-// export async function seDatabaseReq(query: string): Promise<RowDataPacket[]> {
-//   return new Promise((resolve, reject) => {
-//     seConnection.query<RowDataPacket[]>(`${query}`, (err, res) => {
-//       if (err) reject(err)
-//       else resolve(res)
-//     })
-//   })
-// }
-
-// pool refactor:
 import { RowDataPacket } from 'mysql2'
 import { seConnectionPool } from './dbConfig'
+
+// this was refactored to use a connection pool for automatic reconnection and scalability as the original db connection was flaky
+// this should ensure that the db connection is available throughout the entirety of the test execution without being prematurely closed
 
 export async function seDatabaseReq(query: string): Promise<RowDataPacket[]> {
   return new Promise((resolve, reject) => {
