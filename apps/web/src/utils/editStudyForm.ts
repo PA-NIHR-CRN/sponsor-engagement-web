@@ -12,7 +12,7 @@ export const mapStudyToStudyFormInput = (study: EditStudyProps['study']): EditSt
   studyId: study.id,
   status: study.studyStatus,
   originalStatus: study.studyStatus,
-  recruitmentTarget: study.sampleSize?.toString() ?? undefined,
+  recruitmentTarget: study.sampleSize?.toString() ?? '',
   cpmsId: study.cpmsId.toString(),
   plannedOpeningDate: constructDatePartsFromDate(study.plannedOpeningDate),
   plannedClosureDate: constructDatePartsFromDate(study.plannedClosureDate),
