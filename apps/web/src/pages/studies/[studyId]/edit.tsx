@@ -276,7 +276,6 @@ export default function EditStudy({ study }: EditStudyProps) {
 
                   return (
                     <TextInput
-                      defaultValue={defaultValues?.recruitmentTarget}
                       errors={errors}
                       inputClassName="govuk-input--width-10"
                       label="UK recruitment target"

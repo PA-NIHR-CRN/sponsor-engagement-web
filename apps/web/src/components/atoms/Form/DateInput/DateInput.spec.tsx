@@ -30,19 +30,19 @@ test('renders three inputs with correct attributes and no error', () => {
   const dayInput = getByLabelText('Day')
   expect(dayInput).toBeInTheDocument()
   expect(dayInput).toHaveAttribute('name', `${name}-day`)
-  expect(dayInput).toHaveValue(null)
+  expect(dayInput).toHaveValue('')
 
   // Month input field
   const monthInput = getByLabelText('Month')
   expect(monthInput).toBeInTheDocument()
   expect(monthInput).toHaveAttribute('name', `${name}-month`)
-  expect(monthInput).toHaveValue(null)
+  expect(monthInput).toHaveValue('')
 
   // Year input field
   const yearInput = getByLabelText('Year')
   expect(yearInput).toBeInTheDocument()
   expect(yearInput).toHaveAttribute('name', `${name}-year`)
-  expect(yearInput).toHaveValue(null)
+  expect(yearInput).toHaveValue('')
 
   // Error
   const errorElement = queryByRole('alert')
@@ -58,17 +58,17 @@ test('renders three inputs with correct value', () => {
   // Day input field value
   const dayInput = getByLabelText('Day')
   expect(dayInput).toBeInTheDocument()
-  expect(dayInput).toHaveValue(Number(value.day))
+  expect(dayInput).toHaveValue(value.day)
 
   // Month input field value
   const monthInput = getByLabelText('Month')
   expect(monthInput).toBeInTheDocument()
-  expect(monthInput).toHaveValue(Number(value.month))
+  expect(monthInput).toHaveValue(value.month)
 
   // Year input field value
   const yearInput = getByLabelText('Year')
   expect(yearInput).toBeInTheDocument()
-  expect(yearInput).toHaveValue(Number(value.year))
+  expect(yearInput).toHaveValue(value.year)
 })
 
 test.each(['Day', 'Month', 'Year'])('renders correctly with field level errors', (dateField: string) => {

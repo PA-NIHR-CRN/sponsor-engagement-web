@@ -88,6 +88,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 {...rest}
                 disabled={disabled}
                 id={`${rest.name}-day`}
+                inputMode="numeric"
                 name={`${rest.name}-day`}
               />
             </div>
@@ -108,6 +109,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 {...rest}
                 disabled={disabled}
                 id={`${rest.name}-month`}
+                inputMode="numeric"
                 name={`${rest.name}-month`}
               />
             </div>
@@ -128,6 +130,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 {...rest}
                 disabled={disabled}
                 id={`${rest.name}-year`}
+                inputMode="numeric"
                 name={`${rest.name}-year`}
               />
             </div>

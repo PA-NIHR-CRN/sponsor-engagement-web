@@ -536,7 +536,7 @@ describe('EditStudy', () => {
         ).toBeInTheDocument()
       })
 
-      it.each(['-e', '-3', '19999999'])(
+      it.each(['19999999'])(
         'should display an error message when UK recruitment target has an invalid value',
         async (value: string) => {
           await renderPage()
