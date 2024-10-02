@@ -33,9 +33,11 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
     const handleInputChange = (event: React.FormEvent<HTMLInputElement>, type: keyof DateInputValue) => {
       const { value: inputValue } = event.currentTarget
 
+      const valueWithNumericsOnly = inputValue.replace(/\D/g, '')
+
       const newDate = {
         ...value,
-        [type]: inputValue,
+        [type]: valueWithNumericsOnly,
       }
 
       onChange(newDate)
@@ -81,11 +83,12 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 }}
                 ref={ref}
                 required={required}
-                type="number"
+                type="text"
                 value={value.day}
                 {...rest}
                 disabled={disabled}
                 id={`${rest.name}-day`}
+                inputMode="numeric"
                 name={`${rest.name}-day`}
               />
             </div>
@@ -101,11 +104,12 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 }}
                 ref={ref}
                 required={required}
-                type="number"
+                type="text"
                 value={value.month}
                 {...rest}
                 disabled={disabled}
                 id={`${rest.name}-month`}
+                inputMode="numeric"
                 name={`${rest.name}-month`}
               />
             </div>
@@ -121,11 +125,12 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 }}
                 ref={ref}
                 required={required}
-                type="number"
+                type="text"
                 value={value.year}
                 {...rest}
                 disabled={disabled}
                 id={`${rest.name}-year`}
+                inputMode="numeric"
                 name={`${rest.name}-year`}
               />
             </div>
