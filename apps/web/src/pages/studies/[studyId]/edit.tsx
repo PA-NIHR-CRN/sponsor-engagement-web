@@ -268,14 +268,27 @@ export default function EditStudy({ study }: EditStudyProps) {
               />
 
               {/* UK recruitment target */}
-              <TextInput
-                defaultValue={defaultValues?.recruitmentTarget}
-                errors={errors}
-                inputClassName="govuk-input--width-10"
-                label="UK recruitment target"
-                labelSize="m"
-                type="number"
-                {...register('recruitmentTarget', { valueAsNumber: true })}
+              <Controller
+                control={control}
+                name="recruitmentTarget"
+                render={({ field }) => {
+                  const { onChange, ...rest } = field
+
+                  return (
+                    <TextInput
+                      defaultValue={defaultValues?.recruitmentTarget}
+                      errors={errors}
+                      inputClassName="govuk-input--width-10"
+                      label="UK recruitment target"
+                      labelSize="m"
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        const inputWithNumericsOnly = e.target.value.replace(/\D/g, '')
+                        onChange(inputWithNumericsOnly)
+                      }}
+                      {...rest}
+                    />
+                  )
+                }}
               />
 
               {/* Further information */}

@@ -22,7 +22,7 @@ export const studySchema = z
     actualClosureDate: dateSchema.optional().nullable(),
     estimatedReopeningDate: dateSchema.optional().nullable(),
     recruitmentTarget: z
-      .number({ invalid_type_error: 'Enter a valid UK target' })
+      .string({ invalid_type_error: 'Enter a valid UK target' })
       .optional()
       .refine(
         (value) =>
