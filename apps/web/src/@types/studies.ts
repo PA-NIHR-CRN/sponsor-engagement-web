@@ -34,7 +34,7 @@ export interface Study {
   ActualClosureToRecruitmentDate: string | null
   EstimatedReopeningDate: string | null
   TotalRecruitmentToDate: number | null
-  UkRecruitmentTargetToDate: number | null
+  UkRecruitmentTarget: number | null
   StudyEvaluationCategories: StudyEvaluationCategory[]
   ProtocolReferenceNumber: number
   IrasId: number
