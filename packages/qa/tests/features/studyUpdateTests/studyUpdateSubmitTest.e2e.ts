@@ -17,6 +17,7 @@ test.beforeAll('Setup Tests', async () => {
     SELECT Study.id FROM Study 
     INNER JOIN StudyOrganisation ON Study.id = StudyOrganisation.studyId
     WHERE StudyOrganisation.organisationId = ${startingOrgId} AND StudyOrganisation.isDeleted = 0 AND Study.isDeleted = 0
+    AND Study.studyStatus = 'In Setup, Pending Approval'
     ORDER BY RAND() LIMIT 1;
   `)
   startingStudyId = randomStudyIdSelected[0].id
@@ -78,9 +79,9 @@ test.describe('Update study and save changes locally in SE @se_184', () => {
       const today = timeStamp.split('T')[0].split('-')
 
       await studyUpdatePage.fillStudyDates('plannedOpening', '12', '06', '2025')
-      await studyUpdatePage.fillStudyDates('actualOpening', today[2], today[1], today[0])
+      // await studyUpdatePage.fillStudyDates('actualOpening', today[2], today[1], today[0])
       await studyUpdatePage.fillStudyDates('plannedClosure', '12', '06', '2027')
-      await studyUpdatePage.fillStudyDates('actualClosure', today[2], today[1], today[0])
+      // await studyUpdatePage.fillStudyDates('actualClosure', today[2], today[1], today[0])
       await studyUpdatePage.ukRecruitmentTarget.fill('101')
       await studyUpdatePage.furtherInfo.fill(`se e2e auto test - ${timeStamp}`)
       await studyUpdatePage.buttonUpdate.click()

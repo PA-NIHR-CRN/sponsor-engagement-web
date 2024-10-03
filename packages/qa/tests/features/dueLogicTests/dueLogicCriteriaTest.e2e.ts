@@ -79,6 +79,10 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
     commonItemsPage,
     studyDetailsPage,
   }) => {
+    await seDatabaseReq(`
+      UPDATE sponsorengagement.Study SET actualOpeningDate = '2024-06-12 00:00:00.000', isDueAssessment = '1' WHERE (id = ${hasOpeningDateStudyId});
+    `) // restores any changes to test data
+
     await test.step(`Given I have navigated to the Study List Page`, async () => {
       await studiesPage.goto()
       await studiesPage.assertOnStudiesPage()
@@ -91,14 +95,14 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
     })
     await test.step('And the study has 1 or more risk indicators', async () => {
       await commonItemsPage.assertStudyHasRisksInDb(
-        `SELECT indicatorType FROM StudyEvaluationCategory 
-            WHERE studyId = ${hasOpeningDateStudyId};`,
+        `SELECT indicatorType FROM StudyEvaluationCategory WHERE studyId = ${hasOpeningDateStudyId};`,
         true
       )
     })
     await test.step('And the studies Last Assessment was 3 months ago, or longer', async () => {
-      await commonItemsPage.assertLastAssessmentLongerThanThreeMonths(`SELECT createdAt FROM Assessment WHERE studyId = ${hasOpeningDateStudyId}
-            ORDER BY createdAt desc LIMIT 1;`)
+      await commonItemsPage.assertLastAssessmentLongerThanThreeMonths(
+        `SELECT createdAt FROM Assessment WHERE studyId = ${hasOpeningDateStudyId} ORDER BY createdAt desc LIMIT 1;`
+      )
     })
     await test.step('And the studies Actual Opening Date is 3 months ago, or longer', async () => {
       await commonItemsPage.assertActualOpeningDateLongerThanThreeMonths(

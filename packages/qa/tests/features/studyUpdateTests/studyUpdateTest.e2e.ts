@@ -21,6 +21,7 @@ test.beforeAll('Setup Tests', async () => {
     INNER JOIN StudyOrganisation
     ON Study.id = StudyOrganisation.studyId
     WHERE StudyOrganisation.organisationId = ${startingOrgId} AND StudyOrganisation.isDeleted = 0 AND Study.isDeleted = 0
+    AND Study.studyStatus = 'In Setup, Pending Approval'
     ORDER BY RAND() LIMIT 1;
   `)
   startingStudyId = randomStudyIdSelected[0].id
@@ -46,7 +47,7 @@ test.describe('Update study data page - @se_166', () => {
 
     await test.step(`And I see the Sponsor Organisation (or delegate CRO/CTU)`, async () => {
       await studyUpdatePage.assertSponsorOrg(getStudyResponse.StudySponsors)
-      // looks for CRO first, then CTU, else Sponsor (see assertSponsorOrg())
+      // looks for CRO first, then CTU, else Sponsor - see method
     })
 
     await test.step(`And I see the study short title`, async () => {
@@ -67,15 +68,14 @@ test.describe('Update study data page - @se_166', () => {
     await test.step(`Then I should see all of the values on the page are defaulted to their current study details values`, async () => {
       await studyUpdatePage.assertStudyStatus(getStudyResponse.StudyStatus)
       await studyUpdatePage.assertStudyDate(getStudyResponse.PlannedOpeningDate, 'plannedOpening')
-      await studyUpdatePage.assertStudyDate(getStudyResponse.ActualOpeningDate, 'actualOpening')
+      // await studyUpdatePage.assertStudyDate(getStudyResponse.ActualOpeningDate, 'actualOpening')
       await studyUpdatePage.assertStudyDate(getStudyResponse.PlannedClosureToRecruitmentDate, 'plannedClosure')
-      await studyUpdatePage.assertStudyDate(getStudyResponse.ActualClosureToRecruitmentDate, 'actualClosure')
+      // await studyUpdatePage.assertStudyDate(getStudyResponse.ActualClosureToRecruitmentDate, 'actualClosure')
       await studyUpdatePage.assertRecruitmentTarget(getStudyResponse.SampleSize)
-      // await studyUpdatePage.assertFurtherInfo(getStudyResponse.Comments)
     })
   })
 
-  test('As a Sponsor I can see and update the study status - @se_166_ac3', async ({ studyUpdatePage }) => {
+  test('As a Sponsor I can see and update the study status - @se_166_ac3 @se_200', async ({ studyUpdatePage }) => {
     await test.step(`Given I have navigated to the Update study data page for a Commercial Study with SE Id ${startingStudyId}`, async () => {
       await studyUpdatePage.goto(startingStudyId.toString())
     })
@@ -84,11 +84,30 @@ test.describe('Update study data page - @se_166', () => {
     })
     await test.step(`And I can choose from the following status options`, async () => {
       await studyUpdatePage.statusRadioInSetup.click()
+      await studyUpdatePage.assertPlannedOpeningFieldsVisible()
+      await studyUpdatePage.assertPlannedClosureFieldsVisible()
       await studyUpdatePage.statusRadioOpenRec.click()
+      await studyUpdatePage.assertPlannedOpeningFieldsVisible()
+      await studyUpdatePage.assertActualOpeningFieldsVisible()
+      await studyUpdatePage.assertPlannedClosureFieldsVisible()
       await studyUpdatePage.statusRadioClosedInFollow.click()
+      await studyUpdatePage.assertPlannedOpeningFieldsVisible()
+      await studyUpdatePage.assertActualOpeningFieldsVisible()
+      await studyUpdatePage.assertPlannedClosureFieldsVisible()
+      await studyUpdatePage.assertActualClosureFieldsVisible()
       await studyUpdatePage.statusRadioClosed.click()
+      await studyUpdatePage.assertPlannedOpeningFieldsVisible()
+      await studyUpdatePage.assertActualOpeningFieldsVisible()
+      await studyUpdatePage.assertPlannedClosureFieldsVisible()
+      await studyUpdatePage.assertActualClosureFieldsVisible()
       await studyUpdatePage.statusRadioWithdrawn.click()
+      await studyUpdatePage.assertPlannedOpeningFieldsVisible()
+      await studyUpdatePage.assertPlannedClosureFieldsVisible()
       await studyUpdatePage.statusRadioSuspended.click()
+      await studyUpdatePage.assertPlannedOpeningFieldsVisible()
+      await studyUpdatePage.assertActualOpeningFieldsVisible()
+      await studyUpdatePage.assertPlannedClosureFieldsVisible()
+      await studyUpdatePage.assertEstimatedReopeningFieldsVisible()
     })
   })
 
@@ -101,9 +120,9 @@ test.describe('Update study data page - @se_166', () => {
     })
     await test.step(`And I can update the following date options`, async () => {
       await studyUpdatePage.fillStudyDates('plannedOpening', '12', '06', '2025')
-      await studyUpdatePage.fillStudyDates('actualOpening', '12', '06', '2026')
+      // await studyUpdatePage.fillStudyDates('actualOpening', '12', '06', '2026')
       await studyUpdatePage.fillStudyDates('plannedClosure', '12', '06', '2027')
-      await studyUpdatePage.fillStudyDates('actualClosure', '12', '06', '2028')
+      // await studyUpdatePage.fillStudyDates('actualClosure', '12', '06', '2028')
     })
   })
 

@@ -441,7 +441,8 @@ export default class StudyDetailsPage {
   }
 
   async assertStudyStatusSuspended(expectedStatus: string) {
-    expect(expectedStatus).toEqual('Suspended')
+    // expect(expectedStatus).toEqual('Suspended')
+    await expect(this.tableStatusValue).toHaveText(expectedStatus)
   }
 
   async assertEstimatedReopenDatePresent(expectedValues: RowDataPacket[]) {
