@@ -8,6 +8,7 @@ import {
   StudySponsorOrganisationRoleRTSIdentifier,
   StudyUpdateRoute,
 } from '@/@types/studies'
+import type { UpdateStudyInput } from '@/lib/cpms/studies'
 import type { StudyForExport } from '@/lib/studies'
 
 export const mockStudiesForExport = Array.from({ length: 3 }).map((_, index) =>
@@ -104,7 +105,7 @@ export const mockCPMSStudy = Mock.of<Study>({
   EstimatedReopeningDate: '2003-02-28T00:00:00',
   TotalRecruitmentToDate: 683,
   SampleSize: 121,
-  UkRecruitmentTargetToDate: 121,
+  UkRecruitmentTarget: 121,
   Title: 'A PHASE 2B',
   ManagingSpecialty: 'Musculoskeletal Disorders',
   ChiefInvestigatorFirstName: 'John',
@@ -143,9 +144,9 @@ export const mockCPMSStudy = Mock.of<Study>({
   ],
 })
 
-export const mockCPMSUpdateInput = {
+export const mockCPMSUpdateInput: UpdateStudyInput = {
   StudyStatus: mockCPMSStudy.StudyStatus,
-  SampleSize: mockCPMSStudy.SampleSize,
+  UkRecruitmentTarget: mockCPMSStudy.SampleSize,
   PlannedOpeningDate: new Date(mockCPMSStudy.PlannedOpeningDate as string).toISOString(),
   ActualOpeningDate: new Date(mockCPMSStudy.ActualOpeningDate as string).toISOString(),
   PlannedClosureToRecruitmentDate: new Date(mockCPMSStudy.PlannedClosureToRecruitmentDate as string).toISOString(),

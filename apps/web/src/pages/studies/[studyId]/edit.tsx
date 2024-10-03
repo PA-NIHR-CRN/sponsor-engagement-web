@@ -3,7 +3,7 @@ import { Container } from '@nihr-ui/frontend'
 import clsx from 'clsx'
 import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
-import { type ReactElement, useCallback } from 'react'
+import { type ReactElement, useCallback, useMemo } from 'react'
 import type { FieldError } from 'react-hook-form'
 import { Controller, useForm } from 'react-hook-form'
 
@@ -17,6 +17,7 @@ import { RequestSupport } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
 import { EDIT_STUDY_ROLE, Roles } from '@/constants'
 import {
+  fieldNameToLabelMapping,
   FURTHER_INFO_MAX_CHARACTERS,
   GENERIC_STUDIES_GUIDANCE_TEXT,
   PAGE_TITLE,
@@ -34,7 +35,7 @@ import {
   updateStudy,
 } from '@/lib/studies'
 import { areAllDatePartsEmpty } from '@/utils/date'
-import { mapStudyToStudyFormInput } from '@/utils/editStudyForm'
+import { getVisibleFormFields, mapStudyToStudyFormInput } from '@/utils/editStudyForm'
 import type { EditStudyInputs } from '@/utils/schemas'
 import { studySchema } from '@/utils/schemas'
 import { withServerSideProps } from '@/utils/withServerSideProps'
@@ -82,6 +83,14 @@ export default function EditStudy({ study }: EditStudyProps) {
     formState,
     onFoundError: handleFoundError,
   })
+
+  const statusInputValue = watch('status')
+
+  const [visibleDateFields, visibleStatuses] = useMemo(
+    () =>
+      getVisibleFormFields(mapCPMSStatusToFormStatus(study.studyStatus), mapCPMSStatusToFormStatus(statusInputValue)),
+    [statusInputValue, study.studyStatus]
+  )
 
   return (
     <Container>
@@ -138,134 +147,148 @@ export default function EditStudy({ study }: EditStudyProps) {
                     <RadioGroup
                       defaultValue={mappedSEStatusValue}
                       errors={{}}
-                      label="Study status"
+                      label={fieldNameToLabelMapping.status}
                       labelSize="m"
                       name={name}
                       onChange={handleOnChange}
                       ref={ref}
                     >
-                      {studyStatuses.map((status) => (
-                        <Radio hint={status.description} key={status.id} label={status.name} value={status.value} />
-                      ))}
+                      {studyStatuses.map((status) => {
+                        if (!visibleStatuses.includes(status.value)) return
+
+                        return (
+                          <Radio hint={status.description} key={status.id} label={status.name} value={status.value} />
+                        )
+                      })}
                     </RadioGroup>
                   )
                 }}
               />
 
               {/* Planned opening to recruitment date */}
-              <Controller
-                control={control}
-                name="plannedOpeningDate"
-                render={({ field }) => {
-                  const { value, onChange, ref, name } = field
+              {visibleDateFields.includes('plannedOpeningDate') && (
+                <Controller
+                  control={control}
+                  name="plannedOpeningDate"
+                  render={({ field }) => {
+                    const { value, onChange, ref, name } = field
 
-                  return (
-                    <DateInput
-                      errors={errors}
-                      label="Planned opening to recruitment date"
-                      name={name}
-                      onChange={(input) => {
-                        const allFieldsEmpty = areAllDatePartsEmpty(input)
-                        onChange(allFieldsEmpty ? null : input)
-                      }}
-                      ref={ref}
-                      value={transformDateValue(value)}
-                    />
-                  )
-                }}
-              />
+                    return (
+                      <DateInput
+                        errors={errors}
+                        label={fieldNameToLabelMapping.plannedOpeningDate}
+                        name={name}
+                        onChange={(input) => {
+                          const allFieldsEmpty = areAllDatePartsEmpty(input)
+                          onChange(allFieldsEmpty ? null : input)
+                        }}
+                        ref={ref}
+                        value={transformDateValue(value)}
+                      />
+                    )
+                  }}
+                />
+              )}
 
               {/* Actual opening to recruitment date */}
-              <Controller
-                control={control}
-                name="actualOpeningDate"
-                render={({ field }) => {
-                  const { value, onChange, ref, name } = field
+              {visibleDateFields.includes('actualOpeningDate') && (
+                <Controller
+                  control={control}
+                  name="actualOpeningDate"
+                  render={({ field }) => {
+                    const { value, onChange, ref, name } = field
 
-                  return (
-                    <DateInput
-                      errors={errors}
-                      label="Actual opening to recruitment date"
-                      name={name}
-                      onChange={(input) => {
-                        const allFieldsEmpty = areAllDatePartsEmpty(input)
-                        onChange(allFieldsEmpty ? null : input)
-                      }}
-                      ref={ref}
-                      value={transformDateValue(value)}
-                    />
-                  )
-                }}
-              />
+                    return (
+                      <DateInput
+                        errors={errors}
+                        label={fieldNameToLabelMapping.actualOpeningDate}
+                        name={name}
+                        onChange={(input) => {
+                          const allFieldsEmpty = areAllDatePartsEmpty(input)
+                          onChange(allFieldsEmpty ? null : input)
+                        }}
+                        ref={ref}
+                        value={transformDateValue(value)}
+                      />
+                    )
+                  }}
+                />
+              )}
 
               {/* Planned closure to recruitment date */}
-              <Controller
-                control={control}
-                name="plannedClosureDate"
-                render={({ field }) => {
-                  const { value, onChange, ref, name } = field
+              {visibleDateFields.includes('plannedClosureDate') && (
+                <Controller
+                  control={control}
+                  name="plannedClosureDate"
+                  render={({ field }) => {
+                    const { value, onChange, ref, name } = field
 
-                  return (
-                    <DateInput
-                      errors={errors}
-                      label="Planned closure to recruitment date"
-                      name={name}
-                      onChange={(input) => {
-                        const allFieldsEmpty = areAllDatePartsEmpty(input)
-                        onChange(allFieldsEmpty ? null : input)
-                      }}
-                      ref={ref}
-                      value={transformDateValue(value)}
-                    />
-                  )
-                }}
-              />
+                    return (
+                      <DateInput
+                        errors={errors}
+                        label={fieldNameToLabelMapping.plannedClosureDate}
+                        name={name}
+                        onChange={(input) => {
+                          const allFieldsEmpty = areAllDatePartsEmpty(input)
+                          onChange(allFieldsEmpty ? null : input)
+                        }}
+                        ref={ref}
+                        value={transformDateValue(value)}
+                      />
+                    )
+                  }}
+                />
+              )}
 
               {/* Actual closure to recruitment date */}
-              <Controller
-                control={control}
-                name="actualClosureDate"
-                render={({ field }) => {
-                  const { value, onChange, ref, name } = field
+              {visibleDateFields.includes('actualClosureDate') && (
+                <Controller
+                  control={control}
+                  name="actualClosureDate"
+                  render={({ field }) => {
+                    const { value, onChange, ref, name } = field
 
-                  return (
-                    <DateInput
-                      errors={errors}
-                      label="Actual closure to recruitment date"
-                      name={name}
-                      onChange={(input) => {
-                        const allFieldsEmpty = areAllDatePartsEmpty(input)
-                        onChange(allFieldsEmpty ? null : input)
-                      }}
-                      ref={ref}
-                      value={transformDateValue(value)}
-                    />
-                  )
-                }}
-              />
+                    return (
+                      <DateInput
+                        errors={errors}
+                        label={fieldNameToLabelMapping.actualClosureDate}
+                        name={name}
+                        onChange={(input) => {
+                          const allFieldsEmpty = areAllDatePartsEmpty(input)
+                          onChange(allFieldsEmpty ? null : input)
+                        }}
+                        ref={ref}
+                        value={transformDateValue(value)}
+                      />
+                    )
+                  }}
+                />
+              )}
 
               {/* Estimated reopening date*/}
-              <Controller
-                control={control}
-                name="estimatedReopeningDate"
-                render={({ field }) => {
-                  const { value, onChange, ref, name } = field
+              {visibleDateFields.includes('estimatedReopeningDate') && (
+                <Controller
+                  control={control}
+                  name="estimatedReopeningDate"
+                  render={({ field }) => {
+                    const { value, onChange, ref, name } = field
 
-                  return (
-                    <DateInput
-                      errors={errors}
-                      label="Estimated reopening date"
-                      name={name}
-                      onChange={(input) => {
-                        const allFieldsEmpty = areAllDatePartsEmpty(input)
-                        onChange(allFieldsEmpty ? null : input)
-                      }}
-                      ref={ref}
-                      value={transformDateValue(value)}
-                    />
-                  )
-                }}
-              />
+                    return (
+                      <DateInput
+                        errors={errors}
+                        label={fieldNameToLabelMapping.estimatedReopeningDate}
+                        name={name}
+                        onChange={(input) => {
+                          const allFieldsEmpty = areAllDatePartsEmpty(input)
+                          onChange(allFieldsEmpty ? null : input)
+                        }}
+                        ref={ref}
+                        value={transformDateValue(value)}
+                      />
+                    )
+                  }}
+                />
+              )}
 
               {/* UK recruitment target */}
               <Controller
@@ -278,7 +301,7 @@ export default function EditStudy({ study }: EditStudyProps) {
                     <TextInput
                       errors={errors}
                       inputClassName="govuk-input--width-10"
-                      label="UK recruitment target"
+                      label={fieldNameToLabelMapping.recruitmentTarget}
                       labelSize="m"
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         const inputWithNumericsOnly = e.target.value.replace(/\D/g, '')
@@ -295,7 +318,7 @@ export default function EditStudy({ study }: EditStudyProps) {
                 defaultValue={defaultValues?.furtherInformation}
                 errors={errors}
                 hint="If needed, provide further context or justification for changes made above."
-                label="Further information"
+                label={fieldNameToLabelMapping.furtherInformation}
                 labelSize="m"
                 remainingCharacters={remainingCharacters}
                 {...register('furtherInformation')}

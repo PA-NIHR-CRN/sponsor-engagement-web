@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import type { ReactElement } from 'react'
 
+import { Status } from '@/@types/studies'
 import {
   AssessmentHistory,
   EditHistory,
@@ -65,6 +66,10 @@ export default function Study({ user, study, assessments }: StudyProps) {
   const showEditStudyFeature = Boolean(user?.groups.includes(EDIT_STUDY_ROLE))
 
   const showEditHistoryFeature = process.env.NEXT_PUBLIC_ENABLE_EDIT_HISTORY_FEATURE?.toLowerCase() === 'true'
+
+  const isStudyStatusSuspended = (
+    [Status.Suspended, Status.SuspendedFromOpenToRecruitment, Status.SuspendedFromOpenWithRecruitment] as string[]
+  ).includes(study.studyStatus)
 
   return (
     <Container>
@@ -148,7 +153,7 @@ export default function Study({ user, study, assessments }: StudyProps) {
                 <Table.CellHeader className="w-1/3">Actual closure to recruitment date</Table.CellHeader>
                 <Table.Cell>{study.actualClosureDate ? formatDate(study.actualClosureDate) : '-'}</Table.Cell>
               </Table.Row>
-              {study.studyStatus === 'Suspended' && Boolean(study.evaluationCategories.length) && (
+              {isStudyStatusSuspended && Boolean(study.evaluationCategories.length) ? (
                 <Table.Row>
                   <Table.CellHeader className="w-1/3">Estimated reopening date</Table.CellHeader>
                   <Table.Cell>
@@ -157,8 +162,7 @@ export default function Study({ user, study, assessments }: StudyProps) {
                       : '-'}
                   </Table.Cell>
                 </Table.Row>
-              )}
-
+              ) : null}
               <Table.Row>
                 <Table.CellHeader className="w-1/3" data-testid="uk-recruitment-target-label">
                   {study.route === 'Commercial'

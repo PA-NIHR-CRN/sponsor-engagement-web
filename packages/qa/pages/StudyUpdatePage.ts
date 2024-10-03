@@ -196,7 +196,7 @@ export default class StudyUpdatePage {
     if (status in ['Closed to Recruitment, In Follow Up']) {
       await expect(this.statusRadioClosed).toBeChecked()
     }
-    if (status in ['Suspended']) {
+    if (status in ['Suspended', 'Suspended (from Open, With Recruitment)', 'Suspended (from Open to Recruitment)']) {
       await expect(this.statusRadioSuspended).toBeChecked()
     }
     if (status in ['Withdrawn in Pre-Setup', 'Withdrawn During Setup']) {
