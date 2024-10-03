@@ -23,10 +23,10 @@ export const mapStudyToStudyFormInput = (study: EditStudyProps['study']): EditSt
 })
 
 /**
- * Mapping to see which date fields are mandatory given a status
+ * Gets mandatory date fields based on current and previous status
  */
-const mapStatusToMandatoryDateFields = (previousStatus: string | null, newStatus: string) => {
-  const mandatoryDateFieldsByStatus: Record<string, (keyof DateFieldName)[]> = {
+const getMandatoryDateFields = (previousStatus: string | null, newStatus: string) => {
+  const mandatoryDateFieldsByStatus: Record<FormStudyStatus, (keyof DateFieldName)[]> = {
     [FormStudyStatus.InSetup]: ['plannedOpeningDate', 'plannedClosureDate'],
     [FormStudyStatus.OpenToRecruitment]: ['plannedOpeningDate', 'actualOpeningDate', 'plannedClosureDate'],
     [FormStudyStatus.Suspended]: [
@@ -45,8 +45,7 @@ const mapStatusToMandatoryDateFields = (previousStatus: string | null, newStatus
     ],
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- status might not exist in object
-  const mandatoryDates = mandatoryDateFieldsByStatus[newStatus] || []
+  const mandatoryDates = (mandatoryDateFieldsByStatus[newStatus] || []) as (keyof DateFieldName)[]
 
   // Exceptions - there are some scenarios that rely on the previous status
   if (
@@ -58,6 +57,62 @@ const mapStatusToMandatoryDateFields = (previousStatus: string | null, newStatus
   }
 
   return mandatoryDates
+}
+
+/**
+ * Mapping to see which form fields are visible based on status
+ */
+
+export const getVisibleFormFields = (
+  previousStatus: string,
+  newStatus: string
+): [(keyof DateFieldName)[], FormStudyStatus[]] => {
+  const visibleDateFieldsMapping: Record<FormStudyStatus, (keyof DateFieldName)[]> = {
+    [FormStudyStatus.InSetup]: ['plannedOpeningDate', 'plannedClosureDate'],
+    [FormStudyStatus.OpenToRecruitment]: ['plannedOpeningDate', 'actualOpeningDate', 'plannedClosureDate'],
+    [FormStudyStatus.Suspended]: [
+      'plannedOpeningDate',
+      'actualOpeningDate',
+      'plannedClosureDate',
+      'estimatedReopeningDate',
+    ],
+    [FormStudyStatus.Closed]: ['plannedOpeningDate', 'actualOpeningDate', 'plannedClosureDate', 'actualClosureDate'],
+    [FormStudyStatus.ClosedFollowUp]: [
+      'plannedOpeningDate',
+      'actualOpeningDate',
+      'plannedClosureDate',
+      'actualClosureDate',
+    ],
+    [FormStudyStatus.Withdrawn]: ['plannedOpeningDate', 'plannedClosureDate'],
+  }
+
+  const visibleStatusesMapping: Record<FormStudyStatus, FormStudyStatus[]> = {
+    [FormStudyStatus.InSetup]: [
+      FormStudyStatus.InSetup,
+      FormStudyStatus.OpenToRecruitment,
+      FormStudyStatus.Closed,
+      FormStudyStatus.ClosedFollowUp,
+      FormStudyStatus.Withdrawn,
+      FormStudyStatus.Suspended,
+    ],
+    [FormStudyStatus.OpenToRecruitment]: [
+      FormStudyStatus.OpenToRecruitment,
+      FormStudyStatus.Closed,
+      FormStudyStatus.ClosedFollowUp,
+      FormStudyStatus.Suspended,
+    ],
+    [FormStudyStatus.Suspended]: [
+      FormStudyStatus.OpenToRecruitment,
+      FormStudyStatus.Closed,
+      FormStudyStatus.ClosedFollowUp,
+      FormStudyStatus.Suspended,
+    ],
+    [FormStudyStatus.Closed]: [FormStudyStatus.Closed],
+    [FormStudyStatus.ClosedFollowUp]: [FormStudyStatus.ClosedFollowUp],
+    [FormStudyStatus.Withdrawn]: [FormStudyStatus.Withdrawn],
+  }
+
+  return [visibleDateFieldsMapping[newStatus] || [], visibleStatusesMapping[previousStatus] || []]
 }
 
 /**
@@ -73,7 +128,7 @@ const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, valu
 
   if (!value) {
     // Mandatory fields based on status
-    if (mapStatusToMandatoryDateFields(previousStatus, currentStatus).includes(fieldName)) {
+    if (getMandatoryDateFields(previousStatus, currentStatus).includes(fieldName)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: `${fieldNameToLabelMapping[fieldName]} is a mandatory field`,
@@ -183,7 +238,7 @@ const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, valu
  * Validates all dates on the edit study form and sends errors to zod ctx
  */
 export const validateAllDates = (ctx: z.RefinementCtx, values: EditStudyInputs) => {
-  Object.keys(fieldNameToLabelMapping).forEach((fieldName: keyof DateFieldName) => {
+  Object.keys(dateValidationRules).forEach((fieldName: keyof DateFieldName) => {
     validateDate(fieldName, ctx, values)
   })
 }

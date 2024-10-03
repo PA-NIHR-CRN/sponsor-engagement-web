@@ -241,7 +241,7 @@ describe('EditStudy', () => {
 
   describe('Edit study page', () => {
     test('default layout', async () => {
-      await renderPage()
+      await renderPage(undefined, undefined, { ...mockStudyWithRelations, studyStatus: Status.InSetup })
 
       // Header title
       expect(screen.getByRole('heading', { level: 1, name: 'Update study data' })).toBeInTheDocument()
@@ -311,25 +311,8 @@ describe('EditStudy', () => {
         'Recruitment of participants has halted, but may resume. Provide an estimated re-opening date below.'
       )
 
-      // Form Input - Planned open recruitment date
-      const plannedOpenDateFieldset = screen.getByRole('group', { name: 'Planned opening to recruitment date' })
-      expect(plannedOpenDateFieldset).toBeInTheDocument()
-
-      // Form Input - Actual open recruitment date
-      const actualOpenDateFieldset = screen.getByRole('group', { name: 'Actual opening to recruitment date' })
-      expect(actualOpenDateFieldset).toBeInTheDocument()
-
-      // Form Input - Planned closing recruitment date
-      const plannedClosingDateFieldset = screen.getByRole('group', { name: 'Planned closure to recruitment date' })
-      expect(plannedClosingDateFieldset).toBeInTheDocument()
-
-      // Form Input - Actual closing recruitment date
-      const actualClosingDateFieldset = screen.getByRole('group', { name: 'Actual closure to recruitment date' })
-      expect(actualClosingDateFieldset).toBeInTheDocument()
-
-      // Form Input - Estimated reopening date
-      const estimatedReopeningDate = screen.getByRole('group', { name: 'Estimated reopening date' })
-      expect(estimatedReopeningDate).toBeInTheDocument()
+      // A given status does not have all dates
+      // Testing of date fields are in separate tests
 
       // Form Input - UK Recruitment target
       const ukRecruitmentTarget = screen.getByLabelText('UK recruitment target')
@@ -354,6 +337,79 @@ describe('EditStudy', () => {
       // Cancel CTA
       expect(screen.getByRole('link', { name: 'Cancel' })).toHaveAttribute('href', `/studies/${mockStudyId}`)
     })
+
+    it.each([
+      [Status.InSetup, ['Planned opening to recruitment date', 'Planned closure to recruitment date']],
+      [
+        Status.OpenToRecruitment,
+        [
+          'Planned opening to recruitment date',
+          'Planned closure to recruitment date',
+          'Actual opening to recruitment date',
+        ],
+      ],
+      [
+        Status.Suspended,
+        [
+          'Planned opening to recruitment date',
+          'Planned closure to recruitment date',
+          'Actual opening to recruitment date',
+          'Estimated reopening date',
+        ],
+      ],
+      [
+        Status.ClosedToRecruitment,
+        [
+          'Planned opening to recruitment date',
+          'Planned closure to recruitment date',
+          'Actual opening to recruitment date',
+          'Actual closure to recruitment date',
+        ],
+      ],
+      [
+        Status.ClosedToRecruitmentInFollowUp,
+        [
+          'Planned opening to recruitment date',
+          'Planned closure to recruitment date',
+          'Actual opening to recruitment date',
+          'Actual closure to recruitment date',
+        ],
+      ],
+      [Status.WithdrawnDuringSetup, ['Planned opening to recruitment date', 'Planned closure to recruitment date']],
+    ])('should show the correct date fields based on the status %s', async (status: Status, fieldLabels: string[]) => {
+      await renderPage(undefined, undefined, { ...mockStudyWithRelations, studyStatus: status })
+
+      const dateFieldSets = screen.getAllByRole('group')
+
+      // Additional one required for the fieldset around the entire form
+      expect(dateFieldSets.length).toEqual(fieldLabels.length + 1)
+
+      fieldLabels.forEach((dateField) => {
+        const dateFieldSet = screen.getByRole('group', { name: dateField })
+        expect(dateFieldSet).toBeInTheDocument()
+      })
+    })
+
+    it.each([
+      [Status.InSetup, ['In setup', 'Open to recruitment', 'Closed, in follow-up', 'Closed', 'Withdrawn', 'Suspended']],
+      [Status.OpenToRecruitment, ['Open to recruitment', 'Closed, in follow-up', 'Closed', 'Suspended']],
+      [Status.Suspended, ['Open to recruitment', 'Closed, in follow-up', 'Closed', 'Suspended']],
+      [Status.ClosedToRecruitmentInFollowUp, ['Closed, in follow-up']],
+      [Status.ClosedToRecruitment, ['Closed']],
+    ])(
+      'should show the correct status fields based on the original status',
+      async (originalStatus: Status, statusLabels: string[]) => {
+        await renderPage(undefined, undefined, { ...mockStudyWithRelations, studyStatus: originalStatus })
+
+        const statuses = screen.getAllByRole('radio')
+        expect(statuses.length).toEqual(statusLabels.length)
+
+        statusLabels.forEach((status) => {
+          const statusRadioButton = screen.getByRole('radio', { name: status })
+          expect(statusRadioButton).toBeInTheDocument()
+        })
+      }
+    )
   })
 
   describe('Form submission failures', () => {
@@ -516,6 +572,7 @@ describe('EditStudy', () => {
         await renderPage(undefined, undefined, {
           ...mockStudyWithRelations,
           plannedOpeningDate: null,
+          studyStatus: Status.ClosedToRecruitment,
         })
         const actualClosureDateFieldSet = screen.getByRole('group', { name: 'Actual closure to recruitment date' })
         expect(actualClosureDateFieldSet).toBeInTheDocument()
