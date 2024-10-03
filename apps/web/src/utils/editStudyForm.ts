@@ -83,7 +83,7 @@ export const getVisibleFormFields = (
       'plannedClosureDate',
       'actualClosureDate',
     ],
-    [FormStudyStatus.Withdrawn]: [],
+    [FormStudyStatus.Withdrawn]: ['plannedOpeningDate', 'plannedClosureDate'],
   }
 
   const visibleStatusesMapping: Record<FormStudyStatus, FormStudyStatus[]> = {
