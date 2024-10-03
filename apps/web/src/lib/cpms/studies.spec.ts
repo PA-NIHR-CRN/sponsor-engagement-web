@@ -4,6 +4,7 @@ import { constructDateObjFromParts } from '@/utils/date'
 import type { EditStudyInputs } from '@/utils/schemas'
 
 import { mockCPMSStudy, mockCPMSUpdateInput, mockCPMSValidationResult } from '../../mocks/studies'
+import type { UpdateStudyInput } from './studies'
 import { getStudyByIdFromCPMS, mapEditStudyInputToCPMSStudy, updateStudyInCPMS, validateStudyUpdate } from './studies'
 
 jest.mock('axios')
@@ -285,9 +286,9 @@ describe('mapEditStudyInputToCPMSStudy', () => {
 
   const mockDate = new Date()
 
-  const mappedInput = {
+  const mappedInput: UpdateStudyInput = {
     StudyStatus: input.status,
-    SampleSize: Number(input.recruitmentTarget),
+    UkRecruitmentTarget: Number(input.recruitmentTarget),
     PlannedOpeningDate: mockDate.toISOString(),
     ActualOpeningDate: mockDate.toISOString(),
     PlannedClosureToRecruitmentDate: mockDate.toISOString(),

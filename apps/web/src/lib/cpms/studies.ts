@@ -36,10 +36,10 @@ export const getStudyByIdFromCPMS = async (studyId: number): Promise<GetStudyFro
   }
 }
 
-type UpdateStudyInput = Pick<
+export type UpdateStudyInput = Pick<
   Study,
   | 'StudyStatus'
-  | 'SampleSize'
+  | 'UkRecruitmentTarget'
   | 'PlannedOpeningDate'
   | 'ActualOpeningDate'
   | 'PlannedClosureToRecruitmentDate'
@@ -91,7 +91,7 @@ export const updateStudyInCPMS = async (
 
 export const mapEditStudyInputToCPMSStudy = (study: EditStudyInputs): UpdateStudyInput => ({
   StudyStatus: study.status,
-  SampleSize: study.recruitmentTarget ? Number(study.recruitmentTarget) : null,
+  UkRecruitmentTarget: study.recruitmentTarget ? Number(study.recruitmentTarget) : null,
   PlannedOpeningDate: constructDateObjFromParts(study.plannedOpeningDate)?.toISOString() ?? null,
   ActualOpeningDate: constructDateObjFromParts(study.actualOpeningDate)?.toISOString() ?? null,
   PlannedClosureToRecruitmentDate: constructDateObjFromParts(study.plannedClosureDate)?.toISOString() ?? null,
