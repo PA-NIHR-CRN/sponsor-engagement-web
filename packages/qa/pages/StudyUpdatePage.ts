@@ -44,6 +44,7 @@ export default class StudyUpdatePage {
   readonly requestSupport: Locator
   readonly updateSuccessBanner: Locator
   readonly updateSuccessContent: Locator
+  readonly updateValidationBanner: Locator
 
   //Initialize Page Objects
   constructor(page: Page) {
@@ -95,6 +96,7 @@ export default class StudyUpdatePage {
     this.requestSupport = page.locator('[data-testid="request-support"]')
     this.updateSuccessBanner = page.locator('.govuk-notification-banner.govuk-notification-banner--success')
     this.updateSuccessContent = page.locator('.govuk-notification-banner__heading')
+    this.updateValidationBanner = page.locator('')
   }
 
   //Page Methods
@@ -239,10 +241,10 @@ export default class StudyUpdatePage {
     }
   }
 
-  async fillStudyDates(dateType: string) {
-    await this.page.locator(`#${dateType}Date-day`).fill('12')
-    await this.page.locator(`#${dateType}Date-month`).fill('06')
-    await this.page.locator(`#${dateType}Date-year`).fill('2024')
+  async fillStudyDates(dateType: string, dd: string, mm: string, yyyy: string) {
+    await this.page.locator(`#${dateType}Date-day`).fill(dd)
+    await this.page.locator(`#${dateType}Date-month`).fill(mm)
+    await this.page.locator(`#${dateType}Date-year`).fill(yyyy)
   }
 
   async assertRecruitmentTarget(target: string) {

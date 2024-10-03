@@ -46,4 +46,26 @@ export const constructDateObjFromParts = (dateParts?: DateInputValue | null) => 
   return new Date(`${Number(year)}-${Number(month)}-${Number(day)}`)
 }
 
+/**
+ * Checks to see if all date parts in type DateInputValue is empty
+ */
 export const areAllDatePartsEmpty = (dateParts: DateInputValue) => Object.values(dateParts).every((val) => val === '')
+
+/**
+ * Gets the maximum amount of days within a given month - takes into consideration leap years
+ */
+export const getDaysInMonth = (month: number, year?: number) => {
+  // month values - 0 to 11
+  switch (month) {
+    case 1:
+      if (!year) return 28
+      return (year % 4 === 0 && year % 100) || year % 400 === 0 ? 29 : 28
+    case 8:
+    case 3:
+    case 5:
+    case 10:
+      return 30
+    default:
+      return 31
+  }
+}

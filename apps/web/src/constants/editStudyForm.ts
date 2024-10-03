@@ -74,7 +74,7 @@ export const fieldNameToLabelMapping: Record<
   furtherInformation: 'Further information',
 }
 
-export type DateRestrictions = 'requiredPast' | 'requiredCurrent' | 'requiredFuture'
+export type DateRestrictions = 'requiredPastOrCurrent' | 'requiredFuture'
 
 /**
  * Date validation rules and dependencies
@@ -84,7 +84,7 @@ export const dateValidationRules: Record<
   { restrictions: DateRestrictions[]; dependencies: { fieldName: keyof DateFieldName; requiredAfter?: boolean }[] }
 > = {
   plannedOpeningDate: { restrictions: [], dependencies: [] },
-  actualOpeningDate: { restrictions: ['requiredPast', 'requiredCurrent'], dependencies: [] },
+  actualOpeningDate: { restrictions: ['requiredPastOrCurrent'], dependencies: [] },
   plannedClosureDate: {
     restrictions: [],
     dependencies: [
@@ -98,6 +98,6 @@ export const dateValidationRules: Record<
       },
     ],
   },
-  actualClosureDate: { restrictions: ['requiredPast', 'requiredCurrent'], dependencies: [] },
+  actualClosureDate: { restrictions: ['requiredPastOrCurrent'], dependencies: [] },
   estimatedReopeningDate: { restrictions: ['requiredFuture'], dependencies: [] },
 }
