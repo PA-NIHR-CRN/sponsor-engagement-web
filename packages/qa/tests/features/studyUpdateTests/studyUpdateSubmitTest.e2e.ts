@@ -38,7 +38,7 @@ test.describe('Update study and save changes locally in SE @se_184', () => {
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
     `)
 
-    await test.step(`Given I have navigated to the Update study data page for a Commercial Study with SE Id ${startingStudyId}`, async () => {
+    await test.step(`Given I have navigated to the Update study data page for the Study with SE Id ${startingStudyId}`, async () => {
       await studyUpdatePage.goto(startingStudyId.toString())
     })
 
@@ -71,7 +71,7 @@ test.describe('Update study and save changes locally in SE @se_184', () => {
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
     `)
 
-    await test.step(`Given I have navigated to the Update study data page for a Commercial Study with SE Id ${startingStudyId}`, async () => {
+    await test.step(`Given I have navigated to the Update study data page for the Study with SE Id ${startingStudyId}`, async () => {
       await studyUpdatePage.goto(startingStudyId.toString())
     })
 

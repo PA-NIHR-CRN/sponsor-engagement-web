@@ -5,10 +5,8 @@ import { getStudyEngagementInfo } from '../../../utils/ApiRequests'
 
 const testUserId = 6
 const startingOrgId = 9
-const timeStamp = new Date().toISOString()
 
 let startingStudyId = 0
-let studyCoreDetails: RowDataPacket[]
 
 test.beforeAll('Setup Tests', async () => {
   await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
@@ -20,10 +18,6 @@ test.beforeAll('Setup Tests', async () => {
     ORDER BY RAND() LIMIT 1;
   `)
   startingStudyId = randomStudyIdSelected[0].id
-
-  studyCoreDetails = await seDatabaseReq(`
-    SELECT cpmsId FROM sponsorengagement.Study where id = ${startingStudyId};
-  `)
 })
 
 test.describe('Validation rules for auto & proposed study updates @se_183', () => {
@@ -34,7 +28,7 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
     `)
 
-    await test.step(`Given I have navigated to the Update study data page for a Commercial Study with SE Id ${startingStudyId}`, async () => {
+    await test.step(`Given I have navigated to the Update study data page for the Study with SE Id ${startingStudyId}`, async () => {
       await studyUpdatePage.goto(startingStudyId.toString())
     })
 
@@ -66,7 +60,7 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
     `)
 
-    await test.step(`Given I have navigated to the Update study data page for a Commercial Study with SE Id ${startingStudyId}`, async () => {
+    await test.step(`Given I have navigated to the Update study data page for the Study with SE Id ${startingStudyId}`, async () => {
       await studyUpdatePage.goto(startingStudyId.toString())
     })
 
@@ -98,7 +92,7 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
     `)
 
-    await test.step(`Given I have navigated to the Update study data page for a Commercial Study with SE Id ${startingStudyId}`, async () => {
+    await test.step(`Given I have navigated to the Update study data page for the Study with SE Id ${startingStudyId}`, async () => {
       await studyUpdatePage.goto(startingStudyId.toString())
     })
 
@@ -132,7 +126,7 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
     `)
 
-    await test.step(`Given I have navigated to the Update study data page for a Commercial Study with SE Id ${startingStudyId}`, async () => {
+    await test.step(`Given I have navigated to the Update study data page for the Study with SE Id ${startingStudyId}`, async () => {
       await studyUpdatePage.goto(startingStudyId.toString())
     })
 
@@ -162,7 +156,7 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
     `)
 
-    await test.step(`Given I have navigated to the Update study data page for a Commercial Study with SE Id ${startingStudyId}`, async () => {
+    await test.step(`Given I have navigated to the Update study data page for the Study with SE Id ${startingStudyId}`, async () => {
       await studyUpdatePage.goto(startingStudyId.toString())
     })
 
@@ -194,7 +188,7 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
     `)
 
-    await test.step(`Given I have navigated to the Update study data page for a Commercial Study with SE Id ${startingStudyId}`, async () => {
+    await test.step(`Given I have navigated to the Update study data page for the Study with SE Id ${startingStudyId}`, async () => {
       await studyUpdatePage.goto(startingStudyId.toString())
     })
 
@@ -219,7 +213,7 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
     `)
 
-    await test.step(`Given I have navigated to the Update study data page for a Commercial Study with SE Id ${startingStudyId}`, async () => {
+    await test.step(`Given I have navigated to the Update study data page for the Study with SE Id ${startingStudyId}`, async () => {
       await studyUpdatePage.goto(startingStudyId.toString())
     })
 
@@ -244,7 +238,7 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
     `)
 
-    await test.step(`Given I have navigated to the Update study data page for a Commercial Study with SE Id ${startingStudyId}`, async () => {
+    await test.step(`Given I have navigated to the Update study data page for the Study with SE Id ${startingStudyId}`, async () => {
       await studyUpdatePage.goto(startingStudyId.toString())
     })
 
@@ -272,7 +266,7 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
     `)
 
-    await test.step(`Given I have navigated to the Update study data page for a Commercial Study with SE Id ${startingStudyId}`, async () => {
+    await test.step(`Given I have navigated to the Update study data page for the Study with SE Id ${startingStudyId}`, async () => {
       await studyUpdatePage.goto(startingStudyId.toString())
     })
 
@@ -300,7 +294,7 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
     `)
 
-    await test.step(`Given I have navigated to the Update study data page for a Commercial Study with SE Id ${startingStudyId}`, async () => {
+    await test.step(`Given I have navigated to the Update study data page for the Study with SE Id ${startingStudyId}`, async () => {
       await studyUpdatePage.goto(startingStudyId.toString())
     })
 
