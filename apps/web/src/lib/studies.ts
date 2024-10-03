@@ -306,12 +306,16 @@ export const mapCPMSStatusToFormStatus = (cpmsStatus: string): string => {
 
 export const mapFormStatusToCPMSStatus = (newStatus: string, currentStatus: string): string => {
   const isCurrentStatusOpenWithRecruitment = currentStatus === (CPMSStatus.OpenWithRecruitment as string)
+  const isCurrentStatusSuspendedWithRecruitment =
+    currentStatus === (CPMSStatus.SuspendedFromOpenWithRecruitment as string)
 
   const statusMap = {
     [FormStudyStatus.InSetup]: CPMSStatus.InSetup,
     [FormStudyStatus.Closed]: CPMSStatus.ClosedToRecruitmentFollowUpComplete,
     [FormStudyStatus.ClosedFollowUp]: CPMSStatus.ClosedToRecruitmentInFollowUp,
-    [FormStudyStatus.OpenToRecruitment]: CPMSStatus.OpenToRecruitment,
+    [FormStudyStatus.OpenToRecruitment]: isCurrentStatusSuspendedWithRecruitment
+      ? CPMSStatus.OpenWithRecruitment
+      : CPMSStatus.OpenToRecruitment,
     [FormStudyStatus.Suspended]: isCurrentStatusOpenWithRecruitment
       ? CPMSStatus.SuspendedFromOpenWithRecruitment
       : CPMSStatus.SuspendedFromOpenToRecruitment,
