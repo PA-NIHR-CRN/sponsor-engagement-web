@@ -1,4 +1,4 @@
-import type { DateFieldName } from '@/utils/schemas'
+import type { DateFieldName, EditStudyInputs } from '@/utils/schemas'
 
 export const PAGE_TITLE = 'Update study data'
 export const GENERIC_STUDIES_GUIDANCE_TEXT =
@@ -60,12 +60,18 @@ export const studyStatuses = [
 export const FURTHER_INFO_MAX_CHARACTERS = 500
 export const UK_RECRUITMENT_TARGET_MAX_VALUE = 9999999
 
-export const fieldNameToLabelMapping: Record<keyof DateFieldName, string> = {
+export const fieldNameToLabelMapping: Record<
+  keyof Omit<EditStudyInputs, 'studyId' | 'cpmsId' | 'originalStatus'>,
+  string
+> = {
   plannedOpeningDate: 'Planned opening to recruitment date',
   actualOpeningDate: 'Actual opening to recruitment date',
   plannedClosureDate: 'Planned closure to recruitment date',
   actualClosureDate: 'Actual closure to recruitment date',
   estimatedReopeningDate: 'Estimated reopening date',
+  status: 'Study status',
+  recruitmentTarget: 'UK recruitment target',
+  furtherInformation: 'Further information',
 }
 
 export type DateRestrictions = 'requiredPastOrCurrent' | 'requiredFuture'

@@ -45,6 +45,13 @@ export default class StudyUpdatePage {
   readonly updateSuccessBanner: Locator
   readonly updateSuccessContent: Locator
   readonly updateValidationBanner: Locator
+  readonly updateValidationList: Locator
+  readonly plannedOpeningInlineError: Locator
+  readonly actualOpeningInlineError: Locator
+  readonly plannedClosureInlineError: Locator
+  readonly actualClosureInlineError: Locator
+  readonly estimatedReopenInlineError: Locator
+  readonly ukRecruitmentTargetInlineError: Locator
 
   //Initialize Page Objects
   constructor(page: Page) {
@@ -62,7 +69,7 @@ export default class StudyUpdatePage {
     this.guidanceText = page.locator('.govuk-inset-text')
 
     //Form
-    this.statusRadioInSetup = page.locator('#status')
+    this.statusRadioInSetup = page.locator('#status').first()
     this.statusHintInSetup = page.locator('#status-hint').first()
     this.statusRadioOpenRec = page.locator('#status-1')
     this.statusHintOpenRec = page.locator('#status-1-hint')
@@ -96,7 +103,14 @@ export default class StudyUpdatePage {
     this.requestSupport = page.locator('[data-testid="request-support"]')
     this.updateSuccessBanner = page.locator('.govuk-notification-banner.govuk-notification-banner--success')
     this.updateSuccessContent = page.locator('.govuk-notification-banner__heading')
-    this.updateValidationBanner = page.locator('')
+    this.updateValidationBanner = page.locator('#form-summary-errors')
+    this.updateValidationList = page.locator('.govuk-list.govuk-error-summary__list')
+    this.plannedOpeningInlineError = page.locator('#plannedOpeningDate-error')
+    this.actualOpeningInlineError = page.locator('#actualOpeningDate-error')
+    this.plannedClosureInlineError = page.locator('#plannedClosureDate-error')
+    this.actualClosureInlineError = page.locator('#actualClosureDate-error')
+    this.estimatedReopenInlineError = page.locator('#estimatedReopeningDate-error')
+    this.ukRecruitmentTargetInlineError = page.locator('#recruitmentTarget-error')
   }
 
   //Page Methods
@@ -182,7 +196,7 @@ export default class StudyUpdatePage {
     if (status in ['Closed to Recruitment, In Follow Up']) {
       await expect(this.statusRadioClosed).toBeChecked()
     }
-    if (status in ['Suspended']) {
+    if (status in ['Suspended', 'Suspended (from Open, With Recruitment)', 'Suspended (from Open to Recruitment)']) {
       await expect(this.statusRadioSuspended).toBeChecked()
     }
     if (status in ['Withdrawn in Pre-Setup', 'Withdrawn During Setup']) {
@@ -190,29 +204,63 @@ export default class StudyUpdatePage {
     }
   }
 
-  async assertStudyDateSelections(status: string) {
+  async assertPlannedOpeningFieldsVisible() {
     await expect(this.plannedOpeningDD).toBeVisible()
     await expect(this.plannedOpeningMM).toBeVisible()
     await expect(this.plannedOpeningYYYY).toBeVisible()
-
+  }
+  async assertActualOpeningFieldsVisible() {
     await expect(this.actualOpeningDD).toBeVisible()
     await expect(this.actualOpeningMM).toBeVisible()
     await expect(this.actualOpeningYYYY).toBeVisible()
-
+  }
+  async assertPlannedClosureFieldsVisible() {
     await expect(this.plannedClosureDD).toBeVisible()
     await expect(this.plannedClosureMM).toBeVisible()
     await expect(this.plannedClosureYYYY).toBeVisible()
-
+  }
+  async assertActualClosureFieldsVisible() {
     await expect(this.actualClosureDD).toBeVisible()
     await expect(this.actualClosureMM).toBeVisible()
     await expect(this.actualClosureYYYY).toBeVisible()
-
-    // TODO: enable this condition once dev has caught up
-    // if (status in ['Withdrawn in Pre-Setup', 'Withdrawn During Setup']) {
+  }
+  async assertEstimatedReopeningFieldsVisible() {
     await expect(this.estimatedReopenDD).toBeVisible()
     await expect(this.estimatedReopenMM).toBeVisible()
     await expect(this.estimatedReopenYYYY).toBeVisible()
-    // }
+  }
+
+  async assertStudyDateSelections(status: string) {
+    // visible to all statuses
+    await this.assertPlannedOpeningFieldsVisible()
+
+    if (
+      status in
+      [
+        'Closed to Recruitment',
+        'Closed to Recruitment, Follow Up Complete',
+        'Open to Recruitment',
+        'Open, With Recruitment',
+        'Closed to Recruitment, In Follow Up',
+        'Suspended',
+      ]
+    ) {
+      await this.assertActualOpeningFieldsVisible()
+    }
+
+    // visible to all statuses
+    await this.assertPlannedClosureFieldsVisible()
+
+    if (
+      status in
+      ['Closed to Recruitment', 'Closed to Recruitment, Follow Up Complete', 'Closed to Recruitment, In Follow Up']
+    ) {
+      await this.assertActualClosureFieldsVisible()
+    }
+
+    if (status in ['Suspended']) {
+      await this.assertEstimatedReopeningFieldsVisible()
+    }
   }
 
   async assertRecruitmentTargetInput() {
@@ -276,5 +324,158 @@ export default class StudyUpdatePage {
     await expect(dbStudyUpdate.studyStatus).not.toBeNull()
     await expect(dbStudyUpdate.comment).toBe(`se e2e auto test - ${timeStamp}`)
     await expect(dbStudyUpdate.studyStatusGroup).not.toBeNull()
+  }
+
+  async ensureAllFieldsAreNull() {
+    await this.statusRadioClosed.click()
+    await this.fillStudyDates('plannedOpening', '', '', '')
+    await this.fillStudyDates('actualOpening', '', '', '')
+    await this.fillStudyDates('plannedClosure', '', '', '')
+    await this.fillStudyDates('actualClosure', '', '', '')
+    await this.ukRecruitmentTarget.fill('')
+    await this.furtherInfo.fill(``)
+  }
+
+  async assertStudyDatesValidationRequired(dateType: string) {
+    await expect(this.updateValidationBanner).toBeVisible()
+    await expect(this.updateValidationBanner).toContainText('There is a problem')
+
+    switch (dateType) {
+      case 'plannedOpening':
+        await expect(this.plannedOpeningInlineError).toBeVisible()
+        await expect(this.plannedOpeningInlineError).toHaveText(
+          'Error: Planned opening to recruitment date is a mandatory field'
+        )
+        await expect(this.updateValidationList).toContainText(
+          'Planned opening to recruitment date is a mandatory field'
+        )
+        break
+      case 'actualOpening':
+        await expect(this.actualOpeningInlineError).toBeVisible()
+        await expect(this.actualOpeningInlineError).toHaveText(
+          'Error: Actual opening to recruitment date is a mandatory field'
+        )
+        await expect(this.updateValidationList).toContainText('Actual opening to recruitment date is a mandatory field')
+        break
+      case 'plannedClosure':
+        await expect(this.plannedClosureInlineError).toBeVisible()
+        await expect(this.plannedClosureInlineError).toHaveText(
+          'Error: Planned closure to recruitment date is a mandatory field'
+        )
+        await expect(this.updateValidationList).toContainText(
+          'Planned closure to recruitment date is a mandatory field'
+        )
+        break
+      case 'actualClosure':
+        await expect(this.actualClosureInlineError).toBeVisible()
+        await expect(this.actualClosureInlineError).toHaveText(
+          'Error: Actual closure to recruitment date is a mandatory field'
+        )
+        await expect(this.updateValidationList).toContainText('Actual closure to recruitment date is a mandatory field')
+        break
+      case 'estimatedReopening':
+        await expect(this.estimatedReopenInlineError).toBeVisible()
+        await expect(this.estimatedReopenInlineError).toHaveText('')
+        await expect(this.updateValidationList).toContainText('')
+        break
+      default:
+        throw new Error(`${dateType} is not a valid date option`)
+    }
+  }
+
+  async assertStudyDatesValidation(dateType: string, dmy: string, partial: boolean) {
+    let plannedOrActualMessage = ''
+    let estimatedReopenMessage = ''
+
+    if (dmy === 'year' && partial === false) {
+      plannedOrActualMessage = `Year must include 4 numbers`
+      estimatedReopenMessage = plannedOrActualMessage
+    } else if ((dmy === 'year' && partial === true) || (dmy !== 'year' && partial === true)) {
+      plannedOrActualMessage = `${dateType} to recruitment date must include a ${dmy}`
+      estimatedReopenMessage = `${dateType} date must include a ${dmy}`
+    } else {
+      plannedOrActualMessage = `${dateType} to recruitment date requires a valid ${dmy}`
+      estimatedReopenMessage = `${dateType} date requires a valid ${dmy}`
+    }
+
+    await expect(this.updateValidationBanner).toBeVisible()
+    await expect(this.updateValidationBanner).toContainText('There is a problem')
+
+    switch (dateType) {
+      case 'Planned opening':
+        const plannedOpeningError = `#plannedOpeningDate-${dmy}-error`
+        await expect(this.page.locator(plannedOpeningError)).toBeVisible()
+        await expect(this.page.locator(plannedOpeningError)).toHaveText(`Error: ${plannedOrActualMessage}`)
+        await expect(this.updateValidationList).toContainText(plannedOrActualMessage)
+        break
+      case 'Actual opening':
+        const actualOpeningError = `#actualOpeningDate-${dmy}-error`
+        await expect(this.page.locator(actualOpeningError)).toBeVisible()
+        await expect(this.page.locator(actualOpeningError)).toHaveText(`Error: ${plannedOrActualMessage}`)
+        await expect(this.updateValidationList).toContainText(plannedOrActualMessage)
+        break
+      case 'Planned closure':
+        const plannedClosureError = `#plannedClosureDate-${dmy}-error`
+        await expect(this.page.locator(plannedClosureError)).toBeVisible()
+        await expect(this.page.locator(plannedClosureError)).toHaveText(`Error: ${plannedOrActualMessage}`)
+        await expect(this.updateValidationList).toContainText(plannedOrActualMessage)
+        break
+      case 'Actual closure':
+        const actualClosureError = `#actualClosureDate-${dmy}-error`
+        await expect(this.page.locator(actualClosureError)).toBeVisible()
+        await expect(this.page.locator(actualClosureError)).toHaveText(`Error: ${plannedOrActualMessage}`)
+        await expect(this.updateValidationList).toContainText(plannedOrActualMessage)
+        break
+      case 'Estimated reopening':
+        const estimatedReopeningError = `#estimatedReopeningDate-${dmy}-error`
+        await expect(this.page.locator(estimatedReopeningError)).toBeVisible()
+        await expect(this.page.locator(estimatedReopeningError)).toHaveText(`Error: ${estimatedReopenMessage}`)
+        await expect(this.updateValidationList).toContainText(estimatedReopenMessage)
+        break
+      default:
+        throw new Error(`${dateType} is not a valid date option`)
+    }
+  }
+
+  async assertPlannedClosureAfterPlannedOpening() {
+    await expect(this.updateValidationBanner).toBeVisible()
+    await expect(this.updateValidationBanner).toContainText('There is a problem')
+    await expect(this.plannedClosureInlineError).toBeVisible()
+    await expect(this.plannedClosureInlineError).toHaveText(
+      'Error: Planned closure to recruitment date must be after Planned opening to recruitment date'
+    )
+    await expect(this.updateValidationList).toContainText(
+      'Planned closure to recruitment date must be after Planned opening to recruitment date'
+    )
+  }
+
+  async assertActualOpeningDateMustBeTodayOrPast() {
+    await expect(this.updateValidationBanner).toBeVisible()
+    await expect(this.updateValidationBanner).toContainText('There is a problem')
+    await expect(this.actualOpeningInlineError).toBeVisible()
+    await expect(this.actualOpeningInlineError).toHaveText(
+      'Error: Actual opening to recruitment date must be today or in the past'
+    )
+    await expect(this.updateValidationList).toContainText(
+      'Actual opening to recruitment date must be today or in the past'
+    )
+  }
+
+  async assertActualClosureDateMustBeTodayOrPast() {
+    await expect(this.updateValidationBanner).toBeVisible()
+    await expect(this.updateValidationBanner).toContainText('There is a problem')
+    await expect(this.actualClosureInlineError).toBeVisible()
+    await expect(this.actualClosureInlineError).toHaveText(
+      'Error: Actual closure to recruitment date must be today or in the past'
+    )
+    await expect(this.updateValidationList).toContainText(
+      'Actual closure to recruitment date must be today or in the past'
+    )
+  }
+
+  async assertUkTargetValidation() {
+    await expect(this.ukRecruitmentTargetInlineError).toBeVisible()
+    await expect(this.ukRecruitmentTargetInlineError).toHaveText(`Error: Enter a valid UK target`)
+    await expect(this.updateValidationList).toContainText(`Enter a valid UK target`)
   }
 }
