@@ -35,6 +35,8 @@ export const studySchema = z
     validateAllDates(ctx, values)
   })
 
+export const studySchemaShape = studySchema.sourceType()._def.shape()
+
 export type EditStudyInputs = z.infer<typeof studySchema>
 
 export type DateFieldName = Pick<

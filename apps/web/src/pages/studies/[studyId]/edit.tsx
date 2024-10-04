@@ -1,4 +1,4 @@
-import { zodResolver } from '@hookform/resolvers/zod'
+// import { zodResolver } from '@hookform/resolvers/zod'
 import { Container } from '@nihr-ui/frontend'
 import clsx from 'clsx'
 import type { InferGetServerSidePropsType } from 'next'
@@ -49,7 +49,7 @@ const transformDateValue = (input?: DateInputValue | null) => ({
 
 export default function EditStudy({ study }: EditStudyProps) {
   const { register, formState, handleSubmit, control, watch, setError } = useForm<EditStudyInputs>({
-    resolver: zodResolver(studySchema),
+    // resolver: zodResolver(studySchema),
     defaultValues: {
       ...mapStudyToStudyFormInput(study),
     },

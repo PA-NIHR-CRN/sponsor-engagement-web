@@ -24,7 +24,24 @@ export type Schemas =
 export function hasErrorsInSearchParams(schema: Schemas, searchParams: ParsedUrlQuery) {
   const shape = schema instanceof Zod.ZodEffects ? schema._def.schema.shape : schema.shape
 
-  return Object.keys(shape).some((field) => searchParams[`${field}Error`])
+  return Object.keys(shape).some((field) => {
+    if (
+      [
+        'plannedOpeningDate',
+        'actualOpeningDate',
+        'plannedClosureDate',
+        'actualClosureDate',
+        'estimatedReopeningDate',
+      ].includes(field)
+    ) {
+      if (searchParams[`${field}Error`]) {
+        return searchParams[`${field}Error`]
+      }
+      const dateFields = ['day', 'month', 'year']
+      return dateFields.some((dateField) => searchParams[`${field}-${dateField}Error`])
+    }
+    return searchParams[`${field}Error`]
+  })
 }
 
 /**
@@ -63,6 +80,28 @@ export function getErrorsFromSearchParams(schema: Schemas, searchParams: ParsedU
   const keysArray: (typeof keys)[number][] = Object.keys(shape)
 
   return keysArray.reduce<FieldErrors>((errors, field) => {
+    if (
+      [
+        'plannedOpeningDate',
+        'actualOpeningDate',
+        'plannedClosureDate',
+        'actualClosureDate',
+        'estimatedReopeningDate',
+      ].includes(field)
+    ) {
+      const dateFields = ['day', 'month', 'year']
+
+      dateFields.forEach((dateField) => {
+        if (searchParams[`${field}-${dateField}Error`]) {
+          const error: FieldError = {
+            type: 'custom',
+            message: searchParams[`${field}-${dateField}Error`] as string,
+          }
+          errors[field] = error
+        }
+      })
+    }
+
     if (searchParams[`${field}Error`]) {
       const error: FieldError = {
         type: 'custom',

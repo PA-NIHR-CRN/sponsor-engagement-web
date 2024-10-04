@@ -1,5 +1,6 @@
 import type { Prisma } from 'database'
 import type { NextApiRequest } from 'next'
+import { ZodError } from 'zod'
 
 import { StudyUpdateRoute } from '@/@types/studies'
 import { Roles, StudyUpdateType } from '@/constants'
@@ -8,7 +9,7 @@ import { prismaClient } from '@/lib/prisma'
 import { mapCPMSStatusToFormStatus } from '@/lib/studies'
 import { constructDateObjFromParts } from '@/utils/date'
 import type { EditStudyInputs } from '@/utils/schemas'
-import { studySchema } from '@/utils/schemas'
+import { studySchema, studySchemaShape } from '@/utils/schemas'
 import { withApiHandler } from '@/utils/withApiHandler'
 
 export interface ExtendedNextApiRequest extends NextApiRequest {
@@ -85,9 +86,31 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
     }
 
     return res.redirect(302, `/studies/${studyData.studyId}?success=${isDirectUpdate ? 3 : 2}`)
-  } catch (e) {
-    const searchParams = new URLSearchParams({ fatal: '1' })
+  } catch (error) {
     const studyId = req.body.studyId
+
+    if (error instanceof ZodError) {
+      const fieldErrors: Record<string, string> = Object.fromEntries(
+        error.errors.map(({ path: [fieldId], message }) => [`${fieldId}Error`, message])
+      )
+
+      // TODO: why doesn't this need to go nested?
+      Object.keys(studySchemaShape).forEach((field) => {
+        if (req.body[field]) {
+          fieldErrors[field] = req.body[field] as string
+        }
+      })
+
+      delete fieldErrors.studyId
+
+      const searchParams = new URLSearchParams({
+        ...fieldErrors,
+      })
+
+      return res.redirect(302, `/studies/${studyId}/edit?${searchParams.toString()}`)
+    }
+
+    const searchParams = new URLSearchParams({ fatal: '1' })
 
     return res.redirect(302, `/studies/${studyId}/edit?${searchParams.toString()}`)
   }

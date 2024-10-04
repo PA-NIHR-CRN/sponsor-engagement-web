@@ -71,7 +71,7 @@ const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, valu
   const requiredPastOrCurrent = dateValidationRules[fieldName].restrictions.includes('requiredPastOrCurrent')
   const requiredFuture = dateValidationRules[fieldName].restrictions.includes('requiredFuture')
 
-  if (!value) {
+  if (!value || Object.values(value).every((dateValue) => !dateValue)) {
     // Mandatory fields based on status
     if (mapStatusToMandatoryDateFields(previousStatus, currentStatus).includes(fieldName)) {
       ctx.addIssue({
