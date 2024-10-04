@@ -12,6 +12,7 @@ import { DateInput } from '@/components/atoms/Form/DateInput/DateInput'
 import type { DateInputValue } from '@/components/atoms/Form/DateInput/types'
 import { Textarea } from '@/components/atoms/Form/Textarea/Textarea'
 import { TextInput } from '@/components/atoms/Form/TextInput/TextInput'
+import Spinner from '@/components/atoms/Spinner/Spinner'
 import Warning from '@/components/atoms/Warning/Warning'
 import { RequestSupport } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
@@ -82,6 +83,8 @@ export default function EditStudy({ study }: EditStudyProps) {
     formState,
     onFoundError: handleFoundError,
   })
+
+  const showLoadingText = formState.isSubmitting
 
   return (
     <Container>
@@ -302,13 +305,26 @@ export default function EditStudy({ study }: EditStudyProps) {
                 maxLength={FURTHER_INFO_MAX_CHARACTERS}
               />
 
-              <Warning>
-                It may a few seconds for the CPMS record to update. Please stay on this page until redirected.
-              </Warning>
+              {showLoadingText ? (
+                <Warning>
+                  It may a few seconds for the CPMS record to update. Please stay on this page until redirected.
+                </Warning>
+              ) : null}
 
               <div className="govuk-button-group">
-                <button className={clsx('govuk-button', { 'pointer-events-none': formState.isLoading })} type="submit">
-                  Update
+                <button
+                  className={clsx('govuk-button', {
+                    'pointer-events-none': showLoadingText,
+                  })}
+                  type="submit"
+                >
+                  {showLoadingText ? (
+                    <>
+                      Updating... <Spinner />
+                    </>
+                  ) : (
+                    'Update'
+                  )}
                 </button>
                 <Link className="govuk-button govuk-button--secondary" href={`/studies/${study.id}`}>
                   Cancel

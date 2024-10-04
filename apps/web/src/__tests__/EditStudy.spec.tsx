@@ -342,12 +342,6 @@ describe('EditStudy', () => {
         'You have 500 characters remaining If needed, provide further context or justification for changes made above.'
       )
 
-      // Warning text
-      const warningText = screen.getByText(
-        'It may a few seconds for the CPMS record to update. Please stay on this page until redirected.'
-      )
-      expect(warningText).toBeInTheDocument()
-
       // Update CTA
       expect(screen.getByRole('button', { name: 'Update' })).toHaveAttribute('type', 'submit')
 
