@@ -159,9 +159,7 @@ export default class StudyDetailsPage {
     this.firstSponsorAssessmentFurtherInfoText = this.firstSponsorAssessmentFurtherInfo.locator('p')
     this.secondSponsorAssessmentFurtherInfoText = this.secondSponsorAssessmentFurtherInfo.locator('p')
     this.sponsorAssessmentHistory = page.locator('[class="govuk-!-margin-bottom-6"]') // TODO: temp fix need to use data-testid
-    // this.firstSponsorAssessmentRow = page.locator('button[id^="radix-:r2:"]')
     this.firstSponsorAssessmentRow = this.sponsorAssessmentHistory.locator('button')
-    // this.secondSponsorAssessmentRow = page.locator('button[id="radix-:r4:"]')
     this.secondSponsorAssessmentRow = this.sponsorAssessmentHistory.locator('button').nth(1)
     this.firstSponsorAssessmentDate = this.firstSponsorAssessmentRow.locator('div')
     this.secondSponsorAssessmentDate = this.secondSponsorAssessmentRow.locator('div')
@@ -441,7 +439,6 @@ export default class StudyDetailsPage {
   }
 
   async assertStudyStatusSuspended(expectedStatus: string) {
-    // expect(expectedStatus).toEqual('Suspended')
     await expect(this.tableStatusValue).toHaveText(expectedStatus)
   }
 

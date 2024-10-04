@@ -332,7 +332,6 @@ export default class StudyUpdatePage {
     await this.fillStudyDates('actualOpening', '', '', '')
     await this.fillStudyDates('plannedClosure', '', '', '')
     await this.fillStudyDates('actualClosure', '', '', '')
-    // await this.fillStudyDates('estimatedReopening', '', '', '')
     await this.ukRecruitmentTarget.fill('')
     await this.furtherInfo.fill(``)
   }
