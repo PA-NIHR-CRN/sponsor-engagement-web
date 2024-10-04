@@ -93,7 +93,7 @@ export default function EditStudy({ study }: EditStudyProps) {
     [statusInputValue, study.studyStatus]
   )
 
-  const showLoadingText = formState.isSubmitting || formState.isSubmitSuccessful
+  const showLoadingState = formState.isSubmitting || formState.isSubmitSuccessful
 
   return (
     <Container>
@@ -328,7 +328,7 @@ export default function EditStudy({ study }: EditStudyProps) {
                 maxLength={FURTHER_INFO_MAX_CHARACTERS}
               />
 
-              {showLoadingText ? (
+              {showLoadingState ? (
                 <Warning>
                   It may a few seconds for the CPMS record to update. Please stay on this page until redirected.
                 </Warning>
@@ -337,11 +337,11 @@ export default function EditStudy({ study }: EditStudyProps) {
               <div className="govuk-button-group">
                 <button
                   className={clsx('govuk-button', {
-                    'pointer-events-none': showLoadingText,
+                    'pointer-events-none': showLoadingState,
                   })}
                   type="submit"
                 >
-                  {showLoadingText ? (
+                  {showLoadingState ? (
                     <>
                       Updating... <Spinner />
                     </>
