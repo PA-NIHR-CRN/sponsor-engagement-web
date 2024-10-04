@@ -84,7 +84,7 @@ export default function EditStudy({ study }: EditStudyProps) {
     onFoundError: handleFoundError,
   })
 
-  const showLoadingText = formState.isSubmitting
+  const showLoadingText = formState.isSubmitting || formState.isSubmitSuccessful
 
   return (
     <Container>
