@@ -474,8 +474,18 @@ export default class StudyUpdatePage {
   }
 
   async assertUkTargetValidation() {
+    await expect(this.updateValidationBanner).toBeVisible()
+    await expect(this.updateValidationBanner).toContainText('There is a problem')
     await expect(this.ukRecruitmentTargetInlineError).toBeVisible()
     await expect(this.ukRecruitmentTargetInlineError).toHaveText(`Error: Enter a valid UK target`)
     await expect(this.updateValidationList).toContainText(`Enter a valid UK target`)
+  }
+
+  async assertUnexpectedErrorOccurred() {
+    await expect(this.updateValidationBanner).toBeVisible()
+    await expect(this.updateValidationBanner).toContainText('There is a problem')
+    await expect(this.updateValidationList).toContainText(
+      `An unexpected error occurred whilst processing the form, please try again later.`
+    )
   }
 }

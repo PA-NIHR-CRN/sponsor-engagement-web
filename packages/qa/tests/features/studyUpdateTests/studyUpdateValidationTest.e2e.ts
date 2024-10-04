@@ -1,11 +1,9 @@
-import { RowDataPacket } from 'mysql2'
 import { test } from '../../../hooks/CustomFixtures'
 import { seDatabaseReq, waitForSeDbRequest } from '../../../utils/DbRequests'
-import { getStudyEngagementInfo } from '../../../utils/ApiRequests'
+import { listenAndDestroyRequest } from '../../../utils/ApiRequests'
 
 const testUserId = 6
-const startingOrgId = 9
-
+const startingOrgId = 2
 let startingStudyId = 0
 
 test.beforeAll('Setup Tests', async () => {
@@ -23,7 +21,7 @@ test.beforeAll('Setup Tests', async () => {
 test.describe('Validation rules for auto & proposed study updates @se_183', () => {
   test.use({ storageState: '.auth/sponsorContact.json' })
 
-  test('Day validation rules for all dates @se_183_ac1_day', async ({ studyUpdatePage }) => {
+  test('Validation error message for date days @se_183_ac1_day', async ({ studyUpdatePage }) => {
     await seDatabaseReq(`
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
     `)
@@ -55,7 +53,7 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
     })
   })
 
-  test('Month validation rules for all dates @se_183_ac1_month', async ({ studyUpdatePage }) => {
+  test('Validation error message for date months @se_183_ac1_month', async ({ studyUpdatePage }) => {
     await seDatabaseReq(`
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
     `)
@@ -87,7 +85,7 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
     })
   })
 
-  test('Year validation rules for all dates @se_183_ac1_year', async ({ studyUpdatePage }) => {
+  test('Validation error message for date years @se_183_ac1_year', async ({ studyUpdatePage }) => {
     await seDatabaseReq(`
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
     `)
@@ -119,7 +117,7 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
     })
   })
 
-  test('Partially complete date validation rules for all dates @se_183_ac1_partialDates', async ({
+  test('Validation error message for partially complete dates @se_183_ac1_partialDates', async ({
     studyUpdatePage,
   }) => {
     await seDatabaseReq(`
@@ -151,7 +149,9 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
     })
   })
 
-  test('29th February in non leap years @se_183_ac1_feb29', async ({ studyUpdatePage }) => {
+  test('Validation error message for 29th February in non leap years @se_183_ac1_feb29', async ({
+    studyUpdatePage,
+  }) => {
     await seDatabaseReq(`
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
     `)
@@ -183,7 +183,7 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
     })
   })
 
-  test('Null validation rules for all dates @se_183_ac3', async ({ studyUpdatePage }) => {
+  test('Validation error message for  Null date fields @se_183_ac3', async ({ studyUpdatePage }) => {
     await seDatabaseReq(`
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
     `)
@@ -208,7 +208,7 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
     })
   })
 
-  test('Invalid UK target validation rule @se_183_ac4', async ({ studyUpdatePage }) => {
+  test('Validation error message for Invalid UK target validation @se_183_ac4', async ({ studyUpdatePage }) => {
     await seDatabaseReq(`
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
     `)
@@ -231,7 +231,7 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
     })
   })
 
-  test('Planned closure to recruitment date must be after Planned opening to recruitment date @se_183_ac2', async ({
+  test('Validation error message for when Planned closure to recruitment date must be after Planned opening to recruitment date @se_183_ac2', async ({
     studyUpdatePage,
   }) => {
     await seDatabaseReq(`
@@ -261,7 +261,9 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
     })
   })
 
-  test('Actual opening to recruitment date must be today or in the past @se_183_ac2', async ({ studyUpdatePage }) => {
+  test('Validation error message for when Actual opening to recruitment date must be today or in the past @se_183_ac2', async ({
+    studyUpdatePage,
+  }) => {
     await seDatabaseReq(`
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
     `)
@@ -289,7 +291,9 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
     })
   })
 
-  test('Actual closure to recruitment date must be today or in the past @se_183_ac2', async ({ studyUpdatePage }) => {
+  test('Validation error message for when Actual closure to recruitment date must be today or in the past @se_183_ac2', async ({
+    studyUpdatePage,
+  }) => {
     await seDatabaseReq(`
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
     `)
@@ -314,6 +318,31 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
 
     await test.step(`Then I should see the Actual closure to recruitment date must be today or in the past date validation`, async () => {
       await studyUpdatePage.assertActualClosureDateMustBeTodayOrPast()
+    })
+  })
+
+  test('Validation error message for when there is a system connection failure @se_183_ac7', async ({
+    page,
+    studyUpdatePage,
+  }) => {
+    await seDatabaseReq(`
+      DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
+    `)
+
+    await test.step(`Given I have navigated to the Update study data page for the Study with SE Id ${startingStudyId}`, async () => {
+      await studyUpdatePage.goto(startingStudyId.toString())
+    })
+
+    await test.step(`But there is a system connection problem`, async () => {
+      await listenAndDestroyRequest(page, `api/forms/editStudy`)
+    })
+
+    await test.step(`When I attempt to update my changes`, async () => {
+      await studyUpdatePage.buttonUpdate.click()
+    })
+
+    await test.step(`Then I should see the unexpected error occurred error message`, async () => {
+      await studyUpdatePage.assertUnexpectedErrorOccurred()
     })
   })
 })
