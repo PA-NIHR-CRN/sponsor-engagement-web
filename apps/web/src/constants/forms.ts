@@ -20,3 +20,5 @@ export const FORM_SUCCESS_MESSAGES = {
   2: 'Your study data changes have been received. These will now be reviewed and applied to the study record. Until then, previous study data values will be displayed.', // Proposed study updates
   3: 'Your study data changes have been accepted.', // Direct study updates
 } as Record<number, string>
+
+export const UPDATE_FROM_SE_TEXT = 'Update from Sponsor Engagement Tool'
