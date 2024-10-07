@@ -8,7 +8,7 @@ import { createRequest, createResponse } from 'node-mocks-http'
 
 import { prismaMock } from '@/__mocks__/prisma'
 import { userWithSponsorContactRole } from '@/__mocks__/session'
-import { StudyUpdateRoute } from '@/@types/studies'
+import { Status, StudyUpdateRoute } from '@/@types/studies'
 import { StudyUpdateType } from '@/constants'
 import type { EditStudyInputs } from '@/utils/schemas'
 
@@ -65,6 +65,7 @@ const body: EditStudyInputs = {
   studyId: mockStudyId,
   cpmsId: mockCPMSStudy.StudyId.toString(),
   status: mockCPMSStudy.StudyStatus,
+  originalStatus: Status.OpenToRecruitment,
   plannedOpeningDate: {
     day: '28',
     month: '02',

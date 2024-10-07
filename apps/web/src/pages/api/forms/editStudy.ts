@@ -78,12 +78,17 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
     })
 
     if (isDirectUpdate) {
-      // Only send additional note if new status is Suspended
-      const additionalNote = (
-        [Status.SuspendedFromOpenToRecruitment, Status.SuspendedFromOpenWithRecruitment, Status.Suspended] as string[]
-      ).includes(studyData.status)
-        ? UPDATE_FROM_SE_TEXT
-        : ''
+      // Only send additional note if new status is Suspended and not the original status
+      // i.e. a status has been changed to Suspended
+      const suspendedStatuses: string[] = [
+        Status.SuspendedFromOpenToRecruitment,
+        Status.SuspendedFromOpenWithRecruitment,
+        Status.Suspended,
+      ]
+      const additionalNote =
+        suspendedStatuses.includes(studyData.status) && !suspendedStatuses.includes(studyData.originalStatus ?? '')
+          ? UPDATE_FROM_SE_TEXT
+          : ''
 
       const { study, error: updateStudyError } = await updateStudyInCPMS(Number(studyData.cpmsId), {
         ...cpmsStudyInput,
