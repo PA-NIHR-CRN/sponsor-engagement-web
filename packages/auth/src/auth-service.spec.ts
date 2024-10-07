@@ -191,9 +191,9 @@ describe('AuthService', () => {
       Wso2GroupOperation.Add
     )
 
-    expect(res.success).toBeTruthy()
+    expect(res?.success).toBeTruthy()
 
-    if (res.success) {
+    if (res?.success) {
       expect(res.data).toEqual(mockUpdateGroupResponse)
     }
   })
@@ -205,9 +205,9 @@ describe('AuthService', () => {
       Wso2GroupOperation.Remove
     )
 
-    expect(res.success).toBeTruthy()
+    expect(res?.success).toBeTruthy()
 
-    if (res.success) {
+    if (res?.success) {
       expect(res.data).toEqual(mockUpdateGroupResponse)
     }
   })
