@@ -12,7 +12,7 @@ import type {
   updateGroupResponseSchema,
 } from './schemas'
 import { requests } from './handlers'
-import { Wso2GroupOperation } from './constants/constants'
+import { ODP_ROLE, Wso2GroupOperation } from './constants/constants'
 
 // Define types inferred from Zod schemas
 type GetUserResponse = z.infer<typeof getUserResponseSchema>
@@ -322,5 +322,37 @@ describe('AuthService', () => {
         Wso2GroupOperation.Add
       )
     ).rejects.toThrow('No user found with email: mockuser@nihr.ac.uk')
+  })
+
+  test('assigning WSO2 user role is skipped when user already has ODP_ROLE', async () => {
+    // Mock user with ODP_ROLE in groups
+    const mockGetUserResponseWithOdpRole: GetUserResponse = {
+      ...mockGetUserResponse,
+      Resources: mockGetUserResponse.Resources
+        ? [
+            {
+              ...mockGetUserResponse.Resources[0],
+              groups: [{ display: ODP_ROLE }],
+            },
+          ]
+        : [],
+    }
+
+    jest.spyOn(requests, 'getUser').mockResolvedValueOnce({
+      success: true,
+      data: mockGetUserResponseWithOdpRole,
+    })
+
+    const patchSpy = jest.spyOn(requests, 'patchUserGroup')
+
+    const res = await authService.updateWSO2UserGroup(
+      'mockuser@nihr.ac.uk',
+      'd6500611-5cf5-4230-8695-5a63329e2648',
+      Wso2GroupOperation.Add
+    )
+
+    expect(patchSpy).not.toHaveBeenCalled()
+
+    expect(res).toBeUndefined()
   })
 })

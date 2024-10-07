@@ -1,5 +1,6 @@
 import type { Wso2GroupOperation } from './constants/constants'
 import { requests } from './handlers'
+import { GroupUpdateData } from './types/requests'
 
 /**
  * The `AuthService` class provides a set of methods for interacting with the IDG OAuth2 API.
@@ -50,6 +51,10 @@ export class AuthService {
     emails: string[]
   }) {
     return requests.createUser(user)
+  }
+
+  async patchUserGroup(groupId: string, groupUpdateData: GroupUpdateData) {
+    return requests.patchUserGroup(`/scim2/Groups/${groupId}`, groupUpdateData)
   }
 
   /**

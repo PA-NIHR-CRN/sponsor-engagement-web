@@ -11,6 +11,7 @@ import {
   updateGroupResponseSchema,
 } from './schemas'
 import { Wso2GroupOperation, ODP_ROLE } from './constants/constants'
+import { GroupUpdateData } from './types/requests'
 
 const { IDG_API_URL, IDG_API_USERNAME, IDG_API_PASSWORD } = process.env
 
@@ -115,6 +116,9 @@ export const requests = {
     const response = await api.post<Infer<typeof createUserResponseSchema>>(`/scim2/Users`, data)
     return createUserResponseSchema.safeParse(response.data)
   },
+  patchUserGroup: async (groupId: string, groupUpdateData: GroupUpdateData) => {
+    return api.patch(`/scim2/Groups/${groupId}`, groupUpdateData)
+  },
   updateWSO2UserGroup: async (email: string, groupId: string, operation: Wso2GroupOperation) => {
     const userResponse = await requests.getUser(email)
 
@@ -128,23 +132,22 @@ export const requests = {
       throw new Error(`No user found with email: ${email}`)
     }
 
-    let groupUpdateData
+    let groupUpdateData: GroupUpdateData | null = null
 
     if (operation === Wso2GroupOperation.Add) {
       const hasSponsorEngagementTool =
         Array.isArray(user.groups) &&
-        user.groups.some((group) => {
-          return typeof group === 'object' && group.display === ODP_ROLE
-        })
+        user.groups.some((group) => typeof group === 'object' && group.display === ODP_ROLE)
 
       if (hasSponsorEngagementTool) {
         return
       }
+
       groupUpdateData = {
         schemas: ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
         Operations: [
           {
-            op: 'add',
+            op: Wso2GroupOperation.Add,
             value: {
               members: [
                 {
@@ -163,15 +166,18 @@ export const requests = {
         schemas: ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
         Operations: [
           {
-            op: 'remove',
+            op: Wso2GroupOperation.Remove,
             path: `members[value eq ${user.id}]`, // The user's SCIM ID
           },
         ],
       }
     }
 
-    const response = await api.patch(`/scim2/Groups/${groupId}`, groupUpdateData)
-
-    return updateGroupResponseSchema.safeParse(response.data)
+    if (groupUpdateData) {
+      const response = await requests.patchUserGroup(groupId, groupUpdateData)
+      return updateGroupResponseSchema.safeParse(response.data)
+    } else {
+      throw new Error('Group update data is undefined')
+    }
   },
 }
