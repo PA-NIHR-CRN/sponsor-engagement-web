@@ -132,8 +132,6 @@ export const requests = {
       throw new Error(`No user found with email: ${email}`)
     }
 
-    let groupUpdateData: GroupUpdateData | null = null
-
     if (operation === Wso2GroupOperation.Add) {
       const hasSponsorEngagementTool =
         Array.isArray(user.groups) &&
@@ -142,42 +140,44 @@ export const requests = {
       if (hasSponsorEngagementTool) {
         return
       }
+    }
 
-      groupUpdateData = {
-        schemas: ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
-        Operations: [
-          {
-            op: Wso2GroupOperation.Add,
-            value: {
-              members: [
-                {
-                  display: user.userName, // The user's username
-                  value: user.id, // The user's SCIM ID
-                },
-              ],
+    let groupUpdateData: GroupUpdateData
+
+    switch (operation) {
+      case Wso2GroupOperation.Add:
+        groupUpdateData = {
+          schemas: ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+          Operations: [
+            {
+              op: Wso2GroupOperation.Add,
+              value: {
+                members: [
+                  {
+                    display: user.userName, // The user's username
+                    value: user.id, // The user's SCIM ID
+                  },
+                ],
+              },
             },
-          },
-        ],
-      }
+          ],
+        }
+        break
+
+      case Wso2GroupOperation.Remove:
+        groupUpdateData = {
+          schemas: ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+          Operations: [
+            {
+              op: Wso2GroupOperation.Remove,
+              path: `members[value eq ${user.id}]`, // The user's SCIM ID
+            },
+          ],
+        }
+        break
     }
 
-    if (operation === Wso2GroupOperation.Remove) {
-      groupUpdateData = {
-        schemas: ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
-        Operations: [
-          {
-            op: Wso2GroupOperation.Remove,
-            path: `members[value eq ${user.id}]`, // The user's SCIM ID
-          },
-        ],
-      }
-    }
-
-    if (groupUpdateData) {
-      const response = await requests.patchUserGroup(groupId, groupUpdateData)
-      return updateGroupResponseSchema.safeParse(response.data)
-    } else {
-      throw new Error('Group update data is undefined')
-    }
+    const response = await requests.patchUserGroup(groupId, groupUpdateData)
+    return updateGroupResponseSchema.safeParse(response.data)
   },
 }
