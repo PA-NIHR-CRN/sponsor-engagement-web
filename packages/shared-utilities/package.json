@@ -1,7 +1,7 @@
 {
   "name": "shared-utilities",
   "version": "0.0.0",
-  "main": "./dist/index.js",
+  "private": true,
   "source": "./src/index.ts",
   "types": "./dist/index.d.ts",
   "scripts": {
