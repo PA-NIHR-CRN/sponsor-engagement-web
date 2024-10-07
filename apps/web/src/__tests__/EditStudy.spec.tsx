@@ -740,6 +740,22 @@ describe('EditStudy', () => {
           expect(within(alert).getByText(`${label} is a mandatory field`)).toBeInTheDocument()
         })
       })
+
+      it('when a date field is not visible, it does not validate against it', async () => {
+        // In Setup status does not have estimated reopening date visible
+        // Estimated reopening has validation that must be today or in the past
+        await renderPage(undefined, undefined, {
+          ...mockStudyWithRelations,
+          estimatedReopeningDate: new Date('2001-01-02'),
+          studyStatus: Status.InSetup,
+        })
+
+        await userEvent.click(screen.getByRole('button', { name: 'Update' }))
+
+        // Assert error does not include estimated reopening date error
+        const alert = screen.getByRole('alert')
+        expect(within(alert).queryByText('Estimated reopening date must be today or in the past')).toBeNull()
+      })
     })
   })
 })
