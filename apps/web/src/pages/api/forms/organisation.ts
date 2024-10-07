@@ -15,7 +15,7 @@ import type { OrganisationAddInputs } from '@/utils/schemas'
 import { organisationAddSchema } from '@/utils/schemas'
 import { withApiHandler } from '@/utils/withApiHandler'
 
-import { assignGroupToUser, isUserEligibleForOdpRole } from './registration'
+import { addUserGroup, isUserEligibleForOdpRole } from './registration'
 
 export interface ExtendedNextApiRequest extends NextApiRequest {
   body: OrganisationAddInputs
@@ -155,7 +155,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
 
     const isEligibleForOdpRole = await isUserEligibleForOdpRole(user.id)
     if (isEligibleForOdpRole) {
-      await assignGroupToUser(user.email, ODP_ROLE_GROUP_ID)
+      await addUserGroup(user.email, ODP_ROLE_GROUP_ID)
     }
 
     await emailService.sendEmail({

@@ -18,7 +18,7 @@ export interface ExtendedNextApiRequest extends NextApiRequest {
   body: OrganisationRemoveContactInputs
 }
 
-export async function updateWSO2UserGroup(email: string, group: string) {
+export async function removeUserGroup(email: string, group: string) {
   try {
     await authService.updateWSO2UserGroup(email, group, Wso2GroupOperation.Remove)
   } catch (groupError) {
@@ -63,8 +63,9 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, asyn
     logger.info('Removed contact with email %s from organisation %s', user.email, organisation.name)
 
     const isEligibleForOdpRole = await isUserEligibleForOdpRole(user.id)
+
     if (!isEligibleForOdpRole) {
-      await updateWSO2UserGroup(user.email, ODP_ROLE_GROUP_ID)
+      await removeUserGroup(user.email, ODP_ROLE_GROUP_ID)
     }
 
     if (user.email) {

@@ -11,7 +11,7 @@ import { isContactManagerAndSponsorContact, isSponsorContact } from '@/utils/aut
 import type { RegistrationInputs } from '@/utils/schemas'
 import { registrationSchema } from '@/utils/schemas'
 
-export async function assignGroupToUser(email: string, group: string) {
+export async function addUserGroup(email: string, group: string) {
   try {
     await authService.updateWSO2UserGroup(email, group, Wso2GroupOperation.Add)
   } catch (groupError) {
@@ -79,9 +79,9 @@ export default async (req: ExtendedNextApiRequest, res: NextApiResponse) => {
         `Updated local user ${id} with identityGatewayId ${identityGatewayId}, now redirecting to confirmation page`
       )
 
-      const isEligibleForOdpRole = await isUserEligibleForOdpRole(id)
+      const isEligibleForOdpRole = await isUserEligibleForOdpRole(user.id)
       if (isEligibleForOdpRole) {
-        await assignGroupToUser(user.email, ODP_ROLE_GROUP_ID)
+        await addUserGroup(user.email, ODP_ROLE_GROUP_ID)
       }
 
       return res.redirect(302, REGISTRATION_CONFIRMATION_PAGE)
