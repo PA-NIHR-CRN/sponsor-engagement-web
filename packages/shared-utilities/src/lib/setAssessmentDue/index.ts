@@ -1,8 +1,14 @@
 import { logger } from '@nihr-ui/logger'
 import dayjs from 'dayjs'
 import { prismaClient } from '../../utils/prisma'
+import assert from 'assert'
 
-export const setAssessmentDue = async (studyIds: number[], lapsePeriodMonths: number): Promise<void> => {
+export const setAssessmentDue = async (studyIds: number[]): Promise<void> => {
+  const { ASSESSMENT_LAPSE_MONTHS } = process.env
+
+  assert(ASSESSMENT_LAPSE_MONTHS)
+  const lapsePeriodMonths = Number(ASSESSMENT_LAPSE_MONTHS)
+
   const threeMonthsAgo = dayjs().subtract(lapsePeriodMonths, 'month').toDate()
   const assessmentDueResult = await prismaClient.study.updateMany({
     data: {

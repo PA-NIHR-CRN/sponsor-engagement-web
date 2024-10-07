@@ -5,8 +5,8 @@ import type {
   SysRefOrganisationRole as SysRefOrganisationRoleEntity,
 } from 'database'
 import { logger } from '@nihr-ui/logger'
-import dayjs from 'dayjs'
 import { config as dotEnvConfig } from 'dotenv'
+import { setAssessmentDue } from 'shared-utilities'
 import { prismaClient } from './lib/prisma'
 import type { Study, StudySponsor, StudyWithRelationships } from './types'
 import { StudyRecordStatus, StudyStatus } from './types'
@@ -307,31 +307,6 @@ const createStudyRelationships = async () => {
   }
 }
 
-const setAssessmentDue = async (lapsePeriodMonths: number) => {
-  const threeMonthsAgo = dayjs().subtract(lapsePeriodMonths, 'month').toDate()
-  const assessmentDueResult = await prismaClient.study.updateMany({
-    data: {
-      isDueAssessment: true,
-    },
-    where: {
-      id: { in: studyEntities.map((study) => study.id) },
-      evaluationCategories: {
-        some: { isDeleted: false },
-      },
-      assessments: {
-        every: {
-          createdAt: {
-            lte: threeMonthsAgo,
-          },
-        },
-      },
-      OR: [{ actualOpeningDate: null }, { actualOpeningDate: { lte: threeMonthsAgo } }],
-    },
-  })
-
-  logger.info(`Flagged ${assessmentDueResult.count} studies as being due assessment`)
-}
-
 const fetchStudies = async function* (url: string, username: string, password: string) {
   logger.info(`ingest ${process.env.APP_ENV}: fetching studies from ${url}`)
 
@@ -425,14 +400,11 @@ const deleteOrganisationRoles = async () => {
 }
 
 export const ingest = async () => {
-  const { API_URL, API_USERNAME, API_PASSWORD, ASSESSMENT_LAPSE_MONTHS } = process.env
+  const { API_URL, API_USERNAME, API_PASSWORD } = process.env
 
   assert(API_URL)
   assert(API_USERNAME)
   assert(API_PASSWORD)
-  assert(ASSESSMENT_LAPSE_MONTHS)
-
-  const lapsePeriodMonths = Number(ASSESSMENT_LAPSE_MONTHS)
 
   allStudyIds = []
   allOrganisationIds = []
@@ -458,7 +430,9 @@ export const ingest = async () => {
     await createOrganisations()
     await createOrganisationRelationships()
     await createStudyRelationships()
-    await setAssessmentDue(lapsePeriodMonths)
+
+    const ids = studyEntities.map((study) => study.id)
+    await setAssessmentDue(ids)
   }
 
   await deleteStudies()
