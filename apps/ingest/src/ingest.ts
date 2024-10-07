@@ -6,7 +6,7 @@ import type {
 } from 'database'
 import { logger } from '@nihr-ui/logger'
 import { config as dotEnvConfig } from 'dotenv'
-import { setAssessmentDue } from 'shared-utilities'
+import { setStudyAssessmentDue } from 'shared-utilities'
 import { prismaClient } from './lib/prisma'
 import type { Study, StudySponsor, StudyWithRelationships } from './types'
 import { StudyRecordStatus, StudyStatus } from './types'
@@ -432,7 +432,7 @@ export const ingest = async () => {
     await createStudyRelationships()
 
     const ids = studyEntities.map((study) => study.id)
-    await setAssessmentDue(ids)
+    await setStudyAssessmentDue(ids)
   }
 
   await deleteStudies()

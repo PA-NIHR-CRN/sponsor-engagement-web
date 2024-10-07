@@ -1,15 +1,15 @@
-import { setAssessmentDue } from './index'
+import { setStudyAssessmentDue } from './index'
 import { prismaMock } from '../../mocks/prisma'
 
 jest.mock('@nihr-ui/logger')
 
 const mockStudyIds = [12, 32, 23]
 
-describe('setAssessmentDue()', () => {
+describe('setStudyAssessmentDue()', () => {
   it('should update the study `isDueAssessment` flag', async () => {
     prismaMock.study.updateMany.mockResolvedValueOnce({ count: 1 })
 
-    await setAssessmentDue(mockStudyIds)
+    await setStudyAssessmentDue(mockStudyIds)
 
     expect(prismaMock.study.updateMany).toHaveBeenCalledTimes(1)
 

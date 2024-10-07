@@ -1,1 +1,1 @@
-export * from './src/lib/setAssessmentDue'
+export * from './src/lib/setStudyAssessmentDue'

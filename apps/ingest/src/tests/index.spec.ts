@@ -1,7 +1,7 @@
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
 import { logger } from '@nihr-ui/logger'
-import { setAssessmentDue } from 'shared-utilities'
+import { setStudyAssessmentDue } from 'shared-utilities'
 import { ingest } from '../ingest'
 import {
   organisationEntities,
@@ -32,7 +32,7 @@ interface EvalCategory {
 
 jest.mock('@nihr-ui/logger')
 jest.mock('shared-utilities')
-const mockSetAssessmentDue = setAssessmentDue as jest.MockedFunction<typeof setAssessmentDue>
+const mocksetStudyAssessmentDue = setStudyAssessmentDue as jest.MockedFunction<typeof setStudyAssessmentDue>
 
 const API_URL = 'https://dev.cpmsapi.nihr.ac.uk/api/v1/study-summaries'
 
@@ -67,7 +67,7 @@ beforeEach(() => {
   prismaMock.studyOrganisation.createMany.mockResolvedValueOnce({ count: 1 })
   prismaMock.studyFunder.createMany.mockResolvedValueOnce({ count: 1 })
   prismaMock.studyEvaluationCategory.updateMany.mockResolvedValueOnce({ count: 1 })
-  mockSetAssessmentDue.mockResolvedValueOnce()
+  mocksetStudyAssessmentDue.mockResolvedValueOnce()
 
   prismaMock.study.findMany.mockResolvedValueOnce(studyEntities)
   prismaMock.organisation.findMany.mockResolvedValueOnce(organisationEntities)
@@ -248,8 +248,8 @@ describe('ingest', () => {
   it('should update the study `isDueAssessment` flag', async () => {
     await ingest()
 
-    expect(mockSetAssessmentDue).toHaveBeenCalledTimes(1)
-    expect(mockSetAssessmentDue).toHaveBeenCalledWith(studyEntities.map(({ id }) => id))
+    expect(mocksetStudyAssessmentDue).toHaveBeenCalledTimes(1)
+    expect(mocksetStudyAssessmentDue).toHaveBeenCalledWith(studyEntities.map(({ id }) => id))
   })
 
   it('should handle errors when fetching studies', async () => {

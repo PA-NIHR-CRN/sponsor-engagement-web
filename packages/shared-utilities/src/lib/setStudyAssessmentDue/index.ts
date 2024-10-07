@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { prismaClient } from '../../utils/prisma'
 import assert from 'assert'
 
-export const setAssessmentDue = async (studyIds: number[]): Promise<void> => {
+export const setStudyAssessmentDue = async (studyIds: number[]): Promise<void> => {
   const { ASSESSMENT_LAPSE_MONTHS } = process.env
 
   assert(ASSESSMENT_LAPSE_MONTHS)

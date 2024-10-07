@@ -1,4 +1,4 @@
-import { setAssessmentDue } from 'shared-utilities'
+import { setStudyAssessmentDue } from 'shared-utilities'
 
 import type { Study, StudyEvaluationCategory } from '@/@types/studies'
 import { Status as CPMSStatus } from '@/@types/studies'
@@ -446,7 +446,7 @@ export const updateEvaluationCategories = async (
 
 export const setStudyAssessmentDueFlag = async (studyIds: number[]) => {
   try {
-    await setAssessmentDue(studyIds)
+    await setStudyAssessmentDue(studyIds)
   } catch (error) {
     const errorMessage = getErrorMessage(error)
 
