@@ -1,6 +1,6 @@
 # sponsor-engagement-web (shared-utilities)
 
-This is the location for shared utilities across sponsor engagement web
+This is the location for shared utilities across sponsor engagement web.
 
 ---
 

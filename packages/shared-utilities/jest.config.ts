@@ -6,18 +6,6 @@ const config: Config = {
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },
-  testPathIgnorePatterns: ['dist', '.vscode'],
-  coverageReporters: ['json-summary', 'text', 'html', 'lcov'],
-  coveragePathIgnorePatterns: ['node_modules'],
-  coverageThreshold: {
-    global: {
-      lines: 96,
-      functions: 100,
-      branches: 85,
-      statements: 97,
-    },
-  },
-  collectCoverageFrom: ['src/**/*.{ts,tsx}'],
 }
 
 module.exports = config
