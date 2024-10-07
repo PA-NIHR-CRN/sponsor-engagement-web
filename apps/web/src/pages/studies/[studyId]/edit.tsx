@@ -31,6 +31,7 @@ import {
   mapCPMSStudyEvalToSEEval,
   mapCPMSStudyToSEStudy,
   mapFormStatusToCPMSStatus,
+  setStudyAssessmentDueFlag,
   updateEvaluationCategories,
   updateStudy,
 } from '@/lib/studies'
@@ -403,6 +404,8 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
   const mappedStudyEvalsInCPMS = studyEvalsInCPMS.map((studyEval) => mapCPMSStudyEvalToSEEval(studyEval))
 
   const { data: updatedStudy } = await updateStudy(Number(cpmsId), mapCPMSStudyToSEStudy(studyInCPMS))
+
+  await setStudyAssessmentDueFlag([study.id])
 
   if (!updatedStudy) {
     return {

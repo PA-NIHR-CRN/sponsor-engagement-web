@@ -1,3 +1,5 @@
+import { setAssessmentDue } from 'shared-utilities'
+
 import type { Study, StudyEvaluationCategory } from '@/@types/studies'
 import { Status as CPMSStatus } from '@/@types/studies'
 import { FormStudyStatus } from '@/constants/editStudyForm'
@@ -432,6 +434,19 @@ export const updateEvaluationCategories = async (
     }
 
     return { data: evaluationCategories, error: null }
+  } catch (error) {
+    const errorMessage = getErrorMessage(error)
+
+    return {
+      data: null,
+      error: errorMessage,
+    }
+  }
+}
+
+export const setStudyAssessmentDueFlag = async (studyIds: number[]) => {
+  try {
+    await setAssessmentDue(studyIds)
   } catch (error) {
     const errorMessage = getErrorMessage(error)
 
