@@ -126,6 +126,13 @@ const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, valu
   const requiredPastOrCurrent = dateValidationRules[fieldName].restrictions.includes('requiredPastOrCurrent')
   const requiredFuture = dateValidationRules[fieldName].restrictions.includes('requiredFuture')
 
+  const [visibleDateFields] = getVisibleFormFields(previousStatus ?? '', currentStatus)
+
+  // Do not validate if field is hidden
+  if (!visibleDateFields.includes(fieldName)) {
+    return
+  }
+
   if (!value) {
     // Mandatory fields based on status
     if (getMandatoryDateFields(previousStatus, currentStatus).includes(fieldName)) {
@@ -210,11 +217,13 @@ const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, valu
       const { fieldName: dateDependencyFieldName, requiredAfter } = dateDependency
 
       const dateDependencyValue = values[dateDependencyFieldName]
+      const isDateDepedencyFieldVisible = visibleDateFields.includes(dateDependencyFieldName)
       const specifiedDateLabel = fieldNameToLabelMapping[dateDependencyFieldName]
 
       if (
         requiredAfter &&
         dateDependencyValue &&
+        isDateDepedencyFieldVisible &&
         !dayjs(`${value.year}-${value.month.padStart(2, '0')}-${value.day.padStart(2, '0')}`).isAfter(
           dayjs(
             `${dateDependencyValue.year}-${dateDependencyValue.month.padStart(
