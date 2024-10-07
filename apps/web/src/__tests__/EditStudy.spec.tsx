@@ -3,6 +3,7 @@ import axios from 'axios'
 import type { GetServerSidePropsContext } from 'next'
 import { getServerSession } from 'next-auth/next'
 import mockRouter from 'next-router-mock'
+import { setStudyAssessmentDue } from 'shared-utilities'
 import { Mock } from 'ts-mockery'
 
 import { userWithSponsorContactRole } from '@/__mocks__/session'
@@ -16,8 +17,12 @@ import { prismaMock } from '../__mocks__/prisma'
 
 jest.mock('next-auth/next')
 jest.mock('axios')
+jest.mock('shared-utilities')
+
 const mockedGetAxios = jest.mocked(axios.get)
 const mockedPostAxios = jest.mocked(axios.post)
+
+const mockSetStudyAssessmentDue = setStudyAssessmentDue as jest.MockedFunction<typeof setStudyAssessmentDue>
 
 const mockStudyId = mockStudyWithRelations.id.toString()
 
@@ -31,6 +36,7 @@ const mockedEnvVars = {
   apiUrl: 'cpms-api',
   apiUsername: 'testuser',
   apiPassword: 'testpwd',
+  assessmentLapseMonths: '3',
 }
 
 const organisationsByRole = {
@@ -51,6 +57,8 @@ const renderPage = async (
   prismaMock.study.update.mockResolvedValueOnce(mockReturnedStudy)
   prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[0])
   prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[1])
+  mockSetStudyAssessmentDue.mockResolvedValueOnce()
+
   if (mockEditAxiosResponseUrl) {
     mockedPostAxios.mockResolvedValueOnce({ request: { responseURL: mockEditAxiosResponseUrl } })
   }
@@ -89,6 +97,7 @@ describe('EditStudy', () => {
     process.env.CPMS_API_URL = mockedEnvVars.apiUrl
     process.env.CPMS_API_USERNAME = mockedEnvVars.apiUsername
     process.env.CPMS_API_PASSWORD = mockedEnvVars.apiPassword
+    process.env.ASSESSMENT_LAPSE_MONTHS = mockedEnvVars.assessmentLapseMonths
   })
 
   afterAll(() => {
@@ -147,6 +156,7 @@ describe('EditStudy', () => {
       prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
       mockedGetAxios.mockResolvedValueOnce({ data: mockCPMSResponse })
       prismaMock.study.update.mockResolvedValueOnce(mockStudyWithRelations)
+      mockSetStudyAssessmentDue.mockResolvedValueOnce()
       prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[0])
       prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[1])
 
@@ -164,6 +174,7 @@ describe('EditStudy', () => {
 
       expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
       expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
+      expect(mockSetStudyAssessmentDue).toHaveBeenCalledTimes(1)
       expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(2)
       expect(mockedGetAxios).toHaveBeenCalledTimes(1)
     })
@@ -236,6 +247,35 @@ describe('EditStudy', () => {
       expect(mockedGetAxios).toHaveBeenCalledTimes(1)
       expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
       expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(2)
+    })
+
+    test('when request to set study assessment flag fails, should not throw a 500 and correctly return study', async () => {
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
+      getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+      prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
+      mockedGetAxios.mockResolvedValueOnce({ data: mockCPMSResponse })
+      prismaMock.study.update.mockResolvedValueOnce(mockStudyWithRelations)
+      mockSetStudyAssessmentDue.mockRejectedValueOnce({})
+      prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[0])
+      prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[1])
+
+      const result = await getServerSideProps(context)
+      expect(result).toEqual({
+        props: {
+          user: userWithSponsorContactRole.user,
+          study: {
+            ...mockStudyWithRelations,
+            evaluationCategories: mappedCPMSStudyEvals,
+            organisationsByRole,
+          },
+        },
+      })
+
+      expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
+      expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
+      expect(mockSetStudyAssessmentDue).toHaveBeenCalledTimes(1)
+      expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(2)
+      expect(mockedGetAxios).toHaveBeenCalledTimes(1)
     })
   })
 

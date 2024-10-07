@@ -14,11 +14,12 @@ The task is configured to run daily via a cron schedule defined in the `sponsor-
 
 ## Environment Variables
 
-| Variable       | Info               |
-| -------------- | ------------------ |
-| `API_URL`      | CPMS API URL.      |
-| `API_USERNAME` | CPMS API Username. |
-| `API_PASSWORD` | CPMS API Password. |
+| Variable                  | Info                                                                             |
+| ------------------------- | -------------------------------------------------------------------------------- |
+| `API_URL`                 | CPMS API URL.                                                                    |
+| `API_USERNAME`            | CPMS API Username.                                                               |
+| `API_PASSWORD`            | CPMS API Password.                                                               |
+| `ASSESSMENT_LAPSE_MONTHS` | Number of months after which a study will be considered as being due assessment. |
 
 ## Install locally
 

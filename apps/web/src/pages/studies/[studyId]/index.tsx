@@ -23,6 +23,7 @@ import {
   getStudyById,
   mapCPMSStudyEvalToSEEval,
   mapCPMSStudyToSEStudy,
+  setStudyAssessmentDueFlag,
   updateEvaluationCategories,
   updateStudy,
 } from '@/lib/studies'
@@ -256,6 +257,8 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
       },
     }
   }
+
+  await setStudyAssessmentDueFlag([studyId])
 
   const currentStudyEvalsInSE = updatedStudy.evaluationCategories
 
