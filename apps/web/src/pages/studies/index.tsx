@@ -1,3 +1,4 @@
+import { ODP_ROLE } from '@nihr-ui/auth/src/constants/constants'
 import { AlertIcon, Container, Details, NotificationBanner } from '@nihr-ui/frontend'
 import { logger } from '@nihr-ui/logger'
 import type { Entry } from 'contentful'
@@ -21,7 +22,7 @@ import {
 } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
 import CmsNotificationBanner from '@/components/organisms/CmsNotificationBanner/CmsNotificationBanner'
-import { ODP_ROLE, Roles, STUDIES_PER_PAGE } from '@/constants'
+import { Roles, STUDIES_PER_PAGE } from '@/constants'
 import { SUPPORT_PAGE } from '@/constants/routes'
 import { useFormListeners } from '@/hooks/useFormListeners'
 import { getNotificationBanner } from '@/lib/contentful/contentfulService'
