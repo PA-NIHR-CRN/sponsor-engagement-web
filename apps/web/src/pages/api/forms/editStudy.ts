@@ -94,8 +94,11 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
         error.errors.map(({ path: [fieldId], message }) => [`${fieldId}Error`, message])
       )
 
-      // TODO: why doesn't this need to go nested?
       Object.keys(studySchemaShape).forEach((field) => {
+        if (['plannedOpeningDate', 'actualOpeningDate', 'plannedClosureDate', 'actualClosureDate'].includes(field)) {
+          const dateFields = ['day', 'month', 'year']
+          dateFields.forEach((dateField) => (fieldErrors[`${field}-${dateField}Error`] = req.body[field] as string))
+        }
         if (req.body[field]) {
           fieldErrors[field] = req.body[field] as string
         }
