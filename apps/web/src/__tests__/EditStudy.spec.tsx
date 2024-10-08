@@ -365,12 +365,6 @@ describe('EditStudy', () => {
         'You have 500 characters remaining If needed, provide further context or justification for changes made above.'
       )
 
-      // Warning text
-      const warningText = screen.getByText(
-        'It may a few seconds for the CPMS record to update. Please stay on this page until redirected.'
-      )
-      expect(warningText).toBeInTheDocument()
-
       // Update CTA
       expect(screen.getByRole('button', { name: 'Update' })).toHaveAttribute('type', 'submit')
 
@@ -785,6 +779,22 @@ describe('EditStudy', () => {
         fieldsToRemove.forEach((label) => {
           expect(within(alert).getByText(`${label} is a mandatory field`)).toBeInTheDocument()
         })
+      })
+
+      it('when a date field is not visible, it does not validate against it', async () => {
+        // In Setup status does not have estimated reopening date visible
+        // Estimated reopening has validation that must be today or in the past
+        await renderPage(undefined, undefined, {
+          ...mockStudyWithRelations,
+          estimatedReopeningDate: new Date('2001-01-02'),
+          studyStatus: Status.InSetup,
+        })
+
+        await userEvent.click(screen.getByRole('button', { name: 'Update' }))
+
+        // Assert error does not include estimated reopening date error
+        const alert = screen.getByRole('alert')
+        expect(within(alert).queryByText('Estimated reopening date must be today or in the past')).toBeNull()
       })
     })
   })

@@ -12,6 +12,7 @@ import { DateInput } from '@/components/atoms/Form/DateInput/DateInput'
 import type { DateInputValue } from '@/components/atoms/Form/DateInput/types'
 import { Textarea } from '@/components/atoms/Form/Textarea/Textarea'
 import { TextInput } from '@/components/atoms/Form/TextInput/TextInput'
+import Spinner from '@/components/atoms/Spinner/Spinner'
 import Warning from '@/components/atoms/Warning/Warning'
 import { RequestSupport } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
@@ -92,6 +93,8 @@ export default function EditStudy({ study }: EditStudyProps) {
       getVisibleFormFields(mapCPMSStatusToFormStatus(study.studyStatus), mapCPMSStatusToFormStatus(statusInputValue)),
     [statusInputValue, study.studyStatus]
   )
+
+  const showLoadingState = formState.isSubmitting || formState.isSubmitSuccessful
 
   return (
     <Container>
@@ -326,13 +329,26 @@ export default function EditStudy({ study }: EditStudyProps) {
                 maxLength={FURTHER_INFO_MAX_CHARACTERS}
               />
 
-              <Warning>
-                It may a few seconds for the CPMS record to update. Please stay on this page until redirected.
-              </Warning>
+              {showLoadingState ? (
+                <Warning>
+                  It may a few seconds for the CPMS record to update. Please stay on this page until redirected.
+                </Warning>
+              ) : null}
 
               <div className="govuk-button-group">
-                <button className={clsx('govuk-button', { 'pointer-events-none': formState.isLoading })} type="submit">
-                  Update
+                <button
+                  className={clsx('govuk-button', {
+                    'pointer-events-none': showLoadingState,
+                  })}
+                  type="submit"
+                >
+                  {showLoadingState ? (
+                    <>
+                      Updating... <Spinner />
+                    </>
+                  ) : (
+                    'Update'
+                  )}
                 </button>
                 <Link className="govuk-button govuk-button--secondary" href={`/studies/${study.id}`}>
                   Cancel
