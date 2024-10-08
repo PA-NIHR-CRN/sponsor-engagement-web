@@ -1,5 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test'
 import { RowDataPacket } from 'mysql2'
+import { seDatabaseReq, waitForSeDbRequest } from '../utils/DbRequests'
 
 //Declare Page Objects
 export default class StudyUpdatePage {
@@ -474,8 +475,37 @@ export default class StudyUpdatePage {
   }
 
   async assertUkTargetValidation() {
+    await expect(this.updateValidationBanner).toBeVisible()
+    await expect(this.updateValidationBanner).toContainText('There is a problem')
     await expect(this.ukRecruitmentTargetInlineError).toBeVisible()
     await expect(this.ukRecruitmentTargetInlineError).toHaveText(`Error: Enter a valid UK target`)
     await expect(this.updateValidationList).toContainText(`Enter a valid UK target`)
+  }
+
+  async assertUnexpectedErrorOccurred() {
+    await expect(this.updateValidationBanner).toBeVisible()
+    await expect(this.updateValidationBanner).toContainText('There is a problem')
+    await expect(this.updateValidationList).toContainText(
+      `An unexpected error occurred whilst processing the form, please try again later.`
+    )
+  }
+
+  async submitProposedChange(timeStamp: string) {
+    await this.statusRadioClosed.click()
+    await this.fillStudyDates('plannedOpening', '12', '06', '2025')
+    await this.fillStudyDates('actualOpening', '12', '06', '2024')
+    await this.fillStudyDates('plannedClosure', '12', '06', '2027')
+    await this.fillStudyDates('actualClosure', '12', '06', '2024')
+    await this.ukRecruitmentTarget.fill('101')
+    await this.furtherInfo.fill(`se e2e auto test - ${timeStamp}`)
+    await this.buttonUpdate.click()
+  }
+
+  async assertUpdateSuccess(id: number, timeStamp: string) {
+    const dbStudyUpdate = await waitForSeDbRequest(
+      `SELECT * FROM sponsorengagement.StudyUpdates WHERE studyId = ${id} ORDER by createdAt LIMIT 1;`
+    )
+
+    await this.assertSeDbUpdateProposed(dbStudyUpdate[0], timeStamp)
   }
 }
