@@ -5,8 +5,8 @@ import type {
   SysRefOrganisationRole as SysRefOrganisationRoleEntity,
 } from 'database'
 import { logger } from '@nihr-ui/logger'
-import dayjs from 'dayjs'
 import { config as dotEnvConfig } from 'dotenv'
+import dayjs from 'dayjs'
 import { prismaClient } from './lib/prisma'
 import type { Study, StudySponsor, StudyWithRelationships } from './types'
 import { StudyRecordStatus, StudyStatus } from './types'
@@ -458,6 +458,7 @@ export const ingest = async () => {
     await createOrganisations()
     await createOrganisationRelationships()
     await createStudyRelationships()
+
     await setAssessmentDue(lapsePeriodMonths)
   }
 

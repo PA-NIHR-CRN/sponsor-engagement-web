@@ -1,8 +1,9 @@
 import type { Prisma } from 'database'
 import type { NextApiRequest } from 'next'
 
-import { StudyUpdateRoute } from '@/@types/studies'
+import { Status, StudyUpdateRoute } from '@/@types/studies'
 import { Roles, StudyUpdateType } from '@/constants'
+import { UPDATE_FROM_SE_TEXT } from '@/constants/forms'
 import { mapEditStudyInputToCPMSStudy, updateStudyInCPMS, validateStudyUpdate } from '@/lib/cpms/studies'
 import { prismaClient } from '@/lib/prisma'
 import { mapCPMSStatusToFormStatus } from '@/lib/studies'
@@ -77,7 +78,22 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
     })
 
     if (isDirectUpdate) {
-      const { study, error: updateStudyError } = await updateStudyInCPMS(Number(studyData.cpmsId), cpmsStudyInput)
+      // Only send additional note if new status is Suspended and not the original status
+      // i.e. a status has been changed to Suspended
+      const suspendedStatuses: string[] = [
+        Status.SuspendedFromOpenToRecruitment,
+        Status.SuspendedFromOpenWithRecruitment,
+        Status.Suspended,
+      ]
+      const additionalNote =
+        suspendedStatuses.includes(studyData.status) && !suspendedStatuses.includes(studyData.originalStatus ?? '')
+          ? UPDATE_FROM_SE_TEXT
+          : ''
+
+      const { study, error: updateStudyError } = await updateStudyInCPMS(Number(studyData.cpmsId), {
+        ...cpmsStudyInput,
+        notes: additionalNote,
+      })
 
       if (!study) {
         throw new Error(updateStudyError)
