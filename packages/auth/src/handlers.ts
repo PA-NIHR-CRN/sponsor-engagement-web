@@ -13,6 +13,7 @@ import {
 import { Wso2GroupOperation, ODP_ROLE } from './constants/constants'
 import { GroupUpdateData } from './types/requests'
 import { logger } from '@nihr-ui/logger'
+import { PatchUserGroupErrorResponse } from './types/responses'
 
 const { IDG_API_URL, IDG_API_USERNAME, IDG_API_PASSWORD } = process.env
 
@@ -184,6 +185,12 @@ export const requests = {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         logger.error(`Failed to patchUserGroup Message: ${error.message}`)
+
+        const responseData = error.response?.data as PatchUserGroupErrorResponse | undefined
+
+        if (responseData?.detail) {
+          logger.error(`Failed to patchUserGroup Detail: ${responseData.detail}`)
+        }
       } else {
         logger.error(error)
       }
