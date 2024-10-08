@@ -35,6 +35,10 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
     commonItemsPage,
     studyDetailsPage,
   }) => {
+    await seDatabaseReq(`
+      UPDATE Study SET actualOpeningDate = null, isDueAssessment = 1 WHERE id = ${nullOpeningDateStudyId};
+    `) // restores any changes to test data
+
     await test.step(`Given I have navigated to the Study List Page`, async () => {
       await studiesPage.goto()
       await studiesPage.assertOnStudiesPage()

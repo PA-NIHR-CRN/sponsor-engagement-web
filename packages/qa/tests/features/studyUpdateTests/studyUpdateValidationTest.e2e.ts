@@ -183,7 +183,7 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
     })
   })
 
-  test('Validation error message for  Null date fields @se_183_ac3', async ({ studyUpdatePage }) => {
+  test('Validation error message for null date fields @se_183_ac3', async ({ studyUpdatePage }) => {
     await seDatabaseReq(`
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
     `)
@@ -338,6 +338,12 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
     })
 
     await test.step(`When I attempt to update my changes`, async () => {
+      await studyUpdatePage.statusRadioClosed.click()
+      await studyUpdatePage.fillStudyDates('plannedOpening', '12', '06', '2025')
+      await studyUpdatePage.fillStudyDates('actualOpening', '12', '06', '2024')
+      await studyUpdatePage.fillStudyDates('plannedClosure', '12', '06', '2027')
+      await studyUpdatePage.fillStudyDates('actualClosure', '12', '06', '2024')
+      await studyUpdatePage.ukRecruitmentTarget.fill('101')
       await studyUpdatePage.buttonUpdate.click()
     })
 
