@@ -3,6 +3,7 @@ import { setupServer } from 'msw/node'
 import { faker } from '@faker-js/faker'
 import { ZodError } from 'zod'
 import type { z, SafeParseReturnType } from 'zod'
+import { logger } from '@nihr-ui/logger'
 import { AuthService } from './auth-service'
 import type {
   checkSessionResponseSchema,
@@ -354,5 +355,44 @@ describe('AuthService', () => {
     expect(patchSpy).not.toHaveBeenCalled()
 
     expect(res).toBeUndefined()
+  })
+
+  test('patchUserGroup handles Axios error with detail', async () => {
+    const mockError = {
+      isAxiosError: true,
+      message: 'Request failed',
+      response: {
+        data: {
+          detail: 'User does not exist',
+        },
+      },
+    }
+
+    jest.spyOn(requests, 'patchUserGroup').mockRejectedValueOnce(mockError)
+
+    const groupId = 'd6500611-5cf5-4230-8695-5a63329e2648'
+
+    const loggerSpy = jest.spyOn(logger, 'error')
+
+    const res = await authService.updateWSO2UserGroup('mockuser@nihr.ac.uk', groupId, Wso2GroupOperation.Add)
+
+    expect(res).toBeUndefined()
+    expect(loggerSpy).toHaveBeenCalledWith('Failed to patchUserGroup Message: Request failed')
+    expect(loggerSpy).toHaveBeenCalledWith('Failed to patchUserGroup Detail: User does not exist')
+  })
+
+  test('patchUserGroup handles non-Axios error', async () => {
+    const mockError = new Error('Unexpected error')
+
+    jest.spyOn(requests, 'patchUserGroup').mockRejectedValueOnce(mockError)
+
+    const groupId = 'd6500611-5cf5-4230-8695-5a63329e2648'
+
+    const loggerSpy = jest.spyOn(logger, 'error')
+
+    const res = await authService.updateWSO2UserGroup('mockuser@nihr.ac.uk', groupId, Wso2GroupOperation.Add)
+
+    expect(res).toBeUndefined()
+    expect(loggerSpy).toHaveBeenCalledWith(mockError)
   })
 })
