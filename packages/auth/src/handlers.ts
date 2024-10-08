@@ -177,7 +177,19 @@ export const requests = {
         break
     }
 
-    const response = await requests.patchUserGroup(groupId, groupUpdateData)
-    return updateGroupResponseSchema.safeParse(response.data)
+    try {
+      const response = await requests.patchUserGroup(groupId, groupUpdateData)
+      return updateGroupResponseSchema.safeParse(response.data)
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        const { status, statusText, data } = error.response
+
+        throw new Error(
+          `Failed to updateWSO2UserGroup. Status: ${status}, StatusText: ${statusText} Body: ${JSON.stringify(data)}`
+        )
+      } else {
+        throw new Error(`An unexpected error occurred in updateWSO2UserGroup. ${error}`)
+      }
+    }
   },
 }

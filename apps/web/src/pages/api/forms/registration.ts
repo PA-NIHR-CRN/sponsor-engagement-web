@@ -11,7 +11,7 @@ import { isContactManagerAndSponsorContact, isSponsorContact } from '@/utils/aut
 import type { RegistrationInputs } from '@/utils/schemas'
 import { registrationSchema } from '@/utils/schemas'
 
-export async function addUserGroup(email: string, group: string) {
+export async function addUserToGroup(email: string, group: string) {
   try {
     await authService.updateWSO2UserGroup(email, group, Wso2GroupOperation.Add)
   } catch (groupError) {
@@ -81,7 +81,7 @@ export default async (req: ExtendedNextApiRequest, res: NextApiResponse) => {
 
       const isEligibleForOdpRole = await isUserEligibleForOdpRole(user.id)
       if (isEligibleForOdpRole) {
-        await addUserGroup(user.email, ODP_ROLE_GROUP_ID)
+        await addUserToGroup(user.email, ODP_ROLE_GROUP_ID)
       }
 
       return res.redirect(302, REGISTRATION_CONFIRMATION_PAGE)
