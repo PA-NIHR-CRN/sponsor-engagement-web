@@ -1,4 +1,4 @@
-import { Wso2GroupOperation } from '../constants/constants'
+import type { Wso2GroupOperation } from '../constants/constants'
 
 export interface AddOperation {
   op: Wso2GroupOperation.Add

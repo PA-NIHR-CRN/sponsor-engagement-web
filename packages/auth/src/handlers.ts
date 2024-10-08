@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto'
 import axios from 'axios'
 import type { ZodType, z } from 'zod'
 import rateLimit from 'axios-rate-limit'
+import { logger } from '@nihr-ui/logger'
 import type { createUserRequestSchema, getUserRequestSchema } from './schemas'
 import {
   checkSessionResponseSchema,
@@ -11,9 +12,8 @@ import {
   updateGroupResponseSchema,
 } from './schemas'
 import { Wso2GroupOperation, ODP_ROLE } from './constants/constants'
-import { GroupUpdateData } from './types/requests'
-import { logger } from '@nihr-ui/logger'
-import { PatchUserGroupErrorResponse } from './types/responses'
+import type { GroupUpdateData } from './types/requests'
+import type { PatchUserGroupErrorResponse } from './types/responses'
 
 const { IDG_API_URL, IDG_API_USERNAME, IDG_API_PASSWORD } = process.env
 
