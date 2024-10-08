@@ -279,6 +279,7 @@ jobs:
           SPONSOR_CONTACT_MANAGER_PASS: ${{ secrets.SPONSOR_CONTACT_MANAGER_PASS }}
           CONTACT_MANAGER_PASS: ${{ secrets.CONTACT_MANAGER_PASS }}
           SE_NO_LOCAL_ACCOUNT_PASS: ${{ secrets.SE_NO_LOCAL_ACCOUNT_PASS }}
+          CPMS_NPM_PASS: ${{ secrets.CPMS_NPM_PASS }}
 
       - name: Remove Github Actions IP from CPMS API security group (Test)
         if: always()        

@@ -10,34 +10,38 @@ let studyListSortedByDescDb: RowDataPacket[]
 
 test.beforeAll('Setup Test Users', async () => {
   await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
-  const studyListSortByDue =
-    await seDatabaseReq(`SELECT DISTINCT Study.id, Study.cpmsId, Study.shortTitle, Study.isDueAssessment,
-  (SELECT createdAt FROM Assessment WHERE Assessment.studyId = Study.id 
-  AND Assessment.isDeleted = 0 ORDER BY createdAt desc LIMIT 1) createdAt FROM Study
-  INNER JOIN StudyOrganisation ON StudyOrganisation.studyId = Study.id
-  WHERE Study.isDeleted = 0
-  AND StudyOrganisation.organisationId = ${startingOrgId}
-  ORDER BY isDueAssessment desc, Study.id asc;`)
+
+  const studyListSortByDue = await seDatabaseReq(`
+    SELECT DISTINCT Study.id, Study.cpmsId, Study.shortTitle, Study.isDueAssessment,
+    (SELECT createdAt FROM Assessment WHERE Assessment.studyId = Study.id 
+    AND Assessment.isDeleted = 0 ORDER BY createdAt desc LIMIT 1) createdAt FROM Study
+    INNER JOIN StudyOrganisation ON StudyOrganisation.studyId = Study.id
+    WHERE Study.isDeleted = 0
+    AND StudyOrganisation.organisationId = ${startingOrgId}
+    ORDER BY isDueAssessment desc, Study.id asc;
+  `)
   studyListSortedByDueDb = studyListSortByDue
 
-  const studyListSortByAsc =
-    await seDatabaseReq(`SELECT DISTINCT Study.id, Study.cpmsId, Study.shortTitle, Study.isDueAssessment,
-  (SELECT createdAt FROM Assessment WHERE Assessment.studyId = Study.id 
-  AND Assessment.isDeleted = 0 ORDER BY createdAt desc LIMIT 1) createdAt FROM Study
-  INNER JOIN StudyOrganisation ON StudyOrganisation.studyId = Study.id
-  WHERE Study.isDeleted = 0
-  AND StudyOrganisation.organisationId = ${startingOrgId}
-  ORDER BY createdAt asc, Study.id asc;`)
+  const studyListSortByAsc = await seDatabaseReq(`
+    SELECT DISTINCT Study.id, Study.cpmsId, Study.shortTitle, Study.isDueAssessment,
+    (SELECT createdAt FROM Assessment WHERE Assessment.studyId = Study.id 
+    AND Assessment.isDeleted = 0 ORDER BY createdAt desc LIMIT 1) createdAt FROM Study
+    INNER JOIN StudyOrganisation ON StudyOrganisation.studyId = Study.id
+    WHERE Study.isDeleted = 0
+    AND StudyOrganisation.organisationId = ${startingOrgId}
+    ORDER BY createdAt asc, Study.id asc;
+  `)
   studyListSortedByAscDb = studyListSortByAsc
 
-  const studyListSortByDesc =
-    await seDatabaseReq(`SELECT DISTINCT Study.id, Study.cpmsId, Study.shortTitle, Study.isDueAssessment,
-  (SELECT createdAt FROM Assessment WHERE Assessment.studyId = Study.id 
-  AND Assessment.isDeleted = 0 ORDER BY createdAt desc LIMIT 1) createdAt FROM Study
-  INNER JOIN StudyOrganisation ON StudyOrganisation.studyId = Study.id
-  WHERE Study.isDeleted = 0
-  AND StudyOrganisation.organisationId = ${startingOrgId}
-  ORDER BY createdAt desc, Study.id asc;`)
+  const studyListSortByDesc = await seDatabaseReq(`
+    SELECT DISTINCT Study.id, Study.cpmsId, Study.shortTitle, Study.isDueAssessment,
+    (SELECT createdAt FROM Assessment WHERE Assessment.studyId = Study.id 
+    AND Assessment.isDeleted = 0 ORDER BY createdAt desc LIMIT 1) createdAt FROM Study
+    INNER JOIN StudyOrganisation ON StudyOrganisation.studyId = Study.id
+    WHERE Study.isDeleted = 0
+    AND StudyOrganisation.organisationId = ${startingOrgId}
+    ORDER BY createdAt desc, Study.id asc;
+  `)
   studyListSortedByDescDb = studyListSortByDesc
 })
 

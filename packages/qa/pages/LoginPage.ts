@@ -51,6 +51,10 @@ export default class LoginPage {
         username = 'senolocalaccount@test.id.nihr.ac.uk'
         password = `${process.env.SE_NO_LOCAL_ACCOUNT_PASS}`
         break
+      case 'national portfolio manager':
+        username = 'sim_auto_npm@test.id.nihr.ac.uk'
+        password = `${process.env.CPMS_NPM_PASS}`
+        break
       default:
         throw new Error(`${user} is not a valid option`)
     }

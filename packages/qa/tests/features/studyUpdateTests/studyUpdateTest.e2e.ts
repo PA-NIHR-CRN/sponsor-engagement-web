@@ -4,7 +4,7 @@ import { seDatabaseReq } from '../../../utils/DbRequests'
 import { getStudyEngagementInfo } from '../../../utils/ApiRequests'
 
 const testUserId = 6
-const startingOrgId = 9
+const startingOrgId = 2
 
 let startingStudyId = 0
 let studyCoreDetails: RowDataPacket[]

@@ -4,7 +4,7 @@ import { seDatabaseReq, waitForSeDbRequest } from '../../../utils/DbRequests'
 import { getStudyEngagementInfo } from '../../../utils/ApiRequests'
 
 const testUserId = 6
-const startingOrgId = 9
+const startingOrgId = 2
 const timeStamp = new Date().toISOString()
 
 let startingStudyId = 0

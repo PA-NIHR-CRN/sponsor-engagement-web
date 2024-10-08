@@ -13,6 +13,7 @@ import OrganisationDetailsPage from '../pages/OrganisationDetailsPage'
 import RemoveContactPage from '../pages/RemoveContactPage'
 import CreatePasswordPage from '../pages/CreatePasswordPage'
 import SignedOutPage from '../pages/SignedOutPage'
+import CpmsStudiesPage from '../pages/cpmsStudiesPage'
 
 type CustomFixtures = {
   commonItemsPage: CommonItemsPage
@@ -27,6 +28,7 @@ type CustomFixtures = {
   removeContactPage: RemoveContactPage
   createPasswordPage: CreatePasswordPage
   signedOutPage: SignedOutPage
+  cpmsStudiesPage: CpmsStudiesPage
   makeAxeBuilder: () => AxeBuilder
 }
 
@@ -77,6 +79,10 @@ export const test = base.extend<CustomFixtures>({
 
   signedOutPage: async ({ page }, use) => {
     await use(new SignedOutPage(page))
+  },
+
+  cpmsStudiesPage: async ({ page }, use) => {
+    await use(new CpmsStudiesPage(page))
   },
 
   makeAxeBuilder: async ({ page }, use) => {

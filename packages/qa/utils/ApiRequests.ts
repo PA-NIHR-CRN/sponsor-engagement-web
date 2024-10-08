@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { Page } from '@playwright/test'
 
 const baseUrl = process.env.SE_TEST_API_URL
 const username = process.env.SE_TEST_API_USERNAME
@@ -28,4 +29,12 @@ export async function getStudyEngagementInfo(studyId: string) {
     console.error('Error fetching SE engagement info:', error)
     throw error
   }
+}
+
+export async function listenAndDestroyRequest(page: Page, urlPart: string): Promise<void> {
+  // intercept the given request and aborts it for system errors
+  await page.route(`**/${urlPart}`, (route) => {
+    console.log(`Aborting request: ${route.request().url()}`)
+    route.abort()
+  })
 }
