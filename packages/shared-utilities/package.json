@@ -1,0 +1,24 @@
+{
+  "name": "shared-utilities",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json",
+    "test": "jest --watch"
+  },
+  "dependencies": {
+    "@nihr-ui/logger": "*",
+    "@prisma/client": "latest"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.13",
+    "@types/node": "^20.6.5",
+    "jest": "^29.7.0",
+    "jest-mock-extended": "^3.0.5",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  }
+}
