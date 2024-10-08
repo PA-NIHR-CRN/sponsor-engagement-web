@@ -4,8 +4,7 @@
     "lib": ["ES2015"],
     "module": "CommonJS",
     "outDir": "./dist",
-    "rootDir": ".",
-    // "allowJs": true
+    "rootDir": "."
   },
   "exclude": ["dist", "build", "node_modules", "**/*.spec.ts"],
   "include": ["**/*.ts"]
