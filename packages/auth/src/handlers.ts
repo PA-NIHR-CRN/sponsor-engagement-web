@@ -12,6 +12,7 @@ import {
 } from './schemas'
 import { Wso2GroupOperation, ODP_ROLE } from './constants/constants'
 import { GroupUpdateData } from './types/requests'
+import { logger } from '@nihr-ui/logger'
 
 const { IDG_API_URL, IDG_API_USERNAME, IDG_API_PASSWORD } = process.env
 
@@ -181,14 +182,10 @@ export const requests = {
       const response = await requests.patchUserGroup(groupId, groupUpdateData)
       return updateGroupResponseSchema.safeParse(response.data)
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        const { status, statusText, data } = error.response
-
-        throw new Error(
-          `Failed to updateWSO2UserGroup. Status: ${status}, StatusText: ${statusText} Body: ${JSON.stringify(data)}`
-        )
+      if (axios.isAxiosError(error)) {
+        logger.error(`Failed to patchUserGroup Message: ${error.message}`)
       } else {
-        throw new Error(`An unexpected error occurred in updateWSO2UserGroup. ${error}`)
+        logger.error(error)
       }
     }
   },
