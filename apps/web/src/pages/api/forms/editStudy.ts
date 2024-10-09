@@ -30,6 +30,8 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
       cpmsStudyInput
     )
 
+    // LSN for current state of study
+
     if (!validationResult) {
       throw new Error(validateStudyError)
     }
@@ -95,6 +97,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
         notes: additionalNote,
       })
 
+      // LSN returned here and save to study updates
       if (!study) {
         throw new Error(updateStudyError)
       }
@@ -108,3 +111,29 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
     return res.redirect(302, `/studies/${studyId}/edit?${searchParams.toString()}`)
   }
 })
+
+// Task 1: EditHistory - proposed GET CPMS response to include:
+// [{
+//   LSN: '3534'
+//   modifiedDate: '2024-10-07 12:44:25.423' <- if direct change, no link to SE so don't know what date.
+//   changes: [{
+//     columnChanged: 'plannedOpeningDate' // Have this as CPMS field - mapping in UI needed for label
+//     beforeValue: '2024-10-07 12:44:25.423'
+//     afterValue: '2024-12-10 12:44:25.423'
+//     id: '12212', // randomnly generated
+//   }]
+// }]
+
+// Task 2: Saving LSN to study updates table
+// Open q: Do study update after CPMS call
+
+// Task 3: Save diff changes to existing or create new table
+// 1. Edit study - fetch study from SE, compare to create diff object
+// 2. Store - in existing or new table
+
+// Task 4: Displaying
+// 1. GET CPMS - for each edit history, look up in SE. If LSN (direct), use email and date. If no LSN (direct), use RDN and date from GET res
+// 2. GET SE - for proposed change, already has email and date. Either fetch from existing or new table using studyUpdateId
+// Map the above into a common type to be used by EditHistory component
+// Direct + In direct changes will have 'Changed...'
+// Proposed changes will have 'Proposed change...

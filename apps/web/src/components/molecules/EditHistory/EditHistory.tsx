@@ -1,53 +1,114 @@
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@nihr-ui/frontend'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Details } from '@nihr-ui/frontend'
 
-export function EditHistory() {
+import { StudyUpdateType } from '@/constants'
+
+import { getCPMSStudyFieldsLabelText } from './utils'
+
+export interface EditHistoryChange {
+  columnChanged: string
+  beforeValue: string
+  afterValue: string
+  id: string
+}
+
+export interface EditHistoryItem {
+  LSN: string
+  modifiedDate: string
+  userEmail?: string
+  studyUpdateType: StudyUpdateType
+  changes: EditHistoryChange[]
+}
+
+interface EditHistoryProps {
+  editHistories: EditHistoryItem[]
+}
+
+export function EditHistoryChangeText({ change }: { change: EditHistoryChange }) {
+  const { afterValue, beforeValue, columnChanged } = change
+
+  const columnLabel = getCPMSStudyFieldsLabelText(columnChanged)
+
+  if (beforeValue && afterValue) {
+    return (
+      <li>
+        {columnLabel} from {beforeValue} to {afterValue}
+      </li>
+    )
+  } else if (beforeValue && !afterValue) {
+    return (
+      <li>
+        {columnLabel} {beforeValue} removed
+      </li>
+    )
+  }
+
   return (
-    <Accordion className="w-full" type="multiple">
-      <AccordionItem className="border-none" value="edit-history-1">
-        <AccordionTrigger>View edit history</AccordionTrigger>
-        <AccordionContent>
-          <Accordion type="multiple">
-            <AccordionItem className="border-t" value="1">
-              <AccordionTrigger
-                sideContent={
-                  <span>
-                    <strong>Proposed change</strong> submitted by sponsorengagement@nihr.ac.uk
-                  </span>
-                }
-              >
-                Updated on 08 March 2024
-              </AccordionTrigger>
-              <AccordionContent indent>
-                <ul aria-label="Change details" className="govuk-list govuk-list--bullet govuk-body-s">
-                  <li>
-                    Study status changed from &apos;Open, With Recruitment&apos; to &apos;Suspended (Open, With
-                    Recruitment)&apos;
-                  </li>
-                  <li>Actual opening to recruitment date 06/03/2024 added</li>
-                  <li>Planned opening to recruitment date 06/03/2024 removed </li>
-                </ul>
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="2">
-              <AccordionTrigger
-                sideContent={
-                  <span>
-                    <strong>Change</strong> made by sponsorengagement@nihr.ac.uk
-                  </span>
-                }
-              >
-                Updated on 07 March 2024
-              </AccordionTrigger>
-              <AccordionContent indent>
-                <ul aria-label="Change details" className="govuk-list govuk-list--bullet govuk-body-s">
-                  <li>UK recruitment target changed from 135 to 160</li>
-                  <li>Planned closure to recruitment date changed from 01/03/2024 to 02/04/2024</li>
-                </ul>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
+    <li>
+      {columnLabel} {afterValue} added
+    </li>
+  )
+}
+
+function EditHistoryItem({
+  studyUpdateType,
+  modifiedDate,
+  userEmail,
+  changes,
+  value,
+}: EditHistoryItem & { value: number }) {
+  const [studyUpdateTypeText, studyUpdateTypeVerb] = [
+    studyUpdateType === StudyUpdateType.Direct ? 'Change' : 'Proposed change',
+    studyUpdateType === StudyUpdateType.Direct ? 'made by' : 'submitted by',
+  ]
+
+  const updatedByWhoText = userEmail || 'Updated by RDN'
+
+  const formattedModifiedDate = new Date(modifiedDate).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+
+  return (
+    <AccordionItem className={`${value === 1 ? 'border-t' : ''}`} value={value.toString()}>
+      <AccordionTrigger
+        sideContent={
+          <span>
+            <strong>{studyUpdateTypeText}</strong> {studyUpdateTypeVerb} {updatedByWhoText}
+          </span>
+        }
+      >
+        Updated on {formattedModifiedDate}
+      </AccordionTrigger>
+      <AccordionContent indent>
+        <ul aria-label="Change details" className="govuk-list govuk-list--bullet govuk-body-s">
+          {changes.map((change) => (
+            <EditHistoryChangeText change={change} key={change.id} />
+          ))}
+        </ul>
+      </AccordionContent>
+    </AccordionItem>
+  )
+}
+
+export function EditHistory({ editHistories }: EditHistoryProps) {
+  if (editHistories.length === 0) return
+
+  return (
+    <Details heading="View edit history">
+      <Accordion type="multiple">
+        {editHistories.map((editHistory, index) => (
+          <EditHistoryItem
+            LSN={editHistory.LSN}
+            changes={editHistory.changes}
+            key={editHistory.LSN}
+            modifiedDate={editHistory.modifiedDate}
+            studyUpdateType={editHistory.studyUpdateType}
+            userEmail={editHistory.userEmail}
+            value={index + 1}
+          />
+        ))}
+      </Accordion>
+    </Details>
   )
 }

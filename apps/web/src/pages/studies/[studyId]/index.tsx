@@ -13,6 +13,7 @@ import {
   RequestSupport,
   StudyDetails,
 } from '@/components/molecules'
+import { mockEditHistories } from '@/components/molecules/EditHistory/EditHistory.spec'
 import { RootLayout } from '@/components/organisms'
 import { EDIT_STUDY_ROLE, Roles } from '@/constants'
 import { FORM_SUCCESS_MESSAGES } from '@/constants/forms'
@@ -57,7 +58,7 @@ const renderBackLink = () => (
 
 export type StudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function Study({ user, study, assessments }: StudyProps) {
+export default function Study({ user, study, assessments, editHistories }: StudyProps) {
   const router = useRouter()
   const successType = router.query.success as string
   const { organisationsByRole } = study
@@ -122,7 +123,7 @@ export default function Study({ user, study, assessments }: StudyProps) {
           <span className="govuk-body-s text-darkGrey">
             Based on the latest data uploaded to CPMS by the study team.
           </span>
-          {showEditHistoryFeature ? <EditHistory /> : null}
+          {showEditHistoryFeature ? <EditHistory editHistories={editHistories ?? []} /> : null}
           <Table className="govuk-!-margin-top-3">
             <Table.Caption className="govuk-visually-hidden">Summary of study’s progress (UK)</Table.Caption>
             <Table.Body>
@@ -281,6 +282,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
       user: session.user,
       assessments: getAssessmentHistoryFromStudy(study),
       study: { ...updatedStudy, evaluationCategories: updatedStudyEvals ?? study.evaluationCategories },
+      editHistories: mockEditHistories,
     },
   }
 })
