@@ -1,4 +1,4 @@
-import assert from 'node:assert'
+import assert from 'assert'
 import { logger } from '@nihr-ui/logger'
 import dayjs from 'dayjs'
 import { prismaClient } from '../../utils/prisma'
