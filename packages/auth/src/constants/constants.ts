@@ -5,3 +5,5 @@ export enum Wso2GroupOperation {
   Add = 'add',
   Remove = 'remove',
 }
+
+export const ODP_ROLE = 'ODP_SponsorEngagementTool'
