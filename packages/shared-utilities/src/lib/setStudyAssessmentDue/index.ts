@@ -1,9 +1,9 @@
+import assert from 'node:assert'
 import { logger } from '@nihr-ui/logger'
 import dayjs from 'dayjs'
 import { prismaClient } from '../../utils/prisma'
-import assert from 'assert'
 
-export const setStudyAssessmentDue = async (studyIds: number[]): Promise<void> => {
+export const setStudyAssessmentDue = async (studyIds: number[]): Promise<{ count: number }> => {
   const { ASSESSMENT_LAPSE_MONTHS } = process.env
 
   assert(ASSESSMENT_LAPSE_MONTHS)
@@ -31,4 +31,6 @@ export const setStudyAssessmentDue = async (studyIds: number[]): Promise<void> =
   })
 
   logger.info(`Flagged ${assessmentDueResult.count} studies as being due assessment`)
+
+  return { count: assessmentDueResult.count }
 }

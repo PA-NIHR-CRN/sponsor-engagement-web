@@ -447,7 +447,9 @@ export const updateEvaluationCategories = async (
 
 export const setStudyAssessmentDueFlag = async (studyIds: number[]) => {
   try {
-    await setStudyAssessmentDue(studyIds)
+    const assessmentDueResult = await setStudyAssessmentDue(studyIds)
+
+    return { data: assessmentDueResult.count }
   } catch (error) {
     const errorMessage = getErrorMessage(error)
 

@@ -88,14 +88,15 @@ const renderPage = async (
   mockUrl = `/study/${mockStudyId}`,
   mockGetCPMSStudyResponse = mockCPMSStudy,
   mockUpdateStudyResponse = mockStudy,
-  mockUpdatedStudyEvals = mappedCPMSStudyEvals
+  mockUpdatedStudyEvals = mappedCPMSStudyEvals,
+  isAssessmentDue = false
 ) => {
   jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRoleAndEditStudyRole)
 
   prismaMock.$transaction.mockResolvedValueOnce([mockGetStudyResponse])
   mockedGetAxios.mockResolvedValueOnce({ data: { StatusCode: 200, Result: mockGetCPMSStudyResponse } })
   prismaMock.study.update.mockResolvedValueOnce(mockUpdateStudyResponse)
-  mockSetStudyAssessmentDue.mockResolvedValueOnce()
+  mockSetStudyAssessmentDue.mockResolvedValueOnce({ count: isAssessmentDue ? 1 : 0 })
   mockUpdatedStudyEvals.forEach((studyEval) =>
     prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(studyEval)
   )
@@ -183,7 +184,7 @@ describe('Study', () => {
       prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
       mockedGetAxios.mockResolvedValueOnce({ data: { StatusCode: 200, Result: mockCPMSStudy } })
       prismaMock.study.update.mockResolvedValueOnce(mockStudyWithRelations)
-      mockSetStudyAssessmentDue.mockResolvedValueOnce()
+      mockSetStudyAssessmentDue.mockResolvedValueOnce({ count: 0 })
       prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[0])
       prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[1])
 
@@ -261,7 +262,7 @@ describe('Study', () => {
       prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
       mockedGetAxios.mockResolvedValueOnce({ data: { StatusCode: 200, Result: mockCPMSStudy } })
       prismaMock.study.update.mockResolvedValueOnce(mockStudyWithRelations)
-      mockSetStudyAssessmentDue.mockResolvedValueOnce()
+      mockSetStudyAssessmentDue.mockResolvedValueOnce({ count: 0 })
       prismaMock.studyEvaluationCategory.upsert.mockRejectedValueOnce(new Error('Oh no, an error!'))
 
       const result = await getServerSideProps(context)
@@ -309,6 +310,36 @@ describe('Study', () => {
       expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
       expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
       expect(mockSetStudyAssessmentDue).toHaveBeenCalledTimes(1)
+      expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(2)
+      expect(mockedGetAxios).toHaveBeenCalledTimes(1)
+    })
+
+    test('when study is due for assessment, should return study with the correct flag', async () => {
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
+      getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+      prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
+      mockedGetAxios.mockResolvedValueOnce({ data: { StatusCode: 200, Result: mockCPMSStudy } })
+      prismaMock.study.update.mockResolvedValueOnce(mockStudyWithRelations)
+      mockSetStudyAssessmentDue.mockResolvedValueOnce({ count: 1 })
+      prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[0])
+      prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[1])
+
+      const result = await getServerSideProps(context)
+      expect(result).toEqual({
+        props: {
+          user: userWithSponsorContactRole.user,
+          assessments: [mockMappedAssessment],
+          study: {
+            ...mockStudyWithRelations,
+            evaluationCategories: mappedCPMSStudyEvals,
+            organisationsByRole,
+            isDueAssessment: true,
+          },
+        },
+      })
+
+      expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
+      expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
       expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(2)
       expect(mockedGetAxios).toHaveBeenCalledTimes(1)
     })
@@ -426,7 +457,7 @@ describe('Study', () => {
     })
 
     test('Due assessment', async () => {
-      await renderPage(undefined, undefined, undefined, { ...mockStudy, isDueAssessment: true })
+      await renderPage(undefined, undefined, undefined, mockStudy, undefined, true)
 
       expect(screen.getByText('Due')).toBeInTheDocument()
       expect(screen.getByText('This study needs a new sponsor assessment.')).toBeInTheDocument()
