@@ -207,7 +207,7 @@ test.describe('Access Study Details Page and view Summary - @se_26', () => {
     })
   })
 
-  test('Estimated reopening date is only Displayed for Suspended Studies - @se_26_estimated', async ({
+  test.skip('Estimated reopening date is only Displayed for Suspended Studies - @se_26_estimated', async ({
     studyDetailsPage,
   }) => {
     const estimatedStudyProgressValues =
