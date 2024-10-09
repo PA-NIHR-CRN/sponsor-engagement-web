@@ -331,7 +331,7 @@ export default function EditStudy({ study }: EditStudyProps) {
 
               {showLoadingState ? (
                 <Warning>
-                  It may a few seconds for the CPMS record to update. Please stay on this page until redirected.
+                  It may take a few seconds for the record to update. Please stay on this page until redirected.
                 </Warning>
               ) : null}
 
