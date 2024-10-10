@@ -113,6 +113,13 @@ export const isUserEligibleForOdpRole = async (userId: number): Promise<boolean>
   const userWithRolesAndOrgs = await getUserWithRolesAndOrgs(userId)
 
   if (!userWithRolesAndOrgs) {
+    logger.warn(`User not found for userId: ${userId}`)
+    return false
+  }
+
+  const hasIdgAccount = userWithRolesAndOrgs.identityGatewayId !== null
+  if (!hasIdgAccount) {
+    logger.info(`IDG account not registered for userId: ${userId}`)
     return false
   }
 
