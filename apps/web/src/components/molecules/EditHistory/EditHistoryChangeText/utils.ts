@@ -1,19 +1,7 @@
-import type { Study } from '@/@types/studies'
 import { fieldNameToLabelMapping } from '@/constants/editStudyForm'
 
-type EditStudyFieldKeys = Pick<
-  Study,
-  | 'StudyStatus'
-  | 'PlannedOpeningDate'
-  | 'ActualOpeningDate'
-  | 'PlannedClosureToRecruitmentDate'
-  | 'ActualClosureToRecruitmentDate'
-  | 'EstimatedReopeningDate'
-  | 'UkRecruitmentTarget'
->
-
-export const getCPMSStudyFieldsLabelText = (key: string): string => {
-  const mappings: Record<keyof EditStudyFieldKeys, string> = {
+export const getColumnChangedLabelText = (key: string): string => {
+  const mappings: Record<string, string> = {
     UkRecruitmentTarget: fieldNameToLabelMapping.recruitmentTarget,
     StudyStatus: fieldNameToLabelMapping.status,
     PlannedOpeningDate: fieldNameToLabelMapping.plannedOpeningDate,

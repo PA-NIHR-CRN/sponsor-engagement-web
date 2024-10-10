@@ -1,103 +1,26 @@
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Details } from '@nihr-ui/frontend'
+import { Accordion, Details } from '@nihr-ui/frontend'
 
-import { StudyUpdateType } from '@/constants'
-
-import { getCPMSStudyFieldsLabelText } from './utils'
+import type { EditHistoryItemProps } from './EditHistoryItem/EditHistoryItem'
+import { EditHistoryItem } from './EditHistoryItem/EditHistoryItem'
 
 export interface EditHistoryChange {
   columnChanged: string
-  beforeValue: string
-  afterValue: string
+  beforeValue?: string | null
+  afterValue?: string | null
   id: string
 }
 
-export interface EditHistoryItem {
-  LSN: string
-  modifiedDate: string
-  userEmail?: string
-  studyUpdateType: StudyUpdateType
-  changes: EditHistoryChange[]
-}
-
 interface EditHistoryProps {
-  editHistories: EditHistoryItem[]
+  editHistoryItems: EditHistoryItemProps[]
+  lsnToAutoExpand?: string
+  errorMessage?: string
 }
 
-export function EditHistoryChangeText({ change }: { change: EditHistoryChange }) {
-  const { afterValue, beforeValue, columnChanged } = change
-
-  const columnLabel = getCPMSStudyFieldsLabelText(columnChanged)
-
-  if (beforeValue && afterValue) {
-    return (
-      <li>
-        {columnLabel} from {beforeValue} to {afterValue}
-      </li>
-    )
-  } else if (beforeValue && !afterValue) {
-    return (
-      <li>
-        {columnLabel} {beforeValue} removed
-      </li>
-    )
-  }
-
+export function EditHistory({ editHistoryItems, lsnToAutoExpand, errorMessage }: EditHistoryProps) {
   return (
-    <li>
-      {columnLabel} {afterValue} added
-    </li>
-  )
-}
-
-function EditHistoryItem({
-  studyUpdateType,
-  modifiedDate,
-  userEmail,
-  changes,
-  value,
-}: EditHistoryItem & { value: number }) {
-  const [studyUpdateTypeText, studyUpdateTypeVerb] = [
-    studyUpdateType === StudyUpdateType.Direct ? 'Change' : 'Proposed change',
-    studyUpdateType === StudyUpdateType.Direct ? 'made by' : 'submitted by',
-  ]
-
-  const updatedByWhoText = userEmail || 'Updated by RDN'
-
-  const formattedModifiedDate = new Date(modifiedDate).toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
-
-  return (
-    <AccordionItem className={`${value === 1 ? 'border-t' : ''}`} value={value.toString()}>
-      <AccordionTrigger
-        sideContent={
-          <span>
-            <strong>{studyUpdateTypeText}</strong> {studyUpdateTypeVerb} {updatedByWhoText}
-          </span>
-        }
-      >
-        Updated on {formattedModifiedDate}
-      </AccordionTrigger>
-      <AccordionContent indent>
-        <ul aria-label="Change details" className="govuk-list govuk-list--bullet govuk-body-s">
-          {changes.map((change) => (
-            <EditHistoryChangeText change={change} key={change.id} />
-          ))}
-        </ul>
-      </AccordionContent>
-    </AccordionItem>
-  )
-}
-
-export function EditHistory({ editHistories }: EditHistoryProps) {
-  if (editHistories.length === 0) return
-
-  return (
-    <Details heading="View edit history">
-      <Accordion type="multiple">
-        {editHistories.map((editHistory, index) => (
+    <Details heading="View edit history" open={Boolean(lsnToAutoExpand)}>
+      <Accordion defaultValue={[lsnToAutoExpand ?? '']} type="multiple">
+        {editHistoryItems.map((editHistory, index) => (
           <EditHistoryItem
             LSN={editHistory.LSN}
             changes={editHistory.changes}
@@ -108,6 +31,8 @@ export function EditHistory({ editHistories }: EditHistoryProps) {
             value={index + 1}
           />
         ))}
+        {editHistoryItems.length === 0 ? <span>There is no edit history.</span> : null}
+        {errorMessage ? <span>{errorMessage}</span> : null}
       </Accordion>
     </Details>
   )
