@@ -14,7 +14,7 @@ import {
   StudyDetails,
 } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
-import { EDIT_STUDY_ROLE, Roles } from '@/constants'
+import { EDIT_STUDY_ROLE, Roles, StudyUpdateType } from '@/constants'
 import { FORM_SUCCESS_MESSAGES } from '@/constants/forms'
 import { ASSESSMENT_PAGE, STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/routes'
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
@@ -29,6 +29,50 @@ import {
 } from '@/lib/studies'
 import { formatDate } from '@/utils/date'
 import { withServerSideProps } from '@/utils/withServerSideProps'
+
+const mockEditHistory = [
+  {
+    LSN: '1212121',
+    modifiedDate: '2024-11-10T00:00:00.000Z',
+    userEmail: 'amarpreet.dawgotra@nihr.ac.uk',
+    changes: [
+      {
+        id: '3434',
+        afterValue: '120',
+        beforeValue: '30',
+        columnChanged: 'UkRecruitmentTarget',
+      },
+      {
+        id: '34334',
+        afterValue: Status.OpenToRecruitment,
+        beforeValue: Status.SuspendedFromOpenToRecruitment,
+        columnChanged: 'StudyStatus',
+      },
+    ],
+    studyUpdateType: StudyUpdateType.Direct,
+  },
+  {
+    LSN: '9867677',
+    modifiedDate: '2024-10-10T00:00:00.000Z',
+    userEmail: 'amarpreet.dawgotra@nihr.ac.uk',
+
+    changes: [
+      {
+        id: '3454334',
+        afterValue: '120',
+        beforeValue: '30',
+        columnChanged: 'UkRecruitmentTarget',
+      },
+      {
+        id: '3432343',
+        afterValue: Status.OpenToRecruitment,
+        beforeValue: Status.SuspendedFromOpenToRecruitment,
+        columnChanged: 'Status',
+      },
+    ],
+    studyUpdateType: StudyUpdateType.Proposed,
+  },
+]
 
 const renderNotificationBanner = (success: string | undefined, showRequestSupportLink: boolean) =>
   success || !Number.isNaN(Number(success)) ? (
@@ -122,7 +166,7 @@ export default function Study({ user, study, assessments }: StudyProps) {
           <span className="govuk-body-s text-darkGrey">
             Based on the latest data uploaded to CPMS by the study team.
           </span>
-          {showEditHistoryFeature ? <EditHistory /> : null}
+          {showEditHistoryFeature ? <EditHistory editHistoryItems={mockEditHistory} /> : null}
           <Table className="govuk-!-margin-top-3">
             <Table.Caption className="govuk-visually-hidden">Summary of study’s progress (UK)</Table.Caption>
             <Table.Body>

@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
+  url      = "mysql://root:new_password@127.0.0.1:3306/SeDB"
 }
 
 model Study {
