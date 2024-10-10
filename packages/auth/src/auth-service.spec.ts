@@ -3,6 +3,7 @@ import { setupServer } from 'msw/node'
 import { faker } from '@faker-js/faker'
 import { ZodError } from 'zod'
 import type { z, SafeParseReturnType } from 'zod'
+import { logger } from '@nihr-ui/logger'
 import { AuthService } from './auth-service'
 import type {
   checkSessionResponseSchema,
@@ -12,7 +13,7 @@ import type {
   updateGroupResponseSchema,
 } from './schemas'
 import { requests } from './handlers'
-import { Wso2GroupOperation } from './constants/constants'
+import { ODP_ROLE, Wso2GroupOperation } from './constants/constants'
 
 // Define types inferred from Zod schemas
 type GetUserResponse = z.infer<typeof getUserResponseSchema>
@@ -191,9 +192,9 @@ describe('AuthService', () => {
       Wso2GroupOperation.Add
     )
 
-    expect(res.success).toBeTruthy()
+    expect(res?.success).toBeTruthy()
 
-    if (res.success) {
+    if (res?.success) {
       expect(res.data).toEqual(mockUpdateGroupResponse)
     }
   })
@@ -205,9 +206,9 @@ describe('AuthService', () => {
       Wso2GroupOperation.Remove
     )
 
-    expect(res.success).toBeTruthy()
+    expect(res?.success).toBeTruthy()
 
-    if (res.success) {
+    if (res?.success) {
       expect(res.data).toEqual(mockUpdateGroupResponse)
     }
   })
@@ -322,5 +323,76 @@ describe('AuthService', () => {
         Wso2GroupOperation.Add
       )
     ).rejects.toThrow('No user found with email: mockuser@nihr.ac.uk')
+  })
+
+  test('assigning WSO2 user role is skipped when user already has ODP_ROLE', async () => {
+    // Mock user with ODP_ROLE in groups
+    const mockGetUserResponseWithOdpRole: GetUserResponse = {
+      ...mockGetUserResponse,
+      Resources: mockGetUserResponse.Resources
+        ? [
+            {
+              ...mockGetUserResponse.Resources[0],
+              groups: [{ display: ODP_ROLE }],
+            },
+          ]
+        : [],
+    }
+
+    jest.spyOn(requests, 'getUser').mockResolvedValueOnce({
+      success: true,
+      data: mockGetUserResponseWithOdpRole,
+    })
+
+    const patchSpy = jest.spyOn(requests, 'patchUserGroup')
+
+    const res = await authService.updateWSO2UserGroup(
+      'mockuser@nihr.ac.uk',
+      'd6500611-5cf5-4230-8695-5a63329e2648',
+      Wso2GroupOperation.Add
+    )
+
+    expect(patchSpy).not.toHaveBeenCalled()
+
+    expect(res).toBeUndefined()
+  })
+
+  test('patchUserGroup handles Axios error with detail', async () => {
+    const mockError = {
+      isAxiosError: true,
+      message: 'Request failed',
+      response: {
+        data: {
+          detail: 'User does not exist',
+        },
+      },
+    }
+
+    jest.spyOn(requests, 'patchUserGroup').mockRejectedValueOnce(mockError)
+
+    const groupId = 'd6500611-5cf5-4230-8695-5a63329e2648'
+
+    const loggerSpy = jest.spyOn(logger, 'error')
+
+    const res = await authService.updateWSO2UserGroup('mockuser@nihr.ac.uk', groupId, Wso2GroupOperation.Add)
+
+    expect(res).toBeUndefined()
+    expect(loggerSpy).toHaveBeenCalledWith('Failed to patchUserGroup Message: Request failed')
+    expect(loggerSpy).toHaveBeenCalledWith('Failed to patchUserGroup Detail: User does not exist')
+  })
+
+  test('patchUserGroup handles non-Axios error', async () => {
+    const mockError = new Error('Unexpected error')
+
+    jest.spyOn(requests, 'patchUserGroup').mockRejectedValueOnce(mockError)
+
+    const groupId = 'd6500611-5cf5-4230-8695-5a63329e2648'
+
+    const loggerSpy = jest.spyOn(logger, 'error')
+
+    const res = await authService.updateWSO2UserGroup('mockuser@nihr.ac.uk', groupId, Wso2GroupOperation.Add)
+
+    expect(res).toBeUndefined()
+    expect(loggerSpy).toHaveBeenCalledWith(mockError)
   })
 })

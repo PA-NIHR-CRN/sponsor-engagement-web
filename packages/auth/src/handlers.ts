@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto'
 import axios from 'axios'
 import type { ZodType, z } from 'zod'
 import rateLimit from 'axios-rate-limit'
+import { logger } from '@nihr-ui/logger'
 import type { createUserRequestSchema, getUserRequestSchema } from './schemas'
 import {
   checkSessionResponseSchema,
@@ -10,7 +11,9 @@ import {
   refreshTokenResponseSchema,
   updateGroupResponseSchema,
 } from './schemas'
-import type { Wso2GroupOperation } from './constants/constants'
+import { Wso2GroupOperation, ODP_ROLE } from './constants/constants'
+import type { GroupUpdateData } from './types/requests'
+import type { PatchUserGroupErrorResponse } from './types/responses'
 
 const { IDG_API_URL, IDG_API_USERNAME, IDG_API_PASSWORD } = process.env
 
@@ -115,7 +118,10 @@ export const requests = {
     const response = await api.post<Infer<typeof createUserResponseSchema>>(`/scim2/Users`, data)
     return createUserResponseSchema.safeParse(response.data)
   },
-  updateWSO2UserGroup: async (email: string, group: string, operation: Wso2GroupOperation) => {
+  patchUserGroup: async (groupId: string, groupUpdateData: GroupUpdateData) => {
+    return api.patch(`/scim2/Groups/${groupId}`, groupUpdateData)
+  },
+  updateWSO2UserGroup: async (email: string, groupId: string, operation: Wso2GroupOperation) => {
     const userResponse = await requests.getUser(email)
 
     if (!userResponse.success) {
@@ -128,24 +134,66 @@ export const requests = {
       throw new Error(`No user found with email: ${email}`)
     }
 
-    const groupUpdateData = {
-      schemas: ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
-      Operations: [
-        {
-          op: operation,
-          path: 'members',
-          value: [
-            {
-              display: user.userName, // The user's username
-              value: user.id, // The user's SCIM ID
-            },
-          ],
-        },
-      ],
+    if (operation === Wso2GroupOperation.Add) {
+      const hasSponsorEngagementTool =
+        Array.isArray(user.groups) &&
+        user.groups.some((group) => typeof group === 'object' && group.display === ODP_ROLE)
+
+      if (hasSponsorEngagementTool) {
+        return
+      }
     }
 
-    const response = await api.patch(`/scim2/Groups/${group}`, groupUpdateData)
+    let groupUpdateData: GroupUpdateData
 
-    return updateGroupResponseSchema.safeParse(response.data)
+    switch (operation) {
+      case Wso2GroupOperation.Add:
+        groupUpdateData = {
+          schemas: ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+          Operations: [
+            {
+              op: Wso2GroupOperation.Add,
+              value: {
+                members: [
+                  {
+                    display: user.userName, // The user's username
+                    value: user.id, // The user's SCIM ID
+                  },
+                ],
+              },
+            },
+          ],
+        }
+        break
+
+      case Wso2GroupOperation.Remove:
+        groupUpdateData = {
+          schemas: ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+          Operations: [
+            {
+              op: Wso2GroupOperation.Remove,
+              path: `members[value eq ${user.id}]`, // The user's SCIM ID
+            },
+          ],
+        }
+        break
+    }
+
+    try {
+      const response = await requests.patchUserGroup(groupId, groupUpdateData)
+      return updateGroupResponseSchema.safeParse(response.data)
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        logger.error(`Failed to patchUserGroup Message: ${error.message}`)
+
+        const responseData = error.response?.data as PatchUserGroupErrorResponse | undefined
+
+        if (responseData?.detail) {
+          logger.error(`Failed to patchUserGroup Detail: ${responseData.detail}`)
+        }
+      } else {
+        logger.error(error)
+      }
+    }
   },
 }

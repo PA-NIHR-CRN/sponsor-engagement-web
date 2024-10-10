@@ -259,7 +259,8 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     }
   }
 
-  await setStudyAssessmentDueFlag([studyId])
+  const { data: setStudyAssessmentDueResponse } = await setStudyAssessmentDueFlag([studyId])
+  const isStudyDueAssessment = setStudyAssessmentDueResponse !== null ? setStudyAssessmentDueResponse === 1 : false
 
   const currentStudyEvalsInSE = updatedStudy.evaluationCategories
 
@@ -281,7 +282,11 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     props: {
       user: session.user,
       assessments: getAssessmentHistoryFromStudy(study),
-      study: { ...updatedStudy, evaluationCategories: updatedStudyEvals ?? study.evaluationCategories },
+      study: {
+        ...updatedStudy,
+        evaluationCategories: updatedStudyEvals ?? study.evaluationCategories,
+        isDueAssessment: isStudyDueAssessment,
+      },
       editHistories: mockEditHistories,
     },
   }

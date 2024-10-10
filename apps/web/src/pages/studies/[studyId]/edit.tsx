@@ -331,7 +331,7 @@ export default function EditStudy({ study }: EditStudyProps) {
 
               {showLoadingState ? (
                 <Warning>
-                  It may a few seconds for the CPMS record to update. Please stay on this page until redirected.
+                  It may take a few seconds for the record to update. Please stay on this page until redirected.
                 </Warning>
               ) : null}
 
@@ -421,8 +421,6 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
 
   const { data: updatedStudy } = await updateStudy(Number(cpmsId), mapCPMSStudyToSEStudy(studyInCPMS))
 
-  await setStudyAssessmentDueFlag([study.id])
-
   if (!updatedStudy) {
     return {
       props: {
@@ -431,6 +429,9 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
       },
     }
   }
+
+  const { data: setStudyAssessmentDueResponse } = await setStudyAssessmentDueFlag([study.id])
+  const isStudyDueAssessment = setStudyAssessmentDueResponse !== null ? setStudyAssessmentDueResponse === 1 : false
 
   const currentStudyEvalsInSE = updatedStudy.evaluationCategories
 
@@ -451,7 +452,11 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
   return {
     props: {
       user: session.user,
-      study: { ...updatedStudy, evaluationCategories: updatedStudyEvals ?? study.evaluationCategories },
+      study: {
+        ...updatedStudy,
+        evaluationCategories: updatedStudyEvals ?? study.evaluationCategories,
+        isDueAssessment: isStudyDueAssessment,
+      },
     },
   }
 })
