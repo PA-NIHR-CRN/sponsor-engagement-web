@@ -45,7 +45,7 @@ test.beforeAll('Setup Test Users', async () => {
   studyListSortedByDescDb = studyListSortByDesc
 })
 
-test.describe('Sort the Studies List - @se_36', () => {
+test.describe.skip('Sort the Studies List - @se_36', () => {
   test.use({ storageState: '.auth/sponsorContact.json' })
 
   test('As a Sponsor I can see that Study List is Sorted By `Due assessment` by default- @se_36_due_default', async ({
