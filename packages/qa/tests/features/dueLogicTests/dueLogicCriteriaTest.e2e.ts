@@ -3,10 +3,7 @@ import { seDatabaseReq } from '../../../utils/DbRequests'
 
 const testUserId = 6
 const startingOrgId = 9
-const nullOpeningDateStudyId = 12546
-const nullOpeningDateCpmsId = 40196
-const hasOpeningDateStudyId = 14785
-const hasOpeningDateCpmsId = 45802
+
 const noPrevAssessmentStudyId = 15273
 const noPrevAssessmentCpmsId = 46553
 const noRisksStudyId = 17122
@@ -32,100 +29,93 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
 
   test('The `Due` icon appears appears for a Study, when the study meets the Due criteria, with null opening date - @se_68_nullOpen', async ({
     studiesPage,
-    commonItemsPage,
     studyDetailsPage,
   }) => {
-    await seDatabaseReq(`
-      UPDATE Study SET actualOpeningDate = null, isDueAssessment = 1 WHERE id = ${nullOpeningDateStudyId};
-    `) // restores any changes to test data
+    const testStudy = await seDatabaseReq(`
+      SELECT s.id, s.cpmsId FROM Study s
+      JOIN StudyOrganisation so ON s.id = so.studyId
+      JOIN StudyEvaluationCategory sec ON s.id = sec.studyId
+      JOIN Assessment a ON s.id = a.studyId
+      WHERE s.actualOpeningDate IS NULL
+        AND so.organisationId = ${startingOrgId}
+        AND sec.isDeleted = 0
+        AND a.createdAt <= NOW() - INTERVAL 90 DAY
+      GROUP BY s.id ORDER BY RAND() LIMIT 1;
+    `)
+
+    if (testStudy[0] == null) {
+      throw new Error('no studies with the required criteria available in the given org, check the test data!')
+    }
 
     await test.step(`Given I have navigated to the Study List Page`, async () => {
       await studiesPage.goto()
       await studiesPage.assertOnStudiesPage()
     })
-    await test.step('And I have identified a study with no Actual Opening Date', async () => {
-      await commonItemsPage.assertStudyHasNullOpeningDate(
-        `SELECT actualOpeningDate FROM Study WHERE id = ${nullOpeningDateStudyId};`,
-        true
-      )
+
+    await test.step(`When I Enter the CPMS Id of this study - '${testStudy[0].cpmsId}' - as the Search Phrase`, async () => {
+      await studiesPage.enterSearchPhrase(testStudy[0].cpmsId.toString())
     })
-    await test.step('And the study has 1 or more risk indicators', async () => {
-      await commonItemsPage.assertStudyHasRisksInDb(
-        `SELECT indicatorType FROM StudyEvaluationCategory 
-            WHERE studyId = ${nullOpeningDateStudyId};`,
-        true
-      )
-    })
-    await test.step('And the studies Last Assessment was 3 months ago, or longer', async () => {
-      await commonItemsPage.assertLastAssessmentLongerThanThreeMonths(`SELECT createdAt FROM Assessment WHERE studyId = ${nullOpeningDateStudyId}
-            ORDER BY createdAt desc LIMIT 1;`)
-    })
-    await test.step(`When I Enter the CPMS Id of this study - '${nullOpeningDateCpmsId}' - as the Search Phrase`, async () => {
-      await studiesPage.enterSearchPhrase(nullOpeningDateCpmsId.toString())
-    })
+
     await test.step('And only 1 study is found', async () => {
       await studiesPage.assertSpecificNumberStudies(1)
     })
+
     await test.step('Then the Study List item will display a `Due` indicator', async () => {
       await studiesPage.assertDueIndicatorDisplayed(0, true)
     })
+
     await test.step('And if I enter the Study Details page for the Study', async () => {
       await studiesPage.viewStudyButton.nth(0).click()
-      await studyDetailsPage.assertOnStudyDetailsPage(nullOpeningDateStudyId.toString())
+      await studyDetailsPage.assertOnStudyDetailsPage(testStudy[0].id.toString())
     })
+
     await test.step('Then the Study Details page will also display a `Due` indicator', async () => {
       await studyDetailsPage.assertDueIndicatorDisplayed(true)
     })
   })
 
-  test('The `Due` icon appears appears for a Study, when the study meets the Due criteria, with opening date - @se_68_withOpen', async ({
+  test('The `Due` icon appears appears for a Study, when the study meets the Due criteria, with actual opening date >= 90 days ago - @se_68_withOpen', async ({
     studiesPage,
-    commonItemsPage,
     studyDetailsPage,
   }) => {
-    await seDatabaseReq(`
-      UPDATE sponsorengagement.Study SET actualOpeningDate = '2024-06-12 00:00:00.000', isDueAssessment = '1' WHERE (id = ${hasOpeningDateStudyId});
-    `) // restores any changes to test data
+    const testStudy = await seDatabaseReq(`
+      SELECT s.id, s.cpmsId FROM Study s
+      JOIN StudyOrganisation so ON s.id = so.studyId
+      JOIN StudyEvaluationCategory sec ON s.id = sec.studyId
+      JOIN Assessment a ON s.id = a.studyId
+      WHERE s.actualOpeningDate <= NOW() - INTERVAL 90 DAY
+        AND so.organisationId = ${startingOrgId}
+        AND sec.isDeleted = 0
+        AND a.createdAt <= NOW() - INTERVAL 90 DAY
+      GROUP BY s.id ORDER BY RAND() LIMIT 1;
+    `)
+
+    if (testStudy[0] == null) {
+      throw new Error('no studies with the required criteria available in the given org, check the test data!')
+    }
 
     await test.step(`Given I have navigated to the Study List Page`, async () => {
       await studiesPage.goto()
       await studiesPage.assertOnStudiesPage()
     })
-    await test.step('And I have identified a study with an Actual Opening Date', async () => {
-      await commonItemsPage.assertStudyHasNullOpeningDate(
-        `SELECT actualOpeningDate FROM Study WHERE id = ${hasOpeningDateStudyId};`,
-        false
-      )
+
+    await test.step(`When I Enter the CPMS Id of this study - '${testStudy[0].cpmsId}' - as the Search Phrase`, async () => {
+      await studiesPage.enterSearchPhrase(testStudy[0].cpmsId.toString())
     })
-    await test.step('And the study has 1 or more risk indicators', async () => {
-      await commonItemsPage.assertStudyHasRisksInDb(
-        `SELECT indicatorType FROM StudyEvaluationCategory WHERE studyId = ${hasOpeningDateStudyId};`,
-        true
-      )
-    })
-    await test.step('And the studies Last Assessment was 3 months ago, or longer', async () => {
-      await commonItemsPage.assertLastAssessmentLongerThanThreeMonths(
-        `SELECT createdAt FROM Assessment WHERE studyId = ${hasOpeningDateStudyId} ORDER BY createdAt desc LIMIT 1;`
-      )
-    })
-    await test.step('And the studies Actual Opening Date is 3 months ago, or longer', async () => {
-      await commonItemsPage.assertActualOpeningDateLongerThanThreeMonths(
-        `SELECT actualOpeningDate FROM Study WHERE id = ${hasOpeningDateStudyId};`
-      )
-    })
-    await test.step(`When I Enter the CPMS Id of this study - '${hasOpeningDateCpmsId}' - as the Search Phrase`, async () => {
-      await studiesPage.enterSearchPhrase(hasOpeningDateCpmsId.toString())
-    })
+
     await test.step('And only 1 study is found', async () => {
       await studiesPage.assertSpecificNumberStudies(1)
     })
+
     await test.step('Then the Study List item will display a `Due` indicator', async () => {
       await studiesPage.assertDueIndicatorDisplayed(0, true)
     })
+
     await test.step('And if I enter the Study Details page for the Study', async () => {
       await studiesPage.viewStudyButton.nth(0).click()
-      await studyDetailsPage.assertOnStudyDetailsPage(hasOpeningDateStudyId.toString())
+      await studyDetailsPage.assertOnStudyDetailsPage(testStudy[0].id.toString())
     })
+
     await test.step('Then the Study Details page will also display a `Due` indicator', async () => {
       await studyDetailsPage.assertDueIndicatorDisplayed(true)
     })
