@@ -339,6 +339,7 @@ export const mapCPMSStudyToSEStudy = (study: Study): UpdateStudyInput => ({
   actualOpeningDate: study.ActualOpeningDate ? new Date(study.ActualOpeningDate) : null,
   actualClosureDate: study.ActualClosureToRecruitmentDate ? new Date(study.ActualClosureToRecruitmentDate) : null,
   estimatedReopeningDate: study.EstimatedReopeningDate ? new Date(study.EstimatedReopeningDate) : null,
+  isDueAssessment: false,
 })
 
 export const updateStudy = async (cpmsId: number, studyData: UpdateStudyInput) => {
@@ -446,7 +447,9 @@ export const updateEvaluationCategories = async (
 
 export const setStudyAssessmentDueFlag = async (studyIds: number[]) => {
   try {
-    await setStudyAssessmentDue(studyIds)
+    const assessmentDueResult = await setStudyAssessmentDue(studyIds)
+
+    return { data: assessmentDueResult.count }
   } catch (error) {
     const errorMessage = getErrorMessage(error)
 
