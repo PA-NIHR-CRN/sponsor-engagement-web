@@ -31,8 +31,8 @@ export function EditHistory({ editHistoryItems, lsnToAutoExpand, errorMessage }:
             value={index + 1}
           />
         ))}
-        {editHistoryItems.length === 0 ? <span>There is no edit history.</span> : null}
-        {errorMessage ? <span>{errorMessage}</span> : null}
+        {editHistoryItems.length === 0 ? <span className="text-sm">There is no edit history.</span> : null}
+        {errorMessage ? <span className="text-sm">{errorMessage}</span> : null}
       </Accordion>
     </Details>
   )

@@ -30,6 +30,50 @@ import {
 import { formatDate } from '@/utils/date'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
+const mockEditHistory = [
+  {
+    LSN: '1212121',
+    modifiedDate: '2024-11-10T00:00:00.000Z',
+    userEmail: 'amarpreet.dawgotra@nihr.ac.uk',
+    changes: [
+      {
+        id: '3434',
+        afterValue: '120',
+        beforeValue: '30',
+        columnChanged: 'UkRecruitmentTarget',
+      },
+      {
+        id: '34334',
+        afterValue: Status.OpenToRecruitment,
+        beforeValue: Status.SuspendedFromOpenToRecruitment,
+        columnChanged: 'StudyStatus',
+      },
+    ],
+    studyUpdateType: StudyUpdateType.Direct,
+  },
+  {
+    LSN: '9867677',
+    modifiedDate: '2024-10-10T00:00:00.000Z',
+    userEmail: 'amarpreet.dawgotra@nihr.ac.uk',
+
+    changes: [
+      {
+        id: '3454334',
+        afterValue: '120',
+        beforeValue: '30',
+        columnChanged: 'UkRecruitmentTarget',
+      },
+      {
+        id: '3432343',
+        afterValue: Status.OpenToRecruitment,
+        beforeValue: Status.SuspendedFromOpenToRecruitment,
+        columnChanged: 'Status',
+      },
+    ],
+    studyUpdateType: StudyUpdateType.Proposed,
+  },
+]
+
 const renderNotificationBanner = (success: string | undefined, showRequestSupportLink: boolean) =>
   success || !Number.isNaN(Number(success)) ? (
     <NotificationBanner heading={FORM_SUCCESS_MESSAGES[Number(success)]} success>
@@ -57,7 +101,7 @@ const renderBackLink = () => (
 
 export type StudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function Study({ user, study, assessments, editHistories }: StudyProps) {
+export default function Study({ user, study, assessments }: StudyProps) {
   const router = useRouter()
   const successType = router.query.success as string
   const { organisationsByRole } = study
@@ -122,7 +166,7 @@ export default function Study({ user, study, assessments, editHistories }: Study
           <span className="govuk-body-s text-darkGrey">
             Based on the latest data uploaded to CPMS by the study team.
           </span>
-          {showEditHistoryFeature ? <EditHistory editHistoryItems={editHistories ?? []} /> : null}
+          {showEditHistoryFeature ? <EditHistory editHistoryItems={mockEditHistory} /> : null}
           <Table className="govuk-!-margin-top-3">
             <Table.Caption className="govuk-visually-hidden">Summary of study’s progress (UK)</Table.Caption>
             <Table.Body>
@@ -286,50 +330,6 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
         evaluationCategories: updatedStudyEvals ?? study.evaluationCategories,
         isDueAssessment: isStudyDueAssessment,
       },
-      // TODO: Remove mock data once hooked up to API
-      editHistories: [
-        {
-          LSN: '1212121',
-          modifiedDate: '2024-11-10T00:00:00.000Z',
-          userEmail: 'amarpreet.dawgotra@nihr.ac.uk',
-          changes: [
-            {
-              id: '3434',
-              afterValue: '120',
-              beforeValue: '30',
-              columnChanged: 'UkRecruitmentTarget',
-            },
-            {
-              id: '34334',
-              afterValue: Status.OpenToRecruitment,
-              beforeValue: Status.SuspendedFromOpenToRecruitment,
-              columnChanged: 'StudyStatus',
-            },
-          ],
-          studyUpdateType: StudyUpdateType.Direct,
-        },
-        {
-          LSN: '9867677',
-          modifiedDate: '2024-10-10T00:00:00.000Z',
-          userEmail: 'amarpreet.dawgotra@nihr.ac.uk',
-
-          changes: [
-            {
-              id: '3454334',
-              afterValue: '120',
-              beforeValue: '30',
-              columnChanged: 'UkRecruitmentTarget',
-            },
-            {
-              id: '3432343',
-              afterValue: Status.OpenToRecruitment,
-              beforeValue: Status.SuspendedFromOpenToRecruitment,
-              columnChanged: 'Status',
-            },
-          ],
-          studyUpdateType: StudyUpdateType.Proposed,
-        },
-      ],
     },
   }
 })

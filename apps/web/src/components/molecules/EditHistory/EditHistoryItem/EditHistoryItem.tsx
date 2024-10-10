@@ -41,6 +41,7 @@ export function EditHistoryItem({
       value={LSN}
     >
       <AccordionTrigger
+        className="text-sm"
         sideContent={
           <span>
             <strong>{studyUpdateTypeText}</strong> {studyUpdateTypeVerb} {updatedByWhoText}
