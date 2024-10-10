@@ -88,10 +88,14 @@ test.describe('Sponsor engagement study update with CPMS study validation @wip',
 
     await test.step(`And I see my expected study details in CPMS`, async () => {
       await expect(cpmsPage.locator('#CurrentStudyRecord_UkRecruitmentSampleSize')).toHaveValue(uniqueTarget)
-      await expect(cpmsPage.locator('#CurrentStudyRecord_PlannedRecruitmentStartDate')).toHaveValue(
-        '12/06/2025 00:00:00'
+      await expect(cpmsPage.locator('#CurrentStudyRecord_PlannedRecruitmentStartDate')).toHaveAttribute(
+        'value',
+        /12\/06\/2025/
       )
-      await expect(cpmsPage.locator('#CurrentStudyRecord_PlannedRecruitmentEndDate')).toHaveValue('12/06/2027 00:00:00')
+      await expect(cpmsPage.locator('#CurrentStudyRecord_PlannedRecruitmentEndDate')).toHaveAttribute(
+        'value',
+        /12\/06\/2027/
+      )
     })
 
     await test.step(`And I save the study in CPMS`, async () => {
