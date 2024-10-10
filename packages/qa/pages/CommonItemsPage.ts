@@ -42,7 +42,7 @@ export default class CommonItemsPage {
     this.requestSupportHeader = this.requestSupportSection.locator('h3')
     this.requestSupportText = this.requestSupportSection.locator('p')
     this.requestSupportButton = this.requestSupportSection.locator('a')
-    this.downloadStudyDataSection = page.locator('div[data-testid="export-study-data"]')
+    this.downloadStudyDataSection = page.locator('div[data-testid="export-study-data"]').first()
     this.downloadStudyDataHeader = this.downloadStudyDataSection.locator('h3')
     this.downloadStudyDataText = this.downloadStudyDataSection.locator('p')
     this.exportStudyDataButton = this.downloadStudyDataSection.locator('a')

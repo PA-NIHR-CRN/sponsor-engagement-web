@@ -1,6 +1,6 @@
 import { test } from '../../../hooks/CustomFixtures'
 import { seDatabaseReq, waitForSeDbRequest } from '../../../utils/DbRequests'
-import { listenAndDestroyRequest } from '../../../utils/ApiRequests'
+import { listenAndDestroyRequest, listenAndUpdateRequest } from '../../../utils/ApiRequests'
 
 const testUserId = 6
 const startingOrgId = 2
@@ -318,6 +318,39 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
 
     await test.step(`Then I should see the Actual closure to recruitment date must be today or in the past date validation`, async () => {
       await studyUpdatePage.assertActualClosureDateMustBeTodayOrPast()
+    })
+  })
+
+  test('Validation error message for when changes sent to CPMS are rejected @se_183_ac6', async ({
+    page,
+    studyUpdatePage,
+  }) => {
+    await seDatabaseReq(`
+      DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
+    `)
+
+    await test.step(`Given I have navigated to the Update study data page for the Study with SE Id ${startingStudyId}`, async () => {
+      await studyUpdatePage.goto(startingStudyId.toString())
+    })
+
+    await test.step(`But CPMS is going to reject my changes`, async () => {
+      const badId = 'abc'
+
+      await listenAndUpdateRequest(page, `api/forms/editStudy`, badId)
+    })
+
+    await test.step(`When I attempt to update my changes`, async () => {
+      await studyUpdatePage.statusRadioClosed.click()
+      await studyUpdatePage.fillStudyDates('plannedOpening', '12', '06', '2025')
+      await studyUpdatePage.fillStudyDates('actualOpening', '12', '06', '2024')
+      await studyUpdatePage.fillStudyDates('plannedClosure', '12', '06', '2027')
+      await studyUpdatePage.fillStudyDates('actualClosure', '12', '06', '2024')
+      await studyUpdatePage.ukRecruitmentTarget.fill('101')
+      await studyUpdatePage.buttonUpdate.click()
+    })
+
+    await test.step(`Then I should see the unexpected error occurred error message`, async () => {
+      await studyUpdatePage.assertUnexpectedErrorOccurred()
     })
   })
 

@@ -38,3 +38,25 @@ export async function listenAndDestroyRequest(page: Page, urlPart: string): Prom
     route.abort()
   })
 }
+
+export async function listenAndUpdateRequest(page: Page, urlPart: string, value: string): Promise<void> {
+  // intercept the given request and update if for testing expected responses
+  await page.route(`**/${urlPart}`, async (route, request) => {
+    const postData = request.postData()
+
+    if (postData) {
+      const parsedData = JSON.parse(postData)
+
+      parsedData.studyId = value
+      parsedData.cpmsId = value
+
+      await route.continue({
+        postData: JSON.stringify(parsedData),
+      })
+    } else {
+      await route.continue()
+    }
+  })
+}
+
+export async function listenAndWaitForRequest(page: Page, urlPart: string): Promise<void> {}
