@@ -27,7 +27,7 @@ const AccordionTrigger = React.forwardRef<
       {...props}
     >
       <div className="flex items-center text-[var(--colour-blue)] font-bold max-w-[222px] w-full text-left">
-        <span className="govuk-accordion-nav__chevron govuk-accordion-nav__chevron govuk-details__summary-text mr-3" />
+        <span className="govuk-accordion-nav__chevron govuk-accordion-nav__chevron mr-3" />
         {children}
       </div>
       {sideContent && <span className="ml-[35px] md:ml-0 govuk-body-s mb-0">{sideContent}</span>}
