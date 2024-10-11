@@ -4,23 +4,22 @@ import { seDatabaseReq } from '../../../utils/DbRequests'
 const testUserId = 6
 const startingOrgId = 9
 
-const noPrevAssessmentStudyId = 15273
-const noPrevAssessmentCpmsId = 46553
-const noRisksStudyId = 17122
-const noRisksCpmsId = 50574
 const provideAssessmentStudyId = 10692
 const provideAssessmentCpmsId = 37196
 
 test.beforeAll('Setup Tests', async () => {
   await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
+
   const allAssessmentIdsForStudy = await seDatabaseReq(
     `SELECT id FROM Assessment WHERE studyId = ${provideAssessmentStudyId};`
   )
+
   for (let index = 0; index < allAssessmentIdsForStudy.length; index++) {
     const assessmentId = allAssessmentIdsForStudy[index].id
     await seDatabaseReq(`DELETE FROM AssessmentFurtherInformation WHERE assessmentId = ${assessmentId};`)
     await seDatabaseReq(`DELETE FROM Assessment WHERE id = ${assessmentId};`)
   }
+
   await seDatabaseReq(`UPDATE Study SET isDueAssessment = 1 WHERE id = ${provideAssessmentStudyId};`)
 })
 
@@ -121,72 +120,93 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
     })
   })
 
-  test('The `Due` icon appears for a Study, when the study has Risks, but no previous Assessment - @se_68_noAssess', async ({
+  test('The `Due` icon appears for a Study, when the study meets the Due criteria, with no previous Assessment - @se_68_noAssess', async ({
     studiesPage,
-    commonItemsPage,
     studyDetailsPage,
   }) => {
+    const testStudy = await seDatabaseReq(`
+      SELECT s.id, s.cpmsId FROM Study s
+      JOIN StudyOrganisation so ON s.id = so.studyId
+      JOIN StudyEvaluationCategory sec ON s.id = sec.studyId
+      LEFT JOIN Assessment a ON s.id = a.studyId
+      WHERE s.actualOpeningDate <= NOW() - INTERVAL 90 DAY
+        AND so.organisationId = ${startingOrgId}
+        AND sec.isDeleted = 0
+        AND a.studyId IS NULL
+      GROUP BY s.id 
+      ORDER BY RAND() LIMIT 1;
+    `)
+
+    if (testStudy[0] == null) {
+      throw new Error('no studies with the required criteria available in the given org, check the test data!')
+    }
+
     await test.step(`Given I have navigated to the Study List Page`, async () => {
       await studiesPage.goto()
       await studiesPage.assertOnStudiesPage()
     })
-    await test.step('And I have identified a study with no Previous Assessment', async () => {
-      await commonItemsPage.assertStudyHasNoPrevAssessment(
-        `SELECT * FROM Assessment WHERE studyId = ${noPrevAssessmentStudyId};`
-      )
+
+    await test.step(`When I Enter the CPMS Id of this study - '${testStudy[0].cpmsId}' - as the Search Phrase`, async () => {
+      await studiesPage.enterSearchPhrase(testStudy[0].cpmsId.toString())
     })
-    await test.step('And the study has 1 or more risk indicators', async () => {
-      await commonItemsPage.assertStudyHasRisksInDb(
-        `SELECT indicatorType FROM StudyEvaluationCategory 
-            WHERE studyId = ${noPrevAssessmentStudyId};`,
-        true
-      )
-    })
-    await test.step(`When I Enter the CPMS Id of this study - '${noPrevAssessmentCpmsId}' - as the Search Phrase`, async () => {
-      await studiesPage.enterSearchPhrase(noPrevAssessmentCpmsId.toString())
-    })
+
     await test.step('And only 1 study is found', async () => {
       await studiesPage.assertSpecificNumberStudies(1)
     })
+
     await test.step('Then the Study List item will display a `Due` indicator', async () => {
       await studiesPage.assertDueIndicatorDisplayed(0, true)
     })
+
     await test.step('And if I enter the Study Details page for the Study', async () => {
       await studiesPage.viewStudyButton.nth(0).click()
-      await studyDetailsPage.assertOnStudyDetailsPage(noPrevAssessmentStudyId.toString())
+      await studyDetailsPage.assertOnStudyDetailsPage(testStudy[0].id.toString())
     })
+
     await test.step('Then the Study Details page will also display a `Due` indicator', async () => {
       await studyDetailsPage.assertDueIndicatorDisplayed(true)
     })
   })
 
-  test('No `Due` icon appears for a Study, when the study has no Risk Indicators - @se_68_noRisks', async ({
+  test('No `Due` icon appears for a Study, when the study does not meet the Due criteria (no Risk Indicators) - @se_68_noRisks', async ({
     studiesPage,
-    commonItemsPage,
     studyDetailsPage,
   }) => {
+    const testStudy = await seDatabaseReq(`
+      SELECT s.id, s.cpmsId FROM Study s
+      JOIN StudyOrganisation so ON s.id = so.studyId
+      JOIN StudyEvaluationCategory sec ON s.id = sec.studyId
+        WHERE so.organisationId = ${startingOrgId}
+        AND sec.isDeleted = 1
+      GROUP BY s.id ORDER BY RAND() LIMIT 1;
+    `)
+
+    if (testStudy[0] == null) {
+      throw new Error('no studies with the required criteria available in the given org, check the test data!')
+    }
+
     await test.step(`Given I have navigated to the Study List Page`, async () => {
       await studiesPage.goto()
       await studiesPage.assertOnStudiesPage()
     })
-    await test.step('And I have identified a study with no Risk Indicators', async () => {
-      await commonItemsPage.assertStudyHasNoRisks(
-        `SELECT * FROM StudyEvaluationCategory WHERE studyId = ${noRisksStudyId} AND isDeleted = 0;`
-      )
+
+    await test.step(`When I Enter the CPMS Id of this study - '${testStudy[0].cpmsId}' - as the Search Phrase`, async () => {
+      await studiesPage.enterSearchPhrase(testStudy[0].cpmsId.toString())
     })
-    await test.step(`When I Enter the CPMS Id of this study - '${noPrevAssessmentCpmsId}' - as the Search Phrase`, async () => {
-      await studiesPage.enterSearchPhrase(noRisksCpmsId.toString())
-    })
+
     await test.step('And only 1 study is found', async () => {
       await studiesPage.assertSpecificNumberStudies(1)
     })
+
     await test.step('Then the Study List item will not display a `Due` indicator', async () => {
       await studiesPage.assertDueIndicatorDisplayed(0, false)
     })
+
     await test.step('And if I enter the Study Details page for the Study', async () => {
       await studiesPage.viewStudyButton.nth(0).click()
-      await studyDetailsPage.assertOnStudyDetailsPage(noRisksStudyId.toString())
+      await studyDetailsPage.assertOnStudyDetailsPage(testStudy[0].id.toString())
     })
+
     await test.step('Then the Study Details page will also not display a `Due` indicator', async () => {
       await studyDetailsPage.assertDueIndicatorDisplayed(false)
     })

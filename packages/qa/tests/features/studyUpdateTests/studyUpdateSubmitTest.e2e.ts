@@ -6,6 +6,10 @@ import { getStudyEngagementInfo } from '../../../utils/ApiRequests'
 const testUserId = 6
 const startingOrgId = 2
 const timeStamp = new Date().toISOString()
+let uniqueTarget = new Date().toISOString().slice(11, 19).replace(/:/g, '')
+if (uniqueTarget.startsWith('0')) {
+  uniqueTarget = uniqueTarget.slice(1)
+}
 
 let startingStudyId = 0
 let studyCoreDetails: RowDataPacket[]
@@ -30,7 +34,7 @@ test.beforeAll('Setup Tests', async () => {
 test.describe('Update study and save changes locally in SE @se_184', () => {
   test.use({ storageState: '.auth/sponsorContact.json' })
 
-  test('As a sponsor contact I can make proposed changed to the study data @se_185_proposed', async ({
+  test('As a sponsor contact I can make proposed changed to the study data @se_184_proposed', async ({
     studyUpdatePage,
     studyDetailsPage,
   }) => {
@@ -48,9 +52,10 @@ test.describe('Update study and save changes locally in SE @se_184', () => {
       await studyUpdatePage.fillStudyDates('actualOpening', '12', '06', '2024')
       await studyUpdatePage.fillStudyDates('plannedClosure', '12', '06', '2027')
       await studyUpdatePage.fillStudyDates('actualClosure', '12', '06', '2024')
-      await studyUpdatePage.ukRecruitmentTarget.fill('101')
+      await studyUpdatePage.ukRecruitmentTarget.fill(uniqueTarget)
       await studyUpdatePage.furtherInfo.fill(`se e2e auto test - ${timeStamp}`)
       await studyUpdatePage.buttonUpdate.click()
+      await studyUpdatePage.assertUpdatingMessage()
     })
 
     await test.step(`Then I should see that my changes have been saved as proposed changes`, async () => {
@@ -63,7 +68,7 @@ test.describe('Update study and save changes locally in SE @se_184', () => {
     })
   })
 
-  test('As a sponsor contact I can make direct changes to the study data @se_185_direct', async ({
+  test('As a sponsor contact I can make direct changes to the study data @se_184_direct', async ({
     studyUpdatePage,
     studyDetailsPage,
   }) => {
@@ -80,9 +85,10 @@ test.describe('Update study and save changes locally in SE @se_184', () => {
 
       await studyUpdatePage.fillStudyDates('plannedOpening', '12', '06', '2025')
       await studyUpdatePage.fillStudyDates('plannedClosure', '12', '06', '2027')
-      await studyUpdatePage.ukRecruitmentTarget.fill('101')
+      await studyUpdatePage.ukRecruitmentTarget.fill(uniqueTarget)
       await studyUpdatePage.furtherInfo.fill(`se e2e auto test - ${timeStamp}`)
       await studyUpdatePage.buttonUpdate.click()
+      await studyUpdatePage.assertUpdatingMessage()
     })
 
     await test.step(`Then I should see that my changes have been saved as direct changes`, async () => {
