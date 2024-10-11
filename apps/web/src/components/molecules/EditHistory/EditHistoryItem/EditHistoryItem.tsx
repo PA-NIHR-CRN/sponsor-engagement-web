@@ -13,14 +13,7 @@ export interface EditHistoryItemProps {
   changes: EditHistoryChange[]
 }
 
-export function EditHistoryItem({
-  LSN,
-  studyUpdateType,
-  modifiedDate,
-  userEmail,
-  changes,
-  value,
-}: EditHistoryItemProps & { value: number }) {
+export function EditHistoryItem({ LSN, studyUpdateType, modifiedDate, userEmail, changes }: EditHistoryItemProps) {
   const [studyUpdateTypeText, studyUpdateTypeVerb] = [
     studyUpdateType === StudyUpdateType.Proposed ? 'Proposed change' : 'Change',
     studyUpdateType === StudyUpdateType.Proposed ? 'submitted by' : 'made by',
@@ -35,13 +28,9 @@ export function EditHistoryItem({
   })
 
   return (
-    <AccordionItem
-      className={`${value === 1 ? 'border-t' : ''}`}
-      data-testid={`edit-history-accordion-item-${LSN}`}
-      value={LSN}
-    >
+    <AccordionItem className="first:border-t" data-testid={`edit-history-accordion-item-${LSN}`} value={LSN}>
       <AccordionTrigger
-        className="text-sm"
+        className="text-sm [&>div]:max-w-[244px]"
         sideContent={
           <span>
             <strong>{studyUpdateTypeText}</strong> {studyUpdateTypeVerb} {updatedByWhoText}
@@ -50,7 +39,7 @@ export function EditHistoryItem({
       >
         Updated on {formattedModifiedDate}
       </AccordionTrigger>
-      <AccordionContent indent>
+      <AccordionContent className="md:ml-[calc(244px+15px)]">
         <ul aria-label="Change details" className="govuk-list govuk-list--bullet govuk-body-s">
           {changes.map((change) => (
             <EditHistoryChangeText change={change} key={change.id} />

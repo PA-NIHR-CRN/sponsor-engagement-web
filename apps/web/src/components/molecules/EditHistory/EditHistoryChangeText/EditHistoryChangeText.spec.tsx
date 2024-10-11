@@ -7,7 +7,7 @@ jest.mock('./utils')
 const mockGetColumnChangedLabelText = getColumnChangedLabelText as jest.MockedFunction<typeof getColumnChangedLabelText>
 
 describe('<EditHistoryChangeText/>', () => {
-  it('should display correct text when there is both a before and after value', () => {
+  it('should display the correct text when there is both a before and after value', () => {
     const mockLabel = 'UK recruitment target'
     mockGetColumnChangedLabelText.mockReturnValue(mockLabel)
     const mockChange = {
@@ -22,7 +22,7 @@ describe('<EditHistoryChangeText/>', () => {
     ).toBeInTheDocument()
   })
 
-  it('should display correct text when there is no before value and only an after value', () => {
+  it('should display the correct text when there is no before value and only an after value', () => {
     const mockLabel = 'UK recruitment target'
     mockGetColumnChangedLabelText.mockReturnValue(mockLabel)
     const mockChange = {
@@ -34,7 +34,7 @@ describe('<EditHistoryChangeText/>', () => {
     expect(getByText(`${mockLabel} ${mockChange.afterValue} added`)).toBeInTheDocument()
   })
 
-  it('should display correct text when there is no after value and only a before value', () => {
+  it('should display the correct text when there is no after value and only a before value', () => {
     const mockLabel = 'UK recruitment target'
     mockGetColumnChangedLabelText.mockReturnValue(mockLabel)
     const mockChange = {

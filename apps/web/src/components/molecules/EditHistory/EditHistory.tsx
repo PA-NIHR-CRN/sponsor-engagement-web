@@ -20,7 +20,7 @@ export function EditHistory({ editHistoryItems, lsnToAutoExpand, errorMessage }:
   return (
     <Details heading="View edit history" open={Boolean(lsnToAutoExpand)}>
       <Accordion defaultValue={[lsnToAutoExpand ?? '']} type="multiple">
-        {editHistoryItems.map((editHistory, index) => (
+        {editHistoryItems.map((editHistory) => (
           <EditHistoryItem
             LSN={editHistory.LSN}
             changes={editHistory.changes}
@@ -28,7 +28,6 @@ export function EditHistory({ editHistoryItems, lsnToAutoExpand, errorMessage }:
             modifiedDate={editHistory.modifiedDate}
             studyUpdateType={editHistory.studyUpdateType}
             userEmail={editHistory.userEmail}
-            value={index + 1}
           />
         ))}
         {editHistoryItems.length === 0 ? <span className="text-sm">There is no edit history.</span> : null}

@@ -35,7 +35,6 @@ describe('<EditHistoryItem/>', () => {
           modifiedDate={mockProposedEditHistory.modifiedDate}
           studyUpdateType={StudyUpdateType.Proposed}
           userEmail={mockProposedEditHistory.userEmail}
-          value={1}
         />
       </Accordion>
     )
@@ -58,7 +57,6 @@ describe('<EditHistoryItem/>', () => {
           modifiedDate={mockProposedEditHistory.modifiedDate}
           studyUpdateType={StudyUpdateType.Direct}
           userEmail={mockProposedEditHistory.userEmail}
-          value={1}
         />
       </Accordion>
     )
@@ -79,7 +77,6 @@ describe('<EditHistoryItem/>', () => {
           LSN={mockProposedEditHistory.LSN}
           changes={mockProposedEditHistory.changes}
           modifiedDate={mockProposedEditHistory.modifiedDate}
-          value={1}
         />
       </Accordion>
     )

@@ -30,8 +30,6 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
       cpmsStudyInput
     )
 
-    // LSN for current state of study
-
     if (!validationResult) {
       throw new Error(validateStudyError)
     }
@@ -97,7 +95,6 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
         notes: additionalNote,
       })
 
-      // LSN returned here and save to study updates
       if (!study) {
         throw new Error(updateStudyError)
       }
