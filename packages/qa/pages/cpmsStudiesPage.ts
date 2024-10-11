@@ -3,12 +3,9 @@ import { expect, Locator, Page } from '@playwright/test'
 //Declare Page Objects
 export default class CpmsStudiesPage {
   readonly page: Page
-
   readonly signIn: Locator
   readonly btnNext: Locator
-
   readonly cpmsStudyBreadcrumb: Locator
-
   readonly editButton: Locator
   readonly statusTab: Locator
   readonly statusTable: Locator
