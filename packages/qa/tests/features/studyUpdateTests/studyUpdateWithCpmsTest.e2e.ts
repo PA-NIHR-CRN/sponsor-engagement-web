@@ -30,10 +30,10 @@ test.beforeAll('Setup Tests', async () => {
   `)
 })
 
-test.describe('Sponsor engagement study update with CPMS study validation @wip', () => {
+test.describe('Sponsor engagement study update with CPMS study validation', () => {
   test.describe.configure({ timeout: 99000 }) // generous timeout as CPMS is slow!
 
-  test('direct se change with cpms validation', async ({ browser }) => {
+  test('direct SE change with CPMS validation', async ({ browser }) => {
     await seDatabaseReq(`
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
     `) // reset test data
@@ -115,7 +115,7 @@ test.describe('Sponsor engagement study update with CPMS study validation @wip',
     await cpmsContext.close()
   })
 
-  test.skip('proposed se change with cpms validation', async ({ browser }) => {
+  test.skip('proposed SE change with CPMS validation', async ({ browser }) => {
     await seDatabaseReq(`
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
     `) // reset test data
@@ -138,9 +138,9 @@ test.describe('Sponsor engagement study update with CPMS study validation @wip',
 
       // await sePage.locator('#status-3').click()
       await fillStudyDates('plannedOpening', '12', '06', '2025')
-      // await fillStudyDates('actualOpening', '12', '06', '2024')
+      await fillStudyDates('actualOpening', '12', '06', '2024')
       await fillStudyDates('plannedClosure', '12', '06', '2027')
-      // await fillStudyDates('actualClosure', '12', '06', '2024')
+      await fillStudyDates('actualClosure', '12', '06', '2024')
       await sePage.locator('#recruitmentTarget').fill(uniqueTarget)
       await sePage.locator('#furtherInformation').fill(`se e2e auto test - ${timeStamp}`)
       await sePage.locator('button.govuk-button:has-text("Update")').click()
@@ -158,9 +158,9 @@ test.describe('Sponsor engagement study update with CPMS study validation @wip',
         'Your study data changes have been accepted.'
       )
 
-      // await expect(dbStudyUpdate[0].studyStatus).toBeNull()
+      await expect(dbStudyUpdate[0].studyStatus).toBeNull()
       await expect(dbStudyUpdate[0].comment).toBe(`se e2e auto test - ${timeStamp}`)
-      // await expect(dbStudyUpdate[0].studyStatusGroup).toBe('Closed')
+      await expect(dbStudyUpdate[0].studyStatusGroup).toBe('Closed')
     })
 
     // close se context
@@ -185,18 +185,15 @@ test.describe('Sponsor engagement study update with CPMS study validation @wip',
         'value',
         /12\/06\/2025/
       )
-      // await expect(cpmsPage.locator('#CurrentStudyRecord_ActualOpeningDate')).toHaveAttribute(
-      //   'value',
-      //   /12\/06\/2024/
-      // )
+      await expect(cpmsPage.locator('#CurrentStudyRecord_ActualOpeningDate')).toHaveAttribute('value', /12\/06\/2024/)
       await expect(cpmsPage.locator('#CurrentStudyRecord_PlannedRecruitmentEndDate')).toHaveAttribute(
         'value',
         /12\/06\/2022/
       )
-      // await expect(cpmsPage.locator('#CurrentStudyRecord_ActualRecruitmentEndDate')).toHaveAttribute(
-      //   'value',
-      //   /12\/06\/2025/
-      // )
+      await expect(cpmsPage.locator('#CurrentStudyRecord_ActualRecruitmentEndDate')).toHaveAttribute(
+        'value',
+        /12\/06\/2025/
+      )
     })
 
     await test.step(`And I save the study in CPMS`, async () => {
