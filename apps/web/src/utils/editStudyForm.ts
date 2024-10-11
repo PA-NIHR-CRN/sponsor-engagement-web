@@ -6,12 +6,12 @@ import { mapCPMSStatusToFormStatus } from '@/lib/studies'
 import type { EditStudyProps } from '@/pages/studies/[studyId]/edit'
 
 import { constructDatePartsFromDate, getDaysInMonth } from './date'
-import type { DateFieldName, EditStudyInputs } from './schemas'
+import type { DateFieldName, EditStudy, EditStudyInputs } from './schemas'
 
-export const mapStudyToStudyFormInput = (study: EditStudyProps['study']): EditStudyInputs => ({
+export const mapStudyToStudyFormInput = (study: EditStudyProps['study'], LSN?: string): EditStudyInputs => ({
   studyId: study.id,
+  LSN,
   status: study.studyStatus,
-  originalStatus: study.studyStatus,
   recruitmentTarget: study.sampleSize?.toString() ?? '',
   cpmsId: study.cpmsId.toString(),
   plannedOpeningDate: constructDatePartsFromDate(study.plannedOpeningDate),
@@ -118,10 +118,10 @@ export const getVisibleFormFields = (
 /**
  * Validates a date on the edit study form and sends errors to zod ctx
  */
-const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, values: EditStudyInputs) => {
+const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, values: EditStudy) => {
   const value = values[fieldName]
   const currentStatus = mapCPMSStatusToFormStatus(values.status)
-  const previousStatus = values.originalStatus ? mapCPMSStatusToFormStatus(values.originalStatus) : null
+  const previousStatus = values.originalValues.status ? mapCPMSStatusToFormStatus(values.originalValues.status) : null
   const label = fieldNameToLabelMapping[fieldName]
   const requiredPastOrCurrent = dateValidationRules[fieldName].restrictions.includes('requiredPastOrCurrent')
   const requiredFuture = dateValidationRules[fieldName].restrictions.includes('requiredFuture')
@@ -246,7 +246,7 @@ const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, valu
 /**
  * Validates all dates on the edit study form and sends errors to zod ctx
  */
-export const validateAllDates = (ctx: z.RefinementCtx, values: EditStudyInputs) => {
+export const validateAllDates = (ctx: z.RefinementCtx, values: EditStudy) => {
   Object.keys(dateValidationRules).forEach((fieldName: keyof DateFieldName) => {
     validateDate(fieldName, ctx, values)
   })
