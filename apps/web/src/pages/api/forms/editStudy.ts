@@ -1,8 +1,9 @@
 import type { Prisma } from 'database'
 import type { NextApiRequest } from 'next'
+import { v4 as uuid } from 'uuid'
 
 import { Status, StudyUpdateRoute } from '@/@types/studies'
-import { Roles, StudyUpdateType } from '@/constants'
+import { Roles, StudyUpdateState, StudyUpdateType } from '@/constants'
 import { UPDATE_FROM_SE_TEXT } from '@/constants/forms'
 import { mapEditStudyInputToCPMSStudy, updateStudyInCPMS, validateStudyUpdate } from '@/lib/cpms/studies'
 import { prismaClient } from '@/lib/prisma'
@@ -46,7 +47,10 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
     const formattedActualClosureDate = constructDateObjFromParts(studyData.actualClosureDate)
     const formattedEstimatedReopeningDate = constructDateObjFromParts(studyData.estimatedReopeningDate)
 
-    const studyUpdate: Prisma.StudyUpdatesCreateInput = {
+    const transactionId = uuid()
+
+    const studyUpdateAfter: Prisma.StudyUpdatesCreateManyInput = {
+      studyId: studyData.studyId,
       studyStatus: isDirectUpdate ? studyData.status : null,
       studyStatusGroup: mapCPMSStatusToFormStatus(studyData.status),
       plannedOpeningDate: formattedPlannedOpeningDate,
@@ -56,25 +60,16 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
       estimatedReopeningDate: formattedEstimatedReopeningDate,
       ukRecruitmentTarget: studyData.recruitmentTarget ? Number(studyData.recruitmentTarget) : undefined,
       comment: studyData.furtherInformation,
-      study: {
-        connect: {
-          id: studyData.studyId,
-        },
-      },
-      studyUpdateType: {
-        connect: { id: isDirectUpdate ? StudyUpdateType.Direct : StudyUpdateType.Proposed },
-      },
-      createdBy: {
-        connect: { id: session.user.id },
-      },
-      modifiedBy: {
-        connect: { id: session.user.id },
-      },
+      transactionId,
+      studyUpdateStateId: StudyUpdateState.After,
+      studyUpdateTypeId: isDirectUpdate ? StudyUpdateType.Direct : StudyUpdateType.Proposed,
+      createdById: session.user.id,
+      modifiedById: session.user.id,
     }
 
     // Both proposed and direct changes are saved to SE
-    await prismaClient.studyUpdates.create({
-      data: studyUpdate,
+    await prismaClient.studyUpdates.createMany({
+      data: [studyUpdateAfter],
     })
 
     if (isDirectUpdate) {
