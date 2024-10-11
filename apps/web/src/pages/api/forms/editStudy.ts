@@ -1,4 +1,5 @@
 import type { NextApiRequest } from 'next'
+import { v4 as uuid } from 'uuid'
 
 import { Status, StudyUpdateRoute } from '@/@types/studies'
 import { Roles } from '@/constants'
