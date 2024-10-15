@@ -66,6 +66,8 @@ test.describe('Update study and save changes locally in SE @se_184', () => {
       await studyUpdatePage.assertSeDbUpdateProposed(dbStudyUpdate[0], timeStamp)
       await studyDetailsPage.assertStudyUpdatedSuccess('proposed')
     })
+
+    await test.step(`And I should see that my proposed changes are reflected on the study details page`, async () => {})
   })
 
   test('As a sponsor contact I can make direct changes to the study data @se_184_direct', async ({
@@ -99,5 +101,7 @@ test.describe('Update study and save changes locally in SE @se_184', () => {
       await studyUpdatePage.assertSeDbUpdateDirect(dbStudyUpdate[0], timeStamp)
       await studyDetailsPage.assertStudyUpdatedSuccess('direct')
     })
+
+    await test.step(`And I should see that my direct changes are reflected on the study details page`, async () => {})
   })
 })

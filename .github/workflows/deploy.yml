@@ -265,7 +265,7 @@ jobs:
       - name: Run All SE E2E Tests
         working-directory: ./packages/qa
         if: success()
-        run: npx playwright test
+        run: npx playwright test --project=seDefault
         env:
           E2E_BASE_URL: ${{ vars.E2E_BASE_URL }}
           CPMS_TEST_DB_PASSWORD: ${{ secrets.CPMS_TEST_DB_PASSWORD }}

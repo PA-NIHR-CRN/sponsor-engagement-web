@@ -1,123 +1,194 @@
-# sponsor-engagement-e2e-tests
+# Sponsor Engagement E2E Tests
 
-Written in Typescript, using Playwright
+Written in Typescript, using Playwright with page object model & test steps.
 
-## --------------------SETUP--------------------
+Playwright [Documentation](https://playwright.dev/docs/intro)
+
+## Authors
+
+[Chris McNeill - PA Consulting](https://github.com/chrismcneill89)
+[Adam Nicolaou-Jones - PA consulting](https://github.com/onlyadam)
+
+## Setup
 
 Install Node on your local machine. e.g. If using a Mac `brew install node`  
 Or Download and Install from [here](https://nodejs.org/en/download/)
 
-Clone repo to local directory
-From the projects root folder  
-Run the command `npm i` to install Playwright and other dependencies
+1. Clone repo to local directory
+2. From the projects root folder run the command `npm i` to install Playwright and other dependencies
+3. Source environment variables and secrets
+4. Check Playwright config (`packages/qa/playwright.config.ts`)
 
-Playwright Getting Started [Documentation](https://playwright.dev/docs/intro)
+### Environment variables & secrets
 
-## --------------------RUN TESTS LOCALLY--------------------
+You will need to either create a new `.env` file under `packages/qa` or run:
+`cp -n .env.example .env` from the `packages/qa` directory
 
-All work related to the E2E tests reside in the **packages/qa** folder of the project
-Playwright is configured in the `playwright.config.ts` file  
-It contains global properties, as well as project specific properties inside a **projects** array  
-By default the tests run using the **SponsorEngagement** project  
-With the **setup** project always running before it,  
-Which sets and stores Authentication states for the Test Users.  
-The `E2E_BASE_URL` environment variable should be defined in your .env file
+Then populate the variables by retrieving from the following sources:
 
-Should you wish to run the test in another environment  
-Simply change the `E2E_BASE_URL` value to the desired environment
-Note: some tests require specific content that is currently only available in the `test` environment
+```text
+  # env             # the SE environment you wish to test (currently only supports test)
+  E2E_BASE_URL=     # (currently only supports test)
 
-Before executing the tests for the first time
-From within the **packages/qa** project folder, create a `.env` file from the `.env.example` and update its values
-The test account passwords can be found in the following [document](https://docs.google.com/document/d/1J9I1b4hb28rd9vl34Oe7XPCeZqk8yVsyG84KJgXS6k0/edit?pli=1)
+  # db              # creds can be found in https://docs.google.com/document/d/1J9I1b4hb28rd9vl34Oe7XPCeZqk8yVsyG84KJgXS6k0
+  SE_TEST_DB_HOST=
+  SE_TEST_DB_PASSWORD=
 
-To execute the tests from the projects root folder run the command:
+  # se test users   # creds can be found in https://docs.google.com/document/d/1J9I1b4hb28rd9vl34Oe7XPCeZqk8yVsyG84KJgXS6k0
+  SPONSOR_CONTACT_PASS=
+  SPONSOR_CONTACT_MANAGER_PASS=
+  CONTACT_MANAGER_PASS=
+  SE_NO_LOCAL_ACCOUNT_PASS=
 
-Or from the **packages/qa** project folder run the command: `npx playwright test`  
-Results will print to the console
+  # cpms test users # creds can be found in https://docs.google.com/spreadsheets/d/1cNsHznOMg9DDkFJnrHUbgK2EoGFys9Hwy5c9n1rO0I4
+  CPMS_NPM_PASS=
 
-To see HTML report generated once the test run has finished,  
-run the command `npx playwright show-report`  
-Will open a browser tab with report showing test results
+  # api
+  SE_TEST_API_URL=  # creds can be found in https://eu-west-2.console.aws.amazon.com/secretsmanager/secret?name=crnccd-secret-test-se-app-config&region=eu-west-2
+  SE_TEST_API_USERNAME=
+  SE_TEST_API_PASSWORD=
 
-To run individual tests or a specific group of tests:
+  # local test config
+  LOCAL_DEV=true              # used for ignoring ci settings
+  #ENABLE_ACCESSIBILITY=true  # used for enabling accessibility without commit risk (commented out by default)
+```
 
-- run using the test tag command `npx playwright test --grep <tag name>` e.g. `npx playwright test --grep @frf_22_ac2_6`
-- add the `.only` method on any individual tests blocks, e.g. `test.only("Test Name"{...});`
-- add the `.only` method on any describe blocks, e.g. `test.describe.only("Test Group Name"{ test("Test Name"{...} )});`
+### Playwright config
 
-Playwright Testing Documentation - https://playwright.dev/docs/api/class-test
+All work related to the E2E tests reside in the **packages/qa** folder of the project. Playwright is configured in the `playwright.config.ts` file
+it contains global properties, as well as project specific properties inside a **projects** array.
 
-## --------------------RUN ACCESSIBILITY TESTS LOCALLY--------------------
+By default the tests run using the **SponsorEngagement** project with the **setup** project always running before it which sets and stores Authentication states for the Test Users.
 
-Go to `playwright.config.ts` file  
-The SponsorEngagement project within the **projects** array has a property called **testIgnore**  
-Which is set to ignore all tests that fall within the **accessibilityTests** folder.  
-This is so that the accessibility tests are not included in the day to day runs.
+Note that the presence on `LOCAL_DEV=true` in `.env` allows you to easily override CI specific settings fear of committing changes (see `retries` for example).
 
-To include the accessibility tests in the run simply comment out this line.  
-Alternatively, to run only the accessibility tests,  
-change the property from testIgnore to **testMatch**
+## Execute test locally (express)
 
-**DO NOT ADD, COMMIT OR PUSH THIS CHANGE TO GITHUB**
+Confirm you have completed the following:
 
-You could also do any of the the following to run all the accessibility tests, or specific ones
+1. Installed node
+2. Run `npm i` from the root directory
+3. Retrieved and populated `packages/qa/.env`
+4. Checked `packages/qa/playwright.config.ts`
+5. Set the directory `cd packages/qa/`
 
-- run using the test tag command `npx playwright test --grep <tag name>` e.g. `npx playwright test --grep @accessibility`
-- add the `.only` method on any individual tests blocks, e.g. `test.only("Test Name"{...});`
-- add the `.only` method on any describe blocks, e.g. `test.describe.only("Test Group Name"{ test("Test Name"{...} )});`
+If the above has been completed then simply run:
 
-## --------------------RUN TESTS LOCALLY in OTHER BROWSERS & DEVICES -----------------
+- `npx playwright test --project=seDefault` - runs all tests and print results to the console.
 
-Go to `playwright.config.ts` file  
-There is a **projects** array containing multiple project objects  
-Each project object is set to run using a different browser and/or device combination  
-For example Firefox on Desktop and Safari on Mobile  
-The default project has the name SponsorEngagement  
-And is set to run the tests in Playwrights default environment, Desktop Chromium
+**Note:** alternatively you can run `npm run test:default`
 
-All of the other projects have a **testIgnore** property  
-With a value that is set to ignore all tests that fall within the **tests** folder, i.e all of them
+## Execute test locally (advanced)
 
-To enable tests to run using the config from other project objects  
-Simply comment out the line with the **testIgnore** property for the relevant project  
-Or change its value so that it no longer ignores all tests  
-For example its value could be changed to only ignore the accessibilityTests folder  
-In the same way the SponsorEngagement project is set up  
-If you wish to run only the selected project, and not include the default SponsorEngagement project  
-You would also be required to change its **testIgnore** value to ignore all tests before running
+### Specify tests to execute
 
-**DO NOT ADD, COMMIT OR PUSH THESE CHANGES TO GITHUB**
+To run tests using tags:
 
-## --------------------RUN TESTS via GITHUB ACTIONS--------------------
+- Run all tests with a given tag, then run:
+  `npx playwright test --project=seDefault --grep <tag name>` - example: `npx playwright test --project=seDefault --grep @se_123_ac1`
 
-The GitHub Action to manually trigger the SE E2E test run is configured in the run-e2e-tests.yml file  
-The GitHub Action which runs the SE E2E tests as part of the CI/CD pipeline is configured in the deploy.yml file  
-This ensures that the tests will be run after the latest work has been deployed to Test, but before it can be deployed to UAT.  
-The SE E2E tests must all pass, before the deployment to UAT can be triggered.  
-This is part of the **Deploy Web App** workflow
+- Run all tests without a given tag, then run:
+  `npx playwright test --project=seDefault --grep-invert <tag name>` - example: `npx playwright test --project=seDefault --grep-invert @wip`
 
-To trigger the test run manually  
-Go the the repo's [GitHub actions page](https://github.com/PA-NIHR-CRN/sponsor-engagement-web/actions)
-Select **Sponsor Engagement E2E Tests** from the workflow's options on the left  
-Set the **Upload test report** input field to either true or false, default value is false  
-This value dictates whether the HTML test report is published to a GitHub Page and the Managed Services Slack channel  
-Set the **Select which Tests** input field to either `all` or `@<test_tag>` e.g. `@frf_13`, default is all  
-This value dictates which tests are included in the run, `all` will run everything, `@<test_tag>` will run any tests with that tag
+**Note:** you can tag the individual `test()` or the `test.describe()`
 
-GitHub Page is found [here](https://pa-nihr-crn.github.io/sponsor-engagement-web/)
-The GitHub page stores and displays the latest published HTML test report  
-Setting this value to true will therefore overwrite the currently stored report
+To run individual tests or a specific group using flags:
 
-Regardless of whether the HTML report is published, each test run will upload the report as an artifact  
-This can be accessed in the Artifacts section of the completed **Sponsor Engagement E2E Tests** summary page  
-To view it, click it and it will be downloaded as a Zip file  
-However the Traces section of the report will not work  
-As The Playwright Trace Viewer must be loaded over the http:// or https:// protocols
+- add the `.only` method on any individual tests blocks - example: `test.only()`
 
-## --------------------GITHUB PAGES--------------------
+- add the `.only` method on any describe blocks - example: `test.describe.only()`
 
-**DO NOT DELETE THE `gh-pages` BRANCH FROM THE REPO**
+**Note:** you can also use `skip` in exactly the same way to skip a test or group of tests.
+
+### Execute tests locally with multiple browsers/devices
+
+By default tests run in chromium but there are several pre configured browsers & mobile device set up in `playwright.config.ts` can be used locally.
+Each browser or device is called a project and can be specified in the command line before execution by setting the project name like this:
+`npx playwright test --project=<projectName>`
+
+The available projects are:
+
+- `npx playwright test --project=seDefault` - uses chromium
+- `npx playwright test --project=seFirefox` - uses firefox
+- `npx playwright test --project=seSafari` - uses safari (not available on PC devices)
+- `npx playwright test --project=seEdge` - uses edge
+- `npx playwright test --project=seChrome` - uses chrome
+- `npx playwright test --project=seMobileAndroid` - uses chrome (emulated on an android device)
+- `npx playwright test --project=seMobileIphone` - uses safari (emulated on an iPhone device)
+
+**Note:** You can also use the `packages/qa/package.json` scripts, running `npm run test:<browser>` & replacing `<browser>` with `[default, firefox, safari, edge, chrome, android, iphone]`.
+
+## Execute accessibility tests locally
+
+Accessibility tests are executed using the [@axe-core/playwright](https://playwright.dev/docs/accessibility-testing) library.
+
+As we don't need to run the accessibility tests with every ci or local run the tests are ignored by default in the `playwright.config.ts` file.
+This is done by conditionally looking for `ENABLE_ACCESSIBILITY=true` (not present in GitHub actions) which if not found then ignores all tests in `**/accessibilityTests/**`.
+This removes the risk of accidentally committing temporary config changes that might effect the ci execution.
+
+To enabled & execute the accessibility tests simply:
+
+1. Add or uncomment `ENABLE_ACCESSIBILITY=true` in `packages/qa/.env`
+2. Run all test as normal with `npx playwright test` or just the accessibility tests with `npx playwright test --project=seDefault --grep "@accessibility"`
+3. After remember to comment out or remove `ENABLE_ACCESSIBILITY=true` in `packages/qa/.env`
+
+**Note:** You could also use any of the following to run the accessibility tests:
+
+- Run `npm run test:axe` runs the tests in a sub shell removing the need to manage the env variable
+- Add the `.only` method on any individual tests blocks, e.g. `test.only()`
+- Sdd the `.only` method on any describe blocks, e.g. `test.describe.only()`
+
+## Execute tests CI (GitHub Actions)
+
+The e2e test Github Actions workflows are found under `./.github/workflows`, currently there are two:
+
+- The workflow to manually run the tests run is configured in `run-e2e-tests.yml`.
+- The workflow that runs the tests as part of the deployment pipeline is configured in `deploy.yml`.
+
+### run-e2e-tests.yml (Sponsor Engagement E2E Tests)
+
+This pipeline allows running the e2e tests from the given branch against the currently deployed test environment and has no requirements.
+
+To trigger:
+
+1. Open the [Sponsor Engagement E2E Tests page](https://github.com/PA-NIHR-CRN/sponsor-engagement-web/actions/workflows/run-e2e-tests.yml)
+2. Click `Run workflow`
+3. Specify a branch
+4. Optionally specify a test report
+5. Optionally specify a test tag to use
+6. Click `Run workflow` and manually approve the workflow
+
+**Note:** You can observe the workflow summary or drill into it to see the live summary and console read out.
+
+### deploy.yml (Deploy Web App)
+
+This pipeline runs the e2e tests from the given branch against the currently deployed test environment and requires that
+build, dev and test have all completed successfully before it can start.
+It is also required to successfully complete without failures for UAT, OAT & Prod environments to be deployed.
+
+**Warning:** Triggering this workflow will deploy the given branch to lower environments (or higher if manually approved)!
+
+To trigger:
+
+1. Open the [Deploy Web App page](https://github.com/PA-NIHR-CRN/sponsor-engagement-web/actions/workflows/deploy.yml)
+2. Click `Run workflow`
+3. Specify a branch
+4. Click `Run workflow` and manually approve the workflows where required
+
+**Note:** You will be required to manually approve the stages including; DEV, Test & Test E2E for the jobs to begin.
+
+### Download CI execution test reports
+
+Regardless of whether the HTML report is published, each test run will upload the report as an artifact.
+This can be accessed in the `Artifacts` section of the completed summary page.
+
+To view it click the artifact link and it will be downloaded as a Zip file
+
+**Note:** The traces section of the report will not work as The Playwright Trace Viewer must be loaded over the http:// or https:// protocols
+
+## ----- GitHub pages ----------------------------------------------------------------------------------------------------------------------------
+
+**Warning: Do not delete `gh-pages` branch from the repo**
 
 When a report is to be published to the GitHub page this will trigger a different Actions workflow  
 This workflow is called **pages-build-deployment**  
@@ -129,7 +200,7 @@ Then the `Download HTML Report Artifact` & `Publish to GH Pages` steps in the `p
 This pushes the newly generated `test-report` folder to the `gh-pages` branch  
 Triggering the **pages-build-deployment** workflow
 
-## --------------------TEST REPORT--------------------
+### GitHub test report
 
 The Test Report summary page will look something like the image shown below  
 It shows a collapsible list of each test feature file and any tests it contains  
@@ -142,11 +213,12 @@ And `GET Organisation by Name 'test', all Orgs returned contain the word 'test'`
 <img width="996" alt="reportHomePage" src="https://user-images.githubusercontent.com/57842230/199301677-5810df39-82c8-4773-8f9a-192349f24fcd.png">
   
 You can filter the results using the tabs at the top of the report to show:
-* Only tests that Passed
-* Only tests that Failed
-* Only tests that are Flaky
-* Only tests that were Skipped
-  
+
+- Only tests that Passed
+- Only tests that Failed
+- Only tests that are Flaky
+- Only tests that were Skipped
+
 <img width="980" alt="reportFails" src="https://user-images.githubusercontent.com/57842230/199304970-185fa311-f4ca-4769-bbf6-cd4cfd68cc54.png">
 
 Clicking a test will take you to the test details page  
@@ -165,7 +237,7 @@ When writing tests we should log things such as relevant Response Bodies to the 
   
 Clicking the trace object (the image) takes you into the API call logs relevant to that particular test  
 **NOTE THAT THIS ONLY WORKS IF VIEWING THE REPORT OVER HTTP(S), FOR EXAMPLE ON A GITHUB PAGE OR LOCALHOST**  
-It shows the requests made and the responses recieved on the left, and Call, Console, Network & Source tabs on the right  
+It shows the requests made and the responses received on the left, and Call, Console, Network & Source tabs on the right  
 Clicking on a request or response will show details for it on the right, relevant to the tab selected  
 The Call tab shows details such as request duration, request method, parameters and header logs, as shown below
 
@@ -173,7 +245,7 @@ The Call tab shows details such as request duration, request method, parameters 
   
 The Console tab shows anything output to the console for the request/response  
 The Source tab shows the line of source code from which the request/response was generated in the test  
-The Network tab shows the Response Code, Request Headers, Response Headers and Response Body, in a simlar format to Postman  
+The Network tab shows the Response Code, Request Headers, Response Headers and Response Body, in a similar format to Postman  
   
 <img width="1658" alt="reportTraceNetwork" src="https://user-images.githubusercontent.com/57842230/199382891-5c8e3f26-928c-46bf-91a5-89657cb5b6f1.png">
   

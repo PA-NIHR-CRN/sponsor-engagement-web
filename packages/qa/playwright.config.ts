@@ -14,9 +14,9 @@ const config: PlaywrightTestConfig = {
   ],
   globalSetup: './hooks/GlobalSetup.ts',
   globalTeardown: './hooks/GlobalTeardown.ts',
-  timeout: 30000,
+  timeout: process.env.LOCAL_DEV ? 25000 : 35000, // longer timeout in ci
   workers: 1, // to enforce serial execution
-  retries: process.env.LOCAL_DEV ? 0 : 2, // enforce retried only in ci
+  retries: process.env.LOCAL_DEV ? 0 : 2, // enforce retries only in ci
   projects: [
     // Setup project for Authorization
     {
@@ -33,10 +33,11 @@ const config: PlaywrightTestConfig = {
         },
       },
     },
+    // desktop
     {
-      name: 'SponsorEngagement',
+      name: 'seDefault',
       dependencies: ['setup'],
-      testIgnore: '**/accessibilityTests/**',
+      testIgnore: process.env.ENABLE_ACCESSIBILITY ? '' : '**/accessibilityTests/**',
       use: {
         trace: 'on',
         baseURL: `${process.env.E2E_BASE_URL}`,
@@ -48,9 +49,9 @@ const config: PlaywrightTestConfig = {
       },
     },
     {
-      name: 'SE Firefox',
+      name: 'seFirefox',
       dependencies: ['setup'],
-      testIgnore: '**/tests/**',
+      testIgnore: process.env.ENABLE_ACCESSIBILITY ? '' : '**/accessibilityTests/**',
       use: {
         ...devices['Desktop Firefox'],
         trace: 'on',
@@ -63,9 +64,9 @@ const config: PlaywrightTestConfig = {
       },
     },
     {
-      name: 'SE Safari',
+      name: 'seSafari',
       dependencies: ['setup'],
-      testIgnore: '**/tests/**',
+      testIgnore: process.env.ENABLE_ACCESSIBILITY ? '' : '**/accessibilityTests/**',
       use: {
         ...devices['Desktop Safari'],
         trace: 'on',
@@ -78,9 +79,9 @@ const config: PlaywrightTestConfig = {
       },
     },
     {
-      name: 'SE Microsoft Edge',
+      name: 'seEdge',
       dependencies: ['setup'],
-      testIgnore: '**/tests/**',
+      testIgnore: process.env.ENABLE_ACCESSIBILITY ? '' : '**/accessibilityTests/**',
       use: {
         ...devices['Desktop Edge'],
         channel: 'msedge',
@@ -94,9 +95,9 @@ const config: PlaywrightTestConfig = {
       },
     },
     {
-      name: 'SE Google Chrome',
+      name: 'seChrome',
       dependencies: ['setup'],
-      testIgnore: '**/tests/**',
+      testIgnore: process.env.ENABLE_ACCESSIBILITY ? '' : '**/accessibilityTests/**',
       use: {
         ...devices['Desktop Chrome'],
         channel: 'chrome',
@@ -109,10 +110,11 @@ const config: PlaywrightTestConfig = {
         },
       },
     },
+    // mobile
     {
-      name: 'SE Mobile Chrome',
+      name: 'seMobileAndroid',
       dependencies: ['setup'],
-      testIgnore: '**/tests/**',
+      testIgnore: process.env.ENABLE_ACCESSIBILITY ? '' : '**/accessibilityTests/**',
       use: {
         ...devices['Pixel 5'],
         trace: 'on',
@@ -125,9 +127,9 @@ const config: PlaywrightTestConfig = {
       },
     },
     {
-      name: 'SE Mobile Safari',
+      name: 'seMobileIphone',
       dependencies: ['setup'],
-      testIgnore: '**/tests/**',
+      testIgnore: process.env.ENABLE_ACCESSIBILITY ? '' : '**/accessibilityTests/**',
       use: {
         ...devices['iPhone 13'],
         trace: 'on',

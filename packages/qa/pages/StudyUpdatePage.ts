@@ -476,12 +476,23 @@ export default class StudyUpdatePage {
     )
   }
 
-  async assertUkTargetValidation() {
+  async assertUkTargetValidation(error: string) {
     await expect(this.updateValidationBanner).toBeVisible()
     await expect(this.updateValidationBanner).toContainText('There is a problem')
     await expect(this.ukRecruitmentTargetInlineError).toBeVisible()
-    await expect(this.ukRecruitmentTargetInlineError).toHaveText(`Error: Enter a valid UK target`)
-    await expect(this.updateValidationList).toContainText(`Enter a valid UK target`)
+
+    switch (error) {
+      case 'invalid':
+        await expect(this.ukRecruitmentTargetInlineError).toHaveText(`Error: Enter a valid UK target`)
+        await expect(this.updateValidationList).toContainText(`Enter a valid UK target`)
+        break
+      case 'null':
+        await expect(this.ukRecruitmentTargetInlineError).toHaveText(`Error: ???`)
+        await expect(this.updateValidationList).toContainText(`???`)
+        break
+      default:
+        throw new Error(`${error} is not a validation option`)
+    }
   }
 
   async assertUnexpectedErrorOccurred() {
