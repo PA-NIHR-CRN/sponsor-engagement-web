@@ -14,8 +14,8 @@ export const logStudyUpdate = async (
   newStudyValues: EditStudyInputs,
   isDirectUpdate: boolean,
   userId: number,
-  beforeLSN?: string,
-  afterLSN?: string
+  beforeLSN?: string | null,
+  afterLSN?: string | null
 ) => {
   const studyUpdateBefore: Prisma.StudyUpdatesCreateManyInput = {
     studyId,
