@@ -1,5 +1,4 @@
 import type { Prisma } from 'database'
-import { v4 as uuid } from 'uuid'
 
 import { StudyUpdateState, StudyUpdateType } from '@/constants'
 import { constructDateObjFromParts } from '@/utils/date'
@@ -10,6 +9,7 @@ import { mapCPMSStatusToFormStatus } from './studies'
 
 export const logStudyUpdate = async (
   studyId: number,
+  transactionId: string,
   originalStudyValues: EditStudy['originalValues'],
   newStudyValues: EditStudyInputs,
   isDirectUpdate: boolean,
@@ -17,8 +17,6 @@ export const logStudyUpdate = async (
   beforeLSN?: string,
   afterLSN?: string
 ) => {
-  const transactionId = uuid()
-
   const studyUpdateBefore: Prisma.StudyUpdatesCreateManyInput = {
     studyId,
     studyStatus: originalStudyValues.status,
@@ -33,7 +31,7 @@ export const logStudyUpdate = async (
       : undefined,
     comment: originalStudyValues.furtherInformation,
     transactionId,
-    LSN: beforeLSN ? Buffer.from(beforeLSN) : null,
+    LSN: beforeLSN ? Buffer.from(beforeLSN, 'base64') : null,
     studyUpdateStateId: StudyUpdateState.Before,
     studyUpdateTypeId: isDirectUpdate ? StudyUpdateType.Direct : StudyUpdateType.Proposed,
     createdById: userId,
@@ -54,7 +52,7 @@ export const logStudyUpdate = async (
     ukRecruitmentTarget: newStudyValues.recruitmentTarget ? Number(newStudyValues.recruitmentTarget) : undefined,
     comment: newStudyValues.furtherInformation,
     transactionId,
-    LSN: afterLSN ? Buffer.from(afterLSN) : null,
+    LSN: afterLSN ? Buffer.from(afterLSN, 'base64') : null,
     studyUpdateStateId: StudyUpdateState.After,
     studyUpdateTypeId: isDirectUpdate ? StudyUpdateType.Direct : StudyUpdateType.Proposed,
     createdById: userId,

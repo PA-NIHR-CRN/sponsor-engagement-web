@@ -1,4 +1,5 @@
 import type { NextApiRequest } from 'next'
+import { v4 as uuid } from 'uuid'
 
 import { Status, StudyUpdateRoute } from '@/@types/studies'
 import { Roles } from '@/constants'
@@ -39,6 +40,8 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
       ? validationResult.StudyUpdateRoute === StudyUpdateRoute.Direct
       : false
 
+    let afterLSN = ''
+
     if (isDirectUpdate) {
       // Only send additional note if new status is Suspended and not the original status
       // i.e. a status has been changed to Suspended
@@ -60,12 +63,27 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
       if (!study) {
         throw new Error(updateStudyError)
       }
+
+      afterLSN = study.UpdateLsn
     }
 
-    // TODO: Update afterLSN once available from PUT request
-    await logStudyUpdate(studyId, originalValues, studyDataToUpdate, isDirectUpdate, session.user.id, beforeLSN, '')
+    const transactionId = uuid()
 
-    return res.redirect(302, `/studies/${studyId}?success=${isDirectUpdate ? 3 : 2}`)
+    await logStudyUpdate(
+      studyId,
+      transactionId,
+      originalValues,
+      studyDataToUpdate,
+      isDirectUpdate,
+      session.user.id,
+      beforeLSN,
+      afterLSN
+    )
+
+    return res.redirect(
+      302,
+      `/studies/${studyId}?success=${isDirectUpdate ? 3 : 2}&latestProposedUpdate=${transactionId}`
+    )
   } catch (e) {
     const searchParams = new URLSearchParams({ fatal: '1' })
     const studyId = req.body.studyId

@@ -30,8 +30,8 @@ describe('<EditHistoryItem/>', () => {
     const { getByRole, getAllByText } = render(
       <Accordion type="multiple">
         <EditHistoryItem
-          LSN={mockProposedEditHistory.LSN}
           changes={mockProposedEditHistory.changes}
+          id={mockProposedEditHistory.LSN}
           modifiedDate={mockProposedEditHistory.modifiedDate}
           studyUpdateType={StudyUpdateType.Proposed}
           userEmail={mockProposedEditHistory.userEmail}
@@ -52,8 +52,8 @@ describe('<EditHistoryItem/>', () => {
     const { getByRole, getAllByText } = render(
       <Accordion type="multiple">
         <EditHistoryItem
-          LSN={mockProposedEditHistory.LSN}
           changes={mockProposedEditHistory.changes}
+          id={mockProposedEditHistory.LSN}
           modifiedDate={mockProposedEditHistory.modifiedDate}
           studyUpdateType={StudyUpdateType.Direct}
           userEmail={mockProposedEditHistory.userEmail}
@@ -74,8 +74,8 @@ describe('<EditHistoryItem/>', () => {
     const { getByRole, getAllByText } = render(
       <Accordion type="multiple">
         <EditHistoryItem
-          LSN={mockProposedEditHistory.LSN}
           changes={mockProposedEditHistory.changes}
+          id={mockProposedEditHistory.LSN}
           modifiedDate={mockProposedEditHistory.modifiedDate}
         />
       </Accordion>
