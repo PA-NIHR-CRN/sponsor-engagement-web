@@ -7,12 +7,12 @@ import { EditHistory } from './EditHistory'
 
 const mockEditHistory = [
   {
-    LSN: '1',
+    id: '1',
     modifiedDate: new Date().toISOString(),
     changes: [],
   },
   {
-    LSN: '2',
+    id: '2',
     modifiedDate: new Date().toISOString(),
     changes: [],
   },
@@ -29,10 +29,10 @@ describe('<EditHistory/>', () => {
     await userEvent.click(viewEditHistory)
 
     expect(
-      within(viewEditHistory).getByTestId(`edit-history-accordion-item-${mockEditHistory[0].LSN}`)
+      within(viewEditHistory).getByTestId(`edit-history-accordion-item-${mockEditHistory[0].id}`)
     ).toBeInTheDocument()
     expect(
-      within(viewEditHistory).getByTestId(`edit-history-accordion-item-${mockEditHistory[1].LSN}`)
+      within(viewEditHistory).getByTestId(`edit-history-accordion-item-${mockEditHistory[1].id}`)
     ).toBeInTheDocument()
   })
 
@@ -61,7 +61,7 @@ describe('<EditHistory/>', () => {
   })
 
   it('should auto expand the relevant item', async () => {
-    render(<EditHistory editHistoryItems={mockEditHistory} lsnToAutoExpand={mockEditHistory[1].LSN} />)
+    render(<EditHistory editHistoryItems={mockEditHistory} idToAutoExpand={mockEditHistory[1].id} />)
 
     const viewEditHistory = screen.getByRole('group')
     expect(within(viewEditHistory).getByText('View edit history')).toBeInTheDocument()
@@ -70,7 +70,7 @@ describe('<EditHistory/>', () => {
 
     await userEvent.click(viewEditHistory)
 
-    const accordionItem = within(viewEditHistory).getByTestId(`edit-history-accordion-item-${mockEditHistory[1].LSN}`)
+    const accordionItem = within(viewEditHistory).getByTestId(`edit-history-accordion-item-${mockEditHistory[1].id}`)
     expect(accordionItem).toBeInTheDocument()
     expect(accordionItem).toHaveAttribute('data-state', 'open')
   })

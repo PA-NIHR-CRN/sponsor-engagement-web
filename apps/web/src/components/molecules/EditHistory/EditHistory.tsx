@@ -1,30 +1,23 @@
 import { Accordion, Details } from '@nihr-ui/frontend'
 
-import type { EditHistoryItemProps } from './EditHistoryItem/EditHistoryItem'
 import { EditHistoryItem } from './EditHistoryItem/EditHistoryItem'
+import type { getEditHistory } from './utils'
 
-export interface EditHistoryChange {
-  columnChanged: string
-  beforeValue?: string | null
-  afterValue?: string | null
-  id: string
-}
-
-interface EditHistoryProps {
-  editHistoryItems: EditHistoryItemProps[]
-  lsnToAutoExpand?: string
+export interface EditHistoryProps {
+  editHistoryItems: Awaited<ReturnType<typeof getEditHistory>>
+  idToAutoExpand?: string
   errorMessage?: string
 }
 
-export function EditHistory({ editHistoryItems, lsnToAutoExpand, errorMessage }: EditHistoryProps) {
+export function EditHistory({ editHistoryItems, idToAutoExpand, errorMessage }: EditHistoryProps) {
   return (
-    <Details heading="View edit history" open={Boolean(lsnToAutoExpand)}>
-      <Accordion defaultValue={[lsnToAutoExpand ?? '']} type="multiple">
+    <Details heading="View edit history" open={Boolean(idToAutoExpand)}>
+      <Accordion defaultValue={[idToAutoExpand ?? '']} type="multiple">
         {editHistoryItems.map((editHistory) => (
           <EditHistoryItem
-            LSN={editHistory.LSN}
             changes={editHistory.changes}
-            key={editHistory.LSN}
+            id={editHistory.id}
+            key={editHistory.id}
             modifiedDate={editHistory.modifiedDate}
             studyUpdateType={editHistory.studyUpdateType}
             userEmail={editHistory.userEmail}
