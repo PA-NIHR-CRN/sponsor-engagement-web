@@ -15,7 +15,7 @@ describe('getColumnChangedLabelText()', () => {
   })
 
   it.each([
-    ['UkRecruitmentTarget', 'Recruitment target'],
+    ['ukRecruitmentTarget', 'Recruitment target'],
     ['StudyStatus', 'Study status'],
   ])('should return the correct value given the input %s', (input: string, expectedOutput: string) => {
     const result = getColumnChangedLabelText(input)

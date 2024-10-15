@@ -147,7 +147,7 @@ const getMockStudyUpdateInput = (isDirect: boolean, isAfterState: boolean) => {
     createdById: userWithSponsorContactRole.user?.id as number,
     modifiedById: userWithSponsorContactRole.user?.id as number,
     transactionId: mockTransactionId,
-    LSN: isAfterState ? null : Buffer.from(body.LSN as string),
+    LSN: isAfterState ? null : Buffer.from(body.LSN as string, 'base64'),
     studyUpdateStateId: isAfterState ? StudyUpdateState.After : StudyUpdateState.Before,
   }
 }
@@ -199,7 +199,9 @@ describe('/api/forms/editStudy', () => {
       const response = await testHandler(api, { method: 'POST', body })
 
       expect(response.statusCode).toBe(302)
-      expect(response._getRedirectUrl()).toBe(`/studies/${body.studyId}?success=2`)
+      expect(response._getRedirectUrl()).toBe(
+        `/studies/${body.studyId}?success=2&latestProposedUpdate=${mockTransactionId}`
+      )
 
       expect(mockedPostAxios).toHaveBeenCalledTimes(1)
       expect(mockedPostAxios).toHaveBeenCalledWith(
@@ -229,7 +231,9 @@ describe('/api/forms/editStudy', () => {
       const response = await testHandler(api, { method: 'POST', body })
 
       expect(response.statusCode).toBe(302)
-      expect(response._getRedirectUrl()).toBe(`/studies/${body.studyId}?success=2`)
+      expect(response._getRedirectUrl()).toBe(
+        `/studies/${body.studyId}?success=2&latestProposedUpdate=${mockTransactionId}`
+      )
 
       expect(mockedPostAxios).toHaveBeenCalledTimes(1)
       expect(mockedPostAxios).toHaveBeenCalledWith(
