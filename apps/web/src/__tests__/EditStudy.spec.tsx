@@ -26,6 +26,7 @@ const mockSetStudyAssessmentDue = setStudyAssessmentDue as jest.MockedFunction<t
 
 const mockStudyId = mockStudyWithRelations.id.toString()
 
+const mockLSN = '1212'
 const mockCPMSResponse = {
   StatusCode: 200,
   Result: mockCPMSStudy,
@@ -169,6 +170,7 @@ describe('EditStudy', () => {
             evaluationCategories: mappedCPMSStudyEvals,
             organisationsByRole,
           },
+          LSN: mockLSN,
         },
       })
 
@@ -240,6 +242,7 @@ describe('EditStudy', () => {
             ...mockStudyWithRelations,
             organisationsByRole,
           },
+          LSN: mockLSN,
         },
       })
 
@@ -268,6 +271,7 @@ describe('EditStudy', () => {
             evaluationCategories: mappedCPMSStudyEvals,
             organisationsByRole,
           },
+          LSN: mockLSN,
         },
       })
 
@@ -298,6 +302,7 @@ describe('EditStudy', () => {
             organisationsByRole,
             isDueAssessment: true,
           },
+          LSN: mockLSN,
         },
       })
 
