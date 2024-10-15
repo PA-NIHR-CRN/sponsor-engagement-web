@@ -147,7 +147,7 @@ const getMockStudyUpdateInput = (isDirect: boolean, isAfterState: boolean) => {
     createdById: userWithSponsorContactRole.user?.id as number,
     modifiedById: userWithSponsorContactRole.user?.id as number,
     transactionId: mockTransactionId,
-    LSN: isAfterState ? null : Buffer.from(body.LSN as string, 'base64'),
+    LSN: isAfterState ? null : Buffer.from(body.LSN as string, 'hex'),
     studyUpdateStateId: isAfterState ? StudyUpdateState.After : StudyUpdateState.Before,
   }
 }
