@@ -12,3 +12,12 @@ export enum StudyUpdateType {
   Direct = 1,
   Proposed = 2,
 }
+
+/**
+ * The state of a study update - Before/After
+ * This should match the values in SysRefStudyUpdateState table
+ */
+export enum StudyUpdateState {
+  Before = 1,
+  After = 2,
+}
