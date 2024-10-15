@@ -38,8 +38,7 @@ const testHandler = async (handler: typeof api, options: RequestOptions) => {
 const mockStudyId = 1211
 
 const nextYearValue = new Date().getFullYear() + 1
-const mockEstimatedReopeningDateInFuture = new Date(mockCPMSStudy.EstimatedReopeningDate as string)
-mockEstimatedReopeningDateInFuture.setFullYear(nextYearValue)
+const mockEstimatedReopeningDateInFuture = `${nextYearValue}-02-28T00:00:00.000`
 
 const mockCPMSUpdateInput = {
   ...mockCPMSUpdate,
@@ -135,11 +134,21 @@ const getMockStudyUpdateInput = (isDirect: boolean, isAfterState: boolean) => {
   return {
     studyStatus: isAfterState ? studyStatusOnUpdateType : body.originalValues.status,
     studyStatusGroup: isAfterState ? 'Suspended' : 'Open, to Recruitment',
-    plannedOpeningDate: isAfterState ? new Date('2003-02-28T00:00:00') : new Date('2003-02-27T00:00:00'),
-    actualOpeningDate: isAfterState ? new Date('1991-09-01T00:00:00') : new Date('1991-09-02T00:00:00'),
-    plannedClosureToRecruitmentDate: isAfterState ? new Date('2004-02-28T00:00:00') : new Date('2004-02-27T00:00:00'),
-    actualClosureToRecruitmentDate: isAfterState ? new Date('2003-02-28T00:00:00') : new Date('2003-02-29T00:00:00'),
-    estimatedReopeningDate: isAfterState ? mockEstimatedReopeningDateInFuture : new Date('2021-02-27T00:00:00'),
+    plannedOpeningDate: isAfterState
+      ? new Date('2003-02-28T00:00:00').toISOString()
+      : new Date('2003-02-27T00:00:00').toISOString(),
+    actualOpeningDate: isAfterState
+      ? new Date('1991-09-01T00:00:00').toISOString()
+      : new Date('1991-09-02T00:00:00').toISOString(),
+    plannedClosureToRecruitmentDate: isAfterState
+      ? new Date('2004-02-28T00:00:00').toISOString()
+      : new Date('2004-02-27T00:00:00').toISOString(),
+    actualClosureToRecruitmentDate: isAfterState
+      ? new Date('2003-02-28T00:00:00').toISOString()
+      : new Date('2003-02-29T00:00:00').toISOString(),
+    estimatedReopeningDate: isAfterState
+      ? new Date(mockEstimatedReopeningDateInFuture).toISOString()
+      : new Date('2021-02-27T00:00:00').toISOString(),
     ukRecruitmentTarget: isAfterState ? 121 : 122,
     comment: '',
     studyId: body.studyId,

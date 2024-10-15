@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { constructDateObjFromParts } from '@/utils/date'
+import { constructDateStrFromParts } from '@/utils/date'
 import type { EditStudyInputs } from '@/utils/schemas'
 
 import { mockCPMSStudy, mockCPMSUpdateInput, mockCPMSValidationResult } from '../../mocks/studies'
@@ -13,7 +13,7 @@ const mockedPutAxios = jest.mocked(axios.put)
 const mockedPostAxios = jest.mocked(axios.post)
 
 jest.mock('../../utils/date')
-const mockConstructDateObjFromParts = constructDateObjFromParts as jest.MockedFunction<typeof constructDateObjFromParts>
+const mockconstructDateStrFromParts = constructDateStrFromParts as jest.MockedFunction<typeof constructDateStrFromParts>
 
 const env = { ...process.env }
 const mockedEnvVars = {
@@ -297,14 +297,14 @@ describe('mapEditStudyInputToCPMSStudy', () => {
   }
 
   test('correctly maps data when all fields exist', () => {
-    mockConstructDateObjFromParts.mockReturnValue(mockDate)
+    mockconstructDateStrFromParts.mockReturnValue(mockDate.toISOString())
 
     const result = mapEditStudyInputToCPMSStudy(input)
     expect(result).toStrictEqual(mappedInput)
   })
 
   test('correctly maps date fields when they do not exist', () => {
-    mockConstructDateObjFromParts.mockReturnValue(undefined)
+    mockconstructDateStrFromParts.mockReturnValue(undefined)
 
     const result = mapEditStudyInputToCPMSStudy({
       ...input,
