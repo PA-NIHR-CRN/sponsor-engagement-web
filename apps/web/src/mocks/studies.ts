@@ -142,6 +142,7 @@ export const mockCPMSStudy = Mock.of<Study>({
       OrganisationRoleRTSIdentifier: StudySponsorOrganisationRoleRTSIdentifier.ClinicalResearchSponsor,
     },
   ],
+  ChangeHistory: [],
 })
 
 export const mockCPMSUpdateInput: UpdateStudyInput = {
