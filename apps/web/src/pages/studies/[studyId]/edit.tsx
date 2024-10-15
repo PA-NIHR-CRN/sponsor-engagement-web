@@ -50,7 +50,7 @@ const transformDateValue = (input?: DateInputValue | null) => ({
   year: input?.year ?? '',
 })
 
-export default function EditStudy({ study, CurrentLsn }: EditStudyProps) {
+export default function EditStudy({ study, currentLSN }: EditStudyProps) {
   const mappedFormInput = mapStudyToStudyFormInput(study)
 
   const { register, formState, handleSubmit, control, watch, setError } = useForm<EditStudySchema>({
@@ -58,7 +58,7 @@ export default function EditStudy({ study, CurrentLsn }: EditStudyProps) {
     defaultValues: {
       ...mappedFormInput,
       originalValues: mappedFormInput,
-      LSN: CurrentLsn,
+      LSN: currentLSN,
     },
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
@@ -461,7 +461,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
         evaluationCategories: updatedStudyEvals ?? study.evaluationCategories,
         isDueAssessment: isStudyDueAssessment,
       },
-      CurrentLsn: studyInCPMS.CurrentLsn,
+      currentLSN: studyInCPMS.CurrentLsn,
     },
   }
 })

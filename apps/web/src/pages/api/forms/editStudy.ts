@@ -80,10 +80,12 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
       afterLSN
     )
 
-    return res.redirect(
-      302,
-      `/studies/${studyId}?success=${isDirectUpdate ? 3 : 2}&latestProposedUpdate=${transactionId}`
-    )
+    const searchParams = new URLSearchParams({
+      success: isDirectUpdate ? '3' : '2',
+      ...(!isDirectUpdate ? { latestProposedUpdate: transactionId } : {}),
+    })
+
+    return res.redirect(302, `/studies/${studyId}?${searchParams.toString()}`)
   } catch (e) {
     const searchParams = new URLSearchParams({ fatal: '1' })
     const studyId = req.body.studyId
