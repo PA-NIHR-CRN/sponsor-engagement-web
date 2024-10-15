@@ -38,7 +38,7 @@ import {
 } from '@/lib/studies'
 import { areAllDatePartsEmpty } from '@/utils/date'
 import { getVisibleFormFields, mapStudyToStudyFormInput } from '@/utils/editStudyForm'
-import type { EditStudyInputs } from '@/utils/schemas'
+import type { EditStudy as EditStudySchema, EditStudyInputs } from '@/utils/schemas'
 import { studySchema } from '@/utils/schemas'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
@@ -50,11 +50,15 @@ const transformDateValue = (input?: DateInputValue | null) => ({
   year: input?.year ?? '',
 })
 
-export default function EditStudy({ study }: EditStudyProps) {
-  const { register, formState, handleSubmit, control, watch, setError } = useForm<EditStudyInputs>({
+export default function EditStudy({ study, LSN }: EditStudyProps) {
+  const mappedFormInput = mapStudyToStudyFormInput(study)
+
+  const { register, formState, handleSubmit, control, watch, setError } = useForm<EditStudySchema>({
     resolver: zodResolver(studySchema),
     defaultValues: {
-      ...mapStudyToStudyFormInput(study),
+      ...mappedFormInput,
+      originalValues: mappedFormInput,
+      LSN,
     },
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
@@ -457,6 +461,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
         evaluationCategories: updatedStudyEvals ?? study.evaluationCategories,
         isDueAssessment: isStudyDueAssessment,
       },
+      LSN: '1212', // TODO: Update from GET response
     },
   }
 })
