@@ -106,7 +106,7 @@ const createChangeHistoryForProposedChanges = async (transactionIds: string[]) =
  * - Returns normalised change history
  */
 const createChangeHistoryForCPMSChanges = async (cpmsUpdates: ChangeHistory[], LSNs: string[]) => {
-  const bufferArrayLSNs = LSNs.map((value) => Buffer.from(value, 'base64'))
+  const bufferArrayLSNs = LSNs.map((value) => Buffer.from(value, 'hex'))
 
   const directSEUpdatesData = await prismaClient.studyUpdates.findMany({
     where: {
@@ -124,7 +124,7 @@ const createChangeHistoryForCPMSChanges = async (cpmsUpdates: ChangeHistory[], L
   cpmsUpdates.forEach((edit) => {
     if (!LSNs.includes(edit.LSN)) return
 
-    const existsInSE = directSEUpdatesData.find((update) => update.LSN?.toString('base64') === edit.LSN)
+    const existsInSE = directSEUpdatesData.find((update) => update.LSN?.toString('hex') === edit.LSN.toLowerCase())
 
     if (existsInSE) {
       editHistoryFromCPMSData.push({
