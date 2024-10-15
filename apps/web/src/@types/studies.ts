@@ -1,10 +1,14 @@
 import type { OrganisationRoleShortName } from '@/lib/organisations'
 
-export interface CPMSStudyResponse {
+interface CPMSResponse<T> {
   Version: string
   StatusCode: number
-  Result: Study
+  Result: T
 }
+
+export type CPMSGetStudyResponse = CPMSResponse<Study & { CurrentLsn: string }>
+
+export type CPMSUpdateStudyResponse = CPMSResponse<Study & { UpdateLsn: string }>
 
 export enum StudyUpdateRoute {
   Direct = 'Direct',
@@ -15,10 +19,18 @@ export interface CPMSValidationResult {
   StudyUpdateRoute: StudyUpdateRoute
 }
 
-export interface CPMSValidateStudyResponse {
-  Version: string
-  StatusCode: number
-  Result: CPMSValidationResult
+export type CPMSValidateStudyResponse = CPMSResponse<CPMSValidationResult>
+
+interface CPMSEditHistoryChange {
+  Column: string
+  OldValue: string
+  NewValue: string
+}
+export interface ChangeHistory {
+  Timestamp: string
+  Operation: string
+  LSN: string
+  Changes: CPMSEditHistoryChange[]
 }
 
 export interface Study {
@@ -43,6 +55,7 @@ export interface Study {
   ChiefInvestigatorLastName: string
   StudySponsors: StudySponsor[]
   organisationsByRole?: Partial<Record<OrganisationRoleShortName, string>>
+  ChangeHistory: ChangeHistory[]
 }
 
 export enum StudyRecordStatus {

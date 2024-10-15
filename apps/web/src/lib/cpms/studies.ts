@@ -2,12 +2,18 @@ import assert from 'node:assert'
 
 import axios from 'axios'
 
-import type { CPMSStudyResponse, CPMSValidateStudyResponse, CPMSValidationResult, Study } from '@/@types/studies'
+import type {
+  CPMSGetStudyResponse,
+  CPMSUpdateStudyResponse,
+  CPMSValidateStudyResponse,
+  CPMSValidationResult,
+  Study,
+} from '@/@types/studies'
 import { constructDateObjFromParts } from '@/utils/date'
 import type { EditStudyInputs } from '@/utils/schemas'
 
 export interface GetStudyFromCPMSResponse {
-  study: Study | null
+  study: (Study & { CurrentLsn: string }) | null
   error?: string
 }
 
@@ -20,7 +26,7 @@ export const getStudyByIdFromCPMS = async (studyId: number): Promise<GetStudyFro
     assert(CPMS_API_PASSWORD, 'CPMS_API_PASSWORD is not defined')
 
     const requestUrl = `${CPMS_API_URL}/studies/${studyId}/engagement-info`
-    const { data } = await axios.get<CPMSStudyResponse>(requestUrl, {
+    const { data } = await axios.get<CPMSGetStudyResponse>(requestUrl, {
       headers: { username: CPMS_API_USERNAME, password: CPMS_API_PASSWORD },
     })
 
@@ -48,7 +54,7 @@ export type UpdateStudyInput = Pick<
 > & { notes?: string }
 
 export interface UpdateStudyFromCPMSResponse {
-  study: Study | null
+  study: (Study & { UpdateLsn: string }) | null
   error?: string
 }
 
@@ -67,7 +73,7 @@ export const updateStudyInCPMS = async (
 
     const requestUrl = `${CPMS_API_URL}/studies/${cpmsId}/engagement-info`
 
-    const { data } = await axios.put<CPMSStudyResponse>(requestUrl, body, {
+    const { data } = await axios.put<CPMSUpdateStudyResponse>(requestUrl, body, {
       headers: {
         username: CPMS_API_USERNAME,
         password: CPMS_API_PASSWORD,
