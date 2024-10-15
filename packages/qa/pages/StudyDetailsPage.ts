@@ -55,7 +55,7 @@ export default class StudyDetailsPage {
   readonly tableEstimatedReopenDateHeader: Locator
   readonly tableEstimatedReopenDateValue: Locator
   readonly assessButton: Locator
-  readonly editStudyDataButton: Locator
+  readonly updateStudyDataButton: Locator
   readonly assessSuccessAlertBox: Locator
   readonly assessSuccessAlertBoxTitle: Locator
   readonly noAssessmentValue: Locator
@@ -100,7 +100,7 @@ export default class StudyDetailsPage {
     this.sponsorOrgSubTitle = page.locator('span[class="govuk-body-m mb-0 text-darkGrey"]')
     this.progressSummarySubTitle = page.locator('span[class="govuk-body-s text-darkGrey"]')
     this.assessButton = page.locator('a[class="govuk-button w-auto govuk-!-margin-bottom-0"]')
-    this.editStudyDataButton = page.locator(
+    this.updateStudyDataButton = page.locator(
       'a[class="govuk-button govuk-button--secondary w-auto govuk-!-margin-bottom-0"]'
     )
     // About Study Table Values
