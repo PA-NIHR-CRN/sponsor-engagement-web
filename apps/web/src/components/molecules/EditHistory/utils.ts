@@ -133,7 +133,7 @@ const createChangeHistoryForCPMSChanges = async (cpmsUpdates: ChangeHistory[], L
         changes: edit.Changes.map((change) => ({
           columnChanged: change.Column,
           beforeValue: transformValue(change.OldValue),
-          newValue: transformValue(change.NewValue),
+          afterValue: transformValue(change.NewValue),
         })),
         userEmail: existsInSE.createdBy.email,
         studyUpdateType: StudyUpdateType.Direct,
@@ -145,7 +145,7 @@ const createChangeHistoryForCPMSChanges = async (cpmsUpdates: ChangeHistory[], L
         changes: edit.Changes.map((change) => ({
           columnChanged: change.Column,
           beforeValue: transformValue(change.OldValue),
-          newValue: transformValue(change.NewValue),
+          afterValue: transformValue(change.NewValue),
         })),
       })
     }
