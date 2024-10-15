@@ -1,7 +1,7 @@
 import type { Prisma } from 'database'
 
 import { StudyUpdateState, StudyUpdateType } from '@/constants'
-import { constructDateObjFromParts } from '@/utils/date'
+import { constructDateStrFromParts } from '@/utils/date'
 import type { EditStudy, EditStudyInputs } from '@/utils/schemas'
 
 import { prismaClient } from './prisma'
@@ -21,11 +21,11 @@ export const logStudyUpdate = async (
     studyId,
     studyStatus: originalStudyValues.status,
     studyStatusGroup: mapCPMSStatusToFormStatus(originalStudyValues.status),
-    plannedOpeningDate: constructDateObjFromParts(originalStudyValues.plannedOpeningDate),
-    actualOpeningDate: constructDateObjFromParts(originalStudyValues.actualOpeningDate),
-    plannedClosureToRecruitmentDate: constructDateObjFromParts(originalStudyValues.plannedClosureDate),
-    actualClosureToRecruitmentDate: constructDateObjFromParts(originalStudyValues.actualClosureDate),
-    estimatedReopeningDate: constructDateObjFromParts(originalStudyValues.estimatedReopeningDate),
+    plannedOpeningDate: constructDateStrFromParts(originalStudyValues.plannedOpeningDate),
+    actualOpeningDate: constructDateStrFromParts(originalStudyValues.actualOpeningDate),
+    plannedClosureToRecruitmentDate: constructDateStrFromParts(originalStudyValues.plannedClosureDate),
+    actualClosureToRecruitmentDate: constructDateStrFromParts(originalStudyValues.actualClosureDate),
+    estimatedReopeningDate: constructDateStrFromParts(originalStudyValues.estimatedReopeningDate),
     ukRecruitmentTarget: originalStudyValues.recruitmentTarget
       ? Number(originalStudyValues.recruitmentTarget)
       : undefined,
@@ -44,11 +44,11 @@ export const logStudyUpdate = async (
     // Therefore, this is only saved if it is a direct update. But studyStatusGroup is always set.
     studyStatus: isDirectUpdate ? newStudyValues.status : null,
     studyStatusGroup: mapCPMSStatusToFormStatus(newStudyValues.status),
-    plannedOpeningDate: constructDateObjFromParts(newStudyValues.plannedOpeningDate),
-    actualOpeningDate: constructDateObjFromParts(newStudyValues.actualOpeningDate),
-    plannedClosureToRecruitmentDate: constructDateObjFromParts(newStudyValues.plannedClosureDate),
-    actualClosureToRecruitmentDate: constructDateObjFromParts(newStudyValues.actualClosureDate),
-    estimatedReopeningDate: constructDateObjFromParts(newStudyValues.estimatedReopeningDate),
+    plannedOpeningDate: constructDateStrFromParts(newStudyValues.plannedOpeningDate),
+    actualOpeningDate: constructDateStrFromParts(newStudyValues.actualOpeningDate),
+    plannedClosureToRecruitmentDate: constructDateStrFromParts(newStudyValues.plannedClosureDate),
+    actualClosureToRecruitmentDate: constructDateStrFromParts(newStudyValues.actualClosureDate),
+    estimatedReopeningDate: constructDateStrFromParts(newStudyValues.estimatedReopeningDate),
     ukRecruitmentTarget: newStudyValues.recruitmentTarget ? Number(newStudyValues.recruitmentTarget) : undefined,
     comment: newStudyValues.furtherInformation,
     transactionId,

@@ -9,7 +9,7 @@ import type {
   CPMSValidationResult,
   Study,
 } from '@/@types/studies'
-import { constructDateObjFromParts } from '@/utils/date'
+import { constructDateStrFromParts } from '@/utils/date'
 import type { EditStudyInputs } from '@/utils/schemas'
 
 export interface GetStudyFromCPMSResponse {
@@ -98,11 +98,11 @@ export const updateStudyInCPMS = async (
 export const mapEditStudyInputToCPMSStudy = (study: EditStudyInputs): UpdateStudyInput => ({
   StudyStatus: study.status,
   UkRecruitmentTarget: study.recruitmentTarget ? Number(study.recruitmentTarget) : null,
-  PlannedOpeningDate: constructDateObjFromParts(study.plannedOpeningDate)?.toISOString() ?? null,
-  ActualOpeningDate: constructDateObjFromParts(study.actualOpeningDate)?.toISOString() ?? null,
-  PlannedClosureToRecruitmentDate: constructDateObjFromParts(study.plannedClosureDate)?.toISOString() ?? null,
-  ActualClosureToRecruitmentDate: constructDateObjFromParts(study.actualClosureDate)?.toISOString() ?? null,
-  EstimatedReopeningDate: constructDateObjFromParts(study.estimatedReopeningDate)?.toISOString() ?? null,
+  PlannedOpeningDate: constructDateStrFromParts(study.plannedOpeningDate, false) ?? null,
+  ActualOpeningDate: constructDateStrFromParts(study.actualOpeningDate, false) ?? null,
+  PlannedClosureToRecruitmentDate: constructDateStrFromParts(study.plannedClosureDate, false) ?? null,
+  ActualClosureToRecruitmentDate: constructDateStrFromParts(study.actualClosureDate, false) ?? null,
+  EstimatedReopeningDate: constructDateStrFromParts(study.estimatedReopeningDate, false) ?? null,
 })
 
 export interface ValidateStudyUpdateResponse {
