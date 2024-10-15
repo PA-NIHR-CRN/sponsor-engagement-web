@@ -22,7 +22,7 @@ export const studyStatuses = [
   },
   {
     name: 'Open to recruitment',
-    description: 'Ready (open) to recruit participants in at least one UK site. Provide an actual opening date below.',
+    description: 'Open to recruit participants in at least one UK site. Provide an actual opening date below.',
     id: '2',
     value: FormStudyStatus.OpenToRecruitment,
   },
@@ -34,7 +34,7 @@ export const studyStatuses = [
     value: FormStudyStatus.ClosedFollowUp,
   },
   {
-    name: 'Closed',
+    name: 'Closed, no follow-up',
     description:
       'Completed recruitment and any subsequent patient related activities (follow up). Provide an actual closure date below.',
     id: '4',
@@ -71,7 +71,7 @@ export const fieldNameToLabelMapping: Record<
   estimatedReopeningDate: 'Estimated reopening date',
   status: 'Study status',
   recruitmentTarget: 'UK recruitment target',
-  furtherInformation: 'Further information',
+  furtherInformation: 'Further information (optional)',
 }
 
 export type DateRestrictions = 'requiredPastOrCurrent' | 'requiredFuture'

@@ -363,7 +363,7 @@ describe('EditStudy', () => {
 
       expect(within(statusFieldset).getByLabelText('Open to recruitment')).toBeInTheDocument()
       expect(within(statusFieldset).getByLabelText('Open to recruitment')).toHaveAccessibleDescription(
-        'Ready (open) to recruit participants in at least one UK site. Provide an actual opening date below.'
+        'Open to recruit participants in at least one UK site. Provide an actual opening date below.'
       )
 
       expect(within(statusFieldset).getByLabelText('Closed, in follow-up')).toBeInTheDocument()
@@ -371,8 +371,8 @@ describe('EditStudy', () => {
         'Ongoing, (i.e. participants are being treated or observed), but recruitment is complete. Provide an actual closure date below.'
       )
 
-      expect(within(statusFieldset).getByLabelText('Closed')).toBeInTheDocument()
-      expect(within(statusFieldset).getByLabelText('Closed')).toHaveAccessibleDescription(
+      expect(within(statusFieldset).getByLabelText('Closed, no follow-up')).toBeInTheDocument()
+      expect(within(statusFieldset).getByLabelText('Closed, no follow-up')).toHaveAccessibleDescription(
         'Completed recruitment and any subsequent patient related activities (follow up). Provide an actual closure date below.'
       )
 
@@ -394,7 +394,7 @@ describe('EditStudy', () => {
       expect(ukRecruitmentTarget).toBeInTheDocument()
 
       // Form Input - Further information
-      const furtherInformation = screen.getByLabelText('Further information')
+      const furtherInformation = screen.getByLabelText('Further information (optional)')
       expect(furtherInformation).toBeInTheDocument()
       expect(furtherInformation).toHaveAccessibleDescription(
         'You have 500 characters remaining If needed, provide further context or justification for changes made above.'
@@ -405,6 +405,13 @@ describe('EditStudy', () => {
 
       // Cancel CTA
       expect(screen.getByRole('link', { name: 'Cancel' })).toHaveAttribute('href', `/studies/${mockStudyId}`)
+
+      // Support text
+      const paragraphSupportText = screen.getByText(/if you need support updating your data, please contact the/i)
+      expect(paragraphSupportText).toBeInTheDocument()
+      const rdnTeamLink = within(paragraphSupportText).getByRole('link', { name: /rdn team/i })
+      expect(rdnTeamLink).toBeInTheDocument()
+      expect(rdnTeamLink).toHaveAttribute('href', 'mailto:supportmystudy@nihr.ac.uk')
     })
 
     it.each([
@@ -460,11 +467,14 @@ describe('EditStudy', () => {
     })
 
     it.each([
-      [Status.InSetup, ['In setup', 'Open to recruitment', 'Closed, in follow-up', 'Closed', 'Withdrawn', 'Suspended']],
-      [Status.OpenToRecruitment, ['Open to recruitment', 'Closed, in follow-up', 'Closed', 'Suspended']],
-      [Status.Suspended, ['Open to recruitment', 'Closed, in follow-up', 'Closed', 'Suspended']],
+      [
+        Status.InSetup,
+        ['In setup', 'Open to recruitment', 'Closed, in follow-up', 'Closed, no follow-up', 'Withdrawn', 'Suspended'],
+      ],
+      [Status.OpenToRecruitment, ['Open to recruitment', 'Closed, in follow-up', 'Closed, no follow-up', 'Suspended']],
+      [Status.Suspended, ['Open to recruitment', 'Closed, in follow-up', 'Closed, no follow-up', 'Suspended']],
       [Status.ClosedToRecruitmentInFollowUp, ['Closed, in follow-up']],
-      [Status.ClosedToRecruitment, ['Closed']],
+      [Status.ClosedToRecruitment, ['Closed, no follow-up']],
     ])(
       'should show the correct status fields based on the original status',
       async (originalStatus: Status, statusLabels: string[]) => {
