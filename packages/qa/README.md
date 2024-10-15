@@ -6,8 +6,8 @@ Playwright [Documentation](https://playwright.dev/docs/intro)
 
 ## Authors
 
-[Chris McNeill - PA Consulting](https://github.com/chrismcneill89)
-[Adam Nicolaou-Jones - PA consulting](https://github.com/onlyadam)
+- [Chris McNeill - PA Consulting](https://github.com/chrismcneill89)
+- [Adam Nicolaou-Jones - PA consulting](https://github.com/onlyadam)
 
 ## Setup
 
@@ -186,7 +186,7 @@ To view it click the artifact link and it will be downloaded as a Zip file
 
 **Note:** The traces section of the report will not work as The Playwright Trace Viewer must be loaded over the http:// or https:// protocols
 
-## ----- GitHub pages ----------------------------------------------------------------------------------------------------------------------------
+## ----- GitHub pages ----------------------------------------------------------------------------
 
 **Warning: Do not delete `gh-pages` branch from the repo**
 
