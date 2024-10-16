@@ -10,7 +10,15 @@ import { setStudyAssessmentDue } from 'shared-utilities'
 import { Mock } from 'ts-mockery'
 
 import { render, screen, within } from '@/config/TestUtils'
-import { mappedCPMSStudyEvals, mockCPMSStudy, mockMappedAssessment, mockStudyWithRelations } from '@/mocks/studies'
+import { StudyUpdateState, StudyUpdateType } from '@/constants'
+import {
+  getMockEditHistoryFromCPMS,
+  mappedCPMSStudyEvals,
+  mockCPMSStudy,
+  mockMappedAssessment,
+  mockStudyUpdates,
+  mockStudyWithRelations,
+} from '@/mocks/studies'
 
 import { prismaMock } from '../__mocks__/prisma'
 import {
@@ -103,9 +111,19 @@ const renderPage = async (
 
   await mockRouter.push(mockUrl)
 
-  prismaMock.studyUpdates.groupBy.mockResolvedValueOnce([])
-  prismaMock.studyUpdates.findMany.mockResolvedValueOnce([])
-  prismaMock.studyUpdates.findMany.mockResolvedValueOnce([])
+  // Requests for edit history
+  prismaMock.studyUpdates.groupBy.mockResolvedValueOnce([
+    { ...mockStudyUpdates[0], _count: true, _avg: undefined, _sum: undefined, _min: undefined, _max: undefined },
+  ])
+  prismaMock.studyUpdates.findMany.mockResolvedValueOnce(mockStudyUpdates)
+  prismaMock.studyUpdates.findMany.mockResolvedValueOnce(
+    mockStudyUpdates.map((studyUpdate) => ({
+      ...studyUpdate,
+      studyUpdateStateId: StudyUpdateState.After,
+      studyUpdateTypeId: StudyUpdateType.Direct,
+      LSN: studyUpdate.LSN ?? Buffer.from(mockCPMSStudy.ChangeHistory[1].LSN, 'hex'),
+    }))
+  )
 
   const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
 
@@ -126,6 +144,7 @@ describe('Study', () => {
     process.env.CPMS_API_USERNAME = mockedEnvVars.apiUsername
     process.env.CPMS_API_PASSWORD = mockedEnvVars.apiPassword
     process.env.ASSESSMENT_LAPSE_MONTHS = mockedEnvVars.assessmentLapseMonths
+    process.env.NEXT_PUBLIC_ENABLE_EDIT_HISTORY_FEATURE = 'true'
   })
 
   afterAll(() => {
@@ -205,7 +224,7 @@ describe('Study', () => {
             evaluationCategories: mappedCPMSStudyEvals,
             organisationsByRole,
           },
-          editHistory: [],
+          editHistory: getMockEditHistoryFromCPMS([false, false]),
         },
       })
 
@@ -286,7 +305,7 @@ describe('Study', () => {
             ...mockStudyWithRelations,
             organisationsByRole,
           },
-          editHistory: [],
+          editHistory: getMockEditHistoryFromCPMS([false, false]),
         },
       })
 
@@ -319,7 +338,7 @@ describe('Study', () => {
             evaluationCategories: mappedCPMSStudyEvals,
             organisationsByRole,
           },
-          editHistory: [],
+          editHistory: getMockEditHistoryFromCPMS([false, false]),
         },
       })
 
@@ -354,7 +373,7 @@ describe('Study', () => {
             organisationsByRole,
             isDueAssessment: true,
           },
-          editHistory: [],
+          editHistory: getMockEditHistoryFromCPMS([false, false]),
         },
       })
 
@@ -586,6 +605,39 @@ describe('Study', () => {
       expect(within(list).getByText('Mocked list item 3')).toBeInTheDocument()
 
       expect(screen.getByText('Testing some further information')).toBeInTheDocument()
+    })
+  })
+
+  describe('Study edit history accordion', () => {
+    test('Displays the correct deatils for edit history', async () => {
+      await renderPage()
+
+      const viewEditHistory = screen.getByRole('group')
+      expect(within(viewEditHistory).getByText('View edit history')).toBeInTheDocument()
+      expect(viewEditHistory).toBeInTheDocument()
+
+      await userEvent.click(viewEditHistory)
+
+      expect(
+        within(viewEditHistory).getByTestId(`edit-history-accordion-item-${mockStudyUpdates[0].transactionId}`)
+      ).toBeInTheDocument()
+      expect(
+        within(viewEditHistory).getByTestId(`edit-history-accordion-item-${mockCPMSStudy.ChangeHistory[0].LSN}`)
+      ).toBeInTheDocument()
+      expect(
+        within(viewEditHistory).getByTestId(`edit-history-accordion-item-${mockCPMSStudy.ChangeHistory[1].LSN}`)
+      ).toBeInTheDocument()
+      expect(
+        within(viewEditHistory).getByTestId(`edit-history-accordion-item-${mockCPMSStudy.ChangeHistory[2].LSN}`)
+      ).toBeInTheDocument()
+    })
+
+    test('When query contains a latestProposedUpdate query, should open the corresponding item', async () => {
+      await renderPage(undefined, `?latestProposedUpdate=${mockStudyUpdates[0].transactionId}`)
+
+      const accordionItem = screen.getByTestId(`edit-history-accordion-item-${mockStudyUpdates[0].transactionId}`)
+      expect(accordionItem).toBeInTheDocument()
+      expect(accordionItem).toHaveAttribute('data-state', 'open')
     })
   })
 

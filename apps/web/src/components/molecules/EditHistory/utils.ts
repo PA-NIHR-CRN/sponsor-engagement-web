@@ -4,7 +4,6 @@ import type { ChangeHistory } from '@/@types/studies'
 import { StudyUpdateState, StudyUpdateType } from '@/constants'
 import type { Prisma } from '@/lib/prisma'
 import { prismaClient } from '@/lib/prisma'
-import { mapCPMSStatusToFormStatus } from '@/lib/studies'
 import { formatDate } from '@/utils/date'
 
 import type { EditHistory, EditHistoryChange } from './types'
@@ -18,9 +17,10 @@ const seStudyUpdatesColumnsForEditHistory: StudyUpdateRecordType[] = [
   'actualClosureToRecruitmentDate',
   'studyStatusGroup',
   'ukRecruitmentTarget',
+  'estimatedReopeningDate',
 ]
 
-const transformValue = (value: string | null) => {
+export const transformValue = (value: string | null) => {
   if (!value) return null
 
   // Check if value is a valid number
@@ -33,9 +33,7 @@ const transformValue = (value: string | null) => {
     return formatDate(value)
   }
 
-  // If value has a mapping, return simplified status
-  // Else returns the input value
-  return mapCPMSStatusToFormStatus(value)
+  return value
 }
 
 /**
@@ -44,7 +42,7 @@ const transformValue = (value: string | null) => {
  * - Calculates the difference between the 'before' and 'after' records
  * - Returns normalised change history
  */
-const createChangeHistoryForProposedChanges = async (transactionIds: string[]) => {
+export const createChangeHistoryForProposedChanges = async (transactionIds: string[]) => {
   const proposedSEUpdatesData = await prismaClient.studyUpdates.findMany({
     where: { transactionId: { in: transactionIds } },
     include: {
@@ -105,7 +103,7 @@ const createChangeHistoryForProposedChanges = async (transactionIds: string[]) =
  * - Retrieves additional fields (user email and date) from SE if it's a direct change
  * - Returns normalised change history
  */
-const createChangeHistoryForCPMSChanges = async (cpmsUpdates: ChangeHistory[], LSNs: string[]) => {
+export const createChangeHistoryForCPMSChanges = async (cpmsUpdates: ChangeHistory[], LSNs: string[]) => {
   const bufferArrayLSNs = LSNs.map((value) => Buffer.from(value, 'hex'))
 
   const directSEUpdatesData = await prismaClient.studyUpdates.findMany({
@@ -124,7 +122,9 @@ const createChangeHistoryForCPMSChanges = async (cpmsUpdates: ChangeHistory[], L
   cpmsUpdates.forEach((edit) => {
     if (!LSNs.includes(edit.LSN)) return
 
-    const existsInSE = directSEUpdatesData.find((update) => update.LSN?.toString('hex') === edit.LSN.toLowerCase())
+    const existsInSE = directSEUpdatesData.find(
+      (update) => update.LSN?.toString('hex').toLowerCase() === edit.LSN.toLowerCase()
+    )
 
     if (existsInSE) {
       editHistoryFromCPMSData.push({
@@ -158,7 +158,7 @@ const createChangeHistoryForCPMSChanges = async (cpmsUpdates: ChangeHistory[], L
  * Gets the ten most recent updates to display to the user
  * Merges direct/indirect changes from CPMS and proposed changes from SE to determine the most recent
  */
-const getTenMostRecentUpdates = (
+export const getTenMostRecentUpdates = (
   proposedUpdates: Prisma.PickEnumerable<Prisma.StudyUpdatesGroupByOutputType, 'transactionId' | 'createdAt'>[],
   cpmsUpdates: ChangeHistory[]
 ) => {
