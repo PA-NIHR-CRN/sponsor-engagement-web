@@ -13,11 +13,7 @@ import { render, screen, within } from '@/config/TestUtils'
 import { mappedCPMSStudyEvals, mockCPMSStudy, mockMappedAssessment, mockStudyWithRelations } from '@/mocks/studies'
 
 import { prismaMock } from '../__mocks__/prisma'
-import {
-  userWithContactManagerRole,
-  userWithSponsorContactRole,
-  userWithSponsorContactRoleAndEditStudyRole,
-} from '../__mocks__/session'
+import { userWithContactManagerRole, userWithSponsorContactRole } from '../__mocks__/session'
 import { SIGN_IN_PAGE, SUPPORT_PAGE } from '../constants/routes'
 import type { StudyProps } from '../pages/studies/[studyId]'
 import Study, { getServerSideProps } from '../pages/studies/[studyId]'
@@ -91,7 +87,7 @@ const renderPage = async (
   mockUpdatedStudyEvals = mappedCPMSStudyEvals,
   isAssessmentDue = false
 ) => {
-  jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRoleAndEditStudyRole)
+  jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRole)
 
   prismaMock.$transaction.mockResolvedValueOnce([mockGetStudyResponse])
   mockedGetAxios.mockResolvedValueOnce({ data: { StatusCode: 200, Result: mockGetCPMSStudyResponse } })

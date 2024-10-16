@@ -106,21 +106,6 @@ describe('EditStudy', () => {
   })
 
   describe('getServerSideProps', () => {
-    test('redirects to 404 page if user does not have edit study role permissions', async () => {
-      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
-      getServerSessionMock.mockResolvedValueOnce({
-        ...userWithSponsorContactRole,
-        user: { ...userWithSponsorContactRole.user, groups: [] },
-      })
-
-      const result = await getServerSideProps(context)
-      expect(result).toEqual({
-        redirect: {
-          destination: '/404',
-        },
-      })
-    })
-
     test('redirects to 404 page if no study found', async () => {
       const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
       getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
