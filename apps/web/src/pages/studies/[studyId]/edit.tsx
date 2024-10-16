@@ -389,7 +389,9 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     }
   }
 
-  const { data: study } = await getStudyById(Number(context.query.studyId))
+  const userOrganisationIds = session.user?.organisations.map((userOrg) => userOrg.organisationId)
+
+  const { data: study } = await getStudyById(Number(context.query.studyId), userOrganisationIds)
 
   if (!study) {
     return {
