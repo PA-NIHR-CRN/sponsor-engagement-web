@@ -76,7 +76,7 @@ If the above has been completed then simply run:
 
 - `npx playwright test --project=seDefault` - runs all tests and print results to the console.
 
-**Note:** alternatively you can run `npm run test:default`
+**Note:** alternatively you can run `npm run test`
 
 ## Execute test locally (advanced)
 
