@@ -371,8 +371,8 @@ describe('EditStudy', () => {
         'Ongoing, (i.e. participants are being treated or observed), but recruitment is complete. Provide an actual closure date below.'
       )
 
-      expect(within(statusFieldset).getByLabelText('Closed, no follow-up')).toBeInTheDocument()
-      expect(within(statusFieldset).getByLabelText('Closed, no follow-up')).toHaveAccessibleDescription(
+      expect(within(statusFieldset).getByLabelText('Closed')).toBeInTheDocument()
+      expect(within(statusFieldset).getByLabelText('Closed')).toHaveAccessibleDescription(
         'Completed recruitment and any subsequent patient related activities (follow up). Provide an actual closure date below.'
       )
 
@@ -467,14 +467,11 @@ describe('EditStudy', () => {
     })
 
     it.each([
-      [
-        Status.InSetup,
-        ['In setup', 'Open to recruitment', 'Closed, in follow-up', 'Closed, no follow-up', 'Withdrawn', 'Suspended'],
-      ],
-      [Status.OpenToRecruitment, ['Open to recruitment', 'Closed, in follow-up', 'Closed, no follow-up', 'Suspended']],
-      [Status.Suspended, ['Open to recruitment', 'Closed, in follow-up', 'Closed, no follow-up', 'Suspended']],
+      [Status.InSetup, ['In setup', 'Open to recruitment', 'Closed, in follow-up', 'Closed', 'Withdrawn', 'Suspended']],
+      [Status.OpenToRecruitment, ['Open to recruitment', 'Closed, in follow-up', 'Closed', 'Suspended']],
+      [Status.Suspended, ['Open to recruitment', 'Closed, in follow-up', 'Closed', 'Suspended']],
       [Status.ClosedToRecruitmentInFollowUp, ['Closed, in follow-up']],
-      [Status.ClosedToRecruitment, ['Closed, no follow-up']],
+      [Status.ClosedToRecruitment, ['Closed']],
     ])(
       'should show the correct status fields based on the original status',
       async (originalStatus: Status, statusLabels: string[]) => {

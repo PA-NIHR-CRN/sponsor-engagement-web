@@ -34,7 +34,7 @@ export const studyStatuses = [
     value: FormStudyStatus.ClosedFollowUp,
   },
   {
-    name: 'Closed, no follow-up',
+    name: 'Closed',
     description:
       'Completed recruitment and any subsequent patient related activities (follow up). Provide an actual closure date below.',
     id: '4',
