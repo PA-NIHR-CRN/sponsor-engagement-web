@@ -108,7 +108,7 @@ export default function Study({ user, study, assessments, editHistory }: StudyPr
                   className="govuk-button govuk-button--secondary w-auto govuk-!-margin-bottom-0"
                   href={`${STUDIES_PAGE}/${study.id}/edit`}
                 >
-                  Edit study data
+                  Update study data
                 </Link>
               ) : null}
             </div>
