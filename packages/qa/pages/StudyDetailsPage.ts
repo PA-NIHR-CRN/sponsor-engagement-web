@@ -127,9 +127,13 @@ export default class StudyDetailsPage {
     this.tableStatusValue = this.tableStatusHeader.locator('..').locator('td')
     this.tableDataIndicatesHeader = page.locator('th[scope="row"]', { hasText: 'Study data indicates' })
     this.tableDataIndicatesValue = this.tableDataIndicatesHeader.locator('..').locator('td')
-    this.tablePlannedOpeningDateHeader = page.locator('th[scope="row"]', { hasText: 'Planned opening date' })
+    this.tablePlannedOpeningDateHeader = page.locator('th[scope="row"]', {
+      hasText: 'Planned opening to recruitment date',
+    })
     this.tablePlannedOpeningDateValue = this.tablePlannedOpeningDateHeader.locator('..').locator('td')
-    this.tableActualOpeningDateHeader = page.locator('th[scope="row"]', { hasText: 'Actual opening date' })
+    this.tableActualOpeningDateHeader = page.locator('th[scope="row"]', {
+      hasText: 'Actual opening to recruitment date',
+    })
     this.tableActualOpeningDateValue = this.tableActualOpeningDateHeader.locator('..').locator('td')
     this.tablePlannedClosureDateHeader = page.locator('th[scope="row"]', {
       hasText: 'Planned closure to recruitment date',

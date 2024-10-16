@@ -401,8 +401,8 @@ describe('Study', () => {
       expect(progressHeaders.map((header) => header.textContent)).toEqual([
         'Study Status',
         'Study data indicates',
-        'Planned opening date',
-        'Actual opening date',
+        'Planned opening to recruitment date',
+        'Actual opening to recruitment date',
         'Planned closure to recruitment date',
         'Actual closure to recruitment date',
         'Estimated reopening date',

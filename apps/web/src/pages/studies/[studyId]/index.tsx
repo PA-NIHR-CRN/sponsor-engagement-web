@@ -139,11 +139,11 @@ export default function Study({ study, assessments, editHistory }: StudyProps) {
                 </Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.CellHeader className="w-1/3">Planned opening date</Table.CellHeader>
+                <Table.CellHeader className="w-1/3">Planned opening to recruitment date</Table.CellHeader>
                 <Table.Cell>{study.plannedOpeningDate ? formatDate(study.plannedOpeningDate) : '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.CellHeader className="w-1/3">Actual opening date</Table.CellHeader>
+                <Table.CellHeader className="w-1/3">Actual opening to recruitment date</Table.CellHeader>
                 <Table.Cell>{study.actualOpeningDate ? formatDate(study.actualOpeningDate) : '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
