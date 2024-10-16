@@ -148,7 +148,7 @@ describe('getEditHistory()', () => {
     prismaMock.studyUpdates.findMany.mockResolvedValue([])
 
     const result = await getEditHistory(mockStudyUpdates[0].studyId, [])
-    expect(result).toEqual([])
+    expect(result).toEqual({ data: [] })
 
     expect(prismaMock.studyUpdates.groupBy).toHaveBeenCalledTimes(1)
     expect(prismaMock.studyUpdates.groupBy).toHaveBeenCalledWith({
@@ -220,7 +220,7 @@ describe('getEditHistory()', () => {
       (a, b) => new Date(b.modifiedDate).getTime() - new Date(a.modifiedDate).getTime()
     )
 
-    expect(result).toEqual(sortedResult)
+    expect(result).toEqual({ data: sortedResult })
 
     expect(prismaMock.studyUpdates.groupBy).toHaveBeenCalledTimes(1)
     expect(prismaMock.studyUpdates.groupBy).toHaveBeenCalledWith({
@@ -256,5 +256,13 @@ describe('getEditHistory()', () => {
         },
       },
     })
+  })
+
+  it('should return the error message when a request fails', async () => {
+    const errorMessage = 'Oh no, an error'
+    prismaMock.studyUpdates.groupBy.mockRejectedValueOnce(new Error(errorMessage))
+
+    const result = await getEditHistory(mockStudyUpdates[0].studyId, mockCPMSStudy.ChangeHistory)
+    expect(result).toEqual({ data: undefined, error: errorMessage })
   })
 })

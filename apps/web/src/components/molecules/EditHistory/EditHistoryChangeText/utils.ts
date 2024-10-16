@@ -18,6 +18,7 @@ export const getColumnChangedLabelText = (key: string): string => {
     actualOpeningDate: fieldNameToLabelMapping.actualOpeningDate,
     plannedClosureToRecruitmentDate: fieldNameToLabelMapping.plannedClosureDate,
     estimatedReopeningDate: fieldNameToLabelMapping.estimatedReopeningDate,
+    plannedOpeningDate: fieldNameToLabelMapping.plannedOpeningDate,
   }
 
   return mappings[key] || key

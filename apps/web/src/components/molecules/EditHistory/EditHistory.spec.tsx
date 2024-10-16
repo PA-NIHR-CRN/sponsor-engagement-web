@@ -48,16 +48,14 @@ describe('<EditHistory/>', () => {
   })
 
   it('should return the correct copy when there is an error message', async () => {
-    const mockErrorMessage = 'There has been an error'
-
-    render(<EditHistory editHistoryItems={[]} errorMessage={mockErrorMessage} />)
+    render(<EditHistory editHistoryItems={[]} error />)
 
     const viewEditHistory = screen.getByRole('group')
     expect(viewEditHistory).toBeInTheDocument()
 
     await userEvent.click(viewEditHistory)
 
-    expect(within(viewEditHistory).getByText(mockErrorMessage)).toBeInTheDocument()
+    expect(within(viewEditHistory).getByText(`There's been an error fetching edit history.`)).toBeInTheDocument()
   })
 
   it('should auto expand the relevant item', async () => {

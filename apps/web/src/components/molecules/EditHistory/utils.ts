@@ -5,6 +5,7 @@ import { StudyUpdateState, StudyUpdateType } from '@/constants'
 import type { Prisma } from '@/lib/prisma'
 import { prismaClient } from '@/lib/prisma'
 import { formatDate } from '@/utils/date'
+import { getErrorMessage } from '@/utils/error'
 
 import type { EditHistory, EditHistoryChange } from './types'
 
@@ -181,30 +182,46 @@ export const getTenMostRecentUpdates = (
     .slice(0, 10)
 }
 
-export const getEditHistory = async (studyId: number, cpmsChangeHistory: ChangeHistory[]): Promise<EditHistory[]> => {
-  // Ten most recent proposed updates - returns transactionId and createdAt
-  const mostRecentProposedUpdates = await prismaClient.studyUpdates.groupBy({
-    by: ['transactionId', 'createdAt'],
-    where: {
-      studyUpdateTypeId: StudyUpdateType.Proposed,
-      studyId,
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-    take: 10,
-  })
+export const getEditHistory = async (
+  studyId: number,
+  cpmsChangeHistory: ChangeHistory[]
+): Promise<{ data?: EditHistory[]; error?: string }> => {
+  try {
+    // Ten most recent proposed updates - returns transactionId and createdAt
+    const mostRecentProposedUpdates = await prismaClient.studyUpdates.groupBy({
+      by: ['transactionId', 'createdAt'],
+      where: {
+        studyUpdateTypeId: StudyUpdateType.Proposed,
+        studyId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 10,
+    })
 
-  // The ten most recent updates
-  const tenMostRecentUpdates = getTenMostRecentUpdates(mostRecentProposedUpdates, cpmsChangeHistory)
+    // The ten most recent updates
+    const tenMostRecentUpdates = getTenMostRecentUpdates(mostRecentProposedUpdates, cpmsChangeHistory)
 
-  const proposedUpdatesTransactionIds = tenMostRecentUpdates.filter((edit) => edit.type === 'SE').map((edit) => edit.id)
-  const editHistoryFromProposedUpdates = await createChangeHistoryForProposedChanges(proposedUpdatesTransactionIds)
+    const proposedUpdatesTransactionIds = tenMostRecentUpdates
+      .filter((edit) => edit.type === 'SE')
+      .map((edit) => edit.id)
+    const editHistoryFromProposedUpdates = await createChangeHistoryForProposedChanges(proposedUpdatesTransactionIds)
 
-  const cpmsUpdatesLSNs = tenMostRecentUpdates.filter((edit) => edit.type === 'CPMS').map((edit) => edit.id)
-  const editHistoryFromCPMSData = await createChangeHistoryForCPMSChanges(cpmsChangeHistory, cpmsUpdatesLSNs)
+    const cpmsUpdatesLSNs = tenMostRecentUpdates.filter((edit) => edit.type === 'CPMS').map((edit) => edit.id)
+    const editHistoryFromCPMSData = await createChangeHistoryForCPMSChanges(cpmsChangeHistory, cpmsUpdatesLSNs)
 
-  return [...editHistoryFromCPMSData, ...editHistoryFromProposedUpdates].sort(
-    (a, b) => new Date(b.modifiedDate).getTime() - new Date(a.modifiedDate).getTime()
-  )
+    return {
+      data: [...editHistoryFromCPMSData, ...editHistoryFromProposedUpdates].sort(
+        (a, b) => new Date(b.modifiedDate).getTime() - new Date(a.modifiedDate).getTime()
+      ),
+    }
+  } catch (error) {
+    const errorMessage = getErrorMessage(error)
+
+    return {
+      data: undefined,
+      error: errorMessage,
+    }
+  }
 }
