@@ -18,7 +18,7 @@ export const studySchema = z
     studyId: z.number(),
     cpmsId: z.string(),
     status: z.string(),
-    LSN: z.string().optional(),
+    LSN: z.string().optional().nullable(),
     plannedOpeningDate: dateSchema,
     actualOpeningDate: dateSchema,
     plannedClosureDate: dateSchema,

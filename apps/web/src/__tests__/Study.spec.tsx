@@ -103,6 +103,10 @@ const renderPage = async (
 
   await mockRouter.push(mockUrl)
 
+  prismaMock.studyUpdates.groupBy.mockResolvedValueOnce([])
+  prismaMock.studyUpdates.findMany.mockResolvedValueOnce([])
+  prismaMock.studyUpdates.findMany.mockResolvedValueOnce([])
+
   const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
 
   const { props } = (await getServerSideProps(context)) as {
@@ -187,6 +191,9 @@ describe('Study', () => {
       mockSetStudyAssessmentDue.mockResolvedValueOnce({ count: 0 })
       prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[0])
       prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[1])
+      prismaMock.studyUpdates.groupBy.mockResolvedValueOnce([])
+      prismaMock.studyUpdates.findMany.mockResolvedValueOnce([])
+      prismaMock.studyUpdates.findMany.mockResolvedValueOnce([])
 
       const result = await getServerSideProps(context)
       expect(result).toEqual({
@@ -198,6 +205,7 @@ describe('Study', () => {
             evaluationCategories: mappedCPMSStudyEvals,
             organisationsByRole,
           },
+          editHistory: [],
         },
       })
 
@@ -264,6 +272,9 @@ describe('Study', () => {
       prismaMock.study.update.mockResolvedValueOnce(mockStudyWithRelations)
       mockSetStudyAssessmentDue.mockResolvedValueOnce({ count: 0 })
       prismaMock.studyEvaluationCategory.upsert.mockRejectedValueOnce(new Error('Oh no, an error!'))
+      prismaMock.studyUpdates.groupBy.mockResolvedValueOnce([])
+      prismaMock.studyUpdates.findMany.mockResolvedValueOnce([])
+      prismaMock.studyUpdates.findMany.mockResolvedValueOnce([])
 
       const result = await getServerSideProps(context)
 
@@ -275,6 +286,7 @@ describe('Study', () => {
             ...mockStudyWithRelations,
             organisationsByRole,
           },
+          editHistory: [],
         },
       })
 
@@ -293,6 +305,9 @@ describe('Study', () => {
       mockSetStudyAssessmentDue.mockRejectedValueOnce({})
       prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[0])
       prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[1])
+      prismaMock.studyUpdates.groupBy.mockResolvedValueOnce([])
+      prismaMock.studyUpdates.findMany.mockResolvedValueOnce([])
+      prismaMock.studyUpdates.findMany.mockResolvedValueOnce([])
 
       const result = await getServerSideProps(context)
       expect(result).toEqual({
@@ -304,6 +319,7 @@ describe('Study', () => {
             evaluationCategories: mappedCPMSStudyEvals,
             organisationsByRole,
           },
+          editHistory: [],
         },
       })
 
@@ -323,6 +339,9 @@ describe('Study', () => {
       mockSetStudyAssessmentDue.mockResolvedValueOnce({ count: 1 })
       prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[0])
       prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[1])
+      prismaMock.studyUpdates.groupBy.mockResolvedValueOnce([])
+      prismaMock.studyUpdates.findMany.mockResolvedValueOnce([])
+      prismaMock.studyUpdates.findMany.mockResolvedValueOnce([])
 
       const result = await getServerSideProps(context)
       expect(result).toEqual({
@@ -335,6 +354,7 @@ describe('Study', () => {
             organisationsByRole,
             isDueAssessment: true,
           },
+          editHistory: [],
         },
       })
 

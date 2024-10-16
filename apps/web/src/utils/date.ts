@@ -28,9 +28,9 @@ export const constructDatePartsFromDate = (date?: Date | null) => {
 }
 
 /**
- * Creates a Date object from its' date parts - year, month and day
+ * Creates a Date string from its' date parts - year, month and day
  */
-export const constructDateObjFromParts = (dateParts?: DateInputValue | null) => {
+export const constructDateStrFromParts = (dateParts?: DateInputValue | null, withTimezone = true) => {
   if (!dateParts) return undefined
 
   const containsAllValidNumbers = Object.values(dateParts).every(
@@ -43,7 +43,15 @@ export const constructDateObjFromParts = (dateParts?: DateInputValue | null) => 
 
   const { year, month, day } = dateParts
 
-  return new Date(`${Number(year)}-${Number(month)}-${Number(day)}`)
+  const dateFromParts = new Date(`${Number(year)}-${Number(month)}-${Number(day)}`)
+
+  if (withTimezone) {
+    return dateFromParts.toISOString()
+  }
+
+  const tzoffset = dateFromParts.getTimezoneOffset() * 60000
+  const withoutTimezone = new Date(dateFromParts.valueOf() - tzoffset).toISOString().slice(0, -1)
+  return withoutTimezone
 }
 
 /**

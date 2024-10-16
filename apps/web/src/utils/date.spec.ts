@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import MockDate from 'mockdate'
 
-import { areAllDatePartsEmpty, constructDateObjFromParts, constructDatePartsFromDate, formatDate } from './date'
+import { areAllDatePartsEmpty, constructDatePartsFromDate, constructDateStrFromParts, formatDate } from './date'
 
 beforeEach(() => {
   MockDate.set(new Date('2001-01-01'))
@@ -21,27 +21,33 @@ describe('formatDate', () => {
   })
 })
 
-describe('constructDateObjFromParts', () => {
+describe('constructDateStrFromParts', () => {
   it.each([undefined, null])('should return undefined if input is %s', (value: undefined | null) => {
-    const result = constructDateObjFromParts(value)
+    const result = constructDateStrFromParts(value)
     expect(result).toBeUndefined()
   })
 
   it.each(['year', 'month', 'day'])('should return undefined if %s is NaN', (datePart: string) => {
     const invalidDateParts = { year: '2021', month: '02', day: '01' }
-    const result = constructDateObjFromParts({ ...invalidDateParts, [datePart]: 'abc' })
+    const result = constructDateStrFromParts({ ...invalidDateParts, [datePart]: 'abc' })
     expect(result).toBeUndefined()
   })
 
-  it('should return a Date object if valid date parts are provided', () => {
+  it('should return a Date object with timezone offset by default if valid date parts are provided', () => {
     const validDateParts = { year: '2021', month: '02', day: '15' }
-    const result = constructDateObjFromParts(validDateParts)
-    expect(result).toEqual(new Date('2021-02-15'))
+    const result = constructDateStrFromParts(validDateParts)
+    expect(result).toEqual(new Date('2021-02-15').toISOString())
+  })
+
+  it('should return a Date object without timezone offset if flag is set to false if valid date parts are provided', () => {
+    const validDateParts = { year: '2021', month: '02', day: '15' }
+    const result = constructDateStrFromParts(validDateParts, false)
+    expect(result).toEqual('2021-02-15T00:00:00.000')
   })
 
   it.each(['year', 'month', 'day'])('should return undefined if %s is an empty string', (datePart: string) => {
     const invalidDateParts = { year: '2021', month: '02', day: '01' }
-    const result = constructDateObjFromParts({ ...invalidDateParts, [datePart]: '' })
+    const result = constructDateStrFromParts({ ...invalidDateParts, [datePart]: '' })
     expect(result).toBeUndefined()
   })
 })

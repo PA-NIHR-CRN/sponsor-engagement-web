@@ -29,7 +29,7 @@ const mockStudyId = mockStudyWithRelations.id.toString()
 const mockLSN = '1212'
 const mockCPMSResponse = {
   StatusCode: 200,
-  Result: mockCPMSStudy,
+  Result: { ...mockCPMSStudy, CurrentLsn: mockLSN },
 }
 
 const env = { ...process.env }
@@ -170,7 +170,7 @@ describe('EditStudy', () => {
             evaluationCategories: mappedCPMSStudyEvals,
             organisationsByRole,
           },
-          LSN: mockLSN,
+          currentLSN: mockLSN,
         },
       })
 
@@ -242,7 +242,7 @@ describe('EditStudy', () => {
             ...mockStudyWithRelations,
             organisationsByRole,
           },
-          LSN: mockLSN,
+          currentLSN: mockLSN,
         },
       })
 
@@ -271,7 +271,7 @@ describe('EditStudy', () => {
             evaluationCategories: mappedCPMSStudyEvals,
             organisationsByRole,
           },
-          LSN: mockLSN,
+          currentLSN: mockLSN,
         },
       })
 
@@ -302,7 +302,7 @@ describe('EditStudy', () => {
             organisationsByRole,
             isDueAssessment: true,
           },
-          LSN: mockLSN,
+          currentLSN: mockLSN,
         },
       })
 

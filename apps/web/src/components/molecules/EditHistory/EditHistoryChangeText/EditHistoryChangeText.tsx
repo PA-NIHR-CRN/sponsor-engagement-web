@@ -1,7 +1,7 @@
-import type { EditHistoryChange } from '../EditHistory'
+import type { EditHistoryChange } from '../types'
 import { getColumnChangedLabelText } from './utils'
 
-export function EditHistoryChangeText({ change }: { change: Omit<EditHistoryChange, 'id'> }) {
+export function EditHistoryChangeText({ change }: { change: EditHistoryChange }) {
   const { afterValue, beforeValue, columnChanged } = change
 
   const columnLabel = getColumnChangedLabelText(columnChanged)
