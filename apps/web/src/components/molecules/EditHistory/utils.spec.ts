@@ -11,7 +11,7 @@ import {
 } from './utils'
 
 describe('transformValue()', () => {
-  it.each([null, ''])('should return null for input is a falsy value', (inputValue: string | null) => {
+  it.each([null, ''])('should return null if input is a falsy value', (inputValue: string | null) => {
     expect(transformValue(inputValue)).toBeNull()
   })
 
