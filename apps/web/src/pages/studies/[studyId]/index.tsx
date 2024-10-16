@@ -33,7 +33,7 @@ import { withServerSideProps } from '@/utils/withServerSideProps'
 
 const renderNotificationBanner = (success: string | undefined, showRequestSupportLink: boolean) =>
   success || !Number.isNaN(Number(success)) ? (
-    <NotificationBanner heading={FORM_SUCCESS_MESSAGES[Number(success)]} success>
+    <NotificationBanner heading={FORM_SUCCESS_MESSAGES[Number(success)]} isRichText success>
       {showRequestSupportLink ? (
         <>
           Request{' '}
