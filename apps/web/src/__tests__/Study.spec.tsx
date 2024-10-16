@@ -405,8 +405,8 @@ describe('Study', () => {
         `http://localhost/assessments/${mockStudy.id}`
       )
 
-      // Edit study data
-      expect(screen.getByRole('link', { name: 'Edit study data' })).toHaveProperty(
+      // Update study data
+      expect(screen.getByRole('link', { name: 'Update study data' })).toHaveProperty(
         'href',
         `http://localhost/studies/${mockStudy.id}/edit`
       )
