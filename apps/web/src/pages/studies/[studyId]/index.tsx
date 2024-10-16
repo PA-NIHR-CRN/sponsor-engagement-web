@@ -237,7 +237,8 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     }
   }
 
-  const { study: studyInCPMS } = await getStudyByIdFromCPMS(study.cpmsId)
+  const changeHistoryFromDate = process.env.EDIT_HISTORY_START_DATE ?? ''
+  const { study: studyInCPMS } = await getStudyByIdFromCPMS(study.cpmsId, changeHistoryFromDate)
 
   if (!studyInCPMS) {
     return {
