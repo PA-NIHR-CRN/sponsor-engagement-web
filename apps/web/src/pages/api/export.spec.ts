@@ -92,8 +92,6 @@ describe('Exporting studies list', () => {
       'Actual closure to recruitment date',
       'UK recruitment target',
       'Total UK recruitment to date',
-      'Network recruitment target',
-      'Total network recruitment to date',
       'Managing speciality',
       'Sponsor Assessment (On track or Off track)',
       'Additional Information (including any updates to study status, target, and/or date milestones)',
@@ -131,8 +129,6 @@ describe('Exporting studies list', () => {
       study.actualOpeningDate,
       study.plannedClosureDate,
       study.actualClosureDate,
-      undefined, // UK recruitment target
-      undefined, // Total UK recruitment to date
       study.sampleSize,
       study.totalRecruitmentToDate,
     ])
@@ -261,8 +257,8 @@ describe('Exporting studies list', () => {
       'Actual opening to recruitment date',
       'Planned closure to recruitment date',
       'Actual closure to recruitment date',
-      'Network recruitment target',
-      'Total network recruitment to date',
+      'UK recruitment target',
+      'Total UK recruitment to date',
       'Managing speciality',
       'Sponsor Assessment (On track or Off track)',
       'Additional Information (including any updates to study status, target, and/or date milestones)',
