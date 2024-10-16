@@ -20,6 +20,7 @@ const mockedEnvVars = {
   apiUrl: 'cpms-api',
   apiUsername: 'testuser',
   apiPassword: 'testpwd',
+  editHistoryStartDate: '2024-11-01',
 }
 
 const mockStudyId = Number(mockCPMSStudy.StudyId)
@@ -128,6 +129,10 @@ describe('updateStudyInCPMS', () => {
           username: mockedEnvVars.apiUsername,
           password: mockedEnvVars.apiPassword,
         },
+        params: {
+          changeHistoryMaxItems: 10,
+          changeHistoryFrom: mockedEnvVars.editHistoryStartDate,
+        },
       }
     )
   })
@@ -205,6 +210,10 @@ describe('validateStudyUpdate', () => {
           'Content-Type': 'application/json',
           username: mockedEnvVars.apiUsername,
           password: mockedEnvVars.apiPassword,
+        },
+        params: {
+          changeHistoryMaxItems: 10,
+          changeHistoryFrom: mockedEnvVars.editHistoryStartDate,
         },
       }
     )

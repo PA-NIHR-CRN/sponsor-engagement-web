@@ -18,16 +18,21 @@ export interface GetStudyFromCPMSResponse {
 }
 
 export const getStudyByIdFromCPMS = async (studyId: number): Promise<GetStudyFromCPMSResponse> => {
-  const { CPMS_API_URL, CPMS_API_USERNAME, CPMS_API_PASSWORD } = process.env
+  const { CPMS_API_URL, CPMS_API_USERNAME, CPMS_API_PASSWORD, EDIT_HISTORY_START_DATE } = process.env
 
   try {
     assert(CPMS_API_URL, 'CPMS_API_URL is not defined')
     assert(CPMS_API_USERNAME, 'CPMS_API_USERNAME is not defined')
     assert(CPMS_API_PASSWORD, 'CPMS_API_PASSWORD is not defined')
+    assert(EDIT_HISTORY_START_DATE, 'EDIT_HISTORY_START_DATE is not defined')
 
     const requestUrl = `${CPMS_API_URL}/studies/${studyId}/engagement-info`
     const { data } = await axios.get<CPMSGetStudyResponse>(requestUrl, {
       headers: { username: CPMS_API_USERNAME, password: CPMS_API_PASSWORD },
+      params: {
+        changeHistoryFrom: EDIT_HISTORY_START_DATE,
+        changeHistoryMaxItems: 10,
+      },
     })
 
     if (data.StatusCode !== 200) {
