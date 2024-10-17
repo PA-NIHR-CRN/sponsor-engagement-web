@@ -28,6 +28,10 @@ describe('transformValue()', () => {
     const inputValue = 'unknownValue'
     expect(transformValue(inputValue)).toBe(inputValue)
   })
+
+  it('should return the mapped value if mapping exists', () => {
+    expect(transformValue('Closed to Recruitment')).toBe('Closed')
+  })
 })
 
 describe('createChangeHistoryForProposedChanges()', () => {
