@@ -262,14 +262,18 @@ jobs:
             --group-id ${{ secrets.SE_TEST_CPMS_API_SG_ID }} \
             --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 443, "ToPort": 443, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for SE automation CPMS API requests"}]}]'
 
+      - name: Add Github Actions IP to CPMS DB security group (Test)
+        run: |
+          aws ec2 authorize-security-group-ingress \
+            --group-id ${{ secrets.CPMS_TEST_DB_SG }} \
+            --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for SE automation CPMS DB requests"}]}]'
+
       - name: Run All SE E2E Tests
         working-directory: ./packages/qa
         if: success()
         run: npx playwright test --project=seDefault
         env:
           E2E_BASE_URL: ${{ vars.E2E_BASE_URL }}
-          # CPMS_TEST_DB_PASSWORD: ${{ secrets.CPMS_TEST_DB_PASSWORD }}
-          # CPMS_TEST_DB_SERVER: ${{ secrets.CPMS_TEST_DB_SERVER }}
           SE_TEST_DB_PASSWORD: ${{ secrets.SE_TEST_DB_PASSWORD }}
           SE_TEST_DB_HOST: ${{ secrets.SE_TEST_DB_HOST }}
           SE_TEST_API_URL: ${{ secrets.CPMS_API_BASE_URL }}
@@ -289,6 +293,13 @@ jobs:
           aws ec2 revoke-security-group-ingress \
             --group-id ${{ secrets.SE_TEST_CPMS_API_SG_ID }} \
             --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 443, "ToPort": 443, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for SE automation CPMS API requests"}]}]'
+
+      - name: Remove Github Actions IP from CPMS DB security group (Test)
+        if: always()        
+        run: |
+          aws ec2 revoke-security-group-ingress \
+            --group-id ${{ secrets.CPMS_TEST_DB_SG }} \
+            --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for SE automation CPMS DB requests"}]}]'
 
       - name: Configure AWS credentials (SE)
         if: always()  
