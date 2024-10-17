@@ -22,7 +22,7 @@ export const studyStatuses = [
   },
   {
     name: 'Open to recruitment',
-    description: 'Ready (open) to recruit participants in at least one UK site. Provide an actual opening date below.',
+    description: 'Open to recruit participants in at least one UK site. Provide an actual opening date below.',
     id: '2',
     value: FormStudyStatus.OpenToRecruitment,
   },
@@ -61,7 +61,7 @@ export const FURTHER_INFO_MAX_CHARACTERS = 500
 export const UK_RECRUITMENT_TARGET_MAX_VALUE = 9999999
 
 export const fieldNameToLabelMapping: Record<
-  keyof Omit<EditStudyInputs, 'studyId' | 'cpmsId' | 'originalStatus'>,
+  keyof Omit<EditStudyInputs, 'studyId' | 'cpmsId' | 'originalStatus' | 'LSN'>,
   string
 > = {
   plannedOpeningDate: 'Planned opening to recruitment date',
@@ -71,7 +71,7 @@ export const fieldNameToLabelMapping: Record<
   estimatedReopeningDate: 'Estimated reopening date',
   status: 'Study status',
   recruitmentTarget: 'UK recruitment target',
-  furtherInformation: 'Further information',
+  furtherInformation: 'Further information (optional)',
 }
 
 export type DateRestrictions = 'requiredPastOrCurrent' | 'requiredFuture'

@@ -53,6 +53,7 @@ export default class StudyUpdatePage {
   readonly actualClosureInlineError: Locator
   readonly estimatedReopenInlineError: Locator
   readonly ukRecruitmentTargetInlineError: Locator
+  readonly updatingText: Locator
 
   //Initialize Page Objects
   constructor(page: Page) {
@@ -112,6 +113,7 @@ export default class StudyUpdatePage {
     this.actualClosureInlineError = page.locator('#actualClosureDate-error')
     this.estimatedReopenInlineError = page.locator('#estimatedReopeningDate-error')
     this.ukRecruitmentTargetInlineError = page.locator('#recruitmentTarget-error')
+    this.updatingText = page.locator('.govuk-warning-text__text')
   }
 
   //Page Methods
@@ -164,7 +166,7 @@ export default class StudyUpdatePage {
     await expect(this.statusHintInSetup).toHaveText(`Not yet open to recruitment.`)
     await expect(this.statusRadioOpenRec).toBeVisible()
     await expect(this.statusHintOpenRec).toHaveText(
-      `Ready (open) to recruit participants in at least one UK site. Provide an actual opening date below.`
+      `Open to recruit participants in at least one UK site. Provide an actual opening date below.`
     )
     await expect(this.statusRadioClosedInFollow).toBeVisible()
     await expect(this.statusHintClosedInFollow).toHaveText(
@@ -507,5 +509,12 @@ export default class StudyUpdatePage {
     )
 
     await this.assertSeDbUpdateProposed(dbStudyUpdate[0], timeStamp)
+  }
+
+  async assertUpdatingMessage() {
+    await expect(this.updatingText).toBeVisible()
+    await expect(this.updatingText).toContainText(
+      `It may take a few seconds for the record to update. Please stay on this page until redirected.`
+    )
   }
 }

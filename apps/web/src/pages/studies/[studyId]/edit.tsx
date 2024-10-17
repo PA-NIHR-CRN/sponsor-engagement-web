@@ -16,7 +16,7 @@ import Spinner from '@/components/atoms/Spinner/Spinner'
 import Warning from '@/components/atoms/Warning/Warning'
 import { RequestSupport } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
-import { EDIT_STUDY_ROLE, Roles } from '@/constants'
+import { Roles } from '@/constants'
 import {
   fieldNameToLabelMapping,
   FURTHER_INFO_MAX_CHARACTERS,
@@ -38,7 +38,7 @@ import {
 } from '@/lib/studies'
 import { areAllDatePartsEmpty } from '@/utils/date'
 import { getVisibleFormFields, mapStudyToStudyFormInput } from '@/utils/editStudyForm'
-import type { EditStudyInputs } from '@/utils/schemas'
+import type { EditStudy as EditStudySchema, EditStudyInputs } from '@/utils/schemas'
 import { studySchema } from '@/utils/schemas'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
@@ -50,11 +50,15 @@ const transformDateValue = (input?: DateInputValue | null) => ({
   year: input?.year ?? '',
 })
 
-export default function EditStudy({ study }: EditStudyProps) {
-  const { register, formState, handleSubmit, control, watch, setError } = useForm<EditStudyInputs>({
+export default function EditStudy({ study, currentLSN }: EditStudyProps) {
+  const mappedFormInput = mapStudyToStudyFormInput(study)
+
+  const { register, formState, handleSubmit, control, watch, setError } = useForm<EditStudySchema>({
     resolver: zodResolver(studySchema),
     defaultValues: {
-      ...mapStudyToStudyFormInput(study),
+      ...mappedFormInput,
+      originalValues: mappedFormInput,
+      LSN: currentLSN,
     },
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
@@ -331,7 +335,7 @@ export default function EditStudy({ study }: EditStudyProps) {
 
               {showLoadingState ? (
                 <Warning>
-                  It may a few seconds for the CPMS record to update. Please stay on this page until redirected.
+                  It may take a few seconds for the record to update. Please stay on this page until redirected.
                 </Warning>
               ) : null}
 
@@ -354,6 +358,11 @@ export default function EditStudy({ study }: EditStudyProps) {
                   Cancel
                 </Link>
               </div>
+
+              <p className="govuk-body">
+                If you need support updating your data, please contact the{' '}
+                <a href="mailto:supportmystudy@nihr.ac.uk">RDN Team</a>.
+              </p>
             </Fieldset>
           </Form>
         </div>
@@ -375,17 +384,9 @@ EditStudy.getLayout = function getLayout(page: ReactElement, { user }: EditStudy
 }
 
 export const getServerSideProps = withServerSideProps(Roles.SponsorContact, async (context, session) => {
-  const canEditStudy = Boolean(session.user?.groups.includes(EDIT_STUDY_ROLE))
+  const userOrganisationIds = session.user?.organisations.map((userOrg) => userOrg.organisationId)
 
-  if (!canEditStudy) {
-    return {
-      redirect: {
-        destination: '/404',
-      },
-    }
-  }
-
-  const { data: study } = await getStudyById(Number(context.query.studyId))
+  const { data: study } = await getStudyById(Number(context.query.studyId), userOrganisationIds)
 
   if (!study) {
     return {
@@ -421,8 +422,6 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
 
   const { data: updatedStudy } = await updateStudy(Number(cpmsId), mapCPMSStudyToSEStudy(studyInCPMS))
 
-  await setStudyAssessmentDueFlag([study.id])
-
   if (!updatedStudy) {
     return {
       props: {
@@ -431,6 +430,9 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
       },
     }
   }
+
+  const { data: setStudyAssessmentDueResponse } = await setStudyAssessmentDueFlag([study.id])
+  const isStudyDueAssessment = setStudyAssessmentDueResponse !== null ? setStudyAssessmentDueResponse === 1 : false
 
   const currentStudyEvalsInSE = updatedStudy.evaluationCategories
 
@@ -451,7 +453,12 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
   return {
     props: {
       user: session.user,
-      study: { ...updatedStudy, evaluationCategories: updatedStudyEvals ?? study.evaluationCategories },
+      study: {
+        ...updatedStudy,
+        evaluationCategories: updatedStudyEvals ?? study.evaluationCategories,
+        isDueAssessment: isStudyDueAssessment,
+      },
+      currentLSN: studyInCPMS.CurrentLsn,
     },
   }
 })

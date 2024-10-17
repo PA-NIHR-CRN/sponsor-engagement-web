@@ -1,4 +1,5 @@
 import { authService, getUserResponseSchema } from '@nihr-ui/auth'
+import { ODP_ROLE } from '@nihr-ui/auth/src/constants/constants'
 import { logger } from '@nihr-ui/logger'
 import axios from 'axios'
 import type { AuthOptions } from 'next-auth'
@@ -12,8 +13,6 @@ import {
   AUTH_PROVIDER_NAME,
   AUTH_PROVIDER_TYPE,
   AUTH_SESSION_EXPIRY_FALLBACK,
-  EDIT_STUDY_ROLE,
-  ODP_ROLE,
 } from '@/constants/auth'
 import { getUserOrganisations } from '@/lib/organisations'
 import { prismaClient } from '@/lib/prisma'
@@ -192,19 +191,8 @@ export const authOptions: AuthOptions = {
               return false
             })
 
-            const hasEditStudyRole = groups.some((group) => {
-              if (typeof group === 'object' && group.display) {
-                return group.display === EDIT_STUDY_ROLE
-              }
-              return false
-            })
-
             if (hasODPSponsorEngagementTool) {
               session.user.groups.push(ODP_ROLE)
-            }
-
-            if (hasEditStudyRole) {
-              session.user.groups.push(EDIT_STUDY_ROLE)
             }
           }
         }

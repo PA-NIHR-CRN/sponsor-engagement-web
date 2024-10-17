@@ -29,8 +29,6 @@ const columns = [
   { key: 'actualClosureDate', header: 'Actual closure to recruitment date' },
   { key: 'recruitmentTargetUK', header: 'UK recruitment target' },
   { key: 'recruitmentToDateUK', header: 'Total UK recruitment to date' },
-  { key: 'recruitmentTargetNetwork', header: 'Network recruitment target' },
-  { key: 'recruitmentToDateNetwork', header: 'Total network recruitment to date' },
   { key: 'managingSpeciality', header: 'Managing speciality' },
   { key: 'onTrack', header: 'Sponsor Assessment (On track or Off track)' },
   {
@@ -42,19 +40,9 @@ const columns = [
 type Columns = typeof columns
 type ColumnKeys = Columns[number]['key']
 
-const commercialColumns: ColumnKeys[] = [
-  'studyCRO',
-  'protocolReferenceNumber',
-  'recruitmentTargetNetwork',
-  'recruitmentToDateNetwork',
-]
+const commercialColumns: ColumnKeys[] = ['studyCRO', 'protocolReferenceNumber']
 
-const nonCommercialColumns: ColumnKeys[] = [
-  'studyCTU',
-  'chiefInvestigator',
-  'recruitmentTargetUK',
-  'recruitmentToDateUK',
-]
+const nonCommercialColumns: ColumnKeys[] = ['studyCTU', 'chiefInvestigator']
 
 type StudyDataMapper = (study: StudyForExport) => string | number | Date | null | undefined
 
@@ -86,10 +74,8 @@ const studyDataMappers: Partial<Record<ColumnKeys, StudyDataMapper>> = {
   plannedClosureDate: (study) => study.plannedClosureDate,
   actualOpeningDate: (study) => study.actualOpeningDate,
   actualClosureDate: (study) => study.actualClosureDate,
-  recruitmentTargetUK: (study) => (study.route !== 'Commercial' ? study.sampleSize : undefined),
-  recruitmentToDateUK: (study) => (study.route !== 'Commercial' ? study.totalRecruitmentToDate : undefined),
-  recruitmentTargetNetwork: (study) => (study.route === 'Commercial' ? study.sampleSize : undefined),
-  recruitmentToDateNetwork: (study) => (study.route === 'Commercial' ? study.totalRecruitmentToDate : undefined),
+  recruitmentTargetUK: (study) => study.sampleSize,
+  recruitmentToDateUK: (study) => study.totalRecruitmentToDate,
   managingSpeciality: (study) => study.managingSpeciality,
 }
 

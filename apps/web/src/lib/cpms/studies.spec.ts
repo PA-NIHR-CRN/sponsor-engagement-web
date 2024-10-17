@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { constructDateObjFromParts } from '@/utils/date'
+import { constructDateStrFromParts } from '@/utils/date'
 import type { EditStudyInputs } from '@/utils/schemas'
 
 import { mockCPMSStudy, mockCPMSUpdateInput, mockCPMSValidationResult } from '../../mocks/studies'
@@ -13,13 +13,14 @@ const mockedPutAxios = jest.mocked(axios.put)
 const mockedPostAxios = jest.mocked(axios.post)
 
 jest.mock('../../utils/date')
-const mockConstructDateObjFromParts = constructDateObjFromParts as jest.MockedFunction<typeof constructDateObjFromParts>
+const mockconstructDateStrFromParts = constructDateStrFromParts as jest.MockedFunction<typeof constructDateStrFromParts>
 
 const env = { ...process.env }
 const mockedEnvVars = {
   apiUrl: 'cpms-api',
   apiUsername: 'testuser',
   apiPassword: 'testpwd',
+  editHistoryStartDate: '2024-11-01',
 }
 
 const mockStudyId = Number(mockCPMSStudy.StudyId)
@@ -44,13 +45,17 @@ describe('getStudyByIdFromCPMS', () => {
 
     mockedGetAxios.mockResolvedValueOnce({ data: mockResponse })
 
-    const result = await getStudyByIdFromCPMS(mockStudyId)
+    const result = await getStudyByIdFromCPMS(mockStudyId, '2024-01-02', 5)
 
     expect(result).toStrictEqual({ study: mockResponse.Result })
 
     expect(mockedGetAxios).toHaveBeenCalledTimes(1)
     expect(mockedGetAxios).toHaveBeenCalledWith(`${mockedEnvVars.apiUrl}/studies/${mockStudyId}/engagement-info`, {
       headers: { username: mockedEnvVars.apiUsername, password: mockedEnvVars.apiPassword },
+      params: {
+        changeHistoryFrom: '2024-01-02',
+        changeHistoryMaxItems: 5,
+      },
     })
   })
 
@@ -297,14 +302,14 @@ describe('mapEditStudyInputToCPMSStudy', () => {
   }
 
   test('correctly maps data when all fields exist', () => {
-    mockConstructDateObjFromParts.mockReturnValue(mockDate)
+    mockconstructDateStrFromParts.mockReturnValue(mockDate.toISOString())
 
     const result = mapEditStudyInputToCPMSStudy(input)
     expect(result).toStrictEqual(mappedInput)
   })
 
   test('correctly maps date fields when they do not exist', () => {
-    mockConstructDateObjFromParts.mockReturnValue(undefined)
+    mockconstructDateStrFromParts.mockReturnValue(undefined)
 
     const result = mapEditStudyInputToCPMSStudy({
       ...input,
