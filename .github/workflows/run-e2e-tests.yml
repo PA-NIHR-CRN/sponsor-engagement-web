@@ -89,8 +89,8 @@ jobs:
         fi
       env:
         E2E_BASE_URL: ${{ vars.E2E_BASE_URL }}
-        CPMS_TEST_DB_PASSWORD: ${{ secrets.CPMS_TEST_DB_PASSWORD }}
-        CPMS_TEST_DB_SERVER: ${{ secrets.CPMS_TEST_DB_SERVER }}
+        # CPMS_TEST_DB_PASSWORD: ${{ secrets.CPMS_TEST_DB_PASSWORD }}
+        # CPMS_TEST_DB_SERVER: ${{ secrets.CPMS_TEST_DB_SERVER }}
         SE_TEST_DB_PASSWORD: ${{ secrets.SE_TEST_DB_PASSWORD }}
         SE_TEST_DB_HOST: ${{ secrets.SE_TEST_DB_HOST }}
         SE_TEST_API_URL: ${{ secrets.CPMS_API_BASE_URL }}
