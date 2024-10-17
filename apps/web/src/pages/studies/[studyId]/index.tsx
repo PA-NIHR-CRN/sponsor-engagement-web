@@ -59,7 +59,7 @@ const renderBackLink = () => (
 
 export type StudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function Study({ study, assessments, editHistory }: StudyProps) {
+export default function Study({ study, assessments, editHistory, getEditHistoryError }: StudyProps) {
   const router = useRouter()
   const successType = router.query.success as string
   const transactionIdLatestProposedUpdate = router.query.latestProposedUpdate as string | undefined
@@ -122,7 +122,11 @@ export default function Study({ study, assessments, editHistory }: StudyProps) {
             Based on the latest data uploaded to CPMS by the study team.
           </span>
           {showEditHistoryFeature ? (
-            <EditHistory editHistoryItems={editHistory ?? []} idToAutoExpand={transactionIdLatestProposedUpdate} />
+            <EditHistory
+              editHistoryItems={editHistory ?? []}
+              error={Boolean(getEditHistoryError)}
+              idToAutoExpand={transactionIdLatestProposedUpdate}
+            />
           ) : null}
           <Table className="govuk-!-margin-top-3">
             <Table.Caption className="govuk-visually-hidden">Summary of study’s progress (UK)</Table.Caption>
@@ -230,7 +234,8 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     }
   }
 
-  const { study: studyInCPMS } = await getStudyByIdFromCPMS(study.cpmsId)
+  const changeHistoryFromDate = process.env.EDIT_HISTORY_START_DATE ?? ''
+  const { study: studyInCPMS } = await getStudyByIdFromCPMS(study.cpmsId, changeHistoryFromDate)
 
   if (!studyInCPMS) {
     return {
@@ -278,8 +283,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
     studyEvalIdsToDelete
   )
 
-  // Error handling on this
-  const editHistory = await getEditHistory(studyId, studyInCPMS.ChangeHistory)
+  const { data: editHistory, error: getEditHistoryError } = await getEditHistory(studyId, studyInCPMS.ChangeHistory)
 
   return {
     props: {
@@ -291,6 +295,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
         isDueAssessment: isStudyDueAssessment,
       },
       editHistory,
+      getEditHistoryError,
     },
   }
 })

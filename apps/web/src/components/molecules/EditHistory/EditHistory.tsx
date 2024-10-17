@@ -1,15 +1,15 @@
 import { Accordion, Details } from '@nihr-ui/frontend'
 
 import { EditHistoryItem } from './EditHistoryItem/EditHistoryItem'
-import type { getEditHistory } from './utils'
+import type { EditHistory } from './types'
 
 export interface EditHistoryProps {
-  editHistoryItems: Awaited<ReturnType<typeof getEditHistory>>
+  editHistoryItems: EditHistory[]
   idToAutoExpand?: string
-  errorMessage?: string
+  error?: boolean
 }
 
-export function EditHistory({ editHistoryItems, idToAutoExpand, errorMessage }: EditHistoryProps) {
+export function EditHistory({ editHistoryItems, idToAutoExpand, error }: EditHistoryProps) {
   return (
     <Details heading="View edit history" open={Boolean(idToAutoExpand)}>
       <Accordion defaultValue={[idToAutoExpand ?? '']} type="multiple">
@@ -23,8 +23,8 @@ export function EditHistory({ editHistoryItems, idToAutoExpand, errorMessage }: 
             userEmail={editHistory.userEmail}
           />
         ))}
-        {editHistoryItems.length === 0 ? <span className="text-sm">There is no edit history.</span> : null}
-        {errorMessage ? <span className="text-sm">{errorMessage}</span> : null}
+        {editHistoryItems.length === 0 && !error ? <span className="text-sm">There is no edit history.</span> : null}
+        {error ? <p className="govuk-error-message">There&apos;s been an error fetching edit history.</p> : null}
       </Accordion>
     </Details>
   )
