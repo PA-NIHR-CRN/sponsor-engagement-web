@@ -4,6 +4,7 @@ import type { ChangeHistory } from '@/@types/studies'
 import { StudyUpdateState, StudyUpdateType } from '@/constants'
 import type { Prisma } from '@/lib/prisma'
 import { prismaClient } from '@/lib/prisma'
+import { mapCPMSStatusToFormStatus } from '@/lib/studies'
 import { formatDate } from '@/utils/date'
 import { getErrorMessage } from '@/utils/error'
 
@@ -34,7 +35,7 @@ export const transformValue = (value: string | null) => {
     return formatDate(value)
   }
 
-  return value
+  return mapCPMSStatusToFormStatus(value)
 }
 
 /**
