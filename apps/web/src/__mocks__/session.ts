@@ -1,7 +1,7 @@
 import type { UserOrganisation } from 'database'
 import type { Session } from 'next-auth'
 
-import { EDIT_STUDY_ROLE, Roles } from '../constants/auth'
+import { Roles } from '../constants/auth'
 
 const defaults: Omit<Session, 'user'> = {
   idleTimeout: 10000,
@@ -51,7 +51,7 @@ export const userWithSponsorContactRole: Session = {
     email: 'testuser@nihr.ac.uk',
     roles: [Roles.SponsorContact],
     organisations: [mockUserOrganisation],
-    groups: [EDIT_STUDY_ROLE],
+    groups: [],
   },
 }
 
@@ -76,17 +76,5 @@ export const userWithSponsorContactAndContactManagerRoles: Session = {
     roles: [Roles.SponsorContact, Roles.ContactManager],
     organisations: [mockUserOrganisation],
     groups: [],
-  },
-}
-
-export const userWithSponsorContactRoleAndEditStudyRole: Session = {
-  ...defaults,
-  user: {
-    id: 123,
-    name: 'Test User',
-    email: 'testuser@nihr.ac.uk',
-    roles: [Roles.SponsorContact],
-    organisations: [mockUserOrganisation],
-    groups: [EDIT_STUDY_ROLE],
   },
 }

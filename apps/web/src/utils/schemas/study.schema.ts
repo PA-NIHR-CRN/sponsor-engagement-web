@@ -4,23 +4,26 @@ import { UK_RECRUITMENT_TARGET_MAX_VALUE } from '@/constants/editStudyForm'
 
 import { validateAllDates } from '../editStudyForm'
 
-const dateSchema = z.object({
-  year: z.string(),
-  day: z.string(),
-  month: z.string(),
-})
+const dateSchema = z
+  .object({
+    year: z.string(),
+    day: z.string(),
+    month: z.string(),
+  })
+  .optional()
+  .nullable()
 
 export const studySchema = z
   .object({
     studyId: z.number(),
     cpmsId: z.string(),
-    originalStatus: z.string().optional().nullable(),
     status: z.string(),
-    plannedOpeningDate: dateSchema.optional().nullable(),
-    actualOpeningDate: dateSchema.optional().nullable(),
-    plannedClosureDate: dateSchema.optional().nullable(),
-    actualClosureDate: dateSchema.optional().nullable(),
-    estimatedReopeningDate: dateSchema.optional().nullable(),
+    LSN: z.string().optional().nullable(),
+    plannedOpeningDate: dateSchema,
+    actualOpeningDate: dateSchema,
+    plannedClosureDate: dateSchema,
+    actualClosureDate: dateSchema,
+    estimatedReopeningDate: dateSchema,
     recruitmentTarget: z
       .string({ invalid_type_error: 'Enter a valid UK target' })
       .optional()
@@ -30,6 +33,16 @@ export const studySchema = z
         'Enter a valid UK target'
       ),
     furtherInformation: z.string().optional(),
+    originalValues: z.object({
+      status: z.string(),
+      plannedOpeningDate: dateSchema,
+      actualOpeningDate: dateSchema,
+      plannedClosureDate: dateSchema,
+      actualClosureDate: dateSchema,
+      estimatedReopeningDate: dateSchema,
+      recruitmentTarget: z.string().optional(),
+      furtherInformation: z.string().optional(),
+    }),
   })
   .superRefine((values, ctx) => {
     validateAllDates(ctx, values)
@@ -37,7 +50,9 @@ export const studySchema = z
 
 export const studySchemaShape = studySchema.sourceType()._def.shape()
 
-export type EditStudyInputs = z.infer<typeof studySchema>
+export type EditStudy = z.infer<typeof studySchema>
+
+export type EditStudyInputs = Omit<EditStudy, 'originalValues'>
 
 export type DateFieldName = Pick<
   EditStudyInputs,

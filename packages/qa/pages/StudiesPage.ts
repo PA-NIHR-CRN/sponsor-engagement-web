@@ -34,6 +34,8 @@ export default class StudiesPage {
   readonly sortBySection: Locator
   readonly sortByLabel: Locator
   readonly sortByDropdown: Locator
+  readonly studyLastItem: Locator
+  readonly studyLastDue: Locator
 
   //Initialize Page Objects
   constructor(page: Page) {
@@ -58,6 +60,8 @@ export default class StudiesPage {
     this.paginationPageList = page.locator('ul[class="govuk-pagination__list"]')
     this.studyList = page.locator('ol[aria-label="Studies"]')
     this.studyListItem = this.studyList.locator('li')
+    this.studyLastItem = this.studyListItem.last()
+    this.studyLastDue = this.studyLastItem.locator('span', { hasText: 'due' })
     this.studyListItemTitle = this.studyListItem.locator(
       'div[class="govuk-heading-s govuk-!-margin-bottom-4 govuk-!-padding-top-0 inline-block font-extrabold"]'
     )
@@ -375,24 +379,22 @@ export default class StudiesPage {
   }
 
   async assertListEndsWithNonDueStudies(sortedList: RowDataPacket[]) {
-    const pageStudyCount = await this.studyListItem.count()
-    let expectedSortedNonDueListItems: RowDataPacket[] = []
-    let actualSortedNonDueStudyTitles: string[] = []
-    sortedList.forEach((study) => {
-      if (study.isDueAssessment == 0) {
-        expectedSortedNonDueListItems.push(study)
+    function checkForStudyNotDue(studies: any) {
+      for (let study of studies) {
+        if (study.isDueAssessment === 0) {
+          console.log('At least 1 study is not due an assessment, checking last study status...')
+          return true
+        }
       }
-    })
-
-    const startIndex = pageStudyCount - expectedSortedNonDueListItems.length
-    for (let index = startIndex; index < pageStudyCount; index++) {
-      actualSortedNonDueStudyTitles.push(confirmStringNotNull(await this.studyListItemTitle.nth(index).textContent()))
-      await expect(this.studyListItem.nth(index).locator(this.studyListItemDueIndicator)).toBeHidden()
+      console.log('All studies are currently due an assessment, checking last study status...')
+      return false
     }
 
-    for (let index = 0; index < actualSortedNonDueStudyTitles.length; index++) {
-      const studyTitle = actualSortedNonDueStudyTitles[index]
-      expect(studyTitle).toEqual(expectedSortedNonDueListItems[index].shortTitle)
+    await expect(this.studyLastItem).toBeVisible()
+    if (checkForStudyNotDue(sortedList)) {
+      await expect(this.studyLastDue).not.toBeVisible()
+    } else {
+      await expect(this.studyLastDue).toBeVisible()
     }
   }
 

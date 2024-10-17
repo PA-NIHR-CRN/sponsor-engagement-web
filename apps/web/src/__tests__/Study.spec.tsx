@@ -6,17 +6,22 @@ import type { GetServerSidePropsContext } from 'next'
 import { getServerSession } from 'next-auth/next'
 import mockRouter from 'next-router-mock'
 import { NextSeo } from 'next-seo'
+import { setStudyAssessmentDue } from 'shared-utilities'
 import { Mock } from 'ts-mockery'
 
 import { render, screen, within } from '@/config/TestUtils'
-import { mappedCPMSStudyEvals, mockCPMSStudy, mockMappedAssessment, mockStudyWithRelations } from '@/mocks/studies'
+import { StudyUpdateState, StudyUpdateType } from '@/constants'
+import {
+  getMockEditHistoryFromCPMS,
+  mappedCPMSStudyEvals,
+  mockCPMSStudy,
+  mockMappedAssessment,
+  mockStudyUpdates,
+  mockStudyWithRelations,
+} from '@/mocks/studies'
 
 import { prismaMock } from '../__mocks__/prisma'
-import {
-  userWithContactManagerRole,
-  userWithSponsorContactRole,
-  userWithSponsorContactRoleAndEditStudyRole,
-} from '../__mocks__/session'
+import { userWithContactManagerRole, userWithSponsorContactRole } from '../__mocks__/session'
 import { SIGN_IN_PAGE, SUPPORT_PAGE } from '../constants/routes'
 import type { StudyProps } from '../pages/studies/[studyId]'
 import Study, { getServerSideProps } from '../pages/studies/[studyId]'
@@ -24,13 +29,17 @@ import Study, { getServerSideProps } from '../pages/studies/[studyId]'
 jest.mock('next-auth/next')
 jest.mock('next-seo')
 jest.mock('axios')
+jest.mock('shared-utilities')
+
 const mockedGetAxios = jest.mocked(axios.get)
+const mockSetStudyAssessmentDue = setStudyAssessmentDue as jest.MockedFunction<typeof setStudyAssessmentDue>
 
 const env = { ...process.env }
 const mockedEnvVars = {
   apiUrl: 'cpms-api',
   apiUsername: 'testuser',
   apiPassword: 'testpwd',
+  assessmentLapseMonths: '3',
 }
 
 type StudyWithRelations = Prisma.StudyGetPayload<{
@@ -83,18 +92,34 @@ const renderPage = async (
   mockUrl = `/study/${mockStudyId}`,
   mockGetCPMSStudyResponse = mockCPMSStudy,
   mockUpdateStudyResponse = mockStudy,
-  mockUpdatedStudyEvals = mappedCPMSStudyEvals
+  mockUpdatedStudyEvals = mappedCPMSStudyEvals,
+  isAssessmentDue = false
 ) => {
-  jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRoleAndEditStudyRole)
+  jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRole)
 
   prismaMock.$transaction.mockResolvedValueOnce([mockGetStudyResponse])
   mockedGetAxios.mockResolvedValueOnce({ data: { StatusCode: 200, Result: mockGetCPMSStudyResponse } })
   prismaMock.study.update.mockResolvedValueOnce(mockUpdateStudyResponse)
+  mockSetStudyAssessmentDue.mockResolvedValueOnce({ count: isAssessmentDue ? 1 : 0 })
   mockUpdatedStudyEvals.forEach((studyEval) =>
     prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(studyEval)
   )
 
   await mockRouter.push(mockUrl)
+
+  // Requests for edit history
+  prismaMock.studyUpdates.groupBy.mockResolvedValueOnce([
+    { ...mockStudyUpdates[0], _count: true, _avg: undefined, _sum: undefined, _min: undefined, _max: undefined },
+  ])
+  prismaMock.studyUpdates.findMany.mockResolvedValueOnce(mockStudyUpdates)
+  prismaMock.studyUpdates.findMany.mockResolvedValueOnce(
+    mockStudyUpdates.map((studyUpdate) => ({
+      ...studyUpdate,
+      studyUpdateStateId: StudyUpdateState.After,
+      studyUpdateTypeId: StudyUpdateType.Direct,
+      LSN: studyUpdate.LSN ?? Buffer.from(mockCPMSStudy.ChangeHistory[1].LSN, 'hex'),
+    }))
+  )
 
   const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
 
@@ -114,6 +139,8 @@ describe('Study', () => {
     process.env.CPMS_API_URL = mockedEnvVars.apiUrl
     process.env.CPMS_API_USERNAME = mockedEnvVars.apiUsername
     process.env.CPMS_API_PASSWORD = mockedEnvVars.apiPassword
+    process.env.ASSESSMENT_LAPSE_MONTHS = mockedEnvVars.assessmentLapseMonths
+    process.env.NEXT_PUBLIC_ENABLE_EDIT_HISTORY_FEATURE = 'true'
   })
 
   afterAll(() => {
@@ -176,8 +203,12 @@ describe('Study', () => {
       prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
       mockedGetAxios.mockResolvedValueOnce({ data: { StatusCode: 200, Result: mockCPMSStudy } })
       prismaMock.study.update.mockResolvedValueOnce(mockStudyWithRelations)
+      mockSetStudyAssessmentDue.mockResolvedValueOnce({ count: 0 })
       prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[0])
       prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[1])
+      prismaMock.studyUpdates.groupBy.mockResolvedValueOnce([])
+      prismaMock.studyUpdates.findMany.mockResolvedValueOnce([])
+      prismaMock.studyUpdates.findMany.mockResolvedValueOnce([])
 
       const result = await getServerSideProps(context)
       expect(result).toEqual({
@@ -189,6 +220,7 @@ describe('Study', () => {
             evaluationCategories: mappedCPMSStudyEvals,
             organisationsByRole,
           },
+          editHistory: getMockEditHistoryFromCPMS([false, false]),
         },
       })
 
@@ -253,7 +285,11 @@ describe('Study', () => {
       prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
       mockedGetAxios.mockResolvedValueOnce({ data: { StatusCode: 200, Result: mockCPMSStudy } })
       prismaMock.study.update.mockResolvedValueOnce(mockStudyWithRelations)
+      mockSetStudyAssessmentDue.mockResolvedValueOnce({ count: 0 })
       prismaMock.studyEvaluationCategory.upsert.mockRejectedValueOnce(new Error('Oh no, an error!'))
+      prismaMock.studyUpdates.groupBy.mockResolvedValueOnce([])
+      prismaMock.studyUpdates.findMany.mockResolvedValueOnce([])
+      prismaMock.studyUpdates.findMany.mockResolvedValueOnce([])
 
       const result = await getServerSideProps(context)
 
@@ -265,6 +301,7 @@ describe('Study', () => {
             ...mockStudyWithRelations,
             organisationsByRole,
           },
+          editHistory: getMockEditHistoryFromCPMS([false, false]),
         },
       })
 
@@ -272,6 +309,74 @@ describe('Study', () => {
       expect(mockedGetAxios).toHaveBeenCalledTimes(1)
       expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
       expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(2)
+    })
+
+    test('when request to set study assessment flag fails, it should not throw a 500 and return correct study', async () => {
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
+      getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+      prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
+      mockedGetAxios.mockResolvedValueOnce({ data: { StatusCode: 200, Result: mockCPMSStudy } })
+      prismaMock.study.update.mockResolvedValueOnce(mockStudyWithRelations)
+      mockSetStudyAssessmentDue.mockRejectedValueOnce({})
+      prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[0])
+      prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[1])
+      prismaMock.studyUpdates.groupBy.mockResolvedValueOnce([])
+      prismaMock.studyUpdates.findMany.mockResolvedValueOnce([])
+      prismaMock.studyUpdates.findMany.mockResolvedValueOnce([])
+
+      const result = await getServerSideProps(context)
+      expect(result).toEqual({
+        props: {
+          user: userWithSponsorContactRole.user,
+          assessments: [mockMappedAssessment],
+          study: {
+            ...mockStudyWithRelations,
+            evaluationCategories: mappedCPMSStudyEvals,
+            organisationsByRole,
+          },
+          editHistory: getMockEditHistoryFromCPMS([false, false]),
+        },
+      })
+
+      expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
+      expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
+      expect(mockSetStudyAssessmentDue).toHaveBeenCalledTimes(1)
+      expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(2)
+      expect(mockedGetAxios).toHaveBeenCalledTimes(1)
+    })
+
+    test('when study is due for assessment, should return study with the correct flag', async () => {
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
+      getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+      prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
+      mockedGetAxios.mockResolvedValueOnce({ data: { StatusCode: 200, Result: mockCPMSStudy } })
+      prismaMock.study.update.mockResolvedValueOnce(mockStudyWithRelations)
+      mockSetStudyAssessmentDue.mockResolvedValueOnce({ count: 1 })
+      prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[0])
+      prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[1])
+      prismaMock.studyUpdates.groupBy.mockResolvedValueOnce([])
+      prismaMock.studyUpdates.findMany.mockResolvedValueOnce([])
+      prismaMock.studyUpdates.findMany.mockResolvedValueOnce([])
+
+      const result = await getServerSideProps(context)
+      expect(result).toEqual({
+        props: {
+          user: userWithSponsorContactRole.user,
+          assessments: [mockMappedAssessment],
+          study: {
+            ...mockStudyWithRelations,
+            evaluationCategories: mappedCPMSStudyEvals,
+            organisationsByRole,
+            isDueAssessment: true,
+          },
+          editHistory: getMockEditHistoryFromCPMS([false, false]),
+        },
+      })
+
+      expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
+      expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
+      expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(2)
+      expect(mockedGetAxios).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -296,8 +401,8 @@ describe('Study', () => {
         `http://localhost/assessments/${mockStudy.id}`
       )
 
-      // Edit study data
-      expect(screen.getByRole('link', { name: 'Edit study data' })).toHaveProperty(
+      // Update study data
+      expect(screen.getByRole('link', { name: 'Update study data' })).toHaveProperty(
         'href',
         `http://localhost/studies/${mockStudy.id}/edit`
       )
@@ -315,8 +420,8 @@ describe('Study', () => {
       expect(progressHeaders.map((header) => header.textContent)).toEqual([
         'Study Status',
         'Study data indicates',
-        'Planned opening date',
-        'Actual opening date',
+        'Planned opening to recruitment date',
+        'Actual opening to recruitment date',
         'Planned closure to recruitment date',
         'Actual closure to recruitment date',
         'Estimated reopening date',
@@ -387,7 +492,7 @@ describe('Study', () => {
     })
 
     test('Due assessment', async () => {
-      await renderPage(undefined, undefined, undefined, { ...mockStudy, isDueAssessment: true })
+      await renderPage(undefined, undefined, undefined, mockStudy, undefined, true)
 
       expect(screen.getByText('Due')).toBeInTheDocument()
       expect(screen.getByText('This study needs a new sponsor assessment.')).toBeInTheDocument()
@@ -496,6 +601,39 @@ describe('Study', () => {
       expect(within(list).getByText('Mocked list item 3')).toBeInTheDocument()
 
       expect(screen.getByText('Testing some further information')).toBeInTheDocument()
+    })
+  })
+
+  describe('Study edit history accordion', () => {
+    test('Displays the correct deatils for edit history', async () => {
+      await renderPage()
+
+      const viewEditHistory = screen.getByRole('group')
+      expect(within(viewEditHistory).getByText('View edit history')).toBeInTheDocument()
+      expect(viewEditHistory).toBeInTheDocument()
+
+      await userEvent.click(viewEditHistory)
+
+      expect(
+        within(viewEditHistory).getByTestId(`edit-history-accordion-item-${mockStudyUpdates[0].transactionId}`)
+      ).toBeInTheDocument()
+      expect(
+        within(viewEditHistory).getByTestId(`edit-history-accordion-item-${mockCPMSStudy.ChangeHistory[0].LSN}`)
+      ).toBeInTheDocument()
+      expect(
+        within(viewEditHistory).getByTestId(`edit-history-accordion-item-${mockCPMSStudy.ChangeHistory[1].LSN}`)
+      ).toBeInTheDocument()
+      expect(
+        within(viewEditHistory).getByTestId(`edit-history-accordion-item-${mockCPMSStudy.ChangeHistory[2].LSN}`)
+      ).toBeInTheDocument()
+    })
+
+    test('When query contains a latestProposedUpdate query, should open the corresponding item', async () => {
+      await renderPage(undefined, `?latestProposedUpdate=${mockStudyUpdates[0].transactionId}`)
+
+      const accordionItem = screen.getByTestId(`edit-history-accordion-item-${mockStudyUpdates[0].transactionId}`)
+      expect(accordionItem).toBeInTheDocument()
+      expect(accordionItem).toHaveAttribute('data-state', 'open')
     })
   })
 

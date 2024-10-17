@@ -3,6 +3,7 @@ import { test as setup } from '../../hooks/CustomFixtures'
 
 const authSponsorContactFile = '.auth/sponsorContact.json'
 const authContactManagerFile = '.auth/contactManager.json'
+const authNpmFile = '.auth/nationalPortfolioManager.json'
 const cookieConfig = {
   name: 'SEConsentGDPR',
   value: 'Reject',
@@ -38,3 +39,13 @@ setup(
     await page.context().storageState({ path: authContactManagerFile })
   }
 )
+
+setup('Authenticate the CPMS NPM User', async ({ cpmsStudiesPage, loginPage, page }) => {
+  await cpmsStudiesPage.goToCpmsStudies()
+  await cpmsStudiesPage.assertOnSignInPage()
+  await cpmsStudiesPage.btnNext.click()
+  await loginPage.loginWithUserCreds('National Portfolio Manager')
+  await cpmsStudiesPage.assertOnCpmsStudiesPage()
+  await page.context().addCookies([cookieConfig])
+  await page.context().storageState({ path: authNpmFile })
+})

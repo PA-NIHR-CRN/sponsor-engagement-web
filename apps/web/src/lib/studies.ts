@@ -1,3 +1,5 @@
+import { setStudyAssessmentDue } from 'shared-utilities'
+
 import type { Study, StudyEvaluationCategory } from '@/@types/studies'
 import { Status as CPMSStatus } from '@/@types/studies'
 import { FormStudyStatus } from '@/constants/editStudyForm'
@@ -337,6 +339,7 @@ export const mapCPMSStudyToSEStudy = (study: Study): UpdateStudyInput => ({
   actualOpeningDate: study.ActualOpeningDate ? new Date(study.ActualOpeningDate) : null,
   actualClosureDate: study.ActualClosureToRecruitmentDate ? new Date(study.ActualClosureToRecruitmentDate) : null,
   estimatedReopeningDate: study.EstimatedReopeningDate ? new Date(study.EstimatedReopeningDate) : null,
+  isDueAssessment: false,
 })
 
 export const updateStudy = async (cpmsId: number, studyData: UpdateStudyInput) => {
@@ -432,6 +435,21 @@ export const updateEvaluationCategories = async (
     }
 
     return { data: evaluationCategories, error: null }
+  } catch (error) {
+    const errorMessage = getErrorMessage(error)
+
+    return {
+      data: null,
+      error: errorMessage,
+    }
+  }
+}
+
+export const setStudyAssessmentDueFlag = async (studyIds: number[]) => {
+  try {
+    const assessmentDueResult = await setStudyAssessmentDue(studyIds)
+
+    return { data: assessmentDueResult.count }
   } catch (error) {
     const errorMessage = getErrorMessage(error)
 

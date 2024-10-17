@@ -3,6 +3,7 @@ import axios from 'axios'
 import type { GetServerSidePropsContext } from 'next'
 import { getServerSession } from 'next-auth/next'
 import mockRouter from 'next-router-mock'
+import { setStudyAssessmentDue } from 'shared-utilities'
 import { Mock } from 'ts-mockery'
 
 import { userWithSponsorContactRole } from '@/__mocks__/session'
@@ -16,14 +17,19 @@ import { prismaMock } from '../__mocks__/prisma'
 
 jest.mock('next-auth/next')
 jest.mock('axios')
+jest.mock('shared-utilities')
+
 const mockedGetAxios = jest.mocked(axios.get)
 const mockedPostAxios = jest.mocked(axios.post)
 
+const mockSetStudyAssessmentDue = setStudyAssessmentDue as jest.MockedFunction<typeof setStudyAssessmentDue>
+
 const mockStudyId = mockStudyWithRelations.id.toString()
 
+const mockLSN = '1212'
 const mockCPMSResponse = {
   StatusCode: 200,
-  Result: mockCPMSStudy,
+  Result: { ...mockCPMSStudy, CurrentLsn: mockLSN },
 }
 
 const env = { ...process.env }
@@ -31,6 +37,7 @@ const mockedEnvVars = {
   apiUrl: 'cpms-api',
   apiUsername: 'testuser',
   apiPassword: 'testpwd',
+  assessmentLapseMonths: '3',
 }
 
 const organisationsByRole = {
@@ -51,6 +58,8 @@ const renderPage = async (
   prismaMock.study.update.mockResolvedValueOnce(mockReturnedStudy)
   prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[0])
   prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[1])
+  mockSetStudyAssessmentDue.mockResolvedValueOnce({ count: 1 })
+
   if (mockEditAxiosResponseUrl) {
     mockedPostAxios.mockResolvedValueOnce({ request: { responseURL: mockEditAxiosResponseUrl } })
   }
@@ -89,6 +98,7 @@ describe('EditStudy', () => {
     process.env.CPMS_API_URL = mockedEnvVars.apiUrl
     process.env.CPMS_API_USERNAME = mockedEnvVars.apiUsername
     process.env.CPMS_API_PASSWORD = mockedEnvVars.apiPassword
+    process.env.ASSESSMENT_LAPSE_MONTHS = mockedEnvVars.assessmentLapseMonths
   })
 
   afterAll(() => {
@@ -96,21 +106,6 @@ describe('EditStudy', () => {
   })
 
   describe('getServerSideProps', () => {
-    test('redirects to 404 page if user does not have edit study role permissions', async () => {
-      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
-      getServerSessionMock.mockResolvedValueOnce({
-        ...userWithSponsorContactRole,
-        user: { ...userWithSponsorContactRole.user, groups: [] },
-      })
-
-      const result = await getServerSideProps(context)
-      expect(result).toEqual({
-        redirect: {
-          destination: '/404',
-        },
-      })
-    })
-
     test('redirects to 404 page if no study found', async () => {
       const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
       getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
@@ -147,6 +142,7 @@ describe('EditStudy', () => {
       prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
       mockedGetAxios.mockResolvedValueOnce({ data: mockCPMSResponse })
       prismaMock.study.update.mockResolvedValueOnce(mockStudyWithRelations)
+      mockSetStudyAssessmentDue.mockResolvedValueOnce({ count: 0 })
       prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[0])
       prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[1])
 
@@ -159,11 +155,13 @@ describe('EditStudy', () => {
             evaluationCategories: mappedCPMSStudyEvals,
             organisationsByRole,
           },
+          currentLSN: mockLSN,
         },
       })
 
       expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
       expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
+      expect(mockSetStudyAssessmentDue).toHaveBeenCalledTimes(1)
       expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(2)
       expect(mockedGetAxios).toHaveBeenCalledTimes(1)
     })
@@ -229,6 +227,7 @@ describe('EditStudy', () => {
             ...mockStudyWithRelations,
             organisationsByRole,
           },
+          currentLSN: mockLSN,
         },
       })
 
@@ -237,11 +236,72 @@ describe('EditStudy', () => {
       expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
       expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(2)
     })
+
+    test('when request to set study assessment flag fails, should not throw a 500 and correctly return study', async () => {
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
+      getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+      prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
+      mockedGetAxios.mockResolvedValueOnce({ data: mockCPMSResponse })
+      prismaMock.study.update.mockResolvedValueOnce(mockStudyWithRelations)
+      mockSetStudyAssessmentDue.mockRejectedValueOnce({})
+      prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[0])
+      prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[1])
+
+      const result = await getServerSideProps(context)
+      expect(result).toEqual({
+        props: {
+          user: userWithSponsorContactRole.user,
+          study: {
+            ...mockStudyWithRelations,
+            evaluationCategories: mappedCPMSStudyEvals,
+            organisationsByRole,
+          },
+          currentLSN: mockLSN,
+        },
+      })
+
+      expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
+      expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
+      expect(mockSetStudyAssessmentDue).toHaveBeenCalledTimes(1)
+      expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(2)
+      expect(mockedGetAxios).toHaveBeenCalledTimes(1)
+    })
+
+    test('when study is due for assessment, should return study with the correct flag', async () => {
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
+      getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+      prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
+      mockedGetAxios.mockResolvedValueOnce({ data: mockCPMSResponse })
+      prismaMock.study.update.mockResolvedValueOnce(mockStudyWithRelations)
+      mockSetStudyAssessmentDue.mockResolvedValueOnce({ count: 1 })
+      prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[0])
+      prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[1])
+
+      const result = await getServerSideProps(context)
+      expect(result).toEqual({
+        props: {
+          user: userWithSponsorContactRole.user,
+          study: {
+            ...mockStudyWithRelations,
+            evaluationCategories: mappedCPMSStudyEvals,
+            organisationsByRole,
+            isDueAssessment: true,
+          },
+          currentLSN: mockLSN,
+        },
+      })
+
+      expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
+      expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
+      expect(mockSetStudyAssessmentDue).toHaveBeenCalledTimes(1)
+      expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(2)
+      expect(mockedGetAxios).toHaveBeenCalledTimes(1)
+    })
   })
 
   describe('Edit study page', () => {
     test('default layout', async () => {
-      await renderPage()
+      await renderPage(undefined, undefined, { ...mockStudyWithRelations, studyStatus: Status.InSetup })
 
       // Header title
       expect(screen.getByRole('heading', { level: 1, name: 'Update study data' })).toBeInTheDocument()
@@ -288,7 +348,7 @@ describe('EditStudy', () => {
 
       expect(within(statusFieldset).getByLabelText('Open to recruitment')).toBeInTheDocument()
       expect(within(statusFieldset).getByLabelText('Open to recruitment')).toHaveAccessibleDescription(
-        'Ready (open) to recruit participants in at least one UK site. Provide an actual opening date below.'
+        'Open to recruit participants in at least one UK site. Provide an actual opening date below.'
       )
 
       expect(within(statusFieldset).getByLabelText('Closed, in follow-up')).toBeInTheDocument()
@@ -311,49 +371,106 @@ describe('EditStudy', () => {
         'Recruitment of participants has halted, but may resume. Provide an estimated re-opening date below.'
       )
 
-      // Form Input - Planned open recruitment date
-      const plannedOpenDateFieldset = screen.getByRole('group', { name: 'Planned opening to recruitment date' })
-      expect(plannedOpenDateFieldset).toBeInTheDocument()
-
-      // Form Input - Actual open recruitment date
-      const actualOpenDateFieldset = screen.getByRole('group', { name: 'Actual opening to recruitment date' })
-      expect(actualOpenDateFieldset).toBeInTheDocument()
-
-      // Form Input - Planned closing recruitment date
-      const plannedClosingDateFieldset = screen.getByRole('group', { name: 'Planned closure to recruitment date' })
-      expect(plannedClosingDateFieldset).toBeInTheDocument()
-
-      // Form Input - Actual closing recruitment date
-      const actualClosingDateFieldset = screen.getByRole('group', { name: 'Actual closure to recruitment date' })
-      expect(actualClosingDateFieldset).toBeInTheDocument()
-
-      // Form Input - Estimated reopening date
-      const estimatedReopeningDate = screen.getByRole('group', { name: 'Estimated reopening date' })
-      expect(estimatedReopeningDate).toBeInTheDocument()
+      // A given status does not have all dates
+      // Testing of date fields are in separate tests
 
       // Form Input - UK Recruitment target
       const ukRecruitmentTarget = screen.getByLabelText('UK recruitment target')
       expect(ukRecruitmentTarget).toBeInTheDocument()
 
       // Form Input - Further information
-      const furtherInformation = screen.getByLabelText('Further information')
+      const furtherInformation = screen.getByLabelText('Further information (optional)')
       expect(furtherInformation).toBeInTheDocument()
       expect(furtherInformation).toHaveAccessibleDescription(
         'You have 500 characters remaining If needed, provide further context or justification for changes made above.'
       )
-
-      // Warning text
-      const warningText = screen.getByText(
-        'It may a few seconds for the CPMS record to update. Please stay on this page until redirected.'
-      )
-      expect(warningText).toBeInTheDocument()
 
       // Update CTA
       expect(screen.getByRole('button', { name: 'Update' })).toHaveAttribute('type', 'submit')
 
       // Cancel CTA
       expect(screen.getByRole('link', { name: 'Cancel' })).toHaveAttribute('href', `/studies/${mockStudyId}`)
+
+      // Support text
+      const paragraphSupportText = screen.getByText(/if you need support updating your data, please contact the/i)
+      expect(paragraphSupportText).toBeInTheDocument()
+      const rdnTeamLink = within(paragraphSupportText).getByRole('link', { name: /rdn team/i })
+      expect(rdnTeamLink).toBeInTheDocument()
+      expect(rdnTeamLink).toHaveAttribute('href', 'mailto:supportmystudy@nihr.ac.uk')
     })
+
+    it.each([
+      [Status.InSetup, ['Planned opening to recruitment date', 'Planned closure to recruitment date']],
+      [
+        Status.OpenToRecruitment,
+        [
+          'Planned opening to recruitment date',
+          'Planned closure to recruitment date',
+          'Actual opening to recruitment date',
+        ],
+      ],
+      [
+        Status.Suspended,
+        [
+          'Planned opening to recruitment date',
+          'Planned closure to recruitment date',
+          'Actual opening to recruitment date',
+          'Estimated reopening date',
+        ],
+      ],
+      [
+        Status.ClosedToRecruitment,
+        [
+          'Planned opening to recruitment date',
+          'Planned closure to recruitment date',
+          'Actual opening to recruitment date',
+          'Actual closure to recruitment date',
+        ],
+      ],
+      [
+        Status.ClosedToRecruitmentInFollowUp,
+        [
+          'Planned opening to recruitment date',
+          'Planned closure to recruitment date',
+          'Actual opening to recruitment date',
+          'Actual closure to recruitment date',
+        ],
+      ],
+      [Status.WithdrawnDuringSetup, ['Planned opening to recruitment date', 'Planned closure to recruitment date']],
+    ])('should show the correct date fields based on the status %s', async (status: Status, fieldLabels: string[]) => {
+      await renderPage(undefined, undefined, { ...mockStudyWithRelations, studyStatus: status })
+
+      const dateFieldSets = screen.getAllByRole('group')
+
+      // Additional one required for the fieldset around the entire form
+      expect(dateFieldSets.length).toEqual(fieldLabels.length + 1)
+
+      fieldLabels.forEach((dateField) => {
+        const dateFieldSet = screen.getByRole('group', { name: dateField })
+        expect(dateFieldSet).toBeInTheDocument()
+      })
+    })
+
+    it.each([
+      [Status.InSetup, ['In setup', 'Open to recruitment', 'Closed, in follow-up', 'Closed', 'Withdrawn', 'Suspended']],
+      [Status.OpenToRecruitment, ['Open to recruitment', 'Closed, in follow-up', 'Closed', 'Suspended']],
+      [Status.Suspended, ['Open to recruitment', 'Closed, in follow-up', 'Closed', 'Suspended']],
+      [Status.ClosedToRecruitmentInFollowUp, ['Closed, in follow-up']],
+      [Status.ClosedToRecruitment, ['Closed']],
+    ])(
+      'should show the correct status fields based on the original status',
+      async (originalStatus: Status, statusLabels: string[]) => {
+        await renderPage(undefined, undefined, { ...mockStudyWithRelations, studyStatus: originalStatus })
+
+        const statuses = screen.getAllByRole('radio')
+        expect(statuses.length).toEqual(statusLabels.length)
+
+        statusLabels.forEach((status) => {
+          const statusRadioButton = screen.getByRole('radio', { name: status })
+          expect(statusRadioButton).toBeInTheDocument()
+        })
+      }
+    )
   })
 
   describe('Form submission failures', () => {
@@ -516,6 +633,7 @@ describe('EditStudy', () => {
         await renderPage(undefined, undefined, {
           ...mockStudyWithRelations,
           plannedOpeningDate: null,
+          studyStatus: Status.ClosedToRecruitment,
         })
         const actualClosureDateFieldSet = screen.getByRole('group', { name: 'Actual closure to recruitment date' })
         expect(actualClosureDateFieldSet).toBeInTheDocument()
@@ -688,6 +806,22 @@ describe('EditStudy', () => {
         fieldsToRemove.forEach((label) => {
           expect(within(alert).getByText(`${label} is a mandatory field`)).toBeInTheDocument()
         })
+      })
+
+      it('when a date field is not visible, it does not validate against it', async () => {
+        // In Setup status does not have estimated reopening date visible
+        // Estimated reopening has validation that must be today or in the past
+        await renderPage(undefined, undefined, {
+          ...mockStudyWithRelations,
+          estimatedReopeningDate: new Date('2001-01-02'),
+          studyStatus: Status.InSetup,
+        })
+
+        await userEvent.click(screen.getByRole('button', { name: 'Update' }))
+
+        // Assert error does not include estimated reopening date error
+        const alert = screen.getByRole('alert')
+        expect(within(alert).queryByText('Estimated reopening date must be today or in the past')).toBeNull()
       })
     })
   })
