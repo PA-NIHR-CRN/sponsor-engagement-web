@@ -318,7 +318,7 @@ describe('/api/forms/editStudy', () => {
       expect(mockedPutAxios).toHaveBeenCalledTimes(1)
       expect(mockedPutAxios).toHaveBeenCalledWith(
         `${mockedEnvVars.apiUrl}/studies/${body.cpmsId}/engagement-info`,
-        JSON.stringify({ ...mockCPMSUpdateInput, notes: 'Update from Sponsor Engagement Tool' }),
+        JSON.stringify({ ...mockCPMSUpdateInput, CurrentLsn: '1212', notes: 'Update from Sponsor Engagement Tool' }),
         {
           headers: {
             'Content-Type': 'application/json',
