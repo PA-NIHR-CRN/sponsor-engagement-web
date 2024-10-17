@@ -17,7 +17,11 @@ export interface GetStudyFromCPMSResponse {
   error?: string
 }
 
-export const getStudyByIdFromCPMS = async (studyId: number): Promise<GetStudyFromCPMSResponse> => {
+export const getStudyByIdFromCPMS = async (
+  studyId: number,
+  changeHistoryFrom?: string,
+  changeHistoryMaxItems = 10
+): Promise<GetStudyFromCPMSResponse> => {
   const { CPMS_API_URL, CPMS_API_USERNAME, CPMS_API_PASSWORD } = process.env
 
   try {
@@ -28,6 +32,10 @@ export const getStudyByIdFromCPMS = async (studyId: number): Promise<GetStudyFro
     const requestUrl = `${CPMS_API_URL}/studies/${studyId}/engagement-info`
     const { data } = await axios.get<CPMSGetStudyResponse>(requestUrl, {
       headers: { username: CPMS_API_USERNAME, password: CPMS_API_PASSWORD },
+      params: {
+        changeHistoryFrom,
+        changeHistoryMaxItems,
+      },
     })
 
     if (data.StatusCode !== 200) {
@@ -51,7 +59,7 @@ export type UpdateStudyInput = Pick<
   | 'PlannedClosureToRecruitmentDate'
   | 'ActualClosureToRecruitmentDate'
   | 'EstimatedReopeningDate'
-> & { notes?: string }
+> & { notes?: string; CurrentLsn?: string | null }
 
 export interface UpdateStudyFromCPMSResponse {
   study: (Study & { UpdateLsn: string }) | null

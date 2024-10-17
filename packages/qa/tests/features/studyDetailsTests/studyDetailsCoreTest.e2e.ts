@@ -138,8 +138,8 @@ test.describe('View core study details - @se_27', () => {
       await studyDetailsPage.goto(startingStudyId.toString())
       await studyDetailsPage.assertOnStudyDetailsPage(startingStudyId.toString())
     })
-    await test.step(`When I click on 'Update study data' button`, async () => {
-      await studyDetailsPage.editStudyDataButton.click()
+    await test.step(`When I click on 'Update study' button`, async () => {
+      await studyDetailsPage.updateStudyDataButton.click()
     })
     await test.step('Then I am taken to the Update study data page', async () => {
       await studyUpdatePage.assertOnUpdateStudyPage(startingStudyId.toString())

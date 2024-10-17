@@ -20,6 +20,7 @@ const mockedEnvVars = {
   apiUrl: 'cpms-api',
   apiUsername: 'testuser',
   apiPassword: 'testpwd',
+  editHistoryStartDate: '2024-11-01',
 }
 
 const mockStudyId = Number(mockCPMSStudy.StudyId)
@@ -44,13 +45,17 @@ describe('getStudyByIdFromCPMS', () => {
 
     mockedGetAxios.mockResolvedValueOnce({ data: mockResponse })
 
-    const result = await getStudyByIdFromCPMS(mockStudyId)
+    const result = await getStudyByIdFromCPMS(mockStudyId, '2024-01-02', 5)
 
     expect(result).toStrictEqual({ study: mockResponse.Result })
 
     expect(mockedGetAxios).toHaveBeenCalledTimes(1)
     expect(mockedGetAxios).toHaveBeenCalledWith(`${mockedEnvVars.apiUrl}/studies/${mockStudyId}/engagement-info`, {
       headers: { username: mockedEnvVars.apiUsername, password: mockedEnvVars.apiPassword },
+      params: {
+        changeHistoryFrom: '2024-01-02',
+        changeHistoryMaxItems: 5,
+      },
     })
   })
 

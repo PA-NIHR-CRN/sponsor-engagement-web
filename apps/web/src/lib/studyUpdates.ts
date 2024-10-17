@@ -11,7 +11,7 @@ export const logStudyUpdate = async (
   studyId: number,
   transactionId: string,
   originalStudyValues: EditStudy['originalValues'],
-  newStudyValues: EditStudyInputs,
+  newStudyValues: Omit<EditStudyInputs, 'studyId' | 'cpmsId'>,
   isDirectUpdate: boolean,
   userId: number,
   beforeLSN?: string | null,
