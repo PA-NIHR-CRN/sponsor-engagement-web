@@ -67,7 +67,7 @@ beforeEach(() => {
   prismaMock.studyOrganisation.createMany.mockResolvedValueOnce({ count: 1 })
   prismaMock.studyFunder.createMany.mockResolvedValueOnce({ count: 1 })
   prismaMock.studyEvaluationCategory.updateMany.mockResolvedValueOnce({ count: 1 })
-  mockSetStudyAssessmentDue.mockResolvedValueOnce()
+  mockSetStudyAssessmentDue.mockResolvedValueOnce({ count: 1 })
 
   prismaMock.study.findMany.mockResolvedValueOnce(studyEntities)
   prismaMock.organisation.findMany.mockResolvedValueOnce(organisationEntities)

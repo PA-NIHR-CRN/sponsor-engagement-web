@@ -1,6 +1,7 @@
 {
   "name": "shared-utilities",
   "version": "0.0.0",
+  "private": true,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
@@ -19,7 +20,6 @@
     "jest-mock-extended": "^3.0.5",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.1",
-    "tsup": "^8.3.0",
     "typescript": "^5.2.2"
   }
 }
