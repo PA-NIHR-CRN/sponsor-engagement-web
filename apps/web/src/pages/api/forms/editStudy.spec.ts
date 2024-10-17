@@ -137,15 +137,21 @@ const getMockStudyUpdateInput = (isDirect: boolean, isAfterState: boolean) => {
   return {
     studyStatus: isAfterState ? studyStatusOnUpdateType : body.originalValues.status,
     studyStatusGroup: isAfterState ? 'Suspended' : 'Open, to Recruitment',
-    plannedOpeningDate: isAfterState ? mockCPMSUpdateInput.PlannedOpeningDate : '2003-02-27T00:00:00.000',
-    actualOpeningDate: isAfterState ? mockCPMSUpdateInput.ActualOpeningDate : '1991-09-02T00:00:00.000',
+    plannedOpeningDate: isAfterState
+      ? new Date(mockCPMSUpdateInput.PlannedOpeningDate as string).toISOString()
+      : new Date('2003-02-27T00:00:00.000').toISOString(),
+    actualOpeningDate: isAfterState
+      ? new Date(mockCPMSUpdateInput.ActualOpeningDate as string).toISOString()
+      : new Date('1991-09-02T00:00:00.000').toISOString(),
     plannedClosureToRecruitmentDate: isAfterState
-      ? mockCPMSUpdateInput.PlannedClosureToRecruitmentDate
-      : '2004-02-27T00:00:00.000',
+      ? new Date(mockCPMSUpdateInput.PlannedClosureToRecruitmentDate as string).toISOString()
+      : new Date('2004-02-27T00:00:00.000').toISOString(),
     actualClosureToRecruitmentDate: isAfterState
-      ? mockCPMSUpdateInput.ActualClosureToRecruitmentDate
-      : '2003-02-27T00:00:00.000',
-    estimatedReopeningDate: isAfterState ? mockCPMSUpdateInput.EstimatedReopeningDate : '2021-02-27T00:00:00.000',
+      ? new Date(mockCPMSUpdateInput.ActualClosureToRecruitmentDate as string).toISOString()
+      : new Date('2003-02-27T00:00:00.000').toISOString(),
+    estimatedReopeningDate: isAfterState
+      ? new Date(mockCPMSUpdateInput.EstimatedReopeningDate).toISOString()
+      : new Date('2021-02-27T00:00:00.000').toISOString(),
     ukRecruitmentTarget: isAfterState ? 121 : 122,
     comment: '',
     studyId: body.studyId,
