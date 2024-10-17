@@ -30,9 +30,13 @@ Then populate the variables by retrieving from the following sources:
   # env             # the SE environment you wish to test (currently only supports test)
   E2E_BASE_URL=     # (currently only supports test)
 
-  # db              # creds can be found in https://docs.google.com/document/d/1J9I1b4hb28rd9vl34Oe7XPCeZqk8yVsyG84KJgXS6k0
+  # se db           # creds can be found in https://docs.google.com/document/d/1J9I1b4hb28rd9vl34Oe7XPCeZqk8yVsyG84KJgXS6k0
   SE_TEST_DB_HOST=
   SE_TEST_DB_PASSWORD=
+
+  # cpms db         # creds ask nihr-managed-services
+  CPMS_TEST_DB_PASSWORD=
+  CPMS_TEST_DB_IP=
 
   # se test users   # creds can be found in https://docs.google.com/document/d/1J9I1b4hb28rd9vl34Oe7XPCeZqk8yVsyG84KJgXS6k0
   SPONSOR_CONTACT_PASS=

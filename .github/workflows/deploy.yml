@@ -280,6 +280,8 @@ jobs:
           CONTACT_MANAGER_PASS: ${{ secrets.CONTACT_MANAGER_PASS }}
           SE_NO_LOCAL_ACCOUNT_PASS: ${{ secrets.SE_NO_LOCAL_ACCOUNT_PASS }}
           CPMS_NPM_PASS: ${{ secrets.CPMS_NPM_PASS }}
+          CPMS_TEST_DB_PASSWORD: ${{ secrets.CPMS_TEST_DB_PASSWORD }}
+          CPMS_TEST_DB_IP: ${{ secrets.CPMS_TEST_DB_IP }}
 
       - name: Remove Github Actions IP from CPMS API security group (Test)
         if: always()        

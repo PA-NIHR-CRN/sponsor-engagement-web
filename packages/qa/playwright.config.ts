@@ -27,7 +27,7 @@ const config: PlaywrightTestConfig = {
         trace: 'on',
         baseURL: `${process.env.E2E_BASE_URL}`,
         headless: true,
-        screenshot: 'on',
+        screenshot: { mode: 'on', fullPage: true, omitBackground: false },
         launchOptions: {
           slowMo: 0,
         },

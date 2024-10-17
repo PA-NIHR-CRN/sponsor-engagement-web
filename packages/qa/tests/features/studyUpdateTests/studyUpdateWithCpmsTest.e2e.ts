@@ -1,6 +1,7 @@
 import { RowDataPacket } from 'mysql2'
 import { test, expect } from '../../../hooks/CustomFixtures'
 import { seDatabaseReq, waitForSeDbRequest } from '../../../utils/DbRequests'
+import { convertIsoDateToDisplayDateV2, splitIsoDate } from '../../../utils/UtilFunctions'
 
 const testUserId = 6
 const startingOrgId = 2
@@ -12,6 +13,13 @@ if (uniqueTarget.startsWith('0')) {
 
 let startingStudyId = 0
 let studyCoreDetails: RowDataPacket[]
+
+const plannedOpen = '2025-06-12'
+const plannedClose = '2027-06-12'
+const po = splitIsoDate(plannedOpen)
+const pc = splitIsoDate(plannedClose)
+const pOpen = new Date(plannedOpen)
+const pClose = new Date(plannedClose)
 
 test.beforeAll('Setup Tests', async () => {
   await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
@@ -30,10 +38,11 @@ test.beforeAll('Setup Tests', async () => {
   `)
 })
 
-test.describe('Sponsor engagement study update with CPMS study validation', () => {
+// note: this test is cumbersome due to the page object model not playing well with multiple auth user roles roles
+test.describe('Sponsor engagement study update with CPMS study validation @se_to_cpms', () => {
   test.describe.configure({ timeout: 99000 }) // generous timeout as CPMS is slow!
 
-  test('direct SE change with CPMS validation', async ({ browser }) => {
+  test('direct SE change with CPMS validation @se_to_cpms_1', async ({ browser }) => {
     await seDatabaseReq(`
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
     `) // reset test data
@@ -47,30 +56,35 @@ test.describe('Sponsor engagement study update with CPMS study validation', () =
       await expect(sePage.locator('.govuk-inset-text')).toBeVisible()
     })
 
-    await test.step(`And I update the study details with proposed changes`, async () => {
+    await test.step(`And I update the study details with direct changes`, async () => {
       async function fillStudyDates(dateType: string, dd: string, mm: string, yyyy: string) {
         await sePage.locator(`#${dateType}Date-day`).fill(dd)
         await sePage.locator(`#${dateType}Date-month`).fill(mm)
         await sePage.locator(`#${dateType}Date-year`).fill(yyyy)
       }
 
-      await fillStudyDates('plannedOpening', '12', '06', '2025')
-      await fillStudyDates('plannedClosure', '12', '06', '2027')
+      await fillStudyDates('plannedOpening', po.d, po.m, po.y)
+      await fillStudyDates('plannedClosure', pc.d, pc.m, pc.y)
       await sePage.locator('#recruitmentTarget').fill(uniqueTarget)
       await sePage.locator('#furtherInformation').fill(`se e2e auto test - ${timeStamp}`)
       await sePage.locator('button.govuk-button:has-text("Update")').click()
     })
 
-    await test.step(`And I see the study is successfully updated in SE`, async () => {
+    await test.step(`And I see that my changes have been saved as direct changes`, async () => {
       const dbStudyUpdate = await waitForSeDbRequest(
-        `SELECT * FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId} ORDER by createdAt LIMIT 1;`
+        `SELECT * FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId} ORDER by createdAt LIMIT 2;`
       )
+      const updateSuccessContent = sePage.locator('.govuk-notification-banner__heading')
+      const studyDetailTable = sePage.locator('.govuk-table__body').first()
+      const studyDetailPlannedOpen = studyDetailTable.locator('tr > td').nth(2)
+      const studyDetailPlannedClose = studyDetailTable.locator('tr > td').nth(4)
+      const studyDetailUkTarget = studyDetailTable.locator('tr > td').nth(6)
 
-      await expect(sePage.locator('.govuk-notification-banner__heading')).toHaveText(
-        'Your study data changes have been accepted.'
-      )
-
-      await expect(dbStudyUpdate[0].comment).toBe(`se e2e auto test - ${timeStamp}`)
+      await expect(updateSuccessContent).toHaveText('Your study data changes have been accepted.')
+      await expect(studyDetailPlannedOpen).toHaveText(convertIsoDateToDisplayDateV2(pOpen))
+      await expect(studyDetailPlannedClose).toHaveText(convertIsoDateToDisplayDateV2(pClose))
+      await expect(studyDetailUkTarget).toHaveText(uniqueTarget)
+      await expect(dbStudyUpdate[1].comment).toBe(`se e2e auto test - ${timeStamp}`)
     })
 
     // close se context
@@ -93,17 +107,19 @@ test.describe('Sponsor engagement study update with CPMS study validation', () =
       await expect(cpmsPage.locator('#CurrentStudyRecord_UkRecruitmentSampleSize')).toHaveValue(uniqueTarget)
       await expect(cpmsPage.locator('#CurrentStudyRecord_PlannedRecruitmentStartDate')).toHaveAttribute(
         'value',
-        /12\/06\/2025/
+        // /12\/06\/2025/
+        new RegExp(`${po.d}\/${po.m}\/${po.y}`)
       )
       await expect(cpmsPage.locator('#CurrentStudyRecord_PlannedRecruitmentEndDate')).toHaveAttribute(
         'value',
-        /12\/06\/2027/
+        // /12\/06\/2027/
+        new RegExp(`${pc.d}\/${pc.m}\/${pc.y}`)
       )
     })
 
     await test.step(`And I save the study in CPMS`, async () => {
       await cpmsPage.locator('#btnSaveStudy').click()
-      await cpmsPage.waitForTimeout(15000) // unable to await request on save
+      await cpmsPage.waitForTimeout(15000) // explicity as unable to await request on save
     })
 
     await test.step(`Then I should not see any save errors`, async () => {
@@ -151,16 +167,16 @@ test.describe('Sponsor engagement study update with CPMS study validation', () =
 
     await test.step(`And I see the study is successfully updated in SE`, async () => {
       const dbStudyUpdate = await waitForSeDbRequest(
-        `SELECT * FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId} ORDER by createdAt LIMIT 1;`
+        `SELECT * FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId} ORDER by createdAt LIMIT 2;`
       )
 
       await expect(sePage.locator('.govuk-notification-banner__heading')).toHaveText(
         'Your study data changes have been accepted.'
       )
 
-      await expect(dbStudyUpdate[0].studyStatus).toBeNull()
-      await expect(dbStudyUpdate[0].comment).toBe(`se e2e auto test - ${timeStamp}`)
-      await expect(dbStudyUpdate[0].studyStatusGroup).toBe('Closed')
+      await expect(dbStudyUpdate[1].studyStatus).toBeNull()
+      await expect(dbStudyUpdate[1].comment).toBe(`se e2e auto test - ${timeStamp}`)
+      await expect(dbStudyUpdate[1].studyStatusGroup).toBe('Closed')
     })
 
     // close se context
