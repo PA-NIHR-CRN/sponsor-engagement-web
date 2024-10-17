@@ -51,7 +51,7 @@ test.describe('Study Accessibility Tests - @accessibility @accessibility_sponsor
       contentType: 'application/json',
     })
 
-    await test.step('Then I should recieve no issue up to WCAG 2.1 AA Standard', async () => {
+    await test.step('Then I should receive no issue up to WCAG 2.1 AA Standard', async () => {
       expect(axeScanResults.violations).toEqual([])
     })
   })
@@ -79,7 +79,7 @@ test.describe('Study Accessibility Tests - @accessibility @accessibility_sponsor
       contentType: 'application/json',
     })
 
-    await test.step('Then I should recieve no issue up to WCAG 2.1 AA Standard', async () => {
+    await test.step('Then I should receive no issue up to WCAG 2.1 AA Standard', async () => {
       expect(axeScanResults.violations).toEqual([])
     })
   })
@@ -112,7 +112,7 @@ test.describe('Study Accessibility Tests - @accessibility @accessibility_sponsor
       contentType: 'application/json',
     })
 
-    await test.step('Then I should recieve no issue up to WCAG 2.1 AA Standard', async () => {
+    await test.step('Then I should receive no issue up to WCAG 2.1 AA Standard', async () => {
       expect(axeScanResults.violations).toEqual([])
     })
   })
@@ -140,7 +140,7 @@ test.describe('Study Accessibility Tests - @accessibility @accessibility_sponsor
       contentType: 'application/json',
     })
 
-    await test.step('Then I should recieve no issue up to WCAG 2.1 AA Standard', async () => {
+    await test.step('Then I should receive no issue up to WCAG 2.1 AA Standard', async () => {
       expect(axeScanResults.violations).toEqual([])
     })
   })
@@ -200,7 +200,7 @@ test.describe('Organisation Accessibility Tests - @accessibility @accessibility_
       contentType: 'application/json',
     })
 
-    await test.step('Then I should recieve no issue up to WCAG 2.1 AA Standard', async () => {
+    await test.step('Then I should receive no issue up to WCAG 2.1 AA Standard', async () => {
       expect(axeScanResults.violations).toEqual([])
     })
   })
@@ -233,7 +233,7 @@ test.describe('Organisation Accessibility Tests - @accessibility @accessibility_
       contentType: 'application/json',
     })
 
-    await test.step('Then I should recieve no issue up to WCAG 2.1 AA Standard', async () => {
+    await test.step('Then I should receive no issue up to WCAG 2.1 AA Standard', async () => {
       expect(axeScanResults.violations).toEqual([])
     })
   })
@@ -261,7 +261,7 @@ test.describe('Organisation Accessibility Tests - @accessibility @accessibility_
       contentType: 'application/json',
     })
 
-    await test.step('Then I should recieve no issue up to WCAG 2.1 AA Standard', async () => {
+    await test.step('Then I should receive no issue up to WCAG 2.1 AA Standard', async () => {
       expect(axeScanResults.violations).toEqual([])
     })
   })
@@ -296,7 +296,7 @@ test.describe('Landing Page Accessibility Tests - @accessibility @accessibility_
       contentType: 'application/json',
     })
 
-    await test.step('Then I should recieve no issue up to WCAG 2.1 AA Standard', async () => {
+    await test.step('Then I should receive no issue up to WCAG 2.1 AA Standard', async () => {
       expect(axeScanResults.violations).toEqual([])
     })
   })
@@ -321,7 +321,7 @@ test.describe('Landing Page Accessibility Tests - @accessibility @accessibility_
       contentType: 'application/json',
     })
 
-    await test.step('Then I should recieve no issue up to WCAG 2.1 AA Standard', async () => {
+    await test.step('Then I should receive no issue up to WCAG 2.1 AA Standard', async () => {
       expect(axeScanResults.violations).toEqual([])
     })
   })
