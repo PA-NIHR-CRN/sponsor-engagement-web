@@ -15,7 +15,7 @@ import {
 } from '@/components/molecules'
 import { getEditHistory } from '@/components/molecules/EditHistory/utils'
 import { RootLayout } from '@/components/organisms'
-import { EDIT_STUDY_ROLE, Roles } from '@/constants'
+import { Roles } from '@/constants'
 import { FORM_SUCCESS_MESSAGES } from '@/constants/forms'
 import { ASSESSMENT_PAGE, STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/routes'
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
@@ -33,7 +33,7 @@ import { withServerSideProps } from '@/utils/withServerSideProps'
 
 const renderNotificationBanner = (success: string | undefined, showRequestSupportLink: boolean) =>
   success || !Number.isNaN(Number(success)) ? (
-    <NotificationBanner heading={FORM_SUCCESS_MESSAGES[Number(success)]} success>
+    <NotificationBanner heading={FORM_SUCCESS_MESSAGES[Number(success)]} isRichText success>
       {showRequestSupportLink ? (
         <>
           Request{' '}
@@ -58,15 +58,13 @@ const renderBackLink = () => (
 
 export type StudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function Study({ user, study, assessments, editHistory }: StudyProps) {
+export default function Study({ study, assessments, editHistory }: StudyProps) {
   const router = useRouter()
   const successType = router.query.success as string
   const transactionIdLatestProposedUpdate = router.query.latestProposedUpdate as string | undefined
   const { organisationsByRole } = study
 
   const supportOrgName = organisationsByRole.CRO ?? organisationsByRole.CTU
-
-  const showEditStudyFeature = Boolean(user?.groups.includes(EDIT_STUDY_ROLE))
 
   const showEditHistoryFeature = process.env.NEXT_PUBLIC_ENABLE_EDIT_HISTORY_FEATURE?.toLowerCase() === 'true'
 
@@ -103,14 +101,12 @@ export default function Study({ user, study, assessments, editHistory }: StudyPr
               <Link className="govuk-button w-auto govuk-!-margin-bottom-0" href={`${ASSESSMENT_PAGE}/${study.id}`}>
                 Assess study
               </Link>
-              {showEditStudyFeature ? (
-                <Link
-                  className="govuk-button govuk-button--secondary w-auto govuk-!-margin-bottom-0"
-                  href={`${STUDIES_PAGE}/${study.id}/edit`}
-                >
-                  Update study data
-                </Link>
-              ) : null}
+              <Link
+                className="govuk-button govuk-button--secondary w-auto govuk-!-margin-bottom-0"
+                href={`${STUDIES_PAGE}/${study.id}/edit`}
+              >
+                Update study data
+              </Link>
             </div>
           </div>
 
@@ -143,11 +139,11 @@ export default function Study({ user, study, assessments, editHistory }: StudyPr
                 </Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.CellHeader className="w-1/3">Planned opening date</Table.CellHeader>
+                <Table.CellHeader className="w-1/3">Planned opening to recruitment date</Table.CellHeader>
                 <Table.Cell>{study.plannedOpeningDate ? formatDate(study.plannedOpeningDate) : '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>
-                <Table.CellHeader className="w-1/3">Actual opening date</Table.CellHeader>
+                <Table.CellHeader className="w-1/3">Actual opening to recruitment date</Table.CellHeader>
                 <Table.Cell>{study.actualOpeningDate ? formatDate(study.actualOpeningDate) : '-'}</Table.Cell>
               </Table.Row>
               <Table.Row>

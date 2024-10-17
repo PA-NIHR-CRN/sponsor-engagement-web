@@ -16,7 +16,7 @@ import Spinner from '@/components/atoms/Spinner/Spinner'
 import Warning from '@/components/atoms/Warning/Warning'
 import { RequestSupport } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
-import { EDIT_STUDY_ROLE, Roles } from '@/constants'
+import { Roles } from '@/constants'
 import {
   fieldNameToLabelMapping,
   FURTHER_INFO_MAX_CHARACTERS,
@@ -384,16 +384,6 @@ EditStudy.getLayout = function getLayout(page: ReactElement, { user }: EditStudy
 }
 
 export const getServerSideProps = withServerSideProps(Roles.SponsorContact, async (context, session) => {
-  const canEditStudy = Boolean(session.user?.groups.includes(EDIT_STUDY_ROLE))
-
-  if (!canEditStudy) {
-    return {
-      redirect: {
-        destination: '/404',
-      },
-    }
-  }
-
   const userOrganisationIds = session.user?.organisations.map((userOrg) => userOrg.organisationId)
 
   const { data: study } = await getStudyById(Number(context.query.studyId), userOrganisationIds)

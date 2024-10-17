@@ -13,11 +13,7 @@ import { render, screen, within } from '@/config/TestUtils'
 import { mappedCPMSStudyEvals, mockCPMSStudy, mockMappedAssessment, mockStudyWithRelations } from '@/mocks/studies'
 
 import { prismaMock } from '../__mocks__/prisma'
-import {
-  userWithContactManagerRole,
-  userWithSponsorContactRole,
-  userWithSponsorContactRoleAndEditStudyRole,
-} from '../__mocks__/session'
+import { userWithContactManagerRole, userWithSponsorContactRole } from '../__mocks__/session'
 import { SIGN_IN_PAGE, SUPPORT_PAGE } from '../constants/routes'
 import type { StudyProps } from '../pages/studies/[studyId]'
 import Study, { getServerSideProps } from '../pages/studies/[studyId]'
@@ -91,7 +87,7 @@ const renderPage = async (
   mockUpdatedStudyEvals = mappedCPMSStudyEvals,
   isAssessmentDue = false
 ) => {
-  jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRoleAndEditStudyRole)
+  jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRole)
 
   prismaMock.$transaction.mockResolvedValueOnce([mockGetStudyResponse])
   mockedGetAxios.mockResolvedValueOnce({ data: { StatusCode: 200, Result: mockGetCPMSStudyResponse } })
@@ -405,8 +401,8 @@ describe('Study', () => {
       expect(progressHeaders.map((header) => header.textContent)).toEqual([
         'Study Status',
         'Study data indicates',
-        'Planned opening date',
-        'Actual opening date',
+        'Planned opening to recruitment date',
+        'Actual opening to recruitment date',
         'Planned closure to recruitment date',
         'Actual closure to recruitment date',
         'Estimated reopening date',
