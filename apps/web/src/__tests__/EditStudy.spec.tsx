@@ -681,6 +681,21 @@ describe('EditStudy', () => {
         }
       )
 
+      it('when UK recruitment target is empty', async () => {
+        await renderPage()
+        const ukRecruitmentTargetField = screen.getByLabelText('UK recruitment target')
+        expect(ukRecruitmentTargetField).toBeInTheDocument()
+
+        await userEvent.click(ukRecruitmentTargetField)
+        await userEvent.clear(ukRecruitmentTargetField)
+
+        await userEvent.click(screen.getByRole('button', { name: 'Update' }))
+
+        // Error message
+        const alert = screen.getByRole('alert')
+        expect(within(alert).getByText('UK target is a mandatory field')).toBeInTheDocument()
+      })
+
       it(`when status is 'In Setup' and both planned opening and planned closure dates are blank`, async () => {
         await renderPage(undefined, undefined, { ...mockStudyWithRelations, studyStatus: Status.InSetup })
 
