@@ -79,14 +79,20 @@ const createChangeHistoryForProposedChanges = async (transactionIds: string[]) =
         const normalisedBeforeValue = value ? value.toString() : null
         const normalisedAfterValue = afterValue ? afterValue.toString() : null
 
-        if (normalisedBeforeValue !== normalisedAfterValue) {
+        const transformedBeforeValue = transformValue(normalisedBeforeValue)
+        const transformedAfterValue = transformValue(normalisedAfterValue)
+
+        if (transformedBeforeValue !== transformedAfterValue) {
           changes.push({
             columnChanged: key,
-            beforeValue: transformValue(normalisedBeforeValue),
-            afterValue: transformValue(normalisedAfterValue),
+            beforeValue: transformedBeforeValue,
+            afterValue: transformedAfterValue,
           })
         }
       })
+
+      // If there are no changes, do not push an edit history entry
+      if (changes.length === 0) return editHistory
 
       editHistory.push({
         id: transactionId,
@@ -126,15 +132,29 @@ const createChangeHistoryForCPMSChanges = async (cpmsUpdates: ChangeHistory[], L
 
     const existsInSE = directSEUpdatesData.find((update) => update.LSN?.toString('hex') === edit.LSN.toLowerCase())
 
+    const changes = edit.Changes.reduce<EditHistoryChange[]>((editHistoryChanges, currentChange) => {
+      const transformedBeforeValue = transformValue(currentChange.OldValue)
+      const transformedAfterValue = transformValue(currentChange.NewValue)
+
+      if (transformedBeforeValue !== transformedAfterValue) {
+        editHistoryChanges.push({
+          columnChanged: currentChange.Column,
+          beforeValue: transformedBeforeValue,
+          afterValue: transformedAfterValue,
+        })
+      }
+
+      return editHistoryChanges
+    }, [])
+
+    // If there are no changes, skip over this change history from CPMS
+    if (changes.length === 0) return
+
     if (existsInSE) {
       editHistoryFromCPMSData.push({
         id: edit.LSN,
         modifiedDate: existsInSE.createdAt.toISOString(),
-        changes: edit.Changes.map((change) => ({
-          columnChanged: change.Column,
-          beforeValue: transformValue(change.OldValue),
-          afterValue: transformValue(change.NewValue),
-        })),
+        changes,
         userEmail: existsInSE.createdBy.email,
         studyUpdateType: StudyUpdateType.Direct,
       })
@@ -142,11 +162,7 @@ const createChangeHistoryForCPMSChanges = async (cpmsUpdates: ChangeHistory[], L
       editHistoryFromCPMSData.push({
         id: edit.LSN,
         modifiedDate: edit.Timestamp,
-        changes: edit.Changes.map((change) => ({
-          columnChanged: change.Column,
-          beforeValue: transformValue(change.OldValue),
-          afterValue: transformValue(change.NewValue),
-        })),
+        changes,
       })
     }
   })
