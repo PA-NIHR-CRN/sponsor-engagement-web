@@ -59,7 +59,7 @@ export type UpdateStudyInput = Pick<
   | 'PlannedClosureToRecruitmentDate'
   | 'ActualClosureToRecruitmentDate'
   | 'EstimatedReopeningDate'
-> & { notes?: string }
+> & { notes?: string; CurrentLsn?: string | null }
 
 export interface UpdateStudyFromCPMSResponse {
   study: (Study & { UpdateLsn: string }) | null
