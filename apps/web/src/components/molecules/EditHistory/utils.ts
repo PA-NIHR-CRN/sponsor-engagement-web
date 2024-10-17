@@ -4,8 +4,8 @@ import type { ChangeHistory } from '@/@types/studies'
 import { StudyUpdateState, StudyUpdateType } from '@/constants'
 import type { Prisma } from '@/lib/prisma'
 import { prismaClient } from '@/lib/prisma'
-import { mapCPMSStatusToFormStatus } from '@/lib/studies'
 import { formatDate } from '@/utils/date'
+import { getErrorMessage } from '@/utils/error'
 
 import type { EditHistory, EditHistoryChange } from './types'
 
@@ -18,9 +18,10 @@ const seStudyUpdatesColumnsForEditHistory: StudyUpdateRecordType[] = [
   'actualClosureToRecruitmentDate',
   'studyStatusGroup',
   'ukRecruitmentTarget',
+  'estimatedReopeningDate',
 ]
 
-const transformValue = (value: string | null) => {
+export const transformValue = (value: string | null) => {
   if (!value) return null
 
   // Check if value is a valid number
@@ -33,9 +34,7 @@ const transformValue = (value: string | null) => {
     return formatDate(value)
   }
 
-  // If value has a mapping, return simplified status
-  // Else returns the input value
-  return mapCPMSStatusToFormStatus(value)
+  return value
 }
 
 /**
@@ -44,7 +43,7 @@ const transformValue = (value: string | null) => {
  * - Calculates the difference between the 'before' and 'after' records
  * - Returns normalised change history
  */
-const createChangeHistoryForProposedChanges = async (transactionIds: string[]) => {
+export const createChangeHistoryForProposedChanges = async (transactionIds: string[]) => {
   const proposedSEUpdatesData = await prismaClient.studyUpdates.findMany({
     where: { transactionId: { in: transactionIds } },
     include: {
@@ -79,14 +78,20 @@ const createChangeHistoryForProposedChanges = async (transactionIds: string[]) =
         const normalisedBeforeValue = value ? value.toString() : null
         const normalisedAfterValue = afterValue ? afterValue.toString() : null
 
-        if (normalisedBeforeValue !== normalisedAfterValue) {
+        const transformedBeforeValue = transformValue(normalisedBeforeValue)
+        const transformedAfterValue = transformValue(normalisedAfterValue)
+
+        if (transformedBeforeValue !== transformedAfterValue) {
           changes.push({
             columnChanged: key,
-            beforeValue: transformValue(normalisedBeforeValue),
-            afterValue: transformValue(normalisedAfterValue),
+            beforeValue: transformedBeforeValue,
+            afterValue: transformedAfterValue,
           })
         }
       })
+
+      // If there are no changes, do not push an edit history entry
+      if (changes.length === 0) return editHistory
 
       editHistory.push({
         id: transactionId,
@@ -105,7 +110,7 @@ const createChangeHistoryForProposedChanges = async (transactionIds: string[]) =
  * - Retrieves additional fields (user email and date) from SE if it's a direct change
  * - Returns normalised change history
  */
-const createChangeHistoryForCPMSChanges = async (cpmsUpdates: ChangeHistory[], LSNs: string[]) => {
+export const createChangeHistoryForCPMSChanges = async (cpmsUpdates: ChangeHistory[], LSNs: string[]) => {
   const bufferArrayLSNs = LSNs.map((value) => Buffer.from(value, 'hex'))
 
   const directSEUpdatesData = await prismaClient.studyUpdates.findMany({
@@ -124,17 +129,33 @@ const createChangeHistoryForCPMSChanges = async (cpmsUpdates: ChangeHistory[], L
   cpmsUpdates.forEach((edit) => {
     if (!LSNs.includes(edit.LSN)) return
 
-    const existsInSE = directSEUpdatesData.find((update) => update.LSN?.toString('hex') === edit.LSN.toLowerCase())
+    const existsInSE = directSEUpdatesData.find(
+      (update) => update.LSN?.toString('hex').toLowerCase() === edit.LSN.toLowerCase()
+    )
+
+    const changes = edit.Changes.reduce<EditHistoryChange[]>((editHistoryChanges, currentChange) => {
+      const transformedBeforeValue = transformValue(currentChange.OldValue)
+      const transformedAfterValue = transformValue(currentChange.NewValue)
+
+      if (transformedBeforeValue !== transformedAfterValue) {
+        editHistoryChanges.push({
+          columnChanged: currentChange.Column,
+          beforeValue: transformedBeforeValue,
+          afterValue: transformedAfterValue,
+        })
+      }
+
+      return editHistoryChanges
+    }, [])
+
+    // If there are no changes, skip over this change history from CPMS
+    if (changes.length === 0) return
 
     if (existsInSE) {
       editHistoryFromCPMSData.push({
         id: edit.LSN,
         modifiedDate: existsInSE.createdAt.toISOString(),
-        changes: edit.Changes.map((change) => ({
-          columnChanged: change.Column,
-          beforeValue: transformValue(change.OldValue),
-          afterValue: transformValue(change.NewValue),
-        })),
+        changes,
         userEmail: existsInSE.createdBy.email,
         studyUpdateType: StudyUpdateType.Direct,
       })
@@ -142,11 +163,7 @@ const createChangeHistoryForCPMSChanges = async (cpmsUpdates: ChangeHistory[], L
       editHistoryFromCPMSData.push({
         id: edit.LSN,
         modifiedDate: edit.Timestamp,
-        changes: edit.Changes.map((change) => ({
-          columnChanged: change.Column,
-          beforeValue: transformValue(change.OldValue),
-          afterValue: transformValue(change.NewValue),
-        })),
+        changes,
       })
     }
   })
@@ -158,7 +175,7 @@ const createChangeHistoryForCPMSChanges = async (cpmsUpdates: ChangeHistory[], L
  * Gets the ten most recent updates to display to the user
  * Merges direct/indirect changes from CPMS and proposed changes from SE to determine the most recent
  */
-const getTenMostRecentUpdates = (
+export const getTenMostRecentUpdates = (
   proposedUpdates: Prisma.PickEnumerable<Prisma.StudyUpdatesGroupByOutputType, 'transactionId' | 'createdAt'>[],
   cpmsUpdates: ChangeHistory[]
 ) => {
@@ -181,30 +198,46 @@ const getTenMostRecentUpdates = (
     .slice(0, 10)
 }
 
-export const getEditHistory = async (studyId: number, cpmsChangeHistory: ChangeHistory[]): Promise<EditHistory[]> => {
-  // Ten most recent proposed updates - returns transactionId and createdAt
-  const mostRecentProposedUpdates = await prismaClient.studyUpdates.groupBy({
-    by: ['transactionId', 'createdAt'],
-    where: {
-      studyUpdateTypeId: StudyUpdateType.Proposed,
-      studyId,
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-    take: 10,
-  })
+export const getEditHistory = async (
+  studyId: number,
+  cpmsChangeHistory: ChangeHistory[]
+): Promise<{ data?: EditHistory[]; error?: string }> => {
+  try {
+    // Ten most recent proposed updates - returns transactionId and createdAt
+    const mostRecentProposedUpdates = await prismaClient.studyUpdates.groupBy({
+      by: ['transactionId', 'createdAt'],
+      where: {
+        studyUpdateTypeId: StudyUpdateType.Proposed,
+        studyId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 10,
+    })
 
-  // The ten most recent updates
-  const tenMostRecentUpdates = getTenMostRecentUpdates(mostRecentProposedUpdates, cpmsChangeHistory)
+    // The ten most recent updates
+    const tenMostRecentUpdates = getTenMostRecentUpdates(mostRecentProposedUpdates, cpmsChangeHistory)
 
-  const proposedUpdatesTransactionIds = tenMostRecentUpdates.filter((edit) => edit.type === 'SE').map((edit) => edit.id)
-  const editHistoryFromProposedUpdates = await createChangeHistoryForProposedChanges(proposedUpdatesTransactionIds)
+    const proposedUpdatesTransactionIds = tenMostRecentUpdates
+      .filter((edit) => edit.type === 'SE')
+      .map((edit) => edit.id)
+    const editHistoryFromProposedUpdates = await createChangeHistoryForProposedChanges(proposedUpdatesTransactionIds)
 
-  const cpmsUpdatesLSNs = tenMostRecentUpdates.filter((edit) => edit.type === 'CPMS').map((edit) => edit.id)
-  const editHistoryFromCPMSData = await createChangeHistoryForCPMSChanges(cpmsChangeHistory, cpmsUpdatesLSNs)
+    const cpmsUpdatesLSNs = tenMostRecentUpdates.filter((edit) => edit.type === 'CPMS').map((edit) => edit.id)
+    const editHistoryFromCPMSData = await createChangeHistoryForCPMSChanges(cpmsChangeHistory, cpmsUpdatesLSNs)
 
-  return [...editHistoryFromCPMSData, ...editHistoryFromProposedUpdates].sort(
-    (a, b) => new Date(b.modifiedDate).getTime() - new Date(a.modifiedDate).getTime()
-  )
+    return {
+      data: [...editHistoryFromCPMSData, ...editHistoryFromProposedUpdates].sort(
+        (a, b) => new Date(b.modifiedDate).getTime() - new Date(a.modifiedDate).getTime()
+      ),
+    }
+  } catch (error) {
+    const errorMessage = getErrorMessage(error)
+
+    return {
+      data: undefined,
+      error: errorMessage,
+    }
+  }
 }

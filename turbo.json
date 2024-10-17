@@ -38,7 +38,8 @@
         "CPMS_API_PASSWORD",
         "ENABLE_DIRECT_STUDY_UPDATES",
         "NEXT_PUBLIC_ENABLE_EDIT_HISTORY_FEATURE",
-        "ASSESSMENT_LAPSE_MONTHS"
+        "ASSESSMENT_LAPSE_MONTHS",
+        "EDIT_HISTORY_START_DATE"
       ]
     },
     "start": {},
@@ -84,7 +85,8 @@
         "CPMS_API_PASSWORD",
         "ENABLE_DIRECT_STUDY_UPDATES",
         "NEXT_PUBLIC_ENABLE_EDIT_HISTORY_FEATURE",
-        "ASSESSMENT_LAPSE_MONTHS"
+        "ASSESSMENT_LAPSE_MONTHS",
+        "EDIT_HISTORY_START_DATE"
       ]
     },
     "test:ci": {
@@ -128,7 +130,8 @@
         "CPMS_API_PASSWORD",
         "ENABLE_DIRECT_STUDY_UPDATES",
         "NEXT_PUBLIC_ENABLE_EDIT_HISTORY_FEATURE",
-        "ASSESSMENT_LAPSE_MONTHS"
+        "ASSESSMENT_LAPSE_MONTHS",
+        "EDIT_HISTORY_START_DATE"
       ]
     },
     "db:generate": { "cache": false },

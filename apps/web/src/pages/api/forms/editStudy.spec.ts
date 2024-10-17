@@ -15,6 +15,8 @@ import type { ExtendedNextApiRequest } from './editStudy'
 import api from './editStudy'
 
 const mockTransactionId = '12121'
+const mockBeforeLSN = 'before-lsn'
+const mockAfterLSN = 'after-lsn'
 
 jest.mock('axios')
 jest.mock('next-auth/next')
@@ -47,7 +49,7 @@ const mockCPMSUpdateInput = {
 
 const mockUpdateCPMSResponse = {
   StatusCode: 200,
-  Result: mockCPMSStudy,
+  Result: { ...mockCPMSStudy, UpdateLsn: mockAfterLSN },
 }
 
 const getMockValidateStudyResponse = (studyUpdateRoute: StudyUpdateRoute) => ({
@@ -103,7 +105,7 @@ const body: ExtendedNextApiRequest['body'] = {
       year: '2003',
     },
     actualClosureDate: {
-      day: '29',
+      day: '27',
       month: '02',
       year: '2003',
     },
@@ -125,30 +127,31 @@ const body: ExtendedNextApiRequest['body'] = {
     recruitmentTarget: '122',
     furtherInformation: '',
   },
-  LSN: '1212',
+  LSN: mockBeforeLSN,
 }
 
 const getMockStudyUpdateInput = (isDirect: boolean, isAfterState: boolean) => {
   const studyStatusOnUpdateType = isDirect ? body.status : null
+  const LSN = isAfterState ? mockAfterLSN : mockBeforeLSN
 
   return {
     studyStatus: isAfterState ? studyStatusOnUpdateType : body.originalValues.status,
     studyStatusGroup: isAfterState ? 'Suspended' : 'Open, to Recruitment',
     plannedOpeningDate: isAfterState
-      ? new Date('2003-02-28T00:00:00').toISOString()
-      : new Date('2003-02-27T00:00:00').toISOString(),
+      ? new Date(mockCPMSUpdateInput.PlannedOpeningDate as string).toISOString()
+      : new Date('2003-02-27T00:00:00.000').toISOString(),
     actualOpeningDate: isAfterState
-      ? new Date('1991-09-01T00:00:00').toISOString()
-      : new Date('1991-09-02T00:00:00').toISOString(),
+      ? new Date(mockCPMSUpdateInput.ActualOpeningDate as string).toISOString()
+      : new Date('1991-09-02T00:00:00.000').toISOString(),
     plannedClosureToRecruitmentDate: isAfterState
-      ? new Date('2004-02-28T00:00:00').toISOString()
-      : new Date('2004-02-27T00:00:00').toISOString(),
+      ? new Date(mockCPMSUpdateInput.PlannedClosureToRecruitmentDate as string).toISOString()
+      : new Date('2004-02-27T00:00:00.000').toISOString(),
     actualClosureToRecruitmentDate: isAfterState
-      ? new Date('2003-02-28T00:00:00').toISOString()
-      : new Date('2003-02-29T00:00:00').toISOString(),
+      ? new Date(mockCPMSUpdateInput.ActualClosureToRecruitmentDate as string).toISOString()
+      : new Date('2003-02-27T00:00:00.000').toISOString(),
     estimatedReopeningDate: isAfterState
-      ? new Date(mockEstimatedReopeningDateInFuture).toISOString()
-      : new Date('2021-02-27T00:00:00').toISOString(),
+      ? new Date(mockCPMSUpdateInput.EstimatedReopeningDate).toISOString()
+      : new Date('2021-02-27T00:00:00.000').toISOString(),
     ukRecruitmentTarget: isAfterState ? 121 : 122,
     comment: '',
     studyId: body.studyId,
@@ -156,7 +159,7 @@ const getMockStudyUpdateInput = (isDirect: boolean, isAfterState: boolean) => {
     createdById: userWithSponsorContactRole.user?.id as number,
     modifiedById: userWithSponsorContactRole.user?.id as number,
     transactionId: mockTransactionId,
-    LSN: isAfterState ? null : Buffer.from(body.LSN as string, 'hex'),
+    LSN: isAfterState && !isDirect ? null : Buffer.from(LSN, 'hex'),
     studyUpdateStateId: isAfterState ? StudyUpdateState.After : StudyUpdateState.Before,
   }
 }
@@ -318,7 +321,11 @@ describe('/api/forms/editStudy', () => {
       expect(mockedPutAxios).toHaveBeenCalledTimes(1)
       expect(mockedPutAxios).toHaveBeenCalledWith(
         `${mockedEnvVars.apiUrl}/studies/${body.cpmsId}/engagement-info`,
-        JSON.stringify({ ...mockCPMSUpdateInput, notes: 'Update from Sponsor Engagement Tool' }),
+        JSON.stringify({
+          ...mockCPMSUpdateInput,
+          CurrentLsn: mockBeforeLSN,
+          notes: 'Update from Sponsor Engagement Tool',
+        }),
         {
           headers: {
             'Content-Type': 'application/json',

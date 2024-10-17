@@ -2,8 +2,8 @@ import { fieldNameToLabelMapping } from '@/constants/editStudyForm'
 
 export const getColumnChangedLabelText = (key: string): string => {
   const mappings: Record<string, string> = {
+    // CPMS fields
     UkRecruitmentSampleSize: fieldNameToLabelMapping.recruitmentTarget,
-    ukRecruitmentTarget: fieldNameToLabelMapping.recruitmentTarget,
     StudyStatus: fieldNameToLabelMapping.status,
     PlannedOpeningDate: fieldNameToLabelMapping.plannedOpeningDate,
     ActualOpeningDate: fieldNameToLabelMapping.actualOpeningDate,
@@ -12,12 +12,16 @@ export const getColumnChangedLabelText = (key: string): string => {
     EstimatedReopeningDate: fieldNameToLabelMapping.estimatedReopeningDate,
     PlannedRecruitmentStartDate: fieldNameToLabelMapping.plannedOpeningDate,
     PlannedRecruitmentEndDate: fieldNameToLabelMapping.plannedClosureDate,
+    ActualClosureDate: fieldNameToLabelMapping.actualClosureDate,
+    PlannedClosureDate: fieldNameToLabelMapping.plannedClosureDate,
+    // SE fields
     studyStatusGroup: fieldNameToLabelMapping.status,
     actualClosureToRecruitmentDate: fieldNameToLabelMapping.actualClosureDate,
-    plannedOpenngDate: fieldNameToLabelMapping.plannedOpeningDate,
+    plannedOpeningDate: fieldNameToLabelMapping.plannedOpeningDate,
     actualOpeningDate: fieldNameToLabelMapping.actualOpeningDate,
     plannedClosureToRecruitmentDate: fieldNameToLabelMapping.plannedClosureDate,
     estimatedReopeningDate: fieldNameToLabelMapping.estimatedReopeningDate,
+    ukRecruitmentTarget: fieldNameToLabelMapping.recruitmentTarget,
   }
 
   return mappings[key] || key
