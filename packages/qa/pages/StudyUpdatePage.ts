@@ -166,7 +166,7 @@ export default class StudyUpdatePage {
     await expect(this.statusHintInSetup).toHaveText(`Not yet open to recruitment.`)
     await expect(this.statusRadioOpenRec).toBeVisible()
     await expect(this.statusHintOpenRec).toHaveText(
-      `Ready (open) to recruit participants in at least one UK site. Provide an actual opening date below.`
+      `Open to recruit participants in at least one UK site. Provide an actual opening date below.`
     )
     await expect(this.statusRadioClosedInFollow).toBeVisible()
     await expect(this.statusHintClosedInFollow).toHaveText(

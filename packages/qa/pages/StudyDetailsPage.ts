@@ -127,9 +127,13 @@ export default class StudyDetailsPage {
     this.tableStatusValue = this.tableStatusHeader.locator('..').locator('td')
     this.tableDataIndicatesHeader = page.locator('th[scope="row"]', { hasText: 'Study data indicates' })
     this.tableDataIndicatesValue = this.tableDataIndicatesHeader.locator('..').locator('td')
-    this.tablePlannedOpeningDateHeader = page.locator('th[scope="row"]', { hasText: 'Planned opening date' })
+    this.tablePlannedOpeningDateHeader = page.locator('th[scope="row"]', {
+      hasText: 'Planned opening to recruitment date',
+    })
     this.tablePlannedOpeningDateValue = this.tablePlannedOpeningDateHeader.locator('..').locator('td')
-    this.tableActualOpeningDateHeader = page.locator('th[scope="row"]', { hasText: 'Actual opening date' })
+    this.tableActualOpeningDateHeader = page.locator('th[scope="row"]', {
+      hasText: 'Actual opening to recruitment date',
+    })
     this.tableActualOpeningDateValue = this.tableActualOpeningDateHeader.locator('..').locator('td')
     this.tablePlannedClosureDateHeader = page.locator('th[scope="row"]', {
       hasText: 'Planned closure to recruitment date',
@@ -347,9 +351,26 @@ export default class StudyDetailsPage {
   }
 
   async assertStudyStatus(expectedStatus: string) {
+    const cpmsStatusToSimpleStatus: Record<string, string> = {
+      'In Setup': 'In setup',
+      'In Setup, Pending NHS Permission': 'In setup',
+      'In Setup, Approval Received': 'In setup',
+      'In Setup, Pending Approval': 'In setup',
+      'In Setup, NHS Permission Received': 'In setup',
+      'Open to Recruitment': 'Open to recruitment',
+      'Open, With Recruitment': 'Open to recruitment',
+      'Closed to Recruitment': 'Closed',
+      'Closed to Recruitment, In Follow Up': 'Closed to Recruitment, In Follow Up',
+      'Closed to Recruitment, Follow Up Complete': 'Closed',
+      'Suspended (from Open, With Recruitment)': 'Suspended',
+      'Suspended (from Open to Recruitment)': 'Suspended',
+      'Withdrawn in Pre-Setup': 'Withdrawn',
+      'Withdrawn During Setup': 'Withdrawn',
+    }
+
     await expect(this.tableStatusHeader).toBeVisible()
     await expect(this.tableStatusValue).toBeVisible()
-    await expect(this.tableStatusValue).toHaveText(expectedStatus)
+    await expect(this.tableStatusValue).toHaveText(cpmsStatusToSimpleStatus[expectedStatus] || expectedStatus)
   }
 
   async assertDataIndicators(expectedDataIndicators: RowDataPacket[]) {

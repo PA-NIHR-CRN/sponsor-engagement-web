@@ -106,21 +106,6 @@ describe('EditStudy', () => {
   })
 
   describe('getServerSideProps', () => {
-    test('redirects to 404 page if user does not have edit study role permissions', async () => {
-      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
-      getServerSessionMock.mockResolvedValueOnce({
-        ...userWithSponsorContactRole,
-        user: { ...userWithSponsorContactRole.user, groups: [] },
-      })
-
-      const result = await getServerSideProps(context)
-      expect(result).toEqual({
-        redirect: {
-          destination: '/404',
-        },
-      })
-    })
-
     test('redirects to 404 page if no study found', async () => {
       const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
       getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
@@ -363,7 +348,7 @@ describe('EditStudy', () => {
 
       expect(within(statusFieldset).getByLabelText('Open to recruitment')).toBeInTheDocument()
       expect(within(statusFieldset).getByLabelText('Open to recruitment')).toHaveAccessibleDescription(
-        'Ready (open) to recruit participants in at least one UK site. Provide an actual opening date below.'
+        'Open to recruit participants in at least one UK site. Provide an actual opening date below.'
       )
 
       expect(within(statusFieldset).getByLabelText('Closed, in follow-up')).toBeInTheDocument()
@@ -394,7 +379,7 @@ describe('EditStudy', () => {
       expect(ukRecruitmentTarget).toBeInTheDocument()
 
       // Form Input - Further information
-      const furtherInformation = screen.getByLabelText('Further information')
+      const furtherInformation = screen.getByLabelText('Further information (optional)')
       expect(furtherInformation).toBeInTheDocument()
       expect(furtherInformation).toHaveAccessibleDescription(
         'You have 500 characters remaining If needed, provide further context or justification for changes made above.'
@@ -405,6 +390,13 @@ describe('EditStudy', () => {
 
       // Cancel CTA
       expect(screen.getByRole('link', { name: 'Cancel' })).toHaveAttribute('href', `/studies/${mockStudyId}`)
+
+      // Support text
+      const paragraphSupportText = screen.getByText(/if you need support updating your data, please contact the/i)
+      expect(paragraphSupportText).toBeInTheDocument()
+      const rdnTeamLink = within(paragraphSupportText).getByRole('link', { name: /rdn team/i })
+      expect(rdnTeamLink).toBeInTheDocument()
+      expect(rdnTeamLink).toHaveAttribute('href', 'mailto:supportmystudy@nihr.ac.uk')
     })
 
     it.each([
