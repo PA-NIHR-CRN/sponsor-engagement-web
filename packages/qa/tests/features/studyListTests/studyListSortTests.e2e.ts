@@ -3,7 +3,7 @@ import { seDatabaseReq } from '../../../utils/DbRequests'
 import { RowDataPacket } from 'mysql2'
 
 const testUserId = 6
-const startingOrgId = 9
+const startingOrgId = 2
 let studyListSortedByDueDb: RowDataPacket[]
 let studyListSortedByAscDb: RowDataPacket[]
 let studyListSortedByDescDb: RowDataPacket[]

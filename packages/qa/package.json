@@ -1,9 +1,16 @@
 {
-  "name": "qa",
+  "name": "sponsor-engagement-e2e-tests",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "test": "npx playwright test"
+    "test": "npx playwright test --project=seDefault",
+    "test:android": "npx playwright test --project=seMobileAndroid",
+    "test:axe": "(ENABLE_ACCESSIBILITY=true npx playwright test --project=seDefault --grep '@accessibility')",
+    "test:chrome": "npx playwright test --project=seChrome",
+    "test:edge": "npx playwright test --project=seEdge",
+    "test:firefox": "npx playwright test --project=seFirefox",
+    "test:iphone": "npx playwright test --project=seMobileIphone",
+    "test:safari": "npx playwright test --project=seSafari"
   },
   "dependencies": {
     "@playwright/test": "^1.40.1",

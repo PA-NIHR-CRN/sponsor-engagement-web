@@ -1,4 +1,3 @@
-// import { test as setup, expect } from '@playwright/test';
 import { test as setup } from '../../hooks/CustomFixtures'
 
 const authSponsorContactFile = '.auth/sponsorContact.json'
@@ -7,9 +6,11 @@ const authNpmFile = '.auth/nationalPortfolioManager.json'
 const cookieConfig = {
   name: 'SEConsentGDPR',
   value: 'Reject',
-  domain: new URL(`${process.env.E2E_BASE_URL}`).hostname,
+  domain: 'test.assessmystudy.nihr.ac.uk',
   path: '/',
-  expires: -1,
+  expires: Math.floor(new Date('2028-10-17T09:09:17.000Z').getTime() / 1000),
+  httpOnly: false,
+  secure: true,
 }
 
 setup(
