@@ -409,7 +409,6 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
   }
   const { study: studyInCPMS } = await getStudyByIdFromCPMS(Number(cpmsId))
 
-  console.log({ studyInCPMS })
   if (!studyInCPMS) {
     return {
       props: {

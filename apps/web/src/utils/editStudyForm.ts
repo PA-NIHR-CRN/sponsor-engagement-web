@@ -5,7 +5,7 @@ import { dateValidationRules, fieldNameToLabelMapping, FormStudyStatus } from '@
 import { mapCPMSStatusToFormStatus } from '@/lib/studies'
 import type { EditStudyProps } from '@/pages/studies/[studyId]/edit'
 
-import { constructDatePartsFromDate, getDaysInMonth } from './date'
+import { areAllDatePartsEmpty, constructDatePartsFromDate, getDaysInMonth } from './date'
 import type { DateFieldName, EditStudy, EditStudyInputs } from './schemas'
 
 export const mapStudyToStudyFormInput = (study: EditStudyProps['study'], LSN?: string): EditStudyInputs => ({
@@ -223,6 +223,7 @@ const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, valu
       if (
         requiredAfter &&
         dateDependencyValue &&
+        !areAllDatePartsEmpty(dateDependencyValue) &&
         isDateDepedencyFieldVisible &&
         !dayjs(`${value.year}-${value.month.padStart(2, '0')}-${value.day.padStart(2, '0')}`).isAfter(
           dayjs(
