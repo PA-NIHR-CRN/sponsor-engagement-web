@@ -18,7 +18,7 @@ export const getGDPRCookieExpiryDate = () => dayjs().add(SE_GDPR_COOKIE_EXPIRY_M
  */
 
 export const constructDatePartsFromDate = (date?: Date | null) => {
-  if (!date) return undefined
+  if (!date) return { day: '', month: '', year: '' }
 
   const day = date.getDate().toString()
   const month = (date.getMonth() + 1).toString()

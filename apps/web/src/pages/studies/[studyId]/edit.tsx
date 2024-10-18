@@ -98,7 +98,8 @@ export default function EditStudy({ study, currentLSN }: EditStudyProps) {
     [statusInputValue, study.studyStatus]
   )
 
-  const showLoadingState = formState.isSubmitting || formState.isSubmitSuccessful
+  const showLoadingState =
+    formState.isSubmitting || (formState.isSubmitSuccessful && Object.values(errors).length === 0) // TODO: fix this, isSubmitSuccessful showing but when we have errors
 
   return (
     <Container>

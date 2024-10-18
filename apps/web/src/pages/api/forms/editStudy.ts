@@ -1,13 +1,15 @@
 import type { NextApiRequest } from 'next'
 import { v4 as uuid } from 'uuid'
+import { ZodError } from 'zod'
 
 import { Status, StudyUpdateRoute } from '@/@types/studies'
+import type { DateInputValue } from '@/components/atoms/Form/DateInput/types'
 import { Roles } from '@/constants'
 import { UPDATE_FROM_SE_TEXT } from '@/constants/forms'
 import { mapEditStudyInputToCPMSStudy, updateStudyInCPMS, validateStudyUpdate } from '@/lib/cpms/studies'
 import { logStudyUpdate } from '@/lib/studyUpdates'
 import type { EditStudy } from '@/utils/schemas'
-import { studySchema } from '@/utils/schemas'
+import { studySchema, studySchemaShape } from '@/utils/schemas'
 import { withApiHandler } from '@/utils/withApiHandler'
 
 export interface ExtendedNextApiRequest extends NextApiRequest {
@@ -87,9 +89,49 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
     })
 
     return res.redirect(302, `/studies/${studyId}?${searchParams.toString()}`)
-  } catch (e) {
-    const searchParams = new URLSearchParams({ fatal: '1' })
+  } catch (error) {
     const studyId = req.body.studyId
+
+    if (error instanceof ZodError) {
+      const fieldErrors: Record<string, string> = Object.fromEntries(
+        error.errors.map(({ path: [fieldId], message }) => {
+          return [`${fieldId}Error`, message]
+        })
+      )
+
+      // Insert the original values
+      Object.keys(studySchemaShape).forEach((field) => {
+        if (
+          [
+            'plannedOpeningDate',
+            'actualOpeningDate',
+            'plannedClosureDate',
+            'actualClosureDate',
+            'estimatedReopeningDate',
+          ].includes(field) &&
+          Boolean(req.body[field])
+        ) {
+          const dateFields = ['day', 'month', 'year']
+          dateFields.forEach(
+            (dateField) =>
+              (fieldErrors[`${field}-${dateField}`] = (req.body[field] as DateInputValue)[dateField] as string)
+          )
+        }
+        if (req.body[field]) {
+          fieldErrors[field] = req.body[field] as string
+        }
+      })
+
+      delete fieldErrors.studyId
+
+      const searchParams = new URLSearchParams({
+        ...fieldErrors,
+      })
+
+      return res.redirect(302, `/studies/${studyId}/edit?${searchParams.toString()}`)
+    }
+
+    const searchParams = new URLSearchParams({ fatal: '1' })
 
     return res.redirect(302, `/studies/${studyId}/edit?${searchParams.toString()}`)
   }
