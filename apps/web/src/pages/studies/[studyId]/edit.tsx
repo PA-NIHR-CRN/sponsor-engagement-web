@@ -1,4 +1,4 @@
-// import { zodResolver } from '@hookform/resolvers/zod'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Container } from '@nihr-ui/frontend'
 import clsx from 'clsx'
 import type { InferGetServerSidePropsType } from 'next'
@@ -54,7 +54,7 @@ export default function EditStudy({ study, currentLSN }: EditStudyProps) {
   const mappedFormInput = mapStudyToStudyFormInput(study)
 
   const { register, formState, handleSubmit, control, watch, setError } = useForm<EditStudySchema>({
-    // resolver: zodResolver(studySchema),
+    resolver: zodResolver(studySchema),
     defaultValues: {
       ...mappedFormInput,
       originalValues: mappedFormInput,
@@ -409,6 +409,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
   }
   const { study: studyInCPMS } = await getStudyByIdFromCPMS(Number(cpmsId))
 
+  console.log({ studyInCPMS })
   if (!studyInCPMS) {
     return {
       props: {
