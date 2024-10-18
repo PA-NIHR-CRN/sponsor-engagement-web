@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid'
 import { ZodError } from 'zod'
 
 import { Status, StudyUpdateRoute } from '@/@types/studies'
+import type { DateInputValue } from '@/components/atoms/Form/DateInput/types'
 import { Roles } from '@/constants'
 import { UPDATE_FROM_SE_TEXT } from '@/constants/forms'
 import { mapEditStudyInputToCPMSStudy, updateStudyInCPMS, validateStudyUpdate } from '@/lib/cpms/studies'
@@ -93,13 +94,27 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
 
     if (error instanceof ZodError) {
       const fieldErrors: Record<string, string> = Object.fromEntries(
-        error.errors.map(({ path: [fieldId], message }) => [`${fieldId}Error`, message])
+        error.errors.map(({ path: [fieldId], message }) => {
+          return [`${fieldId}Error`, message]
+        })
       )
 
+      // Insert the original values
       Object.keys(studySchemaShape).forEach((field) => {
-        if (['plannedOpeningDate', 'actualOpeningDate', 'plannedClosureDate', 'actualClosureDate'].includes(field)) {
+        if (
+          [
+            'plannedOpeningDate',
+            'actualOpeningDate',
+            'plannedClosureDate',
+            'actualClosureDate',
+            'estimatedReopeningDate',
+          ].includes(field)
+        ) {
           const dateFields = ['day', 'month', 'year']
-          dateFields.forEach((dateField) => (fieldErrors[`${field}-${dateField}Error`] = req.body[field] as string))
+          dateFields.forEach(
+            (dateField) =>
+              (fieldErrors[`${field}-${dateField}`] = (req.body[field] as DateInputValue)[dateField] as string)
+          )
         }
         if (req.body[field]) {
           fieldErrors[field] = req.body[field] as string

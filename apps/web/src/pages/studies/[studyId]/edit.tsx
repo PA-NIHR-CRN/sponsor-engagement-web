@@ -1,4 +1,4 @@
-import { zodResolver } from '@hookform/resolvers/zod'
+// import { zodResolver } from '@hookform/resolvers/zod'
 import { Container } from '@nihr-ui/frontend'
 import clsx from 'clsx'
 import type { InferGetServerSidePropsType } from 'next'
@@ -54,7 +54,7 @@ export default function EditStudy({ study, currentLSN }: EditStudyProps) {
   const mappedFormInput = mapStudyToStudyFormInput(study)
 
   const { register, formState, handleSubmit, control, watch, setError } = useForm<EditStudySchema>({
-    resolver: zodResolver(studySchema),
+    // resolver: zodResolver(studySchema),
     defaultValues: {
       ...mappedFormInput,
       originalValues: mappedFormInput,
@@ -98,7 +98,8 @@ export default function EditStudy({ study, currentLSN }: EditStudyProps) {
     [statusInputValue, study.studyStatus]
   )
 
-  const showLoadingState = formState.isSubmitting || formState.isSubmitSuccessful
+  const showLoadingState =
+    formState.isSubmitting || (formState.isSubmitSuccessful && Object.values(errors).length === 0) // TODO: fix this, isSubmitSuccessful showing but when we have errors
 
   return (
     <Container>

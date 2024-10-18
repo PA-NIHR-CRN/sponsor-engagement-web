@@ -97,11 +97,10 @@ export function getErrorsFromSearchParams(schema: Schemas, searchParams: ParsedU
             type: 'custom',
             message: searchParams[`${field}-${dateField}Error`] as string,
           }
-          errors[field] = error
+          errors[`${field}-${dateField}`] = error
         }
       })
     }
-
     if (searchParams[`${field}Error`]) {
       const error: FieldError = {
         type: 'custom',
