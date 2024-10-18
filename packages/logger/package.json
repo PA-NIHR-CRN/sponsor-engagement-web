@@ -2,8 +2,8 @@
   "name": "@nihr-ui/logger",
   "version": "0.0.0",
   "license": "MIT",
-  "main": "./index.ts",
-  "types": "./index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "lint": "eslint .",
