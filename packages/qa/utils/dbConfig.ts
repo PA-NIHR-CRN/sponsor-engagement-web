@@ -61,8 +61,8 @@ const cpmsPassword =
   })()
 
 // TEMP DEBUG!
-console.log('Connecting to DB at IP:', cpmsServer ? 'IP set' : 'IP not set')
-console.log('Connecting with user:', cpmsPassword ? 'User set' : 'User not set')
+console.log(`Connecting to DB at IP: "${cpmsServer}",`, cpmsServer ? 'IP set' : 'IP not set!')
+console.log(`Connecting with user: "${cpmsPassword}",`, cpmsPassword ? 'User set' : 'User not set!')
 // TEMP DEBUG!
 
 const cpmsDbConfig = {
