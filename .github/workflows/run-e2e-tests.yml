@@ -83,6 +83,12 @@ jobs:
           --group-id ${{ secrets.CPMS_TEST_DB_SG }} \
           --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 1433, "ToPort": 1433, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for SE automation CPMS DB requests"}]}]'
 
+    - name: TEMP ENV VAR DEBUG
+      run: echo $CPMS_TEST_DB_IP && echo $CPMS_TEST_DB_USER
+      env:
+        CPMS_TEST_DB_IP: ${{ secrets.CPMS_TEST_DB_IP }}
+        CPMS_TEST_DB_USER: ${{ secrets.CPMS_TEST_DB_USER }}
+
     - name: Run SE E2E Tests
       working-directory: ./packages/qa
       run: |

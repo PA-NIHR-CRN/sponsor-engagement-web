@@ -5,6 +5,7 @@ import { convertIsoDateToDisplayDateV2, splitIsoDate } from '../../../utils/Util
 
 const testUserId = 6
 const startingOrgId = 2
+const user = 'sesponsorcontact@test.id.nihr.ac.uk'
 
 // date variables for updating study dates and creating unique values
 const today = new Date()
@@ -96,7 +97,6 @@ test.describe('Update study and save changes locally in SE @se_184', () => {
     })
 
     await test.step(`And I should see my proposed changes study details edit history`, async () => {
-      const user = 'sesponsorcontact@test.id.nihr.ac.uk'
       const added = true
 
       await expect(studyDetailsPage.proposedChangeEditHistory).toBeVisible()
@@ -174,6 +174,10 @@ test.describe('Update study and save changes locally in SE @se_184', () => {
       await studyDetailsPage.assertUkTarget(parseInt(uniqueTarget), studyCoreDetails[0].route)
     })
 
-    await test.step(`And I should see my changes under View edit history`, async () => {})
+    await test.step(`And I should see my changes under View edit history`, async () => {
+      // await studyDetailsPage.directChangeEditHistory.click()
+      // await expect(studyDetailsPage.proposedChangeEditHistory).toBeVisible()
+      // await expect(studyDetailsPage.directChangeUser).toContainText(`Change made by ${user}`)
+    })
   })
 })

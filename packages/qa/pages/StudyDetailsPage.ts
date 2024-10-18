@@ -79,6 +79,9 @@ export default class StudyDetailsPage {
   readonly sponsorAssessmentHistory: Locator
   readonly updateSuccessBanner: Locator
   readonly updateSuccessContent: Locator
+  readonly viewEditHistory: Locator
+  readonly directChangeEditHistory: Locator
+  readonly directChangeUser: Locator
   readonly proposedChangeEditHistory: Locator
   readonly proposedChangeUser: Locator
   readonly proposedChangeStatus: Locator
@@ -187,6 +190,7 @@ export default class StudyDetailsPage {
     this.allStudiesLink = page.locator('a[href="/studies"]')
     this.updateSuccessBanner = page.locator('.govuk-notification-banner.govuk-notification-banner--success')
     this.updateSuccessContent = page.locator('.govuk-notification-banner__heading')
+    this.viewEditHistory = page.locator('.govuk-details__summary').first()
     this.proposedChangeEditHistory = page.locator('[data-state="open"][data-testid^="edit-history-accordion-item-"]')
     this.proposedChangeUser = this.proposedChangeEditHistory.locator('span > span')
     this.proposedChangeStatus = this.proposedChangeEditHistory.locator('li:has-text("Study status changed from ")')
@@ -203,6 +207,8 @@ export default class StudyDetailsPage {
       'li:has-text("Actual closure to recruitment date")'
     )
     this.proposedChangeUkTarget = this.proposedChangeEditHistory.locator('li:has-text("UK recruitment target")').last()
+    this.directChangeEditHistory = this.proposedChangeEditHistory
+    this.directChangeUser = this.proposedChangeEditHistory.locator('span > span')
   }
 
   //Page Methods
