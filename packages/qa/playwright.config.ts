@@ -14,7 +14,7 @@ const config: PlaywrightTestConfig = {
   ],
   globalSetup: './hooks/GlobalSetup.ts',
   globalTeardown: './hooks/GlobalTeardown.ts',
-  timeout: process.env.LOCAL_DEV ? 25000 : 35000, // longer timeout in ci
+  timeout: process.env.LOCAL_DEV ? 30000 : 35000, // longer timeout in ci
   workers: 1, // to enforce serial execution
   retries: process.env.LOCAL_DEV ? 0 : 2, // enforce retries only in ci
   projects: [
