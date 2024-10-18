@@ -63,12 +63,13 @@ const cpmsPassword =
 const cpmsDbConfig = {
   server: cpmsServer,
   port: 1433, // already default but setting explicitly to avoid ci issues
-  database: 'NIHR.CRN.CPMS.OperationalDatabase',
+  // database: 'NIHR.CRN.CPMS.OperationalDatabase',
   user: 'cpmsadmin',
   password: cpmsPassword,
   options: {
     encrypt: true,
-    trustServerCertificate: false,
+    trustServerCertificate: true,
+    trustedConnection: false,
   },
 }
 
