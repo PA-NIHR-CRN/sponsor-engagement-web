@@ -33,13 +33,14 @@ export function useFormErrorHydration<T extends Record<string, unknown>>({
       if (!formState.defaultValues) return
 
       Object.keys(formState.defaultValues).forEach((field) => {
-        if (typeof formState.defaultValues?.[field] === 'object') {
-          Object.keys(formState.defaultValues[field]).forEach((dateField) => {
-            if (router.query[`${field}-${dateField}Error`]) {
-              console.log('are we calling error')
+        const value = formState.defaultValues?.[field]
+
+        if (value !== undefined && typeof value === 'object') {
+          Object.keys(value as object).forEach((nestedField) => {
+            if (router.query[`${field}-${nestedField}Error`]) {
               onFoundError(field as Path<T>, {
                 type: 'custom',
-                message: router.query[`${field}-${dateField}Error`] as string,
+                message: router.query[`${field}-${nestedField}Error`] as string,
               })
             }
           })
@@ -52,6 +53,10 @@ export function useFormErrorHydration<T extends Record<string, unknown>>({
           })
         }
       })
+
+      if (formState.isSubmitSuccessful) {
+        void router.replace({ query: undefined })
+      }
     }
   }, [router.asPath, router, hasServerErrors, onFoundError, formState.defaultValues, formState.isSubmitSuccessful])
 

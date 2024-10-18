@@ -108,7 +108,8 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
             'plannedClosureDate',
             'actualClosureDate',
             'estimatedReopeningDate',
-          ].includes(field)
+          ].includes(field) &&
+          Boolean(req.body[field])
         ) {
           const dateFields = ['day', 'month', 'year']
           dateFields.forEach(
