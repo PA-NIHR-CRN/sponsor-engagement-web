@@ -60,11 +60,6 @@ const cpmsPassword =
     throw new Error('CPMS_TEST_DB_PASSWORD is not defined')
   })()
 
-// TEMP DEBUG!
-console.log(`Connecting to DB at IP: "${cpmsServer}",`, cpmsServer ? 'IP set' : 'IP not set!')
-console.log(`Connecting with user: "${cpmsPassword}",`, cpmsPassword ? 'User set' : 'User not set!')
-// TEMP DEBUG!
-
 const cpmsDbConfig = {
   server: cpmsServer,
   port: 1433, // already default but setting explicitly to avoid ci issues
@@ -73,7 +68,7 @@ const cpmsDbConfig = {
   password: cpmsPassword,
   options: {
     encrypt: true,
-    trustServerCertificate: true,
+    trustServerCertificate: false,
   },
 }
 

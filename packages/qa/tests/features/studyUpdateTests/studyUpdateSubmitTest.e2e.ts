@@ -175,6 +175,7 @@ test.describe('Update study and save changes locally in SE @se_184', () => {
     })
 
     await test.step(`And I should see my changes under View edit history`, async () => {
+      // await expect(studyDetailsPage.directChangeEditHistory).toContainText(`View edit history`)
       // await studyDetailsPage.directChangeEditHistory.click()
       // await expect(studyDetailsPage.proposedChangeEditHistory).toBeVisible()
       // await expect(studyDetailsPage.directChangeUser).toContainText(`Change made by ${user}`)
