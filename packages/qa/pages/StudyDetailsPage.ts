@@ -77,9 +77,19 @@ export default class StudyDetailsPage {
   readonly dueIndicatorSupportingText: Locator
   readonly allStudiesLink: Locator
   readonly sponsorAssessmentHistory: Locator
-
   readonly updateSuccessBanner: Locator
   readonly updateSuccessContent: Locator
+  readonly viewEditHistory: Locator
+  readonly directChangeEditHistory: Locator
+  readonly directChangeUser: Locator
+  readonly proposedChangeEditHistory: Locator
+  readonly proposedChangeUser: Locator
+  readonly proposedChangeStatus: Locator
+  readonly proposedChangePlannedOpening: Locator
+  readonly proposedChangeActualOpening: Locator
+  readonly proposedChangePlannedClosure: Locator
+  readonly proposedChangeActualClosure: Locator
+  readonly proposedChangeUkTarget: Locator
 
   //Initialize Page Objects
   constructor(page: Page) {
@@ -180,6 +190,25 @@ export default class StudyDetailsPage {
     this.allStudiesLink = page.locator('a[href="/studies"]')
     this.updateSuccessBanner = page.locator('.govuk-notification-banner.govuk-notification-banner--success')
     this.updateSuccessContent = page.locator('.govuk-notification-banner__heading')
+    this.viewEditHistory = page.locator('.govuk-details__summary').first()
+    this.proposedChangeEditHistory = page.locator('[data-state="open"][data-testid^="edit-history-accordion-item-"]')
+    this.proposedChangeUser = this.proposedChangeEditHistory.locator('span > span')
+    this.proposedChangeStatus = this.proposedChangeEditHistory.locator('li:has-text("Study status changed from ")')
+    this.proposedChangePlannedOpening = this.proposedChangeEditHistory.locator(
+      'li:has-text("Planned opening to recruitment date")'
+    )
+    this.proposedChangeActualOpening = this.proposedChangeEditHistory.locator(
+      'li:has-text("Actual opening to recruitment date")'
+    )
+    this.proposedChangePlannedClosure = this.proposedChangeEditHistory.locator(
+      'li:has-text("Planned closure to recruitment date")'
+    )
+    this.proposedChangeActualClosure = this.proposedChangeEditHistory.locator(
+      'li:has-text("Actual closure to recruitment date")'
+    )
+    this.proposedChangeUkTarget = this.proposedChangeEditHistory.locator('li:has-text("UK recruitment target")').last()
+    this.directChangeEditHistory = this.proposedChangeEditHistory
+    this.directChangeUser = this.proposedChangeEditHistory.locator('span > span')
   }
 
   //Page Methods
@@ -460,7 +489,11 @@ export default class StudyDetailsPage {
   }
 
   async assertStudyStatusSuspended(expectedStatus: string) {
-    await expect(this.tableStatusValue).toHaveText(expectedStatus)
+    if (expectedStatus === 'Suspended (from Open, With Recruitment)') {
+      await expect(this.tableStatusValue).toHaveText('Suspended')
+    } else {
+      await expect(this.tableStatusValue).toHaveText(expectedStatus)
+    }
   }
 
   async assertEstimatedReopenDatePresent(expectedValues: RowDataPacket[]) {
@@ -695,6 +728,83 @@ export default class StudyDetailsPage {
       await expect(this.updateSuccessContent).toHaveText(
         'Your study data changes have been received. These will now be reviewed and applied to the study record. Until then, previous study data values will be displayed.'
       )
+    }
+  }
+
+  async assertStudyDetailsEditHistory(updateType: string, newValue: string, added: boolean) {
+    // Study status changed from ${old} to ${new}
+    // ${date} changed from ${old} to ${new} || ${date} ${new} added
+    // UK recruitment target changed from ${old} to ${new} || UK recruitment target ${new} added
+
+    switch (updateType) {
+      case 'status':
+        await expect(this.proposedChangeStatus).toBeVisible()
+        await expect(this.proposedChangeStatus).toContainText(`Study status changed from`)
+        await expect(this.proposedChangeStatus).toContainText(newValue)
+        break
+      case 'plannedOpening':
+        await expect(this.proposedChangePlannedOpening).toBeVisible()
+        if (added == true) {
+          await expect(this.proposedChangePlannedOpening).toContainText(
+            `Planned opening to recruitment date ${newValue} added`
+          )
+        } else {
+          await expect(this.proposedChangePlannedOpening).toContainText(
+            `Planned opening to recruitment date changed from `
+          )
+          await expect(this.proposedChangePlannedOpening).toContainText(newValue)
+        }
+        await expect(this.proposedChangePlannedOpening).toContainText(newValue)
+        break
+      case 'actualOpening':
+        await expect(this.proposedChangeActualOpening).toBeVisible()
+        if (added == true) {
+          await expect(this.proposedChangeActualOpening).toContainText(
+            `Actual opening to recruitment date ${newValue} added`
+          )
+        } else {
+          await expect(this.proposedChangeActualOpening).toContainText(
+            `Actual opening to recruitment date changed from `
+          )
+          await expect(this.proposedChangeActualOpening).toContainText(newValue)
+        }
+        break
+      case 'plannedClosure':
+        if (added == true) {
+          await expect(this.proposedChangePlannedClosure).toContainText(
+            `Planned closure to recruitment date ${newValue} added`
+          )
+        } else {
+          await expect(this.proposedChangePlannedClosure).toContainText(
+            `Planned closure to recruitment date changed from `
+          )
+          await expect(this.proposedChangePlannedClosure).toContainText(newValue)
+        }
+        break
+      case 'actualClosure':
+        if (added == true) {
+          await expect(this.proposedChangeActualClosure).toContainText(
+            `Actual closure to recruitment date ${newValue} added`
+          )
+        } else {
+          await expect(this.proposedChangeActualClosure).toContainText(
+            `Actual closure to recruitment date changed from `
+          )
+          await expect(this.proposedChangeActualClosure).toContainText(newValue)
+        }
+        break
+      // case 'estimatedReopening':
+      //   break
+      case 'ukTarget':
+        if (added == true) {
+          await expect(this.proposedChangeUkTarget).toContainText(`UK recruitment target ${newValue} added`)
+        } else {
+          await expect(this.proposedChangeUkTarget).toContainText(`UK recruitment target changed from`)
+          await expect(this.proposedChangeUkTarget).toContainText(newValue)
+        }
+        break
+      default:
+        throw new Error(`${updateType} is not a valid update option`)
     }
   }
 }

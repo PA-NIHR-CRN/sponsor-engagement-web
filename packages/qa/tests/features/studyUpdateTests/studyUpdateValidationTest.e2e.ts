@@ -226,8 +226,30 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       await studyUpdatePage.buttonUpdate.click()
     })
 
-    await test.step(`Then I should see validation messages invalid UK recruitment target`, async () => {
-      await studyUpdatePage.assertUkTargetValidation()
+    await test.step(`Then I should see the invalid UK recruitment target validation`, async () => {
+      await studyUpdatePage.assertUkTargetValidation('invalid')
+    })
+  })
+
+  test.skip('Validation error message for Null UK target validation @se_217', async ({ studyUpdatePage }) => {
+    await seDatabaseReq(`
+      DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
+    `)
+
+    await test.step(`Given I have navigated to the Update study data page for the Study with SE Id ${startingStudyId}`, async () => {
+      await studyUpdatePage.goto(startingStudyId.toString())
+    })
+
+    await test.step(`When I leave the UK recruitment target empty`, async () => {
+      await studyUpdatePage.ensureAllFieldsAreNull()
+    })
+
+    await test.step(`And I update my changes`, async () => {
+      await studyUpdatePage.buttonUpdate.click()
+    })
+
+    await test.step(`Then I should see the mandatory UK recruitment target validation`, async () => {
+      await studyUpdatePage.assertUkTargetValidation('null')
     })
   })
 

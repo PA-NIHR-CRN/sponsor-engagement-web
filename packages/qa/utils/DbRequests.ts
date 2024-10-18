@@ -1,5 +1,5 @@
 import { RowDataPacket } from 'mysql2'
-import { seConnectionPool } from './dbConfig'
+import { seConnectionPool, cpmsConnectionPool } from './dbConfig'
 
 // this was refactored to use a connection pool for automatic reconnection and scalability as the original db connection was flaky
 // this should ensure that the db connection is available throughout the entirety of the test execution without being prematurely closed
@@ -25,4 +25,16 @@ export async function waitForSeDbRequest(query: string) {
     await new Promise((resolve) => setTimeout(resolve, 1000))
   }
   return dbStudyUpdate
+}
+
+export async function cpmsDatabaseReq(query: string): Promise<any[]> {
+  try {
+    await cpmsConnectionPool.poolConnect
+
+    const result = await cpmsConnectionPool.pool.request().query(query)
+    return result.recordset
+  } catch (err) {
+    console.error('SQL error:', err)
+    throw err
+  }
 }
