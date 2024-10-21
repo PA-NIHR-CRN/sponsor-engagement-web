@@ -49,7 +49,7 @@ export const getStudyByIdFromCPMS = async (
   } catch (e) {
     const error = e instanceof Error ? e.message : String(e)
 
-    logger.error('Failed to retrieve study from CPMS with cpmsId: %s', studyId)
+    logger.error('Failed to retrieve study from CPMS with cpmsId: %s, error: %s', studyId, error)
 
     return { study: null, error }
   }
@@ -106,7 +106,7 @@ export const updateStudyInCPMS = async (
   } catch (e) {
     const error = e instanceof Error ? e.message : String(e)
 
-    logger.error('Failed to update study in CPMS with cpmsId: %s', cpmsId)
+    logger.error('Failed to update study in CPMS with cpmsId: %s, error: %s', cpmsId, error)
     return { study: null, error }
   }
 }
@@ -153,11 +153,15 @@ export const validateStudyUpdate = async (
       throw new Error('An error occured validating study in CPMS')
     }
 
+    logger.info('Validated study in CPMS with cpmsId: %s', cpmsId)
+
     return {
       validationResult: data.Result,
     }
   } catch (e) {
     const error = e instanceof Error ? e.message : String(e)
+
+    logger.error('Failed to update study in CPMS with cpmsId: %s, error: %s', cpmsId, error)
 
     return { validationResult: null, error }
   }
