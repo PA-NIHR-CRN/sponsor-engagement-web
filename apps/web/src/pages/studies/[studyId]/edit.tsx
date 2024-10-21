@@ -5,7 +5,7 @@ import clsx from 'clsx'
 import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
 import { NextSeo } from 'next-seo'
-import { type ReactElement, useCallback, useMemo } from 'react'
+import { type ReactElement, useCallback, useEffect, useMemo } from 'react'
 import type { FieldError } from 'react-hook-form'
 import { Controller, useForm } from 'react-hook-form'
 
@@ -101,6 +101,15 @@ export default function EditStudy({ study, currentLSN }: EditStudyProps) {
   )
 
   const showLoadingState = formState.isSubmitting || formState.isSubmitSuccessful
+
+  useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      })
+    }
+  }, [errors])
 
   return (
     <Container>
