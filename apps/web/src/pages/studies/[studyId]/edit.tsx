@@ -150,6 +150,11 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
             <ErrorSummary errors={errors} />
             <input type="hidden" {...register('studyId')} defaultValue={Number(defaultValues?.studyId)} />
             <input type="hidden" {...register('cpmsId')} defaultValue={defaultValues?.cpmsId} />
+            <input
+              type="hidden"
+              {...register('originalValues')}
+              defaultValue={JSON.stringify(defaultValues?.originalValues)}
+            />
             <Fieldset>
               {/* Status */}
               <Controller
@@ -170,7 +175,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                   return (
                     <RadioGroup
                       defaultValue={mappedSEStatusValue}
-                      errors={{}}
+                      errors={errors}
                       label={fieldNameToLabelMapping.status}
                       labelSize="m"
                       name={name}
@@ -211,6 +216,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                       />
                     )
                   }}
+                  shouldUnregister
                 />
               )}
 
@@ -261,6 +267,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                       />
                     )
                   }}
+                  shouldUnregister
                 />
               )}
 
@@ -286,6 +293,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                       />
                     )
                   }}
+                  shouldUnregister
                 />
               )}
 
@@ -311,6 +319,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                       />
                     )
                   }}
+                  shouldUnregister
                 />
               )}
 

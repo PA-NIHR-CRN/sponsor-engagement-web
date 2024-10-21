@@ -8,9 +8,9 @@ import { Roles } from '@/constants'
 import { UPDATE_FROM_SE_TEXT } from '@/constants/forms'
 import { mapEditStudyInputToCPMSStudy, updateStudyInCPMS, validateStudyUpdate } from '@/lib/cpms/studies'
 import { logStudyUpdate } from '@/lib/studyUpdates'
-import { transformEditStudyBody } from '@/utils/editStudyForm'
+import { editStudyDateFields, transformEditStudyBody } from '@/utils/editStudyForm'
 import type { EditStudy } from '@/utils/schemas'
-import { editStudyDateFields, studySchema, studySchemaShape } from '@/utils/schemas'
+import { studySchema, studySchemaShape } from '@/utils/schemas'
 import { withApiHandler } from '@/utils/withApiHandler'
 
 // Date fields with each date parts as separate fields
@@ -43,11 +43,16 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
   const enableDirectStudyUpdatesFeature = ENABLE_DIRECT_STUDY_UPDATES?.toLowerCase() === 'true'
 
   try {
+    const { studyId, originalValues: originalValuesStringified, LSN: beforeLSN } = req.body
+
+    // When JS is disabled, the original values object is stringified
+    const originalValues = (
+      typeof originalValuesStringified === 'string' ? JSON.parse(originalValuesStringified) : originalValuesStringified
+    ) as EditStudy['originalValues']
+
     // When JS is disabled, the nested date fields are returned as single attributes so this function converts them back into an object to match the schema
     // i.e. plannedOpeningDate-day rather than a object with the key 'day'
-    const transformedData = transformEditStudyBody(req.body)
-
-    const { studyId, originalValues, LSN: beforeLSN } = req.body
+    const transformedData = transformEditStudyBody({ ...req.body, originalValues })
 
     const studyDataToUpdate = studySchema.parse(transformedData)
     const cpmsStudyInput = mapEditStudyInputToCPMSStudy(studyDataToUpdate)

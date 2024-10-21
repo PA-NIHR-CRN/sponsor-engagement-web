@@ -10,6 +10,14 @@ import { areAllDatePartsEmpty, constructDatePartsFromDate, getDaysInMonth } from
 import { type DateFieldName, type EditStudy, type EditStudyInputs } from './schemas'
 import type { Optional } from './typeUtils'
 
+export const editStudyDateFields: (keyof DateFieldName)[] = [
+  'actualClosureDate',
+  'estimatedReopeningDate',
+  'plannedClosureDate',
+  'plannedOpeningDate',
+  'actualOpeningDate',
+]
+
 export const mapStudyToStudyFormInput = (
   study: EditStudyProps['study'],
   LSN?: string
@@ -266,6 +274,33 @@ export const validateAllDates = (ctx: z.RefinementCtx, values: EditStudy) => {
   })
 }
 
+/**
+ * Validates that the status change can occur
+ */
+export const validateStatus = (ctx: z.RefinementCtx, values: EditStudy) => {
+  const previousStatus = values.originalValues?.status ?? ''
+  const newStatus = values.status
+
+  const previousSimplifiedStatus = mapCPMSStatusToFormStatus(previousStatus)
+  const newSimplifiedStatus = mapCPMSStatusToFormStatus(newStatus)
+
+  if (previousSimplifiedStatus === newSimplifiedStatus) return
+
+  const [_, visibleStatuses] = getVisibleFormFields(previousSimplifiedStatus, newSimplifiedStatus)
+
+  if (!(visibleStatuses as string[]).includes(newSimplifiedStatus)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Cannot transition study from ${previousSimplifiedStatus} to ${newSimplifiedStatus}`,
+      path: ['status'],
+    })
+  }
+}
+
+/**
+ * When JS is disabled, the nested date fields are sent separately i.e plannedOpeningDay-day, plannedOpeningDay-month
+ * This function converts those to an object with the correct date parts
+ */
 export const transformEditStudyBody = (body: EditStudy & Partial<DateFieldWithParts>) => {
   const data = {}
 

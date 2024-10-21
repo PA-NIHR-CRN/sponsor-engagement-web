@@ -2,7 +2,7 @@ import * as z from 'zod'
 
 import { UK_RECRUITMENT_TARGET_MAX_VALUE } from '@/constants/editStudyForm'
 
-import { validateAllDates } from '../editStudyForm'
+import { validateAllDates, validateStatus } from '../editStudyForm'
 
 const dateSchema = z
   .object({
@@ -48,6 +48,8 @@ export const studySchema = z
   })
   .superRefine((values, ctx) => {
     validateAllDates(ctx, values)
+
+    validateStatus(ctx, values)
   })
 
 export const studySchemaShape = studySchema.sourceType()._def.shape()
@@ -60,11 +62,3 @@ export type DateFieldName = Pick<
   EditStudyInputs,
   'actualClosureDate' | 'estimatedReopeningDate' | 'plannedClosureDate' | 'plannedOpeningDate' | 'actualOpeningDate'
 >
-
-export const editStudyDateFields: (keyof DateFieldName)[] = [
-  'actualClosureDate',
-  'estimatedReopeningDate',
-  'plannedClosureDate',
-  'plannedOpeningDate',
-  'actualOpeningDate',
-]

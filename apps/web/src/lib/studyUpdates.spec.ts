@@ -42,7 +42,7 @@ const newStudyValues = {
   LSN: beforeLSN,
 }
 const originalValues = {
-  status: 'Open, to Recruitment',
+  status: 'Open to Recruitment',
   plannedOpeningDate: {
     day: '27',
     month: '02',

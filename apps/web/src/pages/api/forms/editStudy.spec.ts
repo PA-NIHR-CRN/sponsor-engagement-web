@@ -98,7 +98,7 @@ const body: ExtendedNextApiRequest['body'] = {
   recruitmentTarget: '121',
   furtherInformation: '',
   originalValues: {
-    status: 'Open, to Recruitment',
+    status: 'Open to Recruitment',
     plannedOpeningDate: {
       day: '27',
       month: '02',
@@ -136,7 +136,7 @@ const getMockStudyUpdateInput = (isDirect: boolean, isAfterState: boolean) => {
 
   return {
     studyStatus: isAfterState ? studyStatusOnUpdateType : body.originalValues?.status,
-    studyStatusGroup: isAfterState ? 'Suspended' : 'Open, to Recruitment',
+    studyStatusGroup: isAfterState ? 'Suspended' : 'Open to recruitment',
     plannedOpeningDate: isAfterState
       ? new Date(mockCPMSUpdateInput.PlannedOpeningDate as string).toISOString()
       : new Date('2003-02-27T00:00:00.000').toISOString(),

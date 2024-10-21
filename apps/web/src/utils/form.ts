@@ -5,9 +5,9 @@ import Zod from 'zod'
 
 import type { DateInputValue } from '@/components/atoms/Form/DateInput/types'
 
+import { editStudyDateFields } from './editStudyForm'
 import {
   type assessmentSchema,
-  editStudyDateFields,
   type organisationAddSchema,
   type organisationRemoveContactSchema,
   type registrationSchema,
