@@ -23,7 +23,7 @@ const mockedEnvVars = {
   editHistoryStartDate: '2024-11-01',
 }
 
-const mockStudyId = Number(mockCPMSStudy.StudyId)
+const mockStudyId = mockCPMSStudy.StudyId
 
 describe('getStudyByIdFromCPMS', () => {
   beforeEach(() => {
@@ -257,7 +257,7 @@ describe('validateStudyUpdate', () => {
 
 describe('mapEditStudyInputToCPMSStudy', () => {
   const input: EditStudyInputs = {
-    studyId: mockStudyId,
+    studyId: mockStudyId.toString(),
     cpmsId: mockCPMSStudy.StudyId.toString(),
     status: mockCPMSStudy.StudyStatus,
     plannedOpeningDate: {

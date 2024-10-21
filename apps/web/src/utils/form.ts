@@ -3,12 +3,15 @@ import type { ParsedUrlQuery } from 'node:querystring'
 import type { FieldError, FieldErrors } from 'react-hook-form'
 import Zod from 'zod'
 
-import type {
-  assessmentSchema,
-  organisationAddSchema,
-  organisationRemoveContactSchema,
-  registrationSchema,
-  studySchema,
+import type { DateInputValue } from '@/components/atoms/Form/DateInput/types'
+
+import {
+  type assessmentSchema,
+  editStudyDateFields,
+  type organisationAddSchema,
+  type organisationRemoveContactSchema,
+  type registrationSchema,
+  type studySchema,
 } from './schemas'
 
 export type Schemas =
@@ -25,18 +28,13 @@ export function hasErrorsInSearchParams(schema: Schemas, searchParams: ParsedUrl
   const shape = schema instanceof Zod.ZodEffects ? schema._def.schema.shape : schema.shape
 
   return Object.keys(shape).some((field) => {
-    if (
-      [
-        'plannedOpeningDate',
-        'actualOpeningDate',
-        'plannedClosureDate',
-        'actualClosureDate',
-        'estimatedReopeningDate',
-      ].includes(field)
-    ) {
+    if ((editStudyDateFields as string[]).includes(field)) {
+      // Check if there is a parent level error
       if (searchParams[`${field}Error`]) {
         return searchParams[`${field}Error`]
       }
+
+      // Loop through date parts for errors
       const dateFields = ['day', 'month', 'year']
       return dateFields.some((dateField) => searchParams[`${field}-${dateField}Error`])
     }
@@ -47,7 +45,10 @@ export function hasErrorsInSearchParams(schema: Schemas, searchParams: ParsedUrl
 /**
  * Extracts the persisted form values state from the URL searchParams for a given schema
  */
-export function getValuesFromSearchParams(schema: Schemas, searchParams: ParsedUrlQuery) {
+export function getValuesFromSearchParams(
+  schema: Schemas,
+  searchParams: ParsedUrlQuery
+): Record<string, string | string[] | undefined | DateInputValue> {
   const shape = schema instanceof Zod.ZodEffects ? schema._def.schema.shape : schema.shape
 
   return Object.fromEntries(
@@ -59,6 +60,20 @@ export function getValuesFromSearchParams(schema: Schemas, searchParams: ParsedU
         if (value.includes(',')) {
           return [field, String(searchParams[field]).split(',')]
         }
+
+        // Nested date fields - curently only date fields are in edit study form
+        if ((editStudyDateFields as string[]).includes(field)) {
+          const dateParts = { day: '', month: '', year: '' }
+
+          Object.keys(dateParts).forEach((dateField) => {
+            if (searchParams[`${field}-${dateField}`]) {
+              dateParts[dateField] = searchParams[`${field}-${dateField}`]
+            }
+          })
+
+          return [field, dateParts]
+        }
+
         // Everything else just returns a value
         return [field, value]
       }
@@ -80,15 +95,7 @@ export function getErrorsFromSearchParams(schema: Schemas, searchParams: ParsedU
   const keysArray: (typeof keys)[number][] = Object.keys(shape)
 
   return keysArray.reduce<FieldErrors>((errors, field) => {
-    if (
-      [
-        'plannedOpeningDate',
-        'actualOpeningDate',
-        'plannedClosureDate',
-        'actualClosureDate',
-        'estimatedReopeningDate',
-      ].includes(field)
-    ) {
+    if ((editStudyDateFields as string[]).includes(field)) {
       const dateFields = ['day', 'month', 'year']
 
       dateFields.forEach((dateField) => {
@@ -101,6 +108,7 @@ export function getErrorsFromSearchParams(schema: Schemas, searchParams: ParsedU
         }
       })
     }
+
     if (searchParams[`${field}Error`]) {
       const error: FieldError = {
         type: 'custom',

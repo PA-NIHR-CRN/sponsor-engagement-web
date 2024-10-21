@@ -25,6 +25,7 @@ const mockedPostAxios = jest.mocked(axios.post)
 const mockSetStudyAssessmentDue = setStudyAssessmentDue as jest.MockedFunction<typeof setStudyAssessmentDue>
 
 const mockStudyId = mockStudyWithRelations.id.toString()
+const mockQuery = { studyId: mockStudyId }
 
 const mockLSN = '1212'
 const mockCPMSResponse = {
@@ -50,7 +51,7 @@ const renderPage = async (
   mockRouterPushUrl = `/studies/${mockStudyId}`,
   mockReturnedStudy = mockStudyWithRelations
 ) => {
-  const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
+  const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: mockQuery })
   getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
   prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
   mockedGetAxios.mockResolvedValueOnce({ data: mockCPMSResponse })
@@ -107,7 +108,7 @@ describe('EditStudy', () => {
 
   describe('getServerSideProps', () => {
     test('redirects to 404 page if no study found', async () => {
-      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: mockQuery })
       getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
       prismaMock.$transaction.mockResolvedValueOnce([])
 
@@ -122,7 +123,7 @@ describe('EditStudy', () => {
     })
 
     test('redirect to 404 page if no cpmsId exists in returned study', async () => {
-      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: mockQuery })
       getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
       prismaMock.$transaction.mockResolvedValueOnce([{ ...mockStudyWithRelations, cpmsId: undefined }])
 
@@ -137,7 +138,7 @@ describe('EditStudy', () => {
     })
 
     test('should return correct study and evaluations when all requests are successful', async () => {
-      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: mockQuery })
       getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
       prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
       mockedGetAxios.mockResolvedValueOnce({ data: mockCPMSResponse })
@@ -156,6 +157,9 @@ describe('EditStudy', () => {
             organisationsByRole,
           },
           currentLSN: mockLSN,
+          query: {
+            ...mockQuery,
+          },
         },
       })
 
@@ -167,7 +171,7 @@ describe('EditStudy', () => {
     })
 
     test('when request to CPMS fails, should not update study in SE and return correct data', async () => {
-      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: mockQuery })
       getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
       prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
       mockedGetAxios.mockRejectedValueOnce(new Error('Oh no, an error!'))
@@ -177,6 +181,9 @@ describe('EditStudy', () => {
         props: {
           user: userWithSponsorContactRole.user,
           study: { ...mockStudyWithRelations, organisationsByRole },
+          query: {
+            ...mockQuery,
+          },
         },
       })
 
@@ -187,7 +194,7 @@ describe('EditStudy', () => {
     })
 
     test('when request to update study fails, should fallback to SE data and return the correct study evals', async () => {
-      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: mockQuery })
       getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
       prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
       mockedGetAxios.mockResolvedValueOnce({ data: mockCPMSResponse })
@@ -201,6 +208,9 @@ describe('EditStudy', () => {
             ...mockStudyWithRelations,
             organisationsByRole,
           },
+          query: {
+            ...mockQuery,
+          },
         },
       })
 
@@ -211,7 +221,7 @@ describe('EditStudy', () => {
     })
 
     test('when request to update study evals fails, should return the updated study and correct study evals', async () => {
-      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: mockQuery })
       getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
       prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
       mockedGetAxios.mockResolvedValueOnce({ data: mockCPMSResponse })
@@ -228,6 +238,9 @@ describe('EditStudy', () => {
             organisationsByRole,
           },
           currentLSN: mockLSN,
+          query: {
+            ...mockQuery,
+          },
         },
       })
 
@@ -238,7 +251,7 @@ describe('EditStudy', () => {
     })
 
     test('when request to set study assessment flag fails, should not throw a 500 and correctly return study', async () => {
-      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: mockQuery })
       getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
       prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
       mockedGetAxios.mockResolvedValueOnce({ data: mockCPMSResponse })
@@ -257,6 +270,9 @@ describe('EditStudy', () => {
             organisationsByRole,
           },
           currentLSN: mockLSN,
+          query: {
+            ...mockQuery,
+          },
         },
       })
 
@@ -268,7 +284,7 @@ describe('EditStudy', () => {
     })
 
     test('when study is due for assessment, should return study with the correct flag', async () => {
-      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: mockQuery })
       getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
       prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
       mockedGetAxios.mockResolvedValueOnce({ data: mockCPMSResponse })
@@ -288,6 +304,9 @@ describe('EditStudy', () => {
             isDueAssessment: true,
           },
           currentLSN: mockLSN,
+          query: {
+            ...mockQuery,
+          },
         },
       })
 

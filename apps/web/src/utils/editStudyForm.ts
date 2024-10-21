@@ -3,13 +3,14 @@ import { z } from 'zod'
 
 import { dateValidationRules, fieldNameToLabelMapping, FormStudyStatus } from '@/constants/editStudyForm'
 import { mapCPMSStatusToFormStatus } from '@/lib/studies'
+import type { DateFieldWithParts } from '@/pages/api/forms/editStudy'
 import type { EditStudyProps } from '@/pages/studies/[studyId]/edit'
 
 import { areAllDatePartsEmpty, constructDatePartsFromDate, getDaysInMonth } from './date'
-import type { DateFieldName, EditStudy, EditStudyInputs } from './schemas'
+import { type DateFieldName, type EditStudy, type EditStudyInputs } from './schemas'
 
 export const mapStudyToStudyFormInput = (study: EditStudyProps['study'], LSN?: string): EditStudyInputs => ({
-  studyId: study.id,
+  studyId: study.id.toString(),
   LSN,
   status: study.studyStatus,
   recruitmentTarget: study.sampleSize?.toString() ?? '',
@@ -19,7 +20,7 @@ export const mapStudyToStudyFormInput = (study: EditStudyProps['study'], LSN?: s
   actualOpeningDate: constructDatePartsFromDate(study.actualOpeningDate),
   actualClosureDate: constructDatePartsFromDate(study.actualClosureDate),
   estimatedReopeningDate: constructDatePartsFromDate(study.estimatedReopeningDate),
-  furtherInformation: '', // TODO: is there a field for this
+  furtherInformation: '',
 })
 
 /**
@@ -65,8 +66,16 @@ const getMandatoryDateFields = (previousStatus: string | null, newStatus: string
 
 export const getVisibleFormFields = (
   previousStatus: string,
-  newStatus: string
+  newStatus: string,
+  returnAllAvailableFields = false
 ): [(keyof DateFieldName)[], FormStudyStatus[]] => {
+  if (returnAllAvailableFields) {
+    return [
+      ['actualClosureDate', 'estimatedReopeningDate', 'plannedClosureDate', 'plannedOpeningDate', 'actualOpeningDate'],
+      Object.values(FormStudyStatus),
+    ]
+  }
+
   const visibleDateFieldsMapping: Record<FormStudyStatus, (keyof DateFieldName)[]> = {
     [FormStudyStatus.InSetup]: ['plannedOpeningDate', 'plannedClosureDate'],
     [FormStudyStatus.OpenToRecruitment]: ['plannedOpeningDate', 'actualOpeningDate', 'plannedClosureDate'],
@@ -121,7 +130,7 @@ export const getVisibleFormFields = (
 const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, values: EditStudy) => {
   const value = values[fieldName]
   const currentStatus = mapCPMSStatusToFormStatus(values.status)
-  const previousStatus = values.originalValues.status ? mapCPMSStatusToFormStatus(values.originalValues.status) : null
+  const previousStatus = values.originalValues?.status ? mapCPMSStatusToFormStatus(values.originalValues.status) : null
   const label = fieldNameToLabelMapping[fieldName]
   const requiredPastOrCurrent = dateValidationRules[fieldName].restrictions.includes('requiredPastOrCurrent')
   const requiredFuture = dateValidationRules[fieldName].restrictions.includes('requiredFuture')
@@ -251,4 +260,32 @@ export const validateAllDates = (ctx: z.RefinementCtx, values: EditStudy) => {
   Object.keys(dateValidationRules).forEach((fieldName: keyof DateFieldName) => {
     validateDate(fieldName, ctx, values)
   })
+}
+
+export const transformEditStudyBody = (body: EditStudy & Partial<DateFieldWithParts>) => {
+  const data: EditStudyInputs = {
+    studyId: body.studyId,
+    cpmsId: body.cpmsId,
+    status: body.status,
+  }
+
+  Object.entries(body).forEach(([key, value]) => {
+    const parts = key.split('-')
+
+    if (parts.length === 2 && ['day', 'month', 'year'].includes(parts[1])) {
+      const fieldName = parts[0]
+      const datePart = parts[1]
+
+      if (typeof data[fieldName] === 'object') {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- narrowed down type to object
+        data[fieldName] = { ...data[fieldName], [datePart]: value }
+      } else {
+        data[fieldName] = { [datePart]: value }
+      }
+    } else {
+      data[key] = value
+    }
+  })
+
+  return data
 }

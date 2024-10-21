@@ -15,7 +15,7 @@ const dateSchema = z
 
 export const studySchema = z
   .object({
-    studyId: z.number(),
+    studyId: z.string(),
     cpmsId: z.string(),
     status: z.string(),
     LSN: z.string().optional().nullable(),
@@ -33,16 +33,18 @@ export const studySchema = z
         'Enter a valid UK target'
       ),
     furtherInformation: z.string().optional(),
-    originalValues: z.object({
-      status: z.string(),
-      plannedOpeningDate: dateSchema,
-      actualOpeningDate: dateSchema,
-      plannedClosureDate: dateSchema,
-      actualClosureDate: dateSchema,
-      estimatedReopeningDate: dateSchema,
-      recruitmentTarget: z.string().optional(),
-      furtherInformation: z.string().optional(),
-    }),
+    originalValues: z
+      .object({
+        status: z.string(),
+        plannedOpeningDate: dateSchema,
+        actualOpeningDate: dateSchema,
+        plannedClosureDate: dateSchema,
+        actualClosureDate: dateSchema,
+        estimatedReopeningDate: dateSchema,
+        recruitmentTarget: z.string().optional(),
+        furtherInformation: z.string().optional(),
+      })
+      .optional(),
   })
   .superRefine((values, ctx) => {
     validateAllDates(ctx, values)
@@ -58,3 +60,11 @@ export type DateFieldName = Pick<
   EditStudyInputs,
   'actualClosureDate' | 'estimatedReopeningDate' | 'plannedClosureDate' | 'plannedOpeningDate' | 'actualOpeningDate'
 >
+
+export const editStudyDateFields: (keyof DateFieldName)[] = [
+  'actualClosureDate',
+  'estimatedReopeningDate',
+  'plannedClosureDate',
+  'plannedOpeningDate',
+  'actualOpeningDate',
+]

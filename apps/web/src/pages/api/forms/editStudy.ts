@@ -8,12 +8,33 @@ import { Roles } from '@/constants'
 import { UPDATE_FROM_SE_TEXT } from '@/constants/forms'
 import { mapEditStudyInputToCPMSStudy, updateStudyInCPMS, validateStudyUpdate } from '@/lib/cpms/studies'
 import { logStudyUpdate } from '@/lib/studyUpdates'
+import { transformEditStudyBody } from '@/utils/editStudyForm'
 import type { EditStudy } from '@/utils/schemas'
-import { studySchema, studySchemaShape } from '@/utils/schemas'
+import { editStudyDateFields, studySchema, studySchemaShape } from '@/utils/schemas'
 import { withApiHandler } from '@/utils/withApiHandler'
 
+// Date fields with each date parts as separate fields
+// This is required for when JS is disabled, as nested fields are sent separately
+export interface DateFieldWithParts {
+  'actualOpeningDate-day': string
+  'actualOpeningDate-month': string
+  'actualOpeningDate-year': string
+  'plannedOpeningDate-day': string
+  'plannedOpeningDate-month': string
+  'plannedOpeningDate-year': string
+  'actualClosureDate-day': string
+  'actualClosureDate-month': string
+  'actualClosureDate-year': string
+  'estimatedReopeningDate-day': string
+  'estimatedReopeningDate-month': string
+  'estimatedReopeningDate-year': string
+  'plannedClosureDate-day': string
+  'plannedClosureDate-month': string
+  'plannedClosureDate-year': string
+}
+
 export interface ExtendedNextApiRequest extends NextApiRequest {
-  body: EditStudy
+  body: EditStudy | (EditStudy & Partial<DateFieldWithParts>)
 }
 
 export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, async (req, res, session) => {
@@ -22,9 +43,13 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
   const enableDirectStudyUpdatesFeature = ENABLE_DIRECT_STUDY_UPDATES?.toLowerCase() === 'true'
 
   try {
+    // When JS is disabled, the nested date fields are returned as single attributes so this function converts them back into an object to match the schema
+    // i.e. plannedOpeningDate-day rather than a object with the key day
+    const transformedData = transformEditStudyBody(req.body)
+
     const { studyId, originalValues, LSN: beforeLSN } = req.body
 
-    const studyDataToUpdate = studySchema.parse(req.body)
+    const studyDataToUpdate = studySchema.parse(transformedData)
     const cpmsStudyInput = mapEditStudyInputToCPMSStudy(studyDataToUpdate)
 
     const { validationResult, error: validateStudyError } = await validateStudyUpdate(
@@ -53,7 +78,8 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
         Status.Suspended,
       ]
       const additionalNote =
-        suspendedStatuses.includes(studyDataToUpdate.status) && !suspendedStatuses.includes(originalValues.status)
+        suspendedStatuses.includes(studyDataToUpdate.status) &&
+        !suspendedStatuses.includes(originalValues?.status ?? '')
           ? UPDATE_FROM_SE_TEXT
           : ''
 
@@ -73,7 +99,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
     const transactionId = uuid()
 
     await logStudyUpdate(
-      studyId,
+      Number(studyId),
       transactionId,
       originalValues,
       studyDataToUpdate,
@@ -90,6 +116,8 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
 
     return res.redirect(302, `/studies/${studyId}?${searchParams.toString()}`)
   } catch (error) {
+    const transformedData = transformEditStudyBody(req.body)
+
     const studyId = req.body.studyId
 
     if (error instanceof ZodError) {
@@ -101,24 +129,15 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
 
       // Insert the original values
       Object.keys(studySchemaShape).forEach((field) => {
-        if (
-          [
-            'plannedOpeningDate',
-            'actualOpeningDate',
-            'plannedClosureDate',
-            'actualClosureDate',
-            'estimatedReopeningDate',
-          ].includes(field) &&
-          Boolean(req.body[field])
-        ) {
+        if ((editStudyDateFields as string[]).includes(field) && Boolean(transformedData[field])) {
           const dateFields = ['day', 'month', 'year']
-          dateFields.forEach(
-            (dateField) =>
-              (fieldErrors[`${field}-${dateField}`] = (req.body[field] as DateInputValue)[dateField] as string)
-          )
+
+          dateFields.forEach((dateField) => {
+            fieldErrors[`${field}-${dateField}`] = (transformedData[field] as DateInputValue)[dateField] as string
+          })
         }
-        if (req.body[field]) {
-          fieldErrors[field] = req.body[field] as string
+        if (transformedData[field]) {
+          fieldErrors[field] = transformedData[field] as string
         }
       })
 

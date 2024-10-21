@@ -37,7 +37,7 @@ const testHandler = async (handler: typeof api, options: RequestOptions) => {
   return res
 }
 
-const mockStudyId = 1211
+const mockStudyId = '1211'
 
 const nextYearValue = new Date().getFullYear() + 1
 const mockEstimatedReopeningDateInFuture = `${nextYearValue}-02-28T00:00:00.000`
@@ -135,7 +135,7 @@ const getMockStudyUpdateInput = (isDirect: boolean, isAfterState: boolean) => {
   const LSN = isAfterState ? mockAfterLSN : mockBeforeLSN
 
   return {
-    studyStatus: isAfterState ? studyStatusOnUpdateType : body.originalValues.status,
+    studyStatus: isAfterState ? studyStatusOnUpdateType : body.originalValues?.status,
     studyStatusGroup: isAfterState ? 'Suspended' : 'Open, to Recruitment',
     plannedOpeningDate: isAfterState
       ? new Date(mockCPMSUpdateInput.PlannedOpeningDate as string).toISOString()
@@ -154,7 +154,7 @@ const getMockStudyUpdateInput = (isDirect: boolean, isAfterState: boolean) => {
       : new Date('2021-02-27T00:00:00.000').toISOString(),
     ukRecruitmentTarget: isAfterState ? 121 : 122,
     comment: '',
-    studyId: body.studyId,
+    studyId: Number(body.studyId),
     studyUpdateTypeId: isDirect ? StudyUpdateType.Direct : StudyUpdateType.Proposed,
     createdById: userWithSponsorContactRole.user?.id as number,
     modifiedById: userWithSponsorContactRole.user?.id as number,
