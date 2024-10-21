@@ -285,7 +285,7 @@ describe('mapEditStudyInputToCPMSStudy', () => {
       month: '02',
       year: '2003',
     },
-    recruitmentTarget: mockCPMSStudy.SampleSize?.toString() ?? undefined,
+    recruitmentTarget: mockCPMSStudy.SampleSize?.toString() ?? '',
     furtherInformation: '',
   }
 
