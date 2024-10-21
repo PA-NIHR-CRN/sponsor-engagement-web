@@ -1,4 +1,5 @@
 import { Container, NotificationBanner, Table } from '@nihr-ui/frontend'
+import { logger } from '@nihr-ui/logger'
 import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -233,6 +234,8 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
       },
     }
   }
+
+  logger.info('Successfully retrieved study from SE with studyId: %s', studyId)
 
   const changeHistoryFromDate = process.env.EDIT_HISTORY_START_DATE ?? ''
   const { study: studyInCPMS } = await getStudyByIdFromCPMS(study.cpmsId, changeHistoryFromDate)

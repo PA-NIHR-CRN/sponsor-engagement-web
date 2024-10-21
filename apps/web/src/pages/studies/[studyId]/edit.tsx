@@ -1,9 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Container } from '@nihr-ui/frontend'
+import { logger } from '@nihr-ui/logger'
 import clsx from 'clsx'
 import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
-import { type ReactElement, useCallback, useMemo } from 'react'
+import { NextSeo } from 'next-seo'
+import { type ReactElement, useCallback, useEffect, useMemo } from 'react'
 import type { FieldError } from 'react-hook-form'
 import { Controller, useForm } from 'react-hook-form'
 
@@ -100,8 +102,18 @@ export default function EditStudy({ study, currentLSN }: EditStudyProps) {
 
   const showLoadingState = formState.isSubmitting || formState.isSubmitSuccessful
 
+  useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      })
+    }
+  }, [errors])
+
   return (
     <Container>
+      <NextSeo title="Study Progress Review - Update study data" />
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">
@@ -395,6 +407,8 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
       },
     }
   }
+
+  logger.info('Successfully retrieved study from SE with studyId: %s', context.query.studyId)
 
   const cpmsId = study.cpmsId
 
