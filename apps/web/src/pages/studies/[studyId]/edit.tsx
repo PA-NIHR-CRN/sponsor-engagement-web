@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Container } from '@nihr-ui/frontend'
+import { logger } from '@nihr-ui/logger'
 import clsx from 'clsx'
 import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
@@ -111,8 +112,16 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
     [statusInputValue, study.studyStatus, mounted]
   )
 
-  const showLoadingState =
-    formState.isSubmitting || (formState.isSubmitSuccessful && Object.entries(errors).length === 0)
+  const showLoadingState = formState.isSubmitting || (formState.isSubmitSuccessful && Object.keys(errors).length === 0)
+
+  useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      })
+    }
+  }, [errors])
 
   return (
     <Container>
@@ -420,6 +429,8 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
       },
     }
   }
+
+  logger.info('Successfully retrieved study from SE with studyId: %s', context.query.studyId)
 
   const cpmsId = study.cpmsId
 
