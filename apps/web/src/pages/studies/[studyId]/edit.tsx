@@ -3,6 +3,7 @@ import { Container } from '@nihr-ui/frontend'
 import clsx from 'clsx'
 import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
+import { NextSeo } from 'next-seo'
 import { type ReactElement, useCallback, useEffect, useMemo, useState } from 'react'
 import type { FieldError } from 'react-hook-form'
 import { Controller, useForm } from 'react-hook-form'
@@ -115,6 +116,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
 
   return (
     <Container>
+      <NextSeo title="Study Progress Review - Update study data" />
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">
