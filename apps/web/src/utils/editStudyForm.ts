@@ -280,7 +280,7 @@ export const transformEditStudyBody = (body: EditStudy & Partial<DateFieldWithPa
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- narrowed down type to object
         data[fieldName] = { ...data[fieldName], [datePart]: value }
       } else {
-        data[fieldName] = { [datePart]: value }
+        data[fieldName] = { day: '', month: '', year: '', [datePart]: value }
       }
     } else {
       data[key] = value
