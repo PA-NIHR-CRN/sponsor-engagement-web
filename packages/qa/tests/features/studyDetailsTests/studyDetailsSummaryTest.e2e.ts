@@ -1,6 +1,6 @@
 import { RowDataPacket } from 'mysql2'
 import { test } from '../../../hooks/CustomFixtures'
-import { seDatabaseReq } from '../../../utils/DbRequests'
+import { seDatabaseReq, cpmsDatabaseReq } from '../../../utils/DbRequests'
 import { getStudyEngagementInfo } from '../../../utils/ApiRequests'
 
 const testUserId = 6
@@ -23,27 +23,32 @@ test.beforeAll('Setup Tests', async () => {
     INNER JOIN StudyOrganisation
     ON Study.id = StudyOrganisation.studyId
     WHERE StudyOrganisation.organisationId = ${startingOrgId} AND StudyOrganisation.isDeleted = 0 AND Study.isDeleted = 0
-    ORDER BY RAND() LIMIT 1;`)
+    ORDER BY RAND() LIMIT 1;
+  `)
   startingStudyId = randomStudyIdSelected[0].id
 
-  studyProgressDetails =
-    await seDatabaseReq(`SELECT studyStatus, Study.plannedOpeningDate, Study.actualOpeningDate, Study.plannedClosureDate, Study.cpmsId,
+  studyProgressDetails = await seDatabaseReq(`
+    SELECT studyStatus, Study.plannedOpeningDate, Study.actualOpeningDate, Study.plannedClosureDate, Study.cpmsId,
     Study.actualClosureDate, Study.sampleSize, Study.totalRecruitmentToDate, StudyEvaluationCategory.indicatorValue, StudyEvaluationCategory.isDeleted 
     FROM Study 
     LEFT JOIN StudyEvaluationCategory
     ON StudyEvaluationCategory.studyId = Study.id
-    WHERE Study.id = ${startingStudyId};`)
+    WHERE Study.id = ${startingStudyId};
+  `)
 
   const randomNonCommStudyIdSelected = await seDatabaseReq(`SELECT Study.id FROM Study 
     INNER JOIN StudyOrganisation
     ON Study.id = StudyOrganisation.studyId
     WHERE StudyOrganisation.organisationId = ${nonCommOrgId} AND Study.route LIKE '%Non-commercial%' AND StudyOrganisation.isDeleted = 0 AND Study.isDeleted = 0
-    ORDER BY RAND() LIMIT 1;`)
+    ORDER BY RAND() LIMIT 1;
+  `)
   nonCommStudyId = randomNonCommStudyIdSelected[0].id
 
-  nonCommStudyProgressDetails =
-    await seDatabaseReq(`SELECT studyStatus, Study.route, Study.sampleSize, Study.totalRecruitmentToDate
-    FROM Study WHERE Study.id = ${nonCommStudyId};`)
+  nonCommStudyProgressDetails = await seDatabaseReq(`
+    SELECT studyStatus, Study.route, Study.sampleSize, Study.totalRecruitmentToDate
+    FROM Study
+    WHERE Study.id = ${nonCommStudyId};
+  `)
 
   const randomCroCtuStudyIdSelected = await seDatabaseReq(`SELECT DISTINCT studyId FROM StudyOrganisation
     INNER JOIN Study ON Study.id = StudyOrganisation.studyId
@@ -51,7 +56,8 @@ test.beforeAll('Setup Tests', async () => {
     AND studyId in (SELECT DISTINCT studyId FROM StudyOrganisation 
     WHERE ((StudyOrganisation.organisationRoleId = 3 OR StudyOrganisation.organisationRoleId = 4) AND StudyOrganisation.isDeleted = 0))
     AND Study.isDeleted = 0
-    ORDER BY RAND() LIMIT 1;`)
+    ORDER BY RAND() LIMIT 1;
+  `)
   croCtuOrgRelationshipStudyId = randomCroCtuStudyIdSelected[0].studyId
 })
 
@@ -173,7 +179,19 @@ test.describe('Access Study Details Page and view Summary - @se_26', () => {
     studyDetailsPage,
   }) => {
     const nullValuesStudyDetails = await seDatabaseReq(`
-      SELECT cpmsId FROM sponsorengagement.Study where id = ${nullValuesStudyId};`)
+      SELECT cpmsId FROM sponsorengagement.Study where id = ${nullValuesStudyId};
+    `)
+    await cpmsDatabaseReq(`
+      UPDATE [NIHR.CRN.CPMS.OperationalDatabase].[dbo].[Study]
+      SET 
+        [PlannedRecruitmentStartDate] = NULL,
+        [PlannedRecruitmentEndDate] = NULL,
+        [ActualOpeningDate] = NULL,
+        [ActualClosureDate] = NULL,
+        [UkRecruitmentSampleSize] = NULL,
+        [NetworkRecruitmentSampleSize] = NULL
+      WHERE [Id] = ${nullValuesStudyDetails[0].cpmsId};  
+    `) // resets values in cpms to null
     const getStudyInCpms = await getStudyEngagementInfo(nullValuesStudyDetails[0].cpmsId)
 
     await test.step(`Given I have navigated to the Study Details Page for a Commercial Study with SE Id ${nullValuesStudyId}`, async () => {
