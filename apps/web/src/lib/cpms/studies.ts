@@ -1,5 +1,6 @@
 import assert from 'node:assert'
 
+import { logger } from '@nihr-ui/logger'
 import axios from 'axios'
 
 import type {
@@ -42,9 +43,13 @@ export const getStudyByIdFromCPMS = async (
       throw new Error('An error occured fetching study from CPMS')
     }
 
+    logger.info('Successfully retrieved study from CPMS with cpmsId: %s', studyId)
+
     return { study: data.Result }
   } catch (e) {
     const error = e instanceof Error ? e.message : String(e)
+
+    logger.error('Failed to retrieve study from CPMS with cpmsId: %s, error: %s', studyId, error)
 
     return { study: null, error }
   }
@@ -93,12 +98,15 @@ export const updateStudyInCPMS = async (
       throw new Error('An error occured updating study in CPMS')
     }
 
+    logger.info('Updated study in CPMS with cpmsId: %s', cpmsId)
+
     return {
       study: data.Result,
     }
   } catch (e) {
     const error = e instanceof Error ? e.message : String(e)
 
+    logger.error('Failed to update study in CPMS with cpmsId: %s, error: %s', cpmsId, error)
     return { study: null, error }
   }
 }
@@ -145,11 +153,15 @@ export const validateStudyUpdate = async (
       throw new Error('An error occured validating study in CPMS')
     }
 
+    logger.info('Validated study in CPMS with cpmsId: %s', cpmsId)
+
     return {
       validationResult: data.Result,
     }
   } catch (e) {
     const error = e instanceof Error ? e.message : String(e)
+
+    logger.error('Failed to update study in CPMS with cpmsId: %s, error: %s', cpmsId, error)
 
     return { validationResult: null, error }
   }

@@ -1,3 +1,4 @@
+import { logger } from '@nihr-ui/logger'
 import type { NextApiRequest } from 'next'
 import { v4 as uuid } from 'uuid'
 
@@ -22,6 +23,8 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
   try {
     const { studyId, originalValues, LSN: beforeLSN } = req.body
 
+    logger.info('Updating study started for studyId: %s', studyId)
+
     const studyDataToUpdate = studySchema.parse(req.body)
     const cpmsStudyInput = mapEditStudyInputToCPMSStudy(studyDataToUpdate)
 
@@ -33,6 +36,8 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
     if (!validationResult) {
       throw new Error(validateStudyError)
     }
+
+    logger.info('Validated study update with cpmsId: %s', studyDataToUpdate.cpmsId)
 
     // When feature flag is enabled, we use the response from the validate endpoint to determine the update type
     // Otherwise, we override this so we do not send any updates to CPMS
@@ -81,6 +86,8 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
       afterLSN
     )
 
+    logger.info('Logged study update with studyId: %s', studyId)
+
     const searchParams = new URLSearchParams({
       success: isDirectUpdate ? '3' : '2',
       ...(!isDirectUpdate ? { latestProposedUpdate: transactionId } : {}),
@@ -91,6 +98,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
     const searchParams = new URLSearchParams({ fatal: '1' })
     const studyId = req.body.studyId
 
+    logger.error('Failed to update study, error: %s', e)
     return res.redirect(302, `/studies/${studyId}/edit?${searchParams.toString()}`)
   }
 })

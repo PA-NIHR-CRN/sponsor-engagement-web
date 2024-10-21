@@ -1,3 +1,4 @@
+import { logger } from '@nihr-ui/logger'
 import { setStudyAssessmentDue } from 'shared-utilities'
 
 import type { Study, StudyEvaluationCategory } from '@/@types/studies'
@@ -372,6 +373,7 @@ export const updateStudy = async (cpmsId: number, studyData: UpdateStudyInput) =
       })
     ) as Partial<Record<OrganisationRoleShortName, string>>
 
+    logger.info(`Successfully updated study in SE with cpmsId: %s`, cpmsId)
     return {
       data: {
         ...study,
@@ -380,6 +382,9 @@ export const updateStudy = async (cpmsId: number, studyData: UpdateStudyInput) =
     }
   } catch (error) {
     const errorMessage = getErrorMessage(error)
+
+    logger.error(`Failed to update study in SE with cpmsId: %s, error: %s`, cpmsId, errorMessage)
+
     return {
       data: null,
       error: errorMessage,
@@ -434,9 +439,13 @@ export const updateEvaluationCategories = async (
       })
     }
 
+    logger.info('Successfully updated study evaluations in SE with studyId: %s', studyId)
+
     return { data: evaluationCategories, error: null }
   } catch (error) {
     const errorMessage = getErrorMessage(error)
+
+    logger.error('Failed to update study evaluations in SE with studyId: %s', studyId)
 
     return {
       data: null,
@@ -449,9 +458,17 @@ export const setStudyAssessmentDueFlag = async (studyIds: number[]) => {
   try {
     const assessmentDueResult = await setStudyAssessmentDue(studyIds)
 
+    logger.info('Successfully set assessment due for studys with Ids: %s', JSON.stringify(studyIds))
+
     return { data: assessmentDueResult.count }
   } catch (error) {
     const errorMessage = getErrorMessage(error)
+
+    logger.error(
+      'Failed to set study assessment due flag for studys with Ids: %s, error: %s',
+      JSON.stringify(studyIds),
+      errorMessage
+    )
 
     return {
       data: null,

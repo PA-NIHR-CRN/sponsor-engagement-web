@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Container } from '@nihr-ui/frontend'
+import { logger } from '@nihr-ui/logger'
 import clsx from 'clsx'
 import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
@@ -397,6 +398,8 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
       },
     }
   }
+
+  logger.info('Successfully retrieved study from SE with studyId: %s', context.query.studyId)
 
   const cpmsId = study.cpmsId
 
