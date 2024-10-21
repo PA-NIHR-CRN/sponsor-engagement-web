@@ -28,24 +28,29 @@ Then populate the variables by retrieving from the following sources:
 
 ```text
   # env             # the SE environment you wish to test (currently only supports test)
-  E2E_BASE_URL=     # (currently only supports test)
+  E2E_BASE_URL=     #
+
+  # test users
+  SPONSOR_CONTACT_USER=sesponsorcontact@test.id.nihr.ac.uk
+  SPONSOR_CONTACT_PASS=
+  SPONSOR_CONTACT_MANAGER_USER=sesponsorcontactmanager@test.id.nihr.ac.uk
+  SPONSOR_CONTACT_MANAGER_PASS=
+  CONTACT_MANAGER_USER=secontactmanager@test.id.nihr.ac.uk
+  CONTACT_MANAGER_PASS=
+  SE_NO_LOCAL_ACCOUNT_USER=senolocalaccount@test.id.nihr.ac.uk
+  SE_NO_LOCAL_ACCOUNT_PASS=
+  CPMS_NPM_USER=sim_auto_npm@test.id.nihr.ac.uk
+  CPMS_NPM_PASS=
 
   # se db           # creds can be found in https://docs.google.com/document/d/1J9I1b4hb28rd9vl34Oe7XPCeZqk8yVsyG84KJgXS6k0
   SE_TEST_DB_HOST=
+  SE_TEST_DB_USERNAME
   SE_TEST_DB_PASSWORD=
 
   # cpms db         # creds ask nihr-managed-services
   CPMS_TEST_DB_PASSWORD=
+  CPMS_TEST_DB_USERNAME
   CPMS_TEST_DB_IP=
-
-  # se test users   # creds can be found in https://docs.google.com/document/d/1J9I1b4hb28rd9vl34Oe7XPCeZqk8yVsyG84KJgXS6k0
-  SPONSOR_CONTACT_PASS=
-  SPONSOR_CONTACT_MANAGER_PASS=
-  CONTACT_MANAGER_PASS=
-  SE_NO_LOCAL_ACCOUNT_PASS=
-
-  # cpms test users # creds can be found in https://docs.google.com/spreadsheets/d/1cNsHznOMg9DDkFJnrHUbgK2EoGFys9Hwy5c9n1rO0I4
-  CPMS_NPM_PASS=
 
   # api
   SE_TEST_API_URL=  # creds can be found in https://eu-west-2.console.aws.amazon.com/secretsmanager/secret?name=crnccd-secret-test-se-app-config&region=eu-west-2
