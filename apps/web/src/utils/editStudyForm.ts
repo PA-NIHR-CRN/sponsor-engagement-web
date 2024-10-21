@@ -8,8 +8,12 @@ import type { EditStudyProps } from '@/pages/studies/[studyId]/edit'
 
 import { areAllDatePartsEmpty, constructDatePartsFromDate, getDaysInMonth } from './date'
 import { type DateFieldName, type EditStudy, type EditStudyInputs } from './schemas'
+import type { Optional } from './typeUtils'
 
-export const mapStudyToStudyFormInput = (study: EditStudyProps['study'], LSN?: string): EditStudyInputs => ({
+export const mapStudyToStudyFormInput = (
+  study: EditStudyProps['study'],
+  LSN?: string
+): Optional<EditStudyInputs, 'recruitmentTarget'> => ({
   studyId: study.id.toString(),
   LSN,
   status: study.studyStatus,
@@ -263,11 +267,7 @@ export const validateAllDates = (ctx: z.RefinementCtx, values: EditStudy) => {
 }
 
 export const transformEditStudyBody = (body: EditStudy & Partial<DateFieldWithParts>) => {
-  const data: EditStudyInputs = {
-    studyId: body.studyId,
-    cpmsId: body.cpmsId,
-    status: body.status,
-  }
+  const data = {}
 
   Object.entries(body).forEach(([key, value]) => {
     const parts = key.split('-')

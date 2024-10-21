@@ -25,8 +25,8 @@ export const studySchema = z
     actualClosureDate: dateSchema,
     estimatedReopeningDate: dateSchema,
     recruitmentTarget: z
-      .string({ invalid_type_error: 'Enter a valid UK target' })
-      .optional()
+      .string()
+      .min(1, 'UK target is a mandatory field')
       .refine(
         (value) =>
           !(Number(value) < 0 || Number.isNaN(Number(value)) || Number(value) > UK_RECRUITMENT_TARGET_MAX_VALUE),
