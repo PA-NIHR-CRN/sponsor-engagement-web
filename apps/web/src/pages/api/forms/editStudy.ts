@@ -98,6 +98,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
     const searchParams = new URLSearchParams({ fatal: '1' })
     const studyId = req.body.studyId
 
+    logger.error('Failed to update study, error: %s', e)
     return res.redirect(302, `/studies/${studyId}/edit?${searchParams.toString()}`)
   }
 })
