@@ -44,7 +44,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
 
   try {
     // When JS is disabled, the nested date fields are returned as single attributes so this function converts them back into an object to match the schema
-    // i.e. plannedOpeningDate-day rather than a object with the key day
+    // i.e. plannedOpeningDate-day rather than a object with the key 'day'
     const transformedData = transformEditStudyBody(req.body)
 
     const { studyId, originalValues, LSN: beforeLSN } = req.body
@@ -129,7 +129,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
 
       // Insert the original values
       Object.keys(studySchemaShape).forEach((field) => {
-        if ((editStudyDateFields as string[]).includes(field) && Boolean(transformedData[field])) {
+        if ((editStudyDateFields as string[]).includes(field) && transformedData[field]) {
           const dateFields = ['day', 'month', 'year']
 
           dateFields.forEach((dateField) => {

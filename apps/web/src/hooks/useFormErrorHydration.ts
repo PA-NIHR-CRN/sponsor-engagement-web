@@ -35,7 +35,7 @@ export function useFormErrorHydration<T extends Record<string, unknown>>({
       Object.keys(formState.defaultValues).forEach((field) => {
         const value = formState.defaultValues?.[field]
 
-        if (value !== undefined && typeof value === 'object') {
+        if (typeof value === 'object') {
           Object.keys(value as object).forEach((nestedField) => {
             if (router.query[`${field}-${nestedField}Error`]) {
               onFoundError(`${field}-${nestedField}` as Path<T>, {

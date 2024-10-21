@@ -157,9 +157,7 @@ describe('EditStudy', () => {
             organisationsByRole,
           },
           currentLSN: mockLSN,
-          query: {
-            ...mockQuery,
-          },
+          query: mockQuery,
         },
       })
 
@@ -181,9 +179,7 @@ describe('EditStudy', () => {
         props: {
           user: userWithSponsorContactRole.user,
           study: { ...mockStudyWithRelations, organisationsByRole },
-          query: {
-            ...mockQuery,
-          },
+          query: mockQuery,
         },
       })
 
@@ -208,9 +204,7 @@ describe('EditStudy', () => {
             ...mockStudyWithRelations,
             organisationsByRole,
           },
-          query: {
-            ...mockQuery,
-          },
+          query: mockQuery,
         },
       })
 
@@ -238,9 +232,7 @@ describe('EditStudy', () => {
             organisationsByRole,
           },
           currentLSN: mockLSN,
-          query: {
-            ...mockQuery,
-          },
+          query: mockQuery,
         },
       })
 
@@ -270,9 +262,7 @@ describe('EditStudy', () => {
             organisationsByRole,
           },
           currentLSN: mockLSN,
-          query: {
-            ...mockQuery,
-          },
+          query: mockQuery,
         },
       })
 
@@ -304,9 +294,7 @@ describe('EditStudy', () => {
             isDueAssessment: true,
           },
           currentLSN: mockLSN,
-          query: {
-            ...mockQuery,
-          },
+          query: mockQuery,
         },
       })
 
