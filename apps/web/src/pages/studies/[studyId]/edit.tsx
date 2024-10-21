@@ -103,7 +103,7 @@ export default function EditStudy({ study, currentLSN }: EditStudyProps) {
   const showLoadingState = formState.isSubmitting || formState.isSubmitSuccessful
 
   useEffect(() => {
-    if (Object.values(errors).length > 0) {
+    if (Object.keys(errors).length > 0) {
       window.scrollTo({
         top: 0,
         behavior: 'smooth',
