@@ -1,9 +1,9 @@
 import mysql, { PoolOptions } from 'mysql2'
 import sql from 'mssql'
 
-// this was refactored to use a connection pools for automatic reconnection and scalability as the original db connection was flaky
+// this was refactored to use a connection pool for automatic reconnection and scalability as the original db connection was flaky
 // this should ensure that the db connection is available throughout the entirety of the test execution without being prematurely closed.
-// this also adds a dedicated pool for both se and cpms connections.
+// this also adds a dedicated pool for both se and cpms db connections.
 
 // se env variables and checks
 const seServer =

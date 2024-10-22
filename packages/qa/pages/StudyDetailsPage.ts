@@ -804,8 +804,6 @@ export default class StudyDetailsPage {
           )
         }
         break
-      // case 'estimatedReopening':
-      //   break
       case 'ukTarget':
         if (added == true) {
           await expect(this.proposedChangeUkTarget).toContainText(`UK recruitment target ${newValue} added`)
