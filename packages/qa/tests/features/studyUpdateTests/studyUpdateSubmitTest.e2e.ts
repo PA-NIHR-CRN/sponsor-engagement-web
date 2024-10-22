@@ -3,6 +3,9 @@ import { test, expect } from '../../../hooks/CustomFixtures'
 import { cpmsDatabaseReq, seDatabaseReq, waitForSeDbRequest } from '../../../utils/DbRequests'
 import { convertIsoDateToDisplayDateV2, splitIsoDate } from '../../../utils/UtilFunctions'
 
+// NOTE: the tests below do a lot pretty quickly and can sometimes run into merge conflicts
+// between se & cpms when updating. The use of retries in ci and locally seems to resolve this nicely.
+
 const testUserId = 6
 const startingOrgId = 9
 const user = 'sesponsorcontact@test.id.nihr.ac.uk'
@@ -42,10 +45,7 @@ test.beforeAll('Setup Tests', async () => {
 test.describe('Update study and save changes locally in SE @se_184 @se_168', () => {
   test.use({ storageState: '.auth/sponsorContact.json' })
 
-  test('As a sponsor contact I can make proposed changes to the study data (added history) @se_184_proposed @se_168_added', async ({
-    studyUpdatePage,
-    studyDetailsPage,
-  }) => {
+  test.beforeEach('Setup Tests', async () => {
     const randomStudyIdSelected = await seDatabaseReq(`
       SELECT Study.id FROM Study 
         INNER JOIN StudyOrganisation ON Study.id = StudyOrganisation.studyId
@@ -57,6 +57,12 @@ test.describe('Update study and save changes locally in SE @se_184 @se_168', () 
     studyCoreDetails = await seDatabaseReq(
       `SELECT cpmsId, route FROM sponsorengagement.Study where id = ${startingStudyId};`
     )
+  })
+
+  test('As a sponsor contact I can make proposed changes to the study data (added history) @se_184_proposed @se_168_added', async ({
+    studyUpdatePage,
+    studyDetailsPage,
+  }) => {
     await cpmsDatabaseReq(`
       UPDATE [NIHR.CRN.CPMS.OperationalDatabase].[dbo].[StudyStatusAudit]
       SET 
@@ -145,17 +151,6 @@ test.describe('Update study and save changes locally in SE @se_184 @se_168', () 
     studyUpdatePage,
     studyDetailsPage,
   }) => {
-    const randomStudyIdSelected = await seDatabaseReq(`
-      SELECT Study.id FROM Study 
-        INNER JOIN StudyOrganisation ON Study.id = StudyOrganisation.studyId
-        WHERE StudyOrganisation.organisationId = ${startingOrgId} AND StudyOrganisation.isDeleted = 0 AND Study.isDeleted = 0
-        AND Study.studyStatus = 'In Setup, Pending Approval'
-      ORDER BY RAND() LIMIT 1;
-    `)
-    startingStudyId = randomStudyIdSelected[0].id
-    studyCoreDetails = await seDatabaseReq(
-      `SELECT cpmsId, route FROM sponsorengagement.Study where id = ${startingStudyId};`
-    )
     await cpmsDatabaseReq(`
       UPDATE [NIHR.CRN.CPMS.OperationalDatabase].[dbo].[StudyStatusAudit]
       SET 
@@ -244,17 +239,6 @@ test.describe('Update study and save changes locally in SE @se_184 @se_168', () 
     studyUpdatePage,
     studyDetailsPage,
   }) => {
-    const randomStudyIdSelected = await seDatabaseReq(`
-      SELECT Study.id FROM Study 
-        INNER JOIN StudyOrganisation ON Study.id = StudyOrganisation.studyId
-        WHERE StudyOrganisation.organisationId = ${startingOrgId} AND StudyOrganisation.isDeleted = 0 AND Study.isDeleted = 0
-        AND Study.studyStatus = 'In Setup, Pending Approval'
-      ORDER BY RAND() LIMIT 1;
-    `)
-    startingStudyId = randomStudyIdSelected[0].id
-    studyCoreDetails = await seDatabaseReq(
-      `SELECT cpmsId, route FROM sponsorengagement.Study where id = ${startingStudyId};`
-    )
     await cpmsDatabaseReq(`
       UPDATE [NIHR.CRN.CPMS.OperationalDatabase].[dbo].[StudyStatusAudit]
       SET 
@@ -274,10 +258,10 @@ test.describe('Update study and save changes locally in SE @se_184 @se_168', () 
         [UkRecruitmentSampleSize] = NULL,
         [NetworkRecruitmentSampleSize] = NULL
       WHERE [Id] = ${studyCoreDetails[0].cpmsId};  
-    `)
+    `) // resets values in cpms to null
     await seDatabaseReq(`
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
-    `)
+    `) // resets study updates in se
 
     await test.step(`Given I have navigated to the Update study data page for the Study with SE Id ${startingStudyId}`, async () => {
       await studyUpdatePage.goto(startingStudyId.toString())
@@ -336,17 +320,6 @@ test.describe('Update study and save changes locally in SE @se_184 @se_168', () 
     studyUpdatePage,
     studyDetailsPage,
   }) => {
-    const randomStudyIdSelected = await seDatabaseReq(`
-      SELECT Study.id FROM Study 
-        INNER JOIN StudyOrganisation ON Study.id = StudyOrganisation.studyId
-        WHERE StudyOrganisation.organisationId = ${startingOrgId} AND StudyOrganisation.isDeleted = 0 AND Study.isDeleted = 0
-        AND Study.studyStatus = 'In Setup, Pending Approval'
-      ORDER BY RAND() LIMIT 1;
-    `)
-    startingStudyId = randomStudyIdSelected[0].id
-    studyCoreDetails = await seDatabaseReq(
-      `SELECT cpmsId, route FROM sponsorengagement.Study where id = ${startingStudyId};`
-    )
     await cpmsDatabaseReq(`
       UPDATE [NIHR.CRN.CPMS.OperationalDatabase].[dbo].[StudyStatusAudit]
       SET 
@@ -366,10 +339,10 @@ test.describe('Update study and save changes locally in SE @se_184 @se_168', () 
         [UkRecruitmentSampleSize] = '${oldTarget}',
         [NetworkRecruitmentSampleSize] = '${oldTarget}'
       WHERE [Id] = ${studyCoreDetails[0].cpmsId};  
-    `)
+    `) // sets up test data with previous values
     await seDatabaseReq(`
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
-    `)
+    `) // resets study updates in se
 
     await test.step(`Given I have navigated to the Update study data page for the Study with SE Id ${startingStudyId}`, async () => {
       await studyUpdatePage.goto(startingStudyId.toString())

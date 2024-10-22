@@ -1,6 +1,6 @@
 # Sponsor Engagement E2E Tests
 
-Written in Typescript, using Playwright with page object model & test steps.
+Written in Typescript with Playwright using page object model & test steps.
 
 Playwright [Documentation](https://playwright.dev/docs/intro)
 
@@ -28,9 +28,9 @@ Then populate the variables by retrieving from the following sources:
 
 ```text
   # env             # the SE environment you wish to test (currently only supports test)
-  E2E_BASE_URL=     #
+  E2E_BASE_URL=https://test.assessmystudy.nihr.ac.uk/
 
-  # test users
+  # test users      # creds can be found in https://docs.google.com/document/d/1J9I1b4hb28rd9vl34Oe7XPCeZqk8yVsyG84KJgXS6k0
   SPONSOR_CONTACT_USER=sesponsorcontact@test.id.nihr.ac.uk
   SPONSOR_CONTACT_PASS=
   SPONSOR_CONTACT_MANAGER_USER=sesponsorcontactmanager@test.id.nihr.ac.uk
@@ -85,7 +85,7 @@ If the above has been completed then simply run:
 
 - `npx playwright test --project=seDefault` - runs all tests and print results to the console.
 
-**Note:** alternatively you can run `npm run test`
+**Note:** alternatively you can run `npm test`
 
 ## Execute test locally (advanced)
 
@@ -95,9 +95,13 @@ To run tests using tags:
 
 - Run all tests with a given tag, then run:
   `npx playwright test --project=seDefault --grep <tag name>` - example: `npx playwright test --project=seDefault --grep @se_123_ac1`
+  or
+  `npm test -- --grep <tag name>`
 
 - Run all tests without a given tag, then run:
   `npx playwright test --project=seDefault --grep-invert <tag name>` - example: `npx playwright test --project=seDefault --grep-invert @wip`
+  or
+  `npm test -- --grep-invert <tag name>`
 
 **Note:** you can tag the individual `test()` or the `test.describe()`
 
