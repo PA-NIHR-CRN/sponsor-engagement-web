@@ -140,7 +140,6 @@ describe('Study', () => {
     process.env.CPMS_API_USERNAME = mockedEnvVars.apiUsername
     process.env.CPMS_API_PASSWORD = mockedEnvVars.apiPassword
     process.env.ASSESSMENT_LAPSE_MONTHS = mockedEnvVars.assessmentLapseMonths
-    process.env.NEXT_PUBLIC_ENABLE_EDIT_HISTORY_FEATURE = 'true'
   })
 
   afterAll(() => {
