@@ -227,7 +227,7 @@ Sign-in [http://localhost:3000/auth/signin]
 
 Hello,
 
-You are a nominated contact for Mocked org name for studies on the NIHR Research Delivery Network’s (RDN) research portfolio. One
+You are a nominated contact for Mocked org name,Mocked second org name for studies on the NIHR Research Delivery Network’s (RDN) research portfolio. One
 or more studies require an update. Please sign in to the Sponsor Engagement Tool to provide these updates.
 
 As a nominated contact for your organisation, you will see all studies linked to your organisation. The Sponsor Engagement Tool
@@ -367,6 +367,8 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
         <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>
         to add a new contact.
       </p>
+
+      <hr />
 
       <p>
         This email is not monitored, do not reply. If you’re not sure why you’ve received this email or need to be
