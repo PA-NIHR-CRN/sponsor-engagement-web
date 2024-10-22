@@ -1,6 +1,6 @@
 import emailTemplates from '.'
 
-const templates = emailTemplates as Record<string, (data: Record<string, string>) => string>
+const templates = emailTemplates as Record<string, (data: Record<string, string | string[]>) => string>
 
 const templateKeys = Object.keys(emailTemplates)
 
@@ -14,6 +14,7 @@ test.each(templateKeys)('Email template %p displays correctly', (key) => {
       signInLink: 'http://localhost:3000/auth/signin',
       termsAndConditionsLink: 'http://terms-conditions-link',
       organisationName: 'Mocked org name',
+      organisationNames: ['Mocked org name', 'Mocked second org name'],
     })
   ).toMatchSnapshot()
 })

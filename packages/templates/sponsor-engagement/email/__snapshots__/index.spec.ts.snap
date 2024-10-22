@@ -17,6 +17,8 @@ exports[`Email template "assessment-reminder.html.hbs" displays correctly 1`] = 
       <p>You are a nominated contact for studies on the NIHR Research Delivery Network’s (RDN) research portfolio for:
         <br />
         <ul>
+            <li>Mocked org name</li>
+            <li>Mocked second org name</li>
         </ul>
       </p>
 
