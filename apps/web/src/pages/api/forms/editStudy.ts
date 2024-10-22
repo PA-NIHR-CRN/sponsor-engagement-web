@@ -8,8 +8,9 @@ import type { DateInputValue } from '@/components/atoms/Form/DateInput/types'
 import { Roles } from '@/constants'
 import { UPDATE_FROM_SE_TEXT } from '@/constants/forms'
 import { mapEditStudyInputToCPMSStudy, updateStudyInCPMS, validateStudyUpdate } from '@/lib/cpms/studies'
+import { mapCPMSStatusToFormStatus } from '@/lib/studies'
 import { logStudyUpdate } from '@/lib/studyUpdates'
-import { editStudyDateFields, transformEditStudyBody } from '@/utils/editStudyForm'
+import { editStudyDateFields, getVisibleFormFields, transformEditStudyBody } from '@/utils/editStudyForm'
 import type { EditStudy } from '@/utils/schemas'
 import { studySchema, studySchemaShape } from '@/utils/schemas'
 import { withApiHandler } from '@/utils/withApiHandler'
@@ -57,11 +58,25 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
     // i.e. plannedOpeningDate-day rather than a object with the key 'day'
     const transformedData = transformEditStudyBody({ ...req.body, originalValues })
 
-    const studyDataToUpdate = studySchema.parse(transformedData)
+    const studyData = studySchema.parse(transformedData)
+
+    // Ensure that only date fields allowed for the status are modified, otherwise, use the original value
+    const [visibleDateFields] = getVisibleFormFields(
+      mapCPMSStatusToFormStatus(studyData.originalValues?.status ?? ''),
+      mapCPMSStatusToFormStatus(studyData.status)
+    )
+
+    const studyDataToUpdate = structuredClone(studyData)
+    editStudyDateFields.forEach((dateField) => {
+      if (!visibleDateFields.includes(dateField)) {
+        studyDataToUpdate[dateField] = originalValues?.[dateField]
+      }
+    })
+
     const cpmsStudyInput = mapEditStudyInputToCPMSStudy(studyDataToUpdate)
 
     const { validationResult, error: validateStudyError } = await validateStudyUpdate(
-      Number(studyDataToUpdate.cpmsId),
+      Number(studyData.cpmsId),
       cpmsStudyInput
     )
 

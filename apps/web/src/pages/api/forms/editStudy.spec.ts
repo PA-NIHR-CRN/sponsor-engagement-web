@@ -105,7 +105,7 @@ const body: ExtendedNextApiRequest['body'] = {
       year: '2003',
     },
     actualClosureDate: {
-      day: '27',
+      day: '28',
       month: '02',
       year: '2003',
     },
@@ -148,7 +148,7 @@ const getMockStudyUpdateInput = (isDirect: boolean, isAfterState: boolean) => {
       : new Date('2004-02-27T00:00:00.000').toISOString(),
     actualClosureToRecruitmentDate: isAfterState
       ? new Date(mockCPMSUpdateInput.ActualClosureToRecruitmentDate as string).toISOString()
-      : new Date('2003-02-27T00:00:00.000').toISOString(),
+      : new Date('2003-02-28T00:00:00.000').toISOString(),
     estimatedReopeningDate: isAfterState
       ? new Date(mockCPMSUpdateInput.EstimatedReopeningDate).toISOString()
       : new Date('2021-02-27T00:00:00.000').toISOString(),
