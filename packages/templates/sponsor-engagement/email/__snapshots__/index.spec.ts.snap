@@ -297,8 +297,9 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
 
       <p>
         The DHSC have published the
-        <a href='http://terms-conditions-link'>Terms and Conditions for NIHR RDN support</a>which outlines the
-        requirements for Sponsors to provide up-to-date study data and assessments of progress to the RDN.
+        <a href='http://terms-conditions-link'>Terms and Conditions for NIHR RDN support</a>
+        which outlines the requirements for Sponsors to provide up-to-date study data and assessments of progress to the
+        RDN.
       </p>
 
       <p>
@@ -306,15 +307,6 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
         outlined in the T&Cs. Sponsors and their delegates should use the Sponsor Engagement Tool to review the data the
         RDN holds on your organisations portfolio of studies and to provide study data updates and assessments to ensure
         the data held by the RDN is complete and up-to-date.
-      </p>
-
-      <p>
-        Please sign in to the Sponsor Engagement Tool to provide updates on studies.
-      </p>
-      
-      <p>
-        NIHR RDN asks Sponsors or their delegates to review these studies and provide regular assessments of how the
-        study is progressing.
       </p>
 
       <p>
@@ -349,20 +341,20 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
       <p>Sponsors or their delegates are asked to review and assess the progress of studies when:</p>
 
       <ul>
-        <li>A study falls behind the agreed milestones or</li>
-        <li>A study is not recruiting to target</li>
-        <li>And the last progress assessment is over three months old</li>
+        <li>A study falls behind a planned milestone or</li>
+        <li> A study appears to not be recruiting to target</li>
+        <li> And the last study assessment is over three months old</li>
       </ul>
 
       <p>
         Sponsors or their delegates can request
         <a href='http://localhost:3000/request-support'>NIHR RDN support</a>
-        with their research study at any time.
+        with study delivery and performance at any time.
       </p>
 
       <p>
         <strong>
-          Please note that providing regular study assessments is a requirement of the
+          Please note that providing regular study data updates and assessments are requirements of the
           <a href='http://terms-conditions-link'>Terms and Conditions for NIHR RDN support</a>. Failure to do so may
           result in removal from the NIHR RDN Portfolio.
         </strong>
@@ -510,7 +502,7 @@ Sponsors or their delegates are asked to review and assess the progress of studi
 - A study appears to not be recruiting to target
 - And the last study assessment is over three months old
 
-Sponsors or their delegates can request NIHR RDN support with their research study at any time. (http://localhost:3000/request-support)
+Sponsors or their delegates can request NIHR RDN support with study delivery and performance at any time. (http://localhost:3000/request-support)
 
 Please note that providing regular study data updates and assessments are requirements of the Terms and Conditions for NIHR RDN support. 
 Failure to do so may result in removal from the NIHR RDN Portfolio.(http://terms-conditions-link)

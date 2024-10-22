@@ -334,7 +334,7 @@ templates['contact-assigned.html.hbs'] = handlebars.template({
             })
           : helper)
       ) +
-      "'>Terms and Conditions for NIHR RDN support</a>which outlines the\n        requirements for Sponsors to provide up-to-date study data and assessments of progress to the RDN.\n      </p>\n\n      <p>\n        The Sponsor Engagement Tool has been designed to support Sponsors and their delegates to meet the requirements\n        outlined in the T&Cs. Sponsors and their delegates should use the Sponsor Engagement Tool to review the data the\n        RDN holds on your organisations portfolio of studies and to provide study data updates and assessments to ensure\n        the data held by the RDN is complete and up-to-date.\n      </p>\n\n      <p>\n        Please sign in to the Sponsor Engagement Tool to provide updates on studies.\n      </p>\n      \n      <p>\n        NIHR RDN asks Sponsors or their delegates to review these studies and provide regular assessments of how the\n        study is progressing.\n      </p>\n\n      <p>\n        Please sign in to the Sponsor Engagement Tool to provide updates on studies.\n      </p>\n\n      <a\n        href='" +
+      "'>Terms and Conditions for NIHR RDN support</a>\n        which outlines the requirements for Sponsors to provide up-to-date study data and assessments of progress to the\n        RDN.\n      </p>\n\n      <p>\n        The Sponsor Engagement Tool has been designed to support Sponsors and their delegates to meet the requirements\n        outlined in the T&Cs. Sponsors and their delegates should use the Sponsor Engagement Tool to review the data the\n        RDN holds on your organisations portfolio of studies and to provide study data updates and assessments to ensure\n        the data held by the RDN is complete and up-to-date.\n      </p>\n\n      <p>\n        Please sign in to the Sponsor Engagement Tool to provide updates on studies.\n      </p>\n\n      <a\n        href='" +
       alias4(
         ((helper =
           (helper =
@@ -347,11 +347,11 @@ templates['contact-assigned.html.hbs'] = handlebars.template({
               name: 'signInLink',
               hash: {},
               data: data,
-              loc: { start: { line: 55, column: 14 }, end: { line: 55, column: 28 } },
+              loc: { start: { line: 47, column: 14 }, end: { line: 47, column: 28 } },
             })
           : helper)
       ) +
-      "'\n        style='\n          box-sizing: border-box;\n          display: inline-block;\n          position: relative;\n          margin-top: 0;\n          margin-right: 0;\n          margin-left: 0;\n          margin-bottom: 22px;\n          padding: 8px 10px 7px;\n          border: 2px solid rgba(0, 0, 0, 0);\n          border-radius: 0;\n          color: #fff;\n          background-color: #00703c;\n          box-shadow: 0 2px 0 #002d18;\n          text-align: center;\n          vertical-align: top;\n          cursor: pointer;\n          -webkit-appearance: none;\n        '\n      >Sign in to assess studies</a>\n\n      <h2>Why am I being asked to assess studies?</h2>\n\n      <p>Sponsors or their delegates are asked to review and assess the progress of studies when:</p>\n\n      <ul>\n        <li>A study falls behind the agreed milestones or</li>\n        <li>A study is not recruiting to target</li>\n        <li>And the last progress assessment is over three months old</li>\n      </ul>\n\n      <p>\n        Sponsors or their delegates can request\n        <a href='" +
+      "'\n        style='\n          box-sizing: border-box;\n          display: inline-block;\n          position: relative;\n          margin-top: 0;\n          margin-right: 0;\n          margin-left: 0;\n          margin-bottom: 22px;\n          padding: 8px 10px 7px;\n          border: 2px solid rgba(0, 0, 0, 0);\n          border-radius: 0;\n          color: #fff;\n          background-color: #00703c;\n          box-shadow: 0 2px 0 #002d18;\n          text-align: center;\n          vertical-align: top;\n          cursor: pointer;\n          -webkit-appearance: none;\n        '\n      >Sign in to assess studies</a>\n\n      <h2>Why am I being asked to assess studies?</h2>\n\n      <p>Sponsors or their delegates are asked to review and assess the progress of studies when:</p>\n\n      <ul>\n        <li>A study falls behind a planned milestone or</li>\n        <li> A study appears to not be recruiting to target</li>\n        <li> And the last study assessment is over three months old</li>\n      </ul>\n\n      <p>\n        Sponsors or their delegates can request\n        <a href='" +
       alias4(
         ((helper =
           (helper =
@@ -364,11 +364,11 @@ templates['contact-assigned.html.hbs'] = handlebars.template({
               name: 'requestSupportLink',
               hash: {},
               data: data,
-              loc: { start: { line: 89, column: 17 }, end: { line: 89, column: 39 } },
+              loc: { start: { line: 81, column: 17 }, end: { line: 81, column: 39 } },
             })
           : helper)
       ) +
-      "'>NIHR RDN support</a>\n        with their research study at any time.\n      </p>\n\n      <p>\n        <strong>\n          Please note that providing regular study assessments is a requirement of the\n          <a href='" +
+      "'>NIHR RDN support</a>\n        with study delivery and performance at any time.\n      </p>\n\n      <p>\n        <strong>\n          Please note that providing regular study data updates and assessments are requirements of the\n          <a href='" +
       alias4(
         ((helper =
           (helper =
@@ -381,7 +381,7 @@ templates['contact-assigned.html.hbs'] = handlebars.template({
               name: 'termsAndConditionsLink',
               hash: {},
               data: data,
-              loc: { start: { line: 96, column: 19 }, end: { line: 96, column: 45 } },
+              loc: { start: { line: 88, column: 19 }, end: { line: 88, column: 45 } },
             })
           : helper)
       ) +
@@ -459,7 +459,7 @@ templates['contact-assigned.text.hbs'] = handlebars.template({
             })
           : helper)
       ) +
-      ')\n\n# Why am I being asked to assess studies?\n\nSponsors or their delegates are asked to review and assess the progress of studies when:\n\n- A study falls behind a planned milestone or\n- A study appears to not be recruiting to target\n- And the last study assessment is over three months old\n\nSponsors or their delegates can request NIHR RDN support with their research study at any time. (' +
+      ')\n\n# Why am I being asked to assess studies?\n\nSponsors or their delegates are asked to review and assess the progress of studies when:\n\n- A study falls behind a planned milestone or\n- A study appears to not be recruiting to target\n- And the last study assessment is over three months old\n\nSponsors or their delegates can request NIHR RDN support with study delivery and performance at any time. (' +
       alias4(
         ((helper =
           (helper =
@@ -472,7 +472,7 @@ templates['contact-assigned.text.hbs'] = handlebars.template({
               name: 'requestSupportLink',
               hash: {},
               data: data,
-              loc: { start: { line: 27, column: 97 }, end: { line: 27, column: 119 } },
+              loc: { start: { line: 27, column: 107 }, end: { line: 27, column: 129 } },
             })
           : helper)
       ) +

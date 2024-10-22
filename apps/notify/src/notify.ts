@@ -133,7 +133,6 @@ const sendNotifications = async () => {
       signInLink: getAbsoluteUrl(SIGN_IN_PAGE),
       requestSupportLink: getAbsoluteUrl(SUPPORT_PAGE),
       iconUrl: getAbsoluteUrl('/assets/images/exclamation-icon.png'),
-      // organisationName: organisations.map((organisation) => organisation.organisation.name).join('\t\r\n'),
       organisationNames: organisations.map((organisation) => organisation.organisation.name),
     },
   }))
