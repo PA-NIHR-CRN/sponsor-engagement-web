@@ -12,10 +12,17 @@
 
       <p>Hello,</p>
 
-      <p>You are a nominated contact for:
-        <span style='text-transform: capitalize'>{{organisationName}}</span>, 
-        for studies on the NIHR Research Delivery Network’s (RDN) research portfolio. One or more studies require an
-        update. Please sign in to the Sponsor Engagement Tool to provide these updates.
+      <p>You are a nominated contact for studies on the NIHR Research Delivery Network’s (RDN) research portfolio for:
+        <br />
+        <ul>
+          {{#each organisationNames}}
+            <li>{{this}}</li>
+          {{/each}}
+        </ul>
+      </p>
+
+      <p>
+        One or more studies require an update. Please sign in to the Sponsor Engagement Tool to provide these updates.
       </p>
 
       <p>As a nominated contact for your organisation, you will see all studies linked to your organisation. The Sponsor
@@ -59,8 +66,10 @@
         delegates on behalf of the Department of Health and Social Care (DHSC).
       </p>
 
-      <p>The DHSC have published the <a href='{{termsAndConditionsLink}}'>Terms and Conditions for NIHR RDN support</a> which
-        outlines the requirements for Sponsors to provide up-to-date study data and assessments of progress to the RDN.
+      <p>The DHSC have published the
+        <a href='{{termsAndConditionsLink}}'>Terms and Conditions for NIHR RDN support</a>
+        which outlines the requirements for Sponsors to provide up-to-date study data and assessments of progress to the
+        RDN.
       </p>
 
       <p>The Sponsor Engagement Tool has been designed to support Sponsors and their delegates to meet the requirements
