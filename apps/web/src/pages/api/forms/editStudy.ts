@@ -16,9 +16,9 @@ export interface ExtendedNextApiRequest extends NextApiRequest {
 }
 
 export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, async (req, res, session) => {
-  const { ENABLE_DIRECT_STUDY_UPDATES } = process.env
+  const { DISABLE_DIRECT_STUDY_UPDATES } = process.env
 
-  const enableDirectStudyUpdatesFeature = ENABLE_DIRECT_STUDY_UPDATES?.toLowerCase() === 'true'
+  const enableDirectStudyUpdatesFeature = DISABLE_DIRECT_STUDY_UPDATES?.toLowerCase() === 'false'
 
   try {
     const { studyId, originalValues, LSN: beforeLSN } = req.body
