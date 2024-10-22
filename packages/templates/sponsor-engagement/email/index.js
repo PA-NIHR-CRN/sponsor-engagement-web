@@ -34,7 +34,24 @@ templates['assessment-reminder.html.hbs'] = handlebars.template({
             })
           : helper)
       ) +
-      "' style='display:block; width: 35px; height: 35px;' />\n        <span style='margin-left: 10px; margin-top: 3px;'>There are one or more studies to assess</span>\n      </p>\n\n      <p>Hello,</p>\n\n      <p>You are nominated as a Sponsor contact for studies on the NIHR Research Delivery Network’s (RDN) research\n        portfolio. One or more studies require an update on their status. Please sign in to the Sponsor Engagement Tool\n        to provide these updates.</p>\n\n      <p>As a nominated contact for your organisation, you will see all studies linked to your organisation. The Sponsor\n        Engagement Tool does not associate contacts to specific studies or groups of studies, only to the organisation.</p>\n\n      <a\n        href='" +
+      "' style='display:block; width: 35px; height: 35px;' />\n        <span style='margin-left: 10px; margin-top: 3px;'>There are one or more studies to assess</span>\n      </p>\n\n      <p>Hello,</p>\n\n      <p>You are a nominated contact for:\n        <span style='text-transform: capitalize'>" +
+      alias4(
+        ((helper =
+          (helper =
+            lookupProperty(helpers, 'organisationName') ||
+            (depth0 != null ? lookupProperty(depth0, 'organisationName') : depth0)) != null
+            ? helper
+            : alias2),
+        typeof helper === alias3
+          ? helper.call(alias1, {
+              name: 'organisationName',
+              hash: {},
+              data: data,
+              loc: { start: { line: 16, column: 49 }, end: { line: 16, column: 69 } },
+            })
+          : helper)
+      ) +
+      "</span>, \n        for studies on the NIHR Research Delivery Network’s (RDN) research portfolio. One or more studies require an\n        update. Please sign in to the Sponsor Engagement Tool to provide these updates.\n      </p>\n\n      <p>As a nominated contact for your organisation, you will see all studies linked to your organisation. The Sponsor\n        Engagement Tool does not associate contacts to specific studies or groups of studies, only to the organisation.\n      </p>\n\n      <a\n        href='" +
       alias4(
         ((helper =
           (helper =
@@ -47,11 +64,11 @@ templates['assessment-reminder.html.hbs'] = handlebars.template({
               name: 'signInLink',
               hash: {},
               data: data,
-              loc: { start: { line: 23, column: 14 }, end: { line: 23, column: 28 } },
+              loc: { start: { line: 26, column: 14 }, end: { line: 26, column: 28 } },
             })
           : helper)
       ) +
-      "'\n        style='\n          box-sizing: border-box;\n          display: inline-block;\n          position: relative;\n          margin-top: 0;\n          margin-right: 0;\n          margin-left: 0;\n          margin-bottom: 22px;\n          padding: 8px 10px 7px;\n          border: 2px solid rgba(0, 0, 0, 0);\n          border-radius: 0;\n          color: #fff;\n          background-color: #00703c;\n          box-shadow: 0 2px 0 #002d18;\n          text-align: center;\n          vertical-align: top;\n          cursor: pointer;\n          -webkit-appearance: none;\n        '\n      >Sign in to assess studies</a>\n\n      <h2>Why am I being asked to assess studies?</h2>\n\n      <p>\n        The\n        <a href='" +
+      "'\n        style='\n          box-sizing: border-box;\n          display: inline-block;\n          position: relative;\n          margin-top: 0;\n          margin-right: 0;\n          margin-left: 0;\n          margin-bottom: 22px;\n          padding: 8px 10px 7px;\n          border: 2px solid rgba(47, 13, 13, 0);\n          border-radius: 0;\n          color: #fff;\n          background-color: #00703c;\n          box-shadow: 0 2px 0 #002d18;\n          text-align: center;\n          vertical-align: top;\n          cursor: pointer;\n          -webkit-appearance: none;\n        '\n      >Sign in to assess studies</a>\n\n      <h2>Why am I being asked to assess studies?</h2>\n\n      <p>\n        The\n        <a href='" +
       alias4(
         ((helper =
           (helper =
@@ -63,28 +80,11 @@ templates['assessment-reminder.html.hbs'] = handlebars.template({
               name: 'rdnLink',
               hash: {},
               data: data,
-              loc: { start: { line: 49, column: 17 }, end: { line: 49, column: 28 } },
+              loc: { start: { line: 52, column: 17 }, end: { line: 52, column: 28 } },
             })
           : helper)
       ) +
-      "'>NIHR RDN</a>\n        supports Sponsors and their delegates to deliver high-quality research, for the benefit of patients, the public\n        and health and care organisations across England.\n      </p>\n\n      <p>\n        The NIHR RDN tracks the progress of research studies in its portfolio using data provided by Sponsors or their\n        delegates on behalf of the Department of Health and Social Care.\n      </p>\n\n      <p>Sponsors or their delegates are asked to review and assess the progress of studies when:</p>\n\n      <ul>\n        <li>A study falls behind the agreed milestones or</li>\n        <li>A study is not recruiting to target</li>\n        <li>And the last progress assessment is over three months old</li>\n      </ul>\n\n      <p>\n        Sponsors or their delegates can request\n        <a href='" +
-      alias4(
-        ((helper =
-          (helper =
-            lookupProperty(helpers, 'requestSupportLink') ||
-            (depth0 != null ? lookupProperty(depth0, 'requestSupportLink') : depth0)) != null
-            ? helper
-            : alias2),
-        typeof helper === alias3
-          ? helper.call(alias1, {
-              name: 'requestSupportLink',
-              hash: {},
-              data: data,
-              loc: { start: { line: 69, column: 17 }, end: { line: 69, column: 39 } },
-            })
-          : helper)
-      ) +
-      "'>NIHR RDN support</a>\n        with their research study at any time.\n      </p>\n\n      <p>\n        <strong>\n          Please note that providing regular study assessments is a requirement of the\n          <a href='" +
+      "'>NIHR RDN</a>\n        supports Sponsors and their delegates to deliver high-quality research, for the benefit of patients, the public\n        and health and care organisations across England.\n      </p>\n\n      <p>\n        The NIHR RDN tracks the progress of research studies in its portfolio using data provided by Sponsors or their\n        delegates on behalf of the Department of Health and Social Care (DHSC).\n      </p>\n\n      <p>The DHSC have published the Terms and Conditions for NIHR RDN support [" +
       alias4(
         ((helper =
           (helper =
@@ -97,7 +97,41 @@ templates['assessment-reminder.html.hbs'] = handlebars.template({
               name: 'termsAndConditionsLink',
               hash: {},
               data: data,
-              loc: { start: { line: 76, column: 19 }, end: { line: 76, column: 45 } },
+              loc: { start: { line: 62, column: 80 }, end: { line: 62, column: 106 } },
+            })
+          : helper)
+      ) +
+      "] which\n        outlines the requirements for Sponsors to provide up-to-date study data and assessments of progress to the RDN.\n      </p>\n\n      <p>The Sponsor Engagement Tool has been designed to support Sponsors and their delegates to meet the requirements\n        outlined in the T&Cs. Sponsors and their delegates should use the Sponsor Engagement Tool to review the data the\n        RDN holds on your organisation’s portfolio of studies, and to provide study data updates and assessments to\n        ensure the data held by the RDN is complete and up-to-date.\n      </p>\n\n      <p>Sponsors or their delegates are prompted to review and assess the progress of studies when:</p>\n\n      <ul>\n        <li>A study falls behind a planned milestone or</li>\n        <li>A study appears to not be recruiting to target</li>\n        <li>And the last study assessment is over three months old</li>\n      </ul>\n\n      <p>\n        Sponsors or their delegates can request\n        <a href='" +
+      alias4(
+        ((helper =
+          (helper =
+            lookupProperty(helpers, 'requestSupportLink') ||
+            (depth0 != null ? lookupProperty(depth0, 'requestSupportLink') : depth0)) != null
+            ? helper
+            : alias2),
+        typeof helper === alias3
+          ? helper.call(alias1, {
+              name: 'requestSupportLink',
+              hash: {},
+              data: data,
+              loc: { start: { line: 82, column: 17 }, end: { line: 82, column: 39 } },
+            })
+          : helper)
+      ) +
+      "'>NIHR RDN support</a>\n        with study delivery and performance at any time.\n      </p>\n\n      <p>\n        <strong>\n          Please note that providing regular study updates and assessments are requirements of the\n          <a href='" +
+      alias4(
+        ((helper =
+          (helper =
+            lookupProperty(helpers, 'termsAndConditionsLink') ||
+            (depth0 != null ? lookupProperty(depth0, 'termsAndConditionsLink') : depth0)) != null
+            ? helper
+            : alias2),
+        typeof helper === alias3
+          ? helper.call(alias1, {
+              name: 'termsAndConditionsLink',
+              hash: {},
+              data: data,
+              loc: { start: { line: 89, column: 19 }, end: { line: 89, column: 45 } },
             })
           : helper)
       ) +
@@ -141,7 +175,24 @@ templates['assessment-reminder.text.hbs'] = handlebars.template({
             })
           : helper)
       ) +
-      ']\n\nHello,\n\nYou are nominated as a Sponsor contact for studies on the NIHR Research Delivery Network’s (RDN) research portfolio. One\nor more studies require an update on their status. Please sign in to the Sponsor Engagement Tool to provide these\nupdates.\n\nAs a nominated contact for your organisation, you will see all studies linked to your organisation. The Sponsor Engagement Tool\ndoes not associate contacts to specific studies or groups of studies, only to the organisation.\n\n# Why am I being asked to assess studies?\n\nThe NIHR RDN [' +
+      ']\n\nHello,\n\nYou are a nominated contact for ' +
+      alias4(
+        ((helper =
+          (helper =
+            lookupProperty(helpers, 'organisationName') ||
+            (depth0 != null ? lookupProperty(depth0, 'organisationName') : depth0)) != null
+            ? helper
+            : alias2),
+        typeof helper === alias3
+          ? helper.call(alias1, {
+              name: 'organisationName',
+              hash: {},
+              data: data,
+              loc: { start: { line: 9, column: 32 }, end: { line: 9, column: 52 } },
+            })
+          : helper)
+      ) +
+      ' for studies on the NIHR Research Delivery Network’s (RDN) research portfolio. One\nor more studies require an update. Please sign in to the Sponsor Engagement Tool to provide these updates.\n\nAs a nominated contact for your organisation, you will see all studies linked to your organisation. The Sponsor Engagement Tool\ndoes not associate contacts to specific studies or groups of studies, only to the organisation.\n\n# Why am I being asked to assess studies?\n\nThe NIHR RDN [' +
       alias4(
         ((helper =
           (helper =
@@ -153,28 +204,11 @@ templates['assessment-reminder.text.hbs'] = handlebars.template({
               name: 'rdnLink',
               hash: {},
               data: data,
-              loc: { start: { line: 18, column: 14 }, end: { line: 18, column: 25 } },
+              loc: { start: { line: 17, column: 14 }, end: { line: 17, column: 25 } },
             })
           : helper)
       ) +
-      '] supports Sponsors and their delegates to deliver high-quality research, for the benefit of\npatients, the public and health and care organisations across England.\n\n\nThe NIHR RDN tracks the progress of research studies in its portfolio using data provided by Sponsors or their delegates\non behalf of the Department of Health and Social Care.\n\nSponsors or their delegates are asked to review and assess the progress of studies when:\n\n- A study falls behind the agreed milestones\n- A study is not recruiting to target\n- And the last progress assessment is over three months old\n\nSponsors or their delegates can request NIHR RDN support with their research study at any time. [' +
-      alias4(
-        ((helper =
-          (helper =
-            lookupProperty(helpers, 'requestSupportLink') ||
-            (depth0 != null ? lookupProperty(depth0, 'requestSupportLink') : depth0)) != null
-            ? helper
-            : alias2),
-        typeof helper === alias3
-          ? helper.call(alias1, {
-              name: 'requestSupportLink',
-              hash: {},
-              data: data,
-              loc: { start: { line: 31, column: 97 }, end: { line: 31, column: 119 } },
-            })
-          : helper)
-      ) +
-      ']\n\nPlease note that providing regular study assessments is a requirement of the Terms and Conditions for NIHR RDN support\n[' +
+      '] supports Sponsors and their delegates to deliver high-quality research, for the benefit of\npatients, the public and health and care organisations across England.\n\nThe NIHR RDN tracks the progress of research studies in its portfolio using data provided by Sponsors or their delegates\non behalf of the Department of Health and Social Care (DHSC).\n\nThe DHSC have published the Terms and Conditions for NIHR RDN support [' +
       alias4(
         ((helper =
           (helper =
@@ -187,7 +221,41 @@ templates['assessment-reminder.text.hbs'] = handlebars.template({
               name: 'termsAndConditionsLink',
               hash: {},
               data: data,
-              loc: { start: { line: 34, column: 1 }, end: { line: 34, column: 27 } },
+              loc: { start: { line: 23, column: 71 }, end: { line: 23, column: 97 } },
+            })
+          : helper)
+      ) +
+      '] which outlines \nthe requirements for Sponsors to provide up-to-date study data and assessments of progress to the RDN. \n\nThe Sponsor Engagement Tool has been designed to support Sponsors and their delegates to meet the requirements outlined in \nthe T&Cs. Sponsors and their delegates should use the Sponsor Engagement Tool to review the data the RDN holds on your organisation’s portfolio of studies, \nand to provide study data updates and assessments to ensure the data held by the RDN is complete and up-to-date.\n\nSponsors or their delegates are prompted to review and assess the progress of studies when:\n\n- A study falls behind a planned milestone or\n- A study appears to not be recruiting to target\n- And the last study assessment is over three months old\n\nSponsors or their delegates can request NIHR RDN support with study delivery and performance at any time. [' +
+      alias4(
+        ((helper =
+          (helper =
+            lookupProperty(helpers, 'requestSupportLink') ||
+            (depth0 != null ? lookupProperty(depth0, 'requestSupportLink') : depth0)) != null
+            ? helper
+            : alias2),
+        typeof helper === alias3
+          ? helper.call(alias1, {
+              name: 'requestSupportLink',
+              hash: {},
+              data: data,
+              loc: { start: { line: 36, column: 107 }, end: { line: 36, column: 129 } },
+            })
+          : helper)
+      ) +
+      ']\n\nPlease note that providing regular study updates and assessments are requirements of the Terms and Conditions for NIHR RDN support\n[' +
+      alias4(
+        ((helper =
+          (helper =
+            lookupProperty(helpers, 'termsAndConditionsLink') ||
+            (depth0 != null ? lookupProperty(depth0, 'termsAndConditionsLink') : depth0)) != null
+            ? helper
+            : alias2),
+        typeof helper === alias3
+          ? helper.call(alias1, {
+              name: 'termsAndConditionsLink',
+              hash: {},
+              data: data,
+              loc: { start: { line: 39, column: 1 }, end: { line: 39, column: 27 } },
             })
           : helper)
       ) +
@@ -338,7 +406,24 @@ templates['contact-assigned.text.hbs'] = handlebars.template({
             })
           : helper)
       ) +
-      " studies on the NIHR Research Delivery Network's (RDN) research portfolio.\n\nThe NIHR RDN supports Sponsors and their delegates to deliver high-quality research, for the benefit of patients, the public and health and care organisations across England.\n\nThe NIHR RDN tracks the progress of research studies in its portfolio using data provided by Sponsors or their delegates on behalf of the Department of Health and Social Care.\n\nNIHR RDN asks Sponsors or their delegates to review these studies and provide regular assessments of how the study is progressing.\n\nPlease sign in to the Sponsor Engagement Tool to provide updates on studies. (" +
+      " studies on the NIHR Research Delivery Network's (RDN) research portfolio.\n\nThe NIHR RDN supports Sponsors and their delegates to deliver high-quality research, for the benefit of patients, the public and health and care organisations across England.\n\nThe NIHR RDN tracks the progress of research studies in its portfolio using data provided by Sponsors or their delegates on behalf of the Department of Health and Social Care (DHSC).\n\nThe DHSC have published the Terms and Conditions for NIHR RDN support which outlines the requirements for Sponsors to provide up-to-date study data and assessments of progress to the RDN. (" +
+      alias4(
+        ((helper =
+          (helper =
+            lookupProperty(helpers, 'termsAndConditionsLink') ||
+            (depth0 != null ? lookupProperty(depth0, 'termsAndConditionsLink') : depth0)) != null
+            ? helper
+            : alias2),
+        typeof helper === alias3
+          ? helper.call(alias1, {
+              name: 'termsAndConditionsLink',
+              hash: {},
+              data: data,
+              loc: { start: { line: 11, column: 189 }, end: { line: 11, column: 215 } },
+            })
+          : helper)
+      ) +
+      ')\n\nThe Sponsor Engagement Tool has been designed to support Sponsors and their delegates to meet the requirements outlined in the T&Cs. Sponsors and their delegates should use the Sponsor Engagement Tool to review the data the RDN holds on your organisations portfolio of studies and to provide study data updates and assessments to ensure the data held by the RDN is complete and up-to-date.\n\nPlease sign in to the Sponsor Engagement Tool to provide updates on studies. (' +
       alias4(
         ((helper =
           (helper =
@@ -351,7 +436,7 @@ templates['contact-assigned.text.hbs'] = handlebars.template({
               name: 'signInLink',
               hash: {},
               data: data,
-              loc: { start: { line: 13, column: 78 }, end: { line: 13, column: 92 } },
+              loc: { start: { line: 15, column: 78 }, end: { line: 15, column: 92 } },
             })
           : helper)
       ) +
@@ -368,7 +453,7 @@ templates['contact-assigned.text.hbs'] = handlebars.template({
               name: 'requestSupportLink',
               hash: {},
               data: data,
-              loc: { start: { line: 23, column: 97 }, end: { line: 23, column: 119 } },
+              loc: { start: { line: 25, column: 97 }, end: { line: 25, column: 119 } },
             })
           : helper)
       ) +
@@ -385,7 +470,7 @@ templates['contact-assigned.text.hbs'] = handlebars.template({
               name: 'termsAndConditionsLink',
               hash: {},
               data: data,
-              loc: { start: { line: 26, column: 69 }, end: { line: 26, column: 95 } },
+              loc: { start: { line: 28, column: 69 }, end: { line: 28, column: 95 } },
             })
           : helper)
       ) +

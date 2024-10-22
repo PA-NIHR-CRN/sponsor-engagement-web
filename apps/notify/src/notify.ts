@@ -47,6 +47,17 @@ const sendNotifications = async () => {
           },
         },
       },
+      include: {
+        organisations: {
+          select: {
+            organisation: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
     })
   } else {
     usersWithStudiesDueAssessment = await prismaClient.user.findMany({
@@ -63,6 +74,17 @@ const sendNotifications = async () => {
         assessmentReminders: {
           none: {
             AND: [{ sentAt: { not: null } }, { sentAt: { gte: dayjs().subtract(resendDelay, 'days').toDate() } }],
+          },
+        },
+      },
+      include: {
+        organisations: {
+          select: {
+            organisation: {
+              select: {
+                name: true,
+              },
+            },
           },
         },
       },
@@ -100,7 +122,7 @@ const sendNotifications = async () => {
     })
   }
 
-  const emailInputs = usersWithStudiesDueAssessment.map(({ email }) => ({
+  const emailInputs = usersWithStudiesDueAssessment.map(({ email, organisations }) => ({
     to: email,
     subject: `Assess the progress of your studies`,
     htmlTemplate: emailTemplates['assessment-reminder.html.hbs'],
@@ -111,6 +133,10 @@ const sendNotifications = async () => {
       signInLink: getAbsoluteUrl(SIGN_IN_PAGE),
       requestSupportLink: getAbsoluteUrl(SUPPORT_PAGE),
       iconUrl: getAbsoluteUrl('/assets/images/exclamation-icon.png'),
+      organisationName: organisations
+        .map((organisation) => organisation.organisation.name)
+        .join(', ')
+        .toLocaleLowerCase(),
     },
   }))
 
