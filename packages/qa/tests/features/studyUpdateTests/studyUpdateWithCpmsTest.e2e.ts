@@ -52,7 +52,7 @@ test.beforeAll('Setup Tests', async () => {
 })
 
 // note: this test is cumbersome due to the page object model not playing well with multiple auth user roles roles
-test.describe('Sponsor engagement study update with CPMS study validation @se_to_cpms @foo', () => {
+test.describe('Sponsor engagement study update with CPMS study validation @se_to_cpms', () => {
   test.describe.configure({ timeout: 99000 }) // generous timeout as CPMS is slow!
 
   test('direct SE change with CPMS validation @se_to_cpms', async ({ browser }) => {
