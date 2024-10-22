@@ -7,7 +7,7 @@ import { createRequest, createResponse } from 'node-mocks-http'
 
 import { prismaMock } from '@/__mocks__/prisma'
 import { userWithSponsorContactRole } from '@/__mocks__/session'
-import { StudyUpdateRoute } from '@/@types/studies'
+import { Status, StudyUpdateRoute } from '@/@types/studies'
 import { StudyUpdateState, StudyUpdateType } from '@/constants'
 
 import { mockCPMSStudy, mockCPMSUpdateInput as mockCPMSUpdate } from '../../../mocks/studies'
@@ -98,7 +98,7 @@ const body: ExtendedNextApiRequest['body'] = {
   recruitmentTarget: '121',
   furtherInformation: '',
   originalValues: {
-    status: 'Open to Recruitment',
+    status: Status.OpenToRecruitment,
     plannedOpeningDate: {
       day: '27',
       month: '02',

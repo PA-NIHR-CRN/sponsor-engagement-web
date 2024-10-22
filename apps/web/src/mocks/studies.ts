@@ -96,7 +96,7 @@ export const mockCPMSStudy = Mock.of<Study>({
   StudyId: 622,
   IrasId: 1212,
   StudyShortName: 'BS06',
-  StudyStatus: 'Suspended',
+  StudyStatus: 'Suspended (from Open to Recruitment)',
   StudyRoute: 'Non-commercial',
   ProtocolReferenceNumber: 8282,
   PlannedOpeningDate: '2003-02-28T00:00:00',
