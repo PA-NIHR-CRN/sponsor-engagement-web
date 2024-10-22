@@ -68,8 +68,6 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
 
   const supportOrgName = organisationsByRole.CRO ?? organisationsByRole.CTU
 
-  const showEditHistoryFeature = process.env.NEXT_PUBLIC_ENABLE_EDIT_HISTORY_FEATURE?.toLowerCase() === 'true'
-
   const isStudyStatusSuspended = (
     [Status.Suspended, Status.SuspendedFromOpenToRecruitment, Status.SuspendedFromOpenWithRecruitment] as string[]
   ).includes(study.studyStatus)
@@ -122,13 +120,13 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
           <span className="govuk-body-s text-darkGrey">
             Based on the latest data uploaded to CPMS by the study team.
           </span>
-          {showEditHistoryFeature ? (
-            <EditHistory
-              editHistoryItems={editHistory ?? []}
-              error={Boolean(getEditHistoryError)}
-              idToAutoExpand={transactionIdLatestProposedUpdate}
-            />
-          ) : null}
+
+          <EditHistory
+            editHistoryItems={editHistory ?? []}
+            error={Boolean(getEditHistoryError)}
+            idToAutoExpand={transactionIdLatestProposedUpdate}
+          />
+
           <Table className="govuk-!-margin-top-3">
             <Table.Caption className="govuk-visually-hidden">Summary of study’s progress (UK)</Table.Caption>
             <Table.Body>
