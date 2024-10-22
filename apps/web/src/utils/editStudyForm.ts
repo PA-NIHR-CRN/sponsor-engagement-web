@@ -1,8 +1,9 @@
 import dayjs from 'dayjs'
 import { z } from 'zod'
 
+import { Status } from '@/@types/studies'
 import { dateValidationRules, fieldNameToLabelMapping, FormStudyStatus } from '@/constants/editStudyForm'
-import { mapCPMSStatusToFormStatus } from '@/lib/studies'
+import { mapCPMSStatusToFormStatus, mapFormStatusToCPMSStatus } from '@/lib/studies'
 import type { DateFieldWithParts } from '@/pages/api/forms/editStudy'
 import type { EditStudyProps } from '@/pages/studies/[studyId]/edit'
 
@@ -284,6 +285,7 @@ export const validateStatus = (ctx: z.RefinementCtx, values: EditStudy) => {
   const previousSimplifiedStatus = mapCPMSStatusToFormStatus(previousStatus)
   const newSimplifiedStatus = mapCPMSStatusToFormStatus(newStatus)
 
+  console.log({ previousSimplifiedStatus, newSimplifiedStatus })
   if (previousSimplifiedStatus === newSimplifiedStatus) return
 
   const [_, visibleStatuses] = getVisibleFormFields(previousSimplifiedStatus, newSimplifiedStatus)
@@ -323,4 +325,34 @@ export const transformEditStudyBody = (body: EditStudy & Partial<DateFieldWithPa
   })
 
   return data
+}
+
+/**
+ * When JS is disabled, the new status won't be the CPMS status but instead the simplified status.
+ * Therefore, when we need to correctly map the status to a CPMS status.
+ * The mapFormStatusToCPMSStatus() function has conditional logic based on the original status for Open and Suspended statuses.
+ * This function relies on the logic that a status cannot go from Open, to recruitment to Open, with recruitment. Same for suspended.
+ */
+export const getCPMSStatusFromEditStudyBody = (originalStatus: string, newStatus: string) => {
+  const mappedNewStatus = mapFormStatusToCPMSStatus(newStatus, originalStatus)
+
+  const isNewStatusOpen = newStatus === (FormStudyStatus.OpenToRecruitment as string)
+  const isOriginalStatusOpen = ([Status.OpenToRecruitment, Status.OpenWithRecruitment] as string[]).includes(
+    originalStatus
+  )
+
+  if (isNewStatusOpen && isOriginalStatusOpen) {
+    return originalStatus
+  }
+
+  const isNewStatusSuspended = newStatus === (FormStudyStatus.Suspended as string)
+  const isOriginalStatusSuspended = (
+    [Status.SuspendedFromOpenToRecruitment, Status.SuspendedFromOpenWithRecruitment] as string[]
+  ).includes(originalStatus)
+
+  if (isNewStatusSuspended && isOriginalStatusSuspended) {
+    return originalStatus
+  }
+
+  return mappedNewStatus
 }

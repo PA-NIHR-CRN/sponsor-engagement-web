@@ -159,6 +159,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
             <ErrorSummary errors={errors} />
             <input type="hidden" {...register('studyId')} defaultValue={Number(defaultValues?.studyId)} />
             <input type="hidden" {...register('cpmsId')} defaultValue={defaultValues?.cpmsId} />
+            <input type="hidden" {...register('LSN')} defaultValue={defaultValues?.LSN ?? ''} />
             <input
               type="hidden"
               {...register('originalValues')}

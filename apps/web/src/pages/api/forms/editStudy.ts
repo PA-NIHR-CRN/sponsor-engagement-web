@@ -10,7 +10,12 @@ import { UPDATE_FROM_SE_TEXT } from '@/constants/forms'
 import { mapEditStudyInputToCPMSStudy, updateStudyInCPMS, validateStudyUpdate } from '@/lib/cpms/studies'
 import { mapCPMSStatusToFormStatus } from '@/lib/studies'
 import { logStudyUpdate } from '@/lib/studyUpdates'
-import { editStudyDateFields, getVisibleFormFields, transformEditStudyBody } from '@/utils/editStudyForm'
+import {
+  editStudyDateFields,
+  getCPMSStatusFromEditStudyBody,
+  getVisibleFormFields,
+  transformEditStudyBody,
+} from '@/utils/editStudyForm'
 import type { EditStudy } from '@/utils/schemas'
 import { studySchema, studySchemaShape } from '@/utils/schemas'
 import { withApiHandler } from '@/utils/withApiHandler'
@@ -58,7 +63,12 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
     // i.e. plannedOpeningDate-day rather than a object with the key 'day'
     const transformedData = transformEditStudyBody({ ...req.body, originalValues })
 
-    const studyData = studySchema.parse(transformedData)
+    const parsedStudyData = studySchema.parse(transformedData)
+    const correctStatusToUpdate = getCPMSStatusFromEditStudyBody(
+      parsedStudyData.originalValues?.status ?? '',
+      parsedStudyData.status
+    )
+    const studyData = { ...parsedStudyData, status: correctStatusToUpdate }
 
     // Ensure that only date fields allowed for the status are modified, otherwise, use the original value
     const [visibleDateFields] = getVisibleFormFields(
@@ -73,7 +83,10 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
       }
     })
 
-    const cpmsStudyInput = mapEditStudyInputToCPMSStudy(studyDataToUpdate)
+    const cpmsStudyInput = mapEditStudyInputToCPMSStudy({
+      ...studyDataToUpdate,
+      status: correctStatusToUpdate,
+    })
 
     const { validationResult, error: validateStudyError } = await validateStudyUpdate(
       Number(studyData.cpmsId),

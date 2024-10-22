@@ -1,7 +1,8 @@
 import { Status } from '@/@types/studies'
+import { FormStudyStatus } from '@/constants/editStudyForm'
 
 import type { DateFieldWithParts, ExtendedNextApiRequest } from '../pages/api/forms/editStudy'
-import { transformEditStudyBody, validateStatus } from './editStudyForm'
+import { getCPMSStatusFromEditStudyBody, transformEditStudyBody, validateStatus } from './editStudyForm'
 import type { EditStudy } from './schemas'
 
 describe('transformEditStudyBody()', () => {
@@ -165,5 +166,52 @@ describe('validateStatus()', () => {
     validateStatus(mockCTX, body)
 
     expect(mockCTX.addIssue).not.toHaveBeenCalled()
+  })
+})
+
+describe('getCPMSStatusFromEditStudyBody()', () => {
+  it.each([Status.OpenToRecruitment, Status.OpenWithRecruitment])(
+    'should return original status when new status is "Open, to recruitment" and original status is %s',
+    (originalStatus: string) => {
+      const newStatus = FormStudyStatus.OpenToRecruitment
+
+      const result = getCPMSStatusFromEditStudyBody(originalStatus, newStatus)
+      expect(result).toBe(originalStatus)
+    }
+  )
+
+  it.each([Status.SuspendedFromOpenToRecruitment, Status.SuspendedFromOpenWithRecruitment])(
+    'should return original status when new status is "Suspended" and original status is %s',
+    (originalStatus: string) => {
+      const newStatus = FormStudyStatus.Suspended
+
+      const result = getCPMSStatusFromEditStudyBody(originalStatus, newStatus)
+      expect(result).toBe(originalStatus)
+    }
+  )
+
+  it('should return mapped status when new status is not "Open, to recruitment" or "Suspended"', () => {
+    const originalStatus = Status.InSetup
+    const result = getCPMSStatusFromEditStudyBody(originalStatus, FormStudyStatus.Closed)
+
+    expect(result).toBe(Status.ClosedToRecruitmentFollowUpComplete)
+  })
+
+  it('should return mapped status when new status is "Open, to recruitment" but original status is not a type of Open', () => {
+    const originalStatus = Status.SuspendedFromOpenWithRecruitment
+    const newStatus = FormStudyStatus.OpenToRecruitment
+
+    const result = getCPMSStatusFromEditStudyBody(originalStatus, newStatus)
+
+    expect(result).toBe(Status.OpenWithRecruitment)
+  })
+
+  it('should return mapped status when new status is Suspended but original status is not a type of Suspended', () => {
+    const originalStatus = Status.OpenWithRecruitment
+    const newStatus = FormStudyStatus.Suspended
+
+    const result = getCPMSStatusFromEditStudyBody(originalStatus, newStatus)
+
+    expect(result).toBe(Status.SuspendedFromOpenWithRecruitment)
   })
 })
