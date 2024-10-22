@@ -271,21 +271,28 @@ jobs:
       - name: Run All SE E2E Tests
         working-directory: ./packages/qa
         if: success()
-        run: npx playwright test --project=seDefault
+        run: npm test
         env:
           E2E_BASE_URL: ${{ vars.E2E_BASE_URL }}
-          SE_TEST_DB_PASSWORD: ${{ secrets.SE_TEST_DB_PASSWORD }}
+          SPONSOR_CONTACT_USER: ${{ secrets.SPONSOR_CONTACT_USER }}
+          SPONSOR_CONTACT_PASS: ${{ secrets.SPONSOR_CONTACT_PASS }}
+          SPONSOR_CONTACT_MANAGER_USER: ${{ secrets.SPONSOR_CONTACT_MANAGER_USER }}
+          SPONSOR_CONTACT_MANAGER_PASS: ${{ secrets.SPONSOR_CONTACT_MANAGER_PASS }}
+          CONTACT_MANAGER_USER: ${{ secrets.CONTACT_MANAGER_USER }}
+          CONTACT_MANAGER_PASS: ${{ secrets.CONTACT_MANAGER_PASS }}
+          SE_NO_LOCAL_ACCOUNT_USER: ${{ secrets.SE_NO_LOCAL_ACCOUNT_USER }}
+          SE_NO_LOCAL_ACCOUNT_PASS: ${{ secrets.SE_NO_LOCAL_ACCOUNT_PASS }}
+          CPMS_NPM_USER: ${{ secrets.CPMS_NPM_USER }}
+          CPMS_NPM_PASS: ${{ secrets.CPMS_NPM_PASS }}
           SE_TEST_DB_HOST: ${{ secrets.SE_TEST_DB_HOST }}
+          SE_TEST_DB_USERNAME: ${{ secrets.SE_TEST_DB_USERNAME }}
+          SE_TEST_DB_PASSWORD: ${{ secrets.SE_TEST_DB_PASSWORD }}
           SE_TEST_API_URL: ${{ secrets.CPMS_API_BASE_URL }}
           SE_TEST_API_USERNAME: ${{ secrets.CPMS_API_USERNAME }}
           SE_TEST_API_PASSWORD: ${{ secrets.CPMS_API_PASSWORD }}
-          SPONSOR_CONTACT_PASS: ${{ secrets.SPONSOR_CONTACT_PASS }}
-          SPONSOR_CONTACT_MANAGER_PASS: ${{ secrets.SPONSOR_CONTACT_MANAGER_PASS }}
-          CONTACT_MANAGER_PASS: ${{ secrets.CONTACT_MANAGER_PASS }}
-          SE_NO_LOCAL_ACCOUNT_PASS: ${{ secrets.SE_NO_LOCAL_ACCOUNT_PASS }}
-          CPMS_NPM_PASS: ${{ secrets.CPMS_NPM_PASS }}
-          CPMS_TEST_DB_PASSWORD: ${{ secrets.CPMS_TEST_DB_PASSWORD }}
           CPMS_TEST_DB_IP: ${{ secrets.CPMS_TEST_DB_IP }}
+          CPMS_TEST_DB_USERNAME: ${{ secrets.CPMS_TEST_DB_USERNAME }}
+          CPMS_TEST_DB_PASSWORD: ${{ secrets.CPMS_TEST_DB_PASSWORD }}
 
       - name: Remove Github Actions IP from CPMS API security group (Test)
         if: always()        

@@ -36,23 +36,23 @@ export default class LoginPage {
     let password = ''
     switch (user.toLowerCase()) {
       case 'sponsor contact':
-        username = 'sesponsorcontact@test.id.nihr.ac.uk'
+        username = `${process.env.SPONSOR_CONTACT_USER}`
         password = `${process.env.SPONSOR_CONTACT_PASS}`
         break
       case 'sponsor contact manager':
-        username = 'sesponsorcontactmanager@test.id.nihr.ac.uk'
+        username = `${process.env.SPONSOR_CONTACT_MANAGER_USER}`
         password = `${process.env.SPONSOR_CONTACT_MANAGER_PASS}`
         break
       case 'contact manager':
-        username = 'secontactmanager@test.id.nihr.ac.uk'
+        username = `${process.env.CONTACT_MANAGER_USER}`
         password = `${process.env.CONTACT_MANAGER_PASS}`
         break
       case 'no local account':
-        username = 'senolocalaccount@test.id.nihr.ac.uk'
+        username = `${process.env.SE_NO_LOCAL_ACCOUNT_USER}`
         password = `${process.env.SE_NO_LOCAL_ACCOUNT_PASS}`
         break
       case 'national portfolio manager':
-        username = 'sim_auto_npm@test.id.nihr.ac.uk'
+        username = `${process.env.CPMS_NPM_USER}`
         password = `${process.env.CPMS_NPM_PASS}`
         break
       default:

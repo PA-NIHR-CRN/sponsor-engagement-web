@@ -487,8 +487,8 @@ export default class StudyUpdatePage {
         await expect(this.updateValidationList).toContainText(`Enter a valid UK target`)
         break
       case 'null':
-        await expect(this.ukRecruitmentTargetInlineError).toHaveText(`Error: ???`)
-        await expect(this.updateValidationList).toContainText(`???`)
+        await expect(this.ukRecruitmentTargetInlineError).toHaveText(`Error: UK target is a mandatory field`)
+        await expect(this.updateValidationList).toContainText(`UK target is a mandatory field`)
         break
       default:
         throw new Error(`${error} is not a validation option`)

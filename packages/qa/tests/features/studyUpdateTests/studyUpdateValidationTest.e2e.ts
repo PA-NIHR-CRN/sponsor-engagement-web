@@ -36,7 +36,7 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       await studyUpdatePage.fillStudyDates('actualOpening', '66', '01', '2024')
       await studyUpdatePage.fillStudyDates('plannedClosure', '66', '01', '2024')
       await studyUpdatePage.fillStudyDates('actualClosure', '66', '01', '2024')
-      await studyUpdatePage.ukRecruitmentTarget.fill('')
+      await studyUpdatePage.ukRecruitmentTarget.fill('101')
       await studyUpdatePage.furtherInfo.fill(``)
     })
 
@@ -68,7 +68,7 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       await studyUpdatePage.fillStudyDates('actualOpening', '02', '24', '2024')
       await studyUpdatePage.fillStudyDates('plannedClosure', '03', '13', '2024')
       await studyUpdatePage.fillStudyDates('actualClosure', '04', '25', '2024')
-      await studyUpdatePage.ukRecruitmentTarget.fill('')
+      await studyUpdatePage.ukRecruitmentTarget.fill('101')
       await studyUpdatePage.furtherInfo.fill(``)
     })
 
@@ -100,7 +100,7 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       await studyUpdatePage.fillStudyDates('actualOpening', '03', '04', '99999')
       await studyUpdatePage.fillStudyDates('plannedClosure', '05', '06', '999')
       await studyUpdatePage.fillStudyDates('actualClosure', '07', '08', '99')
-      await studyUpdatePage.ukRecruitmentTarget.fill('')
+      await studyUpdatePage.ukRecruitmentTarget.fill('101')
       await studyUpdatePage.furtherInfo.fill(``)
     })
 
@@ -133,7 +133,7 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       await studyUpdatePage.fillStudyDates('plannedOpening', '', '02', '2024')
       await studyUpdatePage.fillStudyDates('actualOpening', '01', '', '2024')
       await studyUpdatePage.fillStudyDates('plannedClosure', '01', '02', '')
-      await studyUpdatePage.ukRecruitmentTarget.fill('')
+      await studyUpdatePage.ukRecruitmentTarget.fill('101')
       await studyUpdatePage.furtherInfo.fill(``)
     })
 
@@ -166,7 +166,7 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       await studyUpdatePage.fillStudyDates('actualOpening', '29', '02', '2023')
       await studyUpdatePage.fillStudyDates('plannedClosure', '29', '02', '2023')
       await studyUpdatePage.fillStudyDates('actualClosure', '29', '02', '2023')
-      await studyUpdatePage.ukRecruitmentTarget.fill('')
+      await studyUpdatePage.ukRecruitmentTarget.fill('101')
       await studyUpdatePage.furtherInfo.fill(``)
     })
 
@@ -231,7 +231,7 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
     })
   })
 
-  test.skip('Validation error message for Null UK target validation @se_217', async ({ studyUpdatePage }) => {
+  test('Validation error message for Null UK target validation @se_217', async ({ studyUpdatePage }) => {
     await seDatabaseReq(`
       DELETE FROM sponsorengagement.StudyUpdates WHERE studyId = ${startingStudyId};
     `)
@@ -270,7 +270,7 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       await studyUpdatePage.fillStudyDates('actualOpening', '2', '2', '2024')
       await studyUpdatePage.fillStudyDates('plannedClosure', '2', '2', '2023')
       await studyUpdatePage.fillStudyDates('actualClosure', '2', '2', '2024')
-      await studyUpdatePage.ukRecruitmentTarget.fill('')
+      await studyUpdatePage.ukRecruitmentTarget.fill('101')
       await studyUpdatePage.furtherInfo.fill(``)
     })
 
@@ -300,7 +300,7 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       await studyUpdatePage.fillStudyDates('actualOpening', '2', '2', '2027')
       await studyUpdatePage.fillStudyDates('plannedClosure', '1', '1', '2027')
       await studyUpdatePage.fillStudyDates('actualClosure', '1', '1', '2024')
-      await studyUpdatePage.ukRecruitmentTarget.fill('')
+      await studyUpdatePage.ukRecruitmentTarget.fill('101')
       await studyUpdatePage.furtherInfo.fill(``)
     })
 
@@ -330,7 +330,7 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       await studyUpdatePage.fillStudyDates('actualOpening', '2', '2', '2024')
       await studyUpdatePage.fillStudyDates('plannedClosure', '1', '1', '2027')
       await studyUpdatePage.fillStudyDates('actualClosure', '1', '1', '2027')
-      await studyUpdatePage.ukRecruitmentTarget.fill('')
+      await studyUpdatePage.ukRecruitmentTarget.fill('101')
       await studyUpdatePage.furtherInfo.fill(``)
     })
 
