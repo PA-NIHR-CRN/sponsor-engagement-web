@@ -34,6 +34,7 @@ This project employs a monorepo architecture with `turborepo` being used to mana
 | `templates`            | Contains email templates and handles bundling of templates using Handlebars |
 | `tsconfig`             | TypeScript configuration files                                              |
 | `ui`                   | Reusable GDS React component library                                        |
+| `shared-utilities`     | Shared utilities across workspaces                                          |
 
 > ## Prerequisites:
 

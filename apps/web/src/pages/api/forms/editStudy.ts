@@ -50,13 +50,13 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
   const disableDirectStudyUpdatesFeature = DISABLE_DIRECT_STUDY_UPDATES?.toLowerCase() === 'true'
 
   try {
-    const { studyId, originalValues: originalValuesStringified, LSN: beforeLSN } = req.body
+    const { studyId, originalValues: originalValuesInBody, LSN: beforeLSN } = req.body
 
     logger.info('Updating study started for studyId: %s', studyId)
 
     // When JS is disabled, the original values object is stringified
     const originalValues = (
-      typeof originalValuesStringified === 'string' ? JSON.parse(originalValuesStringified) : originalValuesStringified
+      typeof originalValuesInBody === 'string' ? JSON.parse(originalValuesInBody) : originalValuesInBody
     ) as EditStudy['originalValues']
 
     // When JS is disabled, the nested date fields are returned as single attributes so this function converts them back into an object to match the schema
