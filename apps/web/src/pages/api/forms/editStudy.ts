@@ -1,3 +1,4 @@
+import { logger } from '@nihr-ui/logger'
 import type { NextApiRequest } from 'next'
 import { v4 as uuid } from 'uuid'
 
@@ -15,12 +16,14 @@ export interface ExtendedNextApiRequest extends NextApiRequest {
 }
 
 export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, async (req, res, session) => {
-  const { ENABLE_DIRECT_STUDY_UPDATES } = process.env
+  const { DISABLE_DIRECT_STUDY_UPDATES } = process.env
 
-  const enableDirectStudyUpdatesFeature = ENABLE_DIRECT_STUDY_UPDATES?.toLowerCase() === 'true'
+  const disableDirectStudyUpdatesFeature = DISABLE_DIRECT_STUDY_UPDATES?.toLowerCase() === 'true'
 
   try {
     const { studyId, originalValues, LSN: beforeLSN } = req.body
+
+    logger.info('Updating study started for studyId: %s', studyId)
 
     const studyDataToUpdate = studySchema.parse(req.body)
     const cpmsStudyInput = mapEditStudyInputToCPMSStudy(studyDataToUpdate)
@@ -34,11 +37,13 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
       throw new Error(validateStudyError)
     }
 
-    // When feature flag is enabled, we use the response from the validate endpoint to determine the update type
+    logger.info('Validated study update with cpmsId: %s', studyDataToUpdate.cpmsId)
+
+    // When feature flag is disabled, we use the response from the validate endpoint to determine the update type
     // Otherwise, we override this so we do not send any updates to CPMS
-    const isDirectUpdate = enableDirectStudyUpdatesFeature
-      ? validationResult.StudyUpdateRoute === StudyUpdateRoute.Direct
-      : false
+    const isDirectUpdate = disableDirectStudyUpdatesFeature
+      ? false
+      : validationResult.StudyUpdateRoute === StudyUpdateRoute.Direct
 
     let afterLSN = ''
 
@@ -81,6 +86,8 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
       afterLSN
     )
 
+    logger.info('Logged study update with studyId: %s', studyId)
+
     const searchParams = new URLSearchParams({
       success: isDirectUpdate ? '3' : '2',
       ...(!isDirectUpdate ? { latestProposedUpdate: transactionId } : {}),
@@ -91,6 +98,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
     const searchParams = new URLSearchParams({ fatal: '1' })
     const studyId = req.body.studyId
 
+    logger.error('Failed to update study, error: %s', e)
     return res.redirect(302, `/studies/${studyId}/edit?${searchParams.toString()}`)
   }
 })

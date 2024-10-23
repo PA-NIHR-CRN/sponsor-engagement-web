@@ -7,8 +7,12 @@ import type { EditStudyProps } from '@/pages/studies/[studyId]/edit'
 
 import { constructDatePartsFromDate, getDaysInMonth } from './date'
 import type { DateFieldName, EditStudy, EditStudyInputs } from './schemas'
+import type { Optional } from './typeUtils'
 
-export const mapStudyToStudyFormInput = (study: EditStudyProps['study'], LSN?: string): EditStudyInputs => ({
+export const mapStudyToStudyFormInput = (
+  study: EditStudyProps['study'],
+  LSN?: string
+): Optional<EditStudyInputs, 'recruitmentTarget'> => ({
   studyId: study.id,
   LSN,
   status: study.studyStatus,
@@ -19,7 +23,7 @@ export const mapStudyToStudyFormInput = (study: EditStudyProps['study'], LSN?: s
   actualOpeningDate: constructDatePartsFromDate(study.actualOpeningDate),
   actualClosureDate: constructDatePartsFromDate(study.actualClosureDate),
   estimatedReopeningDate: constructDatePartsFromDate(study.estimatedReopeningDate),
-  furtherInformation: '', // TODO: is there a field for this
+  furtherInformation: '',
 })
 
 /**
