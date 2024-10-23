@@ -45,9 +45,9 @@ export interface ExtendedNextApiRequest extends NextApiRequest {
 }
 
 export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, async (req, res, session) => {
-  const { ENABLE_DIRECT_STUDY_UPDATES } = process.env
+  const { DISABLE_DIRECT_STUDY_UPDATES } = process.env
 
-  const enableDirectStudyUpdatesFeature = ENABLE_DIRECT_STUDY_UPDATES?.toLowerCase() === 'true'
+  const disableDirectStudyUpdatesFeature = DISABLE_DIRECT_STUDY_UPDATES?.toLowerCase() === 'true'
 
   try {
     const { studyId, originalValues: originalValuesStringified, LSN: beforeLSN } = req.body
@@ -99,11 +99,11 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
 
     logger.info('Validated study update with cpmsId: %s', studyDataToUpdate.cpmsId)
 
-    // When feature flag is enabled, we use the response from the validate endpoint to determine the update type
+    // When feature flag is disabled, we use the response from the validate endpoint to determine the update type
     // Otherwise, we override this so we do not send any updates to CPMS
-    const isDirectUpdate = enableDirectStudyUpdatesFeature
-      ? validationResult.StudyUpdateRoute === StudyUpdateRoute.Direct
-      : false
+    const isDirectUpdate = disableDirectStudyUpdatesFeature
+      ? false
+      : validationResult.StudyUpdateRoute === StudyUpdateRoute.Direct
 
     let afterLSN = ''
 

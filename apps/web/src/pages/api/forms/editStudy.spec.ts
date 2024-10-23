@@ -203,7 +203,15 @@ describe('/api/forms/editStudy', () => {
     expect(mockedPostAxios).toHaveBeenCalledTimes(1)
   })
 
-  describe('Feature flag, ENABLE_DIRECT_STUDY_UPDATES, disabled', () => {
+  describe('Feature flag, DISABLE_DIRECT_STUDY_UPDATES, enabled', () => {
+    beforeAll(() => {
+      process.env.DISABLE_DIRECT_STUDY_UPDATES = 'true'
+    })
+
+    afterAll(() => {
+      process.env.DISABLE_DIRECT_STUDY_UPDATES = env.DISABLE_DIRECT_STUDY_UPDATES
+    })
+
     test('when the update type is proposed, creates an entry in the studyUpdates table, with a proposed update type, does not call CPMS and redirects back to study details page with the correct params', async () => {
       prismaMock.studyUpdates.createMany.mockResolvedValueOnce({ count: 2 })
       mockedPostAxios.mockResolvedValueOnce({ data: getMockValidateStudyResponse(StudyUpdateRoute.Proposed) })
@@ -281,13 +289,13 @@ describe('/api/forms/editStudy', () => {
     })
   })
 
-  describe('Feature flag, ENABLE_DIRECT_STUDY_UPDATES, enabled', () => {
+  describe('Feature flag, DISABLE_DIRECT_STUDY_UPDATES, disabled', () => {
     beforeAll(() => {
-      process.env.ENABLE_DIRECT_STUDY_UPDATES = 'true'
+      process.env.DISABLE_DIRECT_STUDY_UPDATES = 'false'
     })
 
     afterAll(() => {
-      process.env.ENABLE_DIRECT_STUDY_UPDATES = env.ENABLE_DIRECT_STUDY_UPDATES
+      process.env.DISABLE_DIRECT_STUDY_UPDATES = env.DISABLE_DIRECT_STUDY_UPDATES
     })
 
     test('when the update is direct, creates an entry in the studyUpdates table, calls CPMS and redirects back to study details page with the correct params', async () => {
