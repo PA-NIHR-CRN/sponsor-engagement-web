@@ -7,7 +7,7 @@ import { createRequest, createResponse } from 'node-mocks-http'
 
 import { prismaMock } from '@/__mocks__/prisma'
 import { userWithSponsorContactRole } from '@/__mocks__/session'
-import { StudyUpdateRoute } from '@/@types/studies'
+import { Status, StudyUpdateRoute } from '@/@types/studies'
 import { StudyUpdateState, StudyUpdateType } from '@/constants'
 
 import { mockCPMSStudy, mockCPMSUpdateInput as mockCPMSUpdate } from '../../../mocks/studies'
@@ -37,7 +37,7 @@ const testHandler = async (handler: typeof api, options: RequestOptions) => {
   return res
 }
 
-const mockStudyId = 1211
+const mockStudyId = '1211'
 
 const nextYearValue = new Date().getFullYear() + 1
 const mockEstimatedReopeningDateInFuture = `${nextYearValue}-02-28T00:00:00.000`
@@ -98,14 +98,14 @@ const body: ExtendedNextApiRequest['body'] = {
   recruitmentTarget: '121',
   furtherInformation: '',
   originalValues: {
-    status: 'Open, to Recruitment',
+    status: Status.OpenToRecruitment,
     plannedOpeningDate: {
       day: '27',
       month: '02',
       year: '2003',
     },
     actualClosureDate: {
-      day: '27',
+      day: '28',
       month: '02',
       year: '2003',
     },
@@ -135,8 +135,8 @@ const getMockStudyUpdateInput = (isDirect: boolean, isAfterState: boolean) => {
   const LSN = isAfterState ? mockAfterLSN : mockBeforeLSN
 
   return {
-    studyStatus: isAfterState ? studyStatusOnUpdateType : body.originalValues.status,
-    studyStatusGroup: isAfterState ? 'Suspended' : 'Open, to Recruitment',
+    studyStatus: isAfterState ? studyStatusOnUpdateType : body.originalValues?.status,
+    studyStatusGroup: isAfterState ? 'Suspended' : 'Open to recruitment',
     plannedOpeningDate: isAfterState
       ? new Date(mockCPMSUpdateInput.PlannedOpeningDate as string).toISOString()
       : new Date('2003-02-27T00:00:00.000').toISOString(),
@@ -148,13 +148,13 @@ const getMockStudyUpdateInput = (isDirect: boolean, isAfterState: boolean) => {
       : new Date('2004-02-27T00:00:00.000').toISOString(),
     actualClosureToRecruitmentDate: isAfterState
       ? new Date(mockCPMSUpdateInput.ActualClosureToRecruitmentDate as string).toISOString()
-      : new Date('2003-02-27T00:00:00.000').toISOString(),
+      : new Date('2003-02-28T00:00:00.000').toISOString(),
     estimatedReopeningDate: isAfterState
       ? new Date(mockCPMSUpdateInput.EstimatedReopeningDate).toISOString()
       : new Date('2021-02-27T00:00:00.000').toISOString(),
     ukRecruitmentTarget: isAfterState ? 121 : 122,
     comment: '',
-    studyId: body.studyId,
+    studyId: Number(body.studyId),
     studyUpdateTypeId: isDirect ? StudyUpdateType.Direct : StudyUpdateType.Proposed,
     createdById: userWithSponsorContactRole.user?.id as number,
     modifiedById: userWithSponsorContactRole.user?.id as number,

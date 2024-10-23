@@ -53,14 +53,14 @@ describe('constructDateStrFromParts', () => {
 })
 
 describe('constructDatePartsFromDate', () => {
-  it('should return undefined if input is undefined', () => {
+  it('should return empty date parts if input is undefined', () => {
     const result = constructDatePartsFromDate(undefined)
-    expect(result).toBeUndefined()
+    expect(result).toEqual({ day: '', month: '', year: '' })
   })
 
-  it('should return undefined if input is null', () => {
+  it('should return empty date parts if input is null', () => {
     const result = constructDatePartsFromDate(null)
-    expect(result).toBeUndefined()
+    expect(result).toEqual({ day: '', month: '', year: '' })
   })
 
   it('should return correct date parts for a valid date', () => {

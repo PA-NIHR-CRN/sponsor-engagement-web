@@ -5,7 +5,7 @@ import clsx from 'clsx'
 import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
 import { NextSeo } from 'next-seo'
-import { type ReactElement, useCallback, useEffect, useMemo } from 'react'
+import { type ReactElement, useCallback, useEffect, useMemo, useState } from 'react'
 import type { FieldError } from 'react-hook-form'
 import { Controller, useForm } from 'react-hook-form'
 
@@ -40,6 +40,7 @@ import {
 } from '@/lib/studies'
 import { areAllDatePartsEmpty } from '@/utils/date'
 import { getVisibleFormFields, mapStudyToStudyFormInput } from '@/utils/editStudyForm'
+import { getValuesFromSearchParams } from '@/utils/form'
 import type { EditStudy as EditStudySchema, EditStudyInputs } from '@/utils/schemas'
 import { studySchema } from '@/utils/schemas'
 import { withServerSideProps } from '@/utils/withServerSideProps'
@@ -52,8 +53,14 @@ const transformDateValue = (input?: DateInputValue | null) => ({
   year: input?.year ?? '',
 })
 
-export default function EditStudy({ study, currentLSN }: EditStudyProps) {
-  const mappedFormInput = mapStudyToStudyFormInput(study)
+export default function EditStudy({ study, currentLSN, query }: EditStudyProps) {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const mappedFormInput =
+    Object.keys(query).length === 1 ? mapStudyToStudyFormInput(study) : getValuesFromSearchParams(studySchema, query)
 
   const { register, formState, handleSubmit, control, watch, setError } = useForm<EditStudySchema>({
     resolver: zodResolver(studySchema),
@@ -94,13 +101,18 @@ export default function EditStudy({ study, currentLSN }: EditStudyProps) {
 
   const statusInputValue = watch('status')
 
+  // If mounted is false, JS is disabled so we want to display all fields
   const [visibleDateFields, visibleStatuses] = useMemo(
     () =>
-      getVisibleFormFields(mapCPMSStatusToFormStatus(study.studyStatus), mapCPMSStatusToFormStatus(statusInputValue)),
-    [statusInputValue, study.studyStatus]
+      getVisibleFormFields(
+        mapCPMSStatusToFormStatus(study.studyStatus),
+        mapCPMSStatusToFormStatus(statusInputValue),
+        !mounted
+      ),
+    [statusInputValue, study.studyStatus, mounted]
   )
 
-  const showLoadingState = formState.isSubmitting || formState.isSubmitSuccessful
+  const showLoadingState = formState.isSubmitting || (formState.isSubmitSuccessful && Object.keys(errors).length === 0)
 
   useEffect(() => {
     if (Object.keys(errors).length > 0) {
@@ -145,7 +157,14 @@ export default function EditStudy({ study, currentLSN }: EditStudyProps) {
             }}
           >
             <ErrorSummary errors={errors} />
+            <input type="hidden" {...register('studyId')} defaultValue={Number(defaultValues?.studyId)} />
             <input type="hidden" {...register('cpmsId')} defaultValue={defaultValues?.cpmsId} />
+            <input type="hidden" {...register('LSN')} defaultValue={defaultValues?.LSN ?? ''} />
+            <input
+              type="hidden"
+              {...register('originalValues')}
+              defaultValue={JSON.stringify(defaultValues?.originalValues)}
+            />
             <Fieldset>
               {/* Status */}
               <Controller
@@ -166,7 +185,7 @@ export default function EditStudy({ study, currentLSN }: EditStudyProps) {
                   return (
                     <RadioGroup
                       defaultValue={mappedSEStatusValue}
-                      errors={{}}
+                      errors={errors}
                       label={fieldNameToLabelMapping.status}
                       labelSize="m"
                       name={name}
@@ -207,6 +226,7 @@ export default function EditStudy({ study, currentLSN }: EditStudyProps) {
                       />
                     )
                   }}
+                  shouldUnregister
                 />
               )}
 
@@ -257,6 +277,7 @@ export default function EditStudy({ study, currentLSN }: EditStudyProps) {
                       />
                     )
                   }}
+                  shouldUnregister
                 />
               )}
 
@@ -282,6 +303,7 @@ export default function EditStudy({ study, currentLSN }: EditStudyProps) {
                       />
                     )
                   }}
+                  shouldUnregister
                 />
               )}
 
@@ -307,6 +329,7 @@ export default function EditStudy({ study, currentLSN }: EditStudyProps) {
                       />
                     )
                   }}
+                  shouldUnregister
                 />
               )}
 
@@ -427,6 +450,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
       props: {
         user: session.user,
         study,
+        query: context.query,
       },
     }
   }
@@ -441,6 +465,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
       props: {
         user: session.user,
         study,
+        query: context.query,
       },
     }
   }
@@ -473,6 +498,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
         isDueAssessment: isStudyDueAssessment,
       },
       currentLSN: studyInCPMS.CurrentLsn,
+      query: context.query,
     },
   }
 })
