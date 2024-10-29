@@ -158,13 +158,11 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
                 <Table.CellHeader className="w-1/3">Actual closure to recruitment date</Table.CellHeader>
                 <Table.Cell>{study.actualClosureDate ? formatDate(study.actualClosureDate) : '-'}</Table.Cell>
               </Table.Row>
-              {isStudyStatusSuspended && Boolean(study.evaluationCategories.length) ? (
+              {isStudyStatusSuspended ? (
                 <Table.Row>
                   <Table.CellHeader className="w-1/3">Estimated reopening date</Table.CellHeader>
                   <Table.Cell>
-                    {study.evaluationCategories[0].expectedReopenDate
-                      ? formatDate(study.evaluationCategories[0].expectedReopenDate)
-                      : '-'}
+                    {study.estimatedReopeningDate ? formatDate(study.estimatedReopeningDate) : '-'}
                   </Table.Cell>
                 </Table.Row>
               ) : null}
