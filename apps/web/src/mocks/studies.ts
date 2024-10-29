@@ -281,6 +281,7 @@ export const mockStudyWithRelations = Mock.of<StudyWithRelations>({
   plannedClosureDate: new Date('2001-01-02'),
   actualOpeningDate: new Date('2001-01-01'),
   actualClosureDate: new Date('2001-01-01'),
+  estimatedReopeningDate: new Date('2001-01-02'),
   totalRecruitmentToDate: 999,
   organisations: [
     {
