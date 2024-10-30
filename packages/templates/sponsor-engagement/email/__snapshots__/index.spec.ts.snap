@@ -295,8 +295,7 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
 
       <p>
         The DHSC have published the
-        <a href='http://terms-conditions-link'>Terms and Conditions for NIHR RDN support</a>, which outlines the requirements for Sponsors to provide up-to-date study data and assessments of progress to the
-        RDN.
+        <a href='http://terms-conditions-link'>Terms and Conditions for NIHR RDN support</a>, which outlines the requirements for Sponsors to provide up-to-date study data and assessments of progress to the RDN.
       </p>
 
       <p>
