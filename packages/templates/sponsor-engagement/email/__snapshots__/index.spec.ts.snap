@@ -69,13 +69,13 @@ exports[`Email template "assessment-reminder.html.hbs" displays correctly 1`] = 
 
       <p>The DHSC have published the
         <a href='http://terms-conditions-link'>Terms and Conditions for NIHR RDN support</a>
-        which outlines the requirements for Sponsors to provide up-to-date study data and assessments of progress to the
+        , which outlines the requirements for Sponsors to provide up-to-date study data and assessments of progress to the
         RDN.
       </p>
 
       <p>The Sponsor Engagement Tool has been designed to support Sponsors and their delegates to meet the requirements
         outlined in the T&Cs. Sponsors and their delegates should use the Sponsor Engagement Tool to review the data the
-        RDN holds on your organisation’s portfolio of studies, and to provide study data updates and assessments to
+        RDN holds on their organisation’s portfolio of studies, and to provide study data updates and assessments to
         ensure the data held by the RDN is complete and up-to-date.
       </p>
 
@@ -241,11 +241,11 @@ patients, the public and health and care organisations across England.
 The NIHR RDN tracks the progress of research studies in its portfolio using data provided by Sponsors or their delegates
 on behalf of the Department of Health and Social Care (DHSC).
 
-The DHSC have published the Terms and Conditions for NIHR RDN support [http://terms-conditions-link] which outlines 
+The DHSC have published the Terms and Conditions for NIHR RDN support [http://terms-conditions-link], which outlines 
 the requirements for Sponsors to provide up-to-date study data and assessments of progress to the RDN. 
 
 The Sponsor Engagement Tool has been designed to support Sponsors and their delegates to meet the requirements outlined in 
-the T&Cs. Sponsors and their delegates should use the Sponsor Engagement Tool to review the data the RDN holds on your organisation’s portfolio of studies, 
+the T&Cs. Sponsors and their delegates should use the Sponsor Engagement Tool to review the data the RDN holds on their organisation’s portfolio of studies, 
 and to provide study data updates and assessments to ensure the data held by the RDN is complete and up-to-date.
 
 Sponsors or their delegates are prompted to review and assess the progress of studies when:
@@ -298,14 +298,14 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
       <p>
         The DHSC have published the
         <a href='http://terms-conditions-link'>Terms and Conditions for NIHR RDN support</a>
-        which outlines the requirements for Sponsors to provide up-to-date study data and assessments of progress to the
+        , which outlines the requirements for Sponsors to provide up-to-date study data and assessments of progress to the
         RDN.
       </p>
 
       <p>
         The Sponsor Engagement Tool has been designed to support Sponsors and their delegates to meet the requirements
         outlined in the T&Cs. Sponsors and their delegates should use the Sponsor Engagement Tool to review the data the
-        RDN holds on your organisations portfolio of studies and to provide study data updates and assessments to ensure
+        RDN holds on their organisations portfolio of studies and to provide study data updates and assessments to ensure
         the data held by the RDN is complete and up-to-date.
       </p>
 
@@ -488,10 +488,10 @@ The NIHR RDN supports Sponsors and their delegates to deliver high-quality resea
 
 The NIHR RDN tracks the progress of research studies in its portfolio using data provided by Sponsors or their delegates on behalf of the Department of Health and Social Care (DHSC).
 
-The DHSC have published the Terms and Conditions for NIHR RDN support (http://terms-conditions-link) which outlines the requirements for Sponsors to provide up-to-date study data and assessments of progress to the RDN.
+The DHSC have published the Terms and Conditions for NIHR RDN support (http://terms-conditions-link), which outlines the requirements for Sponsors to provide up-to-date study data and assessments of progress to the RDN.
 
 The Sponsor Engagement Tool has been designed to support Sponsors and their delegates to meet the requirements outlined in the T&Cs. 
-Sponsors and their delegates should use the Sponsor Engagement Tool to review the data the RDN holds on your organisations portfolio 
+Sponsors and their delegates should use the Sponsor Engagement Tool to review the data the RDN holds on their organisations portfolio 
 of studies and to provide study data updates and assessments to ensure the data held by the RDN is complete and up-to-date.
 
 Please sign in to the Sponsor Engagement Tool to provide updates on studies. (http://localhost:3000/auth/signin)
