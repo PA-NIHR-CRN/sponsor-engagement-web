@@ -53,7 +53,7 @@ templates['assessment-reminder.html.hbs'] = handlebars.template({
       )) != null
         ? stack1
         : '') +
-      "        </ul>\n      </p>\n\n      <p>\n        One or more studies require an update. Please sign in to the Sponsor Engagement Tool to provide these updates.\n      </p>\n\n      <p>As a nominated contact for your organisation, you will see all studies linked to your organisation. The Sponsor\n        Engagement Tool does not associate contacts to specific studies or groups of studies, only to the organisation.\n      </p>\n\n      <a\n        href='" +
+      "        </ul>\n      </p>\n\n      <p>\n        One or more studies requires an update. Please sign in to the Sponsor Engagement Tool to provide these updates.\n      </p>\n\n      <p>As a nominated contact for your organisation, you will see all studies linked to your organisation. The Sponsor\n        Engagement Tool does not associate contacts to specific studies or groups of studies, only to the organisation.\n      </p>\n\n      <a\n        href='" +
       alias4(
         ((helper =
           (helper =
@@ -442,7 +442,7 @@ templates['contact-assigned.text.hbs'] = handlebars.template({
             })
           : helper)
       ) +
-      '), which outlines the requirements for Sponsors to provide up-to-date study data and assessments of progress to the RDN.\n\nThe Sponsor Engagement Tool has been designed to support Sponsors and their delegates to meet the requirements outlined in the T&Cs. \nSponsors and their delegates should use the Sponsor Engagement Tool to review the data the RDN holds on their organisations portfolio \nof studies and to provide study data updates and assessments to ensure the data held by the RDN is complete and up-to-date.\n\nPlease sign in to the Sponsor Engagement Tool to provide updates on studies. (' +
+      '), which outlines the requirements for Sponsors to provide up-to-date study data and assessments of progress to the RDN.\n\nThe Sponsor Engagement Tool has been designed to support Sponsors and their delegates to meet the requirements outlined in the T&Cs. \nSponsors and their delegates should use the Sponsor Engagement Tool to review the data the RDN holds on their organisation’s portfolio \nof studies and to provide study data updates and assessments to ensure the data held by the RDN is complete and up-to-date.\n\nPlease sign in to the Sponsor Engagement Tool to provide updates on studies. (' +
       alias4(
         ((helper =
           (helper =

@@ -23,7 +23,7 @@ exports[`Email template "assessment-reminder.html.hbs" displays correctly 1`] = 
       </p>
 
       <p>
-        One or more studies require an update. Please sign in to the Sponsor Engagement Tool to provide these updates.
+        One or more studies requires an update. Please sign in to the Sponsor Engagement Tool to provide these updates.
       </p>
 
       <p>As a nominated contact for your organisation, you will see all studies linked to your organisation. The Sponsor
@@ -487,7 +487,7 @@ The NIHR RDN tracks the progress of research studies in its portfolio using data
 The DHSC have published the Terms and Conditions for NIHR RDN support (http://terms-conditions-link), which outlines the requirements for Sponsors to provide up-to-date study data and assessments of progress to the RDN.
 
 The Sponsor Engagement Tool has been designed to support Sponsors and their delegates to meet the requirements outlined in the T&Cs. 
-Sponsors and their delegates should use the Sponsor Engagement Tool to review the data the RDN holds on their organisations portfolio 
+Sponsors and their delegates should use the Sponsor Engagement Tool to review the data the RDN holds on their organisation’s portfolio 
 of studies and to provide study data updates and assessments to ensure the data held by the RDN is complete and up-to-date.
 
 Please sign in to the Sponsor Engagement Tool to provide updates on studies. (http://localhost:3000/auth/signin)
