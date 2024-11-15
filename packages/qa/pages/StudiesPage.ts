@@ -30,10 +30,12 @@ export default class StudiesPage {
   readonly searchInput: Locator
   readonly searchButton: Locator
   readonly searchFilterPanel: Locator
-  readonly assessListButton: Locator
+  readonly viewStudyButton: Locator
   readonly sortBySection: Locator
   readonly sortByLabel: Locator
   readonly sortByDropdown: Locator
+  readonly studyLastItem: Locator
+  readonly studyLastDue: Locator
 
   //Initialize Page Objects
   constructor(page: Page) {
@@ -58,8 +60,10 @@ export default class StudiesPage {
     this.paginationPageList = page.locator('ul[class="govuk-pagination__list"]')
     this.studyList = page.locator('ol[aria-label="Studies"]')
     this.studyListItem = this.studyList.locator('li')
+    this.studyLastItem = this.studyListItem.last()
+    this.studyLastDue = this.studyLastItem.locator('span', { hasText: 'due' })
     this.studyListItemTitle = this.studyListItem.locator(
-      'a[class="govuk-link--no-visited-state govuk-heading-s govuk-!-margin-bottom-4 govuk-!-padding-top-0 inline-block"]'
+      'div[class="govuk-heading-s govuk-!-margin-bottom-4 govuk-!-padding-top-0 inline-block font-extrabold"]'
     )
     this.studyListItemOrgName = page.locator(
       'div[class="text-darkGrey govuk-!-margin-bottom-1 max-w-[calc(100%-45px)] lg:max-w-auto govuk-body-s"]'
@@ -82,7 +86,7 @@ export default class StudiesPage {
       'button[class="bg-[var(--colour-blue)] text-white active:top-0 focus:shadow-[inset_0_0_0_4px_var(--text-grey)] focus:outline focus:outline-[3px] focus:outline-[var(--focus)] mb-0 w-[50px] h-[50px] flex items-center justify-center text-lg"]'
     )
     this.searchFilterPanel = page.locator('ul[aria-labelledby="selected-filters"]')
-    this.assessListButton = page.locator('a[class="govuk-button w-auto govuk-!-margin-bottom-0"]')
+    this.viewStudyButton = page.locator('a[class="govuk-button w-auto govuk-!-margin-bottom-0"]')
     this.sortBySection = page.locator('div[class="govuk-form-group mt-2 items-center justify-end md:my-0 md:flex"]')
     this.sortByLabel = this.sortBySection.locator('label')
     this.sortByDropdown = this.sortBySection.locator('select')
@@ -114,17 +118,16 @@ export default class StudiesPage {
   async assertIntroGuideTxt() {
     await expect(this.txtIntroGuidance).toBeVisible()
     await expect(this.txtIntroGuidance).toHaveText(
-      'The NIHR RDN tracks the progress of research studies in its portfolio using data provided by study teams. ' +
-        'Sponsors or their delegates need to assess if studies are on or off track and if any NIHR RDN support is needed.'
+      'Review study data and provide data updates where necessary. You will also be able to assess if studies are on or off track, and decide if any NIHR RDN support is needed.'
     )
   }
 
-  async assertExpandibleSectionPresent() {
+  async assertExpandableSectionPresent() {
     await expect(this.expandCollapseSection).toBeVisible()
     await expect(this.expandCollapseSection.locator('summary')).toHaveText('Why am I being asked to assess studies?')
   }
 
-  async assertExpandibleSectionState(state: string) {
+  async assertExpandableSectionState(state: string) {
     if (state.toLowerCase() == 'collapsed') {
       await expect(this.expandCollapseSectionContents).toBeHidden()
     } else {
@@ -132,7 +135,7 @@ export default class StudiesPage {
     }
   }
 
-  async assertExpandibleSectionTxt() {
+  async assertExpandableSectionTxt() {
     await expect(this.expandCollapseSectionContents.locator('p')).toHaveText(
       'NIHR RDN asks sponsors or their delegates to review and assess study progress for UK studies when:'
     )
@@ -220,8 +223,8 @@ export default class StudiesPage {
     return index
   }
 
-  async getStudyIdFromListTitle(index: number): Promise<string> {
-    const idLink = confirmStringNotNull(await this.studyListItemTitle.nth(index).getAttribute('href'))
+  async getStudyIdFromListViewButton(index: number): Promise<string> {
+    const idLink = confirmStringNotNull(await this.viewStudyButton.nth(index).getAttribute('href'))
     return idLink.substring(9)
   }
 
@@ -376,24 +379,22 @@ export default class StudiesPage {
   }
 
   async assertListEndsWithNonDueStudies(sortedList: RowDataPacket[]) {
-    const pageStudyCount = await this.studyListItem.count()
-    let expectedSortedNonDueListItems: RowDataPacket[] = []
-    let actualSortedNonDueStudyTitles: string[] = []
-    sortedList.forEach((study) => {
-      if (study.isDueAssessment == 0) {
-        expectedSortedNonDueListItems.push(study)
+    function checkForStudyNotDue(studies: any) {
+      for (let study of studies) {
+        if (study.isDueAssessment === 0) {
+          console.log('At least 1 study is not due an assessment, checking last study status...')
+          return true
+        }
       }
-    })
-
-    const startIndex = pageStudyCount - expectedSortedNonDueListItems.length
-    for (let index = startIndex; index < pageStudyCount; index++) {
-      actualSortedNonDueStudyTitles.push(confirmStringNotNull(await this.studyListItemTitle.nth(index).textContent()))
-      await expect(this.studyListItem.nth(index).locator(this.studyListItemDueIndicator)).toBeHidden()
+      console.log('All studies are currently due an assessment, checking last study status...')
+      return false
     }
 
-    for (let index = 0; index < actualSortedNonDueStudyTitles.length; index++) {
-      const studyTitle = actualSortedNonDueStudyTitles[index]
-      expect(studyTitle).toEqual(expectedSortedNonDueListItems[index].shortTitle)
+    await expect(this.studyLastItem).toBeVisible()
+    if (checkForStudyNotDue(sortedList)) {
+      await expect(this.studyLastDue).not.toBeVisible()
+    } else {
+      await expect(this.studyLastDue).toBeVisible()
     }
   }
 

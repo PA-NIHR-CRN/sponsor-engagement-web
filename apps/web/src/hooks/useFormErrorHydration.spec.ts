@@ -2,7 +2,7 @@ import { renderHook } from '@testing-library/react'
 import { useRouter } from 'next/router'
 import type { FieldValues, FormState } from 'react-hook-form'
 
-import { assessmentSchema } from '../utils/schemas'
+import { assessmentSchema, studySchema } from '../utils/schemas'
 import { useFormErrorHydration } from './useFormErrorHydration'
 
 // Mock useRouter
@@ -14,6 +14,16 @@ const formState: FormState<FieldValues> = {
   defaultValues: {
     status: 'default value',
     furtherInformation: 'default value',
+    plannedOpeningDate: {
+      day: '14',
+      month: '12',
+      year: '2024',
+    },
+    actualOpeningDate: {
+      day: '14',
+      month: '12',
+      year: '',
+    },
   },
   submitCount: 1,
   dirtyFields: {},
@@ -67,6 +77,43 @@ describe('useFormErrorHydration', () => {
     expect(onFoundError).toHaveBeenCalledTimes(2)
     expect(onFoundError).toHaveBeenCalledWith('status', { type: 'custom', message: 'Error message 1' })
     expect(onFoundError).toHaveBeenCalledWith('furtherInformation', { type: 'custom', message: 'Error message 2' })
+
+    // Verify that router.replace was called with the correct arguments
+    expect(router.replace).toHaveBeenCalledWith({ query: undefined })
+  })
+
+  it('should handle server errors arround date fields correctly', () => {
+    const onFoundError = jest.fn()
+
+    const router = {
+      query: {
+        plannedOpeningDateError: 'Error message 1',
+        'actualOpeningDate-yearError': 'Error message 2',
+      },
+      replace: jest.fn(),
+    }
+
+    // Mock the useRouter hook to return the router object
+    ;(useRouter as jest.Mock).mockReturnValue(router)
+
+    // Render the hook
+    const { result } = renderHook(() =>
+      useFormErrorHydration({
+        schema: studySchema,
+        formState,
+        onFoundError,
+      })
+    )
+
+    expect(result.current.errors).toEqual({
+      plannedOpeningDate: { type: 'custom', message: 'Error message 1' },
+      'actualOpeningDate-year': { type: 'custom', message: 'Error message 2' },
+    })
+
+    // Verify that onFoundError was called with the correct arguments
+    expect(onFoundError).toHaveBeenCalledTimes(2)
+    expect(onFoundError).toHaveBeenCalledWith('plannedOpeningDate', { type: 'custom', message: 'Error message 1' })
+    expect(onFoundError).toHaveBeenCalledWith('actualOpeningDate-year', { type: 'custom', message: 'Error message 2' })
 
     // Verify that router.replace was called with the correct arguments
     expect(router.replace).toHaveBeenCalledWith({ query: undefined })

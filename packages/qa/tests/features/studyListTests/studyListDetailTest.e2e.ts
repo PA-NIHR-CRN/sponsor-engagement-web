@@ -22,7 +22,7 @@ test.describe('Details on Study List Items - @se_22 @se_22_detail', () => {
     })
     await test.step('When I view a Study on the list', async () => {
       studyListItemIndex = await studiesPage.selectRandomStudyListItemIndex()
-      studyIdFromList = await studiesPage.getStudyIdFromListTitle(studyListItemIndex)
+      studyIdFromList = await studiesPage.getStudyIdFromListViewButton(studyListItemIndex)
     })
     await test.step('Then the Study Title and Sponsor Organisation(s) match the Expected Values', async () => {
       await studiesPage.assertTitleAndSponsors(
@@ -69,7 +69,7 @@ test.describe('Details on Study List Items - @se_22 @se_22_detail', () => {
     })
     await test.step('When I view a Study on the list', async () => {
       studyListItemIndex = await studiesPage.selectRandomStudyListItemIndex()
-      studyIdFromList = await studiesPage.getStudyIdFromListTitle(studyListItemIndex)
+      studyIdFromList = await studiesPage.getStudyIdFromListViewButton(studyListItemIndex)
     })
     await test.step('Then the Study Title and Sponsor Organisation(s) match the Expected Values', async () => {
       await studiesPage.assertTitleAndSponsors(

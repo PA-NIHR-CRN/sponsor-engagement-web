@@ -1,9 +1,21 @@
-import { Prisma, type Study } from 'database'
+import type { Study } from 'database'
+import { Prisma } from 'database'
 import { Mock } from 'ts-mockery'
+
+import { mockCPMSStudy } from '@/mocks/studies'
 
 import { prismaMock } from '../__mocks__/prisma'
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
-import { getStudiesForOrgs, getStudyById } from './studies'
+import type { UpdateStudyInput } from './studies'
+import {
+  getStudiesForOrgs,
+  getStudyById,
+  mapCPMSStatusToFormStatus,
+  mapCPMSStudyEvalToSEEval,
+  mapCPMSStudyToSEStudy,
+  updateEvaluationCategories,
+  updateStudy,
+} from './studies'
 
 describe('getStudiesForOrgs', () => {
   const mockStudies = [Mock.of<Study>({ id: 1, title: 'Study 1' }), Mock.of<Study>({ id: 2, title: 'Study 2' })]
@@ -295,5 +307,372 @@ describe('getStudyById', () => {
         },
       },
     })
+  })
+})
+
+describe('updateStudy', () => {
+  type StudyWithOrganisations = Prisma.StudyGetPayload<{
+    include: {
+      organisations: {
+        include: {
+          organisation: true
+          organisationRole: true
+        }
+      }
+    }
+  }>
+
+  const studyId = 1212
+  const mockStudyInputs = Mock.of<UpdateStudyInput>({ cpmsId: studyId, title: 'Study 1' })
+
+  const mockActualStudy = Mock.of<StudyWithOrganisations>({
+    id: studyId,
+    title: mockStudyInputs.title as string,
+    cpmsId: mockStudyInputs.cpmsId as number,
+    isDueAssessment: true,
+    createdAt: new Date('2001-01-01'),
+    managingSpeciality: 'Cancer',
+    organisations: [
+      {
+        organisation: {
+          id: 1212,
+          name: 'Test Organisation',
+        },
+        organisationRole: {
+          id: 1213,
+          name: 'Clinical Research Sponsor',
+        },
+      },
+    ],
+  })
+
+  it('correctly updates and returns the study with given id', async () => {
+    prismaMock.study.update.mockResolvedValueOnce(mockActualStudy)
+
+    const result = await updateStudy(studyId, mockStudyInputs)
+
+    expect(result).toEqual({
+      data: {
+        ...mockActualStudy,
+        organisationsByRole: { Sponsor: mockActualStudy.organisations[0].organisation.name },
+      },
+    })
+
+    expect(prismaMock.study.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          cpmsId: studyId,
+        },
+        data: { ...mockStudyInputs },
+        include: {
+          organisations: {
+            where: {
+              isDeleted: false,
+            },
+            include: {
+              organisation: true,
+              organisationRole: true,
+            },
+          },
+          evaluationCategories: {
+            select: { id: true, indicatorValue: true },
+          },
+        },
+      })
+    )
+
+    expect(result.data?.cpmsId).toEqual(mockActualStudy.cpmsId)
+    expect(result.data?.title).toEqual(mockActualStudy.title)
+  })
+
+  it('returns the correct error message when there is an error', async () => {
+    const errorMessage = 'Oh no, an error!'
+
+    prismaMock.study.update.mockRejectedValueOnce(new Error(errorMessage))
+
+    const result = await updateStudy(studyId, mockStudyInputs)
+    expect(result).toEqual({ data: null, error: errorMessage })
+  })
+})
+
+describe('updateEvaluationCategories', () => {
+  const mockStudyId = 9282382
+
+  const mockEvaluationCategoriesResponse = Mock.of<Prisma.StudyEvaluationCategoryGetPayload<undefined>>({
+    studyId: 18108,
+    indicatorType: 'Missed milestone',
+    indicatorValue: 'Study is past planned opening date',
+    sampleSize: 3,
+    totalRecruitmentToDate: 0,
+    plannedOpeningDate: new Date('2020-10-09T23:00:00.000Z'),
+    plannedClosureDate: new Date('2020-10-09T23:00:00.000Z'),
+    actualOpeningDate: new Date('2020-10-09T23:00:00.000Z'),
+    actualClosureDate: null,
+    expectedReopenDate: null,
+    createdAt: new Date('2020-10-09T23:00:00.000Z'),
+    updatedAt: new Date('2020-10-09T23:00:00.000Z'),
+    isDeleted: false,
+  })
+
+  it('correctly updates and returns an evaluation when no deletion is required and there is a single evaluation record', async () => {
+    prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce({
+      ...mockEvaluationCategoriesResponse,
+      id: 484022,
+    })
+
+    const result = await updateEvaluationCategories(mockStudyId, [mockEvaluationCategoriesResponse], [])
+
+    expect(result).toEqual({ data: [{ ...mockEvaluationCategoriesResponse, id: 484022 }], error: null })
+
+    expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(1)
+    expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          studyId_indicatorValue: {
+            studyId: mockStudyId,
+            indicatorValue: mockEvaluationCategoriesResponse.indicatorValue,
+          },
+        },
+        update: mockEvaluationCategoriesResponse,
+        create: mockEvaluationCategoriesResponse,
+      })
+    )
+
+    expect(prismaMock.studyEvaluationCategory.updateMany).not.toHaveBeenCalled()
+  })
+
+  it('correctly updates and returns evaluations when no deletion is required and there are multiple evaluations', async () => {
+    const mockEvaluationCategoriesResponseTwo = Mock.of<Prisma.StudyEvaluationCategoryGetPayload<undefined>>({
+      studyId: 934834,
+      indicatorType: 'Missed milestone',
+      indicatorValue: 'Study is past planned opening date',
+      sampleSize: 3,
+      totalRecruitmentToDate: 0,
+      plannedOpeningDate: new Date('2020-10-09T23:00:00.000Z'),
+      plannedClosureDate: new Date('2020-10-09T23:00:00.000Z'),
+      actualOpeningDate: new Date('2020-10-09T23:00:00.000Z'),
+      actualClosureDate: null,
+      expectedReopenDate: null,
+      createdAt: new Date('2020-10-09T23:00:00.000Z'),
+      updatedAt: new Date('2020-10-09T23:00:00.000Z'),
+      isDeleted: false,
+    })
+
+    prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce({
+      ...mockEvaluationCategoriesResponse,
+      id: 484022,
+    })
+    prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce({
+      ...mockEvaluationCategoriesResponseTwo,
+      id: 484023,
+    })
+
+    const result = await updateEvaluationCategories(
+      mockStudyId,
+      [mockEvaluationCategoriesResponse, mockEvaluationCategoriesResponseTwo],
+      []
+    )
+
+    expect(result).toEqual({
+      data: [
+        { ...mockEvaluationCategoriesResponse, id: 484022 },
+        {
+          ...mockEvaluationCategoriesResponseTwo,
+          id: 484023,
+        },
+      ],
+      error: null,
+    })
+
+    expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(2)
+    expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          studyId_indicatorValue: {
+            studyId: mockStudyId,
+            indicatorValue: mockEvaluationCategoriesResponse.indicatorValue,
+          },
+        },
+        update: mockEvaluationCategoriesResponse,
+        create: mockEvaluationCategoriesResponse,
+      })
+    )
+    expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          studyId_indicatorValue: {
+            studyId: mockStudyId,
+            indicatorValue: mockEvaluationCategoriesResponseTwo.indicatorValue,
+          },
+        },
+        update: mockEvaluationCategoriesResponseTwo,
+        create: mockEvaluationCategoriesResponseTwo,
+      })
+    )
+
+    expect(prismaMock.studyEvaluationCategory.updateMany).not.toHaveBeenCalled()
+  })
+
+  it('correctly updates and deletes a given evaluation, when deletion is required', async () => {
+    const studyEvalToDelete = 2323232
+
+    prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce({
+      ...mockEvaluationCategoriesResponse,
+      id: 484022,
+    })
+
+    const result = await updateEvaluationCategories(
+      mockStudyId,
+      [mockEvaluationCategoriesResponse],
+      [studyEvalToDelete]
+    )
+
+    expect(result).toEqual({ data: [{ ...mockEvaluationCategoriesResponse, id: 484022 }], error: null })
+
+    expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(1)
+    expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          studyId_indicatorValue: {
+            studyId: mockStudyId,
+            indicatorValue: mockEvaluationCategoriesResponse.indicatorValue,
+          },
+        },
+        update: mockEvaluationCategoriesResponse,
+        create: mockEvaluationCategoriesResponse,
+      })
+    )
+
+    expect(prismaMock.studyEvaluationCategory.updateMany).toHaveBeenCalledTimes(1)
+    expect(prismaMock.studyEvaluationCategory.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: { in: [studyEvalToDelete] }, isDeleted: false },
+        data: { isDeleted: true },
+      })
+    )
+  })
+
+  it('returns the correct error message when there is an error updating a study evaluation', async () => {
+    const errorMessage = 'Oh no, an error!'
+
+    prismaMock.studyEvaluationCategory.upsert.mockRejectedValueOnce(new Error(errorMessage))
+
+    const result = await updateEvaluationCategories(mockStudyId, [mockEvaluationCategoriesResponse], [])
+    expect(result).toEqual({ data: null, error: errorMessage })
+  })
+
+  it('returns the correct error message when there is an error deleting a study evaluation', async () => {
+    const studyEvalToDelete = 2323232
+    const errorMessage = 'Oh no, an error!'
+
+    prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce({
+      ...mockEvaluationCategoriesResponse,
+      id: 484022,
+    })
+    prismaMock.studyEvaluationCategory.updateMany.mockRejectedValueOnce(new Error(errorMessage))
+
+    const result = await updateEvaluationCategories(
+      mockStudyId,
+      [mockEvaluationCategoriesResponse],
+      [studyEvalToDelete]
+    )
+    expect(result).toEqual({ data: null, error: errorMessage })
+  })
+})
+
+describe('mapCPMSStudyToSEStudy', () => {
+  const mockMappedStudy = {
+    cpmsId: mockCPMSStudy.StudyId,
+    shortTitle: mockCPMSStudy.StudyShortName,
+    studyStatus: mockCPMSStudy.StudyStatus,
+    route: mockCPMSStudy.StudyRoute,
+    sampleSize: mockCPMSStudy.SampleSize,
+    totalRecruitmentToDate: mockCPMSStudy.TotalRecruitmentToDate,
+    plannedOpeningDate: new Date(mockCPMSStudy.PlannedOpeningDate as string),
+    plannedClosureDate: new Date(mockCPMSStudy.PlannedClosureToRecruitmentDate as string),
+    actualOpeningDate: new Date(mockCPMSStudy.ActualOpeningDate as string),
+    actualClosureDate: new Date(mockCPMSStudy.ActualClosureToRecruitmentDate as string),
+    estimatedReopeningDate: new Date(mockCPMSStudy.EstimatedReopeningDate as string),
+    isDueAssessment: false,
+  }
+
+  it('correctly maps data when all fields exist', () => {
+    const result = mapCPMSStudyToSEStudy(mockCPMSStudy)
+    expect(result).toStrictEqual(mockMappedStudy)
+  })
+
+  it('correctly maps date fields when they do not exist', () => {
+    const result = mapCPMSStudyToSEStudy({
+      ...mockCPMSStudy,
+      PlannedOpeningDate: '',
+      PlannedClosureToRecruitmentDate: '',
+      ActualOpeningDate: '',
+      ActualClosureToRecruitmentDate: '',
+      EstimatedReopeningDate: '',
+    })
+    expect(result).toStrictEqual({
+      ...mockMappedStudy,
+      actualClosureDate: null,
+      actualOpeningDate: null,
+      plannedClosureDate: null,
+      plannedOpeningDate: null,
+      estimatedReopeningDate: null,
+    })
+  })
+})
+
+describe('mapCPMSStudyEvalToSEEval', () => {
+  const mockCPMSEvals = mockCPMSStudy.StudyEvaluationCategories[0]
+
+  const mockMappedEval = {
+    indicatorType: mockCPMSEvals.EvaluationCategoryType,
+    indicatorValue: mockCPMSEvals.EvaluationCategoryValue,
+    sampleSize: mockCPMSEvals.SampleSize,
+    totalRecruitmentToDate: mockCPMSEvals.TotalRecruitmentToDate,
+    plannedOpeningDate: new Date(mockCPMSEvals.PlannedRecruitmentStartDate as string),
+    plannedClosureDate: new Date(mockCPMSEvals.PlannedRecruitmentEndDate as string),
+    actualOpeningDate: new Date(mockCPMSEvals.ActualOpeningDate as string),
+    actualClosureDate: new Date(mockCPMSEvals.ActualClosureDate as string),
+    expectedReopenDate: new Date(mockCPMSEvals.ExpectedReopenDate as string),
+    isDeleted: false,
+  }
+  it('correctly maps data when all fields exist', () => {
+    const result = mapCPMSStudyEvalToSEEval(mockCPMSEvals)
+    expect(result).toStrictEqual(mockMappedEval)
+  })
+
+  it('correctly maps date fields when they do not exist', () => {
+    const result = mapCPMSStudyEvalToSEEval({
+      ...mockCPMSEvals,
+      PlannedRecruitmentStartDate: '',
+      PlannedRecruitmentEndDate: '',
+      ActualOpeningDate: '',
+      ActualClosureDate: '',
+    })
+    expect(result).toStrictEqual({
+      ...mockMappedEval,
+      plannedOpeningDate: null,
+      plannedClosureDate: null,
+      actualOpeningDate: null,
+      actualClosureDate: null,
+    })
+  })
+})
+
+describe('mapCPMSStatusToFormStatus', () => {
+  it.each([
+    ['Pre-Setup', 'In setup'],
+    ['In Setup, Pending NHS Permission', 'In setup'],
+    ['Closed to Recruitment', 'Closed'],
+    ['Withdrawn During Setup', 'Withdrawn'],
+  ])('correctly maps known statuses', (inputValue: string, expectedValue: string) => {
+    const result = mapCPMSStatusToFormStatus(inputValue)
+    expect(result).toEqual(expectedValue)
+  })
+
+  it('correctly returns the input value when a mapping does not exist', () => {
+    const mockUnknownStatus = 'unknown'
+    const result = mapCPMSStatusToFormStatus(mockUnknownStatus)
+    expect(result).toEqual(mockUnknownStatus)
   })
 })

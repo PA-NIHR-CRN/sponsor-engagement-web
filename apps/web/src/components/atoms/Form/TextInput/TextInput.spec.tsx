@@ -64,3 +64,15 @@ test('renders with custom attributes', () => {
   expect(inputElement).toBeInTheDocument()
   expect(inputElement).toHaveAttribute('type', 'password')
 })
+
+test('renders correctly in disabled state', () => {
+  const label = 'Input Label'
+  const name = 'inputName'
+
+  const { getByLabelText } = render(<TextInput disabled label={label} name={name} type="password" />)
+
+  const inputElement = getByLabelText(label)
+  expect(inputElement).toBeInTheDocument()
+  expect(inputElement).toHaveAttribute('aria-disabled', 'true')
+  expect(inputElement).toBeDisabled()
+})

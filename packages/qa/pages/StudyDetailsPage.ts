@@ -1,5 +1,9 @@
 import { expect, Locator, Page } from '@playwright/test'
-import { confirmStringNotNull, convertIsoDateToDisplayDate } from '../utils/UtilFunctions'
+import {
+  confirmStringNotNull,
+  convertIsoDateToDisplayDate,
+  convertIsoDateToDisplayDateV2,
+} from '../utils/UtilFunctions'
 import { RowDataPacket } from 'mysql2'
 
 //Declare Page Objects
@@ -44,10 +48,6 @@ export default class StudyDetailsPage {
   readonly tablePlannedClosureDateValue: Locator
   readonly tableActualClosureDateHeader: Locator
   readonly tableActualClosureDateValue: Locator
-  readonly tableNetworkTargetHeader: Locator
-  readonly tableNetworkTargetValue: Locator
-  readonly tableNetworkTotalHeader: Locator
-  readonly tableNetworkTotalValue: Locator
   readonly tableUkTargetHeader: Locator
   readonly tableUkTargetValue: Locator
   readonly tableUkTotalHeader: Locator
@@ -55,6 +55,7 @@ export default class StudyDetailsPage {
   readonly tableEstimatedReopenDateHeader: Locator
   readonly tableEstimatedReopenDateValue: Locator
   readonly assessButton: Locator
+  readonly updateStudyDataButton: Locator
   readonly assessSuccessAlertBox: Locator
   readonly assessSuccessAlertBoxTitle: Locator
   readonly noAssessmentValue: Locator
@@ -74,6 +75,27 @@ export default class StudyDetailsPage {
   readonly secondSponsorAssessmentTrack: Locator
   readonly dueIndicator: Locator
   readonly dueIndicatorSupportingText: Locator
+  readonly allStudiesLink: Locator
+  readonly sponsorAssessmentHistory: Locator
+  readonly updateSuccessBanner: Locator
+  readonly updateSuccessContent: Locator
+  readonly viewEditHistory: Locator
+  readonly directChangeEditHistory: Locator
+  readonly directChangeUser: Locator
+  readonly proposedChangeEditHistory: Locator
+  readonly proposedChangeUser: Locator
+  readonly proposedChangeStatus: Locator
+  readonly proposedChangePlannedOpening: Locator
+  readonly proposedChangeActualOpening: Locator
+  readonly proposedChangePlannedClosure: Locator
+  readonly proposedChangeActualClosure: Locator
+  readonly proposedChangeUkTarget: Locator
+  readonly directChangeStatus: Locator
+  readonly directChangePlannedOpening: Locator
+  readonly directChangeActualOpening: Locator
+  readonly directChangePlannedClosure: Locator
+  readonly directChangeActualClosure: Locator
+  readonly directChangeUkTarget: Locator
 
   //Initialize Page Objects
   constructor(page: Page) {
@@ -82,7 +104,7 @@ export default class StudyDetailsPage {
     //Locators
     this.pageTitle = page.locator('h2[class="govuk-heading-l govuk-!-margin-bottom-1"]')
     this.progressHeader = page.locator('h3[class="govuk-heading-m govuk-!-margin-bottom-1 p-0"]', {
-      hasText: 'Progress Summary',
+      hasText: 'Summary of study’s progress (UK)',
     })
     this.progressSection = page.locator('table[class="govuk-table govuk-!-margin-top-3"]')
     this.assessmentHeader = page.locator('h3[class="govuk-heading-m govuk-!-margin-bottom-1 p-0"]', {
@@ -90,10 +112,13 @@ export default class StudyDetailsPage {
     })
     this.aboutHeader = page.locator('h3[class="govuk-heading-m govuk-!-margin-bottom-3"]')
     this.aboutSection = page.locator('table[class="govuk-table govuk-!-margin-bottom-3"]')
-    this.guidanceText = page.locator('div[class="w-full"] p').nth(0)
+    this.guidanceText = page.locator('div[class="govuk-inset-text mt-7"]')
     this.sponsorOrgSubTitle = page.locator('span[class="govuk-body-m mb-0 text-darkGrey"]')
     this.progressSummarySubTitle = page.locator('span[class="govuk-body-s text-darkGrey"]')
     this.assessButton = page.locator('a[class="govuk-button w-auto govuk-!-margin-bottom-0"]')
+    this.updateStudyDataButton = page.locator(
+      'a[class="govuk-button govuk-button--secondary w-auto govuk-!-margin-bottom-0"]'
+    )
     // About Study Table Values
     this.tableFullTitleHeader = page.locator('th[scope="row"]', { hasText: 'Study full title' })
     this.tableFullTitleValue = this.tableFullTitleHeader.locator('..').locator('td')
@@ -118,9 +143,13 @@ export default class StudyDetailsPage {
     this.tableStatusValue = this.tableStatusHeader.locator('..').locator('td')
     this.tableDataIndicatesHeader = page.locator('th[scope="row"]', { hasText: 'Study data indicates' })
     this.tableDataIndicatesValue = this.tableDataIndicatesHeader.locator('..').locator('td')
-    this.tablePlannedOpeningDateHeader = page.locator('th[scope="row"]', { hasText: 'Planned opening date' })
+    this.tablePlannedOpeningDateHeader = page.locator('th[scope="row"]', {
+      hasText: 'Planned opening to recruitment date',
+    })
     this.tablePlannedOpeningDateValue = this.tablePlannedOpeningDateHeader.locator('..').locator('td')
-    this.tableActualOpeningDateHeader = page.locator('th[scope="row"]', { hasText: 'Actual opening date' })
+    this.tableActualOpeningDateHeader = page.locator('th[scope="row"]', {
+      hasText: 'Actual opening to recruitment date',
+    })
     this.tableActualOpeningDateValue = this.tableActualOpeningDateHeader.locator('..').locator('td')
     this.tablePlannedClosureDateHeader = page.locator('th[scope="row"]', {
       hasText: 'Planned closure to recruitment date',
@@ -130,13 +159,9 @@ export default class StudyDetailsPage {
       hasText: 'Actual closure to recruitment date',
     })
     this.tableActualClosureDateValue = this.tableActualClosureDateHeader.locator('..').locator('td')
-    this.tableNetworkTargetHeader = page.locator('th[scope="row"]', { hasText: 'Network recruitment target' })
-    this.tableNetworkTargetValue = this.tableNetworkTargetHeader.locator('..').locator('td')
-    this.tableNetworkTotalHeader = page.locator('th[scope="row"]', { hasText: 'Total network recruitment to date' })
-    this.tableNetworkTotalValue = this.tableNetworkTotalHeader.locator('..').locator('td')
-    this.tableUkTargetHeader = page.locator('th[scope="row"]', { hasText: 'UK recruitment target' })
+    this.tableUkTargetHeader = page.locator('th[data-testid="uk-recruitment-target-label"]')
     this.tableUkTargetValue = this.tableUkTargetHeader.locator('..').locator('td')
-    this.tableUkTotalHeader = page.locator('th[scope="row"]', { hasText: 'Total UK recruitment to date' })
+    this.tableUkTotalHeader = page.locator('th[data-testid="total-uk-recruitment-label"]')
     this.tableUkTotalValue = this.tableUkTotalHeader.locator('..').locator('td')
     this.tableEstimatedReopenDateHeader = page.locator('th[scope="row"]', { hasText: 'Estimated reopening date' })
     this.tableEstimatedReopenDateValue = this.tableEstimatedReopenDateHeader.locator('..').locator('td')
@@ -153,8 +178,9 @@ export default class StudyDetailsPage {
     this.secondSponsorAssessmentFurtherInfoBullets = this.secondSponsorAssessmentFurtherInfo.locator('ul li')
     this.firstSponsorAssessmentFurtherInfoText = this.firstSponsorAssessmentFurtherInfo.locator('p')
     this.secondSponsorAssessmentFurtherInfoText = this.secondSponsorAssessmentFurtherInfo.locator('p')
-    this.firstSponsorAssessmentRow = page.locator('button[id="radix-:r2:"]')
-    this.secondSponsorAssessmentRow = page.locator('button[id="radix-:r4:"]')
+    this.sponsorAssessmentHistory = page.locator('[class="govuk-!-margin-bottom-6"]')
+    this.firstSponsorAssessmentRow = this.sponsorAssessmentHistory.locator('button')
+    this.secondSponsorAssessmentRow = this.sponsorAssessmentHistory.locator('button').nth(1)
     this.firstSponsorAssessmentDate = this.firstSponsorAssessmentRow.locator('div')
     this.secondSponsorAssessmentDate = this.secondSponsorAssessmentRow.locator('div')
     this.firstSponsorAssessmentText = this.firstSponsorAssessmentRow.locator(
@@ -167,6 +193,42 @@ export default class StudyDetailsPage {
     this.secondSponsorAssessmentTrack = this.secondSponsorAssessmentText.locator('strong')
     this.dueIndicator = page.locator('span[class="govuk-tag govuk-tag--red mr-2"]')
     this.dueIndicatorSupportingText = this.dueIndicator.locator('..')
+    this.allStudiesLink = page.locator('a[href="/studies"]')
+    this.updateSuccessBanner = page.locator('.govuk-notification-banner.govuk-notification-banner--success')
+    this.updateSuccessContent = page.locator('.govuk-notification-banner__heading')
+    this.viewEditHistory = page.locator('span:has-text("View edit history")')
+    this.proposedChangeEditHistory = page.locator('[data-state="open"][data-testid^="edit-history-accordion-item-"]')
+    this.proposedChangeUser = this.proposedChangeEditHistory.locator('span > span')
+    this.proposedChangeStatus = this.proposedChangeEditHistory.locator('li:has-text("Study status changed from ")')
+    this.proposedChangePlannedOpening = this.proposedChangeEditHistory.locator(
+      'li:has-text("Planned opening to recruitment date")'
+    )
+    this.proposedChangeActualOpening = this.proposedChangeEditHistory.locator(
+      'li:has-text("Actual opening to recruitment date")'
+    )
+    this.proposedChangePlannedClosure = this.proposedChangeEditHistory.locator(
+      'li:has-text("Planned closure to recruitment date")'
+    )
+    this.proposedChangeActualClosure = this.proposedChangeEditHistory.locator(
+      'li:has-text("Actual closure to recruitment date")'
+    )
+    this.proposedChangeUkTarget = this.proposedChangeEditHistory.locator('li:has-text("UK recruitment target")')
+    this.directChangeEditHistory = page.locator('[data-testid^="edit-history-accordion-item-"]').first()
+    this.directChangeUser = this.directChangeEditHistory.locator('span > span')
+    this.directChangeStatus = this.proposedChangeEditHistory.locator('li:has-text("Study status changed from ")')
+    this.directChangePlannedOpening = this.directChangeEditHistory.locator(
+      'li:has-text("Planned opening to recruitment date")'
+    )
+    this.directChangeActualOpening = this.directChangeEditHistory.locator(
+      'li:has-text("Actual opening to recruitment date")'
+    )
+    this.directChangePlannedClosure = this.directChangeEditHistory.locator(
+      'li:has-text("Planned closure to recruitment date")'
+    )
+    this.directChangeActualClosure = this.directChangeEditHistory.locator(
+      'li:has-text("Actual closure to recruitment date")'
+    )
+    this.directChangeUkTarget = this.directChangeEditHistory.locator('li:has-text("UK recruitment target")')
   }
 
   //Page Methods
@@ -287,7 +349,7 @@ export default class StudyDetailsPage {
   async assertGuidanceText() {
     await expect(this.guidanceText).toBeVisible()
     await expect(this.guidanceText).toHaveText(
-      'You can review the progress of this study at any time. You will need to assess if the study is on or off track and if any NIHR RDN support is needed.'
+      'Check the study data and provide updates where necessary. Based on the summary, assess if your study is on or off track and what action you need to take.'
     )
   }
 
@@ -326,7 +388,7 @@ export default class StudyDetailsPage {
 
   async assertProgressSummarySectionPresent() {
     await expect(this.progressHeader).toBeVisible()
-    await expect(this.progressHeader).toHaveText('Progress Summary')
+    await expect(this.progressHeader).toHaveText('Summary of study’s progress (UK)')
     await expect(this.progressSection).toBeVisible()
   }
 
@@ -338,9 +400,26 @@ export default class StudyDetailsPage {
   }
 
   async assertStudyStatus(expectedStatus: string) {
+    const cpmsStatusToSimpleStatus: Record<string, string> = {
+      'In Setup': 'In setup',
+      'In Setup, Pending NHS Permission': 'In setup',
+      'In Setup, Approval Received': 'In setup',
+      'In Setup, Pending Approval': 'In setup',
+      'In Setup, NHS Permission Received': 'In setup',
+      'Open to Recruitment': 'Open to recruitment',
+      'Open, With Recruitment': 'Open to recruitment',
+      'Closed to Recruitment': 'Closed',
+      'Closed to Recruitment, In Follow Up': 'Closed to Recruitment, In Follow Up',
+      'Closed to Recruitment, Follow Up Complete': 'Closed',
+      'Suspended (from Open, With Recruitment)': 'Suspended',
+      'Suspended (from Open to Recruitment)': 'Suspended',
+      'Withdrawn in Pre-Setup': 'Withdrawn',
+      'Withdrawn During Setup': 'Withdrawn',
+    }
+
     await expect(this.tableStatusHeader).toBeVisible()
     await expect(this.tableStatusValue).toBeVisible()
-    await expect(this.tableStatusValue).toHaveText(expectedStatus)
+    await expect(this.tableStatusValue).toHaveText(cpmsStatusToSimpleStatus[expectedStatus] || expectedStatus)
   }
 
   async assertDataIndicators(expectedDataIndicators: RowDataPacket[]) {
@@ -393,24 +472,13 @@ export default class StudyDetailsPage {
     }
   }
 
-  async assertNetworkTarget(expectedTarget: number) {
-    await expect(this.tableNetworkTargetHeader).toBeVisible()
-    await expect(this.tableNetworkTargetValue).toBeVisible()
-    if (expectedTarget != null) {
-      await expect(this.tableNetworkTargetValue).toHaveText(expectedTarget.toString())
-    } else {
-      await expect(this.tableNetworkTargetValue).toHaveText('-')
-    }
-  }
-
-  async assertNetworkTotal(expectedTotal: number) {
-    await expect(this.tableNetworkTotalHeader).toBeVisible()
-    await expect(this.tableNetworkTotalValue).toBeVisible()
-    await expect(this.tableNetworkTotalValue).toHaveText(expectedTotal.toString())
-  }
-
-  async assertUkTarget(expectedTarget: number) {
+  async assertUkTarget(expectedTarget: number, studyRoute: string) {
     await expect(this.tableUkTargetHeader).toBeVisible()
+    if (studyRoute === 'Non-commercial') {
+      await expect(this.tableUkTargetHeader).toHaveText('UK recruitment target')
+    } else {
+      await expect(this.tableUkTargetHeader).toHaveText('UK recruitment target (excluding private sites)')
+    }
     await expect(this.tableUkTargetValue).toBeVisible()
     if (expectedTarget != null) {
       await expect(this.tableUkTargetValue).toHaveText(expectedTarget.toString())
@@ -419,8 +487,13 @@ export default class StudyDetailsPage {
     }
   }
 
-  async assertUkTotal(expectedTotal: number) {
+  async assertUkTotal(expectedTotal: number, studyRoute: string) {
     await expect(this.tableUkTotalHeader).toBeVisible()
+    if (studyRoute === 'Non-commercial') {
+      await expect(this.tableUkTotalHeader).toHaveText('Total UK recruitment to date')
+    } else {
+      await expect(this.tableUkTotalHeader).toHaveText('Total UK recruitment to date (excluding private sites)')
+    }
     await expect(this.tableUkTotalValue).toBeVisible()
     await expect(this.tableUkTotalValue).toHaveText(expectedTotal.toString())
   }
@@ -429,14 +502,18 @@ export default class StudyDetailsPage {
     expect(expectedDataIndicators).toHaveLength(0)
   }
 
-  async checkStudyHasNullValues(expectedValues: RowDataPacket[]) {
-    expect(expectedValues[0].actualOpeningDate).toBeNull()
-    expect(expectedValues[0].actualClosureDate).toBeNull()
-    expect(expectedValues[0].sampleSize).toBeNull()
+  async checkStudyHasNullValues(actualOpen: string, actualClose: string, sample: string) {
+    expect(actualOpen).toBeNull()
+    expect(actualClose).toBeNull()
+    expect(sample).toBeNull()
   }
 
   async assertStudyStatusSuspended(expectedStatus: string) {
-    expect(expectedStatus).toEqual('Suspended')
+    if (expectedStatus === 'Suspended (from Open, With Recruitment)') {
+      await expect(this.tableStatusValue).toHaveText('Suspended')
+    } else {
+      await expect(this.tableStatusValue).toHaveText(expectedStatus)
+    }
   }
 
   async assertEstimatedReopenDatePresent(expectedValues: RowDataPacket[]) {
@@ -563,6 +640,181 @@ export default class StudyDetailsPage {
     } else {
       await expect(this.dueIndicator).toBeHidden()
       await expect(this.dueIndicatorSupportingText).toBeHidden()
+    }
+  }
+
+  // new getStudyInCpms methods
+
+  async assertStudyShortTitleV2(expectedShortTitle: string) {
+    await expect(this.pageTitle).toBeVisible()
+    await expect(this.pageTitle).toHaveText(`Study short title: ${expectedShortTitle}`)
+  }
+
+  async assertStudySponsorSubTitleV2(studySponsors: any) {
+    const findSelectedObject = (sponsors: any[]) => {
+      const cro = sponsors.find((sponsor) => sponsor.OrganisationRole === 'Contract Research Organisation')
+      const ctu = sponsors.find((sponsor) => sponsor.OrganisationRole === 'Managing Clinical Trials Unit')
+      const sponsor = sponsors.find((sponsor) => sponsor.OrganisationRole === 'Clinical Research Sponsor ')
+
+      if (cro) {
+        return `${sponsor.OrganisationName} (${cro.OrganisationName})`
+      } else if (ctu) {
+        return `${sponsor.OrganisationName} (${ctu.OrganisationName})`
+      } else if (sponsor) {
+        return sponsor.OrganisationName
+      }
+    }
+
+    const expectedSponsor = findSelectedObject(studySponsors)
+
+    await expect(this.sponsorOrgSubTitle).toBeVisible()
+    await expect(this.sponsorOrgSubTitle).toHaveText(`Study sponsor: ${expectedSponsor}`)
+  }
+
+  async assertDataIndicatorsV2(expectedDataIndicators: any) {
+    const extractDataIndicators = (indicators: any[]) => {
+      if (indicators && indicators.length > 0) {
+        // extracting the 'EvaluationCategoryValue' from each object and joining them with commas
+        const categoryValues = indicators.map((indicator) => indicator.EvaluationCategoryValue).join(', ')
+        return categoryValues
+      }
+      // else return default
+      return 'This study is progressing as planned'
+    }
+
+    const expectedSponsor = extractDataIndicators(expectedDataIndicators)
+    await expect(this.tableDataIndicatesValue).toBeVisible()
+    await expect(this.tableDataIndicatesValue).toHaveText(expectedSponsor)
+  }
+
+  async assertPlannedOpeningDateV2(date: Date) {
+    const expectedDate = convertIsoDateToDisplayDateV2(date)
+    await expect(this.tablePlannedOpeningDateHeader).toBeVisible()
+    await expect(this.tablePlannedOpeningDateValue).toBeVisible()
+    await expect(this.tablePlannedOpeningDateValue).toHaveText(expectedDate)
+  }
+
+  async assertActualOpeningDateV2(date: Date) {
+    const expectedDate = convertIsoDateToDisplayDateV2(date)
+    await expect(this.tableActualOpeningDateHeader).toBeVisible()
+    await expect(this.tableActualOpeningDateValue).toBeVisible()
+    await expect(this.tableActualOpeningDateValue).toHaveText(expectedDate)
+  }
+
+  async assertPlannedClosureDateV2(date: Date) {
+    const expectedDate = convertIsoDateToDisplayDateV2(date)
+    await expect(this.tablePlannedClosureDateHeader).toBeVisible()
+    await expect(this.tablePlannedClosureDateValue).toBeVisible()
+    await expect(this.tablePlannedClosureDateValue).toHaveText(expectedDate)
+  }
+
+  async assertActualClosureDateV2(date: Date) {
+    const expectedDate = convertIsoDateToDisplayDateV2(date)
+    await expect(this.tableActualClosureDateHeader).toBeVisible()
+    await expect(this.tableActualClosureDateValue).toBeVisible()
+    await expect(this.tableActualClosureDateValue).toHaveText(expectedDate)
+  }
+
+  async assertEstimatedReopenDateV2(date: Date) {
+    const expectedDate = convertIsoDateToDisplayDateV2(date)
+    await expect(this.tableEstimatedReopenDateHeader).toBeVisible()
+    await expect(this.tableEstimatedReopenDateValue).toBeVisible()
+    await expect(this.tableEstimatedReopenDateValue).toHaveText(expectedDate)
+  }
+
+  async assertStudySponsorV2(studySponsor: any) {
+    const findSelectedObject = (sponsors: any[]) => {
+      const sponsor = sponsors.find((sponsor) => sponsor.OrganisationRole === 'Clinical Research Sponsor ')
+
+      if (sponsor) {
+        return sponsor.OrganisationName
+      } else {
+        return '-'
+      }
+    }
+
+    const expectedSponsor = findSelectedObject(studySponsor)
+
+    await expect(this.tableSponsorValue).toBeVisible()
+    await expect(this.tableSponsorValue).toHaveText(expectedSponsor)
+  }
+
+  async assertStudyUpdatedSuccess(type: string) {
+    await expect(this.updateSuccessBanner).toBeVisible()
+    if (type === 'direct') {
+      await expect(this.updateSuccessContent).toHaveText('Your study data changes have been accepted.')
+    }
+    if (type === 'proposed') {
+      await expect(this.updateSuccessContent).toHaveText(
+        'Your study data changes have been received. These will now be reviewed and applied to the study record. Until then, previous study data values will be displayed.'
+      )
+    }
+  }
+
+  async assertStudyDetailsEditHistory(updateType: string, oldValue: string, newValue: string, added: boolean) {
+    switch (updateType) {
+      case 'status':
+        await expect(this.proposedChangeStatus).toBeVisible()
+        await expect(this.proposedChangeStatus).toContainText(`Study status changed from ${oldValue} to ${newValue}`)
+        break
+      case 'plannedOpening':
+        await expect(this.proposedChangePlannedOpening).toBeVisible()
+        if (added == true) {
+          await expect(this.proposedChangePlannedOpening).toContainText(
+            `Planned opening to recruitment date ${newValue} added`
+          )
+        } else {
+          await expect(this.proposedChangePlannedOpening).toContainText(
+            `Planned opening to recruitment date changed from ${oldValue} to ${newValue}`
+          )
+        }
+        await expect(this.proposedChangePlannedOpening).toContainText(newValue)
+        break
+      case 'actualOpening':
+        await expect(this.proposedChangeActualOpening).toBeVisible()
+        if (added == true) {
+          await expect(this.proposedChangeActualOpening).toContainText(
+            `Actual opening to recruitment date ${newValue} added`
+          )
+        } else {
+          await expect(this.proposedChangeActualOpening).toContainText(
+            `Actual opening to recruitment date changed from ${oldValue} to ${newValue}`
+          )
+        }
+        break
+      case 'plannedClosure':
+        if (added == true) {
+          await expect(this.proposedChangePlannedClosure).toContainText(
+            `Planned closure to recruitment date ${newValue} added`
+          )
+        } else {
+          await expect(this.proposedChangePlannedClosure).toContainText(
+            `Planned closure to recruitment date changed from ${oldValue} to ${newValue}`
+          )
+        }
+        break
+      case 'actualClosure':
+        if (added == true) {
+          await expect(this.proposedChangeActualClosure).toContainText(
+            `Actual closure to recruitment date ${newValue} added`
+          )
+        } else {
+          await expect(this.proposedChangeActualClosure).toContainText(
+            `Actual closure to recruitment date changed from ${oldValue} to ${newValue}`
+          )
+        }
+        break
+      case 'ukTarget':
+        if (added == true) {
+          await expect(this.proposedChangeUkTarget).toContainText(`UK recruitment target ${newValue} added`)
+        } else {
+          await expect(this.proposedChangeUkTarget).toContainText(
+            `UK recruitment target changed from ${oldValue} to ${newValue}`
+          )
+        }
+        break
+      default:
+        throw new Error(`${updateType} is not a valid update option`)
     }
   }
 }

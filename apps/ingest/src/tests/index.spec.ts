@@ -1,6 +1,7 @@
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
 import { logger } from '@nihr-ui/logger'
+import { setStudyAssessmentDue } from 'shared-utilities'
 import { ingest } from '../ingest'
 import {
   organisationEntities,
@@ -30,6 +31,8 @@ interface EvalCategory {
 }
 
 jest.mock('@nihr-ui/logger')
+jest.mock('shared-utilities')
+const mockSetStudyAssessmentDue = setStudyAssessmentDue as jest.MockedFunction<typeof setStudyAssessmentDue>
 
 const API_URL = 'https://dev.cpmsapi.nihr.ac.uk/api/v1/study-summaries'
 
@@ -44,6 +47,7 @@ beforeAll(() => {
 })
 afterEach(() => {
   server.resetHandlers()
+  jest.resetAllMocks()
 })
 afterAll(() => {
   server.close()
@@ -63,7 +67,7 @@ beforeEach(() => {
   prismaMock.studyOrganisation.createMany.mockResolvedValueOnce({ count: 1 })
   prismaMock.studyFunder.createMany.mockResolvedValueOnce({ count: 1 })
   prismaMock.studyEvaluationCategory.updateMany.mockResolvedValueOnce({ count: 1 })
-  prismaMock.study.updateMany.mockResolvedValueOnce({ count: 1 })
+  mockSetStudyAssessmentDue.mockResolvedValueOnce({ count: 1 })
 
   prismaMock.study.findMany.mockResolvedValueOnce(studyEntities)
   prismaMock.organisation.findMany.mockResolvedValueOnce(organisationEntities)
@@ -101,6 +105,7 @@ describe('ingest', () => {
       plannedClosureDate: expect.any(Date),
       actualOpeningDate: expect.any(Date),
       actualClosureDate: expect.any(Date),
+      estimatedReopeningDate: expect.any(Date),
       isDeleted: false,
     }
 
@@ -243,34 +248,8 @@ describe('ingest', () => {
   it('should update the study `isDueAssessment` flag', async () => {
     await ingest()
 
-    expect(prismaMock.study.updateMany).toHaveBeenCalledTimes(1)
-
-    expect(prismaMock.study.updateMany).toHaveBeenCalledWith({
-      data: {
-        isDueAssessment: true,
-      },
-      where: {
-        id: { in: studyEntities.map(({ id }) => id) },
-        evaluationCategories: {
-          some: { isDeleted: false },
-        },
-        assessments: {
-          every: {
-            createdAt: {
-              lte: expect.any(Date),
-            },
-          },
-        },
-        OR: [
-          { actualOpeningDate: null },
-          {
-            actualOpeningDate: {
-              lte: expect.any(Date),
-            },
-          },
-        ],
-      },
-    })
+    expect(mockSetStudyAssessmentDue).toHaveBeenCalledTimes(1)
+    expect(mockSetStudyAssessmentDue).toHaveBeenCalledWith(studyEntities.map(({ id }) => id))
   })
 
   it('should handle errors when fetching studies', async () => {

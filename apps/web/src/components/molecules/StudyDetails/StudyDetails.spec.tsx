@@ -13,7 +13,6 @@ describe('StudyDetails Component', () => {
       protocolReferenceNumber: 'Protocol123',
       irasId: 'IRAS456',
       cpmsId: 12345,
-      organisations: [{ organisation: { name: 'Sponsor Org' } }],
       organisationsByRole: {
         Sponsor: 'Sponsor Org',
         CTU: 'CTU Org',
@@ -45,14 +44,14 @@ describe('StudyDetails Component', () => {
 
     const aboutRows = within(table).getAllByRole('row')
     expect(aboutRows.map((row) => within(row).getByRole('cell').textContent)).toEqual([
-      'Study Title',
-      'IRAS456',
-      '12345',
+      defaultProps.study.title,
+      defaultProps.study.irasId,
+      defaultProps.study.cpmsId.toString(),
       'Sponsor Org',
       'CTU Org',
       'CRO Org',
-      'Specialty Name',
-      'John Doe',
+      defaultProps.study.managingSpeciality,
+      `${defaultProps.study.chiefInvestigatorFirstName} ${defaultProps.study.chiefInvestigatorLastName}`,
     ])
   })
 
@@ -63,7 +62,6 @@ describe('StudyDetails Component', () => {
         protocolReferenceNumber: null,
         irasId: null,
         cpmsId: 12345,
-        organisations: [{ organisation: { name: 'Sponsor Org' } }],
         organisationsByRole: {
           Sponsor: 'Sponsor Org',
         },
@@ -106,7 +104,6 @@ describe('StudyDetails Component', () => {
         protocolReferenceNumber: '123',
         irasId: null,
         cpmsId: 12345,
-        organisations: [{ organisation: { name: 'Sponsor Org' } }],
         organisationsByRole: {
           Sponsor: 'Sponsor Org',
         },

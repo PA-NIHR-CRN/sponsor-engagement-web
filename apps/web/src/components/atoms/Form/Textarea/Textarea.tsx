@@ -9,22 +9,37 @@ import { ErrorInline } from '../ErrorInline/ErrorInline'
 
 interface TextareaProps {
   label: string
+  labelSize?: 's' | 'm' | 'l'
   name: string
   hint?: ReactNode
   required?: boolean
   errors: FieldErrors
   defaultValue: string | undefined
   remainingCharacters?: number
+  maxLength?: number
 }
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ label, errors, hint, remainingCharacters, defaultValue, required = true, ...rest }, ref) => {
+  (
+    {
+      label,
+      labelSize = 's',
+      errors,
+      hint,
+      remainingCharacters,
+      defaultValue,
+      required = true,
+      maxLength = TEXTAREA_MAX_CHARACTERS,
+      ...rest
+    },
+    ref
+  ) => {
     const error = errors[rest.name]
 
     return (
       <div className={clsx('govuk-form-group', { 'govuk-form-group--error': Boolean(error) })}>
         <div className="govuk-label-wrapper">
-          <label className="govuk-label govuk-label--s" htmlFor={rest.name} id={`${rest.name}-label`}>
+          <label className={`govuk-label govuk-label--${labelSize}`} htmlFor={rest.name} id={`${rest.name}-label`}>
             {label}
           </label>
           {hint ? (
@@ -50,7 +65,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           })}
           defaultValue={defaultValue}
           id={rest.name}
-          maxLength={TEXTAREA_MAX_CHARACTERS}
+          maxLength={maxLength}
           {...rest}
           ref={ref}
           rows={5}

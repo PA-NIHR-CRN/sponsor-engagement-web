@@ -12,12 +12,22 @@
 
       <p>Hello,</p>
 
-      <p>You are nominated as a Sponsor contact for studies on the NIHR Research Delivery Network’s (RDN) research
-        portfolio. One or more studies require an update on their status. Please sign in to the Sponsor Engagement Tool
-        to provide these updates.</p>
+      <p>You are a nominated contact for studies on the NIHR Research Delivery Network’s (RDN) research portfolio for:
+        <br />
+        <ul>
+          {{#each organisationNames}}
+            <li>{{this}}</li>
+          {{/each}}
+        </ul>
+      </p>
+
+      <p>
+        One or more studies requires an update. Please sign in to the Sponsor Engagement Tool to provide these updates.
+      </p>
 
       <p>As a nominated contact for your organisation, you will see all studies linked to your organisation. The Sponsor
-        Engagement Tool does not associate contacts to specific studies or groups of studies, only to the organisation.</p>
+        Engagement Tool does not associate contacts to specific studies or groups of studies, only to the organisation.
+      </p>
 
       <a
         href='{{signInLink}}'
@@ -53,26 +63,36 @@
 
       <p>
         The NIHR RDN tracks the progress of research studies in its portfolio using data provided by Sponsors or their
-        delegates on behalf of the Department of Health and Social Care.
+        delegates on behalf of the Department of Health and Social Care (DHSC).
       </p>
 
-      <p>Sponsors or their delegates are asked to review and assess the progress of studies when:</p>
+      <p>
+        The DHSC have published the <a href='{{termsAndConditionsLink}}'>Terms and Conditions for NIHR RDN support</a>, which outlines the requirements for Sponsors to provide up-to-date study data and assessments of progress to the RDN.
+      </p>
+
+      <p>The Sponsor Engagement Tool has been designed to support Sponsors and their delegates to meet the requirements
+        outlined in the T&Cs. Sponsors and their delegates should use the Sponsor Engagement Tool to review the data the
+        RDN holds on their organisation’s portfolio of studies, and to provide study data updates and assessments to
+        ensure the data held by the RDN is complete and up-to-date.
+      </p>
+
+      <p>Sponsors or their delegates are prompted to review and assess the progress of studies when:</p>
 
       <ul>
-        <li>A study falls behind the agreed milestones or</li>
-        <li>A study is not recruiting to target</li>
-        <li>And the last progress assessment is over three months old</li>
+        <li>A study falls behind a planned milestone or</li>
+        <li>A study appears to not be recruiting to target</li>
+        <li>And the last study assessment is over three months old</li>
       </ul>
 
       <p>
         Sponsors or their delegates can request
         <a href='{{requestSupportLink}}'>NIHR RDN support</a>
-        with their research study at any time.
+        with study delivery and performance at any time.
       </p>
 
       <p>
         <strong>
-          Please note that providing regular study assessments is a requirement of the
+          Please note that providing regular study updates and assessments are requirements of the
           <a href='{{termsAndConditionsLink}}'>Terms and Conditions for NIHR RDN support</a>. Failure to do so may
           result in removal from the NIHR RDN Portfolio.
         </strong>

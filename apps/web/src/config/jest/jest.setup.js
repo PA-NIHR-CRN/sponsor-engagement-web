@@ -11,3 +11,5 @@ jest.mock('next/router', () => require('next-router-mock'))
 // Fixes the "ReferenceError: TextEncoder is not defined" errors
 global.TextEncoder = TextEncoder
 global.TextDecoder = TextDecoder
+
+global.structuredClone = (v) => JSON.parse(JSON.stringify(v))

@@ -1,14 +1,16 @@
-// import { test as setup, expect } from '@playwright/test';
 import { test as setup } from '../../hooks/CustomFixtures'
 
 const authSponsorContactFile = '.auth/sponsorContact.json'
 const authContactManagerFile = '.auth/contactManager.json'
+const authNpmFile = '.auth/nationalPortfolioManager.json'
 const cookieConfig = {
   name: 'SEConsentGDPR',
   value: 'Reject',
-  domain: new URL(`${process.env.E2E_BASE_URL}`).hostname,
+  domain: 'test.assessmystudy.nihr.ac.uk',
   path: '/',
-  expires: -1,
+  expires: Math.floor(new Date('2028-10-17T09:09:17.000Z').getTime() / 1000),
+  httpOnly: false,
+  secure: true,
 }
 
 setup(
@@ -38,3 +40,13 @@ setup(
     await page.context().storageState({ path: authContactManagerFile })
   }
 )
+
+setup('Authenticate the CPMS NPM User', async ({ cpmsStudiesPage, loginPage, page }) => {
+  await cpmsStudiesPage.goToCpmsStudies()
+  await cpmsStudiesPage.assertOnSignInPage()
+  await cpmsStudiesPage.btnNext.click()
+  await loginPage.loginWithUserCreds('National Portfolio Manager')
+  await cpmsStudiesPage.assertOnCpmsStudiesPage()
+  await page.context().addCookies([cookieConfig])
+  await page.context().storageState({ path: authNpmFile })
+})

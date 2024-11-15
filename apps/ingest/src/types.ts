@@ -61,6 +61,7 @@ export interface Study {
   PlannedRecruitmentEndDate: null | string
   ActualOpeningDate: null | string
   ActualClosureDate: null | string
+  EstimatedReopeningDate: null | string
   StudyEvaluationCategories: StudyEvaluationCategory[]
   StudySponsors: StudySponsor[]
   StudyFunders: StudyFunder[]
@@ -159,7 +160,7 @@ export interface StudySponsor {
 }
 
 export enum StudySponsorOrganisationRole {
-  ClinicalResearchSponsor = 'Clinical Research Sponsor ',
+  ClinicalResearchSponsor = 'Clinical Research Sponsor',
   ContractResearchOrganisation = 'Contract Research Organisation',
   ManagingClinicalTrialsUnit = 'Managing Clinical Trials Unit',
 }

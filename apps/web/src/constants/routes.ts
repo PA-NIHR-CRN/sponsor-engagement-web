@@ -34,6 +34,11 @@ export const SUPPORT_PAGE = '/request-support'
 export const REGISTRATION_PAGE = '/register'
 
 /**
+ * Assessment page
+ */
+export const ASSESSMENT_PAGE = '/assessments'
+
+/**
  * Registration confirmation page where users will be redirected to after successful IDG & SE account creation
  */
 export const REGISTRATION_CONFIRMATION_PAGE = '/register/confirmation'

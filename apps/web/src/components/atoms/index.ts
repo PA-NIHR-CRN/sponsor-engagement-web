@@ -1,6 +1,7 @@
 export * from './Card/Card'
 export * from './Form/Checkbox/Checkbox'
 export * from './Form/CheckboxGroup/CheckboxGroup'
+export * from './Form/DateInput/DateInput'
 export * from './Form/ErrorInline/ErrorInline'
 export * from './Form/ErrorSummary/ErrorSummary'
 export * from './Form/Fieldset/Fieldset'

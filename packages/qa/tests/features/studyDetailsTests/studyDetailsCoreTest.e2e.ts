@@ -1,6 +1,7 @@
 import { RowDataPacket } from 'mysql2'
 import { test } from '../../../hooks/CustomFixtures'
 import { seDatabaseReq } from '../../../utils/DbRequests'
+import { getStudyEngagementInfo } from '../../../utils/ApiRequests'
 
 const testUserId = 6
 const startingOrgId = 9
@@ -21,6 +22,7 @@ const noCtuOrgRelationshipStudyId = 339
 test.beforeAll('Setup Tests', async () => {
   await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
   await seDatabaseReq(`UPDATE Study SET protocolReferenceNumber = NULL WHERE id = ${noProtocolRefNoStudyId};`)
+
   const randomStudyIdSelected = await seDatabaseReq(`SELECT Study.id FROM Study 
     INNER JOIN StudyOrganisation
     ON Study.id = StudyOrganisation.studyId
@@ -38,12 +40,12 @@ test.beforeAll('Setup Tests', async () => {
     WHERE Study.id = ${startingStudyId} AND StudyOrganisation.organisationRoleId = 1 AND Study.isDeleted = 0;`)
 
   const randomCROStudyIdSelected = await seDatabaseReq(`SELECT DISTINCT studyId FROM StudyOrganisation
-  INNER JOIN Study ON Study.id = StudyOrganisation.studyId
-  AND StudyOrganisation.organisationId = ${startingOrgId} AND StudyOrganisation.organisationRoleId = 1 
-  AND StudyOrganisation.isDeleted = 0
-  AND studyId in (SELECT DISTINCT studyId FROM StudyOrganisation 
-  WHERE (StudyOrganisation.organisationRoleId = 3 AND StudyOrganisation.isDeleted = 0))
-  AND Study.isDeleted = 0 ORDER BY RAND() LIMIT 1;`)
+    INNER JOIN Study ON Study.id = StudyOrganisation.studyId
+    AND StudyOrganisation.organisationId = ${startingOrgId} AND StudyOrganisation.organisationRoleId = 1 
+    AND StudyOrganisation.isDeleted = 0
+    AND studyId in (SELECT DISTINCT studyId FROM StudyOrganisation 
+    WHERE (StudyOrganisation.organisationRoleId = 3 AND StudyOrganisation.isDeleted = 0))
+    AND Study.isDeleted = 0 ORDER BY RAND() LIMIT 1;`)
   croOrgRelationshipStudyId = randomCROStudyIdSelected[0].studyId
 
   const croStudyOrg = await seDatabaseReq(`SELECT Organisation.name FROM Organisation
@@ -54,10 +56,10 @@ test.beforeAll('Setup Tests', async () => {
   croOrgName = croStudyOrg[0].name
 
   const randomCTUStudyIdSelected = await seDatabaseReq(`SELECT DISTINCT studyId FROM StudyOrganisation
-  INNER JOIN Study ON Study.id = StudyOrganisation.studyId
-  WHERE StudyOrganisation.organisationId = ${nonCommCTUOrgId} AND StudyOrganisation.organisationRoleId = 1 AND StudyOrganisation.isDeleted = 0
-  AND studyId in (SELECT DISTINCT studyId FROM StudyOrganisation WHERE (StudyOrganisation.organisationRoleId = 4 AND StudyOrganisation.isDeleted = 0))
-  AND Study.isDeleted = 0 ORDER BY RAND() LIMIT 1;`)
+    INNER JOIN Study ON Study.id = StudyOrganisation.studyId
+    WHERE StudyOrganisation.organisationId = ${nonCommCTUOrgId} AND StudyOrganisation.organisationRoleId = 1 AND StudyOrganisation.isDeleted = 0
+    AND studyId in (SELECT DISTINCT studyId FROM StudyOrganisation WHERE (StudyOrganisation.organisationRoleId = 4 AND StudyOrganisation.isDeleted = 0))
+    AND Study.isDeleted = 0 ORDER BY RAND() LIMIT 1;`)
   ctuOrgRelationshipStudyId = randomCTUStudyIdSelected[0].studyId
 
   const ctuStudyOrg = await seDatabaseReq(`SELECT Organisation.name FROM Organisation
@@ -74,6 +76,10 @@ test.describe('View core study details - @se_27', () => {
   test('As a Sponsor I can see the Core Study Details about a Specific Study - @se_27_ac1', async ({
     studyDetailsPage,
   }) => {
+    const studyDetails = await seDatabaseReq(`
+      SELECT cpmsId FROM sponsorengagement.Study where id = ${startingStudyId};`)
+    const getStudyInCpms = await getStudyEngagementInfo(studyDetails[0].cpmsId)
+
     await test.step(`Given I have navigated to the Study Details Page for a Commercial Study with SE Id ${startingStudyId}`, async () => {
       await studyDetailsPage.goto(startingStudyId.toString())
       await studyDetailsPage.assertOnStudyDetailsPage(startingStudyId.toString())
@@ -82,29 +88,61 @@ test.describe('View core study details - @se_27', () => {
       await studyDetailsPage.assertAboutStudySectionPresent()
     })
     await test.step('Then I can see the Studies Full Title', async () => {
-      await studyDetailsPage.assertStudyFullTitle(studyCoreDetails[0].title)
+      await studyDetailsPage.assertStudyShortTitleV2(getStudyInCpms.ShortName)
     })
     await test.step('And I can see the Studies Protocol Reference Number', async () => {
-      await studyDetailsPage.assertProtocolRefNo(studyCoreDetails[0].protocolReferenceNumber)
+      await studyDetailsPage.assertProtocolRefNo(getStudyInCpms.ProtocolReferenceNumber)
     })
     await test.step('And I can see the Studies IRAS Id', async () => {
-      await studyDetailsPage.assertStudyIrasId(studyCoreDetails[0].irasId)
+      await studyDetailsPage.assertStudyIrasId(getStudyInCpms.IrasId)
     })
     await test.step('And I can see the Studies CPMS Id', async () => {
-      await studyDetailsPage.assertStudyCpmsId(studyCoreDetails[0].cpmsId.toString())
+      await studyDetailsPage.assertStudyCpmsId(studyDetails[0].cpmsId.toString())
     })
     await test.step('And I can see the Name of the Studies Sponsor', async () => {
-      await studyDetailsPage.assertStudySponsor(studyCoreDetails[0].sponsorName)
+      await studyDetailsPage.assertStudySponsorV2(getStudyInCpms.StudySponsors)
     })
     await test.step('And I can see the Managing Speciality of the Study', async () => {
-      await studyDetailsPage.assertManagingSpecialty(studyCoreDetails[0].managingSpeciality)
+      await studyDetailsPage.assertManagingSpecialty(getStudyInCpms.ManagingSpecialty)
     })
     await test.step('And I can see the Chief Investigator of the Study', async () => {
       //Currently expected to show on both Study Types, if this changes it will need its own separate test (SE-120)
       await studyDetailsPage.assertChiefInvestigator(
-        studyCoreDetails[0].chiefInvestigatorFirstName,
-        studyCoreDetails[0].chiefInvestigatorLastName
+        getStudyInCpms.ChiefInvestigatorFirstName,
+        getStudyInCpms.ChiefInvestigatorLastName
       )
+    })
+  })
+
+  test('As a Sponsor I can navigate back from Study Details page to Studies Page by clicking back link - @se_181_ac1', async ({
+    studyDetailsPage,
+    studiesPage,
+  }) => {
+    await test.step(`Given I have navigated to the Study Details Page for a Study with SE Id ${startingStudyId}`, async () => {
+      await studyDetailsPage.goto(startingStudyId.toString())
+      await studyDetailsPage.assertOnStudyDetailsPage(startingStudyId.toString())
+    })
+    await test.step(`When I click on 'All studies' link`, async () => {
+      await studyDetailsPage.allStudiesLink.click()
+    })
+    await test.step('Then I am taken to the Studies page', async () => {
+      await studiesPage.assertOnStudiesPage()
+    })
+  })
+
+  test('As a Sponsor I can navigate from the Study Details page to Update study data page by clicking Update study data - @se_181_ac2', async ({
+    studyDetailsPage,
+    studyUpdatePage,
+  }) => {
+    await test.step(`Given I have navigated to the Study Details Page for a Study with SE Id ${startingStudyId}`, async () => {
+      await studyDetailsPage.goto(startingStudyId.toString())
+      await studyDetailsPage.assertOnStudyDetailsPage(startingStudyId.toString())
+    })
+    await test.step(`When I click on 'Update study' button`, async () => {
+      await studyDetailsPage.updateStudyDataButton.click()
+    })
+    await test.step('Then I am taken to the Update study data page', async () => {
+      await studyUpdatePage.assertOnUpdateStudyPage(startingStudyId.toString())
     })
   })
 
@@ -207,7 +245,9 @@ test.describe('View core study details - @se_27', () => {
   test('The row titled `Protocol reference number` only appears in for Commercial Studies - @se_27_nonComm_protocolRef', async ({
     studyDetailsPage,
   }) => {
-    await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${nonCommCTUOrgId} WHERE userId = ${testUserId}`)
+    await seDatabaseReq(`
+      UPDATE UserOrganisation SET organisationId = ${nonCommCTUOrgId} WHERE userId = ${testUserId}`)
+
     await test.step(`Given I have navigated to the Study Details Page for Non-Commercial Study with SE Id ${noCtuOrgRelationshipStudyId}`, async () => {
       await studyDetailsPage.goto(noCtuOrgRelationshipStudyId.toString())
       await studyDetailsPage.assertOnStudyDetailsPage(noCtuOrgRelationshipStudyId.toString())

@@ -22,57 +22,6 @@ jest.mock('next-seo')
 jest.mock('axios')
 jest.mock('@nihr-ui/logger')
 
-describe('getServerSideProps', () => {
-  const getServerSessionMock = jest.mocked(getServerSession)
-  const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
-
-  test('redirects to sign in page when there is no user session', async () => {
-    getServerSessionMock.mockResolvedValueOnce(null)
-    const result = await getServerSideProps(context)
-    expect(result).toEqual({
-      redirect: {
-        destination: SIGN_IN_PAGE,
-      },
-    })
-  })
-
-  test('redirects back to the homepage for users without any roles', async () => {
-    getServerSessionMock.mockResolvedValueOnce(userNoRoles)
-
-    const result = await getServerSideProps(context)
-    expect(result).toEqual({
-      redirect: {
-        destination: '/',
-      },
-    })
-  })
-
-  test('redirects to 404 page if no study id provided', async () => {
-    getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
-
-    const result = await getServerSideProps({ ...context, query: { studyId: undefined } })
-    expect(result).toEqual({
-      redirect: {
-        destination: '/404',
-      },
-    })
-  })
-
-  test('redirects to 404 page if no study found', async () => {
-    getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
-
-    prismaMock.$transaction.mockResolvedValueOnce([])
-    prismaMock.$transaction.mockResolvedValueOnce([])
-
-    const result = await getServerSideProps(context)
-    expect(result).toEqual({
-      redirect: {
-        destination: '/404',
-      },
-    })
-  })
-})
-
 type StudyWithRelations = Prisma.StudyGetPayload<{
   include: {
     organisations: {
@@ -160,353 +109,363 @@ const study = Mock.of<StudyWithRelations>({
   ],
 })
 
-describe('Assess progress of a study', () => {
+const env = { ...process.env }
+const mockedEnvVars = {
+  apiUrl: 'cpms-api',
+  apiUsername: 'testuser',
+  apiPassword: 'testpwd',
+}
+
+const renderPage = async (
+  context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: String(mockedStudyId) } }),
+  firstStudyResponse = study,
+  url = '/assessments/123'
+) => {
   jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRole)
+  prismaMock.$transaction.mockResolvedValueOnce([firstStudyResponse])
+  prismaMock.$transaction.mockResolvedValueOnce([sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
 
-  test('Default layout', async () => {
-    prismaMock.$transaction.mockResolvedValueOnce([study])
-    prismaMock.$transaction.mockResolvedValueOnce([sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
+  await mockRouter.push(url)
 
-    await mockRouter.push('/assessments/123')
+  const { props } = (await getServerSideProps(context)) as {
+    props: AssessmentProps
+  }
 
-    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: String(mockedStudyId) } })
+  render(Assessment.getLayout(<Assessment {...props} />, { ...props }))
+}
 
-    const { props } = (await getServerSideProps(context)) as {
-      props: AssessmentProps
-    }
+describe('Assessment', () => {
+  beforeEach(() => {
+    jest.resetAllMocks()
+  })
 
-    render(Assessment.getLayout(<Assessment {...props} />, { ...props }))
+  beforeAll(() => {
+    process.env.CPMS_API_URL = mockedEnvVars.apiUrl
+    process.env.CPMS_API_USERNAME = mockedEnvVars.apiUsername
+    process.env.CPMS_API_PASSWORD = mockedEnvVars.apiPassword
+  })
 
-    // SEO
-    expect(NextSeo).toHaveBeenCalledWith({ title: 'Study Progress Review - Assess progress of study' }, {})
+  afterAll(() => {
+    process.env = env
+  })
 
-    // Title
-    expect(screen.getByRole('heading', { level: 2, name: 'Assess progress of a study' })).toBeInTheDocument()
+  describe('getServerSideProps', () => {
+    const getServerSessionMock = jest.mocked(getServerSession)
+    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: '123' } })
 
-    // Description
-    expect(
-      screen.getByText(
-        'You will need to assess if the study is on or off track and if any action is being taken. If you need NIHR RDN support with this study you will need to request this separately.'
-      )
-    ).toBeInTheDocument()
-
-    // Support
-    expect(screen.getByRole('heading', { level: 3, name: 'Request NIHR RDN support' })).toBeInTheDocument()
-    expect(
-      screen.getByText(
-        'Sponsors or their delegates can request NIHR RDN support with their research study at any time.'
-      )
-    ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Request support' })).toHaveAttribute(
-      'href',
-      `${SUPPORT_PAGE}?returnPath=/assessments/123`
-    )
-
-    // Study sponsor
-    expect(screen.getByText('Test Organisation')).toBeInTheDocument()
-
-    // Study title
-    expect(screen.getByRole('heading', { level: 3, name: 'Study title: Test Study' })).toBeInTheDocument()
-
-    // Study details accordion
-    expect(screen.getByRole('button', { name: 'Show study details', expanded: false })).toBeInTheDocument()
-
-    // Last sponsor assessment
-    expect(screen.getByRole('heading', { level: 3, name: 'Last sponsor assessment' })).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', {
-        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
-        expanded: false,
+    test('redirects to sign in page when there is no user session', async () => {
+      getServerSessionMock.mockResolvedValueOnce(null)
+      const result = await getServerSideProps(context)
+      expect(result).toEqual({
+        redirect: {
+          destination: SIGN_IN_PAGE,
+        },
       })
-    ).toBeInTheDocument()
-
-    // Form Input - Status
-    const statusFieldset = screen.getByRole('radiogroup', { name: 'Is this study progressing as planned?' })
-
-    expect(within(statusFieldset).getByLabelText('On track')).toBeInTheDocument()
-    expect(within(statusFieldset).getByLabelText('On track')).toHaveAccessibleDescription(
-      'The sponsor or delegate is satisfied the study is progressing as planned.'
-    )
-    expect(within(statusFieldset).getByLabelText('Off track')).toBeInTheDocument()
-    expect(within(statusFieldset).getByLabelText('Off track')).toHaveAccessibleDescription(
-      'The sponsor or delegate has some concerns about the study and is taking action where appropriate.'
-    )
-
-    // Form Input - Further information
-    const furtherInformationFieldset = screen.getByRole('group', {
-      name: 'Is there any additional information that would help NIHR RDN understand this progress assessment?',
     })
 
-    for (const item of sysRefAssessmentFurtherInformation) {
-      expect(within(furtherInformationFieldset).getByLabelText(item.name)).toBeInTheDocument()
-    }
+    test('redirects back to the homepage for users without any roles', async () => {
+      getServerSessionMock.mockResolvedValueOnce(userNoRoles)
 
-    // Form Input - Further information (text)
-    expect(screen.getByLabelText('Further information (optional)')).toBeInTheDocument()
-    expect(screen.getByText('You have 400 characters remaining')).toBeInTheDocument()
-
-    // Submit CTA
-    expect(screen.getByRole('button', { name: 'Submit assessment' })).toHaveAttribute('type', 'submit')
-
-    // Cancel CTA
-    expect(screen.getByRole('link', { name: 'Cancel' })).toHaveAttribute('href', `/studies/${mockedStudyId}`)
-  })
-
-  test('Cancel button redirects back to the studies page if access from the list', async () => {
-    prismaMock.$transaction.mockResolvedValueOnce([study])
-    prismaMock.$transaction.mockResolvedValueOnce([sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
-
-    const context = Mock.of<GetServerSidePropsContext>({
-      req: {},
-      res: {},
-      query: { studyId: String(mockedStudyId), returnUrl: 'studies' },
+      const result = await getServerSideProps(context)
+      expect(result).toEqual({
+        redirect: {
+          destination: '/',
+        },
+      })
     })
 
-    const { props } = (await getServerSideProps(context)) as {
-      props: AssessmentProps
-    }
+    test('redirects to 404 page if no study id provided', async () => {
+      getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
 
-    render(Assessment.getLayout(<Assessment {...props} />, { ...props }))
+      const result = await getServerSideProps({ ...context, query: { studyId: undefined } })
+      expect(result).toEqual({
+        redirect: {
+          destination: '/404',
+        },
+      })
+    })
 
-    // Cancel CTA
-    expect(screen.getByRole('link', { name: 'Cancel' })).toHaveAttribute('href', `/studies`)
+    test('redirects to 404 page if no study found', async () => {
+      getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+
+      prismaMock.$transaction.mockResolvedValueOnce([])
+      prismaMock.$transaction.mockResolvedValueOnce([])
+
+      const result = await getServerSideProps(context)
+      expect(result).toEqual({
+        redirect: {
+          destination: '/404',
+        },
+      })
+    })
   })
 
-  test('No previous assessments', async () => {
-    prismaMock.$transaction.mockResolvedValueOnce([
-      {
+  describe('Assess progress of a study', () => {
+    test('Default layout', async () => {
+      await renderPage()
+
+      // SEO
+      expect(NextSeo).toHaveBeenCalledWith({ title: 'Study Progress Review - Assess progress of study' }, {})
+
+      // Title
+      expect(screen.getByRole('heading', { level: 2, name: 'Assess progress of a study' })).toBeInTheDocument()
+
+      // Description
+      expect(
+        screen.getByText(
+          'You will need to assess if the study is on or off track and if any action is being taken. If you need NIHR RDN support with this study you will need to request this separately.'
+        )
+      ).toBeInTheDocument()
+
+      // Support
+      expect(screen.getByRole('heading', { level: 3, name: 'Request NIHR RDN support' })).toBeInTheDocument()
+      expect(
+        screen.getByText(
+          'Sponsors or their delegates can request NIHR RDN support with their research study at any time.'
+        )
+      ).toBeInTheDocument()
+      expect(screen.getByRole('link', { name: 'Request support' })).toHaveAttribute(
+        'href',
+        `${SUPPORT_PAGE}?returnPath=/assessments/123`
+      )
+
+      // Study sponsor
+      expect(screen.getByText('Test Organisation')).toBeInTheDocument()
+
+      // Study title
+      expect(screen.getByRole('heading', { level: 3, name: 'Study title: Test Study' })).toBeInTheDocument()
+
+      // Study details accordion
+      expect(screen.getByRole('button', { name: 'Show study details', expanded: false })).toBeInTheDocument()
+
+      // Last sponsor assessment
+      expect(screen.getByRole('heading', { level: 3, name: 'Last sponsor assessment' })).toBeInTheDocument()
+      expect(
+        screen.getByRole('button', {
+          name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
+          expanded: false,
+        })
+      ).toBeInTheDocument()
+
+      // Form Input - Status
+      const statusFieldset = screen.getByRole('radiogroup', { name: 'Is this study progressing as planned?' })
+
+      expect(within(statusFieldset).getByLabelText('On track')).toBeInTheDocument()
+      expect(within(statusFieldset).getByLabelText('On track')).toHaveAccessibleDescription(
+        'The sponsor or delegate is satisfied the study is progressing as planned.'
+      )
+      expect(within(statusFieldset).getByLabelText('Off track')).toBeInTheDocument()
+      expect(within(statusFieldset).getByLabelText('Off track')).toHaveAccessibleDescription(
+        'The sponsor or delegate has some concerns about the study and is taking action where appropriate.'
+      )
+
+      // Form Input - Further information
+      const furtherInformationFieldset = screen.getByRole('group', {
+        name: 'Is there any additional information that would help NIHR RDN understand this progress assessment?',
+      })
+
+      for (const item of sysRefAssessmentFurtherInformation) {
+        expect(within(furtherInformationFieldset).getByLabelText(item.name)).toBeInTheDocument()
+      }
+
+      // Form Input - Further information (text)
+      expect(screen.getByLabelText('Further information (optional)')).toBeInTheDocument()
+      expect(screen.getByText('You have 400 characters remaining')).toBeInTheDocument()
+
+      // Submit CTA
+      expect(screen.getByRole('button', { name: 'Submit assessment' })).toHaveAttribute('type', 'submit')
+
+      // Cancel CTA
+      expect(screen.getByRole('link', { name: 'Cancel' })).toHaveAttribute('href', `/studies/${mockedStudyId}`)
+    })
+
+    test('Cancel button redirects back to the studies page if access from the list', async () => {
+      const context = Mock.of<GetServerSidePropsContext>({
+        req: {},
+        res: {},
+        query: { studyId: String(mockedStudyId), returnUrl: 'studies' },
+      })
+
+      await renderPage(context)
+
+      // Cancel CTA
+      expect(screen.getByRole('link', { name: 'Cancel' })).toHaveAttribute('href', `/studies`)
+    })
+
+    test('No previous assessments', async () => {
+      const context = Mock.of<GetServerSidePropsContext>({
+        req: {},
+        res: {},
+        query: { studyId: String(mockedStudyId), returnUrl: 'studies' },
+      })
+
+      await renderPage(context, {
         ...study,
         assessments: [],
-      },
-    ])
-    prismaMock.$transaction.mockResolvedValueOnce([sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
+      })
+      expect(screen.getByRole('heading', { level: 3, name: 'Last sponsor assessment' })).toBeInTheDocument()
 
-    const context = Mock.of<GetServerSidePropsContext>({
-      req: {},
-      res: {},
-      query: { studyId: String(mockedStudyId), returnUrl: 'studies' },
+      expect(
+        screen.queryByRole('button', {
+          name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
+          expanded: false,
+        })
+      ).not.toBeInTheDocument()
+
+      expect(screen.getByText('This study has not had any assessments provided')).toBeInTheDocument()
+    })
+  })
+
+  describe('Expanding the show study details accordion', () => {
+    test('Shows more information about the study', async () => {
+      await renderPage()
+
+      // Expand accordion
+      await userEvent.click(screen.getByRole('button', { name: 'Show study details', expanded: false }))
+
+      expect(screen.getByRole('button', { name: 'Show study details', expanded: true })).toBeInTheDocument()
+
+      const table = screen.getByRole('table', { name: 'About this study' })
+      expect(table).toBeInTheDocument()
+
+      const aboutHeaders = within(table).getAllByRole('rowheader')
+      expect(aboutHeaders.map((header) => header.textContent)).toEqual([
+        'Study full title',
+        'IRAS ID',
+        'CPMS ID',
+        'Sponsor',
+        'Managing specialty',
+        'Chief investigator',
+      ])
+
+      const aboutRows = within(table).getAllByRole('row')
+      expect(aboutRows.map((row) => within(row).getByRole('cell').textContent)).toEqual([
+        study.title,
+        study.irasId ?? 'None available',
+        study.cpmsId.toString(),
+        study.organisations[0].organisation.name,
+        study.managingSpeciality,
+        `${
+          study.chiefInvestigatorFirstName
+            ? `${study.chiefInvestigatorFirstName}, ${study.chiefInvestigatorLastName}`
+            : 'None available'
+        }`,
+      ])
+    })
+  })
+
+  describe('Expanding last sponsor assessment accordion', () => {
+    test('Shows further information', async () => {
+      await renderPage()
+
+      // Expand accordion
+      await userEvent.click(
+        screen.getByRole('button', {
+          name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
+          expanded: false,
+        })
+      )
+
+      expect(
+        screen.getByRole('button', {
+          name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
+          expanded: true,
+        })
+      ).toBeInTheDocument()
+
+      const list = screen.getByRole('list', { name: 'Further information' })
+      expect(within(list).getAllByRole('listitem')).toHaveLength(3)
+      expect(within(list).getByText('Mocked list item 1')).toBeInTheDocument()
+      expect(within(list).getByText('Mocked list item 2')).toBeInTheDocument()
+      expect(within(list).getByText('Mocked list item 3')).toBeInTheDocument()
+
+      expect(screen.getByText('Testing some further information')).toBeInTheDocument()
+    })
+  })
+
+  describe('Form submission failures', () => {
+    beforeEach(() => {
+      logger.error = jest.fn()
+      jest.clearAllMocks()
     })
 
-    const { props } = (await getServerSideProps(context)) as {
-      props: AssessmentProps
-    }
+    test('Client side validation errors', async () => {
+      await renderPage()
 
-    render(Assessment.getLayout(<Assessment {...props} />, { ...props }))
+      expect(screen.getByRole('heading', { name: 'Assess progress of a study', level: 2 })).toBeInTheDocument()
 
-    expect(screen.getByRole('heading', { level: 3, name: 'Last sponsor assessment' })).toBeInTheDocument()
+      await userEvent.click(screen.getByRole('button', { name: 'Submit assessment' }))
 
-    expect(
-      screen.queryByRole('button', {
-        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
-        expanded: false,
-      })
-    ).not.toBeInTheDocument()
+      // Summary errors
+      const alert = screen.getByRole('alert', { name: 'There is a problem' })
+      expect(within(alert).getByRole('link', { name: 'Select how the study is progressing' })).toHaveAttribute(
+        'href',
+        '#status'
+      )
+      expect(
+        within(alert).queryByRole('link', { name: 'Select any additional further information' })
+      ).not.toBeInTheDocument()
 
-    expect(screen.getByText('This study has not had any assessments provided')).toBeInTheDocument()
-  })
-})
-
-describe('Expanding the show study details accordion', () => {
-  test('Shows more information about the study', async () => {
-    prismaMock.$transaction.mockResolvedValueOnce([study])
-    prismaMock.$transaction.mockResolvedValueOnce([sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
-
-    const context = Mock.of<GetServerSidePropsContext>({
-      req: {},
-      res: {},
-      query: { studyId: String(mockedStudyId) },
+      // Field errors
+      expect(
+        screen.getByRole('radiogroup', { name: 'Is this study progressing as planned?' })
+      ).toHaveAccessibleErrorMessage('Error: Select how the study is progressing')
+      expect(
+        screen.getByRole('group', {
+          name: 'Is there any additional information that would help NIHR RDN understand this progress assessment?',
+        })
+      ).not.toHaveAccessibleErrorMessage()
+      expect(screen.getByLabelText('Further information (optional)')).not.toHaveAccessibleErrorMessage()
     })
 
-    const { props } = (await getServerSideProps(context)) as {
-      props: AssessmentProps
-    }
+    test('Server side field validation errors', async () => {
+      await renderPage(undefined, undefined, '?statusError=Select+how+the+study+is+progressing')
 
-    render(Assessment.getLayout(<Assessment {...props} />, { ...props }))
+      expect(screen.getByRole('heading', { name: 'Assess progress of a study', level: 2 })).toBeInTheDocument()
 
-    // Expand accordion
-    await userEvent.click(screen.getByRole('button', { name: 'Show study details', expanded: false }))
+      // Summary errors
+      const alert = screen.getByRole('alert', { name: 'There is a problem' })
+      expect(within(alert).getByRole('link', { name: 'Select how the study is progressing' })).toHaveAttribute(
+        'href',
+        '#status'
+      )
+      expect(
+        within(alert).queryByRole('link', { name: 'Select any additional further information' })
+      ).not.toBeInTheDocument()
 
-    expect(screen.getByRole('button', { name: 'Show study details', expanded: true })).toBeInTheDocument()
-
-    const table = screen.getByRole('table', { name: 'About this study' })
-    expect(table).toBeInTheDocument()
-
-    const aboutHeaders = within(table).getAllByRole('rowheader')
-    expect(aboutHeaders.map((header) => header.textContent)).toEqual([
-      'Study full title',
-      'IRAS ID',
-      'CPMS ID',
-      'Sponsor',
-      'Managing specialty',
-      'Chief investigator',
-    ])
-
-    const aboutRows = within(table).getAllByRole('row')
-    expect(aboutRows.map((row) => within(row).getByRole('cell').textContent)).toEqual([
-      study.title,
-      'None available',
-      `${study.cpmsId}`,
-      study.organisations[0].organisation.name,
-      study.managingSpeciality,
-      'None available',
-    ])
-  })
-})
-
-describe('Expanding last sponsor assessment accordion', () => {
-  test('Shows further information', async () => {
-    prismaMock.$transaction.mockResolvedValueOnce([study])
-    prismaMock.$transaction.mockResolvedValueOnce([sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
-
-    const context = Mock.of<GetServerSidePropsContext>({
-      req: {},
-      res: {},
-      query: { studyId: String(mockedStudyId) },
+      // Field errors
+      expect(
+        screen.getByRole('radiogroup', { name: 'Is this study progressing as planned?' })
+      ).toHaveAccessibleErrorMessage('Error: Select how the study is progressing')
+      expect(
+        screen.getByRole('group', {
+          name: 'Is there any additional information that would help NIHR RDN understand this progress assessment?',
+        })
+      ).not.toHaveAccessibleErrorMessage()
+      expect(screen.getByLabelText('Further information (optional)')).not.toHaveAccessibleErrorMessage()
     })
 
-    const { props } = (await getServerSideProps(context)) as {
-      props: AssessmentProps
-    }
+    test('Fatal server error shows an error at the top of the page', async () => {
+      await renderPage()
 
-    render(Assessment.getLayout(<Assessment {...props} />, { ...props }))
+      expect(screen.getByRole('heading', { name: 'Assess progress of a study', level: 2 })).toBeInTheDocument()
 
-    // Expand accordion
-    await userEvent.click(
-      screen.getByRole('button', {
-        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
-        expanded: false,
-      })
-    )
+      // Status
+      await userEvent.click(screen.getByLabelText('On track'))
 
-    expect(
-      screen.getByRole('button', {
-        name: '1 January 2001 Off track assessed by mockeduser@nihr.ac.uk',
-        expanded: true,
-      })
-    ).toBeInTheDocument()
+      // Further information
+      await userEvent.click(screen.getByLabelText('Study no longer going ahead in the UK [withdrawn during setup]'))
+      await userEvent.click(screen.getByLabelText('Waiting for site approval or activation'))
+      await userEvent.click(screen.getByLabelText('Follow up complete or none required'))
 
-    const list = screen.getByRole('list', { name: 'Further information' })
-    expect(within(list).getAllByRole('listitem')).toHaveLength(3)
-    expect(within(list).getByText('Mocked list item 1')).toBeInTheDocument()
-    expect(within(list).getByText('Mocked list item 2')).toBeInTheDocument()
-    expect(within(list).getByText('Mocked list item 3')).toBeInTheDocument()
+      await userEvent.click(screen.getByRole('button', { name: 'Submit assessment' }))
 
-    expect(screen.getByText('Testing some further information')).toBeInTheDocument()
-  })
-})
+      expect(mockRouter.asPath).toBe('/assessments/123?fatal=1')
 
-describe('Form submission failures', () => {
-  beforeEach(() => {
-    logger.error = jest.fn()
-    void mockRouter.push('/assessments/123')
-    jest.clearAllMocks()
-  })
-
-  test('Client side validation errors', async () => {
-    prismaMock.$transaction.mockResolvedValueOnce([study])
-    prismaMock.$transaction.mockResolvedValueOnce([sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
-
-    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: String(mockedStudyId) } })
-
-    const { props } = (await getServerSideProps(context)) as {
-      props: AssessmentProps
-    }
-
-    render(Assessment.getLayout(<Assessment {...props} />, { ...props }))
-
-    expect(screen.getByRole('heading', { name: 'Assess progress of a study', level: 2 })).toBeInTheDocument()
-
-    await userEvent.click(screen.getByRole('button', { name: 'Submit assessment' }))
-
-    // Summary errors
-    const alert = screen.getByRole('alert', { name: 'There is a problem' })
-    expect(within(alert).getByRole('link', { name: 'Select how the study is progressing' })).toHaveAttribute(
-      'href',
-      '#status'
-    )
-    expect(
-      within(alert).queryByRole('link', { name: 'Select any additional further information' })
-    ).not.toBeInTheDocument()
-
-    // Field errors
-    expect(
-      screen.getByRole('radiogroup', { name: 'Is this study progressing as planned?' })
-    ).toHaveAccessibleErrorMessage('Error: Select how the study is progressing')
-    expect(
-      screen.getByRole('group', {
-        name: 'Is there any additional information that would help NIHR RDN understand this progress assessment?',
-      })
-    ).not.toHaveAccessibleErrorMessage()
-    expect(screen.getByLabelText('Further information (optional)')).not.toHaveAccessibleErrorMessage()
-  })
-
-  test('Server side field validation errors', async () => {
-    void mockRouter.push('?statusError=Select+how+the+study+is+progressing')
-
-    prismaMock.$transaction.mockResolvedValueOnce([study])
-    prismaMock.$transaction.mockResolvedValueOnce([sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
-
-    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: String(mockedStudyId) } })
-
-    const { props } = (await getServerSideProps(context)) as {
-      props: AssessmentProps
-    }
-
-    render(Assessment.getLayout(<Assessment {...props} />, { ...props }))
-
-    expect(screen.getByRole('heading', { name: 'Assess progress of a study', level: 2 })).toBeInTheDocument()
-
-    // Summary errors
-    const alert = screen.getByRole('alert', { name: 'There is a problem' })
-    expect(within(alert).getByRole('link', { name: 'Select how the study is progressing' })).toHaveAttribute(
-      'href',
-      '#status'
-    )
-    expect(
-      within(alert).queryByRole('link', { name: 'Select any additional further information' })
-    ).not.toBeInTheDocument()
-
-    // Field errors
-    expect(
-      screen.getByRole('radiogroup', { name: 'Is this study progressing as planned?' })
-    ).toHaveAccessibleErrorMessage('Error: Select how the study is progressing')
-    expect(
-      screen.getByRole('group', {
-        name: 'Is there any additional information that would help NIHR RDN understand this progress assessment?',
-      })
-    ).not.toHaveAccessibleErrorMessage()
-    expect(screen.getByLabelText('Further information (optional)')).not.toHaveAccessibleErrorMessage()
-  })
-
-  test('Fatal server error shows an error at the top of the page', async () => {
-    prismaMock.$transaction.mockResolvedValueOnce([study])
-    prismaMock.$transaction.mockResolvedValueOnce([sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
-
-    const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: String(mockedStudyId) } })
-
-    const { props } = (await getServerSideProps(context)) as {
-      props: AssessmentProps
-    }
-
-    render(Assessment.getLayout(<Assessment {...props} />, { ...props }))
-
-    expect(screen.getByRole('heading', { name: 'Assess progress of a study', level: 2 })).toBeInTheDocument()
-
-    // Status
-    await userEvent.click(screen.getByLabelText('On track'))
-
-    // Further information
-    await userEvent.click(screen.getByLabelText('Study no longer going ahead in the UK [withdrawn during setup]'))
-    await userEvent.click(screen.getByLabelText('Waiting for site approval or activation'))
-    await userEvent.click(screen.getByLabelText('Follow up complete or none required'))
-
-    await userEvent.click(screen.getByRole('button', { name: 'Submit assessment' }))
-
-    expect(mockRouter.asPath).toBe('/assessments/123?fatal=1')
-
-    const alert = screen.getByRole('alert')
-    expect(
-      within(alert).getByText('An unexpected error occurred whilst processing the form, please try again later.')
-    ).toBeInTheDocument()
+      const alert = screen.getByRole('alert')
+      expect(
+        within(alert).getByText('An unexpected error occurred whilst processing the form, please try again later.')
+      ).toBeInTheDocument()
+    })
   })
 })

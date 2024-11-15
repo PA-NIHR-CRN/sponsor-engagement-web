@@ -13,9 +13,9 @@ test.beforeEach('Setup Tests', async () => {
     `SELECT id FROM Assessment WHERE studyId = ${noAssessmentStudyId};`
   )
   for (let index = 0; index < allAssessmentIdsForStudy.length; index++) {
-    const assesmentId = allAssessmentIdsForStudy[index].id
-    await seDatabaseReq(`DELETE FROM AssessmentFurtherInformation WHERE assessmentId = ${assesmentId};`)
-    await seDatabaseReq(`DELETE FROM Assessment WHERE id = ${assesmentId};`)
+    const assessmentId = allAssessmentIdsForStudy[index].id
+    await seDatabaseReq(`DELETE FROM AssessmentFurtherInformation WHERE assessmentId = ${assessmentId};`)
+    await seDatabaseReq(`DELETE FROM Assessment WHERE id = ${assessmentId};`)
   }
   await seDatabaseReq(`UPDATE Study SET isDueAssessment = 1 WHERE id = ${noAssessmentStudyId};`)
 })
@@ -90,50 +90,6 @@ test.describe('Submit a Study Assessment and Validate Form Inputs - @se_38', () 
     })
     await test.step(`Then I can see that No Further Info has been recorded`, async () => {
       await studyDetailsPage.assertAssessmentHasNoFurtherInfo()
-    })
-  })
-
-  test('Submit Assessment Form via Study List, with required field only, Submission is Successful - @se_38_ac2_list', async ({
-    studiesPage,
-    assessmentPage,
-  }) => {
-    await test.step('Given I have navigated to the Studies Page', async () => {
-      await studiesPage.goto()
-      await studiesPage.assertOnStudiesPage()
-    })
-    await test.step(`And I Enter the Search Phrase: '${noAssessmentCpmsId}'`, async () => {
-      await studiesPage.enterSearchPhrase(noAssessmentCpmsId.toString())
-    })
-    await test.step('And only 1 study is found', async () => {
-      await studiesPage.assertSpecificNumberStudies(1)
-    })
-    await test.step('And it has a Last Assessment value of `None`', async () => {
-      await studiesPage.assertSpecificLastAssessmentValue('None', 0)
-    })
-    await test.step(`And I click the Assess button on the Study Item`, async () => {
-      await studiesPage.assessListButton.click()
-    })
-    await test.step(`And I am taken to the Assessment page for Study with SE Id ${noAssessmentStudyId}`, async () => {
-      await assessmentPage.assertOnAssessmentPageViaStudyList(noAssessmentStudyId.toString())
-    })
-    await test.step(`When I select the 'Off Track' option`, async () => {
-      await assessmentPage.radioButtonOffTrack.check()
-    })
-    await test.step(`And I click the Submit button`, async () => {
-      await assessmentPage.submitButton.click()
-    })
-    await test.step(`Then I am returned to the Study List Page, with a Success notification`, async () => {
-      await studiesPage.assertOnStudiesPageWithSuccess()
-    })
-    await test.step(`And I Enter the Search Phrase: '${noAssessmentCpmsId}'`, async () => {
-      await studiesPage.enterSearchPhrase(noAssessmentCpmsId.toString())
-    })
-    await test.step('And only 1 study is found', async () => {
-      await studiesPage.assertSpecificNumberStudies(1)
-    })
-    await test.step('And the Last Assessment value is now todays date', async () => {
-      const todaysDate = convertIsoDateToDisplayDate(new Date())
-      await studiesPage.assertSpecificLastAssessmentValue('Off track on ' + todaysDate, 0)
     })
   })
 
