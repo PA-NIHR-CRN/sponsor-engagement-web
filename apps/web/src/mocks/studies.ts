@@ -96,7 +96,7 @@ export const mockCPMSStudy = Mock.of<Study>({
   StudyId: 622,
   IrasId: 1212,
   StudyShortName: 'BS06',
-  StudyStatus: 'Suspended',
+  StudyStatus: 'Suspended (from Open to Recruitment)',
   StudyRoute: 'Non-commercial',
   ProtocolReferenceNumber: 8282,
   PlannedOpeningDate: '2003-02-28T00:00:00',
@@ -281,6 +281,7 @@ export const mockStudyWithRelations = Mock.of<StudyWithRelations>({
   plannedClosureDate: new Date('2001-01-02'),
   actualOpeningDate: new Date('2001-01-01'),
   actualClosureDate: new Date('2001-01-01'),
+  estimatedReopeningDate: new Date('2001-01-02'),
   totalRecruitmentToDate: 999,
   organisations: [
     {
@@ -375,8 +376,8 @@ export const mockStudyUpdates = [
   {
     id: 23030,
     studyId: 1,
-    studyStatus: 'Open, to recruitment',
-    studyStatusGroup: 'Open, to recruitment',
+    studyStatus: 'Open to Recruitment',
+    studyStatusGroup: 'Open to recruitment',
     plannedOpeningDate: new Date('2023-06-05T08:30:00Z'),
     actualOpeningDate: new Date('2023-06-10T08:45:00Z'),
     plannedClosureToRecruitmentDate: new Date('2024-03-10T18:00:00Z'),
@@ -410,7 +411,7 @@ export const mockProposedEditHistory = [
       {
         columnChanged: 'studyStatusGroup',
         beforeValue: 'Suspended',
-        afterValue: 'Open, to recruitment',
+        afterValue: 'Open to recruitment',
       },
       {
         columnChanged: 'plannedOpeningDate',

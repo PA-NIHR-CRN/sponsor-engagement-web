@@ -1,19 +1,29 @@
 import dayjs from 'dayjs'
 import { z } from 'zod'
 
+import { Status } from '@/@types/studies'
 import { dateValidationRules, fieldNameToLabelMapping, FormStudyStatus } from '@/constants/editStudyForm'
-import { mapCPMSStatusToFormStatus } from '@/lib/studies'
+import { mapCPMSStatusToFormStatus, mapFormStatusToCPMSStatus } from '@/lib/studies'
+import type { DateFieldWithParts } from '@/pages/api/forms/editStudy'
 import type { EditStudyProps } from '@/pages/studies/[studyId]/edit'
 
-import { constructDatePartsFromDate, getDaysInMonth } from './date'
-import type { DateFieldName, EditStudy, EditStudyInputs } from './schemas'
+import { areAllDatePartsEmpty, constructDatePartsFromDate, getDaysInMonth } from './date'
+import { type DateFieldName, type EditStudy, type EditStudyInputs } from './schemas'
 import type { Optional } from './typeUtils'
+
+export const editStudyDateFields: (keyof DateFieldName)[] = [
+  'actualClosureDate',
+  'estimatedReopeningDate',
+  'plannedClosureDate',
+  'plannedOpeningDate',
+  'actualOpeningDate',
+]
 
 export const mapStudyToStudyFormInput = (
   study: EditStudyProps['study'],
   LSN?: string
 ): Optional<EditStudyInputs, 'recruitmentTarget'> => ({
-  studyId: study.id,
+  studyId: study.id.toString(),
   LSN,
   status: study.studyStatus,
   recruitmentTarget: study.sampleSize?.toString() ?? '',
@@ -69,8 +79,16 @@ const getMandatoryDateFields = (previousStatus: string | null, newStatus: string
 
 export const getVisibleFormFields = (
   previousStatus: string,
-  newStatus: string
+  newStatus: string,
+  returnAllAvailableFields = false
 ): [(keyof DateFieldName)[], FormStudyStatus[]] => {
+  if (returnAllAvailableFields) {
+    return [
+      ['actualClosureDate', 'estimatedReopeningDate', 'plannedClosureDate', 'plannedOpeningDate', 'actualOpeningDate'],
+      Object.values(FormStudyStatus),
+    ]
+  }
+
   const visibleDateFieldsMapping: Record<FormStudyStatus, (keyof DateFieldName)[]> = {
     [FormStudyStatus.InSetup]: ['plannedOpeningDate', 'plannedClosureDate'],
     [FormStudyStatus.OpenToRecruitment]: ['plannedOpeningDate', 'actualOpeningDate', 'plannedClosureDate'],
@@ -125,7 +143,7 @@ export const getVisibleFormFields = (
 const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, values: EditStudy) => {
   const value = values[fieldName]
   const currentStatus = mapCPMSStatusToFormStatus(values.status)
-  const previousStatus = values.originalValues.status ? mapCPMSStatusToFormStatus(values.originalValues.status) : null
+  const previousStatus = values.originalValues?.status ? mapCPMSStatusToFormStatus(values.originalValues.status) : null
   const label = fieldNameToLabelMapping[fieldName]
   const requiredPastOrCurrent = dateValidationRules[fieldName].restrictions.includes('requiredPastOrCurrent')
   const requiredFuture = dateValidationRules[fieldName].restrictions.includes('requiredFuture')
@@ -137,7 +155,7 @@ const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, valu
     return
   }
 
-  if (!value) {
+  if (!value || Object.values(value).every((dateValue) => !dateValue)) {
     // Mandatory fields based on status
     if (getMandatoryDateFields(previousStatus, currentStatus).includes(fieldName)) {
       ctx.addIssue({
@@ -227,6 +245,7 @@ const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, valu
       if (
         requiredAfter &&
         dateDependencyValue &&
+        !areAllDatePartsEmpty(dateDependencyValue) &&
         isDateDepedencyFieldVisible &&
         !dayjs(`${value.year}-${value.month.padStart(2, '0')}-${value.day.padStart(2, '0')}`).isAfter(
           dayjs(
@@ -254,4 +273,86 @@ export const validateAllDates = (ctx: z.RefinementCtx, values: EditStudy) => {
   Object.keys(dateValidationRules).forEach((fieldName: keyof DateFieldName) => {
     validateDate(fieldName, ctx, values)
   })
+}
+
+/**
+ * Validates that the status change can occur
+ */
+export const validateStatus = (ctx: z.RefinementCtx, values: EditStudy) => {
+  const previousStatus = values.originalValues?.status ?? ''
+  const newStatus = values.status
+
+  const previousSimplifiedStatus = mapCPMSStatusToFormStatus(previousStatus)
+  const newSimplifiedStatus = mapCPMSStatusToFormStatus(newStatus)
+
+  console.log({ previousSimplifiedStatus, newSimplifiedStatus })
+  if (previousSimplifiedStatus === newSimplifiedStatus) return
+
+  const [_, visibleStatuses] = getVisibleFormFields(previousSimplifiedStatus, newSimplifiedStatus)
+
+  if (!(visibleStatuses as string[]).includes(newSimplifiedStatus)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Cannot transition study from ${previousSimplifiedStatus} to ${newSimplifiedStatus}`,
+      path: ['status'],
+    })
+  }
+}
+
+/**
+ * When JS is disabled, the nested date fields are sent separately i.e plannedOpeningDay-day, plannedOpeningDay-month
+ * This function converts those to an object with the correct date parts
+ */
+export const transformEditStudyBody = (body: EditStudy & Partial<DateFieldWithParts>) => {
+  const data = {}
+
+  Object.entries(body).forEach(([key, value]) => {
+    const parts = key.split('-')
+
+    if (parts.length === 2 && ['day', 'month', 'year'].includes(parts[1])) {
+      const fieldName = parts[0]
+      const datePart = parts[1]
+
+      if (typeof data[fieldName] === 'object') {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- narrowed down type to object
+        data[fieldName] = { ...data[fieldName], [datePart]: value }
+      } else {
+        data[fieldName] = { day: '', month: '', year: '', [datePart]: value }
+      }
+    } else {
+      data[key] = value
+    }
+  })
+
+  return data
+}
+
+/**
+ * When JS is disabled, the new status won't be the CPMS status but instead the simplified status.
+ * Therefore, when we need to correctly map the status to a CPMS status.
+ * The mapFormStatusToCPMSStatus() function has conditional logic based on the original status for Open and Suspended statuses.
+ * This function relies on the logic that a status cannot go from Open, to recruitment to Open, with recruitment. Same for suspended.
+ */
+export const getCPMSStatusFromEditStudyBody = (originalStatus: string, newStatus: string) => {
+  const mappedNewStatus = mapFormStatusToCPMSStatus(newStatus, originalStatus)
+
+  const isNewStatusOpen = newStatus === (FormStudyStatus.OpenToRecruitment as string)
+  const isOriginalStatusOpen = ([Status.OpenToRecruitment, Status.OpenWithRecruitment] as string[]).includes(
+    originalStatus
+  )
+
+  if (isNewStatusOpen && isOriginalStatusOpen) {
+    return originalStatus
+  }
+
+  const isNewStatusSuspended = newStatus === (FormStudyStatus.Suspended as string)
+  const isOriginalStatusSuspended = (
+    [Status.SuspendedFromOpenToRecruitment, Status.SuspendedFromOpenWithRecruitment] as string[]
+  ).includes(originalStatus)
+
+  if (isNewStatusSuspended && isOriginalStatusSuspended) {
+    return originalStatus
+  }
+
+  return mappedNewStatus
 }

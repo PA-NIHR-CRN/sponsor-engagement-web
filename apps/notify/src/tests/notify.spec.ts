@@ -15,10 +15,38 @@ beforeEach(() => {
   jest.clearAllMocks()
 })
 
+type UserWithOrganisations = Prisma.UserGetPayload<{
+  include: {
+    organisations: {
+      select: {
+        organisation: {
+          select: {
+            name: true
+          }
+        }
+      }
+    }
+  }
+}>
+
+const mockOrganisations = [{ organisation: { name: 'Test org1' } }, { organisation: { name: 'Test org2' } }]
+
 const mockUsers = [
-  Mock.of<Prisma.UserGetPayload<undefined>>({ id: 1, email: 'user1@test.com' }),
-  Mock.of<Prisma.UserGetPayload<undefined>>({ id: 2, email: 'user2@test.com' }),
-  Mock.of<Prisma.UserGetPayload<undefined>>({ id: 3, email: 'user3@test.com' }),
+  Mock.of<UserWithOrganisations>({
+    id: 1,
+    email: 'user1@test.com',
+    organisations: mockOrganisations,
+  }),
+  Mock.of<UserWithOrganisations>({
+    id: 2,
+    email: 'user2@test.com',
+    organisations: mockOrganisations,
+  }),
+  Mock.of<UserWithOrganisations>({
+    id: 3,
+    email: 'user3@test.com',
+    organisations: mockOrganisations,
+  }),
 ]
 
 const mockAssessmentReminders = [Mock.of<Prisma.AssessmentReminderGetPayload<undefined>>({ id: 123 })]
@@ -44,7 +72,7 @@ describe('notify', () => {
     await notify()
 
     expect(emailService.sendBulkEmail).toHaveBeenCalledWith(
-      mockUsers.map(({ email }) => ({
+      mockUsers.map(({ email, organisations }) => ({
         subject: `Assess the progress of your studies`,
         to: email,
         templateData: {
@@ -54,6 +82,7 @@ describe('notify', () => {
           signInLink: 'https://assessmystudy.nihr.ac.uk/auth/signin',
           termsAndConditionsLink:
             'https://www.nihr.ac.uk/documents/researchers/i-need-help-to-deliver-my-research/terms-and-conditions-for-nihr-crn-support.pdf',
+          organisationNames: organisations.map((organisation) => organisation.organisation.name),
         },
         htmlTemplate: expect.any(Function),
         textTemplate: expect.any(Function),
@@ -86,6 +115,24 @@ describe('notify', () => {
 
     expect(prismaMock.user.findMany).toHaveBeenCalledWith({
       where: expect.objectContaining({ email: { in: allowList } }),
+      include: expect.objectContaining({
+        organisations: {
+          where: {
+            organisation: {
+              studies: { some: { study: { isDueAssessment: true, isDeleted: false }, isDeleted: false } },
+              isDeleted: false,
+            },
+            isDeleted: false,
+          },
+          select: {
+            organisation: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      }),
     })
   })
 

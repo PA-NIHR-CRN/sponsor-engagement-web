@@ -19,17 +19,17 @@ export const logStudyUpdate = async (
 ) => {
   const studyUpdateBefore: Prisma.StudyUpdatesCreateManyInput = {
     studyId,
-    studyStatus: originalStudyValues.status,
-    studyStatusGroup: mapCPMSStatusToFormStatus(originalStudyValues.status),
-    plannedOpeningDate: constructDateStrFromParts(originalStudyValues.plannedOpeningDate),
-    actualOpeningDate: constructDateStrFromParts(originalStudyValues.actualOpeningDate),
-    plannedClosureToRecruitmentDate: constructDateStrFromParts(originalStudyValues.plannedClosureDate),
-    actualClosureToRecruitmentDate: constructDateStrFromParts(originalStudyValues.actualClosureDate),
-    estimatedReopeningDate: constructDateStrFromParts(originalStudyValues.estimatedReopeningDate),
-    ukRecruitmentTarget: originalStudyValues.recruitmentTarget
+    studyStatus: originalStudyValues?.status,
+    studyStatusGroup: mapCPMSStatusToFormStatus(originalStudyValues?.status ?? ''),
+    plannedOpeningDate: constructDateStrFromParts(originalStudyValues?.plannedOpeningDate),
+    actualOpeningDate: constructDateStrFromParts(originalStudyValues?.actualOpeningDate),
+    plannedClosureToRecruitmentDate: constructDateStrFromParts(originalStudyValues?.plannedClosureDate),
+    actualClosureToRecruitmentDate: constructDateStrFromParts(originalStudyValues?.actualClosureDate),
+    estimatedReopeningDate: constructDateStrFromParts(originalStudyValues?.estimatedReopeningDate),
+    ukRecruitmentTarget: originalStudyValues?.recruitmentTarget
       ? Number(originalStudyValues.recruitmentTarget)
       : undefined,
-    comment: originalStudyValues.furtherInformation,
+    comment: originalStudyValues?.furtherInformation,
     transactionId,
     LSN: beforeLSN ? Buffer.from(beforeLSN, 'hex') : null,
     studyUpdateStateId: StudyUpdateState.Before,
