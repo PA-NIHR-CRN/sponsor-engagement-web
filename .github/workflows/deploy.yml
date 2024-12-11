@@ -290,7 +290,7 @@ jobs:
           SE_TEST_API_URL: ${{ secrets.CPMS_API_BASE_URL }}
           SE_TEST_API_USERNAME: ${{ secrets.CPMS_API_USERNAME }}
           SE_TEST_API_PASSWORD: ${{ secrets.CPMS_API_PASSWORD }}
-          CPMS_TEST_DB_IP: ${{ secrets.CPMS_TEST_DB_IP }}
+          CPMS_TEST_DB_HOST: ${{ secrets.CPMS_TEST_DB_HOST }}
           CPMS_TEST_DB_USERNAME: ${{ secrets.CPMS_TEST_DB_USERNAME }}
           CPMS_TEST_DB_PASSWORD: ${{ secrets.CPMS_TEST_DB_PASSWORD }}
 

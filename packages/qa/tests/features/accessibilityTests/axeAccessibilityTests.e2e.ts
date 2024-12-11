@@ -268,6 +268,8 @@ test.describe('Organisation Accessibility Tests - @accessibility @accessibility_
 })
 
 test.describe('Landing Page Accessibility Tests - @accessibility @accessibility_landing', () => {
+  test.use({ storageState: '.auth/consentCookie.json' })
+
   test('Scan Create Password Page with AXE Tool @access_createPassword', async ({
     createPasswordPage,
     makeAxeBuilder,
