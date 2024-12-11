@@ -5,6 +5,7 @@ async function globalTeardown() {
   unlinkSync('.auth/sponsorContact.json')
   unlinkSync('.auth/contactManager.json')
   unlinkSync('.auth/nationalPortfolioManager.json')
+  unlinkSync('.auth/consentCookie.json')
 }
 
 export default globalTeardown

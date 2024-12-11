@@ -26,9 +26,9 @@ const sePassword =
 
 // cpms env variables and checks
 const cpmsServer =
-  process.env.CPMS_TEST_DB_IP ||
+  process.env.CPMS_TEST_DB_HOST ||
   (() => {
-    throw new Error('CPMS_TEST_DB_IP is not defined')
+    throw new Error('CPMS_TEST_DB_HOST is not defined')
   })()
 
 const cpmsUsername =

@@ -4,11 +4,6 @@ Written in Typescript with Playwright using page object model & test steps.
 
 Playwright [Documentation](https://playwright.dev/docs/intro)
 
-## Authors
-
-- [Chris McNeill - PA Consulting](https://github.com/chrismcneill89)
-- [Adam Nicolaou-Jones - PA consulting](https://github.com/onlyadam)
-
 ## Setup
 
 Install Node on your local machine. e.g. If using a Mac `brew install node`  
@@ -28,32 +23,32 @@ Then populate the variables by retrieving from the following sources:
 
 ```text
   # env             # the SE environment you wish to test (currently only supports test)
-  E2E_BASE_URL=https://test.assessmystudy.nihr.ac.uk/
+  E2E_BASE_URL=
 
-  # test users      # creds can be found in https://docs.google.com/document/d/1J9I1b4hb28rd9vl34Oe7XPCeZqk8yVsyG84KJgXS6k0
-  SPONSOR_CONTACT_USER=sesponsorcontact@test.id.nihr.ac.uk
+  # test users
+  SPONSOR_CONTACT_USER=
   SPONSOR_CONTACT_PASS=
-  SPONSOR_CONTACT_MANAGER_USER=sesponsorcontactmanager@test.id.nihr.ac.uk
+  SPONSOR_CONTACT_MANAGER_USER=
   SPONSOR_CONTACT_MANAGER_PASS=
-  CONTACT_MANAGER_USER=secontactmanager@test.id.nihr.ac.uk
+  CONTACT_MANAGER_USER=
   CONTACT_MANAGER_PASS=
-  SE_NO_LOCAL_ACCOUNT_USER=senolocalaccount@test.id.nihr.ac.uk
+  SE_NO_LOCAL_ACCOUNT_USER=
   SE_NO_LOCAL_ACCOUNT_PASS=
-  CPMS_NPM_USER=sim_auto_npm@test.id.nihr.ac.uk
+  CPMS_NPM_USER=
   CPMS_NPM_PASS=
 
-  # se db           # creds can be found in https://docs.google.com/document/d/1J9I1b4hb28rd9vl34Oe7XPCeZqk8yVsyG84KJgXS6k0
+  # se db
   SE_TEST_DB_HOST=
   SE_TEST_DB_USERNAME
   SE_TEST_DB_PASSWORD=
 
-  # cpms db         # creds ask nihr-managed-services
+  # cpms db
   CPMS_TEST_DB_PASSWORD=
   CPMS_TEST_DB_USERNAME
-  CPMS_TEST_DB_IP=
+  CPMS_TEST_DB_HOST=
 
   # api
-  SE_TEST_API_URL=  # creds can be found in https://eu-west-2.console.aws.amazon.com/secretsmanager/secret?name=crnccd-secret-test-se-app-config&region=eu-west-2
+  SE_TEST_API_URL=
   SE_TEST_API_USERNAME=
   SE_TEST_API_PASSWORD=
 
@@ -141,8 +136,12 @@ This removes the risk of accidentally committing temporary config changes that m
 
 To enabled & execute the accessibility tests simply:
 
+1. Run `npm run test:axe` - runs sub shell so you don't need to worry about environment variables.
+
+or
+
 1. Add or uncomment `ENABLE_ACCESSIBILITY=true` in `packages/qa/.env`
-2. Run all test as normal with `npx playwright test` or just the accessibility tests with `npx playwright test --project=seDefault --grep "@accessibility"`
+2. Run all tests as normal with `npx playwright test` or just the accessibility tests with `npx playwright test --project=seDefault --grep "@accessibility"`
 3. After remember to comment out or remove `ENABLE_ACCESSIBILITY=true` in `packages/qa/.env`
 
 **Note:** You could also use any of the following to run the accessibility tests:
