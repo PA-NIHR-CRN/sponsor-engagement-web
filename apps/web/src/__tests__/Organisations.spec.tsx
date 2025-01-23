@@ -206,7 +206,7 @@ describe('Organisations page', () => {
     expect(within(pagination).queryByRole('link', { name: 'Previous' })).not.toBeInTheDocument()
     expect(within(pagination).getByRole('link', { name: 'Page 1' })).toHaveAttribute('href', '/?page=1')
     expect(within(pagination).getByRole('link', { name: 'Page 2' })).toHaveAttribute('href', '/?page=2')
-    expect(within(pagination).getByRole('link', { name: 'Next' })).toHaveAttribute('href', '/?page=2')
+    expect(within(pagination).getByRole('link', { name: 'Next page' })).toHaveAttribute('href', '/?page=2')
   })
 
   test('Multiple organisastion types (CRO, CTU, Sponsor etc)', async () => {

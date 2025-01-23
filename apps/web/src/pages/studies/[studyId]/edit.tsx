@@ -145,6 +145,8 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
 
           <div className="govuk-inset-text">{GENERIC_STUDIES_GUIDANCE_TEXT}</div>
 
+          <p className="govuk-body govuk-!-margin-bottom-4">You must complete all fields unless marked as optional.</p>
+
           <Form
             action="/api/forms/editStudy"
             handleSubmit={handleSubmit}
@@ -364,6 +366,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                 label={fieldNameToLabelMapping.furtherInformation}
                 labelSize="m"
                 remainingCharacters={remainingCharacters}
+                required={false}
                 {...register('furtherInformation')}
                 maxLength={FURTHER_INFO_MAX_CHARACTERS}
               />
