@@ -104,7 +104,7 @@ exports[`Email template "assessment-reminder.html.hbs" displays correctly 1`] = 
 
       <p>
         The NIHR RDN can give other people in your organisation access to this service. Contact
-        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>
+        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy</a>
         to add a new contact.
       </p>
 
@@ -113,7 +113,7 @@ exports[`Email template "assessment-reminder.html.hbs" displays correctly 1`] = 
       <p>
         This email is not monitored, do not reply. If you’re not sure why you’ve received this email or need to be
         removed from our list contact
-        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>.
+        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy</a>.
       </p>
     </div>
 
@@ -360,7 +360,7 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
 
       <p>
         The NIHR RDN can give other people in your organisation access to this service. Contact
-        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>
+        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy</a>
         to add a new contact.
       </p>
 
@@ -369,7 +369,7 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
       <p>
         This email is not monitored, do not reply. If you’re not sure why you’ve received this email or need to be
         removed from our list contact
-        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>.
+        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy</a>.
       </p>
     </div>
 
@@ -532,10 +532,10 @@ exports[`Email template "contact-removed.html.hbs" displays correctly 1`] = `
       <h2>Not sure why you've been removed?</h2>
 
       <p>If you think there’s been an error please contact
-        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>.</p>
+        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy</a>.</p>
 
       <p>If you’re not sure why you’ve received this email or need to be removed from our list contact
-        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>.</p>
+        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy</a>.</p>
     </div>
 
     <br />
