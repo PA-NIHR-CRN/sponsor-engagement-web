@@ -64,7 +64,7 @@ export default class CommonItemsPage {
     await expect(this.txtUsageGuidance).toHaveText(
       'The Sponsor Engagement Tool is for use by project sponsors or their delegates in CRO/CTU organisations only.'
     )
-    await expect(this.txtContactInfo).toHaveText('Please contact supportmystudy for further assistance.')
+    await expect(this.txtContactInfo).toHaveText('Please contact supportmystudy@nihr.ac.uk for further assistance.')
     await expect(this.page).toHaveURL('')
   }
 

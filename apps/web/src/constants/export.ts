@@ -22,4 +22,4 @@ If any further information, advice or support is required, please contact suppor
 export const PINK_FILL = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'F6D7D2' } } as const
 
 /** Red text colour */
-export const RED_TEXT = { font: { color: { argb: 'C00701' } } } as const
+export const RED_TEXT = { font: { color: { argb: 'B40000' } } } as const
