@@ -98,7 +98,7 @@ export default function Assessment({
             </AccordionItem>
           </Accordion>
 
-          <p className="govuk-body govuk-!-margin-bottom-4">You must complete all fields unless marked as optional.</p>
+          <p className="govuk-body govuk-!-margin-bottom-4">All fields are mandatory unless stated otherwise</p>
 
           <AssessmentHistory
             assessments={assessments.length > 0 ? [assessments[0]] : []}

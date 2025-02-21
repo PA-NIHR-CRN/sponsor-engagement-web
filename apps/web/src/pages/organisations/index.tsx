@@ -66,7 +66,7 @@ export default function Organisations({
                           Organisation
                         </Table.CellHeader>
                         <Table.CellHeader column>
-                          <span className="govuk-visually-hidden">Manage</span>
+                          <span className="govuk-visually-hidden">Action</span>
                         </Table.CellHeader>
                       </Table.Row>
                     </Table.Header>
