@@ -104,7 +104,10 @@ const addConditionalFormatting = (worksheet: Worksheet) => {
   // Empty cells
   worksheet.eachRow({ includeEmpty: true }, (row) => {
     row.eachCell({ includeEmpty: true }, (cell) => {
-      if (!cell.value) cell.value = 'No data available'
+      const cellText = cell.text.trim()
+      if (!cellText) {
+        cell.value = 'No data available'
+      }
     })
   })
 
