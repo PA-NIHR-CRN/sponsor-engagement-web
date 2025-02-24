@@ -145,7 +145,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
 
           <div className="govuk-inset-text">{GENERIC_STUDIES_GUIDANCE_TEXT}</div>
 
-          <p className="govuk-body govuk-!-margin-bottom-4">You must complete all fields unless marked as optional.</p>
+          <p className="govuk-body govuk-!-margin-bottom-4">All fields are mandatory unless stated otherwise</p>
 
           <Form
             action="/api/forms/editStudy"
@@ -239,11 +239,34 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                   name="actualOpeningDate"
                   render={({ field }) => {
                     const { value, onChange, ref, name } = field
-
+                    const previousStatus = study.studyStatus
+                    const newStatus = statusInputValue
+                    const label =
+                      ([
+                        'In Setup',
+                        'In Setup, Pending NHS Permission',
+                        'In Setup, Approval Received',
+                        'In Setup, Pending Approval',
+                        'In Setup, NHS Permission Received',
+                        'In setup',
+                      ].some((status) => previousStatus === status) &&
+                        [
+                          'Suspended (from Open, With Recruitment)',
+                          'Suspended (from Open to Recruitment)',
+                          'Suspended',
+                        ].some((status) => newStatus === status)) ||
+                      ([
+                        'Suspended',
+                        'Suspended (from Open, With Recruitment)',
+                        'Suspended (from Open to Recruitment)',
+                      ].some((status) => previousStatus === status) &&
+                        ['Open to Recruitment', 'Open, With Recruitment'].some((status) => newStatus === status))
+                        ? `${fieldNameToLabelMapping.actualOpeningDate} (optional)`
+                        : fieldNameToLabelMapping.actualOpeningDate
                     return (
                       <DateInput
                         errors={errors}
-                        label={fieldNameToLabelMapping.actualOpeningDate}
+                        label={label}
                         name={name}
                         onChange={(input) => {
                           const allFieldsEmpty = areAllDatePartsEmpty(input)
