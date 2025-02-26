@@ -24,6 +24,7 @@ import {
   FURTHER_INFO_MAX_CHARACTERS,
   GENERIC_STUDIES_GUIDANCE_TEXT,
   PAGE_TITLE,
+  statusMap,
   studyStatuses,
 } from '@/constants/editStudyForm'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
@@ -39,7 +40,7 @@ import {
   updateStudy,
 } from '@/lib/studies'
 import { areAllDatePartsEmpty } from '@/utils/date'
-import { getVisibleFormFields, mapStudyToStudyFormInput } from '@/utils/editStudyForm'
+import { getOptionalFormFields, getVisibleFormFields, mapStudyToStudyFormInput } from '@/utils/editStudyForm'
 import { getValuesFromSearchParams } from '@/utils/form'
 import type { EditStudy as EditStudySchema, EditStudyInputs } from '@/utils/schemas'
 import { studySchema } from '@/utils/schemas'
@@ -145,7 +146,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
 
           <div className="govuk-inset-text">{GENERIC_STUDIES_GUIDANCE_TEXT}</div>
 
-          <p className="govuk-body govuk-!-margin-bottom-4">All fields are mandatory unless stated otherwise</p>
+          <p className="govuk-body govuk-!-margin-bottom-4">All fields are required unless labelled as optional.</p>
 
           <Form
             action="/api/forms/editStudy"
@@ -239,30 +240,12 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                   name="actualOpeningDate"
                   render={({ field }) => {
                     const { value, onChange, ref, name } = field
-                    const previousStatus = study.studyStatus
-                    const newStatus = statusInputValue
-                    const label =
-                      ([
-                        'In Setup',
-                        'In Setup, Pending NHS Permission',
-                        'In Setup, Approval Received',
-                        'In Setup, Pending Approval',
-                        'In Setup, NHS Permission Received',
-                        'In setup',
-                      ].some((status) => previousStatus === status) &&
-                        [
-                          'Suspended (from Open, With Recruitment)',
-                          'Suspended (from Open to Recruitment)',
-                          'Suspended',
-                        ].some((status) => newStatus === status)) ||
-                      ([
-                        'Suspended',
-                        'Suspended (from Open, With Recruitment)',
-                        'Suspended (from Open to Recruitment)',
-                      ].some((status) => previousStatus === status) &&
-                        ['Open to Recruitment', 'Open, With Recruitment'].some((status) => newStatus === status))
-                        ? `${fieldNameToLabelMapping.actualOpeningDate} (optional)`
-                        : fieldNameToLabelMapping.actualOpeningDate
+                    const previousStatus = statusMap[study.studyStatus]
+                    const newStatus = statusMap[statusInputValue]
+                    const optionalFields = getOptionalFormFields(previousStatus, newStatus)
+                    const label = optionalFields.includes('actualOpeningDate')
+                      ? `${fieldNameToLabelMapping.actualOpeningDate} (optional)`
+                      : fieldNameToLabelMapping.actualOpeningDate
                     return (
                       <DateInput
                         errors={errors}
