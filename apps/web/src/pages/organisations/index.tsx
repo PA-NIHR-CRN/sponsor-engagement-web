@@ -65,8 +65,8 @@ export default function Organisations({
                         <Table.CellHeader className="w-5/6" column>
                           Organisation
                         </Table.CellHeader>
-                        <Table.CellHeader column>
-                          <span className="govuk-visually-hidden">Manage</span>
+                        <Table.CellHeader className="align-middle text-right" column>
+                          <span>Manage</span>
                         </Table.CellHeader>
                       </Table.Row>
                     </Table.Header>
