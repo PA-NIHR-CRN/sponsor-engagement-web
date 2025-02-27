@@ -116,7 +116,7 @@ describe('Organisations page', () => {
     expect(table).toBeInTheDocument()
 
     const headers = within(table).getAllByRole('columnheader')
-    expect(headers.map((header) => header.textContent)).toEqual(['Organisation', 'Action'])
+    expect(headers.map((header) => header.textContent)).toEqual(['Organisation', 'Manage'])
 
     const rows = within(table).getAllByRole('row')
 
@@ -129,7 +129,7 @@ describe('Organisations page', () => {
     ])
 
     expect(rows.map((row) => row.lastChild?.textContent)).toEqual([
-      'Action',
+      'Manage',
       'Manage Org name 1 sponsor contacts',
       'Manage Org name 2 sponsor contacts',
       'Manage Org name 3 sponsor contacts',
