@@ -15,7 +15,7 @@ jobs:
     name: 'Build'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-node
       - name: Install
         run: npm ci --no-audit --no-fund
@@ -30,7 +30,7 @@ jobs:
     name: 'Deploy Dev'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Configure AWS credentials (dev)
         uses: aws-actions/configure-aws-credentials@v2
@@ -119,7 +119,7 @@ jobs:
     name: 'Deploy Test'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Configure AWS credentials (test)
         uses: aws-actions/configure-aws-credentials@v2
@@ -339,7 +339,7 @@ jobs:
           retention-days: 3
 
       - name: 'Download HTML Report Artifact'
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         id: download
         if: github.event.inputs.publish-report != 'false' && always()
 
@@ -374,7 +374,7 @@ jobs:
     name: 'Deploy Uat'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Configure AWS credentials (uat)
         uses: aws-actions/configure-aws-credentials@v2
@@ -464,7 +464,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Configure AWS credentials (oat)
         uses: aws-actions/configure-aws-credentials@v2
@@ -553,7 +553,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Configure AWS credentials (prod)
         uses: aws-actions/configure-aws-credentials@v2
