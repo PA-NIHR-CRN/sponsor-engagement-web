@@ -239,7 +239,7 @@ export const SideNavLink = forwardRef(
           <div>{icon}</div>
           <span
             className={clsx(
-              '-translate-x-3 transform whitespace-nowrap opacity-0 transition duration-200 ease-in-out motion-reduce:transform-none motion-reduce:opacity-100 motion-reduce:transition-none',
+              '-translate-x-3 transform opacity-0 transition duration-200 ease-in-out motion-reduce:transform-none motion-reduce:opacity-100 motion-reduce:transition-none',
               { 'translate-x-0 opacity-100': open, 'govuk-!-margin-left-4': !!icon },
               className
             )}
