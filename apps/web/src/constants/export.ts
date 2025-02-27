@@ -21,8 +21,5 @@ If any further information, advice or support is required, please contact suppor
 /** Pink colour for editable column headings */
 export const PINK_FILL = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'F6D7D2' } } as const
 
-/** Grey colour for empty cells */
-export const GREY_FILL = { type: 'pattern', pattern: 'solid', bgColor: { argb: 'F0F0F0' } } as const
-
 /** Red text colour */
-export const RED_TEXT = { font: { color: { argb: 'FF0000' } } } as const
+export const RED_TEXT = { font: { color: { argb: 'B40000' } } } as const

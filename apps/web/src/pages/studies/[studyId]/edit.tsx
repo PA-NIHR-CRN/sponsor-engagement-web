@@ -404,8 +404,8 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
               </div>
 
               <p className="govuk-body">
-                If you need support updating your data, please contact the{' '}
-                <a href="mailto:supportmystudy@nihr.ac.uk">RDN Team</a>.
+                If you need support updating your data, please{' '}
+                <a href="mailto:supportmystudy@nihr.ac.uk">contact the RDN Team</a>.
               </p>
             </Fieldset>
           </Form>

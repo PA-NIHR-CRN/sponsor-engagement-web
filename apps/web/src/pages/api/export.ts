@@ -2,7 +2,7 @@ import { logger } from '@nihr-ui/logger'
 import dayjs from 'dayjs'
 import { Workbook, type Worksheet } from 'exceljs'
 
-import { FILE_NAME, GREY_FILL, HELPER_TEXT, PINK_FILL, RED_TEXT, Roles } from '@/constants'
+import { FILE_NAME, HELPER_TEXT, PINK_FILL, RED_TEXT, Roles } from '@/constants'
 import { getSponsorOrgName, getSupportOrgName } from '@/lib/organisations'
 import { getStudiesForExport, type StudyForExport } from '@/lib/studies'
 import { withApiHandler } from '@/utils/withApiHandler'
@@ -102,17 +102,13 @@ const addValidations = (worksheet: Worksheet) => {
 
 const addConditionalFormatting = (worksheet: Worksheet) => {
   // Empty cells
-  worksheet.addConditionalFormatting({
-    ref: `A1:${worksheet.getColumn(worksheet.columnCount - 2).letter}${worksheet.rowCount}`,
-    rules: [
-      {
-        type: 'cellIs',
-        operator: 'equal',
-        priority: 1,
-        formulae: ['=""'],
-        style: { fill: GREY_FILL },
-      },
-    ],
+  worksheet.eachRow({ includeEmpty: true }, (row) => {
+    row.eachCell({ includeEmpty: true }, (cell) => {
+      const cellText = cell.text.trim()
+      if (!cellText) {
+        cell.value = 'No data available'
+      }
+    })
   })
 
   // Red "Due assessment" text

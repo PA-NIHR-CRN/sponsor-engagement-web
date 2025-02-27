@@ -399,7 +399,7 @@ describe('EditStudy', () => {
       expect(screen.getByRole('link', { name: 'Cancel' })).toHaveAttribute('href', `/studies/${mockStudyId}`)
 
       // Support text
-      const paragraphSupportText = screen.getByText(/if you need support updating your data, please contact the/i)
+      const paragraphSupportText = screen.getByText(/if you need support updating your data, please/i)
       expect(paragraphSupportText).toBeInTheDocument()
       const rdnTeamLink = within(paragraphSupportText).getByRole('link', { name: /rdn team/i })
       expect(rdnTeamLink).toBeInTheDocument()
