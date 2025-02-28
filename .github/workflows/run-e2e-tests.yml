@@ -152,7 +152,7 @@ jobs:
           --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3306, "ToPort": 3306, "IpRanges": [{"CidrIp": "${{ steps.publicip.outputs.ip }}/32", "Description": "GitHub runner IP for SE automation DB requests"}]}]'
 
     - name: Upload HTML Report as artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: test-report
@@ -160,7 +160,7 @@ jobs:
         retention-days: 3
     
     - name: 'Download HTML Report Artifact'
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       id: download
       if: github.event.inputs.publish-report != 'false' && always()
 
