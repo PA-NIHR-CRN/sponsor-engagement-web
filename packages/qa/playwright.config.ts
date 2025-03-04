@@ -28,6 +28,7 @@ const config: PlaywrightTestConfig = {
         baseURL: `${process.env.E2E_BASE_URL}`,
         headless: true,
         screenshot: { mode: 'on', fullPage: true, omitBackground: false },
+        javaScriptEnabled: true, // must be enabled for authentication
         launchOptions: {
           slowMo: 0,
         },
@@ -43,6 +44,7 @@ const config: PlaywrightTestConfig = {
         baseURL: `${process.env.E2E_BASE_URL}`,
         headless: true,
         screenshot: 'on',
+        javaScriptEnabled: process.env.LOCAL_DEV ? true : true, // allows testing with JS disabled (default = true)
         launchOptions: {
           slowMo: 0,
         },

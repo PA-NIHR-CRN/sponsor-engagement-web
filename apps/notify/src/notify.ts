@@ -36,6 +36,7 @@ const sendNotifications = async () => {
           some: {
             organisation: {
               studies: { some: { study: { isDueAssessment: true, isDeleted: false }, isDeleted: false } },
+              isDeleted: false,
             },
             isDeleted: false,
           },
@@ -49,6 +50,13 @@ const sendNotifications = async () => {
       },
       include: {
         organisations: {
+          where: {
+            organisation: {
+              studies: { some: { study: { isDueAssessment: true, isDeleted: false }, isDeleted: false } },
+              isDeleted: false,
+            },
+            isDeleted: false,
+          },
           select: {
             organisation: {
               select: {
@@ -66,6 +74,7 @@ const sendNotifications = async () => {
           some: {
             organisation: {
               studies: { some: { study: { isDueAssessment: true, isDeleted: false }, isDeleted: false } },
+              isDeleted: false,
             },
             isDeleted: false,
           },
@@ -79,6 +88,13 @@ const sendNotifications = async () => {
       },
       include: {
         organisations: {
+          where: {
+            organisation: {
+              studies: { some: { study: { isDueAssessment: true, isDeleted: false }, isDeleted: false } },
+              isDeleted: false,
+            },
+            isDeleted: false,
+          },
           select: {
             organisation: {
               select: {

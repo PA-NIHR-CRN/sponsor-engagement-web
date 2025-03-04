@@ -117,6 +117,13 @@ describe('notify', () => {
       where: expect.objectContaining({ email: { in: allowList } }),
       include: expect.objectContaining({
         organisations: {
+          where: {
+            organisation: {
+              studies: { some: { study: { isDueAssessment: true, isDeleted: false }, isDeleted: false } },
+              isDeleted: false,
+            },
+            isDeleted: false,
+          },
           select: {
             organisation: {
               select: {

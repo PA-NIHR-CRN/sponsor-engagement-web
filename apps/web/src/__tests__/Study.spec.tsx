@@ -436,7 +436,7 @@ describe('Study', () => {
         '1 January 2001',
         '2 January 2001',
         '1 January 2001',
-        '28 February 2003',
+        '2 January 2001',
         `${mockStudy.sampleSize}`,
         `${mockStudy.totalRecruitmentToDate}`,
       ])
@@ -525,8 +525,9 @@ describe('Study', () => {
         {
           ...mockStudy,
           evaluationCategories: [],
+          estimatedReopeningDate: null,
         },
-        [{ ...mappedCPMSStudyEvals[0], expectedReopenDate: null }, mappedCPMSStudyEvals[1]]
+        [{ ...mappedCPMSStudyEvals[0] }, mappedCPMSStudyEvals[1]]
       )
 
       const summaryTable = screen.getByRole('table', { name: 'Summary of study’s progress (UK)' })

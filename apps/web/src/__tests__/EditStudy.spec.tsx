@@ -399,7 +399,7 @@ describe('EditStudy', () => {
       expect(screen.getByRole('link', { name: 'Cancel' })).toHaveAttribute('href', `/studies/${mockStudyId}`)
 
       // Support text
-      const paragraphSupportText = screen.getByText(/if you need support updating your data, please contact the/i)
+      const paragraphSupportText = screen.getByText(/if you need support updating your data, please/i)
       expect(paragraphSupportText).toBeInTheDocument()
       const rdnTeamLink = within(paragraphSupportText).getByRole('link', { name: /rdn team/i })
       expect(rdnTeamLink).toBeInTheDocument()
@@ -421,7 +421,7 @@ describe('EditStudy', () => {
         [
           'Planned opening to recruitment date',
           'Planned closure to recruitment date',
-          'Actual opening to recruitment date',
+          'Actual opening to recruitment date (optional)',
           'Estimated reopening date',
         ],
       ],
@@ -558,7 +558,9 @@ describe('EditStudy', () => {
 
         await renderPage()
 
-        const actualOpeningDateFieldSet = screen.getByRole('group', { name: 'Actual opening to recruitment date' })
+        const actualOpeningDateFieldSet = screen.getByRole('group', {
+          name: 'Actual opening to recruitment date (optional)',
+        })
         expect(actualOpeningDateFieldSet).toBeInTheDocument()
 
         const yearField = within(actualOpeningDateFieldSet).getByLabelText('Year')
@@ -737,13 +739,12 @@ describe('EditStudy', () => {
         })
       })
 
-      it(`when status is 'Suspended' and planned opening, planned closure, actual opening and estimated reopening dates are blank`, async () => {
+      it(`when status is 'Suspended' and planned opening, planned closure, and estimated reopening dates are blank`, async () => {
         await renderPage(undefined, undefined, { ...mockStudyWithRelations, studyStatus: Status.Suspended })
 
         const fieldsToRemove = [
           'Planned opening to recruitment date',
           'Planned closure to recruitment date',
-          'Actual opening to recruitment date',
           'Estimated reopening date',
         ]
         await Promise.all(
