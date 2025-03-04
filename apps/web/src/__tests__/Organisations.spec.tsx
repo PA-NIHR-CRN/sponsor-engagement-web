@@ -116,7 +116,7 @@ describe('Organisations page', () => {
     expect(table).toBeInTheDocument()
 
     const headers = within(table).getAllByRole('columnheader')
-    expect(headers.map((header) => header.textContent)).toEqual(['Organisation', 'Manage'])
+    expect(headers.map((header) => header.textContent)).toEqual(['Organisation', 'Action'])
 
     const rows = within(table).getAllByRole('row')
 
@@ -129,7 +129,7 @@ describe('Organisations page', () => {
     ])
 
     expect(rows.map((row) => row.lastChild?.textContent)).toEqual([
-      'Manage',
+      'Action',
       'Manage Org name 1 sponsor contacts',
       'Manage Org name 2 sponsor contacts',
       'Manage Org name 3 sponsor contacts',
@@ -206,7 +206,7 @@ describe('Organisations page', () => {
     expect(within(pagination).queryByRole('link', { name: 'Previous' })).not.toBeInTheDocument()
     expect(within(pagination).getByRole('link', { name: 'Page 1' })).toHaveAttribute('href', '/?page=1')
     expect(within(pagination).getByRole('link', { name: 'Page 2' })).toHaveAttribute('href', '/?page=2')
-    expect(within(pagination).getByRole('link', { name: 'Next' })).toHaveAttribute('href', '/?page=2')
+    expect(within(pagination).getByRole('link', { name: 'Next page' })).toHaveAttribute('href', '/?page=2')
   })
 
   test('Multiple organisastion types (CRO, CTU, Sponsor etc)', async () => {

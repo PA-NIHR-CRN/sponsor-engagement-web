@@ -99,7 +99,9 @@ export default function Organisation({ organisation, query }: OrganisationProps)
               <Table.Cell>{user.user.email}</Table.Cell>
               <Table.Cell>{formatDate(user.updatedAt)}</Table.Cell>
               <Table.Cell>
-                <Link href={`/organisations/remove-contact/${user.id}`}>Remove</Link>
+                <Link aria-label={`Remove ${user.user.email}`} href={`/organisations/remove-contact/${user.id}`}>
+                  Remove
+                </Link>
               </Table.Cell>
             </Table.Row>
           ))}

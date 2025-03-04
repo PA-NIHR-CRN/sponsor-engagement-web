@@ -102,9 +102,9 @@ exports[`Email template "assessment-reminder.html.hbs" displays correctly 1`] = 
 
       <h2>Nominate someone else to assess research studies</h2>
 
-      <p>
-        The NIHR RDN can give other people in your organisation access to this service. Contact
-        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>
+      <p>The NIHR RDN can give other people in your organisation access to this service.
+        
+        <a href='mailto:supportmystudy@nihr.ac.uk'>Contact supportmystudy@nihr.ac.uk</a>
         to add a new contact.
       </p>
 
@@ -112,8 +112,8 @@ exports[`Email template "assessment-reminder.html.hbs" displays correctly 1`] = 
 
       <p>
         This email is not monitored, do not reply. If you’re not sure why you’ve received this email or need to be
-        removed from our list contact
-        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>.
+        removed from our list
+        <a href='mailto:supportmystudy@nihr.ac.uk'>contact supportmystudy@nihr.ac.uk</a>.
       </p>
     </div>
 
@@ -127,7 +127,7 @@ exports[`Email template "assessment-reminder.html.hbs" displays correctly 1`] = 
               <p>
                 &nbsp;<img
                   src='https://www.nihr.ac.uk/layout/4.0/assets/external/nihr-logo.png'
-                  alt='NIHRLogo'
+                  alt=''
                   width='206'
                   class='CToWUd'
                   data-bit='iit'
@@ -157,42 +157,42 @@ exports[`Email template "assessment-reminder.html.hbs" displays correctly 1`] = 
         Follow us:
         <img
           src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/f_logo_RGB-Blue_58.png'
-          alt='FB Logo'
+          alt=''
           width='11'
           height='11'
           class='CToWUd'
           data-bit='iit'
         />
-        <a href='https://www.facebook.com/OfficialNIHR' target='_blank'>OfficialNIHR</a>&nbsp;|&nbsp;<img
+        <a href='https://www.facebook.com/OfficialNIHR' target='_blank'>NIHR Facebook</a>&nbsp;|&nbsp;<img
           src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/Twitter_Logo_Blue.png'
-          alt='Twitter logo'
+          alt=''
           width='11'
           height='11'
           class='CToWUd'
           data-bit='iit'
         />
-        <a href='https://twitter.com/NIHRresearch' target='_blank'>@NIHRresearch</a>&nbsp;|&nbsp;<img
+        <a href='https://x.com/NIHRresearch' target='_blank' aria-label='NIHR X (formerly Twitter)'>NIHR X</a>&nbsp;|&nbsp;<img
           src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/LI-In-Bug.png'
-          alt='LI Logo'
+          alt=''
           width='11'
           height='9'
           class='CToWUd'
           data-bit='iit'
-        /><a href='https://www.linkedin.com/company/nihr-research' target='_blank'>NIHR</a>
+        /><a href='https://www.linkedin.com/company/nihr-research' target='_blank'>NIHR LinkedIn</a>
         |
         <img
           src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/youtube_logo_rgb_light.png'
-          alt='Youtube Logo'
+          alt=''
           width='11'
           height='9'
           class='CToWUd'
           data-bit='iit'
         />
-        <a href='https://www.youtube.com/user/NIHRtv' target='_blank'>NIHRtv</a>
+        <a href='https://www.youtube.com/user/NIHRtv' target='_blank'>NIHR YouTube</a>
         |
         <img
           src='https://www.nihr.ac.uk/layout/img/external/nihr-link-icon.png'
-          alt='URL Logo'
+          alt=''
           width='11'
           height='9'
           class='CToWUd'
@@ -201,7 +201,7 @@ exports[`Email template "assessment-reminder.html.hbs" displays correctly 1`] = 
         <a
           href='https://www.nihr.ac.uk/?utm_source=gmail&amp;utm_medium=email&amp;utm_campaign=ccsignature'
           target='_blank'
-        >nihr.ac.uk</a>
+        >NIHR Website</a>
       </p>
       <br />
       <br />
@@ -301,7 +301,7 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
       <p>
         The Sponsor Engagement Tool has been designed to support Sponsors and their delegates to meet the requirements
         outlined in the T&Cs. Sponsors and their delegates should use the Sponsor Engagement Tool to review the data the
-        RDN holds on their organisations portfolio of studies and to provide study data updates and assessments to ensure
+        RDN holds on their organisation's portfolio of studies and to provide study data updates and assessments to ensure
         the data held by the RDN is complete and up-to-date.
       </p>
 
@@ -359,8 +359,8 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
       <h2>Nominate someone else to assess studies</h2>
 
       <p>
-        The NIHR RDN can give other people in your organisation access to this service. Contact
-        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>
+        The NIHR RDN can give other people in your organisation access to this service.
+        <a href='mailto:supportmystudy@nihr.ac.uk'>Contact supportmystudy@nihr.ac.uk</a>
         to add a new contact.
       </p>
 
@@ -368,8 +368,8 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
 
       <p>
         This email is not monitored, do not reply. If you’re not sure why you’ve received this email or need to be
-        removed from our list contact
-        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>.
+        removed from our list
+        <a href='mailto:supportmystudy@nihr.ac.uk'>contact supportmystudy@nihr.ac.uk</a>.
       </p>
     </div>
 
@@ -383,7 +383,7 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
               <p>
                 &nbsp;<img
                   src='https://www.nihr.ac.uk/layout/4.0/assets/external/nihr-logo.png'
-                  alt='NIHRLogo'
+                  alt=''
                   width='206'
                   class='CToWUd'
                   data-bit='iit'
@@ -413,42 +413,42 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
         Follow us:
         <img
           src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/f_logo_RGB-Blue_58.png'
-          alt='FB Logo'
+          alt=''
           width='11'
           height='11'
           class='CToWUd'
           data-bit='iit'
         />
-        <a href='https://www.facebook.com/OfficialNIHR' target='_blank'>OfficialNIHR</a>&nbsp;|&nbsp;<img
+        <a href='https://www.facebook.com/OfficialNIHR' target='_blank'>NIHR Facebook</a>&nbsp;|&nbsp;<img
           src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/Twitter_Logo_Blue.png'
-          alt='Twitter logo'
+          alt=''
           width='11'
           height='11'
           class='CToWUd'
           data-bit='iit'
         />
-        <a href='https://twitter.com/NIHRresearch' target='_blank'>@NIHRresearch</a>&nbsp;|&nbsp;<img
+        <a href='https://x.com/NIHRresearch' target='_blank' aria-label='NIHR X (formerly Twitter)'>NIHR X</a>&nbsp;|&nbsp;<img
           src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/LI-In-Bug.png'
-          alt='LI Logo'
+          alt=''
           width='11'
           height='9'
           class='CToWUd'
           data-bit='iit'
-        /><a href='https://www.linkedin.com/company/nihr-research' target='_blank'>NIHR</a>
+        /><a href='https://www.linkedin.com/company/nihr-research' target='_blank'>NIHR LinkedIn</a>
         |
         <img
           src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/youtube_logo_rgb_light.png'
-          alt='Youtube Logo'
+          alt=''
           width='11'
           height='9'
           class='CToWUd'
           data-bit='iit'
         />
-        <a href='https://www.youtube.com/user/NIHRtv' target='_blank'>NIHRtv</a>
+        <a href='https://www.youtube.com/user/NIHRtv' target='_blank'>NIHR YouTube</a>
         |
         <img
           src='https://www.nihr.ac.uk/layout/img/external/nihr-link-icon.png'
-          alt='URL Logo'
+          alt=''
           width='11'
           height='9'
           class='CToWUd'
@@ -457,7 +457,7 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
         <a
           href='https://www.nihr.ac.uk/?utm_source=gmail&amp;utm_medium=email&amp;utm_campaign=ccsignature'
           target='_blank'
-        >nihr.ac.uk</a>
+        >NIHR Website</a>
       </p>
       <br />
       <br />
@@ -531,11 +531,11 @@ exports[`Email template "contact-removed.html.hbs" displays correctly 1`] = `
 
       <h2>Not sure why you've been removed?</h2>
 
-      <p>If you think there’s been an error please contact
-        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>.</p>
+      <p>If you think there’s been an error please
+        <a href='mailto:supportmystudy@nihr.ac.uk'>contact supportmystudy@nihr.ac.uk</a>.</p>
 
-      <p>If you’re not sure why you’ve received this email or need to be removed from our list contact
-        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>.</p>
+      <p>If you’re not sure why you’ve received this email or need to be removed from our list
+        <a href='mailto:supportmystudy@nihr.ac.uk'>contact supportmystudy@nihr.ac.uk</a>.</p>
     </div>
 
     <br />
@@ -548,7 +548,7 @@ exports[`Email template "contact-removed.html.hbs" displays correctly 1`] = `
               <p>
                 &nbsp;<img
                   src='https://www.nihr.ac.uk/layout/4.0/assets/external/nihr-logo.png'
-                  alt='NIHRLogo'
+                  alt=''
                   width='206'
                   class='CToWUd'
                   data-bit='iit'
@@ -578,42 +578,42 @@ exports[`Email template "contact-removed.html.hbs" displays correctly 1`] = `
         Follow us:
         <img
           src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/f_logo_RGB-Blue_58.png'
-          alt='FB Logo'
+          alt=''
           width='11'
           height='11'
           class='CToWUd'
           data-bit='iit'
         />
-        <a href='https://www.facebook.com/OfficialNIHR' target='_blank'>OfficialNIHR</a>&nbsp;|&nbsp;<img
+        <a href='https://www.facebook.com/OfficialNIHR' target='_blank'>NIHR Facebook</a>&nbsp;|&nbsp;<img
           src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/Twitter_Logo_Blue.png'
-          alt='Twitter logo'
+          alt=''
           width='11'
           height='11'
           class='CToWUd'
           data-bit='iit'
         />
-        <a href='https://twitter.com/NIHRresearch' target='_blank'>@NIHRresearch</a>&nbsp;|&nbsp;<img
+        <a href='https://x.com/NIHRresearch' target='_blank' aria-label='NIHR X (formerly Twitter)'>NIHR X</a>&nbsp;|&nbsp;<img
           src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/LI-In-Bug.png'
-          alt='LI Logo'
+          alt=''
           width='11'
           height='9'
           class='CToWUd'
           data-bit='iit'
-        /><a href='https://www.linkedin.com/company/nihr-research' target='_blank'>NIHR</a>
+        /><a href='https://www.linkedin.com/company/nihr-research' target='_blank'>NIHR LinkedIn</a>
         |
         <img
           src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/youtube_logo_rgb_light.png'
-          alt='Youtube Logo'
+          alt=''
           width='11'
           height='9'
           class='CToWUd'
           data-bit='iit'
         />
-        <a href='https://www.youtube.com/user/NIHRtv' target='_blank'>NIHRtv</a>
+        <a href='https://www.youtube.com/user/NIHRtv' target='_blank'>NIHR YouTube</a>
         |
         <img
           src='https://www.nihr.ac.uk/layout/img/external/nihr-link-icon.png'
-          alt='URL Logo'
+          alt=''
           width='11'
           height='9'
           class='CToWUd'
@@ -622,7 +622,7 @@ exports[`Email template "contact-removed.html.hbs" displays correctly 1`] = `
         <a
           href='https://www.nihr.ac.uk/?utm_source=gmail&amp;utm_medium=email&amp;utm_campaign=ccsignature'
           target='_blank'
-        >nihr.ac.uk</a>
+        >NIHR Website</a>
       </p>
       <br />
       <br />

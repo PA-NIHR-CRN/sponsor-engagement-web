@@ -152,7 +152,8 @@ test.describe('Sponsor engagement study update with CPMS study update and SE val
     })
 
     await test.step(`And I update the study details in CPMS with new values`, async () => {
-      await cpmsPage.locator('#CurrentStudyRecord_EnglandRecruitmentSampleSize').fill('10101')
+      await cpmsPage.locator('#CurrentStudyRecord_UkRecruitmentSampleSize').fill('10101')
+      await cpmsPage.locator('#CurrentStudyRecord_EnglandRecruitmentSampleSize').fill('')
       await cpmsPage.locator('#CurrentStudyRecord_GlobalRecruitmentSampleSize').fill('')
       await cpmsPage.locator('#CurrentStudyRecord_ScotlandRecruitmentSampleSize').fill('')
       await cpmsPage.locator('#CurrentStudyRecord_WalesRecruitmentSampleSize').fill('')

@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "test": "NODE_OPTIONS='--no-deprecation=DEP0123' playwright test --project=seDefault",
+    "test": "playwright test --project=seDefault",
     "test:android": "playwright test --project=seMobileAndroid",
     "test:axe": "(ENABLE_ACCESSIBILITY=true playwright test --project=seDefault --grep '@accessibility')",
     "test:chrome": "playwright test --project=seChrome",

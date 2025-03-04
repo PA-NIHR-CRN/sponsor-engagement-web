@@ -164,7 +164,11 @@ describe('Studies page', () => {
         'This download is a snapshot of all the information held within the Sponsor Engagement Tool for the sponsor/delegate organisation.'
       )
     ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Download' })).toHaveAttribute('href', '/api/export')
+    expect(
+      screen.getByRole('link', {
+        name: 'Download a snapshot of all the information held within the Sponsor Engagement Tool for the sponsor/delegate organisation',
+      })
+    ).toHaveAttribute('href', '/api/export')
 
     // Study results title
     expect(screen.getByText(`${mockStudies.length} studies found (3 due for assessment)`)).toBeInTheDocument()
@@ -200,7 +204,11 @@ describe('Studies page', () => {
     expect(withinFirstStudy.getByText('Off Track on 1 January 2001')).toBeInTheDocument()
 
     // Study assessment CTA
-    expect(withinFirstStudy.getByRole('link', { name: 'View study' })).toHaveAttribute('href', '/studies/mocked-id')
+    const shortTitle = mockStudies[0].shortTitle
+    expect(withinFirstStudy.getByRole('link', { name: `View study ${shortTitle}` })).toHaveAttribute(
+      'href',
+      '/studies/mocked-id'
+    )
 
     // Pagination
     const pagination = screen.getByRole('navigation', { name: 'results' })
@@ -208,7 +216,7 @@ describe('Studies page', () => {
     expect(within(pagination).queryByRole('link', { name: 'Previous' })).not.toBeInTheDocument()
     expect(within(pagination).getByRole('link', { name: 'Page 1' })).toHaveAttribute('href', '/?page=1')
     expect(within(pagination).getByRole('link', { name: 'Page 2' })).toHaveAttribute('href', '/?page=2')
-    expect(within(pagination).getByRole('link', { name: 'Next' })).toHaveAttribute('href', '/?page=2')
+    expect(within(pagination).getByRole('link', { name: 'Next page' })).toHaveAttribute('href', '/?page=2')
   })
 
   test('No studies found', async () => {
