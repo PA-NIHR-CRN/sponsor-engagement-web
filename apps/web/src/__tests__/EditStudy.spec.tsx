@@ -745,7 +745,6 @@ describe('EditStudy', () => {
         const fieldsToRemove = [
           'Planned opening to recruitment date',
           'Planned closure to recruitment date',
-          // 'Actual opening to recruitment date',
           'Estimated reopening date',
         ]
         await Promise.all(

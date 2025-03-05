@@ -66,7 +66,7 @@ export default function Organisations({
                           Organisation
                         </Table.CellHeader>
                         <Table.CellHeader className="align-middle text-right" column>
-                          <span>Manage</span>
+                          <span>Action</span>
                         </Table.CellHeader>
                       </Table.Row>
                     </Table.Header>
