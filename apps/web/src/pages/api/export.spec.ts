@@ -131,8 +131,8 @@ describe('Exporting studies list', () => {
       study.actualClosureDate,
       study.sampleSize,
       study.totalRecruitmentToDate,
-      'No data available',
-      'No data available',
+      '-',
+      '-',
     ])
 
     // Cell validations added
@@ -219,8 +219,8 @@ describe('Exporting studies list', () => {
       study.actualClosureDate,
       study.sampleSize,
       study.totalRecruitmentToDate,
-      'No data available',
-      'No data available',
+      '-',
+      '-',
     ])
 
     expect(res.statusCode).toBe(200)
@@ -293,8 +293,8 @@ describe('Exporting studies list', () => {
       study.actualClosureDate,
       study.sampleSize,
       study.totalRecruitmentToDate,
-      'No data available',
-      'No data available',
+      '-',
+      '-',
     ])
 
     expect(res.statusCode).toBe(200)

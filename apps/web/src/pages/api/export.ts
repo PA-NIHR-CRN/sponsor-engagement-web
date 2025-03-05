@@ -103,10 +103,18 @@ const addValidations = (worksheet: Worksheet) => {
 const addConditionalFormatting = (worksheet: Worksheet) => {
   // Empty cells
   worksheet.eachRow({ includeEmpty: true }, (row) => {
-    row.eachCell({ includeEmpty: true }, (cell) => {
-      const cellText = cell.text.trim()
+    const lastColIndex = row.cellCount
+    const secondLastColIndex = lastColIndex - 1
+
+    row.eachCell({ includeEmpty: true }, (cell, colIndex) => {
+      const cellText = cell.value ? String(cell.value).trim() : ''
+
       if (!cellText) {
-        cell.value = 'No data available'
+        if (colIndex === lastColIndex || colIndex === secondLastColIndex) {
+          cell.value = '-'
+        } else {
+          cell.value = 'No data available'
+        }
       }
     })
   })
