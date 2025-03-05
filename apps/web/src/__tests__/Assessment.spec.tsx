@@ -261,7 +261,7 @@ describe('Assessment', () => {
 
       // Form Input - Further information
       const furtherInformationFieldset = screen.getByRole('group', {
-        name: 'Is there any additional information that would help NIHR RDN understand this progress assessment?',
+        name: 'Is there any additional information that would help NIHR RDN understand this progress assessment? (optional)',
       })
 
       for (const item of sysRefAssessmentFurtherInformation) {
@@ -412,7 +412,7 @@ describe('Assessment', () => {
       ).toHaveAccessibleErrorMessage('Error: Select how the study is progressing')
       expect(
         screen.getByRole('group', {
-          name: 'Is there any additional information that would help NIHR RDN understand this progress assessment?',
+          name: 'Is there any additional information that would help NIHR RDN understand this progress assessment? (optional)',
         })
       ).not.toHaveAccessibleErrorMessage()
       expect(screen.getByLabelText('Further information (optional)')).not.toHaveAccessibleErrorMessage()
@@ -439,7 +439,7 @@ describe('Assessment', () => {
       ).toHaveAccessibleErrorMessage('Error: Select how the study is progressing')
       expect(
         screen.getByRole('group', {
-          name: 'Is there any additional information that would help NIHR RDN understand this progress assessment?',
+          name: 'Is there any additional information that would help NIHR RDN understand this progress assessment? (optional)',
         })
       ).not.toHaveAccessibleErrorMessage()
       expect(screen.getByLabelText('Further information (optional)')).not.toHaveAccessibleErrorMessage()
