@@ -293,6 +293,7 @@ describe('Exporting studies list', () => {
       study.actualClosureDate,
       study.sampleSize,
       study.totalRecruitmentToDate,
+      'No data available',
       '-',
       '-',
     ])
