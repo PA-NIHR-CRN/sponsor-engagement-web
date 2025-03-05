@@ -2,7 +2,7 @@ import { logger } from '@nihr-ui/logger'
 import dayjs from 'dayjs'
 import { Workbook, type Worksheet } from 'exceljs'
 
-import { Column, FILE_NAME, HELPER_TEXT, PINK_FILL, RED_TEXT, Roles } from '@/constants'
+import { FILE_NAME, HELPER_TEXT, PINK_FILL, RED_TEXT, Roles } from '@/constants'
 import { getSponsorOrgName, getSupportOrgName } from '@/lib/organisations'
 import { getStudiesForExport, type StudyForExport } from '@/lib/studies'
 import { withApiHandler } from '@/utils/withApiHandler'
@@ -100,25 +100,21 @@ const addValidations = (worksheet: Worksheet) => {
   })
 }
 
-const addBlanks = (worksheet: Worksheet) => {
-  worksheet.getColumn('additionalInformation').eachCell((cell, rowNumber) => {
-    if (rowNumber > 2) {
-      cell.value = '-'
-    }
-  })
-}
-
 const addConditionalFormatting = (worksheet: Worksheet) => {
   // Empty cells
-  const columnsWithDash = [Column.SponsorAssessment, Column.AdditionalInformation]
-
   worksheet.eachRow({ includeEmpty: true }, (row) => {
+    const lastColIndex = row.cellCount
+    const secondLastColIndex = lastColIndex - 1
+
     row.eachCell({ includeEmpty: true }, (cell, colIndex) => {
-      const columnLetter = row.getCell(colIndex).address.replace(/\d/g, '')
       const cellText = cell.value ? String(cell.value).trim() : ''
 
       if (!cellText) {
-        cell.value = columnsWithDash.includes(columnLetter) ? '-' : 'No data available'
+        if (colIndex === lastColIndex || colIndex === secondLastColIndex) {
+          cell.value = '-'
+        } else {
+          cell.value = 'No data available'
+        }
       }
     })
   })
@@ -200,7 +196,6 @@ export default withApiHandler(Roles.SponsorContact, async (req, res, session) =>
   addStudyData(worksheet, studies)
   addHelperText(worksheet)
   addValidations(worksheet)
-  addBlanks(worksheet)
   addConditionalFormatting(worksheet)
   addFormatting(worksheet)
 

@@ -23,8 +23,3 @@ export const PINK_FILL = { type: 'pattern', pattern: 'solid', fgColor: { argb: '
 
 /** Red text colour */
 export const RED_TEXT = { font: { color: { argb: 'B40000' } } } as const
-
-export const Column = {
-  SponsorAssessment: 'U',
-  AdditionalInformation: 'V',
-}
