@@ -37,10 +37,12 @@ export const getStudyOrganisations = async ({
   currentPage,
   pageSize,
   searchTerm,
+  userId,
 }: {
   currentPage: number
   pageSize: number
   searchTerm: string | null
+  userId?: number
 }) => {
   const query = {
     skip: currentPage * pageSize - pageSize,
@@ -63,6 +65,13 @@ export const getStudyOrganisations = async ({
       }),
       studies: {
         some: {},
+      },
+      users: {
+        some: {
+          userId: {
+            equals: userId,
+          },
+        },
       },
       isDeleted: false,
     },

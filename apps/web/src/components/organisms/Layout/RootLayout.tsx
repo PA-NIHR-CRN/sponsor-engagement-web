@@ -1,4 +1,4 @@
-import { HomeIcon, SettingsIcon, SideNav } from '@nihr-ui/frontend'
+import { GroupsIcons, HomeIcon, SettingsIcon, SideNav } from '@nihr-ui/frontend'
 import { logger } from '@nihr-ui/logger'
 import { useIdle } from '@uidotdev/usehooks'
 import { Roboto } from 'next/font/google'
@@ -34,6 +34,11 @@ export function RootLayout({ children, backLink, heading = SERVICE_NAME, user }:
   const [sideNavOpen, setSideNavOpen] = useState(false)
   const { data: session } = useSession()
   const idle = useIdle(session ? session.idleTimeout * 1000 : undefined)
+  const isContactManager = user?.roles.includes(Roles.ContactManager)
+  const isSponsorContact = user?.roles.includes(Roles.SponsorContact)
+  const userOrganisations = user?.organisations.filter((userOrg) => !userOrg.isDeleted) ?? []
+  const groupsIconsLink =
+    userOrganisations.length === 1 ? `${ORGANISATIONS_PAGE}/${userOrganisations[0].organisationId}` : ORGANISATIONS_PAGE
 
   useEffect(() => {
     if (session && session.error === 'RefreshAccessTokenError') {
@@ -68,10 +73,13 @@ export function RootLayout({ children, backLink, heading = SERVICE_NAME, user }:
           <SideNav.Link as={Link} href="/" icon={<HomeIcon />}>
             Home
           </SideNav.Link>
-          {user?.roles.includes(Roles.ContactManager) ? (
+          {isContactManager ? (
             <SideNav.Link as={Link} href={ORGANISATIONS_PAGE} icon={<SettingsIcon />}>
               Manage sponsor contacts
             </SideNav.Link>
+          ) : null}
+          {isSponsorContact && !isContactManager && userOrganisations.length > 0 ? (
+            <SideNav.Link as={Link} href={groupsIconsLink} icon={<GroupsIcons />} />
           ) : null}
         </SideNav.Panel>
         <SideNav.Main>{children}</SideNav.Main>

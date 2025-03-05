@@ -7,7 +7,7 @@ import { SIGN_IN_PAGE } from '../constants/routes'
 import { authOptions } from '../pages/api/auth/[...nextauth]'
 
 export const withServerSideProps =
-  <R>(role: Roles, getServerSideProps: (context: GetServerSidePropsContext, session: Session) => R) =>
+  <R>(roles: Roles[], getServerSideProps: (context: GetServerSidePropsContext, session: Session) => R) =>
   async (context: GetServerSidePropsContext) => {
     try {
       const session = await getServerSession(context.req, context.res, authOptions)
@@ -20,7 +20,7 @@ export const withServerSideProps =
         }
       }
 
-      if (!session.user.roles.includes(role)) {
+      if (!session.user.roles.some((role) => roles.includes(role))) {
         return {
           redirect: {
             destination: '/',

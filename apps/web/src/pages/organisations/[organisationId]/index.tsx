@@ -17,6 +17,7 @@ import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
 import { getOrganisationById } from '@/lib/organisations'
 import { formatDate } from '@/utils/date'
 import { getValuesFromSearchParams } from '@/utils/form'
+import { hasOrganisationAccess } from '@/utils/organisations'
 import type { OrganisationAddInputs } from '@/utils/schemas'
 import { organisationAddSchema } from '@/utils/schemas'
 import { withServerSideProps } from '@/utils/withServerSideProps'
@@ -186,32 +187,43 @@ Organisation.getLayout = function getLayout(page: ReactElement, { user }: Organi
   return <RootLayout user={user}>{page}</RootLayout>
 }
 
-export const getServerSideProps = withServerSideProps(Roles.ContactManager, async (context, session) => {
-  const organisationId = Number(context.query.organisationId)
+export const getServerSideProps = withServerSideProps(
+  [Roles.ContactManager, Roles.SponsorContact],
+  async (context, session) => {
+    const organisationId = Number(context.query.organisationId)
 
-  if (!organisationId) {
+    if (!organisationId) {
+      return {
+        redirect: {
+          destination: '/404',
+        },
+      }
+    }
+
+    if (!hasOrganisationAccess(session.user?.roles ?? [], session.user?.organisations ?? [], organisationId)) {
+      return {
+        redirect: {
+          destination: '/404',
+        },
+      }
+    }
+
+    const organisation = await getOrganisationById(organisationId)
+
+    if (!organisation) {
+      return {
+        redirect: {
+          destination: '/404',
+        },
+      }
+    }
+
     return {
-      redirect: {
-        destination: '/404',
+      props: {
+        query: context.query,
+        user: session.user,
+        organisation,
       },
     }
   }
-
-  const organisation = await getOrganisationById(organisationId)
-
-  if (!organisation) {
-    return {
-      redirect: {
-        destination: '/404',
-      },
-    }
-  }
-
-  return {
-    props: {
-      query: context.query,
-      user: session.user,
-      organisation,
-    },
-  }
-})
+)
