@@ -131,7 +131,7 @@ describe('Exporting studies list', () => {
       study.actualClosureDate,
       study.sampleSize,
       study.totalRecruitmentToDate,
-      undefined,
+      study.managingSpeciality,
       'Select an option',
     ])
 
@@ -219,7 +219,7 @@ describe('Exporting studies list', () => {
       study.actualClosureDate,
       study.sampleSize,
       study.totalRecruitmentToDate,
-      undefined,
+      study.managingSpeciality,
       'Select an option',
     ])
 
@@ -293,7 +293,7 @@ describe('Exporting studies list', () => {
       study.actualClosureDate,
       study.sampleSize,
       study.totalRecruitmentToDate,
-      undefined,
+      study.managingSpeciality,
       'Select an option',
     ])
 
