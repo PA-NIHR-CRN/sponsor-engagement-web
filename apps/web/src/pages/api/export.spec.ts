@@ -131,8 +131,8 @@ describe('Exporting studies list', () => {
       study.actualClosureDate,
       study.sampleSize,
       study.totalRecruitmentToDate,
-      '-',
-      '-',
+      undefined,
+      'Select an option',
     ])
 
     // Cell validations added
@@ -219,8 +219,8 @@ describe('Exporting studies list', () => {
       study.actualClosureDate,
       study.sampleSize,
       study.totalRecruitmentToDate,
-      '-',
-      '-',
+      undefined,
+      'Select an option',
     ])
 
     expect(res.statusCode).toBe(200)
@@ -293,8 +293,8 @@ describe('Exporting studies list', () => {
       study.actualClosureDate,
       study.sampleSize,
       study.totalRecruitmentToDate,
-      '-',
-      '-',
+      undefined,
+      'Select an option',
     ])
 
     expect(res.statusCode).toBe(200)

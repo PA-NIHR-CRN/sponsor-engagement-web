@@ -91,6 +91,10 @@ const addHelperText = (worksheet: Worksheet) => {
 const addValidations = (worksheet: Worksheet) => {
   worksheet.getColumn('onTrack').eachCell((cell, rowNumber) => {
     if (rowNumber > 2) {
+      if (!cell.value) {
+        cell.value = 'Select an option'
+      }
+
       cell.dataValidation = {
         type: 'list',
         allowBlank: true,
@@ -103,18 +107,11 @@ const addValidations = (worksheet: Worksheet) => {
 const addConditionalFormatting = (worksheet: Worksheet) => {
   // Empty cells
   worksheet.eachRow({ includeEmpty: true }, (row) => {
-    const lastColIndex = row.cellCount
-    const secondLastColIndex = lastColIndex - 1
-
-    row.eachCell({ includeEmpty: true }, (cell, colIndex) => {
+    row.eachCell({ includeEmpty: true }, (cell) => {
       const cellText = cell.value ? String(cell.value).trim() : ''
 
       if (!cellText) {
-        if (colIndex === lastColIndex || colIndex === secondLastColIndex) {
-          cell.value = '-'
-        } else {
-          cell.value = 'No data available'
-        }
+        cell.value = 'No data available'
       }
     })
   })
@@ -195,8 +192,8 @@ export default withApiHandler(Roles.SponsorContact, async (req, res, session) =>
 
   addStudyData(worksheet, studies)
   addHelperText(worksheet)
-  addValidations(worksheet)
   addConditionalFormatting(worksheet)
+  addValidations(worksheet)
   addFormatting(worksheet)
 
   res.setHeader('content-disposition', `attachment; filename="${FILE_NAME}"`)
