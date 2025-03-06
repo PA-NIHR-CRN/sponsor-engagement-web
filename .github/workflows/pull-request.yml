@@ -55,6 +55,12 @@ jobs:
         run: |
           npx turbo run lint --cache-dir=".turbo"
           npx turbo run typecheck --cache-dir=".turbo"
+      - name: Upload prisma client # to debug intermittent failures
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: prisma-client-lint
+          path: node_modules/.prisma/client
 
   # Unit tests
   unit-tests:
@@ -71,6 +77,12 @@ jobs:
       - name: Unit tests
         run: |
           npx turbo run test:ci --cache-dir=".turbo"
+      - name: Upload prisma client # to debug intermittent failures
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: prisma-client-unit-tests
+          path: node_modules/.prisma/client
       - name: Unit tests coverage comment
         uses: MishaKav/jest-coverage-comment@main
         with:
