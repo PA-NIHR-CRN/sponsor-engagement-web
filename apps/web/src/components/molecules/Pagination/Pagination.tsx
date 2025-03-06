@@ -104,6 +104,7 @@ export function Pagination({ initialPage, initialPageSize, totalItems, className
       {nextEnabled ? (
         <div className="govuk-pagination__next">
           <Link
+            aria-label="Next page"
             className="govuk-link govuk-pagination__link govuk-link--no-visited-state"
             href={{
               pathname: router.pathname,

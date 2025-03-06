@@ -174,9 +174,14 @@ describe('Organisation page', () => {
       'Remove',
     ])
 
-    const removeLinks = within(contactsTable).getAllByRole('link', { name: 'Remove' })
-    expect(removeLinks[0]).toHaveAttribute('href', '/organisations/remove-contact/1')
-    expect(removeLinks[1]).toHaveAttribute('href', '/organisations/remove-contact/2')
+    const removeLink1 = within(contactsTable).getAllByRole('link', {
+      name: `Remove ${mockOrganisation.users[0].user.email}`,
+    })[0]
+    const removeLink2 = within(contactsTable).getAllByRole('link', {
+      name: `Remove ${mockOrganisation.users[1].user.email}`,
+    })[0]
+    expect(removeLink1).toHaveAttribute('href', '/organisations/remove-contact/1')
+    expect(removeLink2).toHaveAttribute('href', '/organisations/remove-contact/2')
   })
 
   test('No contacts', async () => {

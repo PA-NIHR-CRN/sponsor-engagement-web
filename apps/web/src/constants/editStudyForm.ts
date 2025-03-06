@@ -13,6 +13,27 @@ export enum FormStudyStatus {
   Suspended = 'Suspended',
 }
 
+export const statusMap: Record<string, FormStudyStatus> = {
+  'In Setup': FormStudyStatus.InSetup,
+  'In Setup, Pending NHS Permission': FormStudyStatus.InSetup,
+  'In Setup, Approval Received': FormStudyStatus.InSetup,
+  'In Setup, Pending Approval': FormStudyStatus.InSetup,
+  'In Setup, NHS Permission Received': FormStudyStatus.InSetup,
+  'Open to Recruitment': FormStudyStatus.OpenToRecruitment,
+  'Open, With Recruitment': FormStudyStatus.OpenToRecruitment,
+  'Closed to Recruitment': FormStudyStatus.Closed,
+  'Closed to Recruitment, In Follow Up': FormStudyStatus.ClosedFollowUp,
+  'Closed to Recruitment, Follow Up Complete': FormStudyStatus.Closed,
+  'Suspended (from Open, With Recruitment)': FormStudyStatus.Suspended,
+  'Suspended (from Open to Recruitment)': FormStudyStatus.Suspended,
+  'Withdrawn in Pre-Setup': FormStudyStatus.Withdrawn,
+  'Withdrawn During Setup': FormStudyStatus.Withdrawn,
+}
+
+export function mapToFormStudyStatus(status: string): FormStudyStatus {
+  return statusMap[status]
+}
+
 export const studyStatuses = [
   {
     name: 'In setup',

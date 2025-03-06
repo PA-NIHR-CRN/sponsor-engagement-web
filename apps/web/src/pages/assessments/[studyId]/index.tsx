@@ -98,6 +98,8 @@ export default function Assessment({
             </AccordionItem>
           </Accordion>
 
+          <p className="govuk-body govuk-!-margin-bottom-4">All fields are required unless labelled as optional.</p>
+
           <AssessmentHistory
             assessments={assessments.length > 0 ? [assessments[0]] : []}
             heading="Last sponsor assessment"
@@ -139,7 +141,7 @@ export default function Assessment({
                     : []
                 }
                 errors={errors}
-                label="Is there any additional information that would help NIHR RDN understand this progress assessment?"
+                label="Is there any additional information that would help NIHR RDN understand this progress assessment? (optional)"
                 required={false}
                 {...register('furtherInformation')}
               >

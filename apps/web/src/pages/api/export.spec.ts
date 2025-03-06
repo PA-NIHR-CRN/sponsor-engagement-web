@@ -58,7 +58,7 @@ describe('Exporting studies list', () => {
 
     expect(mockWorksheet.rowCount).toBe(5)
 
-    expect(addConditionalFormattingSpy).toHaveBeenCalledTimes(2)
+    expect(addConditionalFormattingSpy).toHaveBeenCalledTimes(1)
 
     // Helper text inserted as first row
     const helpTextRow = mockWorksheet.getRow(1)
@@ -117,7 +117,7 @@ describe('Exporting studies list', () => {
       study.title,
       `${study.chiefInvestigatorFirstName} ${study.chiefInvestigatorLastName}`,
       'Test Clinical Research Sponsor',
-      undefined, // Study CTU
+      'No data available', // Study CTU
       'Test Contract Research Organisation',
       'Yes',
       'Off Track',
@@ -131,6 +131,8 @@ describe('Exporting studies list', () => {
       study.actualClosureDate,
       study.sampleSize,
       study.totalRecruitmentToDate,
+      'No data available',
+      'No data available',
     ])
 
     // Cell validations added
@@ -217,6 +219,8 @@ describe('Exporting studies list', () => {
       study.actualClosureDate,
       study.sampleSize,
       study.totalRecruitmentToDate,
+      'No data available',
+      'No data available',
     ])
 
     expect(res.statusCode).toBe(200)
@@ -289,6 +293,8 @@ describe('Exporting studies list', () => {
       study.actualClosureDate,
       study.sampleSize,
       study.totalRecruitmentToDate,
+      'No data available',
+      'No data available',
     ])
 
     expect(res.statusCode).toBe(200)

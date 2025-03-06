@@ -72,7 +72,6 @@ const getMandatoryDateFields = (previousStatus: string | null, newStatus: string
 
   return mandatoryDates
 }
-
 /**
  * Mapping to see which form fields are visible based on status
  */
@@ -135,6 +134,17 @@ export const getVisibleFormFields = (
   }
 
   return [visibleDateFieldsMapping[newStatus] || [], visibleStatusesMapping[previousStatus] || []]
+}
+
+/**
+ * Returns optional fields to append '(optional)' to the labels of
+ */
+export const getOptionalFormFields = (previousStatus: string, newStatus: string): (keyof EditStudyInputs)[] => {
+  const [visibleDateFields] = getVisibleFormFields(previousStatus, newStatus, true)
+  const mandatoryDateFields = getMandatoryDateFields(previousStatus, newStatus)
+  const optionalFields = visibleDateFields.filter((field) => !mandatoryDateFields.includes(field))
+
+  return optionalFields
 }
 
 /**

@@ -69,7 +69,11 @@ export function StudyList({
         </div>
 
         <div className="text-right lg:w-full">
-          <Link className="govuk-button w-auto govuk-!-margin-bottom-0" href={studyHref}>
+          <Link
+            aria-label={`View study ${shortTitle}`}
+            className="govuk-button w-auto govuk-!-margin-bottom-0"
+            href={studyHref}
+          >
             View study
           </Link>
         </div>

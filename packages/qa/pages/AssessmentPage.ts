@@ -349,7 +349,7 @@ export default class AssessmentPage {
     await expect(this.additionalInfoSection).toBeVisible()
     await expect(this.additionalInfoSectionHeader).toBeVisible()
     await expect(this.additionalInfoSectionHeader).toHaveText(
-      'Is there any additional information that would help NIHR RDN understand this progress assessment?'
+      'Is there any additional information that would help NIHR RDN understand this progress assessment? (optional)'
     )
   }
 
