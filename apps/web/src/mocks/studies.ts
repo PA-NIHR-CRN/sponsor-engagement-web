@@ -276,7 +276,7 @@ export const mockStudyWithRelations = Mock.of<StudyWithRelations>({
   sampleSize: 1000,
   chiefInvestigatorFirstName: 'John',
   chiefInvestigatorLastName: 'Smith',
-  managingSpeciality: 'Cardiovascular',
+  managingSpeciality: '',
   plannedOpeningDate: new Date('2001-01-01'),
   plannedClosureDate: new Date('2001-01-02'),
   actualOpeningDate: new Date('2001-01-01'),
