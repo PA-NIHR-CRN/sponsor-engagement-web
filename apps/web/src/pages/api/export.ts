@@ -174,7 +174,7 @@ const addStudyData = (worksheet: Worksheet, studies: StudyForExport[]) => {
       requiredColumns.reduce((row, column) => {
         row[column.key] = studyDataMappers[column.key]?.(study)
 
-        if (column.key === 'onTrack' && !row[column.key]) {
+        if (column.key === 'onTrack') {
           row[column.key] = 'Select an option'
         }
 
