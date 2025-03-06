@@ -91,10 +91,6 @@ const addHelperText = (worksheet: Worksheet) => {
 const addValidations = (worksheet: Worksheet) => {
   worksheet.getColumn('onTrack').eachCell((cell, rowNumber) => {
     if (rowNumber > 2) {
-      if (!cell.value) {
-        cell.value = 'Select an option'
-      }
-
       cell.dataValidation = {
         type: 'list',
         allowBlank: true,
@@ -177,6 +173,11 @@ const addStudyData = (worksheet: Worksheet, studies: StudyForExport[]) => {
     worksheet.addRow(
       requiredColumns.reduce((row, column) => {
         row[column.key] = studyDataMappers[column.key]?.(study)
+
+        if (column.key === 'onTrack' && !row[column.key]) {
+          row[column.key] = 'Select an option'
+        }
+
         return row
       }, {})
     )
