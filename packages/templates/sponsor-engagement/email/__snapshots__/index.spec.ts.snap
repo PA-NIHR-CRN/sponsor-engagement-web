@@ -155,7 +155,8 @@ exports[`Email template "assessment-reminder.html.hbs" displays correctly 1`] = 
 
       <p>
         Follow us:
-        <img <!-- facebook logo -->
+        <!-- facebook logo -->
+        <img
           src='https://nihr.widen.net/content/aqo4dnubmf/jpeg/f_logo_rgb-blue_58.jpeg'
           alt=''
           width='11'
@@ -165,7 +166,8 @@ exports[`Email template "assessment-reminder.html.hbs" displays correctly 1`] = 
         />
         <a href='https://www.facebook.com/OfficialNIHR' target='_blank'>NIHR Facebook</a>
         &nbsp;|&nbsp;
-        <img <!-- twitter logo -->
+        <!-- twitter logo -->
+        <img
           src='https://nihr.widen.net/content/egucpu5vgs/jpeg/x-logo-black.jpeg'
           alt=''
           width='11'
@@ -175,7 +177,8 @@ exports[`Email template "assessment-reminder.html.hbs" displays correctly 1`] = 
         />
         <a href='https://x.com/NIHRresearch' target='_blank' aria-label='NIHR X (formerly Twitter)'>NIHR X</a>
         &nbsp;|&nbsp;
-        <img <!-- linkedin logo -->
+        <!-- linkedin logo -->
+        <img 
           src='https://nihr.widen.net/content/xc1gslcvmt/jpeg/li-in-bug.jpeg'
           alt=''
           width='11'
@@ -185,7 +188,8 @@ exports[`Email template "assessment-reminder.html.hbs" displays correctly 1`] = 
         />
         <a href='https://www.linkedin.com/company/nihr-research' target='_blank'>NIHR LinkedIn</a>
         &nbsp;|&nbsp;
-        <img <!-- youtube logo -->
+        <!-- youtube logo -->
+        <img
           src='https://nihr.widen.net/content/52cd9uokcy/jpeg/youtube_logo_rgb_light.jpeg'
           alt=''
           width='11'
@@ -195,7 +199,8 @@ exports[`Email template "assessment-reminder.html.hbs" displays correctly 1`] = 
         />
         <a href='https://www.youtube.com/user/NIHRtv' target='_blank'>NIHR YouTube</a>
         &nbsp;|&nbsp;
-        <img <!-- nihr link logo -->
+        <!-- nihr link logo -->
+        <img
           src='https://nihr.widen.net/content/5mhcdc6utg/jpeg/nihr-link-icon.jpeg'
           alt=''
           width='11'
@@ -416,7 +421,8 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
 
       <p>
         Follow us:
-        <img <!-- facebook logo -->
+        <!-- facebook logo -->
+        <img
           src='https://nihr.widen.net/content/aqo4dnubmf/jpeg/f_logo_rgb-blue_58.jpeg'
           alt=''
           width='11'
@@ -426,7 +432,8 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
         />
         <a href='https://www.facebook.com/OfficialNIHR' target='_blank'>NIHR Facebook</a>
         &nbsp;|&nbsp;
-        <img <!-- twitter logo -->
+        <!-- twitter logo -->
+        <img
           src='https://nihr.widen.net/content/egucpu5vgs/jpeg/x-logo-black.jpeg'
           alt=''
           width='11'
@@ -436,7 +443,8 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
         />
         <a href='https://x.com/NIHRresearch' target='_blank' aria-label='NIHR X (formerly Twitter)'>NIHR X</a>
         &nbsp;|&nbsp;
-        <img <!-- linkedin logo -->
+        <!-- linkedin logo -->
+        <img 
           src='https://nihr.widen.net/content/xc1gslcvmt/jpeg/li-in-bug.jpeg'
           alt=''
           width='11'
@@ -446,7 +454,8 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
         />
         <a href='https://www.linkedin.com/company/nihr-research' target='_blank'>NIHR LinkedIn</a>
         &nbsp;|&nbsp;
-        <img <!-- youtube logo -->
+        <!-- youtube logo -->
+        <img
           src='https://nihr.widen.net/content/52cd9uokcy/jpeg/youtube_logo_rgb_light.jpeg'
           alt=''
           width='11'
@@ -456,7 +465,8 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
         />
         <a href='https://www.youtube.com/user/NIHRtv' target='_blank'>NIHR YouTube</a>
         &nbsp;|&nbsp;
-        <img <!-- nihr link logo -->
+        <!-- nihr link logo -->
+        <img
           src='https://nihr.widen.net/content/5mhcdc6utg/jpeg/nihr-link-icon.jpeg'
           alt=''
           width='11'
@@ -586,7 +596,8 @@ exports[`Email template "contact-removed.html.hbs" displays correctly 1`] = `
 
       <p>
         Follow us:
-        <img <!-- facebook logo -->
+        <!-- facebook logo -->
+        <img
           src='https://nihr.widen.net/content/aqo4dnubmf/jpeg/f_logo_rgb-blue_58.jpeg'
           alt=''
           width='11'
@@ -596,7 +607,8 @@ exports[`Email template "contact-removed.html.hbs" displays correctly 1`] = `
         />
         <a href='https://www.facebook.com/OfficialNIHR' target='_blank'>NIHR Facebook</a>
         &nbsp;|&nbsp;
-        <img <!-- twitter logo -->
+        <!-- twitter logo -->
+        <img
           src='https://nihr.widen.net/content/egucpu5vgs/jpeg/x-logo-black.jpeg'
           alt=''
           width='11'
@@ -606,7 +618,8 @@ exports[`Email template "contact-removed.html.hbs" displays correctly 1`] = `
         />
         <a href='https://x.com/NIHRresearch' target='_blank' aria-label='NIHR X (formerly Twitter)'>NIHR X</a>
         &nbsp;|&nbsp;
-        <img <!-- linkedin logo -->
+        <!-- linkedin logo -->
+        <img 
           src='https://nihr.widen.net/content/xc1gslcvmt/jpeg/li-in-bug.jpeg'
           alt=''
           width='11'
@@ -616,7 +629,8 @@ exports[`Email template "contact-removed.html.hbs" displays correctly 1`] = `
         />
         <a href='https://www.linkedin.com/company/nihr-research' target='_blank'>NIHR LinkedIn</a>
         &nbsp;|&nbsp;
-        <img <!-- youtube logo -->
+        <!-- youtube logo -->
+        <img
           src='https://nihr.widen.net/content/52cd9uokcy/jpeg/youtube_logo_rgb_light.jpeg'
           alt=''
           width='11'
@@ -626,7 +640,8 @@ exports[`Email template "contact-removed.html.hbs" displays correctly 1`] = `
         />
         <a href='https://www.youtube.com/user/NIHRtv' target='_blank'>NIHR YouTube</a>
         &nbsp;|&nbsp;
-        <img <!-- nihr link logo -->
+        <!-- nihr link logo -->
+        <img
           src='https://nihr.widen.net/content/5mhcdc6utg/jpeg/nihr-link-icon.jpeg'
           alt=''
           width='11'
