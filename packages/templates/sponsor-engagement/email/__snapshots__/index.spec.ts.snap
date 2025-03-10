@@ -155,33 +155,38 @@ exports[`Email template "assessment-reminder.html.hbs" displays correctly 1`] = 
 
       <p>
         Follow us:
-        <img
-          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/f_logo_RGB-Blue_58.png'
+        <img <!-- facebook logo -->
+          src='https://nihr.widen.net/content/aqo4dnubmf/jpeg/f_logo_rgb-blue_58.jpeg'
           alt=''
           width='11'
           height='11'
           class='CToWUd'
           data-bit='iit'
         />
-        <a href='https://www.facebook.com/OfficialNIHR' target='_blank'>NIHR Facebook</a>&nbsp;|&nbsp;<img
-          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/Twitter_Logo_Blue.png'
+        <a href='https://www.facebook.com/OfficialNIHR' target='_blank'>NIHR Facebook</a>
+        &nbsp;|&nbsp;
+        <img <!-- twitter logo -->
+          src='https://nihr.widen.net/content/egucpu5vgs/jpeg/x-logo-black.jpeg'
           alt=''
           width='11'
           height='11'
           class='CToWUd'
           data-bit='iit'
         />
-        <a href='https://x.com/NIHRresearch' target='_blank' aria-label='NIHR X (formerly Twitter)'>NIHR X</a>&nbsp;|&nbsp;<img
-          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/LI-In-Bug.png'
+        <a href='https://x.com/NIHRresearch' target='_blank' aria-label='NIHR X (formerly Twitter)'>NIHR X</a>
+        &nbsp;|&nbsp;
+        <img <!-- linkedin logo -->
+          src='https://nihr.widen.net/content/xc1gslcvmt/jpeg/li-in-bug.jpeg'
           alt=''
           width='11'
           height='9'
           class='CToWUd'
           data-bit='iit'
-        /><a href='https://www.linkedin.com/company/nihr-research' target='_blank'>NIHR LinkedIn</a>
-        |
-        <img
-          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/youtube_logo_rgb_light.png'
+        />
+        <a href='https://www.linkedin.com/company/nihr-research' target='_blank'>NIHR LinkedIn</a>
+        &nbsp;|&nbsp;
+        <img <!-- youtube logo -->
+          src='https://nihr.widen.net/content/52cd9uokcy/jpeg/youtube_logo_rgb_light.jpeg'
           alt=''
           width='11'
           height='9'
@@ -189,9 +194,9 @@ exports[`Email template "assessment-reminder.html.hbs" displays correctly 1`] = 
           data-bit='iit'
         />
         <a href='https://www.youtube.com/user/NIHRtv' target='_blank'>NIHR YouTube</a>
-        |
-        <img
-          src='https://www.nihr.ac.uk/layout/img/external/nihr-link-icon.png'
+        &nbsp;|&nbsp;
+        <img <!-- nihr link logo -->
+          src='https://nihr.widen.net/content/5mhcdc6utg/jpeg/nihr-link-icon.jpeg'
           alt=''
           width='11'
           height='9'
@@ -240,7 +245,7 @@ patients, the public and health and care organisations across England.
 The NIHR RDN tracks the progress of research studies in its portfolio using data provided by Sponsors or their delegates
 on behalf of the Department of Health and Social Care (DHSC).
 
-The DHSC have published the Terms and Conditions for NIHR RDN support [http://terms-conditions-link], which outlines the requirements for Sponsors to provide up-to-date study data and assessments of progress to the RDN. 
+The DHSC have published the Terms and Conditions for NIHR RDN support [http://terms-conditions-link], which outlines the requirements for Sponsors to provide up-to-date study data and assessments of progress to the RDN.
 
 The Sponsor Engagement Tool has been designed to support Sponsors and their delegates to meet the requirements outlined in 
 the T&Cs. Sponsors and their delegates should use the Sponsor Engagement Tool to review the data the RDN holds on their organisation’s portfolio of studies, 
@@ -411,33 +416,38 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
 
       <p>
         Follow us:
-        <img
-          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/f_logo_RGB-Blue_58.png'
+        <img <!-- facebook logo -->
+          src='https://nihr.widen.net/content/aqo4dnubmf/jpeg/f_logo_rgb-blue_58.jpeg'
           alt=''
           width='11'
           height='11'
           class='CToWUd'
           data-bit='iit'
         />
-        <a href='https://www.facebook.com/OfficialNIHR' target='_blank'>NIHR Facebook</a>&nbsp;|&nbsp;<img
-          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/Twitter_Logo_Blue.png'
+        <a href='https://www.facebook.com/OfficialNIHR' target='_blank'>NIHR Facebook</a>
+        &nbsp;|&nbsp;
+        <img <!-- twitter logo -->
+          src='https://nihr.widen.net/content/egucpu5vgs/jpeg/x-logo-black.jpeg'
           alt=''
           width='11'
           height='11'
           class='CToWUd'
           data-bit='iit'
         />
-        <a href='https://x.com/NIHRresearch' target='_blank' aria-label='NIHR X (formerly Twitter)'>NIHR X</a>&nbsp;|&nbsp;<img
-          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/LI-In-Bug.png'
+        <a href='https://x.com/NIHRresearch' target='_blank' aria-label='NIHR X (formerly Twitter)'>NIHR X</a>
+        &nbsp;|&nbsp;
+        <img <!-- linkedin logo -->
+          src='https://nihr.widen.net/content/xc1gslcvmt/jpeg/li-in-bug.jpeg'
           alt=''
           width='11'
           height='9'
           class='CToWUd'
           data-bit='iit'
-        /><a href='https://www.linkedin.com/company/nihr-research' target='_blank'>NIHR LinkedIn</a>
-        |
-        <img
-          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/youtube_logo_rgb_light.png'
+        />
+        <a href='https://www.linkedin.com/company/nihr-research' target='_blank'>NIHR LinkedIn</a>
+        &nbsp;|&nbsp;
+        <img <!-- youtube logo -->
+          src='https://nihr.widen.net/content/52cd9uokcy/jpeg/youtube_logo_rgb_light.jpeg'
           alt=''
           width='11'
           height='9'
@@ -445,9 +455,9 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
           data-bit='iit'
         />
         <a href='https://www.youtube.com/user/NIHRtv' target='_blank'>NIHR YouTube</a>
-        |
-        <img
-          src='https://www.nihr.ac.uk/layout/img/external/nihr-link-icon.png'
+        &nbsp;|&nbsp;
+        <img <!-- nihr link logo -->
+          src='https://nihr.widen.net/content/5mhcdc6utg/jpeg/nihr-link-icon.jpeg'
           alt=''
           width='11'
           height='9'
@@ -576,33 +586,38 @@ exports[`Email template "contact-removed.html.hbs" displays correctly 1`] = `
 
       <p>
         Follow us:
-        <img
-          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/f_logo_RGB-Blue_58.png'
+        <img <!-- facebook logo -->
+          src='https://nihr.widen.net/content/aqo4dnubmf/jpeg/f_logo_rgb-blue_58.jpeg'
           alt=''
           width='11'
           height='11'
           class='CToWUd'
           data-bit='iit'
         />
-        <a href='https://www.facebook.com/OfficialNIHR' target='_blank'>NIHR Facebook</a>&nbsp;|&nbsp;<img
-          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/Twitter_Logo_Blue.png'
+        <a href='https://www.facebook.com/OfficialNIHR' target='_blank'>NIHR Facebook</a>
+        &nbsp;|&nbsp;
+        <img <!-- twitter logo -->
+          src='https://nihr.widen.net/content/egucpu5vgs/jpeg/x-logo-black.jpeg'
           alt=''
           width='11'
           height='11'
           class='CToWUd'
           data-bit='iit'
         />
-        <a href='https://x.com/NIHRresearch' target='_blank' aria-label='NIHR X (formerly Twitter)'>NIHR X</a>&nbsp;|&nbsp;<img
-          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/LI-In-Bug.png'
+        <a href='https://x.com/NIHRresearch' target='_blank' aria-label='NIHR X (formerly Twitter)'>NIHR X</a>
+        &nbsp;|&nbsp;
+        <img <!-- linkedin logo -->
+          src='https://nihr.widen.net/content/xc1gslcvmt/jpeg/li-in-bug.jpeg'
           alt=''
           width='11'
           height='9'
           class='CToWUd'
           data-bit='iit'
-        /><a href='https://www.linkedin.com/company/nihr-research' target='_blank'>NIHR LinkedIn</a>
-        |
-        <img
-          src='https://www.nihr.ac.uk/images/about-us/stay-up-to-date/youtube_logo_rgb_light.png'
+        />
+        <a href='https://www.linkedin.com/company/nihr-research' target='_blank'>NIHR LinkedIn</a>
+        &nbsp;|&nbsp;
+        <img <!-- youtube logo -->
+          src='https://nihr.widen.net/content/52cd9uokcy/jpeg/youtube_logo_rgb_light.jpeg'
           alt=''
           width='11'
           height='9'
@@ -610,9 +625,9 @@ exports[`Email template "contact-removed.html.hbs" displays correctly 1`] = `
           data-bit='iit'
         />
         <a href='https://www.youtube.com/user/NIHRtv' target='_blank'>NIHR YouTube</a>
-        |
-        <img
-          src='https://www.nihr.ac.uk/layout/img/external/nihr-link-icon.png'
+        &nbsp;|&nbsp;
+        <img <!-- nihr link logo -->
+          src='https://nihr.widen.net/content/5mhcdc6utg/jpeg/nihr-link-icon.jpeg'
           alt=''
           width='11'
           height='9'
