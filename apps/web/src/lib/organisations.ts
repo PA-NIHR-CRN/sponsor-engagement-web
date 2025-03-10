@@ -79,7 +79,7 @@ export const getStudyOrganisations = async ({
       studies: {
         some: {},
       },
-      ...(Boolean(userId) && userOrgsQuery),
+      ...(userId !== undefined && userOrgsQuery),
       isDeleted: false,
     },
   }

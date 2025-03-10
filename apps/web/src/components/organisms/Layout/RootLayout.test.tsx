@@ -86,7 +86,7 @@ describe('Displays the correct navigation links for a user who is only a Sponsor
 
   test('and is associated with multiple organisations', () => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- test data is not null
-    const user = userWithSponsorContactRole.user!
+    const user = { ...userWithSponsorContactRole.user! }
     user.organisations = [
       userWithSponsorContactRole.user?.organisations[0],
       { ...userWithSponsorContactRole.user?.organisations[0], id: 2, organisationId: 3534 },

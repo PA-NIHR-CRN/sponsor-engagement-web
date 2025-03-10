@@ -37,7 +37,7 @@ export function RootLayout({ children, backLink, heading = SERVICE_NAME, user }:
   const isContactManager = user?.roles.includes(Roles.ContactManager)
   const isSponsorContact = user?.roles.includes(Roles.SponsorContact)
   const userOrganisations = user?.organisations.filter((userOrg) => !userOrg.isDeleted) ?? []
-  const GroupIconLink =
+  const groupIconLink =
     userOrganisations.length === 1 ? `${ORGANISATIONS_PAGE}/${userOrganisations[0].organisationId}` : ORGANISATIONS_PAGE
 
   useEffect(() => {
@@ -79,7 +79,7 @@ export function RootLayout({ children, backLink, heading = SERVICE_NAME, user }:
             </SideNav.Link>
           ) : null}
           {isSponsorContact && !isContactManager && userOrganisations.length > 0 ? (
-            <SideNav.Link as={Link} href={GroupIconLink} icon={<GroupIcon />}>
+            <SideNav.Link as={Link} href={groupIconLink} icon={<GroupIcon />}>
               Manage sponsor contacts
             </SideNav.Link>
           ) : null}
