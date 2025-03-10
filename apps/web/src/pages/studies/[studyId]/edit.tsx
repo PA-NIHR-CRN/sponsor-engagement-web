@@ -427,7 +427,7 @@ EditStudy.getLayout = function getLayout(page: ReactElement, { user }: EditStudy
   )
 }
 
-export const getServerSideProps = withServerSideProps(Roles.SponsorContact, async (context, session) => {
+export const getServerSideProps = withServerSideProps([Roles.SponsorContact], async (context, session) => {
   const userOrganisationIds = session.user?.organisations.map((userOrg) => userOrg.organisationId)
 
   const { data: study } = await getStudyById(Number(context.query.studyId), userOrganisationIds)

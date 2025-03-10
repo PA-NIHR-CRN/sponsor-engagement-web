@@ -1,4 +1,5 @@
 import type { GetServerSideProps, GetServerSidePropsContext } from 'next'
+import type { Session } from 'next-auth'
 import { getServerSession } from 'next-auth/next'
 import { Mock } from 'ts-mockery'
 
@@ -19,7 +20,7 @@ describe('withServerSideProps', () => {
 
     const getServerSideProps = jest.fn() as GetServerSideProps
 
-    const props = await withServerSideProps(Roles.SponsorContact, getServerSideProps)(mockContext)
+    const props = await withServerSideProps([Roles.SponsorContact], getServerSideProps)(mockContext)
 
     expect(getServerSideProps).not.toHaveBeenCalled()
 
@@ -37,7 +38,7 @@ describe('withServerSideProps', () => {
 
     const getServerSideProps = jest.fn() as GetServerSideProps
 
-    const props = await withServerSideProps(Roles.SponsorContact, getServerSideProps)(mockContext)
+    const props = await withServerSideProps([Roles.SponsorContact], getServerSideProps)(mockContext)
 
     expect(getServerSideProps).not.toHaveBeenCalled()
 
@@ -55,7 +56,7 @@ describe('withServerSideProps', () => {
 
     const getServerSideProps = jest.fn() as GetServerSideProps
 
-    const props = await withServerSideProps(Roles.SponsorContact, getServerSideProps)(mockContext)
+    const props = await withServerSideProps([Roles.SponsorContact], getServerSideProps)(mockContext)
 
     expect(getServerSideProps).not.toHaveBeenCalled()
 
@@ -65,6 +66,31 @@ describe('withServerSideProps', () => {
       },
     })
   })
+
+  it.each([
+    [userWithSponsorContactRole, [Roles.ContactManager, Roles.SponsorContact]],
+    [userWithContactManagerRole, [Roles.ContactManager, Roles.SponsorContact]],
+  ])(
+    'does not redirect user if they have one of the required roles',
+    async (userSession: Session, authorisedRoles: Roles[]) => {
+      const getServerSessionMock = jest.mocked(getServerSession)
+
+      getServerSessionMock.mockResolvedValueOnce(userSession)
+
+      const getServerSideProps = jest.fn() as GetServerSideProps
+
+      const props = await withServerSideProps(authorisedRoles, getServerSideProps)(mockContext)
+
+      expect(getServerSideProps).toHaveBeenCalled()
+      expect(props).not.toEqual(
+        expect.objectContaining({
+          redirect: {
+            destination: '/',
+          },
+        })
+      )
+    }
+  )
 
   it('calls provided getServerSideProps function with expected arguments', async () => {
     const getServerSessionMock = jest.mocked(getServerSession)
@@ -76,7 +102,7 @@ describe('withServerSideProps', () => {
       props: { test: true },
     })) as GetServerSideProps
 
-    const result = await withServerSideProps(Roles.SponsorContact, getServerSideProps)(mockContext)
+    const result = await withServerSideProps([Roles.SponsorContact], getServerSideProps)(mockContext)
 
     expect(getServerSideProps).toHaveBeenCalledTimes(1)
     expect(getServerSideProps).toHaveBeenCalledWith(mockContext, userWithSponsorContactRole)

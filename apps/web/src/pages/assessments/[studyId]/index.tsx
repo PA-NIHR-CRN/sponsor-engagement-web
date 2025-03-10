@@ -183,7 +183,7 @@ Assessment.getLayout = function getLayout(page: ReactElement, { user }: Assessme
   return <RootLayout user={user}>{page}</RootLayout>
 }
 
-export const getServerSideProps = withServerSideProps(Roles.SponsorContact, async (context, session) => {
+export const getServerSideProps = withServerSideProps([Roles.SponsorContact], async (context, session) => {
   const studyId = context.query.studyId
 
   if (!studyId) {

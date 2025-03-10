@@ -11,6 +11,7 @@ import { RootLayout } from '@/components/organisms'
 import { ORGANISATIONS_PER_PAGE, Roles } from '@/constants'
 import { useFormListeners } from '@/hooks/useFormListeners'
 import { getStudyOrganisations } from '@/lib/organisations'
+import { isSponsorContact } from '@/utils/auth'
 import { getFiltersFromQuery } from '@/utils/filters'
 import { pluraliseOrganisation } from '@/utils/pluralise'
 import { withServerSideProps } from '@/utils/withServerSideProps'
@@ -119,42 +120,56 @@ Organisations.getLayout = function getLayout(page: ReactElement, { user }: Organ
   return <RootLayout user={user}>{page}</RootLayout>
 }
 
-export const getServerSideProps = withServerSideProps(Roles.ContactManager, async (context, session) => {
-  try {
-    const searchParams = new URLSearchParams({
-      q: context.query.q ? String(context.query.q) : '',
-      page: context.query.page ? String(context.query.page) : '1',
-    })
+export const getServerSideProps = withServerSideProps(
+  [Roles.ContactManager, Roles.SponsorContact],
+  async (context, session) => {
+    try {
+      const searchParams = new URLSearchParams({
+        q: context.query.q ? String(context.query.q) : '',
+        page: context.query.page ? String(context.query.page) : '1',
+      })
 
-    const initialPage = Number(searchParams.get('page'))
-    const searchTerm = searchParams.get('q')
+      const initialPage = Number(searchParams.get('page'))
+      const searchTerm = searchParams.get('q')
+      const isOnlyASponsorContact = isSponsorContact(session.user?.roles ?? [])
 
-    const { data: organisations, pagination } = await getStudyOrganisations({
-      searchTerm,
-      currentPage: initialPage,
-      pageSize: ORGANISATIONS_PER_PAGE,
-    })
+      if (isOnlyASponsorContact && session.user?.organisations.length === 0) {
+        return {
+          redirect: {
+            destination: '/400',
+          },
+        }
+      }
 
-    const filters = getFiltersFromQuery(context.query)
+      const { data: organisations, pagination } = await getStudyOrganisations({
+        searchTerm,
+        currentPage: initialPage,
+        pageSize: ORGANISATIONS_PER_PAGE,
+        // Sponsor contact only have permissions to see organisations they are associated to
+        ...(isOnlyASponsorContact && { userId: session.user?.id }),
+      })
 
-    return {
-      props: {
-        user: session.user,
-        meta: {
-          initialPage,
-          initialPageSize: ORGANISATIONS_PER_PAGE,
-          totalItems: pagination.total,
+      const filters = getFiltersFromQuery(context.query)
+
+      return {
+        props: {
+          user: session.user,
+          meta: {
+            initialPage,
+            initialPageSize: ORGANISATIONS_PER_PAGE,
+            totalItems: pagination.total,
+          },
+          organisations,
+          filters,
         },
-        organisations,
-        filters,
-      },
-    }
-  } catch (error) {
-    logger.error(error)
-    return {
-      redirect: {
-        destination: '/500',
-      },
+      }
+    } catch (error) {
+      logger.error(error)
+      return {
+        redirect: {
+          destination: '/500',
+        },
+      }
     }
   }
-})
+)

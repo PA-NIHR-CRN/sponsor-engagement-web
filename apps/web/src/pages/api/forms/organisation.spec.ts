@@ -397,12 +397,12 @@ describe('Failed organisation sponsor contact invitation', () => {
     expect(logger.error).toHaveBeenCalledWith(new AuthError('Not signed in'))
   })
 
-  test('User without roles redirects to error page', async () => {
+  test('User without having a required role is redirected to error page', async () => {
     jest.mocked(getServerSession).mockResolvedValueOnce(userNoRoles)
     const res = await testHandler(api, { method: 'POST', body, query: {} })
     expect(res.statusCode).toBe(302)
     expect(res._getRedirectUrl()).toBe(`/500`)
-    expect(logger.error).toHaveBeenCalledWith(new Error('No role found for user'))
+    expect(logger.error).toHaveBeenCalledWith(new Error('User does not have a valid role'))
   })
 
   test('Wrong http method redirects back to the form with a fatal error', async () => {

@@ -8,7 +8,7 @@ import { Mock } from 'ts-mockery'
 import { render, screen, within } from '@/config/TestUtils'
 
 import { prismaMock } from '../__mocks__/prisma'
-import { userNoRoles, userWithContactManagerRole } from '../__mocks__/session'
+import { userNoRoles, userWithContactManagerRole, userWithSponsorContactRole } from '../__mocks__/session'
 import { SIGN_IN_PAGE } from '../constants/routes'
 import type { OrganisationsProps } from '../pages/organisations'
 import Organisations, { getServerSideProps } from '../pages/organisations'
@@ -18,7 +18,7 @@ jest.mock('next-seo')
 
 describe('getServerSideProps', () => {
   const getServerSessionMock = jest.mocked(getServerSession)
-  const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {} })
+  const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: {} })
 
   test('redirects to sign in page when there is no user session', async () => {
     getServerSessionMock.mockResolvedValueOnce(null)
@@ -37,6 +37,20 @@ describe('getServerSideProps', () => {
     expect(result).toEqual({
       redirect: {
         destination: '/',
+      },
+    })
+  })
+
+  test('redirects to 400 if user is a Sponsor Contact and does not have any organisations', async () => {
+    getServerSessionMock.mockResolvedValueOnce({
+      ...userWithSponsorContactRole,
+      user: { ...userWithSponsorContactRole.user, organisations: [] },
+    })
+
+    const result = await getServerSideProps(context)
+    expect(result).toEqual({
+      redirect: {
+        destination: '/400',
       },
     })
   })

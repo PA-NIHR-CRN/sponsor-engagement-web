@@ -14,7 +14,7 @@ interface SessionWithUser {
 
 export const withApiHandler =
   <Req extends NextApiRequest = NextApiRequest, Res extends NextApiResponse = NextApiResponse>(
-    role: Roles,
+    roles: Roles[],
     handler: (req: Req, res: Res, session: SessionWithUser) => Promise<Res>
   ) =>
   async (req: Req, res: Res) => {
@@ -25,8 +25,8 @@ export const withApiHandler =
         throw new AuthError('Not signed in')
       }
 
-      if (!session.user.roles.includes(role)) {
-        throw new Error('No role found for user')
+      if (!session.user.roles.some((role) => roles.includes(role))) {
+        throw new Error('User does not have a valid role')
       }
 
       return handler(req, res, session)

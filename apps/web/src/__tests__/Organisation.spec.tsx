@@ -9,7 +9,7 @@ import { Mock } from 'ts-mockery'
 import { render, screen, within } from '@/config/TestUtils'
 
 import { prismaMock } from '../__mocks__/prisma'
-import { userWithContactManagerRole, userWithSponsorContactRole } from '../__mocks__/session'
+import { userNoRoles, userWithContactManagerRole } from '../__mocks__/session'
 import { SIGN_IN_PAGE } from '../constants/routes'
 import type { OrganisationWithRelations } from '../lib/organisations'
 import type { OrganisationProps } from '../pages/organisations/[organisationId]'
@@ -33,9 +33,9 @@ describe('getServerSideProps', () => {
     })
   })
 
-  test('redirects back to the homepage for users without contact manager role', async () => {
+  test('redirects back to the homepage for users without contact manager role or sponsor contact role', async () => {
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {} })
-    getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+    getServerSessionMock.mockResolvedValueOnce(userNoRoles)
 
     const result = await getServerSideProps(context)
     expect(result).toEqual({

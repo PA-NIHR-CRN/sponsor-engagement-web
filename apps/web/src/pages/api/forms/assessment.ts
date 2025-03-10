@@ -13,7 +13,7 @@ export interface ExtendedNextApiRequest extends NextApiRequest {
   body: AssessmentInputs
 }
 
-export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, async (req, res, session) => {
+export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], async (req, res, session) => {
   try {
     if (req.method !== 'POST') {
       throw new Error('Wrong method')

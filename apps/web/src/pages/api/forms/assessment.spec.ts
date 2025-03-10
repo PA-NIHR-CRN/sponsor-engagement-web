@@ -164,7 +164,7 @@ describe('Failed study assessment submission', () => {
     const res = await testHandler(api, { method: 'POST', body, query: {} })
     expect(res.statusCode).toBe(302)
     expect(res._getRedirectUrl()).toBe(`/500`)
-    expect(logger.error).toHaveBeenCalledWith(new Error('No role found for user'))
+    expect(logger.error).toHaveBeenCalledWith(new Error('User does not have a valid role'))
   })
 
   test('Wrong http method redirects back to the form with a fatal error', async () => {
