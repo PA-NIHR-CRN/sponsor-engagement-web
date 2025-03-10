@@ -69,7 +69,7 @@ export function RootLayout({ children, backLink, heading = SERVICE_NAME, user }:
       <SideNav.Provider open={sideNavOpen} setOpen={setSideNavOpen}>
         <Header heading={heading} user={user} />
         {backLink}
-        <SideNav.Panel>
+        <SideNav.Panel data-testid="side-panel">
           <SideNav.Link as={Link} href="/" icon={<HomeIcon />}>
             Home
           </SideNav.Link>
@@ -79,7 +79,9 @@ export function RootLayout({ children, backLink, heading = SERVICE_NAME, user }:
             </SideNav.Link>
           ) : null}
           {isSponsorContact && !isContactManager && userOrganisations.length > 0 ? (
-            <SideNav.Link as={Link} href={GroupIconLink} icon={<GroupIcon />} />
+            <SideNav.Link as={Link} href={GroupIconLink} icon={<GroupIcon />}>
+              Manage sponsor contacts
+            </SideNav.Link>
           ) : null}
         </SideNav.Panel>
         <SideNav.Main>{children}</SideNav.Main>
