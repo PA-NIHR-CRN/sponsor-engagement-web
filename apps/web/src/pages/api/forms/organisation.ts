@@ -52,7 +52,7 @@ export default withApiHandler<ExtendedNextApiRequest>(
       })
 
       const {
-        user: { id: requesterUserId },
+        user: { id: requestedByUserId },
       } = session
 
       const registrationToken = crypto.randomBytes(24).toString('hex')
@@ -108,14 +108,14 @@ export default withApiHandler<ExtendedNextApiRequest>(
                 },
                 data: {
                   isDeleted: false,
-                  updatedBy: { connect: { id: requesterUserId } },
+                  updatedBy: { connect: { id: requestedByUserId } },
                 },
               },
             }),
             ...(!userOrganisation && {
               create: {
-                createdBy: { connect: { id: requesterUserId } },
-                updatedBy: { connect: { id: requesterUserId } },
+                createdBy: { connect: { id: requestedByUserId } },
+                updatedBy: { connect: { id: requestedByUserId } },
                 user: {
                   connectOrCreate: {
                     // If a user does not exist, create the user. We'll set registration token later.
@@ -147,8 +147,8 @@ export default withApiHandler<ExtendedNextApiRequest>(
             createMany: {
               data: {
                 roleId,
-                createdById: requesterUserId,
-                updatedById: requesterUserId,
+                createdById: requestedByUserId,
+                updatedById: requestedByUserId,
               },
               skipDuplicates: true,
             },

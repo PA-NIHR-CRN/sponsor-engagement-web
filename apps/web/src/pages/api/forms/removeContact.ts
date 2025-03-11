@@ -49,7 +49,7 @@ export default withApiHandler<ExtendedNextApiRequest>(
       }
 
       const {
-        user: { id: requesterUserId },
+        user: { id: requestedByUserId },
       } = session
 
       // Remove user from organisation
@@ -63,7 +63,7 @@ export default withApiHandler<ExtendedNextApiRequest>(
         },
         data: {
           isDeleted: true,
-          updatedBy: { connect: { id: requesterUserId } },
+          updatedBy: { connect: { id: requestedByUserId } },
         },
       })
 
