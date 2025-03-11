@@ -141,7 +141,7 @@ export default function Assessment({
                     : []
                 }
                 errors={errors}
-                label="Is there any additional information that would help NIHR RDN understand this progress assessment?"
+                label="Is there any additional information that would help NIHR RDN understand this progress assessment? (optional)"
                 required={false}
                 {...register('furtherInformation')}
               >

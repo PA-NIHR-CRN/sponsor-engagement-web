@@ -104,7 +104,8 @@ const addConditionalFormatting = (worksheet: Worksheet) => {
   // Empty cells
   worksheet.eachRow({ includeEmpty: true }, (row) => {
     row.eachCell({ includeEmpty: true }, (cell) => {
-      const cellText = cell.text.trim()
+      const cellText = cell.value ? String(cell.value).trim() : ''
+
       if (!cellText) {
         cell.value = 'No data available'
       }
@@ -172,6 +173,11 @@ const addStudyData = (worksheet: Worksheet, studies: StudyForExport[]) => {
     worksheet.addRow(
       requiredColumns.reduce((row, column) => {
         row[column.key] = studyDataMappers[column.key]?.(study)
+
+        if (column.key === 'onTrack') {
+          row[column.key] = 'Select an option'
+        }
+
         return row
       }, {})
     )
@@ -187,8 +193,8 @@ export default withApiHandler([Roles.SponsorContact], async (req, res, session) 
 
   addStudyData(worksheet, studies)
   addHelperText(worksheet)
-  addValidations(worksheet)
   addConditionalFormatting(worksheet)
+  addValidations(worksheet)
   addFormatting(worksheet)
 
   res.setHeader('content-disposition', `attachment; filename="${FILE_NAME}"`)
