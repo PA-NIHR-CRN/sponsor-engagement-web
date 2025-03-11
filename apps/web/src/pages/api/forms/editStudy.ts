@@ -44,7 +44,7 @@ export interface ExtendedNextApiRequest extends NextApiRequest {
   body: EditStudy | (EditStudy & Partial<DateFieldWithParts>)
 }
 
-export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, async (req, res, session) => {
+export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], async (req, res, session) => {
   const { DISABLE_DIRECT_STUDY_UPDATES } = process.env
 
   const disableDirectStudyUpdatesFeature = DISABLE_DIRECT_STUDY_UPDATES?.toLowerCase() === 'true'
