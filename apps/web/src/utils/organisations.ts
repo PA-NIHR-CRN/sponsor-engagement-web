@@ -20,7 +20,7 @@ export const hasOrganisationAccess = (
   // Sponsor contacts only have access to organisations they are associated to
   if (
     isSponsorContact(roles) &&
-    userOrganisations.find((organisation) => organisation.organisationId === organisationId)
+    userOrganisations.some((organisation) => organisation.organisationId === organisationId)
   )
     return true
 
