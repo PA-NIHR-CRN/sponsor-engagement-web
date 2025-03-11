@@ -13,6 +13,7 @@ import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
 import { getUserOrganisationById } from '@/lib/organisations'
+import { hasOrganisationAccess } from '@/utils/organisations'
 import type { OrganisationRemoveContactInputs } from '@/utils/schemas'
 import { organisationRemoveContactSchema } from '@/utils/schemas'
 import { withServerSideProps } from '@/utils/withServerSideProps'
@@ -95,31 +96,48 @@ RemoveContact.getLayout = function getLayout(page: ReactElement, { user }: Remov
   return <RootLayout user={user}>{page}</RootLayout>
 }
 
-export const getServerSideProps = withServerSideProps(Roles.ContactManager, async ({ query }, session) => {
-  const userOrganisationId = Number(query.userOrganisationId)
+export const getServerSideProps = withServerSideProps(
+  [Roles.ContactManager, Roles.SponsorContact],
+  async ({ query }, session) => {
+    const userOrganisationId = Number(query.userOrganisationId)
 
-  if (!userOrganisationId) {
+    if (!userOrganisationId) {
+      return {
+        redirect: {
+          destination: '/404',
+        },
+      }
+    }
+
+    const userOrganisation = await getUserOrganisationById(userOrganisationId)
+
+    if (!userOrganisation) {
+      return {
+        redirect: {
+          destination: '/404',
+        },
+      }
+    }
+
+    if (
+      !hasOrganisationAccess(
+        session.user?.roles ?? [],
+        session.user?.organisations ?? [],
+        userOrganisation.organisationId
+      )
+    ) {
+      return {
+        redirect: {
+          destination: '/404',
+        },
+      }
+    }
+
     return {
-      redirect: {
-        destination: '/404',
+      props: {
+        user: session.user,
+        userOrganisation,
       },
     }
   }
-
-  const userOrganisation = await getUserOrganisationById(userOrganisationId)
-
-  if (!userOrganisation) {
-    return {
-      redirect: {
-        destination: '/404',
-      },
-    }
-  }
-
-  return {
-    props: {
-      user: session.user,
-      userOrganisation,
-    },
-  }
-})
+)

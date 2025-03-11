@@ -8,6 +8,7 @@ import type { NextApiRequest } from 'next'
 import { Roles } from '@/constants'
 import { getUserOrganisationById } from '@/lib/organisations'
 import { prismaClient } from '@/lib/prisma'
+import { hasOrganisationAccess } from '@/utils/organisations'
 import type { OrganisationRemoveContactInputs } from '@/utils/schemas'
 import { organisationRemoveContactSchema } from '@/utils/schemas'
 import { withApiHandler } from '@/utils/withApiHandler'
@@ -26,73 +27,80 @@ export async function removeUserFromGroup(email: string, group: string) {
   }
 }
 
-export default withApiHandler<ExtendedNextApiRequest>(Roles.ContactManager, async (req, res, session) => {
-  try {
-    if (req.method !== 'POST') {
-      throw new Error('Wrong method')
-    }
-    const { ODP_ROLE_GROUP_ID = '' } = process.env
+export default withApiHandler<ExtendedNextApiRequest>(
+  [Roles.ContactManager, Roles.SponsorContact],
+  async (req, res, session) => {
+    try {
+      if (req.method !== 'POST') {
+        throw new Error('Wrong method')
+      }
+      const { ODP_ROLE_GROUP_ID = '' } = process.env
 
-    const { userOrganisationId } = organisationRemoveContactSchema.parse(req.body)
+      const { userOrganisationId } = organisationRemoveContactSchema.parse(req.body)
 
-    const userOrganisation = await getUserOrganisationById(Number(userOrganisationId))
+      const userOrganisation = await getUserOrganisationById(Number(userOrganisationId))
 
-    if (!userOrganisation) {
-      throw new Error('No user organisation found')
-    }
+      if (!userOrganisation) {
+        throw new Error('No user organisation found')
+      }
 
-    const {
-      user: { id: contactManagerUserId },
-    } = session
+      if (!hasOrganisationAccess(session.user.roles, session.user.organisations, userOrganisation.organisationId)) {
+        throw new Error(`User does not have access to this organisation: ${userOrganisation.organisationId}`)
+      }
 
-    // Remove user from organisation
-    const { user, organisation } = await prismaClient.userOrganisation.update({
-      where: {
-        id: Number(userOrganisationId),
-      },
-      include: {
-        organisation: true,
-        user: true,
-      },
-      data: {
-        isDeleted: true,
-        updatedBy: { connect: { id: contactManagerUserId } },
-      },
-    })
+      const {
+        user: { id: requestedByUserId },
+      } = session
 
-    logger.info('Removed contact with email %s from organisation %s', user.email, organisation.name)
-
-    const isEligibleForOdpRole = await isUserEligibleForOdpRole(user.id)
-
-    if (!isEligibleForOdpRole) {
-      await removeUserFromGroup(user.email, ODP_ROLE_GROUP_ID)
-    }
-
-    if (user.email) {
-      await emailService.sendEmail({
-        to: user.email,
-        subject: `NIHR RDN has removed you as a Sponsor contact for ${organisation.name}`,
-        htmlTemplate: emailTemplates['contact-removed.html.hbs'],
-        textTemplate: emailTemplates['contact-removed.text.hbs'],
-        templateData: {
-          organisationName: organisation.name,
+      // Remove user from organisation
+      const { user, organisation } = await prismaClient.userOrganisation.update({
+        where: {
+          id: Number(userOrganisationId),
+        },
+        include: {
+          organisation: true,
+          user: true,
+        },
+        data: {
+          isDeleted: true,
+          updatedBy: { connect: { id: requestedByUserId } },
         },
       })
-    }
 
-    return res.redirect(302, `/organisations/${userOrganisation.organisation.id}?success=2`)
-  } catch (error) {
-    logger.error(error)
+      logger.info('Removed contact with email %s from organisation %s', user.email, organisation.name)
 
-    const userOrganisationId = req.body.userOrganisationId
+      const isEligibleForOdpRole = await isUserEligibleForOdpRole(user.id)
 
-    if ((error as Error).stack?.includes('MessageRejected')) {
-      const searchParams = new URLSearchParams({ fatal: '3' })
+      if (!isEligibleForOdpRole) {
+        await removeUserFromGroup(user.email, ODP_ROLE_GROUP_ID)
+      }
+
+      if (user.email) {
+        await emailService.sendEmail({
+          to: user.email,
+          subject: `NIHR RDN has removed you as a Sponsor contact for ${organisation.name}`,
+          htmlTemplate: emailTemplates['contact-removed.html.hbs'],
+          textTemplate: emailTemplates['contact-removed.text.hbs'],
+          templateData: {
+            organisationName: organisation.name,
+          },
+        })
+      }
+
+      return res.redirect(302, `/organisations/${userOrganisation.organisation.id}?success=2`)
+    } catch (error) {
+      logger.error(error)
+
+      const userOrganisationId = req.body.userOrganisationId
+
+      if ((error as Error).stack?.includes('MessageRejected')) {
+        const searchParams = new URLSearchParams({ fatal: '3' })
+        return res.redirect(302, `/organisations/remove-contact/${userOrganisationId}/?${searchParams.toString()}`)
+      }
+
+      const searchParams = new URLSearchParams({ fatal: '1' })
+
       return res.redirect(302, `/organisations/remove-contact/${userOrganisationId}/?${searchParams.toString()}`)
     }
-
-    const searchParams = new URLSearchParams({ fatal: '1' })
-
-    return res.redirect(302, `/organisations/remove-contact/${userOrganisationId}/?${searchParams.toString()}`)
   }
-})
+)

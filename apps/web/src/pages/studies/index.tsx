@@ -208,7 +208,7 @@ Studies.getLayout = function getLayout(page: ReactElement, { user }: StudiesProp
   return <RootLayout user={user}>{page}</RootLayout>
 }
 
-export const getServerSideProps = withServerSideProps(Roles.SponsorContact, async (context, session) => {
+export const getServerSideProps = withServerSideProps([Roles.SponsorContact], async (context, session) => {
   try {
     if (!session.user?.organisations.length) {
       return {
