@@ -137,7 +137,6 @@ exports[`Email template "assessment-reminder.html.hbs" displays correctly 1`] = 
           </tr>
         </tbody>
       </table>
-
       <p>
         Follow us:
         <!-- facebook logo -->
@@ -388,7 +387,6 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
           </tr>
         </tbody>
       </table>
-
       <p>
         Follow us:
         <!-- facebook logo -->
@@ -548,7 +546,6 @@ exports[`Email template "contact-removed.html.hbs" displays correctly 1`] = `
           </tr>
         </tbody>
       </table>
-
       <p>
         Follow us:
         <!-- facebook logo -->
