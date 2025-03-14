@@ -95,7 +95,7 @@ export function CookieBanner() {
           Reject additional cookies
         </button>
         <Link
-          aria-label="View Cookie policy, (opens in a new tab)"
+          aria-label="View Cookie policy (opens in a new tab)"
           className="govuk-link"
           data-testid="veiwCookiePolicy"
           href={EXTERNAL_COOKIE_POLICY_PAGE_URL}
@@ -115,7 +115,7 @@ export function CookieBanner() {
             <p className="govuk-body" data-testid="confirmation-message">
               You’ve {view === CookieBannerView.Accepted ? 'accepted' : 'rejected'} additional cookies. You can view the{' '}
               <Link
-                aria-label="Cookie policy, (opens in a new tab)"
+                aria-label="Cookie policy (opens in a new tab)"
                 className="govuk-link"
                 href={EXTERNAL_COOKIE_POLICY_PAGE_URL}
                 target="_blank"

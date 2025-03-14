@@ -69,18 +69,3 @@ export const EXTERNAL_CRN_TERMS_CONDITIONS_URL =
 
 export const EXTERNAL_COOKIE_POLICY_PAGE_URL =
   'https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-cookie-policy'
-
-export const TERMS_AND_CONDITIONS_FOOTER_URL =
-  'https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-terms-and-conditions'
-
-export const PRIVACY_PAGE_URL =
-  'https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-privacy-notice'
-
-export const ACCESSIBILITY_PAGE_URL =
-  'https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-accessibility-statement'
-
-export const RELEASE_NOTES_URL =
-  'https://sites.google.com/nihr.ac.uk/nihr-sponsor-engagement-tool/se-tool-release-notes'
-
-export const SHAW_TRUST_ACCREDITATION_URL =
-  'https://www.accessibility-services.co.uk/certificates/nihr-sponsor-engagement-tool/'
