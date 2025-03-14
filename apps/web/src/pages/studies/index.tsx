@@ -187,7 +187,7 @@ export default function Studies({
                   Sponsors can view all of their studies included in the RDN portfolio by clicking the button below.
                 </p>
                 <a
-                  aria-label="Access dashboard for Sponsor RDN Portfolio (Opens in a new tab)"
+                  aria-label="Access dashboard for Sponsor RDN Portfolio, (Opens in a new tab)"
                   className="govuk-button mb-0"
                   href={dashboardLink}
                   rel="noopener noreferrer"

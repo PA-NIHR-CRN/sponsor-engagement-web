@@ -9,7 +9,7 @@ import { useSession } from 'next-auth/react'
 import type { ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 
-import { Header } from '@/components/molecules'
+import { Footer, Header } from '@/components/molecules'
 import { CookieBanner } from '@/components/organisms/CookieBanner/CookieBanner'
 import { SERVICE_NAME } from '@/constants'
 import { Roles } from '@/constants/auth'
@@ -64,27 +64,30 @@ export function RootLayout({ children, backLink, heading = SERVICE_NAME, user }:
   }, [])
 
   return (
-    <div className={`${primaryFont.variable} font-sans`}>
+    <div className={`${primaryFont.variable} font-sans min-h-screen flex flex-col`}>
       <CookieBanner />
       <SideNav.Provider open={sideNavOpen} setOpen={setSideNavOpen}>
         <Header heading={heading} user={user} />
         {backLink}
-        <SideNav.Panel data-testid="side-panel">
-          <SideNav.Link as={Link} href="/" icon={<HomeIcon />}>
-            Home
-          </SideNav.Link>
-          {isContactManager ? (
-            <SideNav.Link as={Link} href={ORGANISATIONS_PAGE} icon={<SettingsIcon />}>
-              Manage sponsor contacts
+        <div className="flex flex-1">
+          <SideNav.Panel className="flex flex-col" data-testid="side-panel">
+            <SideNav.Link as={Link} href="/" icon={<HomeIcon />}>
+              Home
             </SideNav.Link>
-          ) : null}
-          {isSponsorContact && !isContactManager && userOrganisations.length > 0 ? (
-            <SideNav.Link as={Link} href={groupIconLink} icon={<GroupIcon />}>
-              Manage sponsor contacts
-            </SideNav.Link>
-          ) : null}
-        </SideNav.Panel>
-        <SideNav.Main>{children}</SideNav.Main>
+            {isContactManager ? (
+              <SideNav.Link as={Link} href={ORGANISATIONS_PAGE} icon={<SettingsIcon />}>
+                Manage sponsor contacts
+              </SideNav.Link>
+            ) : null}
+            {isSponsorContact && !isContactManager && userOrganisations.length > 0 ? (
+              <SideNav.Link as={Link} href={groupIconLink} icon={<GroupIcon />}>
+                Manage sponsor contacts
+              </SideNav.Link>
+            ) : null}
+          </SideNav.Panel>
+          <SideNav.Main className="flex-1 overflow-auto">{children}</SideNav.Main>
+        </div>
+        <Footer />
       </SideNav.Provider>
     </div>
   )

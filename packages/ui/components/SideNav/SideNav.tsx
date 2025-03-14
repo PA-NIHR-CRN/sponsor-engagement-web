@@ -139,7 +139,7 @@ export const SideNavPanel = forwardRef(
         role="navigation"
         aria-label="Main application links"
         className={clsx(
-          'transition-width absolute bottom-0 top-[var(--header-height)] z-20 h-full overflow-hidden bg-[var(--side-nav-bg)] shadow-[2px_0px_4px_0_rgba(0,0,0,.1)] duration-200 ease-in-out motion-reduce:transition-none',
+          'transition-width absolute bottom-0 top-[var(--header-height)] z-20 overflow-hidden bg-[var(--side-nav-bg)] shadow-[2px_0px_4px_0_rgba(0,0,0,.1)] duration-200 ease-in-out motion-reduce:transition-none',
           { 'w-[var(--side-nav-width-collapsed)]': !open },
           { 'w-[var(--side-nav-width-expanded)]': open },
           className
