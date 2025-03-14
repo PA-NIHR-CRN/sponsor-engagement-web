@@ -337,6 +337,7 @@ const fetchStudies = async function* (url: string, username: string, password: s
             StudyStatus.SuspendedActivelyRecruiting,
           ],
           studyRecordStatus: [StudyRecordStatus.Live, StudyRecordStatus.LiveChangesPendingApproval],
+          includeDevolvedAdministrationLedStudies: true,
         },
       })
       totalStudies = data.Result.TotalRecords
@@ -413,18 +414,16 @@ export const ingest = async () => {
   for await (const studyRecords of fetchStudies(API_URL, API_USERNAME, API_PASSWORD)) {
     if (!studyRecords) return
 
-    studies = studyRecords
-      .filter((study) => Boolean(study.QualificationDate))
-      .map((study) => ({
-        ...study,
-        StudySponsors: study.StudySponsors.map(
-          (sponsor) =>
-            ({
-              ...sponsor,
-              OrganisationRole: sponsor.OrganisationRole.trim(),
-            } as StudySponsor)
-        ),
-      }))
+    studies = studyRecords.map((study) => ({
+      ...study,
+      StudySponsors: study.StudySponsors.map(
+        (sponsor) =>
+          ({
+            ...sponsor,
+            OrganisationRole: sponsor.OrganisationRole.trim(),
+          } as StudySponsor)
+      ),
+    }))
 
     await createStudies()
     await createOrganisations()
