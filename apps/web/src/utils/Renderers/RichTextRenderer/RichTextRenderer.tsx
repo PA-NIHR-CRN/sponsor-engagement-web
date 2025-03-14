@@ -39,7 +39,7 @@ function Heading({ level, children }: { level: 2 | 3 | 4; children: ReactNode })
 function LinkEntry({ text, url }: LinkEntryProps) {
   return (
     <Link
-      aria-label={`${text}, (Opens in new tab)`}
+      aria-label={`${text} (Opens in new tab)`}
       className="govuk-link"
       href={url}
       rel="noopener noreferrer"
