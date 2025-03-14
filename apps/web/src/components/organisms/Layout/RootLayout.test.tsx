@@ -1,4 +1,6 @@
-import { userNoRoles } from '@/__mocks__/session'
+import type { UserOrganisation } from '@prisma/client'
+
+import { userNoRoles, userWithSponsorContactRole } from '@/__mocks__/session'
 import { render, within } from '@/config/TestUtils'
 
 import { RootLayout } from './RootLayout'
@@ -30,4 +32,85 @@ test('Adds a class to the body to detect js is enabled', () => {
     </RootLayout>
   )
   expect(document.body.classList.contains('js-enabled')).toBeTruthy()
+})
+
+describe('Displays the correct navigation links for a user who is only a Sponsor Contact', () => {
+  test('and is associated with no organisations', () => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- test data is not null
+    const user = { ...userWithSponsorContactRole.user! }
+    user.organisations = []
+
+    const { getByTestId, getByRole } = render(
+      <RootLayout heading="Welcome" user={user}>
+        <div>Page content</div>
+      </RootLayout>
+    )
+
+    const navLinksContainer = getByTestId('side-panel')
+    expect(within(navLinksContainer).getAllByRole('link')).toHaveLength(1)
+
+    const homeLinkElement = getByRole('link', { name: 'Home' })
+    expect(homeLinkElement).toBeInTheDocument()
+    expect(within(homeLinkElement).queryByTestId('home-icon')).toBeInTheDocument()
+    expect(homeLinkElement).toHaveAttribute('href', '/')
+
+    expect(within(navLinksContainer).queryByTestId('settings-icon')).toBeNull()
+    expect(within(navLinksContainer).queryByTestId('group-icon')).toBeNull()
+  })
+
+  test('and is associated with one organisation', () => {
+    const { getByTestId, getByRole } = render(
+      <RootLayout heading="Welcome" user={userWithSponsorContactRole.user}>
+        <div>Page content</div>
+      </RootLayout>
+    )
+
+    const navLinksContainer = getByTestId('side-panel')
+    expect(within(navLinksContainer).getAllByRole('link')).toHaveLength(2)
+
+    const homeLinkElement = getByRole('link', { name: 'Home' })
+    expect(homeLinkElement).toBeInTheDocument()
+    expect(within(homeLinkElement).queryByTestId('home-icon')).toBeInTheDocument()
+    expect(homeLinkElement).toHaveAttribute('href', '/')
+
+    const groupLinkElement = getByRole('link', { name: 'Manage sponsor contacts' })
+    expect(groupLinkElement).toBeInTheDocument()
+    expect(within(groupLinkElement).queryByTestId('group-icon')).toBeInTheDocument()
+    expect(groupLinkElement).toHaveAttribute(
+      'href',
+      `/organisations/${userWithSponsorContactRole.user?.organisations[0].organisationId}`
+    )
+
+    expect(within(navLinksContainer).queryByTestId('settings-icon')).toBeNull()
+  })
+
+  test('and is associated with multiple organisations', () => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- test data is not null
+    const user = { ...userWithSponsorContactRole.user! }
+    user.organisations = [
+      userWithSponsorContactRole.user?.organisations[0],
+      { ...userWithSponsorContactRole.user?.organisations[0], id: 2, organisationId: 3534 },
+    ] as UserOrganisation[]
+
+    const { getByTestId, getByRole } = render(
+      <RootLayout heading="Welcome" user={user}>
+        <div>Page content</div>
+      </RootLayout>
+    )
+
+    const navLinksContainer = getByTestId('side-panel')
+    expect(within(navLinksContainer).getAllByRole('link')).toHaveLength(2)
+
+    const homeLinkElement = getByRole('link', { name: 'Home' })
+    expect(homeLinkElement).toBeInTheDocument()
+    expect(within(homeLinkElement).queryByTestId('home-icon')).toBeInTheDocument()
+    expect(homeLinkElement).toHaveAttribute('href', '/')
+
+    const groupLinkElement = getByRole('link', { name: 'Manage sponsor contacts' })
+    expect(groupLinkElement).toBeInTheDocument()
+    expect(within(groupLinkElement).queryByTestId('group-icon')).toBeInTheDocument()
+    expect(groupLinkElement).toHaveAttribute('href', '/organisations')
+
+    expect(within(navLinksContainer).queryByTestId('settings-icon')).toBeNull()
+  })
 })

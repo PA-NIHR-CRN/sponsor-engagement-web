@@ -86,7 +86,7 @@ templates['assessment-reminder.html.hbs'] = handlebars.template({
             })
           : helper)
       ) +
-      "'>NIHR RDN</a>\n        supports Sponsors and their delegates to deliver high-quality research, for the benefit of patients, the public\n        and health and care organisations across England.\n      </p>\n\n      <p>\n        The NIHR RDN tracks the progress of research studies in its portfolio using data provided by Sponsors or their\n        delegates on behalf of the Department of Health and Social Care (DHSC).\n      </p>\n\n      <p>The DHSC have published the\n        <a href='" +
+      "'>NIHR RDN</a>\n        supports Sponsors and their delegates to deliver high-quality research, for the benefit of patients, the public\n        and health and care organisations across England.\n      </p>\n\n      <p>\n        The NIHR RDN tracks the progress of research studies in its portfolio using data provided by Sponsors or their\n        delegates on behalf of the Department of Health and Social Care (DHSC).\n      </p>\n\n      <p>\n        For studies that have sites based in England, the DHSC have published the\n        <a href='" +
       alias4(
         ((helper =
           (helper =
@@ -103,7 +103,7 @@ templates['assessment-reminder.html.hbs'] = handlebars.template({
             })
           : helper)
       ) +
-      "'>Terms and Conditions for NIHR RDN support</a>, which outlines the requirements for Sponsors to provide up-to-date study data and assessments of progress to the\n        RDN.\n      </p>\n\n      <p>The Sponsor Engagement Tool has been designed to support Sponsors and their delegates to meet the requirements\n        outlined in the T&Cs. Sponsors and their delegates should use the Sponsor Engagement Tool to review the data the\n        RDN holds on their organisation’s portfolio of studies, and to provide study data updates and assessments to\n        ensure the data held by the RDN is complete and up-to-date.\n      </p>\n\n      <p>Sponsors or their delegates are prompted to review and assess the progress of studies when:</p>\n\n      <ul>\n        <li>A study falls behind a planned milestone or</li>\n        <li>A study appears to not be recruiting to target</li>\n        <li>And the last study assessment is over three months old</li>\n      </ul>\n\n      <p>\n        Sponsors or their delegates can request\n        <a href='" +
+      "'>Terms and Conditions for NIHR RDN support</a>, which outlines the\n        requirements for Sponsors to provide up-to-date study data and assessments of progress to the RDN.\n      </p>\n\n      <p>The Sponsor Engagement Tool has been designed to support Sponsors and their delegates to meet the requirements\n        outlined in the T&Cs. Sponsors and their delegates should use the Sponsor Engagement Tool to review the data the\n        RDN holds on their organisation’s portfolio of studies, to provide study data updates and assessments to ensure\n        the data held by the RDN is complete and up-to-date, and to manage contacts linked to their organisation.\n      </p>\n\n      <p>Sponsors or their delegates are prompted to review and assess the progress of studies when:</p>\n\n      <ul>\n        <li>A study falls behind a planned milestone or</li>\n        <li>A study appears to not be recruiting to target</li>\n        <li>And the last study assessment is over three months old</li>\n      </ul>\n\n      <p>\n        For studies that have sites based in England, Sponsors or their delegates can request\n        <a href='" +
       alias4(
         ((helper =
           (helper =
@@ -261,7 +261,7 @@ templates['assessment-reminder.text.hbs'] = handlebars.template({
             })
           : helper)
       ) +
-      ']. Failure to do so may result in removal from the NIHR RDN Portfolio.\n\n# Nominate someone else to assess research studies\n\nThe NIHR RDN can give other people in your organisation access to this service. Contact supportmystudy@nihr.ac.uk to add\na new contact.\n\nThis email is not monitored, do not reply. If you’re not sure why you’ve received this email or need to be removed from\nour list contact supportmystudy@nihr.ac.uk.'
+      ']. Failure to do so may result in removal from the NIHR RDN Portfolio.\n\n# Nominate someone else to assess research studies\n\nYou can give other people in your organisation access to this service by accessing the contacts section of the Sponsor Engagement Tool. \nWithin this section you can view all contacts linked to your organisation, add new contacts, and remove any contacts who no longer need access to the service.\n\nThis email is not monitored, do not reply. If you’re not sure why you’ve received this email or need to be removed from\nour list contact supportmystudy@nihr.ac.uk.'
     )
   },
   useData: true,
@@ -317,7 +317,7 @@ templates['contact-assigned.html.hbs'] = handlebars.template({
             })
           : helper)
       ) +
-      "'>NIHR RDN</a>\n        supports Sponsors and their delegates to deliver high-quality research, for the benefit of patients, the public\n        and health and care organisations across England.\n      </p>\n\n      <p>\n        The NIHR RDN tracks the progress of research studies in its portfolio using data provided by Sponsors or their\n        delegates on behalf of the Department of Health and Social Care (DHSC).\n      </p>\n\n      <p>\n        The DHSC have published the\n        <a href='" +
+      "'>NIHR RDN</a>\n        supports Sponsors and their delegates to deliver high-quality research, for the benefit of patients, the public\n        and health and care organisations across England.\n      </p>\n\n      <p>\n        The NIHR RDN tracks the progress of research studies in its portfolio using data provided by Sponsors or their\n        delegates on behalf of the Department of Health and Social Care (DHSC).\n      </p>\n\n      <p>\n        The DHSC have published the \n        <a href='" +
       alias4(
         ((helper =
           (helper =
@@ -334,7 +334,7 @@ templates['contact-assigned.html.hbs'] = handlebars.template({
             })
           : helper)
       ) +
-      "'>Terms and Conditions for NIHR RDN support</a>, which outlines the requirements for Sponsors to provide up-to-date study data and assessments of progress to the RDN.\n      </p>\n\n      <p>\n        The Sponsor Engagement Tool has been designed to support Sponsors and their delegates to meet the requirements\n        outlined in the T&Cs. Sponsors and their delegates should use the Sponsor Engagement Tool to review the data the\n        RDN holds on their organisation's portfolio of studies and to provide study data updates and assessments to ensure\n        the data held by the RDN is complete and up-to-date.\n      </p>\n\n      <p>\n        Please sign in to the Sponsor Engagement Tool to provide updates on studies.\n      </p>\n\n      <a\n        href='" +
+      "'>Terms and Conditions for NIHR RDN support</a>, which outlines the requirements for Sponsors to provide up-to-date study data and assessments of progress to the RDN.\n      </p>\n\n      <p>\n        The Sponsor Engagement Tool has been designed to support Sponsors and their delegates to meet the requirements\n        outlined in the T&Cs. Sponsors and their delegates should use the Sponsor Engagement Tool to review the data the\n        RDN holds on their organisation’s portfolio of studies and to provide study data updates and assessments to ensure\n        the data held by the RDN is complete and up-to-date.\n      </p>\n\n      <p>\n        Please sign in to the Sponsor Engagement Tool to provide updates on studies.\n      </p>\n\n      <a\n        href='" +
       alias4(
         ((helper =
           (helper =

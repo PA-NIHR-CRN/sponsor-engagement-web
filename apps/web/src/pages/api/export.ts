@@ -184,7 +184,7 @@ const addStudyData = (worksheet: Worksheet, studies: StudyForExport[]) => {
   })
 }
 
-export default withApiHandler(Roles.SponsorContact, async (req, res, session) => {
+export default withApiHandler([Roles.SponsorContact], async (req, res, session) => {
   const workbook = new Workbook()
   const worksheet = workbook.addWorksheet('Studies Export')
 
