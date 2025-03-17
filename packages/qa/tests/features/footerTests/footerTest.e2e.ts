@@ -1,20 +1,14 @@
 import { test } from '../../../hooks/CustomFixtures'
 
 test.describe('Footer validation - @se_255', () => {
+  test.use({ storageState: '.auth/sponsorContact.json' })
+
   test('As a user I can see and use the Footer - @se_255_Footer_validation', async ({
     commonItemsPage,
-    signedOutPage,
-    loginPage,
     studiesPage,
   }) => {
-    await test.step('Given I have navigated to the Home Page and succesfully sign in as a Sponsor Contact', async () => {
-      await commonItemsPage.goto()
-      await signedOutPage.assertOnSignedOutPage()
-      await signedOutPage.btnSignIn.click()
-      await loginPage.assertOnLoginPage()
-      await loginPage.loginWithUserCreds('Sponsor Contact')
-    })
     await test.step('When I am taken to the Studies Page', async () => {
+      await studiesPage.goto()
       await studiesPage.assertOnStudiesPage()
     })
     /*
