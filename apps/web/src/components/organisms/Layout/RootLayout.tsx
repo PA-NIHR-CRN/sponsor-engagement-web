@@ -12,8 +12,8 @@ import { useEffect, useState } from 'react'
 import { Footer, Header } from '@/components/molecules'
 import { CookieBanner } from '@/components/organisms/CookieBanner/CookieBanner'
 import { SERVICE_NAME } from '@/constants'
-import { Roles } from '@/constants/auth'
 import { ORGANISATIONS_PAGE, SIGN_OUT_PAGE } from '@/constants/routes'
+import { isContactManager, isContactManagerAndSponsorContact, isSponsorContact } from '@/utils/auth'
 
 export const primaryFont = Roboto({
   weight: ['400', '700'],
@@ -34,8 +34,6 @@ export function RootLayout({ children, backLink, heading = SERVICE_NAME, user }:
   const [sideNavOpen, setSideNavOpen] = useState(false)
   const { data: session } = useSession()
   const idle = useIdle(session ? session.idleTimeout * 1000 : undefined)
-  const isContactManager = user?.roles.includes(Roles.ContactManager)
-  const isSponsorContact = user?.roles.includes(Roles.SponsorContact)
   const userOrganisations = user?.organisations.filter((userOrg) => !userOrg.isDeleted) ?? []
   const groupIconLink =
     userOrganisations.length === 1 ? `${ORGANISATIONS_PAGE}/${userOrganisations[0].organisationId}` : ORGANISATIONS_PAGE
@@ -74,12 +72,12 @@ export function RootLayout({ children, backLink, heading = SERVICE_NAME, user }:
             <SideNav.Link as={Link} href="/" icon={<HomeIcon />}>
               Home
             </SideNav.Link>
-            {isContactManager ? (
+            {isContactManager(user?.roles ?? []) || isContactManagerAndSponsorContact(user?.roles ?? []) ? (
               <SideNav.Link as={Link} href={ORGANISATIONS_PAGE} icon={<SettingsIcon />}>
                 Manage sponsor contacts
               </SideNav.Link>
             ) : null}
-            {isSponsorContact && !isContactManager && userOrganisations.length > 0 ? (
+            {isSponsorContact(user?.roles ?? []) && userOrganisations.length > 0 ? (
               <SideNav.Link as={Link} href={groupIconLink} icon={<GroupIcon />}>
                 Manage sponsor contacts
               </SideNav.Link>

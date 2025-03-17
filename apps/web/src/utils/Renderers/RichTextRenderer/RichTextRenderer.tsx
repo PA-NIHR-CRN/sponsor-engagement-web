@@ -15,6 +15,7 @@ interface TypographyProps {
 interface LinkEntryProps {
   text: string
   url: string
+  className?: string
 }
 
 interface RichTextRendererProps {
@@ -36,11 +37,11 @@ function Heading({ level, children }: { level: 2 | 3 | 4; children: ReactNode })
   return <Tag className={`govuk-heading-${headingVariants[level - 1]}`}>{children}</Tag>
 }
 
-function LinkEntry({ text, url }: LinkEntryProps) {
+export function LinkEntry({ text, url, className }: LinkEntryProps) {
   return (
     <Link
-      aria-label={`${text}, (Opens in new tab)`}
-      className="govuk-link"
+      aria-label={`${text} (opens in new tab)`}
+      className={className}
       href={url}
       rel="noopener noreferrer"
       target="_blank"
@@ -63,7 +64,7 @@ const options: Options = {
     [BLOCKS.HEADING_3]: (node, children: ReactNode) => <Heading level={3}>{children}</Heading>,
     [BLOCKS.HEADING_4]: (node, children: ReactNode) => <Heading level={4}>{children}</Heading>,
     [INLINES.HYPERLINK]: (node, children: ReactNode) => (
-      <LinkEntry text={children ? (children as string) : ''} url={node.data.uri as string} />
+      <LinkEntry className="govuk-link" text={children ? (children as string) : ''} url={node.data.uri as string} />
     ),
   },
 }
