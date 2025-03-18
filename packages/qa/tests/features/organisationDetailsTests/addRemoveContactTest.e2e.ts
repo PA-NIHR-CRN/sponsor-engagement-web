@@ -103,7 +103,7 @@ test.describe('Add and Remove Contacts for a Sponsor Organisation - @addRemoveCo
       await organisationDetailsPage.assertNewEmailAdded(testUserEmail, true)
     })
     await test.step(`When I click the Remove Option`, async () => {
-      await organisationDetailsPage.contactListRow.nth(0).locator('td').nth(2).locator('a').click()
+      await organisationDetailsPage.contactListRow.nth(0).locator('td').nth(3).locator('a').click()
     })
     await test.step(`Then I am taken to the Remove Contact Screen`, async () => {
       const expectedUserOrgId = await removeContactPage.getUserOrgId(
@@ -134,7 +134,7 @@ test.describe('Add and Remove Contacts for a Sponsor Organisation - @addRemoveCo
       await organisationDetailsPage.assertNewEmailAdded(testUserEmail, true)
     })
     await test.step(`When I click the Remove Option`, async () => {
-      await organisationDetailsPage.contactListRow.nth(0).locator('td').nth(2).locator('a').click()
+      await organisationDetailsPage.contactListRow.nth(0).locator('td').nth(3).locator('a').click()
     })
     await test.step(`Then I am taken to the Remove Contact Screen`, async () => {
       const expectedUserOrgId = await removeContactPage.getUserOrgId(
