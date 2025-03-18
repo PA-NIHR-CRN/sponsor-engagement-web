@@ -93,6 +93,7 @@ const mockOrganisation = Mock.of<OrganisationWithRelations>({
       user: {
         email: 'test1@test1.com',
         registrationConfirmed: true,
+        lastLogin: new Date('2001-01-03'),
       },
       createdAt: new Date('2001-01-01'),
       updatedAt: new Date('2001-01-02'),
@@ -102,6 +103,7 @@ const mockOrganisation = Mock.of<OrganisationWithRelations>({
       user: {
         email: 'test2@test2.com',
         registrationConfirmed: false,
+        lastLogin: null,
       },
       createdAt: new Date('2001-01-01'),
       updatedAt: new Date('2001-01-02'),
@@ -159,7 +161,12 @@ describe('Organisation page', () => {
     const contactsTable = screen.getByRole('table', { name: 'Organisation contacts' })
 
     const contactHeaders = within(contactsTable).getAllByRole('columnheader')
-    expect(contactHeaders.map((header) => header.textContent)).toEqual(['Contact email', 'Date added', 'Actions'])
+    expect(contactHeaders.map((header) => header.textContent)).toEqual([
+      'Contact email',
+      'Date added',
+      'Date of last login',
+      'Actions',
+    ])
 
     const contactCells = within(contactsTable)
       .getAllByRole('cell')
@@ -168,9 +175,11 @@ describe('Organisation page', () => {
     expect(contactCells).toEqual([
       'test1@test1.com',
       '2 January 2001',
+      '3 January 2001 ',
       'Remove',
       'test2@test2.com',
       '2 January 2001',
+      '- ',
       'Remove',
     ])
 
