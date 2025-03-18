@@ -9,11 +9,11 @@ import { useSession } from 'next-auth/react'
 import type { ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 
-import { Header } from '@/components/molecules'
+import { Footer, Header } from '@/components/molecules'
 import { CookieBanner } from '@/components/organisms/CookieBanner/CookieBanner'
 import { SERVICE_NAME } from '@/constants'
-import { Roles } from '@/constants/auth'
 import { ORGANISATIONS_PAGE, SIGN_OUT_PAGE } from '@/constants/routes'
+import { isContactManager, isContactManagerAndSponsorContact, isSponsorContact } from '@/utils/auth'
 
 export const primaryFont = Roboto({
   weight: ['400', '700'],
@@ -34,8 +34,6 @@ export function RootLayout({ children, backLink, heading = SERVICE_NAME, user }:
   const [sideNavOpen, setSideNavOpen] = useState(false)
   const { data: session } = useSession()
   const idle = useIdle(session ? session.idleTimeout * 1000 : undefined)
-  const isContactManager = user?.roles.includes(Roles.ContactManager)
-  const isSponsorContact = user?.roles.includes(Roles.SponsorContact)
   const userOrganisations = user?.organisations.filter((userOrg) => !userOrg.isDeleted) ?? []
   const groupIconLink =
     userOrganisations.length === 1 ? `${ORGANISATIONS_PAGE}/${userOrganisations[0].organisationId}` : ORGANISATIONS_PAGE
@@ -64,27 +62,30 @@ export function RootLayout({ children, backLink, heading = SERVICE_NAME, user }:
   }, [])
 
   return (
-    <div className={`${primaryFont.variable} font-sans`}>
+    <div className={`${primaryFont.variable} font-sans min-h-screen flex flex-col`}>
       <CookieBanner />
       <SideNav.Provider open={sideNavOpen} setOpen={setSideNavOpen}>
         <Header heading={heading} user={user} />
         {backLink}
-        <SideNav.Panel data-testid="side-panel">
-          <SideNav.Link as={Link} href="/" icon={<HomeIcon />}>
-            Home
-          </SideNav.Link>
-          {isContactManager ? (
-            <SideNav.Link as={Link} href={ORGANISATIONS_PAGE} icon={<SettingsIcon />}>
-              Manage sponsor contacts
+        <div className="flex flex-1">
+          <SideNav.Panel className="flex flex-col" data-testid="side-panel">
+            <SideNav.Link as={Link} href="/" icon={<HomeIcon />}>
+              Home
             </SideNav.Link>
-          ) : null}
-          {isSponsorContact && !isContactManager && userOrganisations.length > 0 ? (
-            <SideNav.Link as={Link} href={groupIconLink} icon={<GroupIcon />}>
-              Manage sponsor contacts
-            </SideNav.Link>
-          ) : null}
-        </SideNav.Panel>
-        <SideNav.Main>{children}</SideNav.Main>
+            {isContactManager(user?.roles ?? []) || isContactManagerAndSponsorContact(user?.roles ?? []) ? (
+              <SideNav.Link as={Link} href={ORGANISATIONS_PAGE} icon={<SettingsIcon />}>
+                Manage sponsor contacts
+              </SideNav.Link>
+            ) : null}
+            {isSponsorContact(user?.roles ?? []) && userOrganisations.length > 0 ? (
+              <SideNav.Link as={Link} href={groupIconLink} icon={<GroupIcon />}>
+                Manage sponsor contacts
+              </SideNav.Link>
+            ) : null}
+          </SideNav.Panel>
+          <SideNav.Main className="flex-1 overflow-auto">{children}</SideNav.Main>
+        </div>
+        <Footer />
       </SideNav.Provider>
     </div>
   )
