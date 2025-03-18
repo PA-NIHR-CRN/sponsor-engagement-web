@@ -83,13 +83,16 @@ export default function Organisation({ organisation, query }: OrganisationProps)
         <Table.Caption className="govuk-visually-hidden">Organisation contacts</Table.Caption>
         <Table.Header>
           <Table.Row>
-            <Table.CellHeader className="w-1/3" column>
+            <Table.CellHeader className="w-1/4" column>
               Contact email
             </Table.CellHeader>
-            <Table.CellHeader className="w-1/3" column>
+            <Table.CellHeader className="w-1/4" column>
               Date added
             </Table.CellHeader>
-            <Table.CellHeader className="w-1/3" column>
+            <Table.CellHeader className="w-1/4" column>
+              Date of last login
+            </Table.CellHeader>
+            <Table.CellHeader className="w-1/4" column>
               Actions
             </Table.CellHeader>
           </Table.Row>
@@ -99,6 +102,7 @@ export default function Organisation({ organisation, query }: OrganisationProps)
             <Table.Row key={user.id}>
               <Table.Cell>{user.user.email}</Table.Cell>
               <Table.Cell>{formatDate(user.updatedAt)}</Table.Cell>
+              <Table.Cell>{user.user.lastLogin ? formatDate(user.user.lastLogin) : '-'} </Table.Cell>
               <Table.Cell>
                 <Link aria-label={`Remove ${user.user.email}`} href={`/organisations/remove-contact/${user.id}`}>
                   Remove
