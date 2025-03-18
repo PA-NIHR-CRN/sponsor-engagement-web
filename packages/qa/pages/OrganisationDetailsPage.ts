@@ -72,7 +72,7 @@ export default class OrganisationDetailsPage {
     this.contactsListHeaders = this.contactsList.locator('thead tr')
     this.contactsListEmailHeader = this.contactsListHeaders.locator('th').nth(0)
     this.contactsListDateHeader = this.contactsListHeaders.locator('th').nth(1)
-    this.contactsListActionsHeader = this.contactsListHeaders.locator('th').nth(2)
+    this.contactsListActionsHeader = this.contactsListHeaders.locator('th').nth(3)
     this.contactListRow = this.contactsList.locator('tbody tr')
     this.noContactsMsg = page.locator('div[class="w-full"] p').last()
     this.searchInput = page.locator('input[id="emailAddress"]')
