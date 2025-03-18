@@ -1,6 +1,7 @@
 import { test as setup } from '../../hooks/CustomFixtures'
 
 const authSponsorContactFile = '.auth/sponsorContact.json'
+const authSponsorContact2File = '.auth/sponsorContact2.json'
 const authContactManagerFile = '.auth/contactManager.json'
 const authNpmFile = '.auth/nationalPortfolioManager.json'
 const cookieOnlyFile = '.auth/consentCookie.json'
@@ -13,7 +14,7 @@ const cookieConfig = {
   expires: Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60, // sets one year from today
   httpOnly: false,
   secure: true,
-  sameSite: undefined
+  sameSite: undefined,
 }
 
 setup(
@@ -27,6 +28,20 @@ setup(
     await loginPage.loginWithUserCreds('Sponsor Contact')
     await studiesPage.assertOnStudiesPage()
     await page.context().storageState({ path: authSponsorContactFile })
+  }
+)
+
+setup(
+  'Authenticate the Sponsor Contact User with multiple organsiations',
+  async ({ commonItemsPage, signedOutPage, loginPage, studiesPage, page }) => {
+    await page.context().addCookies([cookieConfig])
+    await commonItemsPage.goto()
+    await signedOutPage.assertOnSignedOutPage()
+    await signedOutPage.btnSignIn.click()
+    await loginPage.assertOnLoginPage()
+    await loginPage.loginWithUserCreds('Sponsor Contact 2')
+    await studiesPage.assertOnStudiesPage()
+    await page.context().storageState({ path: authSponsorContact2File })
   }
 )
 

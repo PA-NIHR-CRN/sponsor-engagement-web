@@ -39,6 +39,10 @@ export default class LoginPage {
         username = `${process.env.SPONSOR_CONTACT_USER}`
         password = `${process.env.SPONSOR_CONTACT_PASS}`
         break
+      case 'sponsor contact 2':
+        username = `${process.env.SPONSOR_CONTACT_2_USER}`
+        password = `${process.env.SPONSOR_CONTACT_2_PASS}`
+        break
       case 'sponsor contact manager':
         username = `${process.env.SPONSOR_CONTACT_MANAGER_USER}`
         password = `${process.env.SPONSOR_CONTACT_MANAGER_PASS}`
