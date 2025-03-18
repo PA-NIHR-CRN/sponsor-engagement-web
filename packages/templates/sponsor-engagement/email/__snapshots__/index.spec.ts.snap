@@ -103,10 +103,10 @@ exports[`Email template "assessment-reminder.html.hbs" displays correctly 1`] = 
 
       <h2>Nominate someone else to assess research studies</h2>
 
-      <p>
-        You can give other people in your organisation access to this service by accessing the contacts section of the
-        Sponsor Engagement Tool. Within this section you can view all contacts linked to your organisation, add new
-        contacts, and remove any contacts who no longer need access to the service.
+      <p>The NIHR RDN can give other people in your organisation access to this service.
+        
+        <a href='mailto:supportmystudy@nihr.ac.uk'>Contact supportmystudy@nihr.ac.uk</a>
+        to add a new contact.
       </p>
 
       <hr />
@@ -239,7 +239,7 @@ The DHSC have published the Terms and Conditions for NIHR RDN support [http://te
 
 The Sponsor Engagement Tool has been designed to support Sponsors and their delegates to meet the requirements outlined in 
 the T&Cs. Sponsors and their delegates should use the Sponsor Engagement Tool to review the data the RDN holds on their organisation’s portfolio of studies, 
-to provide study data updates and assessments to ensure the data held by the RDN is complete and up-to-date, and to manage contacts linked to their organisation.
+and to provide study data updates and assessments to ensure the data held by the RDN is complete and up-to-date.
 
 Sponsors or their delegates are prompted to review and assess the progress of studies when:
 
@@ -247,7 +247,7 @@ Sponsors or their delegates are prompted to review and assess the progress of st
 - A study appears to not be recruiting to target
 - And the last study assessment is over three months old
 
-For studies that have sites based in England, Sponsors or their delegates can request NIHR RDN support with study delivery and performance at any time. [http://localhost:3000/request-support]
+Sponsors or their delegates can request NIHR RDN support with study delivery and performance at any time. [http://localhost:3000/request-support]
 
 Please note that providing regular study updates and assessments are requirements of the Terms and Conditions for NIHR RDN support
 [http://terms-conditions-link]. Failure to do so may result in removal from the NIHR RDN Portfolio.
@@ -354,7 +354,7 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
       <h2>Nominate someone else to assess studies</h2>
 
       <p>
-        The NIHR RDN can give other people in your organisation access to this service. 
+        The NIHR RDN can give other people in your organisation access to this service.
         <a href='mailto:supportmystudy@nihr.ac.uk'>Contact supportmystudy@nihr.ac.uk</a>
         to add a new contact.
       </p>
@@ -363,7 +363,7 @@ exports[`Email template "contact-assigned.html.hbs" displays correctly 1`] = `
 
       <p>
         This email is not monitored, do not reply. If you’re not sure why you’ve received this email or need to be
-        removed from our list 
+        removed from our list
         <a href='mailto:supportmystudy@nihr.ac.uk'>contact supportmystudy@nihr.ac.uk</a>.
       </p>
     </div>
@@ -520,10 +520,10 @@ exports[`Email template "contact-removed.html.hbs" displays correctly 1`] = `
 
       <h2>Not sure why you've been removed?</h2>
 
-      <p>If you think there’s been an error please 
+      <p>If you think there’s been an error please
         <a href='mailto:supportmystudy@nihr.ac.uk'>contact supportmystudy@nihr.ac.uk</a>.</p>
 
-      <p>If you’re not sure why you’ve received this email or need to be removed from our list 
+      <p>If you’re not sure why you’ve received this email or need to be removed from our list
         <a href='mailto:supportmystudy@nihr.ac.uk'>contact supportmystudy@nihr.ac.uk</a>.</p>
     </div>
 
