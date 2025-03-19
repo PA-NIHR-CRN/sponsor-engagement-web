@@ -23,6 +23,7 @@ export default class OrganisationDetailsPage {
   readonly contactsListHeaders: Locator
   readonly contactsListEmailHeader: Locator
   readonly contactsListDateHeader: Locator
+  readonly contactsListLastLoginHeader: Locator
   readonly contactsListActionsHeader: Locator
   readonly contactListRow: Locator
   readonly noContactsMsg: Locator
@@ -72,6 +73,7 @@ export default class OrganisationDetailsPage {
     this.contactsListHeaders = this.contactsList.locator('thead tr')
     this.contactsListEmailHeader = this.contactsListHeaders.locator('th').nth(0)
     this.contactsListDateHeader = this.contactsListHeaders.locator('th').nth(1)
+    this.contactsListLastLoginHeader = this.contactsListHeaders.locator('th').nth(2)
     this.contactsListActionsHeader = this.contactsListHeaders.locator('th').nth(3)
     this.contactListRow = this.contactsList.locator('tbody tr')
     this.noContactsMsg = page.locator('div[class="w-full"] p').last()
@@ -222,6 +224,7 @@ export default class OrganisationDetailsPage {
       await expect(this.contactsListHeaders).toBeVisible()
       await expect(this.contactsListEmailHeader).toHaveText('Contact email')
       await expect(this.contactsListDateHeader).toHaveText('Date added')
+      await expect(this.contactsListLastLoginHeader).toHaveText('Date of last login')
       await expect(this.contactsListActionsHeader).toHaveText('Actions')
     } else {
       await expect(this.contactsListHeaders).toBeHidden()
@@ -257,6 +260,18 @@ export default class OrganisationDetailsPage {
       const row = this.contactListRow.nth(index)
       const expectedDate = convertIsoDateToDisplayDate(expectedDetails[index].updatedAt)
       await expect(row.locator('td').nth(1)).toHaveText(expectedDate)
+    }
+  }
+
+  async assertContactDateOfLastLogin() {
+    await expect(this.contactListRow.first()).toBeVisible()
+    const numberOfContactRows = await this.contactListRow.count()
+    for (let index = 0; index < numberOfContactRows; index++) {
+      const row = this.contactListRow.nth(index)
+      const dateText = await row.locator('td').nth(2).innerText()
+      const isHyphen = dateText === '-'
+      const isValidDate = /^\d{1,2} [A-Za-z]+ \d{4}$/.test(dateText)
+      expect(isValidDate || isHyphen).toBeTruthy()
     }
   }
 
