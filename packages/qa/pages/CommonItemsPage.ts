@@ -56,7 +56,7 @@ export default class CommonItemsPage {
     this.usernameBanner = page.locator('span[class="hidden text-sm md:block"]')
     this.cogIcon = page.locator('button[aria-haspopup="menu"]')
     this.logoutOption = page.locator('a[role="menuitem"]')
-    this.footer = page.locator('footer[class="govuk-footer py-3 bg-navy-100 text-white"]')
+    this.footer = page.locator('footer[class="govuk-footer"]')
     this.shawTrustLogo = this.footer.locator('img[alt="Shaw Trust Logo"]')
     this.termsAndConditionsLink = this.footer.locator(
       'a[href="https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-terms-and-conditions"]'
@@ -238,6 +238,11 @@ export default class CommonItemsPage {
   async assertLogoutOptionVisible() {
     await expect(this.logoutOption).toBeVisible()
     await expect(this.logoutOption).toHaveText('Logout')
+  }
+
+  async assertFooterPresent() {
+    await expect(this.footer).toBeVisible()
+    await expect(this.shawTrustLogo).toBeVisible()
   }
 
   async assertFooterLinksPresent() {
