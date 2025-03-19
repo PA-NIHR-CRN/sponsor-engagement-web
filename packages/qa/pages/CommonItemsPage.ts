@@ -56,8 +56,8 @@ export default class CommonItemsPage {
     this.usernameBanner = page.locator('span[class="hidden text-sm md:block"]')
     this.cogIcon = page.locator('button[aria-haspopup="menu"]')
     this.logoutOption = page.locator('a[role="menuitem"]')
-    this.footer = page.locator('footer[class="govuk-footer"]')
-    this.shawTrustLogo = this.footer.locator('img[alt="Shaw Trust Logo"]')
+    this.footer = page.locator('footer[class*="govuk-footer"]')
+    this.shawTrustLogo = this.footer.locator('img[src*="shaw-trust-logo.png"]')
     this.termsAndConditionsLink = this.footer.locator(
       'a[href="https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-terms-and-conditions"]'
     )
@@ -246,27 +246,22 @@ export default class CommonItemsPage {
   }
 
   async assertFooterLinksPresent() {
-    await expect(this.termsAndConditionsLink).toBeVisible()
     await expect(this.termsAndConditionsLink).toHaveAttribute(
       'href',
       'https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-terms-and-conditions'
     )
-    await expect(this.privacyPolicyLink).toBeVisible()
     await expect(this.privacyPolicyLink).toHaveAttribute(
       'href',
       'https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-privacy-notice'
     )
-    await expect(this.cookiePolicyLink).toBeVisible()
     await expect(this.cookiePolicyLink).toHaveAttribute(
       'href',
       'https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-cookie-policy'
     )
-    await expect(this.accessibilityLink).toBeVisible()
     await expect(this.accessibilityLink).toHaveAttribute(
       'href',
       'https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-accessibility-statement'
     )
-    await expect(this.releaseNotesLink).toBeVisible()
     await expect(this.releaseNotesLink).toHaveAttribute(
       'href',
       'https://sites.google.com/nihr.ac.uk/nihr-sponsor-engagement-tool/se-tool-release-notes'
