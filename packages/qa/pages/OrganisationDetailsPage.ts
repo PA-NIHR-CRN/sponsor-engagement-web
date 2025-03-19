@@ -265,9 +265,9 @@ export default class OrganisationDetailsPage {
     const numberOfContactRows = await this.contactListRow.count()
     for (let index = 0; index < numberOfContactRows; index++) {
       const row = this.contactListRow.nth(index)
-      await expect(row.locator('td').nth(2).locator('a')).toBeVisible()
-      await expect(row.locator('td').nth(2).locator('a')).toHaveText('Remove')
-      await expect(row.locator('td').nth(2).locator('a')).toHaveAttribute('href')
+      await expect(row.locator('td').nth(3).locator('a')).toBeVisible()
+      await expect(row.locator('td').nth(3).locator('a')).toHaveText('Remove')
+      await expect(row.locator('td').nth(3).locator('a')).toHaveAttribute('href')
     }
   }
 
