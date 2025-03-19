@@ -1,5 +1,5 @@
 import { Roles } from '../constants/auth'
-import { isContactManager, isContactManagerAndSponsorContact, isSponsorContact } from './auth'
+import { isContactManager, isSponsorContact } from './auth'
 
 describe('Authentication utility functions', () => {
   describe('isContactManager', () => {
@@ -15,10 +15,10 @@ describe('Authentication utility functions', () => {
       expect(result).toBe(false)
     })
 
-    test('returns false when roles include multiple roles', () => {
+    test('returns true when roles include multiple roles', () => {
       const roles = [Roles.ContactManager, Roles.SponsorContact]
       const result = isContactManager(roles)
-      expect(result).toBe(false)
+      expect(result).toBe(true)
     })
 
     test('returns false when roles is an empty array', () => {
@@ -41,41 +41,15 @@ describe('Authentication utility functions', () => {
       expect(result).toBe(false)
     })
 
-    test('returns false when roles include multiple roles', () => {
+    test('returns true when roles include multiple roles', () => {
       const roles = [Roles.SponsorContact, Roles.ContactManager]
       const result = isSponsorContact(roles)
-      expect(result).toBe(false)
-    })
-
-    test('returns false when roles is an empty array', () => {
-      const roles: number[] = []
-      const result = isSponsorContact(roles)
-      expect(result).toBe(false)
-    })
-  })
-
-  describe('isContactManagerAndSponsorContact', () => {
-    test('returns true when roles include both ContactManager and SponsorContact', () => {
-      const roles = [Roles.ContactManager, Roles.SponsorContact]
-      const result = isContactManagerAndSponsorContact(roles)
       expect(result).toBe(true)
     })
 
-    test('returns false when roles do not include both ContactManager and SponsorContact', () => {
-      const roles = [Roles.ContactManager]
-      const result = isContactManagerAndSponsorContact(roles)
-      expect(result).toBe(false)
-    })
-
-    test('returns false when roles include only one of the roles', () => {
-      const roles = [Roles.SponsorContact]
-      const result = isContactManagerAndSponsorContact(roles)
-      expect(result).toBe(false)
-    })
-
     test('returns false when roles is an empty array', () => {
       const roles: number[] = []
-      const result = isContactManagerAndSponsorContact(roles)
+      const result = isSponsorContact(roles)
       expect(result).toBe(false)
     })
   })

@@ -1,6 +1,6 @@
 import type { Prisma } from '@/lib/prisma'
 
-import { isContactManager, isContactManagerAndSponsorContact, isSponsorContact } from './auth'
+import { isContactManager, isSponsorContact } from './auth'
 
 type UserOrganisationId = Prisma.UserOrganisationGetPayload<{
   select: {
@@ -15,7 +15,7 @@ export const hasOrganisationAccess = (
   organisationId: number
 ) => {
   // Contact managers have access to all organisations
-  if (isContactManagerAndSponsorContact(roles) || isContactManager(roles)) return true
+  if (isContactManager(roles)) return true
 
   // Sponsor contacts only have access to organisations they are associated to
   if (

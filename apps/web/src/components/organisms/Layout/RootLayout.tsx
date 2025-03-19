@@ -13,7 +13,7 @@ import { Footer, Header } from '@/components/molecules'
 import { CookieBanner } from '@/components/organisms/CookieBanner/CookieBanner'
 import { SERVICE_NAME } from '@/constants'
 import { ORGANISATIONS_PAGE, SIGN_OUT_PAGE } from '@/constants/routes'
-import { isContactManager, isContactManagerAndSponsorContact, isSponsorContact } from '@/utils/auth'
+import { isContactManager, isSponsorContact } from '@/utils/auth'
 
 export const primaryFont = Roboto({
   weight: ['400', '700'],
@@ -72,7 +72,7 @@ export function RootLayout({ children, backLink, heading = SERVICE_NAME, user }:
             <SideNav.Link as={Link} href="/" icon={<HomeIcon />}>
               Home
             </SideNav.Link>
-            {isContactManager(user?.roles ?? []) || isContactManagerAndSponsorContact(user?.roles ?? []) ? (
+            {isContactManager(user?.roles ?? []) ? (
               <SideNav.Link as={Link} href={ORGANISATIONS_PAGE} icon={<SettingsIcon />}>
                 Manage sponsor contacts
               </SideNav.Link>

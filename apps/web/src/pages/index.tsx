@@ -6,7 +6,7 @@ import type { ReactElement } from 'react'
 
 import { RootLayout } from '../components/organisms'
 import { ERROR_PAGE_500, ORGANISATIONS_PAGE, SIGN_OUT_CONFIRM_PAGE, STUDIES_PAGE } from '../constants/routes'
-import { isContactManager, isContactManagerAndSponsorContact, isSponsorContact } from '../utils/auth'
+import { isContactManager, isSponsorContact } from '../utils/auth'
 import { authOptions } from './api/auth/[...nextauth]'
 
 export type HomeProps = InferGetServerSidePropsType<typeof getServerSideProps>
@@ -54,18 +54,18 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       user: { roles, organisations },
     } = session
 
-    if (isContactManager(roles)) {
+    if (isSponsorContact(roles) && organisations.length > 0) {
       return {
         redirect: {
-          destination: ORGANISATIONS_PAGE,
+          destination: STUDIES_PAGE,
         },
       }
     }
 
-    if ((isSponsorContact(roles) || isContactManagerAndSponsorContact(roles)) && organisations.length > 0) {
+    if (isContactManager(roles)) {
       return {
         redirect: {
-          destination: STUDIES_PAGE,
+          destination: ORGANISATIONS_PAGE,
         },
       }
     }

@@ -7,7 +7,7 @@ import { ZodError } from 'zod'
 import { REGISTRATION_CONFIRMATION_PAGE, REGISTRATION_PAGE } from '@/constants/routes'
 import { getUserWithRolesAndOrgs } from '@/lib/organisations'
 import { prismaClient } from '@/lib/prisma'
-import { isContactManagerAndSponsorContact, isSponsorContact } from '@/utils/auth'
+import { isSponsorContact } from '@/utils/auth'
 import type { RegistrationInputs } from '@/utils/schemas'
 import { registrationSchema } from '@/utils/schemas'
 
@@ -129,8 +129,5 @@ export const isUserEligibleForOdpRole = async (userId: number): Promise<boolean>
     orgRole.organisation.roles.some((role) => role.role.name === 'Clinical Research Sponsor')
   )
 
-  return (
-    (isSponsorContact(userRoleIds) || isContactManagerAndSponsorContact(userRoleIds)) &&
-    hasClinicalResearchSponsorOrganisation
-  )
+  return isSponsorContact(userRoleIds) && hasClinicalResearchSponsorOrganisation
 }
