@@ -87,12 +87,12 @@ export default class OrganisationDetailsPage {
     await this.page.goto(`organisations/${orgId}`)
   }
 
-  async assertOnOrganisationDetailsPage(orgId: string, prefix: string = '') {
+  async assertOnOrganisationDetailsPage(orgId: string) {
     await expect(this.pageTitle).toBeVisible()
     await expect(this.addRemoveHeader).toBeVisible()
     await expect(this.inviteSection).toBeVisible()
     await expect(this.addRemoveHeader).toHaveText('Add or remove sponsor contacts')
-    await expect(this.page).toHaveURL(`organisations/${prefix}${orgId}`)
+    await expect(this.page).toHaveURL(`organisations/${orgId}`)
   }
 
   async gotoSuccess(orgId: string) {
@@ -263,15 +263,15 @@ export default class OrganisationDetailsPage {
     }
   }
 
-  async assertContactDateOfLastLogin() {
+  async assertContactDateOfLastLogin(expectedDetails: RowDataPacket[]) {
     await expect(this.contactListRow.first()).toBeVisible()
     const numberOfContactRows = await this.contactListRow.count()
     for (let index = 0; index < numberOfContactRows; index++) {
       const row = this.contactListRow.nth(index)
-      const dateText = await row.locator('td').nth(2).innerText()
-      const isHyphen = dateText === '-'
-      const isValidDate = /^\d{1,2} [A-Za-z]+ \d{4}$/.test(dateText)
-      expect(isValidDate || isHyphen).toBeTruthy()
+      const expectedDate = expectedDetails[index].lastLogin
+        ? convertIsoDateToDisplayDate(expectedDetails[index].lastLogin)
+        : '-'
+      await expect(row.locator('td').nth(2)).toHaveText(expectedDate)
     }
   }
 
