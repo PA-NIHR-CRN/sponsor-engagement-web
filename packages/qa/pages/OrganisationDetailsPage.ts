@@ -87,12 +87,12 @@ export default class OrganisationDetailsPage {
     await this.page.goto(`organisations/${orgId}`)
   }
 
-  async assertOnOrganisationDetailsPage(orgId: string, prefix: string = '') {
+  async assertOnOrganisationDetailsPage(orgId: string) {
     await expect(this.pageTitle).toBeVisible()
     await expect(this.addRemoveHeader).toBeVisible()
     await expect(this.inviteSection).toBeVisible()
     await expect(this.addRemoveHeader).toHaveText('Add or remove sponsor contacts')
-    await expect(this.page).toHaveURL(`organisations/${prefix}${orgId}`)
+    await expect(this.page).toHaveURL(`organisations/${orgId}`)
   }
 
   async gotoSuccess(orgId: string) {

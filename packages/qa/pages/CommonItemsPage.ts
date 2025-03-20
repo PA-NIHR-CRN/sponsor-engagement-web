@@ -43,7 +43,7 @@ export default class CommonItemsPage {
     this.txtContactInfo = page.locator('p[class="govuk-body"]').nth(1)
     this.homeIcon = page.locator('svg[data-testid="home-icon"]')
     this.manageContactsIcon = page.locator('a[href="/organisations"]')
-    this.manageAbridgedContactsIcon = page.locator('a[href="/organisations/2"]')
+    this.manageAbridgedContactsIcon = page.locator('a[class*="navigation-link"]').nth(1)
     this.assessStudiesDropdown = page.locator('span[class="govuk-details__summary-text"]')
     this.studiesFoundHeading = page.locator('p[class="govuk-heading-s mb-0 whitespace-nowrap"]')
     this.txtGenericErrorGuidance = page.locator('p[class="govuk-body"]')

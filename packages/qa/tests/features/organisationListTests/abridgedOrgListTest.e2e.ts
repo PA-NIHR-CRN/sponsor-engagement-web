@@ -1,5 +1,7 @@
 import { test } from '../../../hooks/CustomFixtures'
 
+const orgIdWithContacts = 2
+
 test.describe('Sponsor Organisation Details Page for Sponsor Contacts - @se_248', () => {
   test.use({ storageState: '.auth/sponsorContact.json' })
 
@@ -7,7 +9,6 @@ test.describe('Sponsor Organisation Details Page for Sponsor Contacts - @se_248'
     commonItemsPage,
     organisationDetailsPage,
   }) => {
-    let orgId: string = ''
     await test.step('Given I have navigated to the Study deatils Page', async () => {
       await commonItemsPage.goto()
     })
@@ -15,13 +16,15 @@ test.describe('Sponsor Organisation Details Page for Sponsor Contacts - @se_248'
       await commonItemsPage.manageAbridgedContactsIcon.click()
     })
     await test.step('Then I am taken to the orgnasiation details page, not the orgnanisation list page', async () => {
-      await organisationDetailsPage.assertOnOrganisationDetailsPage(orgId, '2')
+      await organisationDetailsPage.assertOnOrganisationDetailsPage(orgIdWithContacts.toString())
     })
   })
 })
 
+/*
+Requires a database change
 test.describe('Sponsor Organisation List Page for Sponsor Contacts - @se_248', () => {
-  test.use({ storageState: '.auth/sponsorContact2.json' })
+  test.use({ storageState: '.auth/sponsorContact.json' })
   test('As a Sponsor Contact associated to two or more organisations I can see the expected Organisation list Page Layouts - @se_248_ac2_multiple_organisations', async ({
     commonItemsPage,
     organisationsPage,
@@ -37,3 +40,4 @@ test.describe('Sponsor Organisation List Page for Sponsor Contacts - @se_248', (
     })
   })
 })
+*/

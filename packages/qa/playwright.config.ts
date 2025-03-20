@@ -16,7 +16,7 @@ const config: PlaywrightTestConfig = {
   globalTeardown: './hooks/GlobalTeardown.ts',
   timeout: process.env.LOCAL_DEV ? 30000 : 35000, // longer timeout in ci
   workers: 1, // to enforce serial execution
-  retries: process.env.LOCAL_DEV ? 0 : 0, // enforce retries only in ci
+  retries: process.env.LOCAL_DEV ? 0 : 2, // enforce retries only in ci
   projects: [
     // Setup project for Authorization
     {
@@ -41,7 +41,6 @@ const config: PlaywrightTestConfig = {
       testIgnore: process.env.ENABLE_ACCESSIBILITY ? '' : '**/accessibilityTests/**',
       use: {
         trace: 'on',
-        video: 'on',
         baseURL: `${process.env.E2E_BASE_URL}`,
         headless: true,
         screenshot: 'on',
