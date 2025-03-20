@@ -1,7 +1,7 @@
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
 import { logger } from '@nihr-ui/logger'
-import { setStudyAssessmentDue } from 'shared-utilities'
+import { setStudyAssessmentDue, setStudyAssessmentNotDue } from 'shared-utilities'
 import { ingest } from '../ingest'
 import {
   organisationEntities,
@@ -33,6 +33,7 @@ interface EvalCategory {
 jest.mock('@nihr-ui/logger')
 jest.mock('shared-utilities')
 const mockSetStudyAssessmentDue = setStudyAssessmentDue as jest.MockedFunction<typeof setStudyAssessmentDue>
+const mockSetStudyAssessmentNotDue = setStudyAssessmentNotDue as jest.MockedFunction<typeof setStudyAssessmentNotDue>
 
 const API_URL = 'https://dev.cpmsapi.nihr.ac.uk/api/v1/study-summaries'
 
@@ -68,6 +69,7 @@ beforeEach(() => {
   prismaMock.studyFunder.createMany.mockResolvedValueOnce({ count: 1 })
   prismaMock.studyEvaluationCategory.updateMany.mockResolvedValueOnce({ count: 1 })
   mockSetStudyAssessmentDue.mockResolvedValueOnce({ count: 1 })
+  mockSetStudyAssessmentNotDue.mockResolvedValueOnce({ count: 1 })
 
   prismaMock.study.findMany.mockResolvedValueOnce(studyEntities)
   prismaMock.organisation.findMany.mockResolvedValueOnce(organisationEntities)
@@ -245,11 +247,14 @@ describe('ingest', () => {
     })
   })
 
-  it('should update the study `isDueAssessment` flag', async () => {
+  it('should update the study `dueAssessmentAt` flag', async () => {
     await ingest()
 
     expect(mockSetStudyAssessmentDue).toHaveBeenCalledTimes(1)
     expect(mockSetStudyAssessmentDue).toHaveBeenCalledWith(studyEntities.map(({ id }) => id))
+
+    expect(mockSetStudyAssessmentNotDue).toHaveBeenCalledTimes(1)
+    expect(mockSetStudyAssessmentNotDue).toHaveBeenCalledWith(studyEntities.map(({ id }) => id))
   })
 
   it('should handle errors when fetching studies', async () => {

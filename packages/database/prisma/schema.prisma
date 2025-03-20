@@ -36,6 +36,7 @@ model Study {
   createdAt                  DateTime                  @default(now())
   updatedAt                  DateTime                  @updatedAt
   isDueAssessment            Boolean?                  @default(false)
+  dueAssessmentAt            DateTime?
   isDeleted                  Boolean?                  @default(false)
   StudyUpdates               StudyUpdates[]
 
