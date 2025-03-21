@@ -4,7 +4,7 @@ import { logger } from '@nihr-ui/logger'
 import type { Entry, EntrySkeletonType } from 'contentful'
 import { createClient } from 'contentful'
 
-import type { TypeBannerSkeleton } from '@/@types/generated'
+import type { TypeBannerSkeleton, TypeBporFooterSkeleton, TypePageSkeleton } from '@/@types/generated'
 
 function getContentClient() {
   const {
@@ -50,5 +50,35 @@ export const getNotificationBanner = async (): Promise<Entry<TypeBannerSkeleton>
     }
   }
 
+  return null
+}
+
+export const getPage = async (): Promise<Entry<TypePageSkeleton> | null> => {
+  const { CONTENTFUL_PAGE_ENTRY_ID } = process.env
+
+  if (CONTENTFUL_PAGE_ENTRY_ID) {
+    try {
+      const entry = await getEntryById<TypePageSkeleton>(CONTENTFUL_PAGE_ENTRY_ID)
+      return entry
+    } catch (error) {
+      logger.error(`Encountered error fetching entry from Contentful: ${error}`)
+      return null
+    }
+  }
+  return null
+}
+
+export const getBporFooter = async (): Promise<Entry<TypeBporFooterSkeleton> | null> => {
+  const { CONTENTFUL_BPOR_FOOTER_ENTRY_ID } = process.env
+
+  if (CONTENTFUL_BPOR_FOOTER_ENTRY_ID) {
+    try {
+      const entry = await getEntryById<TypeBporFooterSkeleton>(CONTENTFUL_BPOR_FOOTER_ENTRY_ID)
+      return entry
+    } catch (error) {
+      logger.error(`Encountered error fetching entry from Contentful: ${error}`)
+      return null
+    }
+  }
   return null
 }
