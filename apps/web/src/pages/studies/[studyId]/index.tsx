@@ -26,11 +26,11 @@ import {
   mapCPMSStatusToFormStatus,
   mapCPMSStudyEvalToSEEval,
   mapCPMSStudyToSEStudy,
-  setStudyAssessmentDueFlag,
   updateEvaluationCategories,
   updateStudy,
 } from '@/lib/studies'
 import { formatDate } from '@/utils/date'
+import { getStudyAssessmentDueDate } from '@/utils/studies'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
 const renderNotificationBanner = (success: string | undefined, showRequestSupportLink: boolean) =>
@@ -263,8 +263,8 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
     }
   }
 
-  const { data: setStudyAssessmentDueResponse } = await setStudyAssessmentDueFlag([studyId])
-  const isStudyDueAssessment = setStudyAssessmentDueResponse !== null ? setStudyAssessmentDueResponse === 1 : false
+  const currentDueAssessmentAt = study.dueAssessmentAt
+  const dueAssessmentAt = await getStudyAssessmentDueDate(study.id, currentDueAssessmentAt)
 
   const currentStudyEvalsInSE = updatedStudy.evaluationCategories
 
@@ -291,7 +291,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
       study: {
         ...updatedStudy,
         evaluationCategories: updatedStudyEvals ?? study.evaluationCategories,
-        isDueAssessment: isStudyDueAssessment,
+        dueAssessmentAt,
       },
       editHistory,
       getEditHistoryError,

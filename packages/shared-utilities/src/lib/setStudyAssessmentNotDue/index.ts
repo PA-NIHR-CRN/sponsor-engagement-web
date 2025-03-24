@@ -17,7 +17,8 @@ export const setStudyAssessmentNotDue = async (studyIds: number[]): Promise<{ co
       dueAssessmentAt: null,
     },
     where: {
-      NOT: generateAssessmentDueLogic(studyIds, threeMonthsAgo),
+      id: { in: studyIds },
+      NOT: generateAssessmentDueLogic(threeMonthsAgo),
     },
   })
 

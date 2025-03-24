@@ -35,7 +35,7 @@ import {
   mapCPMSStudyEvalToSEEval,
   mapCPMSStudyToSEStudy,
   mapFormStatusToCPMSStatus,
-  setStudyAssessmentDueFlag,
+  setStudyAssessmentDueDate,
   updateEvaluationCategories,
   updateStudy,
 } from '@/lib/studies'
@@ -44,6 +44,7 @@ import { getOptionalFormFields, getVisibleFormFields, mapStudyToStudyFormInput }
 import { getValuesFromSearchParams } from '@/utils/form'
 import type { EditStudy as EditStudySchema, EditStudyInputs } from '@/utils/schemas'
 import { studySchema } from '@/utils/schemas'
+import { getStudyAssessmentDueDate } from '@/utils/studies'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
 export type EditStudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
@@ -467,6 +468,8 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
   const studyEvalsInCPMS = studyInCPMS.StudyEvaluationCategories
   const mappedStudyEvalsInCPMS = studyEvalsInCPMS.map((studyEval) => mapCPMSStudyEvalToSEEval(studyEval))
 
+  const currentDueAssessmentAt = study.dueAssessmentAt
+
   const { data: updatedStudy } = await updateStudy(Number(cpmsId), mapCPMSStudyToSEStudy(studyInCPMS))
 
   if (!updatedStudy) {
@@ -479,9 +482,12 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
     }
   }
 
-  const { data: setStudyAssessmentDueResponse } = await setStudyAssessmentDueFlag([study.id])
-  const isStudyDueAssessment = setStudyAssessmentDueResponse !== null ? setStudyAssessmentDueResponse === 1 : false
+  const { data: setStudyAssessmentDueResponse } = await setStudyAssessmentDueDate([study.id])
+  console.log('current due value', { setStudyAssessmentDueResponse, currentDueAssessmentAt })
 
+  const dueAssessmentAt = await getStudyAssessmentDueDate(study.id, currentDueAssessmentAt)
+
+  console.log('new date to be set', { dueAssessmentAt })
   const currentStudyEvalsInSE = updatedStudy.evaluationCategories
 
   // Soft delete evaluations in SE that are no longer returned from CPMS
@@ -504,7 +510,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
       study: {
         ...updatedStudy,
         evaluationCategories: updatedStudyEvals ?? study.evaluationCategories,
-        isDueAssessment: isStudyDueAssessment,
+        dueAssessmentAt,
       },
       currentLSN: studyInCPMS.CurrentLsn,
       query: context.query,
