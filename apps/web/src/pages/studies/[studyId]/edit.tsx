@@ -35,7 +35,6 @@ import {
   mapCPMSStudyEvalToSEEval,
   mapCPMSStudyToSEStudy,
   mapFormStatusToCPMSStatus,
-  setStudyAssessmentDueDate,
   updateEvaluationCategories,
   updateStudy,
 } from '@/lib/studies'
@@ -481,13 +480,8 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
       },
     }
   }
-
-  const { data: setStudyAssessmentDueResponse } = await setStudyAssessmentDueDate([study.id])
-  console.log('current due value', { setStudyAssessmentDueResponse, currentDueAssessmentAt })
-
   const dueAssessmentAt = await getStudyAssessmentDueDate(study.id, currentDueAssessmentAt)
 
-  console.log('new date to be set', { dueAssessmentAt })
   const currentStudyEvalsInSE = updatedStudy.evaluationCategories
 
   // Soft delete evaluations in SE that are no longer returned from CPMS

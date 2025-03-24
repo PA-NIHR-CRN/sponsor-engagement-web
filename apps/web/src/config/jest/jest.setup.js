@@ -13,3 +13,7 @@ global.TextEncoder = TextEncoder
 global.TextDecoder = TextDecoder
 
 global.structuredClone = (v) => JSON.parse(JSON.stringify(v))
+
+Object.defineProperty(window, 'scrollTo', {
+  value: jest.fn(),
+})

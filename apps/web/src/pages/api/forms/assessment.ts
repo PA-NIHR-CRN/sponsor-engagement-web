@@ -60,6 +60,7 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
       },
       data: {
         isDueAssessment: false,
+        dueAssessmentAt: null,
         lastAssessmentId: assessmentResult.id,
       },
     })

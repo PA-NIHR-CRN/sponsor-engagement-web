@@ -91,7 +91,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
           </span>
 
           <div className="flex flex-col govuk-!-margin-bottom-4 govuk-!-margin-top-4 gap-6">
-            {Boolean(study.isDueAssessment) && (
+            {Boolean(study.dueAssessmentAt) && (
               <div>
                 <span className="govuk-tag govuk-tag--red mr-2">Due</span>
                 This study needs a new sponsor assessment.

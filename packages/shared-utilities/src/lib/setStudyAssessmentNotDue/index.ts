@@ -2,7 +2,7 @@ import assert from 'assert'
 import { logger } from '@nihr-ui/logger'
 import dayjs from 'dayjs'
 import { prismaClient } from '../../utils/prisma'
-import { generateAssessmentDueLogic } from '../../utils/assessment'
+import { getAssessmentDueCriteria } from '../../utils/assessment'
 
 export const setStudyAssessmentNotDue = async (studyIds: number[]): Promise<{ count: number }> => {
   const { ASSESSMENT_LAPSE_MONTHS } = process.env
@@ -18,7 +18,7 @@ export const setStudyAssessmentNotDue = async (studyIds: number[]): Promise<{ co
     },
     where: {
       id: { in: studyIds },
-      NOT: generateAssessmentDueLogic(threeMonthsAgo),
+      NOT: getAssessmentDueCriteria(threeMonthsAgo),
     },
   })
 

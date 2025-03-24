@@ -1,6 +1,6 @@
 import type { Prisma } from '@prisma/client'
 
-export const generateAssessmentDueLogic = (date: Date): Prisma.StudyWhereInput => {
+export const getAssessmentDueCriteria = (date: Date): Prisma.StudyWhereInput => {
   return {
     evaluationCategories: {
       some: { isDeleted: false },
