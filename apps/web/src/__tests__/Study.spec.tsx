@@ -150,7 +150,7 @@ describe('Study', () => {
   })
 
   describe('getServerSideProps', () => {
-    const fixedDate = new Date('2025-03-20T12:00:00Z')
+    const mockDate = new Date('2025-03-20T12:00:00Z')
 
     const getServerSessionMock = jest.mocked(getServerSession)
     test('redirects to sign in page when there is no user session', async () => {
@@ -353,7 +353,7 @@ describe('Study', () => {
 
     test('when study is due for assessment, should return study with the correct date', async () => {
       const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
-      jest.useFakeTimers().setSystemTime(fixedDate)
+      jest.useFakeTimers().setSystemTime(mockDate)
       getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
       prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
       mockedGetAxios.mockResolvedValueOnce({ data: { StatusCode: 200, Result: mockCPMSStudy } })
@@ -375,7 +375,7 @@ describe('Study', () => {
             ...mockStudyWithRelations,
             evaluationCategories: mappedCPMSStudyEvals,
             organisationsByRole,
-            dueAssessmentAt: fixedDate,
+            dueAssessmentAt: mockDate,
           },
           editHistory: getMockEditHistoryFromCPMS([false, false]),
         },

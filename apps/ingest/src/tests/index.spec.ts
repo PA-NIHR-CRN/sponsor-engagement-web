@@ -247,7 +247,7 @@ describe('ingest', () => {
     })
   })
 
-  it('should update the study `dueAssessmentAt` flag', async () => {
+  it('should make the correct requests to update the study `dueAssessmentAt` field', async () => {
     await ingest()
 
     expect(mockSetStudyAssessmentDue).toHaveBeenCalledTimes(1)

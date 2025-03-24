@@ -6,7 +6,7 @@ jest.mock('@nihr-ui/logger')
 const mockStudyIds = [12, 32, 23]
 
 describe('setStudyAssessmentNotDue()', () => {
-  it('should set the "dueAssessmentAt" field to null AND set "isDueAssessment" to false', async () => {
+  it('should set the "dueAssessmentAt" field to null', async () => {
     prismaMock.study.updateMany.mockResolvedValueOnce({ count: mockStudyIds.length })
 
     const response = await setStudyAssessmentNotDue(mockStudyIds)
@@ -16,7 +16,6 @@ describe('setStudyAssessmentNotDue()', () => {
 
     expect(prismaMock.study.updateMany).toHaveBeenCalledWith({
       data: {
-        isDueAssessment: false,
         dueAssessmentAt: null,
       },
       where: {

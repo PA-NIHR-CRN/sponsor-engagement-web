@@ -12,22 +12,6 @@ import type { Study, StudySponsor, StudyWithRelationships } from './types'
 import { StudyRecordStatus, StudyStatus } from './types'
 import { getOrganisationName, getOrgsUniqueByName, getOrgsUniqueByNameRole, getOrgsUniqueByRole } from './utils'
 
-// If assessment is due:
-// - if there is already a date, leave as is.
-// - if there is not already a date, set to today's date
-
-// if assessment is not due:
-// - set to null
-
-// Problem:
-// we set all studies to not due and do not know the value of the assessemnt due date
-
-// Solutions?
-// 1
-// get the due date value or do not update it (i.e. retain value), set assessments to null currently instead leave value as is. this doesn't set new assessments to today's date. or do we run both?
-// if we run both, set assessment to null and set assessment to todays date (only if there isn't already a date)
-// assuming that an assessment will go to not due and then to due, in order for the date to update
-
 dotEnvConfig()
 
 // Entities related to the current batch of studies
@@ -65,13 +49,12 @@ const createStudies = async () => {
       actualOpeningDate: study.ActualOpeningDate ? new Date(study.ActualOpeningDate) : null,
       actualClosureDate: study.ActualClosureDate ? new Date(study.ActualClosureDate) : null,
       estimatedReopeningDate: study.EstimatedReopeningDate ? new Date(study.EstimatedReopeningDate) : null,
-      isDueAssessment: false,
       isDeleted: false,
     }
 
     return prismaClient.study.upsert({
       where: { cpmsId: study.Id },
-      create: { ...studyData, dueAssessmentAt: null },
+      create: studyData,
       update: studyData,
       include: {
         organisations: {
@@ -449,7 +432,6 @@ export const ingest = async () => {
     const ids = studyEntities.map((study) => study.id)
     await setStudyAssessmentDue(ids)
     await setStudyAssessmentNotDue(ids)
-    // Set assessments to not due ? For new studies, this will be correct. For studies that are no longer due, we need to make sure we've set it to null.
   }
 
   await deleteStudies()

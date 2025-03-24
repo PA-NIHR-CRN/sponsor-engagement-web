@@ -13,7 +13,6 @@ export const setStudyAssessmentNotDue = async (studyIds: number[]): Promise<{ co
   const threeMonthsAgo = dayjs().subtract(lapsePeriodMonths, 'month').toDate()
   const assessmentDueResult = await prismaClient.study.updateMany({
     data: {
-      isDueAssessment: false,
       dueAssessmentAt: null,
     },
     where: {

@@ -8,7 +8,7 @@ const mockStudyIds = [12, 32, 23]
 const date = new Date('2002-02-02')
 
 describe('setStudyAssessmentDue()', () => {
-  it('should set the "dueAssessmentAt` field to current date and set isDueAssessment` flag to true', async () => {
+  it('should set the "dueAssessmentAt` field to the correct date', async () => {
     jest.useFakeTimers().setSystemTime(date)
     prismaMock.study.updateMany.mockResolvedValueOnce({ count: mockStudyIds.length })
 
@@ -19,7 +19,6 @@ describe('setStudyAssessmentDue()', () => {
 
     expect(prismaMock.study.updateMany).toHaveBeenCalledWith({
       data: {
-        isDueAssessment: true,
         dueAssessmentAt: date,
       },
       where: {
