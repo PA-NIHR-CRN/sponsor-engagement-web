@@ -58,6 +58,7 @@ describe('getServerSideProps', () => {
 const mockStudies = Array.from(Array(15)).map((_, index) => ({
   id: index === 0 ? 'mocked-id' : simpleFaker.number.int(),
   shortTitle: 'Test Study',
+  isDueAssessment: index === 0,
   dueAssessmentAt: index === 0 ? new Date('2001-01-01') : null,
   organisations: [
     {

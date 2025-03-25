@@ -183,7 +183,7 @@ export const getStudiesForOrgs = async ({
       id: true,
       title: true,
       shortTitle: true,
-      dueAssessmentAt: true,
+      isDueAssessment: true,
       lastAssessment: {
         include: {
           status: true,
@@ -213,9 +213,7 @@ export const getStudiesForOrgs = async ({
     prismaClient.study.count({
       where: {
         ...query.where,
-        dueAssessmentAt: {
-          not: null,
-        },
+        isDueAssessment: true,
       },
     }),
   ])
