@@ -6,6 +6,7 @@ const testUserId = 6
 const startingOrgId = 21
 const noAssessmentStudyId = 16958
 const noAssessmentCpmsId = 49605
+const currentDate = new Date()
 
 test.beforeEach('Setup Tests', async () => {
   await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
@@ -17,7 +18,7 @@ test.beforeEach('Setup Tests', async () => {
     await seDatabaseReq(`DELETE FROM AssessmentFurtherInformation WHERE assessmentId = ${assessmentId};`)
     await seDatabaseReq(`DELETE FROM Assessment WHERE id = ${assessmentId};`)
   }
-  await seDatabaseReq(`UPDATE Study SET isDueAssessment = 1 WHERE id = ${noAssessmentStudyId};`)
+  await seDatabaseReq(`UPDATE Study SET dueAssessmentAt = ${currentDate} WHERE id = ${noAssessmentStudyId};`)
 })
 
 test.describe('Submit a Study Assessment and Validate Form Inputs - @se_38', () => {
