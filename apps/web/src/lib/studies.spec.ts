@@ -67,7 +67,7 @@ describe('getStudiesForOrgs', () => {
           organisations: expectedOrganisationsQuery,
           isDeleted: false,
         },
-        orderBy: [{ isDueAssessment: Prisma.SortOrder.desc }, { id: Prisma.SortOrder.asc }],
+        orderBy: [{ dueAssessmentAt: { sort: Prisma.SortOrder.asc, nulls: 'last' } }, { id: Prisma.SortOrder.asc }],
       })
     )
 
