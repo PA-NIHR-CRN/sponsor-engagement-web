@@ -110,6 +110,7 @@ describe('Studies page', () => {
   jest.mocked(getNotificationBanner)
 
   test('Default layout', async () => {
+    jest.useFakeTimers().setSystemTime(new Date('2001-01-05'))
     prismaMock.$transaction.mockResolvedValueOnce([mockStudies, mockStudies.length, 3])
 
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: {} })
@@ -194,8 +195,8 @@ describe('Studies page', () => {
     ).toBeInTheDocument()
 
     // Study due assessment
-    expect(withinFirstStudy.getByText('Due')).toBeInTheDocument()
-    expect(withinSecondStudy.queryByText('Due')).not.toBeInTheDocument()
+    expect(withinFirstStudy.getByText('Due for 4 days')).toBeInTheDocument()
+    expect(withinSecondStudy.queryByText(/Due/)).not.toBeInTheDocument()
 
     // Study indicators
     expect(withinFirstStudy.getByText('Milestone missed, Recruitment concerns')).toBeInTheDocument()
@@ -217,6 +218,8 @@ describe('Studies page', () => {
     expect(within(pagination).getByRole('link', { name: 'Page 1' })).toHaveAttribute('href', '/?page=1')
     expect(within(pagination).getByRole('link', { name: 'Page 2' })).toHaveAttribute('href', '/?page=2')
     expect(within(pagination).getByRole('link', { name: 'Next page' })).toHaveAttribute('href', '/?page=2')
+
+    jest.useRealTimers()
   })
 
   test('No studies found', async () => {
