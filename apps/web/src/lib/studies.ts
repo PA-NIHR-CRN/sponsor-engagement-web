@@ -184,6 +184,7 @@ export const getStudiesForOrgs = async ({
       title: true,
       shortTitle: true,
       isDueAssessment: true,
+      dueAssessmentAt: true,
       lastAssessment: {
         include: {
           status: true,
