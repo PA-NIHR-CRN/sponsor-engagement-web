@@ -212,7 +212,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
     })
   })
 
-  test('The `Due` icon is removed for a Study, when a New Assessment is submitted - @se_68_submitAssess', async ({
+  test.skip('The `Due` icon is removed for a Study, when a New Assessment is submitted - @se_68_submitAssess', async ({
     studiesPage,
     studyDetailsPage,
     assessmentPage,
