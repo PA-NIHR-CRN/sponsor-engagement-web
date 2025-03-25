@@ -381,7 +381,7 @@ export default class StudiesPage {
   async assertListEndsWithNonDueStudies(sortedList: RowDataPacket[]) {
     function checkForStudyNotDue(studies: any) {
       for (let study of studies) {
-        if (Boolean(study.isDueAssessment)) {
+        if (Boolean(study.dueAssessmentAt)) {
           console.log('At least 1 study is not due an assessment, checking last study status...')
           return true
         }
