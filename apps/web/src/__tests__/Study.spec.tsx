@@ -351,7 +351,7 @@ describe('Study', () => {
       expect(mockedGetAxios).toHaveBeenCalledTimes(1)
     })
 
-    test('when study is due for assessment, should return study with the correct date', async () => {
+    test('when study is due for assessment, should return study with the correct "dueAssessmentAt" field', async () => {
       const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
       jest.useFakeTimers().setSystemTime(mockDate)
       getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
@@ -385,6 +385,45 @@ describe('Study', () => {
       expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
       expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(2)
       expect(mockedGetAxios).toHaveBeenCalledTimes(1)
+      jest.useRealTimers()
+    })
+
+    test('when study is not due for assessment, should return study with "dueAssessmentAt" field set to null', async () => {
+      const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: mockStudyId } })
+      jest.useFakeTimers().setSystemTime(mockDate)
+      getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+      prismaMock.$transaction.mockResolvedValueOnce([mockStudyWithRelations])
+      mockedGetAxios.mockResolvedValueOnce({ data: { StatusCode: 200, Result: mockCPMSStudy } })
+      prismaMock.study.update.mockResolvedValueOnce(mockStudyWithRelations)
+      mockSetStudyAssessmentNotDue.mockResolvedValueOnce({ count: 1 })
+      prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[0])
+      prismaMock.studyEvaluationCategory.upsert.mockResolvedValueOnce(mappedCPMSStudyEvals[1])
+      prismaMock.studyUpdates.groupBy.mockResolvedValueOnce([])
+      prismaMock.studyUpdates.findMany.mockResolvedValueOnce([])
+      prismaMock.studyUpdates.findMany.mockResolvedValueOnce([])
+
+      const result = await getServerSideProps(context)
+      expect(result).toEqual({
+        props: {
+          user: userWithSponsorContactRole.user,
+          assessments: [mockMappedAssessment],
+          study: {
+            ...mockStudyWithRelations,
+            evaluationCategories: mappedCPMSStudyEvals,
+            organisationsByRole,
+            dueAssessmentAt: null,
+          },
+          editHistory: getMockEditHistoryFromCPMS([false, false]),
+        },
+      })
+
+      expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
+      expect(prismaMock.study.update).toHaveBeenCalledTimes(1)
+      expect(mockSetStudyAssessmentNotDue).toHaveBeenCalledTimes(1)
+      expect(prismaMock.studyEvaluationCategory.upsert).toHaveBeenCalledTimes(2)
+      expect(mockedGetAxios).toHaveBeenCalledTimes(1)
+
+      expect(mockSetStudyAssessmentDueDate).not.toHaveBeenCalled()
       jest.useRealTimers()
     })
   })

@@ -20,10 +20,8 @@ export const getStudyAssessmentDueDate = async (studyId: number, currentAssessme
   }
 
   // If there is already a date set, `setStudyAssessmentDueDate` will return 0 as no update was done.
-  if (studyAssessmentDueResponse === 0) {
-    if (currentAssessmentDueDate) {
-      return currentAssessmentDueDate
-    }
+  if (studyAssessmentDueResponse === 0 && currentAssessmentDueDate) {
+    return currentAssessmentDueDate
   }
 
   return new Date()

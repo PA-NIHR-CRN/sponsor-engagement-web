@@ -7,7 +7,7 @@ jest.mock('../lib/studies')
 const mockSetStudyAssessmentNotDue = setStudyAssessmentNotDue as jest.MockedFunction<typeof setStudyAssessmentNotDue>
 const mockSetStudyAssessmentDueDate = setStudyAssessmentDueDate as jest.MockedFunction<typeof setStudyAssessmentDueDate>
 
-describe('getStudyAssessmentDueDate', () => {
+describe('getStudyAssessmentDueDate()', () => {
   const studyId = 1
   const mockDate = new Date('2025-03-20T00:00:00.000Z')
 
@@ -31,7 +31,7 @@ describe('getStudyAssessmentDueDate', () => {
     expect(setStudyAssessmentDueDate).not.toHaveBeenCalled()
   })
 
-  it('should return null when study is not due an assessment', async () => {
+  it('should return null when assessment is not due', async () => {
     mockSetStudyAssessmentNotDue.mockResolvedValue({ data: 1 })
 
     const result = await getStudyAssessmentDueDate(studyId, null)
@@ -53,7 +53,7 @@ describe('getStudyAssessmentDueDate', () => {
     expect(setStudyAssessmentDueDate).toHaveBeenCalledWith([studyId])
   })
 
-  it('should return current assessment due date when study is due an assessment and current date exists', async () => {
+  it('should return current assessment due date when requests to set assessment as due and not due, does not make any updates and current date exists', async () => {
     mockSetStudyAssessmentNotDue.mockResolvedValue({ data: 0 })
     mockSetStudyAssessmentDueDate.mockResolvedValue({ data: 0 })
 
