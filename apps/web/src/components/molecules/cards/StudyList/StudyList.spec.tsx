@@ -39,16 +39,32 @@ describe('StudyList Component', () => {
     expect(viewStudyButtonElement).toHaveAttribute('href', defaultProps.studyHref)
   })
 
-  test('renders "Due" tag when assessmentDue is true', () => {
-    render(<StudyList {...defaultProps} assessmentDue />)
+  test('renders correct "Due" tag when daysSinceAssessmentDue is 0', () => {
+    render(<StudyList {...defaultProps} daysSinceAssessmentDue={0} />)
 
     // Check if the "Due" tag is rendered
-    const dueTagElement = screen.getByText('Due')
+    const dueTagElement = screen.getByText('Due for 1 day')
     expect(dueTagElement).toBeInTheDocument()
   })
 
-  test('does not render "Due" tag when assessmentDue is false', () => {
-    render(<StudyList {...defaultProps} assessmentDue={false} />)
+  test('renders "Due" tag when daysSinceAssessmentDue is 1', () => {
+    render(<StudyList {...defaultProps} daysSinceAssessmentDue={1} />)
+
+    // Check if the "Due" tag is rendered
+    const dueTagElement = screen.getByText('Due for 1 day')
+    expect(dueTagElement).toBeInTheDocument()
+  })
+
+  test('renders "Due" tag when daysSinceAssessmentDue is greater than 1', () => {
+    render(<StudyList {...defaultProps} daysSinceAssessmentDue={2} />)
+
+    // Check if the "Due" tag is rendered
+    const dueTagElement = screen.getByText('Due for 2 days')
+    expect(dueTagElement).toBeInTheDocument()
+  })
+
+  test('does not render "Due" tag when daysSinceAssessmentDue is undefined', () => {
+    render(<StudyList {...defaultProps} daysSinceAssessmentDue={undefined} />)
 
     // Check if the "Due" tag is not rendered
     const dueTagElement = screen.queryByText('Due')
