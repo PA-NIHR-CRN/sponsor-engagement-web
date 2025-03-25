@@ -329,7 +329,6 @@ describe('updateStudy', () => {
     id: studyId,
     title: mockStudyInputs.title as string,
     cpmsId: mockStudyInputs.cpmsId as number,
-    isDueAssessment: true,
     createdAt: new Date('2001-01-01'),
     managingSpeciality: 'Cancer',
     organisations: [
