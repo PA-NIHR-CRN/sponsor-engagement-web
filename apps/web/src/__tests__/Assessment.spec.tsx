@@ -50,7 +50,6 @@ const study = Mock.of<StudyWithRelations>({
   id: mockedStudyId,
   title: 'Test Study',
   cpmsId: 12345,
-  isDueAssessment: true,
   createdAt: new Date('2001-01-01'),
   managingSpeciality: 'Cancer',
   organisations: [

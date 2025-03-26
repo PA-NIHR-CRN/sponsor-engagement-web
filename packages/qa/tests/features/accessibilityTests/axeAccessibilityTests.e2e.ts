@@ -13,7 +13,7 @@ test.beforeAll('Setup Tests', async () => {
     INNER JOIN StudyOrganisation
     ON Study.id = StudyOrganisation.studyId
     WHERE StudyOrganisation.organisationId = ${startingOrgId} AND StudyOrganisation.isDeleted = 0 
-    AND Study.isDueAssessment = 1 AND Study.isDeleted = 0
+    AND Study.dueAssessmentAt IS NOT NULL AND Study.isDeleted = 0
     ORDER BY RAND() LIMIT 1;`)
   startingStudyId = randomStudyIdSelected[0].id
 

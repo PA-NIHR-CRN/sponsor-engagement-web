@@ -35,7 +35,6 @@ import {
   mapCPMSStudyEvalToSEEval,
   mapCPMSStudyToSEStudy,
   mapFormStatusToCPMSStatus,
-  setStudyAssessmentDueFlag,
   updateEvaluationCategories,
   updateStudy,
 } from '@/lib/studies'
@@ -44,6 +43,7 @@ import { getOptionalFormFields, getVisibleFormFields, mapStudyToStudyFormInput }
 import { getValuesFromSearchParams } from '@/utils/form'
 import type { EditStudy as EditStudySchema, EditStudyInputs } from '@/utils/schemas'
 import { studySchema } from '@/utils/schemas'
+import { getStudyAssessmentDueDate } from '@/utils/studies'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
 export type EditStudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
@@ -467,6 +467,8 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
   const studyEvalsInCPMS = studyInCPMS.StudyEvaluationCategories
   const mappedStudyEvalsInCPMS = studyEvalsInCPMS.map((studyEval) => mapCPMSStudyEvalToSEEval(studyEval))
 
+  const currentDueAssessmentAt = study.dueAssessmentAt
+
   const { data: updatedStudy } = await updateStudy(Number(cpmsId), mapCPMSStudyToSEStudy(studyInCPMS))
 
   if (!updatedStudy) {
@@ -478,9 +480,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
       },
     }
   }
-
-  const { data: setStudyAssessmentDueResponse } = await setStudyAssessmentDueFlag([study.id])
-  const isStudyDueAssessment = setStudyAssessmentDueResponse !== null ? setStudyAssessmentDueResponse === 1 : false
+  const dueAssessmentAt = await getStudyAssessmentDueDate(study.id, currentDueAssessmentAt)
 
   const currentStudyEvalsInSE = updatedStudy.evaluationCategories
 
@@ -504,7 +504,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
       study: {
         ...updatedStudy,
         evaluationCategories: updatedStudyEvals ?? study.evaluationCategories,
-        isDueAssessment: isStudyDueAssessment,
+        dueAssessmentAt,
       },
       currentLSN: studyInCPMS.CurrentLsn,
       query: context.query,

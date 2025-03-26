@@ -31,6 +31,7 @@ export const mockStudiesForExport = Array.from({ length: 3 }).map((_, index) =>
     sampleSize: simpleFaker.number.int(),
     totalRecruitmentToDate: simpleFaker.number.int(),
     isDueAssessment: index === 0,
+    dueAssessmentAt: index === 0 ? new Date('2001-01-01') : null,
     organisations: [
       {
         organisation: {
@@ -266,7 +267,7 @@ export const mockStudyWithRelations = Mock.of<StudyWithRelations>({
   id: 123,
   title: 'Test Study Long Title',
   shortTitle: 'Test Study Short Title',
-  isDueAssessment: false,
+  dueAssessmentAt: new Date('2003-01-02'),
   cpmsId: 1234567,
   studyStatus: 'Suspended',
   recordStatus: 'Test record status',
