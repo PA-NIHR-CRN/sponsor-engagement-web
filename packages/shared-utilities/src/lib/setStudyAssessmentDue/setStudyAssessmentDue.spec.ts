@@ -5,8 +5,11 @@ jest.mock('@nihr-ui/logger')
 
 const mockStudyIds = [12, 32, 23]
 
+const date = new Date('2002-02-02')
+
 describe('setStudyAssessmentDue()', () => {
-  it('should update the study `isDueAssessment` flag', async () => {
+  it('should set the "dueAssessmentAt` field to the correct date', async () => {
+    jest.useFakeTimers().setSystemTime(date)
     prismaMock.study.updateMany.mockResolvedValueOnce({ count: mockStudyIds.length })
 
     const response = await setStudyAssessmentDue(mockStudyIds)
@@ -16,13 +19,14 @@ describe('setStudyAssessmentDue()', () => {
 
     expect(prismaMock.study.updateMany).toHaveBeenCalledWith({
       data: {
-        isDueAssessment: true,
+        dueAssessmentAt: date,
       },
       where: {
         id: { in: mockStudyIds },
         evaluationCategories: {
           some: { isDeleted: false },
         },
+        dueAssessmentAt: null,
         assessments: {
           every: {
             createdAt: {
@@ -40,5 +44,7 @@ describe('setStudyAssessmentDue()', () => {
         ],
       },
     })
+
+    jest.useRealTimers()
   })
 })

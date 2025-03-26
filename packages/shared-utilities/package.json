@@ -11,6 +11,7 @@
   "dependencies": {
     "@nihr-ui/logger": "*",
     "@prisma/client": "latest",
+    "database": "*",
     "dayjs": "^1.11.13"
   },
   "devDependencies": {

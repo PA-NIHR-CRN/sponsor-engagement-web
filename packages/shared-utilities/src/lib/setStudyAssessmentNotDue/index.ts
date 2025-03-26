@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import { prismaClient } from '../../utils/prisma'
 import { getAssessmentDueCriteria } from '../../utils/assessment'
 
-export const setStudyAssessmentDue = async (studyIds: number[]): Promise<{ count: number }> => {
+export const setStudyAssessmentNotDue = async (studyIds: number[]): Promise<{ count: number }> => {
   const { ASSESSMENT_LAPSE_MONTHS } = process.env
 
   assert(ASSESSMENT_LAPSE_MONTHS)
@@ -13,16 +13,15 @@ export const setStudyAssessmentDue = async (studyIds: number[]): Promise<{ count
   const threeMonthsAgo = dayjs().subtract(lapsePeriodMonths, 'month').toDate()
   const assessmentDueResult = await prismaClient.study.updateMany({
     data: {
-      dueAssessmentAt: new Date(),
+      dueAssessmentAt: null,
     },
     where: {
       id: { in: studyIds },
-      ...getAssessmentDueCriteria(threeMonthsAgo),
-      dueAssessmentAt: null,
+      NOT: getAssessmentDueCriteria(threeMonthsAgo),
     },
   })
 
-  logger.info(`Flagged ${assessmentDueResult.count} studies as being due an assessment`)
+  logger.info(`Flagged ${assessmentDueResult.count} studies as not being due an assessment`)
 
   return { count: assessmentDueResult.count }
 }

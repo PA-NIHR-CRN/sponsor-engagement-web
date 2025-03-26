@@ -84,7 +84,7 @@ describe('Successful study assessment submission', () => {
     // Study is updated to not be due an assessment
     expect(updateStudyMock).toHaveBeenCalledWith({
       where: { id: 999 },
-      data: { isDueAssessment: false, lastAssessmentId: 1 },
+      data: { dueAssessmentAt: null, lastAssessmentId: 1 },
     })
 
     expect(logger.info).toHaveBeenCalledWith('Added assessment with id: 1')
@@ -130,7 +130,7 @@ describe('Successful study assessment submission', () => {
     // Study is updated to not be due an assessment
     expect(updateStudyMock).toHaveBeenCalledWith({
       where: { id: 999 },
-      data: { isDueAssessment: false, lastAssessmentId: 1 },
+      data: { dueAssessmentAt: null, lastAssessmentId: 1 },
     })
 
     expect(logger.info).toHaveBeenCalledWith('Added assessment with id: 1')

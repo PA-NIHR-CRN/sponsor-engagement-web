@@ -1,5 +1,5 @@
 import { logger } from '@nihr-ui/logger'
-import { setStudyAssessmentDue } from 'shared-utilities'
+import { setStudyAssessmentDue, setStudyAssessmentNotDue as setStudyAssessmentNotDueUtil } from 'shared-utilities'
 
 import type { Study, StudyEvaluationCategory } from '@/@types/studies'
 import { Status as CPMSStatus } from '@/@types/studies'
@@ -184,6 +184,7 @@ export const getStudiesForOrgs = async ({
       title: true,
       shortTitle: true,
       isDueAssessment: true,
+      dueAssessmentAt: true,
       lastAssessment: {
         include: {
           status: true,
@@ -340,7 +341,6 @@ export const mapCPMSStudyToSEStudy = (study: Study): UpdateStudyInput => ({
   actualOpeningDate: study.ActualOpeningDate ? new Date(study.ActualOpeningDate) : null,
   actualClosureDate: study.ActualClosureToRecruitmentDate ? new Date(study.ActualClosureToRecruitmentDate) : null,
   estimatedReopeningDate: study.EstimatedReopeningDate ? new Date(study.EstimatedReopeningDate) : null,
-  isDueAssessment: false,
 })
 
 export const updateStudy = async (cpmsId: number, studyData: UpdateStudyInput) => {
@@ -454,18 +454,41 @@ export const updateEvaluationCategories = async (
   }
 }
 
-export const setStudyAssessmentDueFlag = async (studyIds: number[]) => {
+export const setStudyAssessmentDueDate = async (studyIds: number[]) => {
   try {
     const assessmentDueResult = await setStudyAssessmentDue(studyIds)
 
-    logger.info('Successfully set assessment due for studys with Ids: %s', JSON.stringify(studyIds))
+    logger.info('Successfully checked if assessment is due for studys with Ids: %s', JSON.stringify(studyIds))
 
     return { data: assessmentDueResult.count }
   } catch (error) {
     const errorMessage = getErrorMessage(error)
 
     logger.error(
-      'Failed to set study assessment due flag for studys with Ids: %s, error: %s',
+      'Failed to set study assessment due date for studys with Ids: %s, error: %s',
+      JSON.stringify(studyIds),
+      errorMessage
+    )
+
+    return {
+      data: null,
+      error: errorMessage,
+    }
+  }
+}
+
+export const setStudyAssessmentNotDue = async (studyIds: number[]) => {
+  try {
+    const assessmentNotDueResult = await setStudyAssessmentNotDueUtil(studyIds)
+
+    logger.info('Successfully checked if assessment is not due for studys with Ids: %s', JSON.stringify(studyIds))
+
+    return { data: assessmentNotDueResult.count }
+  } catch (error) {
+    const errorMessage = getErrorMessage(error)
+
+    logger.error(
+      'Failed to set study assessment as not due for studys with Ids: %s, error: %s',
       JSON.stringify(studyIds),
       errorMessage
     )

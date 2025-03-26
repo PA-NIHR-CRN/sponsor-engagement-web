@@ -119,7 +119,7 @@ describe('notify', () => {
         organisations: {
           where: {
             organisation: {
-              studies: { some: { study: { isDueAssessment: true, isDeleted: false }, isDeleted: false } },
+              studies: { some: { study: { dueAssessmentAt: { not: null }, isDeleted: false }, isDeleted: false } },
               isDeleted: false,
             },
             isDeleted: false,
