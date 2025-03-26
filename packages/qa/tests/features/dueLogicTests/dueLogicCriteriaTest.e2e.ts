@@ -34,7 +34,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
     studyDetailsPage,
   }) => {
     const testStudy = await seDatabaseReq(`
-      SELECT s.id, s.cpmsId FROM Study s
+      SELECT s.id, s.cpmsId, s.dueAssessmentAt FROM Study s
       JOIN StudyOrganisation so ON s.id = so.studyId
       JOIN StudyEvaluationCategory sec ON s.id = sec.studyId
       JOIN Assessment a ON s.id = a.studyId
@@ -63,7 +63,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
     })
 
     await test.step('Then the Study List item will display a `Due` indicator', async () => {
-      await studiesPage.assertDueIndicatorDisplayed(0, true)
+      await studiesPage.assertDueIndicatorDisplayed(0, testStudy[0].dueAssessmentAt)
     })
 
     await test.step('And if I enter the Study Details page for the Study', async () => {
@@ -81,7 +81,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
     studyDetailsPage,
   }) => {
     const testStudy = await seDatabaseReq(`
-      SELECT s.id, s.cpmsId FROM Study s
+      SELECT s.id, s.cpmsId, s.dueAssessmentAt FROM Study s
       JOIN StudyOrganisation so ON s.id = so.studyId
       JOIN StudyEvaluationCategory sec ON s.id = sec.studyId
       JOIN Assessment a ON s.id = a.studyId
@@ -110,7 +110,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
     })
 
     await test.step('Then the Study List item will display a `Due` indicator', async () => {
-      await studiesPage.assertDueIndicatorDisplayed(0, true)
+      await studiesPage.assertDueIndicatorDisplayed(0, testStudy[0].dueAssessmentAt)
     })
 
     await test.step('And if I enter the Study Details page for the Study', async () => {
@@ -128,7 +128,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
     studyDetailsPage,
   }) => {
     const testStudy = await seDatabaseReq(`
-      SELECT s.id, s.cpmsId FROM Study s
+      SELECT s.id, s.cpmsId, s.dueAssessmentAt FROM Study s
       JOIN StudyOrganisation so ON s.id = so.studyId
       JOIN StudyEvaluationCategory sec ON s.id = sec.studyId
       LEFT JOIN Assessment a ON s.id = a.studyId
@@ -158,7 +158,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
     })
 
     await test.step('Then the Study List item will display a `Due` indicator', async () => {
-      await studiesPage.assertDueIndicatorDisplayed(0, true)
+      await studiesPage.assertDueIndicatorDisplayed(0, testStudy[0].dueAssessmentAt)
     })
 
     await test.step('And if I enter the Study Details page for the Study', async () => {
@@ -176,7 +176,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
     studyDetailsPage,
   }) => {
     const testStudy = await seDatabaseReq(`
-      SELECT s.id, s.cpmsId FROM Study s
+      SELECT s.id, s.cpmsId, s.dueAssessmentAt FROM Study s
       JOIN StudyOrganisation so ON s.id = so.studyId
       JOIN StudyEvaluationCategory sec ON s.id = sec.studyId
         WHERE so.organisationId = ${startingOrgId}
@@ -202,7 +202,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
     })
 
     await test.step('Then the Study List item will not display a `Due` indicator', async () => {
-      await studiesPage.assertDueIndicatorDisplayed(0, false)
+      await studiesPage.assertDueIndicatorDisplayed(0, testStudy[0].dueAssessmentAt)
     })
 
     await test.step('And if I enter the Study Details page for the Study', async () => {
@@ -220,6 +220,15 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
     studyDetailsPage,
     assessmentPage,
   }) => {
+    const testStudy = await seDatabaseReq(`
+      SELECT * FROM Study
+      WHERE cpmsId = ${provideAssessmentCpmsId}
+    `)
+
+    if (testStudy[0] == null) {
+      throw new Error('no studies with given cpmsId, check the test data!')
+    }
+
     await test.step('Given I have navigated to the Studies Page', async () => {
       await studiesPage.goto()
       await studiesPage.assertOnStudiesPage()
@@ -234,7 +243,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
       await studiesPage.assertSpecificLastAssessmentValue('None', 0)
     })
     await test.step('And the Study List item displays a `Due` indicator', async () => {
-      await studiesPage.assertDueIndicatorDisplayed(0, true)
+      await studiesPage.assertDueIndicatorDisplayed(0, testStudy[0].dueAssessmentAt)
     })
     await test.step('And if I enter the Study Details page for the Study', async () => {
       await studiesPage.viewStudyButton.nth(0).click()
@@ -272,7 +281,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
       await studiesPage.assertSpecificNumberStudies(1)
     })
     await test.step('Then the Study List item will also not display a `Due` indicator', async () => {
-      await studiesPage.assertDueIndicatorDisplayed(0, false)
+      await studiesPage.assertDueIndicatorDisplayed(0, null)
     })
   })
 })

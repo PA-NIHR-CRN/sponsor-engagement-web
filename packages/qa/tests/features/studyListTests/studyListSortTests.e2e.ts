@@ -18,7 +18,7 @@ test.beforeAll('Setup Test Users', async () => {
     INNER JOIN StudyOrganisation ON StudyOrganisation.studyId = Study.id
     WHERE Study.isDeleted = 0
     AND StudyOrganisation.organisationId = ${startingOrgId}
-    ORDER BY dueAssessmentAt asc, Study.id asc;
+    ORDER BY Study.dueAssessmentAt IS NULL, Study.dueAssessmentAt asc, Study.id asc;
   `)
   studyListSortedByDueDb = studyListSortByDue
 

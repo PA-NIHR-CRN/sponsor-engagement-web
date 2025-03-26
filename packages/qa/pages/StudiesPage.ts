@@ -1,5 +1,10 @@
 import { expect, Locator, Page } from '@playwright/test'
-import { convertPromiseStringToNumber, confirmStringNotNull, convertIsoDateToDisplayDate } from '../utils/UtilFunctions'
+import {
+  convertPromiseStringToNumber,
+  confirmStringNotNull,
+  convertIsoDateToDisplayDate,
+  numDaysBetween,
+} from '../utils/UtilFunctions'
 import { seDatabaseReq } from '../utils/DbRequests'
 import { RowDataPacket } from 'mysql2'
 
@@ -337,10 +342,18 @@ export default class StudiesPage {
     await this.searchFilterPanel.waitFor()
   }
 
-  async assertDueIndicatorDisplayed(index: number, isDisplayed: boolean) {
-    if (isDisplayed) {
+  async getDaysSinceAssessmentDue(dueAssessmentAt: Date) {
+    return Math.round(numDaysBetween(new Date(), dueAssessmentAt))
+  }
+
+  async assertDueIndicatorDisplayed(index: number, dueAssessmentAt?: Date | null) {
+    if (dueAssessmentAt) {
+      const numberOfDaysDue = await this.getDaysSinceAssessmentDue(dueAssessmentAt)
+
       await expect(this.studyListItem.nth(index).locator(this.studyListItemDueIndicator)).toBeVisible()
-      await expect(this.studyListItem.nth(index).locator(this.studyListItemDueIndicator)).toHaveText('Due')
+      await expect(this.studyListItem.nth(index).locator(this.studyListItemDueIndicator)).toHaveText(
+        `Due for ${numberOfDaysDue || 1} day${numberOfDaysDue > 1 ? 's' : ''}`
+      )
     } else {
       await expect(this.studyListItem.nth(index).locator(this.studyListItemDueIndicator)).toBeHidden()
     }
