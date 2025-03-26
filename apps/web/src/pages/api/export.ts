@@ -57,7 +57,7 @@ const studyDataMappers: Partial<Record<ColumnKeys, StudyDataMapper>> = {
   sponsorOrg: (study) => getSponsorOrgName(study.organisations),
   studyCRO: (study) => (study.route === 'Commercial' ? getSupportOrgName(study.organisations) : undefined),
   studyCTU: (study) => (study.route !== 'Commercial' ? getSupportOrgName(study.organisations) : undefined),
-  isDueAssessment: (study) => (study.isDueAssessment ? 'Yes' : 'No'),
+  isDueAssessment: (study) => (study.dueAssessmentAt ? 'Yes' : 'No'),
   lastAssessmentStatus: (study) => study.lastAssessment?.status.name,
   lastAssessmentDate: (study) => study.lastAssessment?.createdAt,
   lastAssessmentInfo: (study) =>

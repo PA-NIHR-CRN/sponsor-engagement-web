@@ -39,4 +39,4 @@ The task is configured to run daily via a cron schedule defined in the `sponsor-
 
 ## Info
 
-The ingest task queries the CPMS API and processes studies iteratively in batches of 250. The task also handles soft deletion of studies and their relationships. (Note: organisations are not deleted because it was desired to keep them visible in the application for Contact Managers). During ingestion the `isDueAssessment` flag is set for studies that meet the criteria for being due assessment.
+The ingest task queries the CPMS API and processes studies iteratively in batches of 250. The task also handles soft deletion of studies and their relationships. (Note: organisations are not deleted because it was desired to keep them visible in the application for Contact Managers). During ingestion the `dueAssessmentAt` date field is set to the current date for studies that meet the criteria for being due assessment and do not already have this field set.

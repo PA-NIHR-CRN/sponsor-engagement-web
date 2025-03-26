@@ -26,11 +26,11 @@ import {
   mapCPMSStatusToFormStatus,
   mapCPMSStudyEvalToSEEval,
   mapCPMSStudyToSEStudy,
-  setStudyAssessmentDueFlag,
   updateEvaluationCategories,
   updateStudy,
 } from '@/lib/studies'
 import { formatDate } from '@/utils/date'
+import { getStudyAssessmentDueDate } from '@/utils/studies'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
 const renderNotificationBanner = (success: string | undefined, showRequestSupportLink: boolean) =>
@@ -91,7 +91,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
           </span>
 
           <div className="flex flex-col govuk-!-margin-bottom-4 govuk-!-margin-top-4 gap-6">
-            {Boolean(study.isDueAssessment) && (
+            {Boolean(study.dueAssessmentAt) && (
               <div>
                 <span className="govuk-tag govuk-tag--red mr-2">Due</span>
                 This study needs a new sponsor assessment.
@@ -263,8 +263,8 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
     }
   }
 
-  const { data: setStudyAssessmentDueResponse } = await setStudyAssessmentDueFlag([studyId])
-  const isStudyDueAssessment = setStudyAssessmentDueResponse !== null ? setStudyAssessmentDueResponse === 1 : false
+  const currentDueAssessmentAt = study.dueAssessmentAt
+  const dueAssessmentAt = await getStudyAssessmentDueDate(study.id, currentDueAssessmentAt)
 
   const currentStudyEvalsInSE = updatedStudy.evaluationCategories
 
@@ -291,7 +291,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
       study: {
         ...updatedStudy,
         evaluationCategories: updatedStudyEvals ?? study.evaluationCategories,
-        isDueAssessment: isStudyDueAssessment,
+        dueAssessmentAt,
       },
       editHistory,
       getEditHistoryError,

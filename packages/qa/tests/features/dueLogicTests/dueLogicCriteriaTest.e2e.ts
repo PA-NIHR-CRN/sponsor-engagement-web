@@ -6,6 +6,7 @@ const startingOrgId = 9
 
 const provideAssessmentStudyId = 10692
 const provideAssessmentCpmsId = 37196
+const dueAssessmentAtDate = '2025-03-25 11:23:14.227'
 
 test.beforeAll('Setup Tests', async () => {
   await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
@@ -20,7 +21,9 @@ test.beforeAll('Setup Tests', async () => {
     await seDatabaseReq(`DELETE FROM Assessment WHERE id = ${assessmentId};`)
   }
 
-  await seDatabaseReq(`UPDATE Study SET isDueAssessment = 1 WHERE id = ${provideAssessmentStudyId};`)
+  await seDatabaseReq(
+    `UPDATE Study SET dueAssessmentAt = '${dueAssessmentAtDate}' WHERE id = ${provideAssessmentStudyId};`
+  )
 })
 
 test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se_68', () => {

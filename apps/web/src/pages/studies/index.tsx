@@ -133,7 +133,7 @@ export default function Studies({
                     {studies.map((study) => (
                       <li key={study.id}>
                         <StudyList
-                          assessmentDue={Boolean(study.isDueAssessment)}
+                          assessmentDue={Boolean(study.dueAssessmentAt)}
                           indications={study.evaluationCategories
                             .map((evalCategory) => evalCategory.indicatorType)
                             .filter((evalCategory, index, items) => items.indexOf(evalCategory) === index)}
