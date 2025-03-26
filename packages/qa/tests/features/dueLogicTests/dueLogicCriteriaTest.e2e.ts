@@ -22,7 +22,7 @@ test.beforeAll('Setup Tests', async () => {
   }
 
   await seDatabaseReq(
-    `UPDATE Study SET dueAssessmentAt '${dueAssessmentAtDate}' WHERE id = ${provideAssessmentStudyId};`
+    `UPDATE Study SET dueAssessmentAt = '${dueAssessmentAtDate}' WHERE id = ${provideAssessmentStudyId};`
   )
 })
 
