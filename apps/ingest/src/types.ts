@@ -46,6 +46,7 @@ export interface Study {
   Id: number
   ShortName: string
   Title: string
+  LeadAdministrationId: number
   StudyStatus: Status
   StudyRecordStatus: StudyRecordStatus
   StudyRoute: StudyRoute

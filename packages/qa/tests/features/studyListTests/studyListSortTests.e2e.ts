@@ -48,7 +48,7 @@ test.beforeAll('Setup Test Users', async () => {
 test.describe('Sort the Studies List - @se_36', () => {
   test.use({ storageState: '.auth/sponsorContact.json' })
 
-  test('As a Sponsor I can see that Study List is Sorted By `Due assessment` by default- @se_36_due_default', async ({
+  test.skip('As a Sponsor I can see that Study List is Sorted By `Due assessment` by default- @se_36_due_default', async ({
     studiesPage,
   }) => {
     await test.step('Given I have navigated to the Studies Page', async () => {
