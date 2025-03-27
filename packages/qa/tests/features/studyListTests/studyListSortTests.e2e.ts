@@ -22,6 +22,23 @@ test.beforeAll('Setup Test Users', async () => {
   `)
   studyListSortedByDueDb = studyListSortByDue
 
+  if (!studyListSortedByDueDb.some((study) => study.dueAssessmentAt)) {
+    // Set one study due for an assessment if no studies are currently due
+    const studyIdToUpdate = studyListSortedByDueDb[0].id
+
+    const allAssessmentIdsForStudy = await seDatabaseReq(
+      `SELECT id FROM Assessment WHERE studyId = ${studyIdToUpdate} AND isDeleted = 0`
+    )
+    for (let index = 0; index < allAssessmentIdsForStudy.length; index++) {
+      const assessmentId = allAssessmentIdsForStudy[index].id
+
+      await seDatabaseReq(`DELETE FROM AssessmentFurtherInformation WHERE assessmentId = ${assessmentId};`)
+      await seDatabaseReq(`DELETE FROM Assessment WHERE id = ${assessmentId};`)
+    }
+
+    await seDatabaseReq(`UPDATE Study SET dueAssessmentAt = NOW() WHERE id = ${studyIdToUpdate};`)
+  }
+
   const studyListSortByAsc = await seDatabaseReq(`
     SELECT DISTINCT Study.id, Study.cpmsId, Study.shortTitle, Study.dueAssessmentAt,
     (SELECT createdAt FROM Assessment WHERE Assessment.studyId = Study.id 
