@@ -7,7 +7,7 @@ export interface StudyListProps {
   supportOrgName?: string
   shortTitle: string
   studyHref: string
-  lastAsessmentDate?: string
+  lastAssessmentDate?: string
   daysSinceAssessmentDue?: number
   trackStatus?: string
   trackStatusHref?: string
@@ -22,7 +22,7 @@ export function StudyList({
   daysSinceAssessmentDue,
   trackStatus,
   trackStatusHref,
-  lastAsessmentDate,
+  lastAssessmentDate,
   indications,
 }: StudyListProps) {
   const daysDueText =
@@ -60,7 +60,7 @@ export function StudyList({
                 ) : (
                   trackStatus
                 )}{' '}
-                on {lastAsessmentDate}
+                on {lastAssessmentDate}
               </>
             ) : (
               'None'

@@ -382,24 +382,25 @@ export default class StudiesPage {
     }
   }
 
-  async assertListBeginsWithDueStudies(sortedList: RowDataPacket[]) {
-    function checkForStudyDue(studies: any) {
-      for (let study of studies) {
-        if (study.dueAssessmentAt) {
-          console.log('At least 1 study is due an assessment')
-          return true
-        }
+  async checkForStudyDue(studies: any) {
+    for (let study of studies) {
+      if (study.dueAssessmentAt) {
+        console.log('At least 1 study is due an assessment')
+        return true
       }
-      console.log('All studies are currently not due an assessment')
-      return false
     }
+    console.log('All studies are currently not due an assessment')
+    return false
+  }
 
-    if (checkForStudyDue(sortedList)) {
+  async assertListBeginsWithDueStudies(sortedList: RowDataPacket[]) {
+    if (await this.checkForStudyDue(sortedList)) {
       const pageStudyCount = await this.studyListItem.count()
       for (let index = 0; index < pageStudyCount; index++) {
         const study = sortedList[index]
+        await expect(this.studyListItemTitle.nth(index)).toHaveText(study.shortTitle)
+
         if (study.dueAssessmentAt) {
-          await expect(this.studyListItemTitle.nth(index)).toHaveText(study.shortTitle)
           await expect(this.studyListItem.nth(index).locator(this.studyListItemDueIndicator)).toBeVisible()
         }
       }

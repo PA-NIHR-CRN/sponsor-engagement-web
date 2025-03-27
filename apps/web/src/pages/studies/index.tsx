@@ -66,6 +66,8 @@ export default function Studies({
           totalItems / initialPageSize
         )})`
 
+  const today = dayjs()
+
   return (
     <Container>
       <NextSeo title={`Study Progress Review - Search results ${titleResultsText}`} />
@@ -133,7 +135,7 @@ export default function Studies({
                   <ol aria-label="Studies" className="govuk-list govuk-list--spaced">
                     {studies.map((study) => {
                       const daysSinceAssessmentDue = study.dueAssessmentAt
-                        ? dayjs().diff(study.dueAssessmentAt, 'day')
+                        ? today.diff(study.dueAssessmentAt, 'day')
                         : undefined
 
                       return (
@@ -143,7 +145,7 @@ export default function Studies({
                             indications={study.evaluationCategories
                               .map((evalCategory) => evalCategory.indicatorType)
                               .filter((evalCategory, index, items) => items.indexOf(evalCategory) === index)}
-                            lastAsessmentDate={study.lastAssessment ? formatDate(study.lastAssessment.createdAt) : ''}
+                            lastAssessmentDate={study.lastAssessment ? formatDate(study.lastAssessment.createdAt) : ''}
                             shortTitle={study.shortTitle}
                             sponsorOrgName={getSponsorOrgName(study.organisations)}
                             studyHref={`${STUDIES_PAGE}/${study.id}`}

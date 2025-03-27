@@ -10,7 +10,7 @@ describe('StudyList Component', () => {
     sponsorOrgName: 'Sponsor ABC',
     shortTitle: 'Study XYZ',
     studyHref: '/studies/xyz',
-    lastAsessmentDate: '2023-09-30',
+    lastAssessmentDate: '2023-09-30',
     trackStatus: 'On track',
     trackStatusHref: '/track/on',
     indications: ['Indication ABC'],
