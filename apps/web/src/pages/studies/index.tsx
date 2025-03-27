@@ -136,7 +136,7 @@ export default function Studies({
                     {studies.map((study) => {
                       const daysSinceAssessmentDue = study.dueAssessmentAt
                         ? today.diff(study.dueAssessmentAt, 'day')
-                        : undefined
+                        : null
 
                       return (
                         <li key={study.id}>

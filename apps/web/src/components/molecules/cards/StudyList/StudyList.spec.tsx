@@ -14,6 +14,7 @@ describe('StudyList Component', () => {
     trackStatus: 'On track',
     trackStatusHref: '/track/on',
     indications: ['Indication ABC'],
+    daysSinceAssessmentDue: null,
   }
 
   test('renders with default props', () => {
@@ -64,7 +65,7 @@ describe('StudyList Component', () => {
   })
 
   test('does not render "Due" tag when daysSinceAssessmentDue is undefined', () => {
-    render(<StudyList {...defaultProps} daysSinceAssessmentDue={undefined} />)
+    render(<StudyList {...defaultProps} daysSinceAssessmentDue={null} />)
 
     // Check if the "Due" tag is not rendered
     const dueTagElement = screen.queryByText('Due')
