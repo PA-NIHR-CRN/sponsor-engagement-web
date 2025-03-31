@@ -370,6 +370,7 @@ jobs:
 
   deploy-uat:
     # needs: e2e-test Temporary to unblock UAT deployments
+    needs: deploy-test
     environment: UAT
     name: 'Deploy Uat'
     runs-on: ubuntu-latest
