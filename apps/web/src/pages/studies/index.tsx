@@ -135,7 +135,7 @@ export default function Studies({
                   <ol aria-label="Studies" className="govuk-list govuk-list--spaced">
                     {studies.map((study) => {
                       const daysSinceAssessmentDue = study.dueAssessmentAt
-                        ? today.diff(study.dueAssessmentAt, 'day')
+                        ? Math.round(today.diff(study.dueAssessmentAt, 'day', true))
                         : null
 
                       return (
