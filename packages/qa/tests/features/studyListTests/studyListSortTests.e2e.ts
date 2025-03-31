@@ -23,6 +23,7 @@ test.beforeAll('Setup Test Users', async () => {
   studyListSortedByDueDb = studyListSortByDue
 
   if (!studyListSortedByDueDb.some((study) => study.dueAssessmentAt)) {
+    console.log('No studies due for an assessment, setting up test data...')
     // Set one study due for an assessment if no studies are currently due
     const studyIdToUpdate = studyListSortedByDueDb[0].id
 
