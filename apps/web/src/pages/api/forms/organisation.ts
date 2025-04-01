@@ -6,7 +6,7 @@ import { emailTemplates } from '@nihr-ui/templates/sponsor-engagement'
 import type { NextApiRequest } from 'next'
 import { ZodError } from 'zod'
 
-import { Roles } from '@/constants'
+import { Roles, UserOrganisationInviteStatus } from '@/constants'
 import { EXTERNAL_CRN_TERMS_CONDITIONS_URL, EXTERNAL_CRN_URL, SIGN_IN_PAGE, SUPPORT_PAGE } from '@/constants/routes'
 import { getOrganisationById } from '@/lib/organisations'
 import { prismaClient } from '@/lib/prisma'
@@ -88,13 +88,19 @@ export default withApiHandler<ExtendedNextApiRequest>(
       const shouldUpdateRegistrationToken = (existingUser?.identityGatewayId ?? null) === null
 
       // Add user to organisation
-      const { name: organisationName } = await prismaClient.organisation.update({
+      const { name: organisationName, users } = await prismaClient.organisation.update({
         where: {
           id: Number(organisationId),
         },
         include: {
           users: {
-            include: {
+            where: {
+              user: {
+                email: emailAddress,
+              },
+            },
+            select: {
+              id: true,
               user: true,
             },
           },
@@ -133,6 +139,8 @@ export default withApiHandler<ExtendedNextApiRequest>(
         },
       })
 
+      const userOrganisationId = users[0].id
+
       const user = await prismaClient.user.update({
         where: {
           email: emailAddress,
@@ -165,7 +173,7 @@ export default withApiHandler<ExtendedNextApiRequest>(
         await addUserToGroup(user.email, ODP_ROLE_GROUP_ID)
       }
 
-      await emailService.sendEmail({
+      const { messageId } = await emailService.sendEmail({
         to: emailAddress,
         subject: 'Assess the progress of your studies',
         htmlTemplate: emailTemplates['contact-assigned.html.hbs'],
@@ -178,6 +186,30 @@ export default withApiHandler<ExtendedNextApiRequest>(
           ),
           requestSupportLink: getAbsoluteUrl(SUPPORT_PAGE),
           termsAndConditionsLink: EXTERNAL_CRN_TERMS_CONDITIONS_URL,
+        },
+      })
+
+      // Get the invitation status ref
+      const { id: invitationStatusId } = await prismaClient.sysRefInvitationStatus.findFirstOrThrow({
+        where: {
+          name: UserOrganisationInviteStatus.PENDING,
+        },
+      })
+
+      await prismaClient.userOrganisationInvitation.create({
+        data: {
+          messageId,
+          timestamp: new Date(),
+          status: {
+            connect: {
+              id: invitationStatusId,
+            },
+          },
+          userOrganisation: {
+            connect: {
+              id: userOrganisationId,
+            },
+          },
         },
       })
 

@@ -1,6 +1,12 @@
 import { emailService } from '@nihr-ui/email'
 import { logger } from '@nihr-ui/logger'
-import type { Assessment, Study, SysRefOrganisationRole } from 'database'
+import type {
+  Assessment,
+  Study,
+  SysRefInvitationStatus,
+  SysRefOrganisationRole,
+  UserOrganisationInvitation,
+} from 'database'
 import type { NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
 import type { RequestOptions } from 'node-mocks-http'
@@ -40,7 +46,14 @@ const findSysRefRoleResponse = Mock.of<SysRefOrganisationRole>({
   name: 'SponsorContact',
 })
 
+const findSysRefInvitationStatusResponse = Mock.of<SysRefInvitationStatus>({
+  id: 121,
+  name: 'Pending',
+})
+
 const findOrgResponse = Mock.of<OrganisationWithRelations>({ id: 2, name: 'Test Organisation', roles: [] })
+
+const currentDate = new Date('2025-03-31')
 
 describe('Successful organisation sponsor contact invitation', () => {
   const registrationToken = 'mock-token'
@@ -57,6 +70,7 @@ describe('Successful organisation sponsor contact invitation', () => {
   })
 
   test('New user', async () => {
+    jest.useFakeTimers().setSystemTime(currentDate)
     const updateOrgResponse = Mock.of<OrganisationWithRelations>({
       id: 2,
       roles: [],
@@ -67,6 +81,7 @@ describe('Successful organisation sponsor contact invitation', () => {
             email: body.emailAddress,
             registrationConfirmed: false,
             registrationToken,
+            id: 2,
           },
         },
       ],
@@ -83,6 +98,19 @@ describe('Successful organisation sponsor contact invitation', () => {
       lastLogin: null,
     }
 
+    const messageId = '121'
+
+    const createUserOrgInvitation = Mock.of<UserOrganisationInvitation>({
+      id: 1,
+      userOrganisationId: updateOrgResponse.users[0].id,
+      messageId,
+      timestamp: currentDate,
+      statusId: findSysRefInvitationStatusResponse.id,
+      failureNotifiedAt: null,
+      createdAt: currentDate,
+      updatedAt: currentDate,
+    })
+
     jest.mocked(prismaClient.organisation.findFirst).mockResolvedValueOnce(findOrgResponse)
 
     const findSysRefRoleMock = jest
@@ -91,6 +119,13 @@ describe('Successful organisation sponsor contact invitation', () => {
     const updateOrgMock = jest.mocked(prismaClient.organisation.update).mockResolvedValueOnce(updateOrgResponse)
 
     jest.mocked(prismaClient.user.update).mockResolvedValueOnce(updateUserResponse)
+
+    jest.mocked(emailService.sendEmail).mockResolvedValueOnce({ messageId, recipients: [] })
+    jest
+      .mocked(prismaClient.sysRefInvitationStatus.findFirstOrThrow)
+      .mockResolvedValueOnce(findSysRefInvitationStatusResponse)
+
+    jest.mocked(prismaClient.userOrganisationInvitation.create).mockResolvedValueOnce(createUserOrgInvitation)
 
     const res = await testHandler(api, { method: 'POST', body })
 
@@ -101,8 +136,14 @@ describe('Successful organisation sponsor contact invitation', () => {
       where: { id: Number(body.organisationId) },
       include: {
         users: {
-          include: {
+          select: {
+            id: true,
             user: true,
+          },
+          where: {
+            user: {
+              email: body.emailAddress,
+            },
           },
         },
       },
@@ -165,12 +206,34 @@ describe('Successful organisation sponsor contact invitation', () => {
       to: body.emailAddress,
     })
 
+    // Entry in UserOrganisationInvitation table is added
+    expect(prismaClient.userOrganisationInvitation.create).toHaveBeenCalledWith({
+      data: {
+        messageId,
+        timestamp: createUserOrgInvitation.timestamp,
+        status: {
+          connect: {
+            id: createUserOrgInvitation.statusId,
+          },
+        },
+        userOrganisation: {
+          connect: {
+            id: createUserOrgInvitation.userOrganisationId,
+          },
+        },
+      },
+    })
+
     // Redirect back to organisation page
     expect(res.statusCode).toBe(302)
     expect(res._getRedirectUrl()).toBe(`/organisations/${body.organisationId}?success=1`)
+
+    jest.useRealTimers()
   })
 
   test('Existing user - registration confirmed', async () => {
+    jest.useFakeTimers().setSystemTime(currentDate)
+
     const updateOrgResponse = Mock.of<OrganisationWithRelations>({
       id: 2,
       roles: [],
@@ -178,6 +241,7 @@ describe('Successful organisation sponsor contact invitation', () => {
       users: [
         {
           user: {
+            id: 2,
             email: body.emailAddress,
             registrationConfirmed: false,
             registrationToken: null,
@@ -197,9 +261,28 @@ describe('Successful organisation sponsor contact invitation', () => {
       lastLogin: null,
     }
 
+    const messageId = '121'
+
+    const createUserOrgInvitation = Mock.of<UserOrganisationInvitation>({
+      id: 1,
+      userOrganisationId: updateOrgResponse.users[0].id,
+      messageId,
+      timestamp: currentDate,
+      statusId: findSysRefInvitationStatusResponse.id,
+      failureNotifiedAt: null,
+      createdAt: currentDate,
+      updatedAt: currentDate,
+    })
+
     jest.mocked(prismaClient.user.findUnique).mockResolvedValueOnce(updateUserResponse)
     jest.mocked(prismaClient.organisation.findFirst).mockResolvedValueOnce(findOrgResponse)
     jest.mocked(prismaClient.user.update).mockResolvedValueOnce(updateUserResponse)
+    jest.mocked(emailService.sendEmail).mockResolvedValueOnce({ messageId, recipients: [] })
+    jest
+      .mocked(prismaClient.sysRefInvitationStatus.findFirstOrThrow)
+      .mockResolvedValueOnce(findSysRefInvitationStatusResponse)
+
+    jest.mocked(prismaClient.userOrganisationInvitation.create).mockResolvedValueOnce(createUserOrgInvitation)
 
     const findSysRefRoleMock = jest
       .mocked(prismaClient.sysRefRole.findFirstOrThrow)
@@ -215,8 +298,14 @@ describe('Successful organisation sponsor contact invitation', () => {
       where: { id: Number(body.organisationId) },
       include: {
         users: {
-          include: {
+          select: {
+            id: true,
             user: true,
+          },
+          where: {
+            user: {
+              email: body.emailAddress,
+            },
           },
         },
       },
@@ -277,12 +366,33 @@ describe('Successful organisation sponsor contact invitation', () => {
       to: body.emailAddress,
     })
 
+    // Entry in UserOrganisationInvitation table is added
+    expect(prismaClient.userOrganisationInvitation.create).toHaveBeenCalledWith({
+      data: {
+        messageId,
+        timestamp: createUserOrgInvitation.timestamp,
+        status: {
+          connect: {
+            id: createUserOrgInvitation.statusId,
+          },
+        },
+        userOrganisation: {
+          connect: {
+            id: createUserOrgInvitation.userOrganisationId,
+          },
+        },
+      },
+    })
+
     // Redirect back to organisation page
     expect(res.statusCode).toBe(302)
     expect(res._getRedirectUrl()).toBe(`/organisations/${body.organisationId}?success=1`)
+
+    jest.useRealTimers()
   })
 
   test('Re-add deleted contact', async () => {
+    jest.useFakeTimers().setSystemTime(currentDate)
     const updateOrgResponse = Mock.of<OrganisationWithRelations>({
       id: 2,
       roles: [],
@@ -309,9 +419,28 @@ describe('Successful organisation sponsor contact invitation', () => {
       lastLogin: null,
     }
 
+    const messageId = '121'
+
+    const createUserOrgInvitation = Mock.of<UserOrganisationInvitation>({
+      id: 1,
+      userOrganisationId: updateOrgResponse.users[0].id,
+      messageId,
+      timestamp: currentDate,
+      statusId: findSysRefInvitationStatusResponse.id,
+      failureNotifiedAt: null,
+      createdAt: currentDate,
+      updatedAt: currentDate,
+    })
+
     jest.mocked(prismaClient.user.findUnique).mockResolvedValueOnce(updateUserResponse)
     jest.mocked(prismaClient.user.update).mockResolvedValueOnce(updateUserResponse)
     jest.mocked(prismaClient.organisation.findFirst).mockResolvedValueOnce(findOrgResponse)
+    jest.mocked(emailService.sendEmail).mockResolvedValueOnce({ messageId, recipients: [] })
+    jest
+      .mocked(prismaClient.sysRefInvitationStatus.findFirstOrThrow)
+      .mockResolvedValueOnce(findSysRefInvitationStatusResponse)
+
+    jest.mocked(prismaClient.userOrganisationInvitation.create).mockResolvedValueOnce(createUserOrgInvitation)
 
     const mockUserOrganisation = Mock.of<UserOrganisationWithRelations>({
       id: 123,
@@ -334,8 +463,14 @@ describe('Successful organisation sponsor contact invitation', () => {
       where: { id: Number(body.organisationId) },
       include: {
         users: {
-          include: {
+          select: {
+            id: true,
             user: true,
+          },
+          where: {
+            user: {
+              email: body.emailAddress,
+            },
           },
         },
       },
@@ -369,6 +504,24 @@ describe('Successful organisation sponsor contact invitation', () => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- valid any
       textTemplate: expect.any(Function),
       to: body.emailAddress,
+    })
+
+    // Entry in UserOrganisationInvitation table is added
+    expect(prismaClient.userOrganisationInvitation.create).toHaveBeenCalledWith({
+      data: {
+        messageId,
+        timestamp: createUserOrgInvitation.timestamp,
+        status: {
+          connect: {
+            id: createUserOrgInvitation.statusId,
+          },
+        },
+        userOrganisation: {
+          connect: {
+            id: createUserOrgInvitation.userOrganisationId,
+          },
+        },
+      },
     })
 
     // Redirect back to organisation page
