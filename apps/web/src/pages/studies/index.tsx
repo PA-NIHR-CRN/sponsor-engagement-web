@@ -2,6 +2,7 @@ import { ODP_ROLE } from '@nihr-ui/auth/src/constants/constants'
 import { AlertIcon, Container, Details, NotificationBanner } from '@nihr-ui/frontend'
 import { logger } from '@nihr-ui/logger'
 import type { Entry } from 'contentful'
+import dayjs from 'dayjs'
 import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -64,6 +65,8 @@ export default function Studies({
       : `(${totalItems} ${pluraliseStudy(totalItems)}, page ${initialPage} of ${Math.ceil(
           totalItems / initialPageSize
         )})`
+
+  const today = dayjs()
 
   return (
     <Container>
@@ -130,22 +133,28 @@ export default function Studies({
               {studies.length > 0 ? (
                 <>
                   <ol aria-label="Studies" className="govuk-list govuk-list--spaced">
-                    {studies.map((study) => (
-                      <li key={study.id}>
-                        <StudyList
-                          assessmentDue={Boolean(study.dueAssessmentAt)}
-                          indications={study.evaluationCategories
-                            .map((evalCategory) => evalCategory.indicatorType)
-                            .filter((evalCategory, index, items) => items.indexOf(evalCategory) === index)}
-                          lastAsessmentDate={study.lastAssessment ? formatDate(study.lastAssessment.createdAt) : ''}
-                          shortTitle={study.shortTitle}
-                          sponsorOrgName={getSponsorOrgName(study.organisations)}
-                          studyHref={`${STUDIES_PAGE}/${study.id}`}
-                          supportOrgName={getSupportOrgName(study.organisations)}
-                          trackStatus={study.lastAssessment?.status.name}
-                        />
-                      </li>
-                    ))}
+                    {studies.map((study) => {
+                      const daysSinceAssessmentDue = study.dueAssessmentAt
+                        ? Math.round(today.diff(study.dueAssessmentAt, 'day', true))
+                        : null
+
+                      return (
+                        <li key={study.id}>
+                          <StudyList
+                            daysSinceAssessmentDue={daysSinceAssessmentDue}
+                            indications={study.evaluationCategories
+                              .map((evalCategory) => evalCategory.indicatorType)
+                              .filter((evalCategory, index, items) => items.indexOf(evalCategory) === index)}
+                            lastAssessmentDate={study.lastAssessment ? formatDate(study.lastAssessment.createdAt) : ''}
+                            shortTitle={study.shortTitle}
+                            sponsorOrgName={getSponsorOrgName(study.organisations)}
+                            studyHref={`${STUDIES_PAGE}/${study.id}`}
+                            supportOrgName={getSupportOrgName(study.organisations)}
+                            trackStatus={study.lastAssessment?.status.name}
+                          />
+                        </li>
+                      )
+                    })}
                   </ol>
 
                   <Pagination
