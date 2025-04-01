@@ -26,7 +26,7 @@ export type StudyEvalsWithoutGeneratedValues = Prisma.StudyEvaluationCategoryGet
 }>
 
 const sortMap = {
-  'due-assessment': { isDueAssessment: Prisma.SortOrder.desc },
+  'due-assessment': { dueAssessmentAt: { sort: Prisma.SortOrder.asc, nulls: Prisma.NullsOrder.last } },
   'last-assessment-asc': {
     lastAssessment: {
       createdAt: Prisma.SortOrder.asc,
@@ -183,7 +183,6 @@ export const getStudiesForOrgs = async ({
       id: true,
       title: true,
       shortTitle: true,
-      isDueAssessment: true,
       dueAssessmentAt: true,
       lastAssessment: {
         include: {
@@ -214,7 +213,7 @@ export const getStudiesForOrgs = async ({
     prismaClient.study.count({
       where: {
         ...query.where,
-        isDueAssessment: true,
+        dueAssessmentAt: { not: null },
       },
     }),
   ])
@@ -278,7 +277,10 @@ export const getStudiesForExport = async (organisationIds: number[]) => {
       },
     },
     ...studiesForExportFields,
-    orderBy: [{ isDueAssessment: Prisma.SortOrder.desc }, { id: Prisma.SortOrder.asc }],
+    orderBy: [
+      { dueAssessmentAt: { sort: Prisma.SortOrder.asc, nulls: Prisma.NullsOrder.last } },
+      { id: Prisma.SortOrder.asc },
+    ],
   }
 
   return prismaClient.study.findMany(query)
