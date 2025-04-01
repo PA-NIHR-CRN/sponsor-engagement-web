@@ -30,7 +30,6 @@ export const mockStudiesForExport = Array.from({ length: 3 }).map((_, index) =>
     actualClosureDate: simpleFaker.date.future(),
     sampleSize: simpleFaker.number.int(),
     totalRecruitmentToDate: simpleFaker.number.int(),
-    isDueAssessment: index === 0,
     dueAssessmentAt: index === 0 ? new Date('2001-01-01') : null,
     organisations: [
       {

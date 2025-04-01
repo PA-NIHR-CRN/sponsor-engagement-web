@@ -1,5 +1,10 @@
 import { expect, Locator, Page } from '@playwright/test'
-import { convertPromiseStringToNumber, confirmStringNotNull, convertIsoDateToDisplayDate } from '../utils/UtilFunctions'
+import {
+  convertPromiseStringToNumber,
+  confirmStringNotNull,
+  convertIsoDateToDisplayDate,
+  numDaysBetween,
+} from '../utils/UtilFunctions'
 import { seDatabaseReq } from '../utils/DbRequests'
 import { RowDataPacket } from 'mysql2'
 
@@ -337,10 +342,18 @@ export default class StudiesPage {
     await this.searchFilterPanel.waitFor()
   }
 
-  async assertDueIndicatorDisplayed(index: number, isDisplayed: boolean) {
-    if (isDisplayed) {
+  async getDaysSinceAssessmentDue(dueAssessmentAt: Date) {
+    return Math.round(numDaysBetween(new Date(), dueAssessmentAt))
+  }
+
+  async assertDueIndicatorDisplayed(index: number, dueAssessmentAt?: Date | null) {
+    if (dueAssessmentAt) {
+      const numberOfDaysDue = await this.getDaysSinceAssessmentDue(dueAssessmentAt)
+
       await expect(this.studyListItem.nth(index).locator(this.studyListItemDueIndicator)).toBeVisible()
-      await expect(this.studyListItem.nth(index).locator(this.studyListItemDueIndicator)).toHaveText('Due')
+      await expect(this.studyListItem.nth(index).locator(this.studyListItemDueIndicator)).toHaveText(
+        `Due for ${numberOfDaysDue || 1} day${numberOfDaysDue > 1 ? 's' : ''}`
+      )
     } else {
       await expect(this.studyListItem.nth(index).locator(this.studyListItemDueIndicator)).toBeHidden()
     }
@@ -369,19 +382,37 @@ export default class StudiesPage {
     }
   }
 
+  async checkForStudyDue(studies: any) {
+    for (let study of studies) {
+      if (study.dueAssessmentAt) {
+        console.log('At least 1 study is due an assessment')
+        return true
+      }
+    }
+    console.log('All studies are currently not due an assessment')
+    return false
+  }
+
   async assertListBeginsWithDueStudies(sortedList: RowDataPacket[]) {
-    const pageStudyCount = await this.studyListItem.count()
-    for (let index = 0; index < pageStudyCount; index++) {
-      const study = sortedList[index]
-      await expect(this.studyListItemTitle.nth(index)).toHaveText(study.shortTitle)
-      await expect(this.studyListItem.nth(index).locator(this.studyListItemDueIndicator)).toBeVisible()
+    if (await this.checkForStudyDue(sortedList)) {
+      const pageStudyCount = await this.studyListItem.count()
+      for (let index = 0; index < pageStudyCount; index++) {
+        const study = sortedList[index]
+        await expect(this.studyListItemTitle.nth(index)).toHaveText(study.shortTitle)
+
+        if (study.dueAssessmentAt) {
+          await expect(this.studyListItem.nth(index).locator(this.studyListItemDueIndicator)).toBeVisible()
+        }
+      }
+    } else {
+      throw new Error('No studies are due an assessment, check test data...')
     }
   }
 
   async assertListEndsWithNonDueStudies(sortedList: RowDataPacket[]) {
     function checkForStudyNotDue(studies: any) {
       for (let study of studies) {
-        if (study.isDueAssessment === 0) {
+        if (study.dueAssessmentAt === null) {
           console.log('At least 1 study is not due an assessment, checking last study status...')
           return true
         }

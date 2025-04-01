@@ -7,8 +7,8 @@ export interface StudyListProps {
   supportOrgName?: string
   shortTitle: string
   studyHref: string
-  lastAsessmentDate?: string
-  assessmentDue?: boolean
+  lastAssessmentDate?: string
+  daysSinceAssessmentDue: number | null
   trackStatus?: string
   trackStatusHref?: string
   indications?: string[]
@@ -19,15 +19,22 @@ export function StudyList({
   supportOrgName,
   shortTitle,
   studyHref,
-  assessmentDue,
+  daysSinceAssessmentDue,
   trackStatus,
   trackStatusHref,
-  lastAsessmentDate,
+  lastAssessmentDate,
   indications,
 }: StudyListProps) {
+  const daysDueText =
+    daysSinceAssessmentDue !== null
+      ? `Due for ${daysSinceAssessmentDue || '1'} day${daysSinceAssessmentDue > 1 ? 's' : ''}`
+      : ''
+
   return (
     <Card>
-      {assessmentDue ? <span className="govuk-tag govuk-tag--red absolute top-0 right-0">Due</span> : null}
+      {daysSinceAssessmentDue !== null ? (
+        <span className="govuk-tag govuk-tag--red absolute top-0 right-0 normal-case">{daysDueText}</span>
+      ) : null}
 
       <div className="md:max-w-[calc(100%-50px)]">
         <div className="text-darkGrey govuk-!-margin-bottom-1 max-w-[calc(100%-45px)] lg:max-w-auto govuk-body-s">
@@ -53,7 +60,7 @@ export function StudyList({
                 ) : (
                   trackStatus
                 )}{' '}
-                on {lastAsessmentDate}
+                on {lastAssessmentDate}
               </>
             ) : (
               'None'
