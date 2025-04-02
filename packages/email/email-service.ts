@@ -113,7 +113,7 @@ export class EmailService {
       const { MessageId, Insights } = await this.sesClientV2.getMessageInsights({ MessageId: messageId }).promise()
 
       if (!MessageId) {
-        throw new Error('messageId does not exist within the response')
+        throw new Error('MessageId does not exist within the response')
       }
 
       return { messageId: MessageId, insights: Insights ?? [] }

@@ -61,7 +61,7 @@ const fetchEmailStatus = async (
     }
 
     if (error instanceof NotFoundException) {
-      logger.error('Email with messageId %s does not exist', emailMessageId)
+      logger.error('Email with messageId %s is not found', emailMessageId)
 
       return null
     }
