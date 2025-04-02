@@ -1,3 +1,3 @@
-import { inviteMonitor } from './invite-monitor'
+import { monitorInvitationEmails } from './invitation-monitor'
 
-void inviteMonitor()
+void monitorInvitationEmails()

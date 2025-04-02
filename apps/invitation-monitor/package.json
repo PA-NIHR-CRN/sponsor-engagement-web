@@ -16,6 +16,7 @@
     "@nihr-ui/email": "*",
     "@nihr-ui/logger": "*",
     "database": "^0.0.0",
+    "dayjs": "^1.11.13",
     "dotenv": "^16.3.1"
   },
   "devDependencies": {

@@ -108,7 +108,7 @@ export class EmailService {
     await Promise.all(emailPromises)
   }
 
-  getEmailStatus = async (messageId: string): Promise<EmailStatusResult> => {
+  getEmailInsights = async (messageId: string): Promise<EmailStatusResult> => {
     try {
       const { MessageId, Insights } = await this.sesClientV2.getMessageInsights({ MessageId: messageId }).promise()
 
