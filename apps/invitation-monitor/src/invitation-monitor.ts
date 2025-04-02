@@ -1,10 +1,11 @@
 import { Prisma } from 'database'
 import { emailService } from '@nihr-ui/email'
 import { config as dotEnvConfig } from 'dotenv'
-import { BounceType, EventType, TooManyRequestsException } from '@aws-sdk/client-sesv2'
+import { BounceType, EventType, NotFoundException, TooManyRequestsException } from '@aws-sdk/client-sesv2'
 import utc from 'dayjs/plugin/utc'
 import dayjs from 'dayjs'
 import { logger } from '@nihr-ui/logger'
+import type { EmailStatusResult } from '@nihr-ui/email/email-service'
 import { EMAIL_DELIVERY_THRESHOLD_HOURS, EMAIL_FAILURES, UserOrganisationInviteStatus } from './lib/constants'
 import { prismaClient } from './lib/prisma'
 
@@ -35,11 +36,42 @@ const updateEmailStatus = async (statusId: number, idsToUpdate: string[]) => {
   })
 }
 
-// const fetchEmailStatus = async (messageId: string) => {
-//   return emailService.getEmailInsights(messageId)
-// }
+const fetchEmailStatus = async (
+  emailMessageId: string,
+  retryCount: number,
+  maxRetries = 2
+): Promise<EmailStatusResult | null> => {
+  if (retryCount === maxRetries) return null
+
+  try {
+    const { messageId, insights } = await emailService.getEmailInsights(emailMessageId)
+
+    return { messageId, insights }
+  } catch (error) {
+    logger.error('Error occurred fetching email status for messageId %s, retry count %s', emailMessageId, retryCount)
+
+    if (error instanceof TooManyRequestsException && retryCount !== maxRetries) {
+      logger.error('Rate limit exceeded. Trying again... ')
+
+      await new Promise((resolve) => {
+        setTimeout(resolve, 1000) // Delay 1 second
+      })
+
+      return fetchEmailStatus(emailMessageId, 2)
+    }
+
+    if (error instanceof NotFoundException) {
+      logger.error('Email with messageId %s does not exist', emailMessageId)
+
+      return null
+    }
+
+    return null
+  }
+}
 
 const processEmails = async () => {
+  // Fetch status ids for each email status
   const { id: pendingStatusId } = await prismaClient.sysRefInvitationStatus.findFirstOrThrow({
     where: { name: UserOrganisationInviteStatus.PENDING },
   })
@@ -60,47 +92,43 @@ const processEmails = async () => {
     return
   }
 
-  // const getEmailStatusPromises = pendingEmails.map((email) => emailService.getEmailInsights(email.messageId))
-  // await Promise.allSettled(getEmailStatusPromises)  // Requires an update to JS version to use allSettled
-  // How would we handle retries here?
+  const getEmailStatusPromises = pendingEmails.map((email) => fetchEmailStatus(email.messageId, 1))
+  const emailStatusDetails = await Promise.all(getEmailStatusPromises)
 
   const successfulMessageIds = []
   const failedMessageIds = []
 
   for (const email of pendingEmails) {
-    try {
-      // eslint-disable-next-line no-await-in-loop -- generator loop and to prevent getting rate limited
-      const { messageId, insights } = await emailService.getEmailInsights(email.messageId)
+    const messageId = email.messageId
 
-      const events = insights[0].Events ?? [] // TODO: are we safe to only fetch the first item in the Insights array
+    const emailDetails = emailStatusDetails.find((details) => details?.messageId === email.messageId)
 
-      // console.log({ messageId, insights })
-      // console.log({ events })
+    if (!emailDetails) {
+      logger.info('No details for email with messageId %s', email.messageId)
 
-      events.sort((a, b) => new Date(b.Timestamp ?? 0).getTime() - new Date(a.Timestamp ?? 0).getTime())
+      continue
+    }
 
-      const latestEvent = events[0]
-      const hoursSinceEmailSent = dayjs.utc().diff(latestEvent.Timestamp, 'hours')
+    const { insights } = emailDetails
 
-      if (latestEvent.Type === EventType.DELIVERY) {
-        successfulMessageIds.push(messageId)
-      } else if (
-        latestEvent.Type === EventType.BOUNCE &&
-        latestEvent.Details?.Bounce?.BounceType === BounceType.PERMANENT
-      ) {
-        failedMessageIds.push(messageId)
-      } else if (EMAIL_FAILURES.includes(latestEvent.Type ?? '')) {
-        failedMessageIds.push(messageId)
-      } else if (hoursSinceEmailSent > EMAIL_DELIVERY_THRESHOLD_HOURS) {
-        failedMessageIds.push(messageId)
-      }
-    } catch (error) {
-      if (error instanceof TooManyRequestsException) {
-        logger.error('Rate limit exceeded. Trying again... ')
-        // Should we recursively re-call again...
-      }
+    const events = insights[0].Events ?? [] // TODO: are we safe to only fetch the first item in the Insights array
 
-      logger.error('Error occurred whilst fetching email status')
+    events.sort((a, b) => new Date(b.Timestamp ?? 0).getTime() - new Date(a.Timestamp ?? 0).getTime())
+
+    const latestEvent = events[0]
+    const hoursSinceEmailSent = dayjs.utc().diff(latestEvent.Timestamp, 'hours')
+
+    if (latestEvent.Type === EventType.DELIVERY) {
+      successfulMessageIds.push(messageId)
+    } else if (
+      latestEvent.Type === EventType.BOUNCE &&
+      latestEvent.Details?.Bounce?.BounceType === BounceType.PERMANENT
+    ) {
+      failedMessageIds.push(messageId)
+    } else if (EMAIL_FAILURES.includes(latestEvent.Type ?? '')) {
+      failedMessageIds.push(messageId)
+    } else if (hoursSinceEmailSent > EMAIL_DELIVERY_THRESHOLD_HOURS) {
+      failedMessageIds.push(messageId)
     }
   }
 
@@ -112,12 +140,10 @@ const processEmails = async () => {
   const [numOfSuccessfulEmailsUpdated, numOfFailedEmailsUpdated] = await Promise.all(updateEmailStatusPromises)
 
   logger.info(
-    'Successfully set %s email statuses to success and %s to failed',
-    numOfSuccessfulEmailsUpdated,
-    numOfFailedEmailsUpdated
+    'Successfully set %s emails to success and %s to failed',
+    numOfSuccessfulEmailsUpdated.count,
+    numOfFailedEmailsUpdated.count
   )
-
-  // Send a new email for failed emails
 }
 
 export const monitorInvitationEmails = async () => {
