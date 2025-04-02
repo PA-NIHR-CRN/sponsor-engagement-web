@@ -35,6 +35,10 @@ const updateEmailStatus = async (statusId: number, idsToUpdate: string[]) => {
   })
 }
 
+// const fetchEmailStatus = async (messageId: string) => {
+//   return emailService.getEmailInsights(messageId)
+// }
+
 const processEmails = async () => {
   const { id: pendingStatusId } = await prismaClient.sysRefInvitationStatus.findFirstOrThrow({
     where: { name: UserOrganisationInviteStatus.PENDING },
@@ -55,6 +59,10 @@ const processEmails = async () => {
   if (pendingEmails.length === 0) {
     return
   }
+
+  // const getEmailStatusPromises = pendingEmails.map((email) => emailService.getEmailInsights(email.messageId))
+  // await Promise.allSettled(getEmailStatusPromises)  // Requires an update to JS version to use allSettled
+  // How would we handle retries here?
 
   const successfulMessageIds = []
   const failedMessageIds = []
@@ -88,28 +96,28 @@ const processEmails = async () => {
       }
     } catch (error) {
       if (error instanceof TooManyRequestsException) {
-        logger.error('Rate limit exceeded. Trying to  ')
+        logger.error('Rate limit exceeded. Trying again... ')
+        // Should we recursively re-call again...
       }
 
       logger.error('Error occurred whilst fetching email status')
-
-      // Log error
-      // See what the error is. If it's a retry error, wait a second and try again ?
     }
   }
 
-  const emailPromises = [
+  const updateEmailStatusPromises = [
     updateEmailStatus(successStatusId, successfulMessageIds),
     updateEmailStatus(failedStatusId, failedMessageIds),
   ]
 
-  const [numOfSuccessfulEmailsUpdated, numOfFailedEmailsUpdated] = await Promise.all(emailPromises)
+  const [numOfSuccessfulEmailsUpdated, numOfFailedEmailsUpdated] = await Promise.all(updateEmailStatusPromises)
 
   logger.info(
     'Successfully set %s email statuses to success and %s to failed',
     numOfSuccessfulEmailsUpdated,
     numOfFailedEmailsUpdated
   )
+
+  // Send a new email for failed emails
 }
 
 export const monitorInvitationEmails = async () => {
