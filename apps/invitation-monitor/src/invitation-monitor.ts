@@ -50,7 +50,7 @@ const fetchEmailStatus = async (
   } catch (error) {
     logger.error('Error occurred fetching email status for messageId %s, retry count %s', emailMessageId, retryCount)
 
-    if (error instanceof TooManyRequestsException && retryCount !== maxRetries) {
+    if (error instanceof TooManyRequestsException && retryCount <= maxRetries) {
       logger.error('Rate limit exceeded. Trying again... ')
 
       await new Promise((resolve) => {
