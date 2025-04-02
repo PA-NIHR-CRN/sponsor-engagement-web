@@ -1,4 +1,4 @@
-import { SES } from 'aws-sdk'
+import { SES, SESV2 } from 'aws-sdk'
 import { logger } from '@nihr-ui/logger'
 import { EmailService, type EmailArgs } from './email-service'
 
@@ -9,11 +9,13 @@ jest.mock('@nihr-ui/logger')
 
 describe('EmailService', () => {
   let sesClientMock: jest.Mocked<SES>
+  let sesV2ClientMock: jest.Mocked<SESV2>
   let emailService: EmailService
 
   beforeEach(() => {
     sesClientMock = new SES() as jest.Mocked<SES>
-    emailService = new EmailService(sesClientMock)
+    sesV2ClientMock = new SESV2() as jest.Mocked<SESV2>
+    emailService = new EmailService(sesClientMock, sesV2ClientMock)
   })
 
   afterEach(() => {
@@ -315,5 +317,40 @@ describe('EmailService', () => {
     sesClientMock.getSendQuota = jest.fn().mockReturnValueOnce({ promise: getSendQuotaMock })
 
     await expect(emailService.sendBulkEmail([], jest.fn())).rejects.toThrow('Unable to determine maximum send rate')
+  })
+
+  it('should fetch email status with the correct parameters', async () => {
+    const mockMessageId = '1212121'
+    const mockGetMessageInsights = jest.fn().mockResolvedValue({ MessageId: mockMessageId })
+    sesV2ClientMock.getMessageInsights = jest.fn().mockReturnValueOnce({ promise: mockGetMessageInsights })
+
+    const result = await emailService.getEmailInsights(mockMessageId)
+    expect(result).toEqual({ messageId: mockMessageId, insights: [] })
+
+    expect(sesV2ClientMock.getMessageInsights).toHaveBeenCalledTimes(1)
+    expect(sesV2ClientMock.getMessageInsights).toHaveBeenCalledWith({ MessageId: mockMessageId })
+  })
+
+  it('should handle errors correctly when fetching email status', async () => {
+    const mockMessageId = '1212121'
+    const error = new Error('Oh no, an error!')
+    const mockGetMessageInsights = jest.fn().mockRejectedValueOnce(error)
+    sesV2ClientMock.getMessageInsights = jest.fn().mockReturnValueOnce({ promise: mockGetMessageInsights })
+
+    await expect(emailService.getEmailInsights(mockMessageId)).rejects.toThrow(error)
+
+    expect(sesV2ClientMock.getMessageInsights).toHaveBeenCalledTimes(1)
+  })
+
+  it(`should throw an error when 'MessageId' does not exist within the fetch email status response`, async () => {
+    const mockMessageId = '1212121'
+    const mockGetMessageInsights = jest.fn().mockResolvedValue({})
+    sesV2ClientMock.getMessageInsights = jest.fn().mockReturnValueOnce({ promise: mockGetMessageInsights })
+
+    await expect(emailService.getEmailInsights(mockMessageId)).rejects.toThrow(
+      new Error('MessageId does not exist within the response')
+    )
+
+    expect(sesV2ClientMock.getMessageInsights).toHaveBeenCalledTimes(1)
   })
 })

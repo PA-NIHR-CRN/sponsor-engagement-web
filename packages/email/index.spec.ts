@@ -3,6 +3,7 @@ import { emailService } from '.'
 
 jest.mock('aws-sdk', () => ({
   SES: jest.fn(),
+  SESV2: jest.fn(),
   config: {
     update: jest.fn(),
   },
