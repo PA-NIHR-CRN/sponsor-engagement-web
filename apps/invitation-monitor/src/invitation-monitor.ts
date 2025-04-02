@@ -57,7 +57,7 @@ const fetchEmailStatus = async (
         setTimeout(resolve, 1000) // Delay 1 second
       })
 
-      return fetchEmailStatus(emailMessageId, 2)
+      return fetchEmailStatus(emailMessageId, retryCount + 1)
     }
 
     if (error instanceof NotFoundException) {
