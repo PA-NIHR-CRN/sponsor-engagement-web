@@ -39,9 +39,9 @@ const updateEmailStatus = async (statusId: number, idsToUpdate: string[]) => {
 const fetchEmailStatus = async (
   emailMessageId: string,
   retryCount: number,
-  maxRetries = 2
+  maxRetries = 1
 ): Promise<EmailStatusResult | null> => {
-  if (retryCount === maxRetries) return null
+  if (retryCount > maxRetries) return null
 
   try {
     const { messageId, insights } = await emailService.getEmailInsights(emailMessageId)
@@ -50,7 +50,7 @@ const fetchEmailStatus = async (
   } catch (error) {
     logger.error('Error occurred fetching email status for messageId %s, retry count %s', emailMessageId, retryCount)
 
-    if (error instanceof TooManyRequestsException && retryCount <= maxRetries) {
+    if (error instanceof TooManyRequestsException) {
       logger.error('Rate limit exceeded. Trying again... ')
 
       await new Promise((resolve) => {
@@ -92,7 +92,7 @@ const processEmails = async () => {
     return
   }
 
-  const getEmailStatusPromises = pendingEmails.map((email) => fetchEmailStatus(email.messageId, 1))
+  const getEmailStatusPromises = pendingEmails.map((email) => fetchEmailStatus(email.messageId, 0))
   const emailStatusDetails = await Promise.all(getEmailStatusPromises)
 
   const successfulMessageIds = []
