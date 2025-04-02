@@ -99,6 +99,7 @@ const processEmails = async () => {
 
   const successfulMessageIds = []
   const failedMessageIds = []
+  const todayUTCDate = dayjs.utc()
 
   for (const email of pendingEmails) {
     const messageId = email.messageId
@@ -118,7 +119,7 @@ const processEmails = async () => {
     events.sort((a, b) => new Date(b.Timestamp ?? 0).getTime() - new Date(a.Timestamp ?? 0).getTime())
 
     const latestEvent = events[0]
-    const hoursSinceEmailSent = dayjs.utc().diff(email.timestamp.toISOString(), 'hours', true)
+    const hoursSinceEmailSent = todayUTCDate.diff(email.timestamp.toISOString(), 'hours', true)
 
     if (latestEvent.Type === EventType.DELIVERY) {
       successfulMessageIds.push(messageId)
