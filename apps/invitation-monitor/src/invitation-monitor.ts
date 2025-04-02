@@ -66,6 +66,8 @@ const fetchEmailStatus = async (
       return null
     }
 
+    logger.error(error)
+
     return null
   }
 }
@@ -111,12 +113,12 @@ const processEmails = async () => {
 
     const { insights } = emailDetails
 
-    const events = insights[0].Events ?? [] // TODO: are we safe to only fetch the first item in the Insights array
+    const events = insights[0].Events ?? []
 
     events.sort((a, b) => new Date(b.Timestamp ?? 0).getTime() - new Date(a.Timestamp ?? 0).getTime())
 
     const latestEvent = events[0]
-    const hoursSinceEmailSent = dayjs.utc().diff(latestEvent.Timestamp, 'hours', true)
+    const hoursSinceEmailSent = dayjs.utc().diff(email.timestamp.toISOString(), 'hours', true)
 
     if (latestEvent.Type === EventType.DELIVERY) {
       successfulMessageIds.push(messageId)
