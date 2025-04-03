@@ -6,6 +6,6 @@ import { EventType } from '@aws-sdk/client-sesv2'
  */
 export const UserOrganisationInviteStatus = { SUCCESS: 'Success', FAILURE: 'Failure', PENDING: 'Pending' }
 
-export const EMAIL_FAILURES: string[] = [EventType.RENDERING_FAILURE, EventType.REJECT, EventType.BOUNCE]
+export const PERMANENT_EMAIL_FAILURES: string[] = [EventType.RENDERING_FAILURE, EventType.REJECT]
 
 export const EMAIL_DELIVERY_THRESHOLD_HOURS = 72

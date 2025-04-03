@@ -1,9 +1,9 @@
 import { emailService } from '@nihr-ui/email'
-import { TooManyRequestsException } from '@aws-sdk/client-sesv2'
+import { BounceType, EventType, TooManyRequestsException } from '@aws-sdk/client-sesv2'
 import { monitorInvitationEmails } from '../invitation-monitor'
 import { prismaMock } from '../mocks/prisma'
 import { pendingEmails } from '../mocks/user-organisation-invitations'
-import { mockAWSDeliveredInsight, mockAWSBouncePermanentInsight, mockAWSRejectedInsight } from '../mocks/insights'
+import { mockAWSDeliveredInsight, mockAWSBouncePermanentInsight, mockAWSSentInsight } from '../mocks/insights'
 
 const mockFetchStatusIds = () => {
   prismaMock.sysRefInvitationStatus.findFirstOrThrow.mockResolvedValueOnce({ id: 2, name: 'Pending' })
@@ -25,7 +25,6 @@ const mockGetCurrentDate = (numOfDaysToAdjust: number) => {
 describe('monitorInvitationEmails', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-
     mockFetchStatusIds()
   })
 
@@ -65,112 +64,6 @@ describe('monitorInvitationEmails', () => {
     })
   })
 
-  it(`should correctly set status of email in SE DB to 'Failure' when AWS email status is 'BOUNCE' and it has a 'PERMANENT' subtype`, async () => {
-    prismaMock.userOrganisationInvitation.findMany.mockResolvedValueOnce(pendingEmails)
-    mockEmailService.getEmailInsights.mockResolvedValueOnce({
-      messageId: pendingEmails[0].messageId,
-      insights: [mockAWSBouncePermanentInsight],
-    })
-    prismaMock.userOrganisationInvitation.updateMany.mockResolvedValueOnce({ count: 1 })
-
-    await monitorInvitationEmails()
-
-    expect(prismaMock.sysRefInvitationStatus.findFirstOrThrow).toHaveBeenCalledTimes(3)
-    expect(prismaMock.userOrganisationInvitation.findMany).toHaveBeenCalledTimes(1)
-
-    expect(mockEmailService.getEmailInsights).toHaveBeenCalledTimes(1)
-    expect(mockEmailService.getEmailInsights).toHaveBeenCalledWith(pendingEmails[0].messageId)
-
-    expect(prismaMock.userOrganisationInvitation.updateMany).toHaveBeenCalledTimes(1)
-    expect(prismaMock.userOrganisationInvitation.updateMany).toHaveBeenCalledWith({
-      data: {
-        statusId: 3,
-      },
-      where: { messageId: { in: [pendingEmails[0].messageId] } },
-    })
-  })
-
-  it(`should correctly set status of email in SE DB to 'Failure' when AWS email status is in our predefined failure list`, async () => {
-    prismaMock.userOrganisationInvitation.findMany.mockResolvedValueOnce(pendingEmails)
-    mockEmailService.getEmailInsights.mockResolvedValueOnce({
-      messageId: pendingEmails[0].messageId,
-      insights: [mockAWSRejectedInsight],
-    })
-    prismaMock.userOrganisationInvitation.updateMany.mockResolvedValueOnce({ count: 1 })
-
-    await monitorInvitationEmails()
-
-    expect(prismaMock.sysRefInvitationStatus.findFirstOrThrow).toHaveBeenCalledTimes(3)
-    expect(prismaMock.userOrganisationInvitation.findMany).toHaveBeenCalledTimes(1)
-
-    expect(mockEmailService.getEmailInsights).toHaveBeenCalledTimes(1)
-    expect(mockEmailService.getEmailInsights).toHaveBeenCalledWith(pendingEmails[0].messageId)
-
-    expect(prismaMock.userOrganisationInvitation.updateMany).toHaveBeenCalledTimes(1)
-    expect(prismaMock.userOrganisationInvitation.updateMany).toHaveBeenCalledWith({
-      data: {
-        statusId: 3,
-      },
-      where: { messageId: { in: [pendingEmails[0].messageId] } },
-    })
-  })
-
-  it(`should correctly set status of email in SE DB to 'Failure' when AWS email status is not 'Delivery' or in our pre-defined failed list AND it has been greater than 72 hours since email was sent`, async () => {
-    const mockInsight = { ...mockAWSDeliveredInsight, Events: [mockAWSDeliveredInsight.Events![1]] } //  Only include 'SEND' event
-
-    jest.useFakeTimers().setSystemTime(mockGetCurrentDate(4))
-
-    prismaMock.userOrganisationInvitation.findMany.mockResolvedValueOnce(pendingEmails)
-    mockEmailService.getEmailInsights.mockResolvedValueOnce({
-      messageId: pendingEmails[0].messageId,
-      insights: [mockInsight],
-    })
-    prismaMock.userOrganisationInvitation.updateMany.mockResolvedValueOnce({ count: 1 })
-
-    await monitorInvitationEmails()
-
-    expect(prismaMock.sysRefInvitationStatus.findFirstOrThrow).toHaveBeenCalledTimes(3)
-    expect(prismaMock.userOrganisationInvitation.findMany).toHaveBeenCalledTimes(1)
-
-    expect(mockEmailService.getEmailInsights).toHaveBeenCalledTimes(1)
-    expect(mockEmailService.getEmailInsights).toHaveBeenCalledWith(pendingEmails[0].messageId)
-
-    expect(prismaMock.userOrganisationInvitation.updateMany).toHaveBeenCalledTimes(1)
-    expect(prismaMock.userOrganisationInvitation.updateMany).toHaveBeenCalledWith({
-      data: {
-        statusId: 3,
-      },
-      where: { messageId: { in: [pendingEmails[0].messageId] } },
-    })
-
-    jest.useRealTimers()
-  })
-
-  it(`should not update the status of email in SE DB when AWS email status is not 'Delivery' or in our pre-defined failed list AND it has been less than 72 hours since email was sent`, async () => {
-    const mockInsight = { ...mockAWSDeliveredInsight, Events: [mockAWSDeliveredInsight.Events![1]] } //  Only include 'SEND' event
-
-    jest.useFakeTimers().setSystemTime(mockGetCurrentDate(1))
-
-    prismaMock.userOrganisationInvitation.findMany.mockResolvedValueOnce(pendingEmails)
-    mockEmailService.getEmailInsights.mockResolvedValueOnce({
-      messageId: pendingEmails[0].messageId,
-      insights: [mockInsight],
-    })
-    prismaMock.userOrganisationInvitation.updateMany.mockResolvedValueOnce({ count: 1 })
-
-    await monitorInvitationEmails()
-
-    expect(prismaMock.sysRefInvitationStatus.findFirstOrThrow).toHaveBeenCalledTimes(3)
-    expect(prismaMock.userOrganisationInvitation.findMany).toHaveBeenCalledTimes(1)
-
-    expect(mockEmailService.getEmailInsights).toHaveBeenCalledTimes(1)
-    expect(mockEmailService.getEmailInsights).toHaveBeenCalledWith(pendingEmails[0].messageId)
-
-    expect(prismaMock.userOrganisationInvitation.updateMany).not.toHaveBeenCalled()
-
-    jest.useRealTimers()
-  })
-
   it('should retry once if initial request to fetch status from AWS fails due to too many requests', async () => {
     prismaMock.userOrganisationInvitation.findMany.mockResolvedValueOnce(pendingEmails)
 
@@ -196,5 +89,191 @@ describe('monitorInvitationEmails', () => {
 
     expect(mockEmailService.getEmailInsights).toHaveBeenCalledTimes(1)
     expect(prismaMock.userOrganisationInvitation.updateMany).not.toHaveBeenCalled()
+  })
+
+  it('should not throw an error when when insights array is empty', async () => {
+    prismaMock.userOrganisationInvitation.findMany.mockResolvedValueOnce(pendingEmails)
+
+    mockEmailService.getEmailInsights.mockResolvedValueOnce({
+      messageId: pendingEmails[0].messageId,
+      insights: [],
+    })
+
+    await monitorInvitationEmails()
+
+    expect(prismaMock.userOrganisationInvitation.updateMany).not.toHaveBeenCalled()
+  })
+
+  it('should not throw an error when DB request fails', async () => {
+    prismaMock.userOrganisationInvitation.findMany.mockResolvedValueOnce(pendingEmails)
+    mockEmailService.getEmailInsights.mockResolvedValueOnce({
+      messageId: pendingEmails[0].messageId,
+      insights: [mockAWSDeliveredInsight],
+    })
+    prismaMock.userOrganisationInvitation.updateMany.mockRejectedValueOnce(new Error('Oh no, an error!'))
+
+    await monitorInvitationEmails()
+
+    expect(prismaMock.sysRefInvitationStatus.findFirstOrThrow).toHaveBeenCalledTimes(3)
+    expect(prismaMock.userOrganisationInvitation.findMany).toHaveBeenCalledTimes(1)
+
+    expect(mockEmailService.getEmailInsights).toHaveBeenCalledTimes(1)
+
+    expect(prismaMock.userOrganisationInvitation.updateMany).toHaveBeenCalledTimes(1)
+  })
+
+  describe('given email was sent within 72 hours', () => {
+    beforeAll(() => {
+      jest.useFakeTimers().setSystemTime(mockGetCurrentDate(1))
+    })
+
+    afterAll(() => {
+      jest.useRealTimers()
+    })
+
+    it(`should correctly set status of email in SE DB to 'Failure' when AWS email status is 'BOUNCE' and it has a 'PERMANENT' subtype`, async () => {
+      prismaMock.userOrganisationInvitation.findMany.mockResolvedValueOnce(pendingEmails)
+      mockEmailService.getEmailInsights.mockResolvedValueOnce({
+        messageId: pendingEmails[0].messageId,
+        insights: [mockAWSBouncePermanentInsight],
+      })
+      prismaMock.userOrganisationInvitation.updateMany.mockResolvedValueOnce({ count: 1 })
+
+      await monitorInvitationEmails()
+
+      expect(prismaMock.sysRefInvitationStatus.findFirstOrThrow).toHaveBeenCalledTimes(3)
+      expect(prismaMock.userOrganisationInvitation.findMany).toHaveBeenCalledTimes(1)
+
+      expect(mockEmailService.getEmailInsights).toHaveBeenCalledTimes(1)
+      expect(mockEmailService.getEmailInsights).toHaveBeenCalledWith(pendingEmails[0].messageId)
+
+      expect(prismaMock.userOrganisationInvitation.updateMany).toHaveBeenCalledTimes(1)
+      expect(prismaMock.userOrganisationInvitation.updateMany).toHaveBeenCalledWith({
+        data: {
+          statusId: 3,
+        },
+        where: { messageId: { in: [pendingEmails[0].messageId] } },
+      })
+    })
+
+    it(`should not set status of email in SE DB to 'Failure' when AWS email status is 'BOUNCE' and it does not have a  'PERMANENT' subtype`, async () => {
+      prismaMock.userOrganisationInvitation.findMany.mockResolvedValueOnce(pendingEmails)
+      mockEmailService.getEmailInsights.mockResolvedValueOnce({
+        messageId: pendingEmails[0].messageId,
+        insights: [
+          {
+            ...mockAWSBouncePermanentInsight,
+            Events: [
+              {
+                Type: EventType.BOUNCE,
+                Details: {
+                  Bounce: {
+                    BounceType: BounceType.TRANSIENT,
+                  },
+                },
+              },
+            ],
+          },
+        ],
+      })
+      prismaMock.userOrganisationInvitation.updateMany.mockResolvedValueOnce({ count: 1 })
+
+      await monitorInvitationEmails()
+
+      expect(prismaMock.sysRefInvitationStatus.findFirstOrThrow).toHaveBeenCalledTimes(3)
+      expect(prismaMock.userOrganisationInvitation.findMany).toHaveBeenCalledTimes(1)
+
+      expect(mockEmailService.getEmailInsights).toHaveBeenCalledTimes(1)
+      expect(mockEmailService.getEmailInsights).toHaveBeenCalledWith(pendingEmails[0].messageId)
+
+      expect(prismaMock.userOrganisationInvitation.updateMany).not.toHaveBeenCalled()
+    })
+
+    it.each([EventType.REJECT, EventType.RENDERING_FAILURE])(
+      `should correctly set status of email in SE DB to 'Failure' when AWS email status is %s`,
+      async (failedEmailStatus: string) => {
+        prismaMock.userOrganisationInvitation.findMany.mockResolvedValueOnce(pendingEmails)
+        mockEmailService.getEmailInsights.mockResolvedValueOnce({
+          messageId: pendingEmails[0].messageId,
+          insights: [
+            {
+              ...mockAWSSentInsight,
+              Events: [mockAWSSentInsight.Events![0], { Type: failedEmailStatus, Timestamp: new Date('2025-04-03') }],
+            },
+          ],
+        })
+        prismaMock.userOrganisationInvitation.updateMany.mockResolvedValueOnce({ count: 1 })
+
+        await monitorInvitationEmails()
+
+        expect(prismaMock.sysRefInvitationStatus.findFirstOrThrow).toHaveBeenCalledTimes(3)
+        expect(prismaMock.userOrganisationInvitation.findMany).toHaveBeenCalledTimes(1)
+
+        expect(mockEmailService.getEmailInsights).toHaveBeenCalledTimes(1)
+        expect(mockEmailService.getEmailInsights).toHaveBeenCalledWith(pendingEmails[0].messageId)
+
+        expect(prismaMock.userOrganisationInvitation.updateMany).toHaveBeenCalledTimes(1)
+        expect(prismaMock.userOrganisationInvitation.updateMany).toHaveBeenCalledWith({
+          data: {
+            statusId: 3,
+          },
+          where: { messageId: { in: [pendingEmails[0].messageId] } },
+        })
+      }
+    )
+
+    it(`should not update the status of email in SE DB when AWS email status is not 'Delivery' or in our pre-defined failed list`, async () => {
+      prismaMock.userOrganisationInvitation.findMany.mockResolvedValueOnce(pendingEmails)
+      mockEmailService.getEmailInsights.mockResolvedValueOnce({
+        messageId: pendingEmails[0].messageId,
+        insights: [mockAWSSentInsight],
+      })
+      prismaMock.userOrganisationInvitation.updateMany.mockResolvedValueOnce({ count: 1 })
+
+      await monitorInvitationEmails()
+
+      expect(prismaMock.sysRefInvitationStatus.findFirstOrThrow).toHaveBeenCalledTimes(3)
+      expect(prismaMock.userOrganisationInvitation.findMany).toHaveBeenCalledTimes(1)
+
+      expect(mockEmailService.getEmailInsights).toHaveBeenCalledTimes(1)
+      expect(mockEmailService.getEmailInsights).toHaveBeenCalledWith(pendingEmails[0].messageId)
+
+      expect(prismaMock.userOrganisationInvitation.updateMany).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('email created after 72 hours', () => {
+    beforeAll(() => {
+      jest.useFakeTimers().setSystemTime(mockGetCurrentDate(4))
+    })
+
+    afterAll(() => {
+      jest.useRealTimers()
+    })
+
+    it(`should correctly set status of email in SE DB to 'Failure' when AWS email status is not 'Delivery' or in our pre-defined failed list AND it has been greater than 72 hours since email was sent`, async () => {
+      prismaMock.userOrganisationInvitation.findMany.mockResolvedValueOnce(pendingEmails)
+      mockEmailService.getEmailInsights.mockResolvedValueOnce({
+        messageId: pendingEmails[0].messageId,
+        insights: [mockAWSSentInsight],
+      })
+      prismaMock.userOrganisationInvitation.updateMany.mockResolvedValueOnce({ count: 1 })
+
+      await monitorInvitationEmails()
+
+      expect(prismaMock.sysRefInvitationStatus.findFirstOrThrow).toHaveBeenCalledTimes(3)
+      expect(prismaMock.userOrganisationInvitation.findMany).toHaveBeenCalledTimes(1)
+
+      expect(mockEmailService.getEmailInsights).toHaveBeenCalledTimes(1)
+      expect(mockEmailService.getEmailInsights).toHaveBeenCalledWith(pendingEmails[0].messageId)
+
+      expect(prismaMock.userOrganisationInvitation.updateMany).toHaveBeenCalledTimes(1)
+      expect(prismaMock.userOrganisationInvitation.updateMany).toHaveBeenCalledWith({
+        data: {
+          statusId: 3,
+        },
+        where: { messageId: { in: [pendingEmails[0].messageId] } },
+      })
+    })
   })
 })

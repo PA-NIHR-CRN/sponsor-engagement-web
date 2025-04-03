@@ -4,8 +4,8 @@ export const mockAWSDeliveredInsight: EmailInsights = {
   Destination: 'test.user@nihr.com',
   Isp: 'UNKNOWN_ISP',
   Events: [
-    { Timestamp: new Date('2025-04-02'), Type: 'DELIVERY' },
     { Timestamp: new Date('2025-04-02'), Type: 'SEND' },
+    { Timestamp: new Date('2025-04-03'), Type: 'DELIVERY' },
   ],
 }
 
@@ -15,7 +15,7 @@ export const mockAWSBouncePermanentInsight: EmailInsights = {
   Events: [
     { Timestamp: new Date('2025-04-02'), Type: 'SEND' },
     {
-      Timestamp: new Date('2025-04-02'),
+      Timestamp: new Date('2025-04-03'),
       Type: 'BOUNCE',
       Details: {
         Bounce: {
@@ -29,14 +29,8 @@ export const mockAWSBouncePermanentInsight: EmailInsights = {
   ],
 }
 
-export const mockAWSRejectedInsight: EmailInsights = {
+export const mockAWSSentInsight: EmailInsights = {
   Destination: 'test.user@nihr.com',
   Isp: 'UNKNOWN_ISP',
-  Events: [
-    { Timestamp: new Date('2025-04-02'), Type: 'SEND' },
-    {
-      Timestamp: new Date('2025-04-02'),
-      Type: 'REJECT',
-    },
-  ],
+  Events: [{ Timestamp: new Date('2025-04-02'), Type: 'SEND' }],
 }

@@ -1,4 +1,5 @@
 /* eslint-env jest -- set environment to jest */
+import '@testing-library/jest-dom'
 
 import { TextDecoder, TextEncoder } from 'node:util'
 

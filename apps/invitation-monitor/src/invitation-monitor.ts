@@ -6,7 +6,7 @@ import utc from 'dayjs/plugin/utc'
 import dayjs from 'dayjs'
 import { logger } from '@nihr-ui/logger'
 import type { EmailStatusResult } from '@nihr-ui/email/email-service'
-import { EMAIL_DELIVERY_THRESHOLD_HOURS, EMAIL_FAILURES, UserOrganisationInviteStatus } from './lib/constants'
+import { EMAIL_DELIVERY_THRESHOLD_HOURS, PERMANENT_EMAIL_FAILURES, UserOrganisationInviteStatus } from './lib/constants'
 import { prismaClient } from './lib/prisma'
 import type { UserOrgnaisationInvitations } from './types'
 
@@ -125,7 +125,7 @@ const processEmails = async () => {
       latestEvent.Details?.Bounce?.BounceType === BounceType.PERMANENT
     ) {
       failedMessageIds.push(messageId)
-    } else if (EMAIL_FAILURES.includes(latestEvent.Type ?? '')) {
+    } else if (PERMANENT_EMAIL_FAILURES.includes(latestEvent.Type ?? '')) {
       failedMessageIds.push(messageId)
     } else if (hoursSinceEmailSent > EMAIL_DELIVERY_THRESHOLD_HOURS) {
       failedMessageIds.push(messageId)
