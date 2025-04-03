@@ -21,8 +21,6 @@ export const mockAWSBouncePermanentInsight: EmailInsights = {
         Bounce: {
           BounceType: 'PERMANENT',
           BounceSubType: 'GENERAL',
-          DiagnosticCode:
-            'smtp; 550 4.4.7 Message expired: unable to deliver in 840 minutes.<421 4.4.0 Unable to lookup DNS for paconsuling.com>',
         },
       },
     },

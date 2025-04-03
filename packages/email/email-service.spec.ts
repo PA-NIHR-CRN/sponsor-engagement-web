@@ -319,7 +319,7 @@ describe('EmailService', () => {
     await expect(emailService.sendBulkEmail([], jest.fn())).rejects.toThrow('Unable to determine maximum send rate')
   })
 
-  it('should fetch email status with the correct parameters', async () => {
+  it('should fetch email details with the correct parameters', async () => {
     const mockMessageId = '1212121'
     const mockGetMessageInsights = jest.fn().mockResolvedValue({ MessageId: mockMessageId })
     sesV2ClientMock.getMessageInsights = jest.fn().mockReturnValueOnce({ promise: mockGetMessageInsights })
@@ -331,7 +331,7 @@ describe('EmailService', () => {
     expect(sesV2ClientMock.getMessageInsights).toHaveBeenCalledWith({ MessageId: mockMessageId })
   })
 
-  it('should handle errors correctly when fetching email status', async () => {
+  it('should throw an error when request to fetch email details fails', async () => {
     const mockMessageId = '1212121'
     const error = new Error('Oh no, an error!')
     const mockGetMessageInsights = jest.fn().mockRejectedValueOnce(error)
@@ -342,7 +342,7 @@ describe('EmailService', () => {
     expect(sesV2ClientMock.getMessageInsights).toHaveBeenCalledTimes(1)
   })
 
-  it(`should throw an error when 'MessageId' does not exist within the fetch email status response`, async () => {
+  it(`should throw an error when 'MessageId' does not exist within the fetch email details response`, async () => {
     const mockMessageId = '1212121'
     const mockGetMessageInsights = jest.fn().mockResolvedValue({})
     sesV2ClientMock.getMessageInsights = jest.fn().mockReturnValueOnce({ promise: mockGetMessageInsights })
