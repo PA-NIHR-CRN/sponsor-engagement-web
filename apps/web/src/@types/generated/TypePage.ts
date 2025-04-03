@@ -25,8 +25,8 @@ export interface TypePageFields {
  * Entry skeleton type definition for content type 'page'
  * @name TypePageSkeleton
  * @type {TypePageSkeleton}
-//  * @author 2rrNVCpeOdsG9LZyGrr8NG
-//  * @since 2022-03-09T10:50:23.593Z
+//  * @author 
+//  * @since 
 //  * @version 4
  */
 export type TypePageSkeleton = EntrySkeletonType<TypePageFields, 'page'>
@@ -34,8 +34,8 @@ export type TypePageSkeleton = EntrySkeletonType<TypePageFields, 'page'>
  * Entry type definition for content type 'page' 
  * @name TypePage
  * @type {TypePage}
-//  * @author 2rrNVCpeOdsG9LZyGrr8NG
-//  * @since 2022-03-09T10:50:23.593Z
+//  * @author
+//  * @since 
 //  * @version 4
  */
 
