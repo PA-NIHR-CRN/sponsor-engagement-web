@@ -1,7 +1,7 @@
 import { Prisma } from 'database'
 import { emailService } from '@nihr-ui/email'
 import { config as dotEnvConfig } from 'dotenv'
-import { BounceType, EventType, NotFoundException, TooManyRequestsException } from '@aws-sdk/client-sesv2'
+import { BounceType, EventType, TooManyRequestsException } from '@aws-sdk/client-sesv2'
 import utc from 'dayjs/plugin/utc'
 import dayjs from 'dayjs'
 import { logger } from '@nihr-ui/logger'
@@ -61,12 +61,6 @@ const fetchEmailStatus = async (
       })
 
       return fetchEmailStatus(emailMessageId, retryCount + 1)
-    }
-
-    if (error instanceof NotFoundException) {
-      logger.error('Email with messageId %s is not found', emailMessageId)
-
-      return null
     }
 
     logger.error(error)

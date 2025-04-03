@@ -177,9 +177,24 @@ describe('monitorInvitationEmails', () => {
     mockEmailService.getEmailInsights.mockRejectedValueOnce(
       new TooManyRequestsException({ message: 'Oh no an error', $metadata: {} })
     )
+    mockEmailService.getEmailInsights.mockResolvedValueOnce({
+      messageId: pendingEmails[0].messageId,
+      insights: [mockAWSDeliveredInsight],
+    })
 
     await monitorInvitationEmails()
 
     expect(mockEmailService.getEmailInsights).toHaveBeenCalledTimes(2)
+  })
+
+  it('should not throw an error when request to fetch status from AWS fails', async () => {
+    prismaMock.userOrganisationInvitation.findMany.mockResolvedValueOnce(pendingEmails)
+
+    mockEmailService.getEmailInsights.mockRejectedValueOnce(new Error())
+
+    await monitorInvitationEmails()
+
+    expect(mockEmailService.getEmailInsights).toHaveBeenCalledTimes(1)
+    expect(prismaMock.userOrganisationInvitation.updateMany).not.toHaveBeenCalled()
   })
 })

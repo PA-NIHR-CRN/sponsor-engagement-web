@@ -2,3 +2,4 @@
 
 jest.mock('@nihr-ui/logger')
 jest.mock('@nihr-ui/email')
+jest.mock('dotenv')
