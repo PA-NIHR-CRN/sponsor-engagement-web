@@ -8,11 +8,12 @@ import { logger } from '@nihr-ui/logger'
 import type { EmailStatusResult } from '@nihr-ui/email/email-service'
 import { EMAIL_DELIVERY_THRESHOLD_HOURS, EMAIL_FAILURES, UserOrganisationInviteStatus } from './lib/constants'
 import { prismaClient } from './lib/prisma'
+import type { UserOrgnaisationInvitations } from './types'
 
 dotEnvConfig()
 dayjs.extend(utc)
 
-const fetchPendingEmails = async (pendingStatusId: number) => {
+const fetchPendingEmails = async (pendingStatusId: number): Promise<UserOrgnaisationInvitations> => {
   return prismaClient.userOrganisationInvitation.findMany({
     where: { statusId: pendingStatusId },
     distinct: ['userOrganisationId'],
@@ -28,6 +29,8 @@ const fetchPendingEmails = async (pendingStatusId: number) => {
 }
 
 const updateEmailStatus = async (statusId: number, idsToUpdate: string[]) => {
+  if (idsToUpdate.length === 0) return { count: 0 }
+
   return prismaClient.userOrganisationInvitation.updateMany({
     data: {
       statusId,
@@ -95,7 +98,7 @@ const processEmails = async () => {
   }
 
   const getEmailStatusPromises = pendingEmails.map((email) => fetchEmailStatus(email.messageId, 0))
-  const emailStatusDetails = await Promise.all(getEmailStatusPromises)
+  const emailStatusResults = await Promise.all(getEmailStatusPromises)
 
   const successfulMessageIds = []
   const failedMessageIds = []
@@ -104,10 +107,10 @@ const processEmails = async () => {
   for (const email of pendingEmails) {
     const messageId = email.messageId
 
-    const emailDetails = emailStatusDetails.find((details) => details?.messageId === email.messageId)
+    const emailDetails = emailStatusResults.find((results) => results?.messageId === email.messageId)
 
     if (!emailDetails) {
-      logger.info('No details for email with messageId %s', email.messageId)
+      logger.info('No information for email with messageId %s', email.messageId)
 
       continue
     }
