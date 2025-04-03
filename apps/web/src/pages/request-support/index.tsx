@@ -46,7 +46,7 @@ export const getServerSideProps = async ({ query }: GetServerSidePropsContext) =
   const [entry, footerEntry] = await Promise.all([getPage(), getBporFooter()])
   return {
     props: {
-      returnPath: query.returnPath || null,
+      returnPath: query.returnPath,
       content: entry?.fields || null,
       footerContent: footerEntry?.fields || null,
     },
