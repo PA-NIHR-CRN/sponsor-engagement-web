@@ -20,27 +20,19 @@ export interface RequestSupportProps {
 }
 
 export default function RequestSupport({ returnPath, content, footerContent }: RequestSupportProps) {
-  if (!content || !footerContent) return null
+  if (!content?.richText && !footerContent?.richText) return null
   return (
     <Container>
       <NextSeo title="Request NIHR RDN support" />
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <div>
-            {content.richText ? <RichTextRenderer>{content.richText}</RichTextRenderer> : 'No page content available'}
-          </div>
+          <div>{content?.richText ? <RichTextRenderer>{content.richText}</RichTextRenderer> : null}</div>
           {returnPath ? (
             <Link className="govuk-button govuk-!-margin-top-2" href={returnPath}>
               Return to previous page
             </Link>
           ) : null}
-          <div>
-            {footerContent.richText ? (
-              <RichTextRenderer>{footerContent.richText}</RichTextRenderer>
-            ) : (
-              'No BPoR text available'
-            )}
-          </div>
+          <div>{footerContent?.richText ? <RichTextRenderer>{footerContent.richText}</RichTextRenderer> : null}</div>
         </div>
       </div>
     </Container>
