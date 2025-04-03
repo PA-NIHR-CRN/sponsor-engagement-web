@@ -93,14 +93,12 @@ const processEmails = async () => {
 
   const getEmailStatusPromises = pendingEmails.map((email) => fetchEmailStatus(email.messageId, 0))
   const emailStatusResults = await Promise.all(getEmailStatusPromises)
-
   const successfulMessageIds = []
   const failedMessageIds = []
   const todayUTCDate = dayjs.utc()
 
   for (const email of pendingEmails) {
     const messageId = email.messageId
-
     const emailDetails = emailStatusResults.find((results) => results?.messageId === email.messageId)
 
     if (!emailDetails) {
@@ -110,8 +108,7 @@ const processEmails = async () => {
     }
 
     const { insights } = emailDetails
-
-    const events = insights[0].Events ?? []
+    const events = insights[0]?.Events ?? []
 
     events.sort((a, b) => new Date(b.Timestamp ?? 0).getTime() - new Date(a.Timestamp ?? 0).getTime())
 
