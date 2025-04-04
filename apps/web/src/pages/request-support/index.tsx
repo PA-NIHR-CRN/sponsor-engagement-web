@@ -1,5 +1,6 @@
 import type { Document } from '@contentful/rich-text-types'
 import { Container } from '@nihr-ui/frontend'
+import { logger } from '@nihr-ui/logger'
 import type { GetServerSidePropsContext } from 'next'
 import Link from 'next/link'
 import { NextSeo } from 'next-seo'
@@ -20,7 +21,6 @@ export interface RequestSupportProps {
 }
 
 export default function RequestSupport({ returnPath, content, footerContent }: RequestSupportProps) {
-  if (!content?.richText && !footerContent?.richText) return null
   return (
     <Container>
       <NextSeo title="Request NIHR RDN support" />
@@ -42,13 +42,25 @@ export default function RequestSupport({ returnPath, content, footerContent }: R
 RequestSupport.getLayout = function getLayout(page: ReactElement) {
   return <RootLayout user={null}>{page}</RootLayout>
 }
+
 export const getServerSideProps = async ({ query }: GetServerSidePropsContext) => {
   const [entry, footerEntry] = await Promise.all([getPage(), getBporFooter()])
+  const content = entry?.fields || null
+  const footerContent = footerEntry?.fields || null
+
+  if (!content?.richText && !footerContent?.richText) {
+    logger.error('Error: Contentful response is empty for RDN Request Support page.')
+    return {
+      redirect: {
+        destination: '/500',
+      },
+    }
+  }
   return {
     props: {
       returnPath: query.returnPath,
-      content: entry?.fields || null,
-      footerContent: footerEntry?.fields || null,
+      content,
+      footerContent,
     },
   }
 }
