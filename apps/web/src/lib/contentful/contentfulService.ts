@@ -58,8 +58,7 @@ export const getPage = async (): Promise<Entry<TypePageSkeleton> | null> => {
 
   if (CONTENTFUL_PAGE_ENTRY_ID) {
     try {
-      const entry = await getEntryById<TypePageSkeleton>(CONTENTFUL_PAGE_ENTRY_ID)
-      return entry
+      return await getEntryById<TypePageSkeleton>(CONTENTFUL_PAGE_ENTRY_ID)
     } catch (error) {
       logger.error(`Encountered error fetching entry from Contentful: ${error}`)
       return null
@@ -73,8 +72,7 @@ export const getBporFooter = async (): Promise<Entry<TypeBporFooterSkeleton> | n
 
   if (CONTENTFUL_BPOR_FOOTER_ENTRY_ID) {
     try {
-      const entry = await getEntryById<TypeBporFooterSkeleton>(CONTENTFUL_BPOR_FOOTER_ENTRY_ID)
-      return entry
+      return await getEntryById<TypeBporFooterSkeleton>(CONTENTFUL_BPOR_FOOTER_ENTRY_ID)
     } catch (error) {
       logger.error(`Encountered error fetching entry from Contentful: ${error}`)
       return null
