@@ -75,7 +75,7 @@ export default withApiHandler<ExtendedNextApiRequest>(
           userOrganisationId: Number(userOrganisationId),
         },
         data: {
-          isDeleted: true, // TODO: make sure to update nightly jobs to filter by isDeleted field
+          isDeleted: true,
         },
       })
 
