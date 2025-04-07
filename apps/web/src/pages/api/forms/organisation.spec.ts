@@ -221,6 +221,7 @@ describe('Successful organisation sponsor contact invitation', () => {
             id: createUserOrgInvitation.userOrganisationId,
           },
         },
+        sentBy: { connect: { id: userWithContactManagerRole.user?.id } },
       },
     })
 
@@ -381,6 +382,11 @@ describe('Successful organisation sponsor contact invitation', () => {
             id: createUserOrgInvitation.userOrganisationId,
           },
         },
+        sentBy: {
+          connect: {
+            id: userWithContactManagerRole.user?.id,
+          },
+        },
       },
     })
 
@@ -519,6 +525,11 @@ describe('Successful organisation sponsor contact invitation', () => {
         userOrganisation: {
           connect: {
             id: createUserOrgInvitation.userOrganisationId,
+          },
+        },
+        sentBy: {
+          connect: {
+            id: userWithContactManagerRole.user?.id,
           },
         },
       },

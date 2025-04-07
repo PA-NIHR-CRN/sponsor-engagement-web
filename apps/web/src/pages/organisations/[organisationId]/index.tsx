@@ -12,7 +12,7 @@ import { useForm } from 'react-hook-form'
 import { ErrorSummary, Form } from '@/components/atoms'
 import { TextInput } from '@/components/atoms/Form/TextInput/TextInput'
 import { RootLayout } from '@/components/organisms'
-import { Roles } from '@/constants'
+import { Roles, UserOrganisationInviteStatus } from '@/constants'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
 import { getOrganisationById } from '@/lib/organisations'
 import { formatDate } from '@/utils/date'
@@ -101,7 +101,14 @@ export default function Organisation({ organisation, query }: OrganisationProps)
           {organisation.users.map((user) => (
             <Table.Row key={user.id}>
               <Table.Cell>{user.user.email}</Table.Cell>
-              <Table.Cell>{formatDate(user.updatedAt)}</Table.Cell>
+              <Table.Cell>
+                <div className="flex flex-col gap-2 w-fit">
+                  {formatDate(user.updatedAt)}
+                  {user.invitations[0]?.status.name === UserOrganisationInviteStatus.FAILURE ? (
+                    <span className="govuk-tag govuk-tag--red normal-case">Failed to deliver email</span>
+                  ) : null}
+                </div>
+              </Table.Cell>
               <Table.Cell>{user.user.lastLogin ? formatDate(user.user.lastLogin) : '-'} </Table.Cell>
               <Table.Cell>
                 <Link aria-label={`Remove ${user.user.email}`} href={`/organisations/remove-contact/${user.id}`}>
