@@ -16,7 +16,8 @@
     "@aws-sdk/client-sesv2": "^3.779.0",
     "@nihr-ui/email": "*",
     "@nihr-ui/logger": "*",
-    "database": "^0.0.0",
+    "@nihr-ui/templates": "*",
+    "database": "*",
     "dayjs": "^1.11.13",
     "dotenv": "^16.3.1"
   },
@@ -36,6 +37,11 @@
   "tsup": {
     "entry": [
       "src/index.ts"
+    ],
+    "noExternal": [
+      "@nihr-ui/logger",
+      "@nihr-ui/email",
+      "@nihr-ui/templates"
     ],
     "splitting": false,
     "sourcemap": true,

@@ -6,16 +6,18 @@ import utc from 'dayjs/plugin/utc'
 import dayjs from 'dayjs'
 import { logger } from '@nihr-ui/logger'
 import type { EmailStatusResult } from '@nihr-ui/email/email-service'
+import { emailTemplates } from '@nihr-ui/templates/sponsor-engagement'
 import { EMAIL_DELIVERY_THRESHOLD_HOURS, PERMANENT_EMAIL_FAILURES, UserOrganisationInviteStatus } from './lib/constants'
 import { prismaClient } from './lib/prisma'
 import type { UserOrgnaisationInvitations } from './types'
+import { getSponsorEngagementUrl } from './utils'
 
 dotEnvConfig()
 dayjs.extend(utc)
 
 const fetchPendingEmails = async (pendingStatusId: number): Promise<UserOrgnaisationInvitations> => {
   return prismaClient.userOrganisationInvitation.findMany({
-    where: { statusId: pendingStatusId },
+    where: { statusId: pendingStatusId, isDeleted: false },
     distinct: ['userOrganisationId'],
     orderBy: {
       createdAt: Prisma.SortOrder.desc,
@@ -24,6 +26,16 @@ const fetchPendingEmails = async (pendingStatusId: number): Promise<UserOrgnaisa
       id: true,
       messageId: true,
       timestamp: true,
+      sentBy: true,
+      userOrganisation: {
+        include: {
+          user: {
+            select: {
+              email: true,
+            },
+          },
+        },
+      },
     },
   })
 }
@@ -94,7 +106,7 @@ const processEmails = async () => {
   const getEmailStatusPromises = pendingEmails.map((email) => fetchEmailStatus(email.messageId, 0))
   const emailStatusResults = await Promise.all(getEmailStatusPromises)
   const successfulMessageIds = []
-  const failedMessageIds = []
+  const failedEmailDetails: { messageId: string; userEmail: string; sentByEmail: string }[] = []
   const todayUTCDate = dayjs.utc()
 
   for (const email of pendingEmails) {
@@ -121,13 +133,27 @@ const processEmails = async () => {
       latestEvent.Type === EventType.BOUNCE &&
       latestEvent.Details?.Bounce?.BounceType === BounceType.PERMANENT
     ) {
-      failedMessageIds.push(messageId)
+      failedEmailDetails.push({
+        messageId,
+        userEmail: email.userOrganisation.user.email,
+        sentByEmail: email.sentBy.email,
+      })
     } else if (PERMANENT_EMAIL_FAILURES.includes(latestEvent.Type ?? '')) {
-      failedMessageIds.push(messageId)
+      failedEmailDetails.push({
+        messageId,
+        userEmail: email.userOrganisation.user.email,
+        sentByEmail: email.sentBy.email,
+      })
     } else if (hoursSinceEmailSent > EMAIL_DELIVERY_THRESHOLD_HOURS) {
-      failedMessageIds.push(messageId)
+      failedEmailDetails.push({
+        messageId,
+        userEmail: email.userOrganisation.user.email,
+        sentByEmail: email.sentBy.email,
+      })
     }
   }
+
+  const failedMessageIds = failedEmailDetails.map((details) => details.messageId)
 
   const updateEmailStatusPromises = [
     updateEmailStatus(successStatusId, successfulMessageIds),
@@ -141,6 +167,32 @@ const processEmails = async () => {
     numOfSuccessfulEmailsUpdated.count,
     numOfFailedEmailsUpdated.count
   )
+
+  if (failedEmailDetails.length > 0) {
+    const emailInputs = failedEmailDetails.map(({ sentByEmail, userEmail }) => ({
+      to: sentByEmail,
+      subject: `The invitation email for a new Sponsor Contact has not been delivered successfully`,
+      htmlTemplate: emailTemplates['invitation-email-unsuccessful.html.hbs'],
+      textTemplate: emailTemplates['invitation-email-unsuccessful.text.hbs'],
+      templateData: {
+        recipientEmailAddress: userEmail,
+        sponsorEngagementToolLink: getSponsorEngagementUrl(),
+      },
+    }))
+
+    await emailService.sendBulkEmail(emailInputs, async () => {
+      logger.info('Successfully sent emails')
+
+      await prismaClient.userOrganisationInvitation.updateMany({
+        where: {
+          messageId: { in: failedMessageIds },
+        },
+        data: {
+          failureNotifiedAt: todayUTCDate.toDate(),
+        },
+      })
+    })
+  }
 }
 
 export const monitorInvitationEmails = async () => {
