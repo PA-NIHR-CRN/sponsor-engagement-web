@@ -1,15 +1,16 @@
 import { Prisma } from 'database'
-import { emailService } from '@nihr-ui/email'
+import { emailDeliverabilityService } from '@nihr-ui/email'
 import { config as dotEnvConfig } from 'dotenv'
-import { BounceType, EventType, TooManyRequestsException } from '@aws-sdk/client-sesv2'
+import { BounceType, EventType } from '@aws-sdk/client-sesv2'
 import utc from 'dayjs/plugin/utc'
 import dayjs from 'dayjs'
 import { logger } from '@nihr-ui/logger'
-import type { EmailStatusResult } from '@nihr-ui/email/email-service'
+import type { EmailStatusResult } from '@nihr-ui/email/email-deliverability-service'
 import { retry } from '@lifeomic/attempt'
 import { PERMANENT_EMAIL_FAILURES, UserOrganisationInviteStatus } from './lib/constants'
 import { prismaClient } from './lib/prisma'
 import type { UserOrgnaisationInvitations } from './types'
+import { isFulfilled } from './utils'
 
 dotEnvConfig()
 // eslint-disable-next-line import/no-named-as-default-member -- intentional to use this extend from dayjs obj
@@ -41,45 +42,32 @@ const updateEmailStatus = async (statusId: number, idsToUpdate: number[]) => {
   })
 }
 
-const fetchEmailStatus = async (emailMessageId: string): Promise<EmailStatusResult | null> => {
-  const { messageId, insights } = await emailService.getEmailInsights(emailMessageId)
+const fetchEmailStatusInner = async (emailMessageId: string): Promise<EmailStatusResult> => {
+  const { messageId, insights } = await emailDeliverabilityService.getEmailInsights(emailMessageId)
 
   return { messageId, insights }
 }
 
-const fetchEmailStatusWithRetries = async (
-  emailMessageId: string,
-  maxAttempts = 3
-): Promise<EmailStatusResult | null> => {
-  try {
-    return await retry(
-      async () => {
-        return fetchEmailStatus(emailMessageId)
+const fetchEmailStatusWithRetries = async (emailMessageId: string, maxAttempts = 3): Promise<EmailStatusResult> => {
+  return retry(
+    async () => {
+      return fetchEmailStatusInner(emailMessageId)
+    },
+    {
+      delay: 1000,
+      maxAttempts,
+      handleError: (error, context) => {
+        logger.error(
+          'Error occurred fetching email status for messageId: %s, %s, error: %s',
+          emailMessageId,
+          context.attemptsRemaining > 0
+            ? `retrying... , ${context.attemptNum + 1}/${maxAttempts - 1} retries`
+            : 'aborting...',
+          error
+        )
       },
-      {
-        delay: 1000,
-        maxAttempts,
-        handleError: (error, context) => {
-          logger.error('Error occurred fetching email status for messageId: %s, error: %s', emailMessageId, error)
-
-          // Only retry if error is 'TooManyRequestsException'
-          if (!(error instanceof TooManyRequestsException)) {
-            context.abort()
-          } else if (context.attemptsRemaining > 0) {
-            logger.error(
-              'Attempting to fetch email status again for messageId: %s, %s/%s retries, error: %s',
-              emailMessageId,
-              context.attemptNum + 1,
-              maxAttempts - 1,
-              error
-            )
-          }
-        },
-      }
-    )
-  } catch (error) {
-    return null
-  }
+    }
+  )
 }
 
 export const monitorInvitationEmails = async () => {
@@ -102,14 +90,16 @@ export const monitorInvitationEmails = async () => {
   }
 
   const getEmailStatusPromises = pendingEmails.map((email) => fetchEmailStatusWithRetries(email.messageId))
-  const emailStatusResults = await Promise.all(getEmailStatusPromises)
+  const emailStatusResults = await Promise.allSettled(getEmailStatusPromises)
   const successIds = []
   const failedIds = []
   const todayUTCDate = dayjs.utc()
 
   for (const email of pendingEmails) {
     const id = email.id
-    const emailDetails = emailStatusResults.find((results) => results?.messageId === email.messageId)
+    const emailDetails = emailStatusResults
+      .filter((result) => isFulfilled(result))
+      .find((statusResult) => statusResult.value.messageId === email.messageId)
 
     if (!emailDetails) {
       logger.info('No information for email with messageId %s', email.messageId)
@@ -117,7 +107,9 @@ export const monitorInvitationEmails = async () => {
       continue
     }
 
-    const { insights } = emailDetails
+    const {
+      value: { insights },
+    } = emailDetails
     const events = insights[0]?.Events ?? []
 
     const hoursSinceEmailSent = todayUTCDate.diff(email.timestamp.toISOString(), 'hours', true)

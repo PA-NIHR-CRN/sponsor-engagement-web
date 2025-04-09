@@ -1,8 +1,8 @@
-import type { SES, SESV2 } from 'aws-sdk'
+import type { SES } from 'aws-sdk'
 import { logger } from '@nihr-ui/logger'
 import Bottleneck from 'bottleneck'
 import type { EmailInsightsList } from 'aws-sdk/clients/sesv2'
-import { EMAIL_CHARSET, EMAIL_FROM_ADDRESS } from './constants'
+import { EMAIL_CHARSET, EMAIL_FROM_ADDRESS } from '../constants'
 
 export interface EmailArgs {
   to: string | string[]
@@ -23,7 +23,7 @@ export interface EmailStatusResult {
 }
 
 export class EmailService {
-  constructor(private sesClient: SES, private sesClientV2: SESV2) {}
+  constructor(private sesClient: SES) {}
 
   sendEmail = async (data: EmailArgs, retries = 3): Promise<EmailResult> => {
     const { subject, to, htmlTemplate, textTemplate, templateData } = data
@@ -106,21 +106,5 @@ export class EmailService {
     logger.info('Sending bulk email with maximum send rate: %s', sendRate)
 
     await Promise.all(emailPromises)
-  }
-
-  getEmailInsights = async (messageId: string): Promise<EmailStatusResult> => {
-    try {
-      const { MessageId, Insights } = await this.sesClientV2.getMessageInsights({ MessageId: messageId }).promise()
-
-      if (!MessageId) {
-        throw new Error('MessageId does not exist within the response')
-      }
-
-      return { messageId: MessageId, insights: Insights ?? [] }
-    } catch (error) {
-      logger.error('Error occurred fetching email status with messageId %s', messageId)
-
-      throw error
-    }
   }
 }
