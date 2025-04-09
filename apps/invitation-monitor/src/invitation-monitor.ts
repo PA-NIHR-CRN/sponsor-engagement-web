@@ -1,4 +1,3 @@
-import assert from 'assert'
 import { Prisma } from 'database'
 import { emailService } from '@nihr-ui/email'
 import { config as dotEnvConfig } from 'dotenv'
@@ -84,10 +83,6 @@ const fetchEmailStatusWithRetries = async (
 }
 
 export const monitorInvitationEmails = async () => {
-  assert(
-    process.env.INVITE_EMAIL_DELIVERY_THRESHOLD_HOURS,
-    'INVITE_EMAIL_DELIVERY_THRESHOLD_HOURS env var is not defined'
-  )
   const EMAIL_DELIVERY_THRESHOLD_HOURS = process.env.INVITE_EMAIL_DELIVERY_THRESHOLD_HOURS
     ? Number(process.env.INVITE_EMAIL_DELIVERY_THRESHOLD_HOURS)
     : 72
