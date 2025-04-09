@@ -5,6 +5,7 @@ module.exports = {
   ignorePatterns: ['node_modules/', 'dist/', 'coverage/', 'jest.config.ts'],
   parserOptions: {
     project: [path.join(__dirname, 'tsconfig.eslint.json')],
+    ecmaVersion: 11,
   },
   overrides: [
     {

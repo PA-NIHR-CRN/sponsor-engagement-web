@@ -6,6 +6,8 @@ export const mockAWSDeliveredInsight: EmailInsights = {
   Events: [
     { Timestamp: new Date('2025-04-02'), Type: 'SEND' },
     { Timestamp: new Date('2025-04-03'), Type: 'DELIVERY' },
+    { Timestamp: new Date('2025-04-04'), Type: 'OPEN' },
+    { Timestamp: new Date('2025-04-045'), Type: 'CLICK' },
   ],
 }
 
