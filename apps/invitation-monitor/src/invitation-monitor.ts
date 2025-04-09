@@ -10,7 +10,6 @@ import { retry } from '@lifeomic/attempt'
 import { PERMANENT_EMAIL_FAILURES, UserOrganisationInviteStatus } from './lib/constants'
 import { prismaClient } from './lib/prisma'
 import type { UserOrgnaisationInvitations } from './types'
-import { isFulfilled } from './utils'
 
 dotEnvConfig()
 // eslint-disable-next-line import/no-named-as-default-member -- intentional to use this extend from dayjs obj
@@ -98,7 +97,7 @@ export const monitorInvitationEmails = async () => {
   for (const email of pendingEmails) {
     const id = email.id
     const emailDetails = emailStatusResults
-      .filter((result) => isFulfilled(result))
+      .filter((result): result is PromiseFulfilledResult<EmailStatusResult> => result.status === 'fulfilled')
       .find((statusResult) => statusResult.value.messageId === email.messageId)
 
     if (!emailDetails) {
