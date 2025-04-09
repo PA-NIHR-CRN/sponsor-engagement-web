@@ -125,8 +125,7 @@ describe('monitorInvitationEmails', () => {
       expect(prismaMock.userOrganisationInvitation.updateMany).not.toHaveBeenCalled()
     })
 
-    it.skip('should retry twice if initial request to fetch status from AWS fails due to too many requests', async () => {
-      // TODO: Unskip
+    it('should retry if initial request to fetch status from AWS fails due to too many requests', async () => {
       prismaMock.userOrganisationInvitation.findMany.mockResolvedValueOnce(pendingEmails)
 
       mockEmailService.getEmailInsights.mockRejectedValueOnce(
@@ -140,13 +139,13 @@ describe('monitorInvitationEmails', () => {
 
       prismaMock.userOrganisationInvitation.updateMany.mockResolvedValueOnce({ count: 1 })
 
-      await monitorInvitationEmails()
+      const promise = monitorInvitationEmails()
 
-      // jest.advanceTimersByTime(5000)
-      // await jest.advanceTimersByTimeAsync(2000)
-      // jest.runAllTimers()
+      await jest.advanceTimersByTimeAsync(1000)
 
-      expect(mockEmailService.getEmailInsights).toHaveBeenCalledTimes(3)
+      await promise
+
+      expect(mockEmailService.getEmailInsights).toHaveBeenCalledTimes(2)
     })
 
     it(`should correctly set status of email in DB to 'Failure' when AWS email status is 'BOUNCE' and it has a 'PERMANENT' subtype`, async () => {
