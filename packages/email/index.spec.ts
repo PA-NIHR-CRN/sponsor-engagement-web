@@ -1,6 +1,5 @@
 import * as aws from 'aws-sdk'
-import { emailService } from '.'
-import { emailDeliverabilityService } from '.'
+import { emailService, emailDeliverabilityService } from '.'
 
 jest.mock('aws-sdk', () => ({
   SES: jest.fn(),
