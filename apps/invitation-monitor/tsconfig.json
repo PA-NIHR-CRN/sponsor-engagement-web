@@ -1,0 +1,12 @@
+{
+  "extends": "tsconfig/base.json",
+  "compilerOptions": {
+    "lib": ["ES2020"],
+    "module": "CommonJS",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "downlevelIteration": true
+  },
+  "exclude": ["dist", "build", "node_modules", "**/*.spec.ts", "src/mocks/**/*"],
+  "include": ["src/**/*.ts"]
+}

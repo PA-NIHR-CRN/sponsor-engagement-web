@@ -1,7 +1,7 @@
 import type { SES } from 'aws-sdk'
 import { logger } from '@nihr-ui/logger'
 import Bottleneck from 'bottleneck'
-import { EMAIL_CHARSET, EMAIL_FROM_ADDRESS } from './constants'
+import { EMAIL_CHARSET, EMAIL_FROM_ADDRESS } from '../constants'
 
 export interface EmailArgs {
   to: string | string[]

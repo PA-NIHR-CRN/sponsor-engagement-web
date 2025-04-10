@@ -1,6 +1,6 @@
 import { SES } from 'aws-sdk'
 import { logger } from '@nihr-ui/logger'
-import { EmailService, type EmailArgs } from './email-service'
+import { EmailService, type EmailArgs } from '.'
 
 // Mock dependencies
 jest.mock('aws-sdk')
