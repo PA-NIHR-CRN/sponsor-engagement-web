@@ -1,23 +1,25 @@
 import { Prisma } from 'database'
-import { emailDeliverabilityService } from '@nihr-ui/email'
+import { emailDeliverabilityService, emailService } from '@nihr-ui/email'
 import { config as dotEnvConfig } from 'dotenv'
 import { BounceType, EventType } from '@aws-sdk/client-sesv2'
 import utc from 'dayjs/plugin/utc'
 import dayjs from 'dayjs'
 import { logger } from '@nihr-ui/logger'
 import type { EmailStatusResult } from '@nihr-ui/email/email-deliverability-service'
+import { emailTemplates } from '@nihr-ui/templates/sponsor-engagement'
 import { retry } from '@lifeomic/attempt'
 import { PERMANENT_EMAIL_FAILURES, UserOrganisationInviteStatus } from './lib/constants'
 import { prismaClient } from './lib/prisma'
-import type { UserOrgnaisationInvitations } from './types'
+import type { UserOrganisationInvitations } from './types'
+import { getSponsorEngagementUrl } from './utils'
 
 dotEnvConfig()
 // eslint-disable-next-line import/no-named-as-default-member -- intentional to use this extend from dayjs obj
 dayjs.extend(utc)
 
-const fetchPendingEmails = async (pendingStatusId: number): Promise<UserOrgnaisationInvitations> => {
+const fetchPendingEmails = async (pendingStatusId: number): Promise<UserOrganisationInvitations> => {
   return prismaClient.userOrganisationInvitation.findMany({
-    where: { statusId: pendingStatusId },
+    where: { statusId: pendingStatusId, isDeleted: false },
     distinct: ['userOrganisationId'],
     orderBy: {
       createdAt: Prisma.SortOrder.desc,
@@ -26,6 +28,16 @@ const fetchPendingEmails = async (pendingStatusId: number): Promise<UserOrgnaisa
       id: true,
       messageId: true,
       timestamp: true,
+      sentBy: true,
+      userOrganisation: {
+        include: {
+          user: {
+            select: {
+              email: true,
+            },
+          },
+        },
+      },
     },
   })
 }
@@ -91,7 +103,7 @@ export const monitorInvitationEmails = async () => {
   const getEmailStatusPromises = pendingEmails.map((email) => fetchEmailStatus(email.messageId))
   const emailStatusResults = await Promise.allSettled(getEmailStatusPromises)
   const successIds = []
-  const failedIds = []
+  const failedEmailDetails: { id: number; userEmail: string; sentByEmail: string }[] = []
   const todayUTCDate = dayjs.utc()
 
   for (const email of pendingEmails) {
@@ -120,13 +132,27 @@ export const monitorInvitationEmails = async () => {
         (event) => event.Type === EventType.BOUNCE && event.Details?.Bounce?.BounceType === BounceType.PERMANENT
       )
     ) {
-      failedIds.push(id)
+      failedEmailDetails.push({
+        id,
+        userEmail: email.userOrganisation.user.email,
+        sentByEmail: email.sentBy.email,
+      })
     } else if (events.some((event) => PERMANENT_EMAIL_FAILURES.includes(event.Type ?? ''))) {
-      failedIds.push(id)
+      failedEmailDetails.push({
+        id,
+        userEmail: email.userOrganisation.user.email,
+        sentByEmail: email.sentBy.email,
+      })
     } else if (hoursSinceEmailSent > EMAIL_DELIVERY_THRESHOLD_HOURS) {
-      failedIds.push(id)
+      failedEmailDetails.push({
+        id,
+        userEmail: email.userOrganisation.user.email,
+        sentByEmail: email.sentBy.email,
+      })
     }
   }
+
+  const failedIds = failedEmailDetails.map((details) => details.id)
 
   const updateEmailStatusPromises = [
     updateEmailStatus(invitationStatuses[UserOrganisationInviteStatus.SUCCESS], successIds),
@@ -142,4 +168,38 @@ export const monitorInvitationEmails = async () => {
     numOfFailedEmailsUpdated.count,
     failedIds.length
   )
+
+  if (failedEmailDetails.length > 0) {
+    const emailInputs = failedEmailDetails.map(({ id, sentByEmail, userEmail }) => ({
+      to: sentByEmail,
+      subject: `The invitation email for a new Sponsor Contact has not been delivered successfully`,
+      htmlTemplate: emailTemplates['invitation-email-unsuccessful.html.hbs'],
+      textTemplate: emailTemplates['invitation-email-unsuccessful.text.hbs'],
+      templateData: {
+        recipientEmailAddress: userEmail,
+        sponsorEngagementToolLink: getSponsorEngagementUrl(),
+      },
+      identifier: id,
+    }))
+
+    const successfullySentIds: number[] = []
+
+    await emailService.sendBulkEmail(emailInputs, (_, identifier) => {
+      if (identifier) successfullySentIds.push(identifier)
+    })
+
+    logger.info('Successfully sent %s/%s emails', successfullySentIds.length, failedEmailDetails.length)
+
+    // Log `failureNotifiedAt` in DB for emails sent successfully
+    if (successfullySentIds.length > 0) {
+      await prismaClient.userOrganisationInvitation.updateMany({
+        where: {
+          id: { in: successfullySentIds },
+        },
+        data: {
+          failureNotifiedAt: todayUTCDate.toDate(),
+        },
+      })
+    }
+  }
 }
