@@ -1,10 +1,9 @@
 import { getSponsorEngagementUrl } from './utils'
 
-describe('getSponsorEngagementUrl', () => {
+describe('getSponsorEngagementUrl()', () => {
   const originalEnv = process.env
 
   beforeEach(() => {
-    jest.resetModules()
     process.env = { ...originalEnv }
   })
 
@@ -13,7 +12,7 @@ describe('getSponsorEngagementUrl', () => {
   })
 
   it('should return localhost URL with custom WEB_PORT when APP_ENV is not set', () => {
-    delete process.env.APP_ENV
+    process.env.APP_ENV = undefined
     process.env.WEB_PORT = '2000'
 
     const result = getSponsorEngagementUrl()
