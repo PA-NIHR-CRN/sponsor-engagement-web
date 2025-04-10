@@ -10,11 +10,10 @@ This is the location of the Sponsor Engagement invitation-monitor scheduled task
 
 ## Environment Variables
 
-| Variable                | Info                                             |
-| ----------------------- | ------------------------------------------------ |
-| `AWS_ACCESS_KEY_ID`     | AWS Access Key ID. See SES section below.        |
-| `AWS_SECRET_ACCESS_KEY` | AWS Secret Access Key ID. See SES section below. |
-| `AWS_SESSION_TOKEN`     | AWS Session Token. See SES section below.        |
+| Variable                                | Info                                                                                                                |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `INVITE_EMAIL_DELIVERY_THRESHOLD_HOURS` | Specifies the number of hours to wait after an invitation email is sent, to mark it as failed if no status response |
+| `AWS_SDK_LOAD_CONFIG`                   | Required to use SSO                                                                                                 |
 
 ## Install locally
 
@@ -31,7 +30,3 @@ This is the location of the Sponsor Engagement invitation-monitor scheduled task
 
 1. Execute `npm run build`
 2. Execute `node dist/index.js`
-
-## SES
-
-Checking email statuses requires adding AWS credentials to `.env`. These are temporary credentials with a 1 hour expiry. From the AWS account page, click **Command line or programmatic access** and copy over the `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_SESSION_TOKEN` values.

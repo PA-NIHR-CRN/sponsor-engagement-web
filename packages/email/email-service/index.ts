@@ -1,7 +1,6 @@
 import type { SES } from 'aws-sdk'
 import { logger } from '@nihr-ui/logger'
 import Bottleneck from 'bottleneck'
-import type { EmailInsightsList } from 'aws-sdk/clients/sesv2'
 import { EMAIL_CHARSET, EMAIL_FROM_ADDRESS } from '../constants'
 
 export interface EmailArgs {
@@ -15,11 +14,6 @@ export interface EmailArgs {
 export interface EmailResult {
   messageId: string
   recipients: string[]
-}
-
-export interface EmailStatusResult {
-  messageId: string
-  insights: EmailInsightsList
 }
 
 export class EmailService {

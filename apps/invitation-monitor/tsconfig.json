@@ -5,8 +5,7 @@
     "module": "CommonJS",
     "outDir": "./dist",
     "rootDir": "./src",
-    "downlevelIteration": true,
-    // "target": "ES2020"
+    "downlevelIteration": true
   },
   "exclude": ["dist", "build", "node_modules", "**/*.spec.ts", "src/mocks/**/*"],
   "include": ["src/**/*.ts"]

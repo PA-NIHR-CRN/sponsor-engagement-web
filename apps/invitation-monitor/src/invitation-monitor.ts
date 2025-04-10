@@ -47,7 +47,7 @@ const fetchEmailStatusInner = async (emailMessageId: string): Promise<EmailStatu
   return { messageId, insights }
 }
 
-const fetchEmailStatusWithRetries = async (emailMessageId: string, maxAttempts = 3): Promise<EmailStatusResult> => {
+const fetchEmailStatus = async (emailMessageId: string, maxAttempts = 3): Promise<EmailStatusResult> => {
   return retry(
     async () => {
       return fetchEmailStatusInner(emailMessageId)
@@ -88,7 +88,7 @@ export const monitorInvitationEmails = async () => {
     return
   }
 
-  const getEmailStatusPromises = pendingEmails.map((email) => fetchEmailStatusWithRetries(email.messageId))
+  const getEmailStatusPromises = pendingEmails.map((email) => fetchEmailStatus(email.messageId))
   const emailStatusResults = await Promise.allSettled(getEmailStatusPromises)
   const successIds = []
   const failedIds = []
