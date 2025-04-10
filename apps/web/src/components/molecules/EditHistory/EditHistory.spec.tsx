@@ -10,17 +10,19 @@ const mockEditHistory = [
     id: '1',
     modifiedDate: new Date().toISOString(),
     changes: [],
+    leadAdministrationId: 1,
   },
   {
     id: '2',
     modifiedDate: new Date().toISOString(),
     changes: [],
+    leadAdministrationId: 1,
   },
 ]
 
 describe('<EditHistory/>', () => {
   it('should correctly display the default text', async () => {
-    render(<EditHistory editHistoryItems={mockEditHistory} />)
+    render(<EditHistory editHistoryItems={mockEditHistory} leadAdministrationId={null} />)
 
     const viewEditHistory = screen.getByRole('group')
     expect(within(viewEditHistory).getByText('View edit history')).toBeInTheDocument()
@@ -37,7 +39,7 @@ describe('<EditHistory/>', () => {
   })
 
   it('should return the correct copy if there are no edit history items', async () => {
-    render(<EditHistory editHistoryItems={[]} />)
+    render(<EditHistory editHistoryItems={[]} leadAdministrationId={1} />)
 
     const viewEditHistory = screen.getByRole('group')
     expect(viewEditHistory).toBeInTheDocument()
@@ -48,7 +50,7 @@ describe('<EditHistory/>', () => {
   })
 
   it('should return the correct copy when there is an error message', async () => {
-    render(<EditHistory editHistoryItems={[]} error />)
+    render(<EditHistory editHistoryItems={[]} error leadAdministrationId={2} />)
 
     const viewEditHistory = screen.getByRole('group')
     expect(viewEditHistory).toBeInTheDocument()
@@ -59,7 +61,9 @@ describe('<EditHistory/>', () => {
   })
 
   it('should auto expand the relevant item', async () => {
-    render(<EditHistory editHistoryItems={mockEditHistory} idToAutoExpand={mockEditHistory[1].id} />)
+    render(
+      <EditHistory editHistoryItems={mockEditHistory} idToAutoExpand={mockEditHistory[1].id} leadAdministrationId={3} />
+    )
 
     const viewEditHistory = screen.getByRole('group')
     expect(within(viewEditHistory).getByText('View edit history')).toBeInTheDocument()

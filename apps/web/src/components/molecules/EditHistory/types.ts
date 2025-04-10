@@ -8,6 +8,7 @@ export interface EditHistoryChange {
 
 export interface EditHistory {
   id: string
+  leadAdministrationId?: number | null
   modifiedDate: string
   userEmail?: string
   studyUpdateType?: StudyUpdateType

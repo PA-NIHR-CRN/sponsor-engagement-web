@@ -125,6 +125,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
             editHistoryItems={editHistory ?? []}
             error={Boolean(getEditHistoryError)}
             idToAutoExpand={transactionIdLatestProposedUpdate}
+            leadAdministrationId={study.leadAdministrationId}
           />
 
           <Table className="govuk-!-margin-top-3">
@@ -283,7 +284,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
   )
 
   const { data: editHistory, error: getEditHistoryError } = await getEditHistory(studyId, studyInCPMS.ChangeHistory)
-
+  console.log(updatedStudy)
   return {
     props: {
       user: session.user,

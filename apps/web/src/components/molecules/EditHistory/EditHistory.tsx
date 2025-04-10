@@ -7,9 +7,10 @@ export interface EditHistoryProps {
   editHistoryItems: EditHistory[]
   idToAutoExpand?: string
   error?: boolean
+  leadAdministrationId: number | null
 }
 
-export function EditHistory({ editHistoryItems, idToAutoExpand, error }: EditHistoryProps) {
+export function EditHistory({ editHistoryItems, idToAutoExpand, error, leadAdministrationId }: EditHistoryProps) {
   return (
     <Details heading="View edit history" open={Boolean(idToAutoExpand)}>
       <Accordion defaultValue={[idToAutoExpand ?? '']} type="multiple">
@@ -18,6 +19,7 @@ export function EditHistory({ editHistoryItems, idToAutoExpand, error }: EditHis
             changes={editHistory.changes}
             id={editHistory.id}
             key={editHistory.id}
+            leadAdministrationId={leadAdministrationId}
             modifiedDate={editHistory.modifiedDate}
             studyUpdateType={editHistory.studyUpdateType}
             userEmail={editHistory.userEmail}

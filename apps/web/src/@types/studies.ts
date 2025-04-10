@@ -56,6 +56,7 @@ export interface Study {
   StudySponsors: StudySponsor[]
   organisationsByRole?: Partial<Record<OrganisationRoleShortName, string>>
   ChangeHistory: ChangeHistory[]
+  LeadAdministrationId: number
 }
 
 export enum StudyRecordStatus {
@@ -183,4 +184,11 @@ export enum StudyFunderOrganisationRole {
 
 export enum StudyFunderOrganisationRoleRTSIdentifier {
   Crfndr216840111388321385111107 = 'CRFNDR@2.16.840.1.113883.2.1.3.8.5.11.1.107',
+}
+
+export enum LeadAdministrationId {
+  England = 1,
+  Scotland = 2,
+  Wales = 3,
+  NorthernIreland = 4,
 }
