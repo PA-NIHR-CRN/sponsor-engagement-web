@@ -69,6 +69,18 @@ export default withApiHandler<ExtendedNextApiRequest>(
 
       logger.info('Removed contact with email %s from organisation %s', user.email, organisation.name)
 
+      // Remove corresponding entries in UserOrganisationInvitation table
+      await prismaClient.userOrganisationInvitation.updateMany({
+        where: {
+          userOrganisationId: Number(userOrganisationId),
+        },
+        data: {
+          isDeleted: true,
+        },
+      })
+
+      logger.info('Successfully removed entry in UserOrganisationInvitation table')
+
       const isEligibleForOdpRole = await isUserEligibleForOdpRole(user.id)
 
       if (!isEligibleForOdpRole) {
