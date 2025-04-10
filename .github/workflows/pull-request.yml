@@ -90,6 +90,7 @@ jobs:
           multiple-files: |
             Web App, apps/web/coverage/coverage-summary.json
             Ingest App, apps/ingest/coverage/coverage-summary.json
+            Invitation Monitor App, apps/invitation-monitor/coverage/coverage-summary.json
             UI Package, packages/ui/coverage/coverage-summary.json
             Email Package, packages/email/coverage/coverage-summary.json
             Auth Package, packages/auth/coverage/coverage-summary.json
