@@ -116,10 +116,13 @@ describe('monitorInvitationEmails', () => {
       insights: [mockAWSBouncePermanentInsight],
     })
     mockEmailService.sendBulkEmail.mockImplementationOnce(async (_, onSuccess) => {
-      await onSuccess({
-        recipients: [pendingEmails[0].sentBy.email],
-        messageId: pendingEmails[0].messageId,
-      })
+      await onSuccess(
+        {
+          recipients: [pendingEmails[0].sentBy.email],
+          messageId: pendingEmails[0].messageId,
+        },
+        pendingEmails[0].id
+      )
     })
     prismaMock.userOrganisationInvitation.updateMany.mockResolvedValue({ count: 1 })
 
@@ -138,16 +141,19 @@ describe('monitorInvitationEmails', () => {
             recipientEmailAddress: pendingEmails[0].userOrganisation.user.email,
             sponsorEngagementToolLink: 'http://localhost:3000',
           },
+          identifier: pendingEmails[0].id,
         },
       ],
       expect.any(Function)
     )
 
+    expect(prismaMock.userOrganisationInvitation.updateMany).toHaveBeenCalledTimes(2)
+
     // Log failureNotifiedAt in DB
     expect(prismaMock.userOrganisationInvitation.updateMany).toHaveBeenNthCalledWith(2, {
       where: {
-        messageId: {
-          in: [pendingEmails[0].messageId],
+        id: {
+          in: [pendingEmails[0].id],
         },
       },
       data: {
@@ -156,6 +162,31 @@ describe('monitorInvitationEmails', () => {
     })
 
     jest.useRealTimers()
+  })
+
+  it(`should not log 'failureNotifiedAt' field in DB when email status is updated to 'Failure' within the DB AND new email was not successfully sent`, async () => {
+    const todaysDate = mockGetCurrentDate(0)
+    jest.useFakeTimers().setSystemTime(todaysDate)
+
+    mockUserOrgInvitationFindMany()
+    mockEmailDeliverabilityService.getEmailInsights.mockResolvedValueOnce({
+      messageId: pendingEmails[0].messageId,
+      insights: [mockAWSBouncePermanentInsight],
+    })
+    mockEmailService.sendBulkEmail.mockResolvedValueOnce()
+    prismaMock.userOrganisationInvitation.updateMany.mockResolvedValue({ count: 1 })
+
+    await monitorInvitationEmails()
+
+    // Send email
+    expect(mockEmailService.sendBulkEmail).toHaveBeenCalledTimes(1)
+    expect(prismaMock.userOrganisationInvitation.updateMany).toHaveBeenCalledTimes(1) // Only once to update status
+    expect(prismaMock.userOrganisationInvitation.updateMany).toHaveBeenCalledWith({
+      data: {
+        statusId: 3,
+      },
+      where: { id: { in: [pendingEmails[0].id] } },
+    })
   })
 
   describe('given email was sent within 72 hours', () => {

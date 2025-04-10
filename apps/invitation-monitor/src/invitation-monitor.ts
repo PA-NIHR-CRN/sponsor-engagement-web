@@ -170,7 +170,7 @@ export const monitorInvitationEmails = async () => {
   )
 
   if (failedEmailDetails.length > 0) {
-    const emailInputs = failedEmailDetails.map(({ sentByEmail, userEmail }) => ({
+    const emailInputs = failedEmailDetails.map(({ id, sentByEmail, userEmail }) => ({
       to: sentByEmail,
       subject: `The invitation email for a new Sponsor Contact has not been delivered successfully`,
       htmlTemplate: emailTemplates['invitation-email-unsuccessful.html.hbs'],
@@ -179,19 +179,27 @@ export const monitorInvitationEmails = async () => {
         recipientEmailAddress: userEmail,
         sponsorEngagementToolLink: getSponsorEngagementUrl(),
       },
+      identifier: id,
     }))
 
-    await emailService.sendBulkEmail(emailInputs, async () => {
-      logger.info('Successfully sent emails')
+    const successfullySentIds: number[] = []
 
+    await emailService.sendBulkEmail(emailInputs, (_, identifier) => {
+      if (identifier) successfullySentIds.push(identifier)
+    })
+
+    logger.info('Successfully sent %s/%s emails', successfullySentIds.length, failedEmailDetails.length)
+
+    // Log `failureNotifiedAt` in DB for emails sent successfully
+    if (successfullySentIds.length > 0) {
       await prismaClient.userOrganisationInvitation.updateMany({
         where: {
-          id: { in: failedIds },
+          id: { in: successfullySentIds },
         },
         data: {
           failureNotifiedAt: todayUTCDate.toDate(),
         },
       })
-    })
+    }
   }
 }

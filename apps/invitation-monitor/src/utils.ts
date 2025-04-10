@@ -9,6 +9,3 @@ export const getSponsorEngagementUrl = () => {
 
   return `https://${env}.assessmystudy.nihr.ac.uk`
 }
-
-export const isFulfilled = <T>(input: PromiseSettledResult<T>): input is PromiseFulfilledResult<T> =>
-  input.status === 'fulfilled'
