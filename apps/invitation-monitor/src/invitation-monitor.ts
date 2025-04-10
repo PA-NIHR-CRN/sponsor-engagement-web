@@ -10,14 +10,14 @@ import { emailTemplates } from '@nihr-ui/templates/sponsor-engagement'
 import { retry } from '@lifeomic/attempt'
 import { PERMANENT_EMAIL_FAILURES, UserOrganisationInviteStatus } from './lib/constants'
 import { prismaClient } from './lib/prisma'
-import type { UserOrgnaisationInvitations } from './types'
+import type { UserOrganisationInvitations } from './types'
 import { getSponsorEngagementUrl } from './utils'
 
 dotEnvConfig()
 // eslint-disable-next-line import/no-named-as-default-member -- intentional to use this extend from dayjs obj
 dayjs.extend(utc)
 
-const fetchPendingEmails = async (pendingStatusId: number): Promise<UserOrgnaisationInvitations> => {
+const fetchPendingEmails = async (pendingStatusId: number): Promise<UserOrganisationInvitations> => {
   return prismaClient.userOrganisationInvitation.findMany({
     where: { statusId: pendingStatusId, isDeleted: false },
     distinct: ['userOrganisationId'],

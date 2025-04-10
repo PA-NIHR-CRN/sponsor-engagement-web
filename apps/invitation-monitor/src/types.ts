@@ -1,6 +1,6 @@
 import type { Prisma } from 'database'
 
-export type UserOrgnaisationInvitations = Prisma.UserOrganisationInvitationGetPayload<{
+export type UserOrganisationInvitations = Prisma.UserOrganisationInvitationGetPayload<{
   select: {
     id: true
     messageId: true

@@ -1,7 +1,7 @@
 import { Mock } from 'ts-mockery'
-import type { UserOrgnaisationInvitations } from '../types'
+import type { UserOrganisationInvitations } from '../types'
 
-export const pendingEmails = Mock.of<UserOrgnaisationInvitations>([
+export const pendingEmails = Mock.of<UserOrganisationInvitations>([
   {
     id: 1,
     messageId: '1-1-1',
