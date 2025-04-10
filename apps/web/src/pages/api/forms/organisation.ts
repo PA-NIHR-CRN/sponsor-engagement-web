@@ -210,6 +210,11 @@ export default withApiHandler<ExtendedNextApiRequest>(
               id: userOrganisationId,
             },
           },
+          sentBy: {
+            connect: {
+              id: requestedByUserId,
+            },
+          },
         },
       })
 

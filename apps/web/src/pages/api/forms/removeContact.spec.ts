@@ -58,6 +58,7 @@ describe('Successful remove organisation contact', () => {
   ])('Removing user from an organisation', async (userSession: Session) => {
     jest.mocked(getServerSession).mockResolvedValueOnce(userSession)
     jest.mocked(prismaClient.userOrganisation.findFirst).mockResolvedValueOnce(mockUserOrganisation)
+    jest.mocked(prismaClient.userOrganisationInvitation.updateMany).mockResolvedValueOnce({ count: 1 })
 
     const updateUserOrgMock = jest
       .mocked(prismaClient.userOrganisation.update)
@@ -93,6 +94,15 @@ describe('Successful remove organisation contact', () => {
     // Redirect back to organisation page
     expect(res.statusCode).toBe(302)
     expect(res._getRedirectUrl()).toBe(`/organisations/${mockUserOrganisation.organisation.id}?success=2`)
+
+    expect(prismaClient.userOrganisationInvitation.updateMany).toHaveBeenCalledWith({
+      where: {
+        userOrganisationId: mockUserOrganisation.id,
+      },
+      data: {
+        isDeleted: true,
+      },
+    })
   })
 })
 

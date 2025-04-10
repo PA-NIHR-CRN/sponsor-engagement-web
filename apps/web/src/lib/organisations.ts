@@ -110,6 +110,20 @@ const organisationByIdRelations = {
       },
       include: {
         user: true,
+        invitations: {
+          select: {
+            status: {
+              select: {
+                name: true,
+              },
+            },
+          },
+          where: {
+            isDeleted: false,
+          },
+          distinct: [Prisma.UserOrganisationInvitationScalarFieldEnum.userOrganisationId],
+          orderBy: { timestamp: Prisma.SortOrder.desc },
+        },
       },
       orderBy: {
         updatedAt: Prisma.SortOrder.desc,

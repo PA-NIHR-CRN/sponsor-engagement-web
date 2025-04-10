@@ -11,7 +11,7 @@ import { retry } from '@lifeomic/attempt'
 import { PERMANENT_EMAIL_FAILURES, UserOrganisationInviteStatus } from './lib/constants'
 import { prismaClient } from './lib/prisma'
 import type { UserOrgnaisationInvitations } from './types'
-import { isFulfilled, getSponsorEngagementUrl } from './utils'
+import { getSponsorEngagementUrl } from './utils'
 
 dotEnvConfig()
 // eslint-disable-next-line import/no-named-as-default-member -- intentional to use this extend from dayjs obj
@@ -59,7 +59,7 @@ const fetchEmailStatusInner = async (emailMessageId: string): Promise<EmailStatu
   return { messageId, insights }
 }
 
-const fetchEmailStatusWithRetries = async (emailMessageId: string, maxAttempts = 3): Promise<EmailStatusResult> => {
+const fetchEmailStatus = async (emailMessageId: string, maxAttempts = 3): Promise<EmailStatusResult> => {
   return retry(
     async () => {
       return fetchEmailStatusInner(emailMessageId)
@@ -100,7 +100,7 @@ export const monitorInvitationEmails = async () => {
     return
   }
 
-  const getEmailStatusPromises = pendingEmails.map((email) => fetchEmailStatusWithRetries(email.messageId))
+  const getEmailStatusPromises = pendingEmails.map((email) => fetchEmailStatus(email.messageId))
   const emailStatusResults = await Promise.allSettled(getEmailStatusPromises)
   const successIds = []
   const failedEmailDetails: { id: number; userEmail: string; sentByEmail: string }[] = []
@@ -109,7 +109,7 @@ export const monitorInvitationEmails = async () => {
   for (const email of pendingEmails) {
     const id = email.id
     const emailDetails = emailStatusResults
-      .filter((result) => isFulfilled(result))
+      .filter((result): result is PromiseFulfilledResult<EmailStatusResult> => result.status === 'fulfilled')
       .find((statusResult) => statusResult.value.messageId === email.messageId)
 
     if (!emailDetails) {

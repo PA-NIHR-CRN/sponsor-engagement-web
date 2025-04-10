@@ -1,4 +1,4 @@
-import { emailDeliverabilityService } from '@nihr-ui/email'
+import { emailDeliverabilityService, emailService } from '@nihr-ui/email'
 import { BounceType, EventType, TooManyRequestsException } from '@aws-sdk/client-sesv2'
 import { monitorInvitationEmails } from '../invitation-monitor'
 import { prismaMock } from '../mocks/prisma'
@@ -14,6 +14,7 @@ const mockFetchStatusIds = () => {
 }
 
 const mockEmailDeliverabilityService = emailDeliverabilityService as jest.Mocked<typeof emailDeliverabilityService>
+const mockEmailService = emailService as jest.Mocked<typeof emailService>
 
 const mockGetCurrentDate = (numOfDaysToAdjust: number) => {
   const today = new Date(pendingEmails[0].timestamp)
@@ -77,22 +78,6 @@ describe('monitorInvitationEmails', () => {
     })
   })
 
-  it('should retry once if initial request to fetch status from AWS fails due to too many requests', async () => {
-    mockUserOrgInvitationFindMany()
-
-    mockEmailService.getEmailInsights.mockRejectedValueOnce(
-      new TooManyRequestsException({ message: 'Oh no an error', $metadata: {} })
-    )
-    mockEmailService.getEmailInsights.mockResolvedValueOnce({
-      messageId: pendingEmails[0].messageId,
-      insights: [mockAWSDeliveredInsight],
-    })
-
-    await monitorInvitationEmails()
-
-    expect(mockEmailService.getEmailInsights).toHaveBeenCalledTimes(2)
-  })
-
   it('should not throw an error when request to fetch status from AWS fails', async () => {
     mockUserOrgInvitationFindMany()
 
@@ -104,22 +89,9 @@ describe('monitorInvitationEmails', () => {
     expect(prismaMock.userOrganisationInvitation.updateMany).not.toHaveBeenCalled()
   })
 
-  it('should not throw an error when when insights array is empty', async () => {
+  it('should throw an error when DB request throws an error', async () => {
     mockUserOrgInvitationFindMany()
-
-    mockEmailService.getEmailInsights.mockResolvedValueOnce({
-      messageId: pendingEmails[0].messageId,
-      insights: [],
-    })
-
-    await expect(monitorInvitationEmails()).resolves.not.toThrow()
-
-    expect(prismaMock.userOrganisationInvitation.updateMany).not.toHaveBeenCalled()
-  })
-
-  it('should not throw an error when DB request fails', async () => {
-    mockUserOrgInvitationFindMany()
-    mockEmailService.getEmailInsights.mockResolvedValueOnce({
+    mockEmailDeliverabilityService.getEmailInsights.mockResolvedValueOnce({
       messageId: pendingEmails[0].messageId,
       insights: [mockAWSDeliveredInsight],
     })
@@ -139,7 +111,7 @@ describe('monitorInvitationEmails', () => {
     jest.useFakeTimers().setSystemTime(todaysDate)
 
     mockUserOrgInvitationFindMany()
-    mockEmailService.getEmailInsights.mockResolvedValueOnce({
+    mockEmailDeliverabilityService.getEmailInsights.mockResolvedValueOnce({
       messageId: pendingEmails[0].messageId,
       insights: [mockAWSBouncePermanentInsight],
     })
@@ -200,7 +172,7 @@ describe('monitorInvitationEmails', () => {
     })
 
     it('should not throw an error when when insights array is empty', async () => {
-      prismaMock.userOrganisationInvitation.findMany.mockResolvedValueOnce(pendingEmails)
+      mockUserOrgInvitationFindMany()
 
       mockEmailDeliverabilityService.getEmailInsights.mockResolvedValueOnce({
         messageId: pendingEmails[0].messageId,
@@ -213,7 +185,7 @@ describe('monitorInvitationEmails', () => {
     })
 
     it('should retry if initial request to fetch status from AWS fails due to too many requests', async () => {
-      prismaMock.userOrganisationInvitation.findMany.mockResolvedValueOnce(pendingEmails)
+      mockUserOrgInvitationFindMany()
 
       mockEmailDeliverabilityService.getEmailInsights.mockRejectedValueOnce(
         new TooManyRequestsException({ message: 'Oh no an error', $metadata: {} })
