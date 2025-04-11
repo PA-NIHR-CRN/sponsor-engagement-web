@@ -109,6 +109,7 @@ describe('ingest', () => {
       actualClosureDate: expect.any(Date),
       estimatedReopeningDate: expect.any(Date),
       isDeleted: false,
+      leadAdministrationId: mockStudy.LeadAdministrationId,
     }
 
     expect(prismaMock.study.upsert).toHaveBeenCalledTimes(3)

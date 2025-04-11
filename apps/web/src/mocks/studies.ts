@@ -1,5 +1,6 @@
 import { simpleFaker } from '@faker-js/faker'
 import type { Prisma } from 'database'
+import { LeadAdministrationId } from 'shared-utilities/src/utils/lead-administration-id'
 import { Mock } from 'ts-mockery'
 
 import type { CPMSValidationResult, Study } from '@/@types/studies'
@@ -31,6 +32,7 @@ export const mockStudiesForExport = Array.from({ length: 3 }).map((_, index) =>
     sampleSize: simpleFaker.number.int(),
     totalRecruitmentToDate: simpleFaker.number.int(),
     dueAssessmentAt: index === 0 ? new Date('2001-01-01') : null,
+    leadAdministrationId: LeadAdministrationId.England,
     organisations: [
       {
         organisation: {
@@ -111,6 +113,7 @@ export const mockCPMSStudy = Mock.of<Study>({
   ManagingSpecialty: 'Musculoskeletal Disorders',
   ChiefInvestigatorFirstName: 'John',
   ChiefInvestigatorLastName: 'Smith',
+  LeadAdministrationId: LeadAdministrationId.England,
   StudyEvaluationCategories: [
     {
       EvaluationCategoryType: 'Recruitment concerns',

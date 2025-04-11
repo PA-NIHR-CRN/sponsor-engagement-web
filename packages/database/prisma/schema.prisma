@@ -39,6 +39,7 @@ model Study {
   dueAssessmentAt            DateTime?
   isDeleted                  Boolean?                  @default(false)
   StudyUpdates               StudyUpdates[]
+  leadAdministrationId       Int?
 
   @@index([cpmsId])
 }

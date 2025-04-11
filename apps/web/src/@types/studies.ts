@@ -1,3 +1,5 @@
+import type { LeadAdministrationId } from 'shared-utilities/src/utils/lead-administration-id'
+
 import type { OrganisationRoleShortName } from '@/lib/organisations'
 
 interface CPMSResponse<T> {
@@ -56,6 +58,7 @@ export interface Study {
   StudySponsors: StudySponsor[]
   organisationsByRole?: Partial<Record<OrganisationRoleShortName, string>>
   ChangeHistory: ChangeHistory[]
+  LeadAdministrationId: LeadAdministrationId | null
 }
 
 export enum StudyRecordStatus {
