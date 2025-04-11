@@ -1,6 +1,7 @@
 import { Accordion } from '@nihr-ui/frontend'
 import userEvent from '@testing-library/user-event'
 
+import { LeadAdministrationId } from '@/@types/studies'
 import { render } from '@/config/TestUtils'
 import { StudyUpdateType } from '@/constants'
 
@@ -15,7 +16,7 @@ const mockProposedEditHistory = {
   LSN: '9867677',
   modifiedDate: '2024-10-10T00:00:00.000Z',
   userEmail: 'sponsor.contact@nihr.ac.uk',
-  leadAdministrationId: 1,
+  leadAdministrationId: LeadAdministrationId.England,
   changes: [
     {
       id: '3454334',
@@ -29,7 +30,7 @@ const mockProposedEditHistory2 = {
   LSN: '9867557',
   modifiedDate: '2024-11-10T00:00:00.000Z',
   userEmail: 'sponsor.contact2@nihr.ac.uk',
-  leadAdministrationId: 2,
+  leadAdministrationId: LeadAdministrationId.Scotland,
   changes: [
     {
       id: '3454334',
@@ -43,7 +44,7 @@ const mockProposedEditHistory3 = {
   LSN: '9867377',
   modifiedDate: '2024-10-11T00:00:00.000Z',
   userEmail: 'sponsor.contact3@nihr.ac.uk',
-  leadAdministrationId: 3,
+  leadAdministrationId: LeadAdministrationId.Wales,
   changes: [
     {
       id: '345464',
@@ -57,7 +58,7 @@ const mockProposedEditHistory4 = {
   LSN: '9867687',
   modifiedDate: '2024-10-12T00:00:00.000Z',
   userEmail: 'sponsor.contact4@nihr.ac.uk',
-  leadAdministrationId: 4,
+  leadAdministrationId: LeadAdministrationId.NorthernIreland,
   changes: [
     {
       id: '3114334',
@@ -75,7 +76,7 @@ describe('<EditHistoryItem/>', () => {
         <EditHistoryItem
           changes={mockProposedEditHistory.changes}
           id={mockProposedEditHistory.LSN}
-          leadAdministrationId={null}
+          leadAdministrationId={undefined}
           modifiedDate={mockProposedEditHistory.modifiedDate}
           studyUpdateType={StudyUpdateType.Proposed}
           userEmail={mockProposedEditHistory.userEmail}
@@ -98,7 +99,7 @@ describe('<EditHistoryItem/>', () => {
         <EditHistoryItem
           changes={mockProposedEditHistory.changes}
           id={mockProposedEditHistory.LSN}
-          leadAdministrationId={null}
+          leadAdministrationId={undefined}
           modifiedDate={mockProposedEditHistory.modifiedDate}
           studyUpdateType={StudyUpdateType.Direct}
           userEmail={mockProposedEditHistory.userEmail}

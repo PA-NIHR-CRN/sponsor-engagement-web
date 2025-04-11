@@ -16,6 +16,6 @@ describe('getEditAdmin', () => {
     expect(getEditAdmin(LeadAdministrationId.Wales)).toBe('Health and Care Research Wales Admin')
   })
   it('returns undefined for null input', () => {
-    expect(getEditAdmin(null)).toBeUndefined()
+    expect(getEditAdmin(undefined)).toBeUndefined()
   })
 })

@@ -42,11 +42,18 @@ export interface ResultResult {
   Entity: null
 }
 
+export enum LeadAdministrationId {
+  England = 1,
+  Scotland = 2,
+  Wales = 3,
+  NorthernIreland = 4,
+}
+
 export interface Study {
   Id: number
   ShortName: string
   Title: string
-  LeadAdministrationId: number
+  LeadAdministrationId: LeadAdministrationId
   StudyStatus: Status
   StudyRecordStatus: StudyRecordStatus
   StudyRoute: StudyRoute

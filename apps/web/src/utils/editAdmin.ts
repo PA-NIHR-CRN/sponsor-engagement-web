@@ -1,6 +1,6 @@
 import { LeadAdministrationId } from '@/@types/studies'
 
-export const getEditAdmin = (LeadAdmin?: number | null) => {
+export const getEditAdmin = (LeadAdmin?: LeadAdministrationId) => {
   const adminMap: Record<LeadAdministrationId, string> = {
     [LeadAdministrationId.Scotland]: 'Scotland Admin',
     [LeadAdministrationId.NorthernIreland]: 'NI Portfolio Admin',

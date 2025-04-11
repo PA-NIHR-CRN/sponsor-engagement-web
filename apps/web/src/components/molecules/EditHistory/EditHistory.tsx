@@ -1,5 +1,7 @@
 import { Accordion, Details } from '@nihr-ui/frontend'
 
+import type { LeadAdministrationId } from '@/@types/studies'
+
 import { EditHistoryItem } from './EditHistoryItem/EditHistoryItem'
 import type { EditHistory } from './types'
 
@@ -7,7 +9,7 @@ export interface EditHistoryProps {
   editHistoryItems: EditHistory[]
   idToAutoExpand?: string
   error?: boolean
-  leadAdministrationId: number | null
+  leadAdministrationId: LeadAdministrationId
 }
 
 export function EditHistory({ editHistoryItems, idToAutoExpand, error, leadAdministrationId }: EditHistoryProps) {

@@ -1,3 +1,4 @@
+import type { LeadAdministrationId } from '@/@types/studies'
 import type { StudyUpdateType } from '@/constants'
 
 export interface EditHistoryChange {
@@ -8,7 +9,7 @@ export interface EditHistoryChange {
 
 export interface EditHistory {
   id: string
-  leadAdministrationId?: number | null
+  leadAdministrationId?: LeadAdministrationId
   modifiedDate: string
   userEmail?: string
   studyUpdateType?: StudyUpdateType

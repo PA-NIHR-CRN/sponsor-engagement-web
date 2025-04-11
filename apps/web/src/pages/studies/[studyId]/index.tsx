@@ -6,6 +6,7 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import type { ReactElement } from 'react'
 
+import type { LeadAdministrationId } from '@/@types/studies'
 import { Status } from '@/@types/studies'
 import {
   AssessmentHistory,
@@ -125,7 +126,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
             editHistoryItems={editHistory ?? []}
             error={Boolean(getEditHistoryError)}
             idToAutoExpand={transactionIdLatestProposedUpdate}
-            leadAdministrationId={study.leadAdministrationId}
+            leadAdministrationId={study.leadAdministrationId as LeadAdministrationId}
           />
 
           <Table className="govuk-!-margin-top-3">
@@ -284,7 +285,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
   )
 
   const { data: editHistory, error: getEditHistoryError } = await getEditHistory(studyId, studyInCPMS.ChangeHistory)
-  console.log(updatedStudy)
+
   return {
     props: {
       user: session.user,

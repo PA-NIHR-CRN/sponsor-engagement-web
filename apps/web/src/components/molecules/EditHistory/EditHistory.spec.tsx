@@ -1,6 +1,7 @@
 import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
+import { LeadAdministrationId } from '@/@types/studies'
 import { render } from '@/config/TestUtils'
 
 import { EditHistory } from './EditHistory'
@@ -10,19 +11,19 @@ const mockEditHistory = [
     id: '1',
     modifiedDate: new Date().toISOString(),
     changes: [],
-    leadAdministrationId: 1,
+    leadAdministrationId: LeadAdministrationId.England,
   },
   {
     id: '2',
     modifiedDate: new Date().toISOString(),
     changes: [],
-    leadAdministrationId: 1,
+    leadAdministrationId: LeadAdministrationId.England,
   },
 ]
 
 describe('<EditHistory/>', () => {
   it('should correctly display the default text', async () => {
-    render(<EditHistory editHistoryItems={mockEditHistory} leadAdministrationId={null} />)
+    render(<EditHistory editHistoryItems={mockEditHistory} leadAdministrationId={LeadAdministrationId.England} />)
 
     const viewEditHistory = screen.getByRole('group')
     expect(within(viewEditHistory).getByText('View edit history')).toBeInTheDocument()
