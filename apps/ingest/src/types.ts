@@ -1,4 +1,5 @@
 import type { Prisma } from 'database'
+import type { LeadAdministrationId } from 'shared-utilities/src/utils/lead-administration-id'
 
 export enum StudyRecordStatus {
   Live = 'SRS_LIVE@2.16.840.1.113883.2.1.3.8.5.2.4.230',
@@ -42,18 +43,11 @@ export interface ResultResult {
   Entity: null
 }
 
-export enum LeadAdministrationId {
-  England = 1,
-  Scotland = 2,
-  Wales = 3,
-  NorthernIreland = 4,
-}
-
 export interface Study {
   Id: number
   ShortName: string
   Title: string
-  LeadAdministrationId: LeadAdministrationId
+  LeadAdministrationId: null | LeadAdministrationId
   StudyStatus: Status
   StudyRecordStatus: StudyRecordStatus
   StudyRoute: StudyRoute

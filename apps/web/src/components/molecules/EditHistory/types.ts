@@ -1,4 +1,5 @@
-import type { LeadAdministrationId } from '@/@types/studies'
+import type { LeadAdministrationId } from 'shared-utilities/src/utils/lead-administration-id'
+
 import type { StudyUpdateType } from '@/constants'
 
 export interface EditHistoryChange {
@@ -9,7 +10,7 @@ export interface EditHistoryChange {
 
 export interface EditHistory {
   id: string
-  leadAdministrationId?: LeadAdministrationId
+  leadAdministrationId?: LeadAdministrationId | null
   modifiedDate: string
   userEmail?: string
   studyUpdateType?: StudyUpdateType

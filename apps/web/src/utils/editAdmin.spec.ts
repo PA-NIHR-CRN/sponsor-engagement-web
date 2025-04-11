@@ -1,4 +1,4 @@
-import { LeadAdministrationId } from '@/@types/studies'
+import { LeadAdministrationId } from 'shared-utilities/src/utils/lead-administration-id'
 
 import { getEditAdmin } from './editAdmin'
 
@@ -15,7 +15,7 @@ describe('getEditAdmin', () => {
   it('returns correct admin label for Wales Admin', () => {
     expect(getEditAdmin(LeadAdministrationId.Wales)).toBe('Health and Care Research Wales Admin')
   })
-  it('returns undefined for null input', () => {
-    expect(getEditAdmin(undefined)).toBeUndefined()
+  it('returns empty label for null input', () => {
+    expect(getEditAdmin(null)).toBe('')
   })
 })

@@ -5,8 +5,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import type { ReactElement } from 'react'
+import type { LeadAdministrationId } from 'shared-utilities/src/utils/lead-administration-id'
 
-import type { LeadAdministrationId } from '@/@types/studies'
 import { Status } from '@/@types/studies'
 import {
   AssessmentHistory,

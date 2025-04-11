@@ -1,10 +1,10 @@
 import { simpleFaker } from '@faker-js/faker'
 import type { Prisma } from 'database'
+import { LeadAdministrationId } from 'shared-utilities/src/utils/lead-administration-id'
 import { Mock } from 'ts-mockery'
 
 import type { CPMSValidationResult, Study } from '@/@types/studies'
 import {
-  LeadAdministrationId,
   StudySponsorOrganisationRole,
   StudySponsorOrganisationRoleRTSIdentifier,
   StudyUpdateRoute,

@@ -1,7 +1,7 @@
 import { Accordion } from '@nihr-ui/frontend'
 import userEvent from '@testing-library/user-event'
+import { LeadAdministrationId } from 'shared-utilities/src/utils/lead-administration-id'
 
-import { LeadAdministrationId } from '@/@types/studies'
 import { render } from '@/config/TestUtils'
 import { StudyUpdateType } from '@/constants'
 
@@ -76,7 +76,7 @@ describe('<EditHistoryItem/>', () => {
         <EditHistoryItem
           changes={mockProposedEditHistory.changes}
           id={mockProposedEditHistory.LSN}
-          leadAdministrationId={undefined}
+          leadAdministrationId={null}
           modifiedDate={mockProposedEditHistory.modifiedDate}
           studyUpdateType={StudyUpdateType.Proposed}
           userEmail={mockProposedEditHistory.userEmail}
@@ -99,7 +99,7 @@ describe('<EditHistoryItem/>', () => {
         <EditHistoryItem
           changes={mockProposedEditHistory.changes}
           id={mockProposedEditHistory.LSN}
-          leadAdministrationId={undefined}
+          leadAdministrationId={null}
           modifiedDate={mockProposedEditHistory.modifiedDate}
           studyUpdateType={StudyUpdateType.Direct}
           userEmail={mockProposedEditHistory.userEmail}

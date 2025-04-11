@@ -1,7 +1,7 @@
 import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { LeadAdministrationId } from 'shared-utilities/src/utils/lead-administration-id'
 
-import { LeadAdministrationId } from '@/@types/studies'
 import { render } from '@/config/TestUtils'
 
 import { EditHistory } from './EditHistory'
@@ -40,7 +40,7 @@ describe('<EditHistory/>', () => {
   })
 
   it('should return the correct copy if there are no edit history items', async () => {
-    render(<EditHistory editHistoryItems={[]} leadAdministrationId={1} />)
+    render(<EditHistory editHistoryItems={[]} leadAdministrationId={LeadAdministrationId.England} />)
 
     const viewEditHistory = screen.getByRole('group')
     expect(viewEditHistory).toBeInTheDocument()
@@ -51,7 +51,7 @@ describe('<EditHistory/>', () => {
   })
 
   it('should return the correct copy when there is an error message', async () => {
-    render(<EditHistory editHistoryItems={[]} error leadAdministrationId={2} />)
+    render(<EditHistory editHistoryItems={[]} error leadAdministrationId={LeadAdministrationId.Scotland} />)
 
     const viewEditHistory = screen.getByRole('group')
     expect(viewEditHistory).toBeInTheDocument()
@@ -63,7 +63,11 @@ describe('<EditHistory/>', () => {
 
   it('should auto expand the relevant item', async () => {
     render(
-      <EditHistory editHistoryItems={mockEditHistory} idToAutoExpand={mockEditHistory[1].id} leadAdministrationId={3} />
+      <EditHistory
+        editHistoryItems={mockEditHistory}
+        idToAutoExpand={mockEditHistory[1].id}
+        leadAdministrationId={LeadAdministrationId.Wales}
+      />
     )
 
     const viewEditHistory = screen.getByRole('group')
