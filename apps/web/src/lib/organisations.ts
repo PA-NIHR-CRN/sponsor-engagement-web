@@ -96,9 +96,6 @@ export const getStudyOrganisations = async ({
       studies: {
         some: {},
       },
-      users: {
-        some: {},
-      },
       ...(userId !== undefined && userOrgsQuery),
       isDeleted: false,
     },
