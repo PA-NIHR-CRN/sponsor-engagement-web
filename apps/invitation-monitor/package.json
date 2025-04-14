@@ -38,6 +38,11 @@
     "entry": [
       "src/index.ts"
     ],
+    "noExternal": [
+      "@nihr-ui/logger",
+      "@nihr-ui/email",
+      "@nihr-ui/templates"
+    ],
     "splitting": false,
     "sourcemap": true,
     "clean": true
