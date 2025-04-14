@@ -18,6 +18,7 @@ on:
         options:
         - ingest
         - notify
+        - invitation-monitor
 
 env:
   AWS_DEFAULT_REGION: eu-west-2
