@@ -8,7 +8,7 @@ RUN apk update
 WORKDIR /app
 RUN npm i -g turbo@^1
 COPY . .
-RUN turbo prune --scope=ingest --docker
+RUN turbo prune --scope=invitation-monitor --docker
 
 
 # Add lockfile and package.json's of isolated subworkspace
