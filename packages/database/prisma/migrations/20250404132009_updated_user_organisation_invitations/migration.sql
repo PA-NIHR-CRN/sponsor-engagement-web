@@ -13,7 +13,7 @@ JOIN  (
 ) AS adminUser
 SET userOrgInvitation.`sentById` = adminUser.`id`;
 
---- Update `sentById` field to be required
+-- Update `sentById` field to be required
 ALTER TABLE `UserOrganisationInvitation` MODIFY COLUMN `sentById` INT NOT NULL;
 
 -- AddForeignKey
