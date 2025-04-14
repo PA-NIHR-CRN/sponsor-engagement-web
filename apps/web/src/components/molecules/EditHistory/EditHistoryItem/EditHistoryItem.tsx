@@ -1,17 +1,25 @@
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@nihr-ui/frontend'
+import type { LeadAdministrationId } from 'shared-utilities/src/utils/lead-administration-id'
 
 import { StudyUpdateType } from '@/constants'
+import { getEditAdmin } from '@/utils/editAdmin'
 
 import { EditHistoryChangeText } from '../EditHistoryChangeText/EditHistoryChangeText'
 import type { EditHistory } from '../types'
 
-export function EditHistoryItem({ id, studyUpdateType, modifiedDate, userEmail, changes }: EditHistory) {
+export function EditHistoryItem({
+  id,
+  leadAdministrationId,
+  studyUpdateType,
+  modifiedDate,
+  userEmail,
+  changes,
+}: EditHistory) {
   const [studyUpdateTypeText, studyUpdateTypeVerb] = [
     studyUpdateType === StudyUpdateType.Proposed ? 'Proposed change' : 'Change',
     studyUpdateType === StudyUpdateType.Proposed ? 'submitted by' : 'made by',
   ]
-
-  const updatedByWhoText = userEmail || 'RDN'
+  const updatedByWhoText = userEmail || getEditAdmin(leadAdministrationId as LeadAdministrationId)
 
   const formattedModifiedDate = new Date(modifiedDate).toLocaleDateString('en-GB', {
     day: 'numeric',
@@ -25,7 +33,7 @@ export function EditHistoryItem({ id, studyUpdateType, modifiedDate, userEmail, 
         className="text-sm [&>div]:max-w-[244px]"
         sideContent={
           <span>
-            <strong>{studyUpdateTypeText}</strong> {studyUpdateTypeVerb} {updatedByWhoText}
+            <strong>{studyUpdateTypeText}</strong> {studyUpdateTypeVerb} <strong>{updatedByWhoText}</strong>
           </span>
         }
       >

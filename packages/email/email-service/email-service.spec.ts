@@ -187,15 +187,21 @@ describe('EmailService', () => {
 
     expect(onSuccessSpy).toHaveBeenCalledTimes(2)
 
-    expect(onSuccessSpy).toHaveBeenCalledWith({
-      messageId: 123,
-      recipients: ['recipient1@example.com', 'recipient2@example.com'],
-    })
+    expect(onSuccessSpy).toHaveBeenCalledWith(
+      {
+        messageId: 123,
+        recipients: ['recipient1@example.com', 'recipient2@example.com'],
+      },
+      undefined
+    )
 
-    expect(onSuccessSpy).toHaveBeenLastCalledWith({
-      messageId: 123,
-      recipients: ['recipient3@example.com', 'recipient4@example.com'],
-    })
+    expect(onSuccessSpy).toHaveBeenLastCalledWith(
+      {
+        messageId: 123,
+        recipients: ['recipient3@example.com', 'recipient4@example.com'],
+      },
+      undefined
+    )
 
     expect(logger.info).toHaveBeenCalledWith(
       'Email notification sent to %s with subject %s',
@@ -250,10 +256,13 @@ describe('EmailService', () => {
 
     expect(onSuccessSpy).toHaveBeenCalledTimes(1)
 
-    expect(onSuccessSpy).toHaveBeenLastCalledWith({
-      messageId: '123',
-      recipients: ['recipient3@example.com', 'recipient4@example.com'],
-    })
+    expect(onSuccessSpy).toHaveBeenLastCalledWith(
+      {
+        messageId: '123',
+        recipients: ['recipient3@example.com', 'recipient4@example.com'],
+      },
+      undefined
+    )
 
     expect(logger.info).toHaveBeenCalledWith(
       'Email notification sent to %s with subject %s',

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import type { ReactElement } from 'react'
+import type { LeadAdministrationId } from 'shared-utilities/src/utils/lead-administration-id'
 
 import { Status } from '@/@types/studies'
 import {
@@ -125,6 +126,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
             editHistoryItems={editHistory ?? []}
             error={Boolean(getEditHistoryError)}
             idToAutoExpand={transactionIdLatestProposedUpdate}
+            leadAdministrationId={study.leadAdministrationId as LeadAdministrationId}
           />
 
           <Table className="govuk-!-margin-top-3">

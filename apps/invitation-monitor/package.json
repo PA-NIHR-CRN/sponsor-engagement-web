@@ -17,6 +17,7 @@
     "@lifeomic/attempt": "3.1.0",
     "@nihr-ui/email": "*",
     "@nihr-ui/logger": "*",
+    "@nihr-ui/templates": "*",
     "database": "*",
     "dayjs": "1.11.13",
     "dotenv": "16.3.1"
