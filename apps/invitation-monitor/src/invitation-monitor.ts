@@ -69,7 +69,7 @@ const fetchEmailStatus = async (
       return fetchEmailStatusInner(emailMessageId)
     },
     {
-      delay: 2000,
+      delay: 3000,
       maxAttempts,
       jitter: true,
       minDelay: 1000,
@@ -96,7 +96,7 @@ export const monitorInvitationEmails = async () => {
 
   const RETRY_MAX_DELAY_MS = process.env.FETCH_EMAIL_RETRY_MAX_DELAY_MS
     ? Number(process.env.FETCH_EMAIL_RETRY_MAX_DELAY_MS)
-    : 4000
+    : 6000
 
   // Fetch status ids for each email status
   const refInvitationStatusResponse = await prismaClient.sysRefInvitationStatus.findMany()

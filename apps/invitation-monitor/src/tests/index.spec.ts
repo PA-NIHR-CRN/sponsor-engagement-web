@@ -231,7 +231,7 @@ describe('monitorInvitationEmails', () => {
 
       const promise = monitorInvitationEmails()
 
-      await jest.advanceTimersByTimeAsync(4000)
+      await jest.advanceTimersByTimeAsync(12000)
 
       await promise
 
