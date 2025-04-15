@@ -79,14 +79,23 @@ describe('monitorInvitationEmails', () => {
   })
 
   it('should not throw an error when request to fetch status from AWS fails', async () => {
+    jest.useFakeTimers()
     mockUserOrgInvitationFindMany()
 
     mockEmailDeliverabilityService.getEmailInsights.mockRejectedValueOnce(new Error())
     prismaMock.userOrganisationInvitation.updateMany.mockResolvedValue({ count: 1 })
 
-    await expect(monitorInvitationEmails()).resolves.not.toThrow()
+    const promise = monitorInvitationEmails()
+
+    await jest.advanceTimersByTimeAsync(9000)
+
+    await promise
+
+    await expect(promise).resolves.not.toThrow()
 
     expect(mockEmailDeliverabilityService.getEmailInsights).toHaveBeenCalledTimes(3) // Retries two times
+
+    jest.useRealTimers()
   })
 
   it('should throw an error when DB request throws an error', async () => {
@@ -231,7 +240,7 @@ describe('monitorInvitationEmails', () => {
 
       const promise = monitorInvitationEmails()
 
-      await jest.advanceTimersByTimeAsync(12000)
+      await jest.advanceTimersByTimeAsync(9000)
 
       await promise
 
