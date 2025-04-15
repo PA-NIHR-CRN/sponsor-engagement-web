@@ -37,7 +37,7 @@ export default class RequestSupportPage {
   async assertOnRequestSupportPageViaAssess(studyId: string) {
     await expect(this.pageTitle).toBeVisible()
     await expect(this.pageTitle).toHaveText('Request NIHR RDN support')
-    await expect(this.page).toHaveURL(`request-support?returnPath=/assessments/${studyId}`)
+    await expect(this.page).toHaveURL(`request-support?returnPath=/studies/${studyId}/assess`)
   }
 
   async assertGuidanceTextContains() {

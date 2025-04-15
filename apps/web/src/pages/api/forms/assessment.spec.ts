@@ -171,7 +171,7 @@ describe('Failed study assessment submission', () => {
     jest.mocked(getServerSession).mockResolvedValueOnce(userWithSponsorContactRole)
     const res = await testHandler(api, { method: 'GET', body, query: {} })
     expect(res.statusCode).toBe(302)
-    expect(res._getRedirectUrl()).toBe(`/assessments/${body.studyId}/?fatal=1`)
+    expect(res._getRedirectUrl()).toBe(`/studies/${body.studyId}/assess/?fatal=1`)
     expect(logger.error).toHaveBeenCalledWith(new Error('Wrong method'))
   })
 
@@ -191,7 +191,7 @@ describe('Failed study assessment submission', () => {
 
     expect(res.statusCode).toBe(302)
     expect(res._getRedirectUrl()).toBe(
-      `/assessments/999/?statusError=Select+how+the+study+is+progressing&furtherInformation=4%2C5&furtherInformationText=Some+extra+text`
+      `/studies/999/assess/?statusError=Select+how+the+study+is+progressing&furtherInformation=4%2C5&furtherInformationText=Some+extra+text`
     )
     expect(logger.error).toHaveBeenCalledWith(
       new ZodError([
