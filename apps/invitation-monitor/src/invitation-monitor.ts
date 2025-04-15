@@ -59,7 +59,11 @@ const fetchEmailStatusInner = async (emailMessageId: string): Promise<EmailStatu
   return { messageId, insights }
 }
 
-const fetchEmailStatus = async (emailMessageId: string, maxAttempts = 3): Promise<EmailStatusResult> => {
+const fetchEmailStatus = async (
+  emailMessageId: string,
+  maxDelay: number,
+  maxAttempts = 3
+): Promise<EmailStatusResult> => {
   return retry(
     async () => {
       return fetchEmailStatusInner(emailMessageId)
@@ -67,6 +71,10 @@ const fetchEmailStatus = async (emailMessageId: string, maxAttempts = 3): Promis
     {
       delay: 2000,
       maxAttempts,
+      jitter: true,
+      minDelay: 1000,
+      maxDelay,
+      factor: 2,
       handleError: (error, context) => {
         logger.error(
           'Error occurred fetching email status for messageId: %s, %s, error: %s',
@@ -86,6 +94,10 @@ export const monitorInvitationEmails = async () => {
     ? Number(process.env.INVITE_EMAIL_DELIVERY_THRESHOLD_HOURS)
     : 72
 
+  const RETRY_MAX_DELAY_MS = process.env.FETCH_EMAIL_RETRY_MAX_DELAY_MS
+    ? Number(process.env.FETCH_EMAIL_RETRY_MAX_DELAY_MS)
+    : 4000
+
   // Fetch status ids for each email status
   const refInvitationStatusResponse = await prismaClient.sysRefInvitationStatus.findMany()
   const invitationStatuses: Record<string, number> = refInvitationStatusResponse.reduce((dictionary, { id, name }) => {
@@ -100,7 +112,7 @@ export const monitorInvitationEmails = async () => {
     return
   }
 
-  const getEmailStatusPromises = pendingEmails.map((email) => fetchEmailStatus(email.messageId))
+  const getEmailStatusPromises = pendingEmails.map((email) => fetchEmailStatus(email.messageId, RETRY_MAX_DELAY_MS))
   const emailStatusResults = await Promise.allSettled(getEmailStatusPromises)
   const successIds = []
   const failedEmailDetails: { id: number; userEmail: string; sentByEmail: string }[] = []
