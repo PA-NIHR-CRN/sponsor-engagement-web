@@ -1,4 +1,4 @@
-import type { UserOrganisation } from 'database'
+import type { Prisma, UserOrganisation } from 'database'
 import { Mock } from 'ts-mockery'
 
 import {
@@ -12,6 +12,7 @@ import type { OrganisationWithRelations, UserOrganisationWithRelations } from '.
 import {
   getOrganisationById,
   getSponsorOrgName,
+  getStudyOrganisations,
   getSupportOrgName,
   getUserOrganisationById,
   getUserOrganisations,
@@ -86,6 +87,117 @@ describe('getUserOrganisationById', () => {
 
     expect(userOrganisation).toStrictEqual(mockUserOrganisation)
   })
+})
+
+describe('getStudyOrganisations', () => {
+  it(`should make the correct DB request when there is a 'searchTerm'`, async () => {
+    const searchTerm = 'Novartis'
+    const currentPage = 1
+    const pageSize = 1
+
+    const query = {
+      skip: currentPage * pageSize - pageSize,
+      take: pageSize,
+      select: {
+        id: true,
+        name: true,
+        roles: {
+          select: {
+            role: true,
+          },
+        },
+      },
+      orderBy: [{ name: 'asc' }],
+      where: {
+        OR: [
+          {
+            name: {
+              contains: searchTerm,
+            },
+          },
+          {
+            users: {
+              some: {
+                user: {
+                  is: {
+                    email: searchTerm,
+                    isDeleted: false,
+                  },
+                },
+                isDeleted: false,
+              },
+            },
+          },
+        ],
+        studies: {
+          some: {},
+        },
+        isDeleted: false,
+      },
+    }
+
+    const mockOrganisation = Mock.of<OrganisationWithRelations>({
+      id: 123,
+      name: 'Novartis',
+      roles: [
+        {
+          role: {
+            name: 'Clinical Research Sponsor',
+          },
+        },
+        {
+          role: {
+            name: 'Contract Research Organisation',
+          },
+        },
+      ],
+    })
+
+    prismaMock.$transaction.mockResolvedValueOnce([[mockOrganisation], 1])
+
+    await getStudyOrganisations({ currentPage, pageSize, searchTerm })
+
+    expect(prismaMock.organisation.findMany).toHaveBeenCalledWith(query)
+  })
+})
+
+it(`should apply user filter if 'userId' parameter is defined`, async () => {
+  const searchTerm = 'Novartis'
+  const userId = 1211
+
+  const mockOrganisation = Mock.of<OrganisationWithRelations>({
+    id: 123,
+    name: 'Novartis',
+    roles: [
+      {
+        role: {
+          name: 'Clinical Research Sponsor',
+        },
+      },
+      {
+        role: {
+          name: 'Contract Research Organisation',
+        },
+      },
+    ],
+  })
+
+  prismaMock.$transaction.mockResolvedValueOnce([[mockOrganisation], 1])
+
+  await getStudyOrganisations({ currentPage: 1, pageSize: 1, searchTerm, userId })
+
+  expect(prismaMock.organisation.findMany).toHaveBeenCalledWith(
+    expect.objectContaining({
+      where: expect.objectContaining({
+        users: {
+          some: {
+            isDeleted: { equals: false },
+            userId: { equals: 1211 },
+          },
+        },
+      }) as Prisma.OrganisationWhereInput,
+    })
+  )
 })
 
 describe('isClinicalResearchSponsor', () => {
