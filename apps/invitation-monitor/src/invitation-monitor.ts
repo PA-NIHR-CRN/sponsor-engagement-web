@@ -65,7 +65,7 @@ const fetchEmailStatus = async (emailMessageId: string, maxAttempts = 3): Promis
       return fetchEmailStatusInner(emailMessageId)
     },
     {
-      delay: 1000,
+      delay: 2000,
       maxAttempts,
       handleError: (error, context) => {
         logger.error(
@@ -113,14 +113,11 @@ export const monitorInvitationEmails = async () => {
       .find((statusResult) => statusResult.value.messageId === email.messageId)
 
     if (!emailDetails) {
-      logger.info('No information for email with messageId %s', email.messageId)
-
-      continue
+      logger.info('No information from AWS for email with messageId %s', email.messageId)
     }
 
-    const {
-      value: { insights },
-    } = emailDetails
+    const insights = emailDetails?.value.insights ?? []
+
     const events = insights[0]?.Events ?? []
 
     const hoursSinceEmailSent = todayUTCDate.diff(email.timestamp.toISOString(), 'hours', true)
