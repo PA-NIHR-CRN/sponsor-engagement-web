@@ -16,6 +16,7 @@ The task is configured to run daily via a cron schedule defined in the `sponsor-
 | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | `INVITE_EMAIL_DELIVERY_THRESHOLD_HOURS` | Specifies the number of hours to wait after an invitation email is sent, to mark it as failed if no status response |
 | `AWS_SDK_LOAD_CONFIG`                   | Set to 1 when using AWS SSO.                                                                                        |
+| `FETCH_EMAIL_RETRY_MAX_DELAY_MS`        | Specifies the maximum delay in milliseconds between retry attempts when fetching email status from AWS              |
 
 ## Install locally
 
