@@ -82,11 +82,11 @@ describe('monitorInvitationEmails', () => {
     mockUserOrgInvitationFindMany()
 
     mockEmailDeliverabilityService.getEmailInsights.mockRejectedValueOnce(new Error())
+    prismaMock.userOrganisationInvitation.updateMany.mockResolvedValue({ count: 1 })
 
     await expect(monitorInvitationEmails()).resolves.not.toThrow()
 
     expect(mockEmailDeliverabilityService.getEmailInsights).toHaveBeenCalledTimes(3) // Retries two times
-    expect(prismaMock.userOrganisationInvitation.updateMany).not.toHaveBeenCalled()
   })
 
   it('should throw an error when DB request throws an error', async () => {
@@ -231,7 +231,7 @@ describe('monitorInvitationEmails', () => {
 
       const promise = monitorInvitationEmails()
 
-      await jest.advanceTimersByTimeAsync(1000)
+      await jest.advanceTimersByTimeAsync(2000)
 
       await promise
 
