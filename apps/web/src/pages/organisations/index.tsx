@@ -42,7 +42,11 @@ export default function Organisations({
 
           {/* Search/Filter bar */}
           <div>
-            <Filters filters={filters} onFilterChange={handleFilterChange} searchLabel="Search organisation name" />
+            <Filters
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              searchLabel="Search by organisation name or contact email address"
+            />
           </div>
 
           <SelectedFilters filters={filters} isLoading={isLoading} />
