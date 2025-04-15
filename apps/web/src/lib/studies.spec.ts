@@ -586,6 +586,7 @@ describe('mapCPMSStudyToSEStudy', () => {
   const mockMappedStudy = {
     cpmsId: mockCPMSStudy.StudyId,
     shortTitle: mockCPMSStudy.StudyShortName,
+    leadAdministrationId: mockCPMSStudy.LeadAdministrationId,
     studyStatus: mockCPMSStudy.StudyStatus,
     route: mockCPMSStudy.StudyRoute,
     sampleSize: mockCPMSStudy.SampleSize,
