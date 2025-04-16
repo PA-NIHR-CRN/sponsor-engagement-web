@@ -8,7 +8,7 @@ import { logger } from '@nihr-ui/logger'
 import type { EmailStatusResult } from '@nihr-ui/email/email-deliverability-service'
 import { emailTemplates } from '@nihr-ui/templates/sponsor-engagement'
 import { retry } from '@lifeomic/attempt'
-import { PERMANENT_EMAIL_FAILURES, UserOrganisationInviteStatus } from './lib/constants'
+import { PERMANENT_EMAIL_FAILURES, RETRYABLE_SES_ERRORS, UserOrganisationInviteStatus } from './lib/constants'
 import { prismaClient } from './lib/prisma'
 import type { UserOrganisationInvitations } from './types'
 import { getSponsorEngagementUrl } from './utils'
@@ -76,14 +76,20 @@ const fetchEmailStatus = async (
       maxDelay,
       factor: 2,
       handleError: (error, context) => {
+        const enableRetry = RETRYABLE_SES_ERRORS.includes(error instanceof Error ? error.name : '')
+
         logger.error(
           'Error occurred fetching email status for messageId: %s, %s, error: %s',
           emailMessageId,
-          context.attemptsRemaining > 0
+          context.attemptsRemaining > 0 && enableRetry
             ? `retrying... , ${context.attemptNum + 1}/${maxAttempts - 1} retries`
             : 'aborting...',
           error
         )
+
+        if (!enableRetry) {
+          context.abort()
+        }
       },
     }
   )
