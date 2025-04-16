@@ -135,7 +135,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
 
   return (
     <Container>
-      <NextSeo title="Study Progress Review - Update study data" />
+      <NextSeo title="Study Progress Review - Update UK study data" />
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">
@@ -216,7 +216,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                 }}
               />
 
-              {/* Planned opening to recruitment date */}
+              {/* Planned UK opening to recruitment date */}
               {visibleDateFields.includes('plannedOpeningDate') && (
                 <Controller
                   control={control}
@@ -242,7 +242,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                 />
               )}
 
-              {/* Actual opening to recruitment date */}
+              {/* Actual UK opening to recruitment date */}
               {visibleDateFields.includes('actualOpeningDate') && (
                 <Controller
                   control={control}
@@ -272,7 +272,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                 />
               )}
 
-              {/* Planned closure to recruitment date */}
+              {/* Planned UK closure to recruitment date */}
               {visibleDateFields.includes('plannedClosureDate') && (
                 <Controller
                   control={control}
@@ -298,7 +298,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                 />
               )}
 
-              {/* Actual closure to recruitment date */}
+              {/* Actual UK closure to recruitment date */}
               {visibleDateFields.includes('actualClosureDate') && (
                 <Controller
                   control={control}
@@ -324,7 +324,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                 />
               )}
 
-              {/* Estimated reopening date*/}
+              {/* Estimated UK reopening date*/}
               {visibleDateFields.includes('estimatedReopeningDate') && (
                 <Controller
                   control={control}

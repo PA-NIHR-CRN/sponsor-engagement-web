@@ -123,8 +123,8 @@ export default class StudyUpdatePage {
 
   async assertOnUpdateStudyPage(studyId: string) {
     await expect(this.pageTitle).toBeVisible()
-    await expect(this.bannerTitle).toContainText('Update study data')
-    await expect(this.pageTitle).toContainText('Update study data')
+    await expect(this.bannerTitle).toContainText('Update UK study data')
+    await expect(this.pageTitle).toContainText('Update UK study data')
     await expect(this.page).toHaveURL(`studies/${studyId}/edit`)
   }
 
@@ -347,34 +347,38 @@ export default class StudyUpdatePage {
       case 'plannedOpening':
         await expect(this.plannedOpeningInlineError).toBeVisible()
         await expect(this.plannedOpeningInlineError).toHaveText(
-          'Error: Planned opening to recruitment date is a mandatory field'
+          'Error: Planned UK opening to recruitment date is a mandatory field'
         )
         await expect(this.updateValidationList).toContainText(
-          'Planned opening to recruitment date is a mandatory field'
+          'Planned UK opening to recruitment date is a mandatory field'
         )
         break
       case 'actualOpening':
         await expect(this.actualOpeningInlineError).toBeVisible()
         await expect(this.actualOpeningInlineError).toHaveText(
-          'Error: Actual opening to recruitment date is a mandatory field'
+          'Error: Actual UK opening to recruitment date is a mandatory field'
         )
-        await expect(this.updateValidationList).toContainText('Actual opening to recruitment date is a mandatory field')
+        await expect(this.updateValidationList).toContainText(
+          'Actual UK opening to recruitment date is a mandatory field'
+        )
         break
       case 'plannedClosure':
         await expect(this.plannedClosureInlineError).toBeVisible()
         await expect(this.plannedClosureInlineError).toHaveText(
-          'Error: Planned closure to recruitment date is a mandatory field'
+          'Error: Planned UK closure to recruitment date is a mandatory field'
         )
         await expect(this.updateValidationList).toContainText(
-          'Planned closure to recruitment date is a mandatory field'
+          'Planned UK closure to recruitment date is a mandatory field'
         )
         break
       case 'actualClosure':
         await expect(this.actualClosureInlineError).toBeVisible()
         await expect(this.actualClosureInlineError).toHaveText(
-          'Error: Actual closure to recruitment date is a mandatory field'
+          'Error: Actual UK closure to recruitment date is a mandatory field'
         )
-        await expect(this.updateValidationList).toContainText('Actual closure to recruitment date is a mandatory field')
+        await expect(this.updateValidationList).toContainText(
+          'Actual UK closure to recruitment date is a mandatory field'
+        )
         break
       case 'estimatedReopening':
         await expect(this.estimatedReopenInlineError).toBeVisible()
@@ -445,10 +449,10 @@ export default class StudyUpdatePage {
     await expect(this.updateValidationBanner).toContainText('There is a problem')
     await expect(this.plannedClosureInlineError).toBeVisible()
     await expect(this.plannedClosureInlineError).toHaveText(
-      'Error: Planned closure to recruitment date must be after Planned opening to recruitment date'
+      'Error: Planned UK closure to recruitment date must be after Planned UK opening to recruitment date'
     )
     await expect(this.updateValidationList).toContainText(
-      'Planned closure to recruitment date must be after Planned opening to recruitment date'
+      'Planned UK closure to recruitment date must be after Planned UK opening to recruitment date'
     )
   }
 
@@ -457,10 +461,10 @@ export default class StudyUpdatePage {
     await expect(this.updateValidationBanner).toContainText('There is a problem')
     await expect(this.actualOpeningInlineError).toBeVisible()
     await expect(this.actualOpeningInlineError).toHaveText(
-      'Error: Actual opening to recruitment date must be today or in the past'
+      'Error: Actual UK opening to recruitment date must be today or in the past'
     )
     await expect(this.updateValidationList).toContainText(
-      'Actual opening to recruitment date must be today or in the past'
+      'Actual UK opening to recruitment date must be today or in the past'
     )
   }
 
@@ -469,10 +473,10 @@ export default class StudyUpdatePage {
     await expect(this.updateValidationBanner).toContainText('There is a problem')
     await expect(this.actualClosureInlineError).toBeVisible()
     await expect(this.actualClosureInlineError).toHaveText(
-      'Error: Actual closure to recruitment date must be today or in the past'
+      'Error: Actual UK closure to recruitment date must be today or in the past'
     )
     await expect(this.updateValidationList).toContainText(
-      'Actual closure to recruitment date must be today or in the past'
+      'Actual UK closure to recruitment date must be today or in the past'
     )
   }
 
