@@ -1,13 +1,6 @@
 export const batchSize = 1000
 
-export const headers = [
-  'StudyID',
-  'Study status in the UK',
-  'Comments',
-  'Agreed Intention',
-  'Created At',
-  'Created By',
-] as const
+export const headers = ['StudyID', 'Study Status', 'Comments', 'Agreed Intention', 'Created At', 'Created By'] as const
 
 export const intentionMap: Partial<Record<string, ['Off track' | 'On track', string?]>> = {
   'In discussion with funder to agree intention': ['Off track', 'In discussion with funder'],
