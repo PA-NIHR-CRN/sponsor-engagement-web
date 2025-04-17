@@ -46,6 +46,19 @@ test('Displays breadcrumbs', () => {
   expect(getByRole('link', { name: 'Navigate to page' })).toBeInTheDocument()
 })
 
+test('Displays breadcrumbs', () => {
+  mockRouter.asPath = `/section/page`
+
+  const { getByRole } = render(
+    <RootLayout breadcrumbConfig={{ showBreadcrumb: true }} heading="Welcome" user={userNoRoles.user}>
+      <div>Page content</div>
+    </RootLayout>
+  )
+
+  expect(getByRole('link', { name: 'Navigate to section' })).toBeInTheDocument()
+  expect(getByRole('link', { name: 'Navigate to page' })).toBeInTheDocument()
+})
+
 describe('Displays the correct navigation links for a user who is only a Sponsor Contact', () => {
   test('and is associated with no organisations', () => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- test data is not null
