@@ -23,7 +23,7 @@ test.describe('View the Study Assessment Form - @se_29 @se_29_form', () => {
       await assessmentPage.goto(startingStudyId.toString())
       await assessmentPage.assertOnAssessmentPage(startingStudyId.toString())
     })
-    await test.step(`When I view the section titled 'Is this study progressing as planned?'`, async () => {
+    await test.step(`When I view the section titled 'Is this study progressing in the UK as planned?'`, async () => {
       await assessmentPage.assertStudyProgressingPresent()
     })
     await test.step(`Then I see 2 Radio Button Options for 'On Track' and 'Off Track' with guidance text`, async () => {
