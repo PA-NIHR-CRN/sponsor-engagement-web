@@ -37,19 +37,6 @@ test('Displays breadcrumbs', () => {
   mockRouter.asPath = `/section/page`
 
   const { getByRole } = render(
-    <RootLayout breadcrumbConfig={{ showBreadcrumb: true }} user={userNoRoles.user}>
-      <div>Page content</div>
-    </RootLayout>
-  )
-
-  expect(getByRole('link', { name: 'Navigate to section' })).toBeInTheDocument()
-  expect(getByRole('link', { name: 'Navigate to page' })).toBeInTheDocument()
-})
-
-test('Displays breadcrumbs', () => {
-  mockRouter.asPath = `/section/page`
-
-  const { getByRole } = render(
     <RootLayout breadcrumbConfig={{ showBreadcrumb: true }} heading="Welcome" user={userNoRoles.user}>
       <div>Page content</div>
     </RootLayout>
