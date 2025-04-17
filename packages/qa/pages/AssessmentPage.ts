@@ -318,11 +318,11 @@ export default class AssessmentPage {
     await expect(this.radioButtonOffTrackTxt).toBeVisible()
     await expect(this.radioButtonOnTrackLbl).toHaveText('On track')
     await expect(this.radioButtonOnTrackTxt).toHaveText(
-      'The sponsor or delegate is satisfied the study is progressing as planned.'
+      'The sponsor or delegate is satisfied the study is progressing in the UK as planned.'
     )
     await expect(this.radioButtonOffTrackLbl).toHaveText('Off track')
     await expect(this.radioButtonOffTrackTxt).toHaveText(
-      'The sponsor or delegate has some concerns about the study and is taking action where appropriate.'
+      'The sponsor or delegate has some concerns about the study in the UK and is taking action where appropriate.'
     )
   }
 
