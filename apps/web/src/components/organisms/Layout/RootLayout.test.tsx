@@ -1,11 +1,10 @@
 import type { UserOrganisation } from '@prisma/client'
+import mockRouter from 'next-router-mock'
 
 import { userNoRoles, userWithSponsorContactRole } from '@/__mocks__/session'
 import { render, within } from '@/config/TestUtils'
 
 import { RootLayout } from './RootLayout'
-
-jest.mock('next/router', () => require('next-router-mock'))
 
 test('Displays NIHR layout & page content', () => {
   const { getByRole, getByText } = render(
@@ -32,6 +31,19 @@ test('Adds a class to the body to detect js is enabled', () => {
     </RootLayout>
   )
   expect(document.body.classList.contains('js-enabled')).toBeTruthy()
+})
+
+test('Displays breadcrumbs', () => {
+  mockRouter.asPath = `/section/page`
+
+  const { getByRole } = render(
+    <RootLayout breadcrumbConfig={{ showBreadcrumb: true }} user={userNoRoles.user}>
+      <div>Page content</div>
+    </RootLayout>
+  )
+
+  expect(getByRole('link', { name: 'Navigate to section' })).toBeInTheDocument()
+  expect(getByRole('link', { name: 'Navigate to page' })).toBeInTheDocument()
 })
 
 describe('Displays the correct navigation links for a user who is only a Sponsor Contact', () => {

@@ -118,7 +118,7 @@ const mockedEnvVars = {
 const renderPage = async (
   context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: String(mockedStudyId) } }),
   firstStudyResponse = study,
-  url = '/studies/assess/123'
+  url = '/studies/123/assess'
 ) => {
   jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRole)
   prismaMock.$transaction.mockResolvedValueOnce([firstStudyResponse])
@@ -225,7 +225,7 @@ describe('Assessment', () => {
       ).toBeInTheDocument()
       expect(screen.getByRole('link', { name: 'Request support' })).toHaveAttribute(
         'href',
-        `${SUPPORT_PAGE}?returnPath=/studies/assess/123`
+        `${SUPPORT_PAGE}?returnPath=/studies/123/assess`
       )
 
       // Study sponsor
@@ -459,7 +459,7 @@ describe('Assessment', () => {
 
       await userEvent.click(screen.getByRole('button', { name: 'Submit assessment' }))
 
-      expect(mockRouter.asPath).toBe('/studies/assess/123?fatal=1')
+      expect(mockRouter.asPath).toBe('/studies/123/assess?fatal=1')
 
       const alert = screen.getByRole('alert')
       expect(
