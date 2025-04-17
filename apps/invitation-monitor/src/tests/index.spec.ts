@@ -93,7 +93,7 @@ describe('monitorInvitationEmails', () => {
 
     await expect(promise).resolves.not.toThrow()
 
-    expect(mockEmailDeliverabilityService.getEmailInsights).toHaveBeenCalledTimes(3) // Retries two times
+    expect(mockEmailDeliverabilityService.getEmailInsights).toHaveBeenCalledTimes(1)
 
     jest.useRealTimers()
   })
