@@ -4,13 +4,14 @@ export const sysRefAssessmentStatus: SysRefAssessmentStatus[] = [
   {
     id: 1,
     name: 'On track',
-    description: 'The sponsor or delegate is satisfied the study is progressing as planned.',
+    description: 'The sponsor or delegate is satisfied the study is progressing in the UK as planned.',
     isDeleted: false,
   },
   {
     id: 2,
     name: 'Off track',
-    description: 'The sponsor or delegate has some concerns about the study and is taking action where appropriate.',
+    description:
+      'The sponsor or delegate has some concerns about the study in the UK and is taking action where appropriate.',
     isDeleted: false,
   },
 ]
