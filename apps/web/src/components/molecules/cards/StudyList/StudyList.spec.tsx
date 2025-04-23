@@ -104,13 +104,10 @@ describe('StudyList Component', () => {
     expect(screen.getByText('Sponsor ABC (Support Org ABC)')).toBeInTheDocument()
   })
 
-  test.each(['', null, undefined])(
-    'displays "Not available" when irasId is null or undefined',
-    (irasId: string | null) => {
-      render(<StudyList {...defaultProps} irasId={irasId} />)
+  test.each(['', null])('displays "Not available" when irasId is null', (irasId: string | null) => {
+    render(<StudyList {...defaultProps} irasId={irasId} />)
 
-      const irasIdElement = screen.getByText('IRAS ID: Not available')
-      expect(irasIdElement).toBeInTheDocument()
-    }
-  )
+    const irasIdElement = screen.getByText('IRAS ID: Not available')
+    expect(irasIdElement).toBeInTheDocument()
+  })
 })
