@@ -15,6 +15,7 @@ describe('StudyList Component', () => {
     trackStatusHref: '/track/on',
     indications: ['Indication ABC'],
     daysSinceAssessmentDue: null,
+    irasId: '31832',
   }
 
   test('renders with default props', () => {
@@ -23,6 +24,7 @@ describe('StudyList Component', () => {
     // Check if default content is present in the rendered output
     const sponsorNameElement = screen.getByText('Sponsor ABC')
     const shortTitleElement = screen.getByText('Study XYZ')
+    const irasIdElement = screen.getByText('IRAS ID: 31832')
     const lastAssessmentTrackStatusElement = screen.getByText('On track')
     const lastAssessmentDateHeading = screen.getByText('Last sponsor assessment')
     const lastAssessmentDateElement = screen.getByText('on 2023-09-30')
@@ -32,6 +34,7 @@ describe('StudyList Component', () => {
 
     expect(sponsorNameElement).toBeInTheDocument()
     expect(shortTitleElement).toBeInTheDocument()
+    expect(irasIdElement).toBeInTheDocument()
     expect(lastAssessmentTrackStatusElement).toHaveAttribute('href', defaultProps.trackStatusHref)
     expect(lastAssessmentDateHeading).toBeInTheDocument()
     expect(lastAssessmentDateElement).toBeInTheDocument()
@@ -72,20 +75,23 @@ describe('StudyList Component', () => {
     expect(dueTagElement).toBeNull()
   })
 
-  test('renders with different sponsorName and shortTitle', () => {
+  test('renders with different sponsorName, irasId and shortTitle', () => {
     const props: StudyListProps = {
       ...defaultProps,
       sponsorOrgName: 'New Sponsor',
       shortTitle: 'New Study',
+      irasId: '31833',
     }
     render(<StudyList {...props} />)
 
     // Check if the updated sponsorName and shortTitle are present
     const sponsorNameElement = screen.getByText('New Sponsor')
     const shortTitleElement = screen.getByText('New Study')
+    const iradIdElement = screen.getByText('IRAS ID: 31833')
 
     expect(sponsorNameElement).toBeInTheDocument()
     expect(shortTitleElement).toBeInTheDocument()
+    expect(iradIdElement).toBeInTheDocument()
   })
 
   test('renders support organisation (i.e. CTU or CRO) name when provided', () => {
@@ -96,5 +102,12 @@ describe('StudyList Component', () => {
     render(<StudyList {...props} />)
 
     expect(screen.getByText('Sponsor ABC (Support Org ABC)')).toBeInTheDocument()
+  })
+
+  test('displays not available when irasId is undefined', () => {
+    render(<StudyList {...defaultProps} irasId={null} />)
+
+    const irasIdElement = screen.getByText('IRAS ID: Not available')
+    expect(irasIdElement).toBeInTheDocument()
   })
 })
