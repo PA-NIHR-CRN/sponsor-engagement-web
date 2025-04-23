@@ -104,7 +104,7 @@ describe('StudyList Component', () => {
     expect(screen.getByText('Sponsor ABC (Support Org ABC)')).toBeInTheDocument()
   })
 
-  test.each(['', null])('displays "Not available" when irasId is null', (irasId: string | null) => {
+  test.each(['', null])('displays "Not available" when irasId is a falsy value', (irasId: string | null) => {
     render(<StudyList {...defaultProps} irasId={irasId} />)
 
     const irasIdElement = screen.getByText('IRAS ID: Not available')
