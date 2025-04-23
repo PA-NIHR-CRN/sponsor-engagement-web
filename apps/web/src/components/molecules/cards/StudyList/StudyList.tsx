@@ -43,13 +43,11 @@ export function StudyList({
           {sponsorOrgName ?? '-'}
           {Boolean(supportOrgName) && ` (${supportOrgName})`}
         </div>
-
         <div className="govuk-heading-s govuk-!-margin-bottom-0 govuk-!-padding-top-0 inline-block font-extrabold">
           {shortTitle}
         </div>
-
         <div className="govuk-body-s govuk-!-margin-bottom-2 govuk-!-padding-top-0">
-          IRAS ID: {irasId ?? 'Not available '}
+          IRAS ID: {irasId || 'Not available '}
         </div>
       </div>
 
