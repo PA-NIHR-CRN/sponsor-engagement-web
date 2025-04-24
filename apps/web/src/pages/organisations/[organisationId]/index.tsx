@@ -109,7 +109,16 @@ export default function Organisation({ organisation, query }: OrganisationProps)
                   ) : null}
                 </div>
               </Table.Cell>
-              <Table.Cell>{user.user.lastLogin ? formatDate(user.user.lastLogin) : '-'} </Table.Cell>
+              <Table.Cell>
+                {user.user.lastLogin ? (
+                  formatDate(user.user.lastLogin)
+                ) : (
+                  <>
+                    <span aria-hidden="true">-</span>
+                    <span className="sr-only">No last login date</span>
+                  </>
+                )}
+              </Table.Cell>
               <Table.Cell>
                 <Link aria-label={`Remove ${user.user.email}`} href={`/organisations/remove-contact/${user.id}`}>
                   Remove
