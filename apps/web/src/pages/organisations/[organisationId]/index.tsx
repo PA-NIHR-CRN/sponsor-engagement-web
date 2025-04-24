@@ -115,7 +115,7 @@ export default function Organisation({ organisation, query }: OrganisationProps)
                 ) : (
                   <>
                     <span aria-hidden="true">-</span>
-                    <span className="sr-only">No last login date</span>
+                    <span className="govuk-visually-hidden">No last login date</span>
                   </>
                 )}
               </Table.Cell>
