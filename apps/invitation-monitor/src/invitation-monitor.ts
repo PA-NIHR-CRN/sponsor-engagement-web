@@ -118,8 +118,17 @@ export const monitorInvitationEmails = async () => {
     return
   }
 
-  const getEmailStatusPromises = pendingEmails.map((email) => fetchEmailStatus(email.messageId, RETRY_MAX_DELAY_MS))
-  const emailStatusResults = await Promise.allSettled(getEmailStatusPromises)
+  const emailStatusResults: PromiseSettledResult<EmailStatusResult>[] = []
+
+  for (const email of pendingEmails) {
+    // eslint-disable-next-line no-await-in-loop -- intentional to prevent rate limiting of 1 request per second
+    await fetchEmailStatus(email.messageId, RETRY_MAX_DELAY_MS)
+      .then((res) => emailStatusResults.push({ status: 'fulfilled', value: res }))
+      .catch((err) =>
+        emailStatusResults.push({ status: 'rejected', reason: err instanceof Error ? err.name : JSON.stringify(err) })
+      )
+  }
+
   const successIds = []
   const failedEmailDetails: { id: number; userEmail: string; sentByEmail: string }[] = []
   const todayUTCDate = dayjs.utc()
