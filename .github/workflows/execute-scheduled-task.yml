@@ -170,7 +170,7 @@ jobs:
       - name: Restore Original Schedule (invitation-monitor)
         if: github.event.inputs.appname == 'invitation-monitor'
         run: |
-          aws events put-rule --name crnccs-ecs-uat-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 16 * * ? *)"
+          aws events put-rule --name crnccs-ecs-uat-se-${{ github.event.inputs.appname}}-cw-event-rule --schedule-expression "cron(0 15 * * ? *)"
           aws events enable-rule --name crnccs-ecs-uat-se-${{ github.event.inputs.appname}}-cw-event-rule
 
 

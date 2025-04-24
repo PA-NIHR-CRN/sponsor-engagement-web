@@ -145,6 +145,7 @@ export default function Studies({
                             indications={study.evaluationCategories
                               .map((evalCategory) => evalCategory.indicatorType)
                               .filter((evalCategory, index, items) => items.indexOf(evalCategory) === index)}
+                            irasId={study.irasId}
                             lastAssessmentDate={study.lastAssessment ? formatDate(study.lastAssessment.createdAt) : ''}
                             shortTitle={study.shortTitle}
                             sponsorOrgName={getSponsorOrgName(study.organisations)}

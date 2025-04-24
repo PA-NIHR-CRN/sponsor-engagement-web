@@ -25,6 +25,7 @@ export const studyEntities = studies.Result.Studies.map((study) =>
   Mock.of<StudyWithRelationships>({
     id: study.Id,
     cpmsId: study.Id,
+    irasId: study.IrasId,
     title: study.Title,
     shortTitle: study.ShortName,
     organisations: study.StudySponsors.map(({ OrganisationName, OrganisationRole }) => ({
