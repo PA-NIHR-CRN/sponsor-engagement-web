@@ -8,7 +8,7 @@ const invalidEmail = 'not.valid.com'
 
 test.beforeAll('Setup Test Users', async () => {
   await seDatabaseReq(
-    `DELETE FROM UserOrganisation WHERE UserOrganisation.userId = ${testUserId} AND organisationId = ${orgIdWithContacts};`
+    `UPDATE UserOrganisation SET isDeleted = 1 WHERE UserOrganisation.userId = ${testUserId} AND organisationId = ${orgIdWithContacts};`
   )
 })
 

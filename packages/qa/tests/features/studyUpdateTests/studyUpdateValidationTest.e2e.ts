@@ -46,10 +46,10 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
 
     await test.step(`Then I should see invalid day messages for all date fields`, async () => {
       const partialDate = false
-      await studyUpdatePage.assertStudyDatesValidation('Planned opening', 'day', partialDate)
-      await studyUpdatePage.assertStudyDatesValidation('Actual opening', 'day', partialDate)
-      await studyUpdatePage.assertStudyDatesValidation('Planned closure', 'day', partialDate)
-      await studyUpdatePage.assertStudyDatesValidation('Actual closure', 'day', partialDate)
+      await studyUpdatePage.assertStudyDatesValidation('plannedOpening', 'day', partialDate)
+      await studyUpdatePage.assertStudyDatesValidation('actualOpening', 'day', partialDate)
+      await studyUpdatePage.assertStudyDatesValidation('plannedClosure', 'day', partialDate)
+      await studyUpdatePage.assertStudyDatesValidation('actualClosure', 'day', partialDate)
     })
   })
 
@@ -78,10 +78,10 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
 
     await test.step(`Then I should see invalid month messages for all date fields`, async () => {
       const partialDate = false
-      await studyUpdatePage.assertStudyDatesValidation('Planned opening', 'month', partialDate)
-      await studyUpdatePage.assertStudyDatesValidation('Actual opening', 'month', partialDate)
-      await studyUpdatePage.assertStudyDatesValidation('Planned closure', 'month', partialDate)
-      await studyUpdatePage.assertStudyDatesValidation('Actual closure', 'month', partialDate)
+      await studyUpdatePage.assertStudyDatesValidation('plannedOpening', 'month', partialDate)
+      await studyUpdatePage.assertStudyDatesValidation('actualOpening', 'month', partialDate)
+      await studyUpdatePage.assertStudyDatesValidation('plannedClosure', 'month', partialDate)
+      await studyUpdatePage.assertStudyDatesValidation('actualClosure', 'month', partialDate)
     })
   })
 
@@ -110,10 +110,10 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
 
     await test.step(`Then I should see invalid year messages for all date fields`, async () => {
       const partialDate = false
-      await studyUpdatePage.assertStudyDatesValidation('Planned opening', 'year', partialDate)
-      await studyUpdatePage.assertStudyDatesValidation('Actual opening', 'year', partialDate)
-      await studyUpdatePage.assertStudyDatesValidation('Planned closure', 'year', partialDate)
-      await studyUpdatePage.assertStudyDatesValidation('Actual closure', 'year', partialDate)
+      await studyUpdatePage.assertStudyDatesValidation('plannedOpening', 'year', partialDate)
+      await studyUpdatePage.assertStudyDatesValidation('actualOpening', 'year', partialDate)
+      await studyUpdatePage.assertStudyDatesValidation('plannedClosure', 'year', partialDate)
+      await studyUpdatePage.assertStudyDatesValidation('actualClosure', 'year', partialDate)
     })
   })
 
@@ -143,9 +143,9 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
 
     await test.step(`Then I should see must must include day, month or year messages for date fields`, async () => {
       const partialDate = true
-      await studyUpdatePage.assertStudyDatesValidation('Planned opening', 'day', partialDate)
-      await studyUpdatePage.assertStudyDatesValidation('Actual opening', 'month', partialDate)
-      await studyUpdatePage.assertStudyDatesValidation('Planned closure', 'year', partialDate)
+      await studyUpdatePage.assertStudyDatesValidation('plannedOpening', 'day', partialDate)
+      await studyUpdatePage.assertStudyDatesValidation('actualOpening', 'month', partialDate)
+      await studyUpdatePage.assertStudyDatesValidation('plannedClosure', 'year', partialDate)
     })
   })
 
@@ -176,10 +176,10 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
 
     await test.step(`Then I should see invalid day messages for all date fields`, async () => {
       const partialDate = false
-      await studyUpdatePage.assertStudyDatesValidation('Planned opening', 'day', partialDate)
-      await studyUpdatePage.assertStudyDatesValidation('Actual opening', 'day', partialDate)
-      await studyUpdatePage.assertStudyDatesValidation('Planned closure', 'day', partialDate)
-      await studyUpdatePage.assertStudyDatesValidation('Actual closure', 'day', partialDate)
+      await studyUpdatePage.assertStudyDatesValidation('plannedOpening', 'day', partialDate)
+      await studyUpdatePage.assertStudyDatesValidation('actualOpening', 'day', partialDate)
+      await studyUpdatePage.assertStudyDatesValidation('plannedClosure', 'day', partialDate)
+      await studyUpdatePage.assertStudyDatesValidation('actualClosure', 'day', partialDate)
     })
   })
 
