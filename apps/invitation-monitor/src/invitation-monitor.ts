@@ -118,15 +118,13 @@ export const monitorInvitationEmails = async () => {
     return
   }
 
-  const emailStatusResults: PromiseSettledResult<EmailStatusResult>[] = []
+  const emailStatusResults: EmailStatusResult[] = []
 
   for (const email of pendingEmails) {
     // eslint-disable-next-line no-await-in-loop -- intentional to prevent rate limiting of 1 request per second
     await fetchEmailStatus(email.messageId, RETRY_MAX_DELAY_MS)
-      .then((res) => emailStatusResults.push({ status: 'fulfilled', value: res }))
-      .catch((err) =>
-        emailStatusResults.push({ status: 'rejected', reason: err instanceof Error ? err.name : JSON.stringify(err) })
-      )
+      .then((res) => emailStatusResults.push(res))
+      .catch((_err) => null)
   }
 
   const successIds = []
@@ -135,15 +133,13 @@ export const monitorInvitationEmails = async () => {
 
   for (const email of pendingEmails) {
     const id = email.id
-    const emailDetails = emailStatusResults
-      .filter((result): result is PromiseFulfilledResult<EmailStatusResult> => result.status === 'fulfilled')
-      .find((statusResult) => statusResult.value.messageId === email.messageId)
+    const emailDetails = emailStatusResults.find((statusResult) => statusResult.messageId === email.messageId)
 
     if (!emailDetails) {
       logger.info('No information from AWS for email with messageId %s', email.messageId)
     }
 
-    const insights = emailDetails?.value.insights ?? []
+    const insights = emailDetails?.insights ?? []
 
     const events = insights[0]?.Events ?? []
 
