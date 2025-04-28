@@ -391,6 +391,16 @@ export default class StudyUpdatePage {
   }
 
   async assertStudyDatesValidation(dateType: string, dmy: string, partial: boolean) {
+    const dateTypeToLabelMapping: Record<string, string> = {
+      plannedOpening: 'Planned UK opening',
+      actualOpening: 'Actual UK opening',
+      actualClosure: 'Actual UK closure',
+      plannedClosure: 'Planned UK closure',
+      estimatedReopening: ' Estimated UK opening',
+    }
+
+    const label = dateTypeToLabelMapping[dateType] ?? dateType
+
     let plannedOrActualMessage = ''
     let estimatedReopenMessage = ''
 
@@ -398,42 +408,42 @@ export default class StudyUpdatePage {
       plannedOrActualMessage = `Year must include 4 numbers`
       estimatedReopenMessage = plannedOrActualMessage
     } else if ((dmy === 'year' && partial === true) || (dmy !== 'year' && partial === true)) {
-      plannedOrActualMessage = `${dateType} to recruitment date must include a ${dmy}`
+      plannedOrActualMessage = `${label} to recruitment date must include a ${dmy}`
       estimatedReopenMessage = `${dateType} date must include a ${dmy}`
     } else {
-      plannedOrActualMessage = `${dateType} to recruitment date requires a valid ${dmy}`
-      estimatedReopenMessage = `${dateType} date requires a valid ${dmy}`
+      plannedOrActualMessage = `${label} to recruitment date requires a valid ${dmy}`
+      estimatedReopenMessage = `${label} date requires a valid ${dmy}`
     }
 
     await expect(this.updateValidationBanner).toBeVisible()
     await expect(this.updateValidationBanner).toContainText('There is a problem')
 
     switch (dateType) {
-      case 'Planned opening':
+      case 'plannedOpening':
         const plannedOpeningError = `#plannedOpeningDate-${dmy}-error`
         await expect(this.page.locator(plannedOpeningError)).toBeVisible()
         await expect(this.page.locator(plannedOpeningError)).toHaveText(`Error: ${plannedOrActualMessage}`)
         await expect(this.updateValidationList).toContainText(plannedOrActualMessage)
         break
-      case 'Actual opening':
+      case 'actualOpening':
         const actualOpeningError = `#actualOpeningDate-${dmy}-error`
         await expect(this.page.locator(actualOpeningError)).toBeVisible()
         await expect(this.page.locator(actualOpeningError)).toHaveText(`Error: ${plannedOrActualMessage}`)
         await expect(this.updateValidationList).toContainText(plannedOrActualMessage)
         break
-      case 'Planned closure':
+      case 'plannedClosure':
         const plannedClosureError = `#plannedClosureDate-${dmy}-error`
         await expect(this.page.locator(plannedClosureError)).toBeVisible()
         await expect(this.page.locator(plannedClosureError)).toHaveText(`Error: ${plannedOrActualMessage}`)
         await expect(this.updateValidationList).toContainText(plannedOrActualMessage)
         break
-      case 'Actual closure':
+      case 'actualClosure':
         const actualClosureError = `#actualClosureDate-${dmy}-error`
         await expect(this.page.locator(actualClosureError)).toBeVisible()
         await expect(this.page.locator(actualClosureError)).toHaveText(`Error: ${plannedOrActualMessage}`)
         await expect(this.updateValidationList).toContainText(plannedOrActualMessage)
         break
-      case 'Estimated reopening':
+      case 'estimatedReopening':
         const estimatedReopeningError = `#estimatedReopeningDate-${dmy}-error`
         await expect(this.page.locator(estimatedReopeningError)).toBeVisible()
         await expect(this.page.locator(estimatedReopeningError)).toHaveText(`Error: ${estimatedReopenMessage}`)
