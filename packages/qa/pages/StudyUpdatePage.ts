@@ -5,6 +5,8 @@ import { seDatabaseReq, waitForSeDbRequest } from '../utils/DbRequests'
 //Declare Page Objects
 export default class StudyUpdatePage {
   readonly page: Page
+  readonly allStudiesBreadcrumb: Locator
+  readonly studyDetailsBreadcrumb: Locator
   readonly bannerTitle: Locator
   readonly pageTitle: Locator
   readonly sponsorOrganisation: Locator
@@ -64,6 +66,8 @@ export default class StudyUpdatePage {
       'h1[class="govuk-heading-m govuk-!-margin-bottom-0 govuk-!-margin-left-4 hidden text-white sm:block"]'
     )
     this.pageTitle = page.locator('h2[class="govuk-heading-l govuk-!-margin-bottom-4"]')
+    this.allStudiesBreadcrumb = page.locator('a[href="/studies"]')
+    this.studyDetailsBreadcrumb = page.locator(`a[href="/studies/"]`)
 
     //Study
     this.sponsorOrganisation = page.locator('.govuk-body-m.mb-0.text-darkGrey')
