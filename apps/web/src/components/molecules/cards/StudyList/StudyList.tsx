@@ -35,7 +35,10 @@ export function StudyList({
   return (
     <Card>
       {daysSinceAssessmentDue !== null ? (
-        <span className="govuk-tag govuk-tag--red absolute top-0 right-0 normal-case">{daysDueText}</span>
+        <>
+          <span className="govuk-visually-hidden">{shortTitle} has been</span>
+          <span className="govuk-tag govuk-tag--red absolute top-0 right-0 normal-case">{daysDueText}</span>
+        </>
       ) : null}
 
       <div className="md:max-w-[calc(100%-50px)]">
