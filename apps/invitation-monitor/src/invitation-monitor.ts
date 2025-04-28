@@ -1,6 +1,7 @@
 import { Prisma } from 'database'
 import { emailDeliverabilityService, emailService } from '@nihr-ui/email'
 import { config as dotEnvConfig } from 'dotenv'
+import type { InsightsEvent } from '@aws-sdk/client-sesv2'
 import { BounceType, EventType } from '@aws-sdk/client-sesv2'
 import utc from 'dayjs/plugin/utc'
 import dayjs from 'dayjs'
@@ -8,7 +9,12 @@ import { logger } from '@nihr-ui/logger'
 import type { EmailStatusResult } from '@nihr-ui/email/email-deliverability-service'
 import { emailTemplates } from '@nihr-ui/templates/sponsor-engagement'
 import { retry } from '@lifeomic/attempt'
-import { PERMANENT_EMAIL_FAILURES, RETRYABLE_SES_ERRORS, UserOrganisationInviteStatus } from './lib/constants'
+import {
+  AWS_GET_MESSAGE_INSIGHTS_RATE_LIMIT_MS,
+  PERMANENT_EMAIL_FAILURES,
+  RETRYABLE_SES_ERRORS,
+  UserOrganisationInviteStatus,
+} from './lib/constants'
 import { prismaClient } from './lib/prisma'
 import type { UserOrganisationInvitations } from './types'
 import { getSponsorEngagementUrl } from './utils'
@@ -16,6 +22,8 @@ import { getSponsorEngagementUrl } from './utils'
 dotEnvConfig()
 // eslint-disable-next-line import/no-named-as-default-member -- intentional to use this extend from dayjs obj
 dayjs.extend(utc)
+
+let previousRequestTime = 0
 
 const fetchPendingEmails = async (pendingStatusId: number): Promise<UserOrganisationInvitations> => {
   return prismaClient.userOrganisationInvitation.findMany({
@@ -64,8 +72,15 @@ const fetchEmailStatus = async (
   maxDelay: number,
   maxAttempts = 3
 ): Promise<EmailStatusResult> => {
+  const timeSinceLastRequest = previousRequestTime ? Date.now() - previousRequestTime : 0
+  const initialDelay =
+    timeSinceLastRequest < AWS_GET_MESSAGE_INSIGHTS_RATE_LIMIT_MS
+      ? AWS_GET_MESSAGE_INSIGHTS_RATE_LIMIT_MS - timeSinceLastRequest
+      : 0
+
   return retry(
     async () => {
+      previousRequestTime = Date.now()
       return fetchEmailStatusInner(emailMessageId)
     },
     {
@@ -75,6 +90,7 @@ const fetchEmailStatus = async (
       minDelay: 1000,
       maxDelay,
       factor: 2,
+      initialDelay,
       handleError: (error, context) => {
         const enableRetry = RETRYABLE_SES_ERRORS.includes(error instanceof Error ? error.name : '')
 
@@ -95,11 +111,21 @@ const fetchEmailStatus = async (
   )
 }
 
-export const monitorInvitationEmails = async () => {
+const hasEmailFailed = (events: InsightsEvent[], hoursSinceEmailSent: number) => {
   const EMAIL_DELIVERY_THRESHOLD_HOURS = process.env.INVITE_EMAIL_DELIVERY_THRESHOLD_HOURS
     ? Number(process.env.INVITE_EMAIL_DELIVERY_THRESHOLD_HOURS)
     : 72
 
+  return (
+    events.some(
+      (event) => event.Type === EventType.BOUNCE && event.Details?.Bounce?.BounceType === BounceType.PERMANENT // Permanent bounce
+    ) ||
+    events.some((event) => PERMANENT_EMAIL_FAILURES.includes(event.Type ?? '')) || // Permanent failure
+    hoursSinceEmailSent > EMAIL_DELIVERY_THRESHOLD_HOURS // Undelivered after expected threshold
+  )
+}
+
+export const monitorInvitationEmails = async () => {
   const RETRY_MAX_DELAY_MS = process.env.FETCH_EMAIL_RETRY_MAX_DELAY_MS
     ? Number(process.env.FETCH_EMAIL_RETRY_MAX_DELAY_MS)
     : 6000
@@ -136,23 +162,7 @@ export const monitorInvitationEmails = async () => {
 
         if (events.some((event) => event.Type === EventType.DELIVERY)) {
           successIds.push(id)
-        } else if (
-          events.some(
-            (event) => event.Type === EventType.BOUNCE && event.Details?.Bounce?.BounceType === BounceType.PERMANENT
-          )
-        ) {
-          failedEmailDetails.push({
-            id,
-            userEmail: email.userOrganisation.user.email,
-            sentByEmail: email.sentBy.email,
-          })
-        } else if (events.some((event) => PERMANENT_EMAIL_FAILURES.includes(event.Type ?? ''))) {
-          failedEmailDetails.push({
-            id,
-            userEmail: email.userOrganisation.user.email,
-            sentByEmail: email.sentBy.email,
-          })
-        } else if (hoursSinceEmailSent > EMAIL_DELIVERY_THRESHOLD_HOURS) {
+        } else if (hasEmailFailed(events, hoursSinceEmailSent)) {
           failedEmailDetails.push({
             id,
             userEmail: email.userOrganisation.user.email,

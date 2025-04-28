@@ -20,3 +20,5 @@ export const RETRYABLE_SES_ERRORS = [
   'ThrottlingException',
   'TooManyRequestsException',
 ]
+
+export const AWS_GET_MESSAGE_INSIGHTS_RATE_LIMIT_MS = 1000
