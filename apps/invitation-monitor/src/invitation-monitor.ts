@@ -118,58 +118,51 @@ export const monitorInvitationEmails = async () => {
     return
   }
 
-  const emailStatusResults: EmailStatusResult[] = []
-
-  for (const email of pendingEmails) {
-    // eslint-disable-next-line no-await-in-loop -- intentional to prevent rate limiting of 1 request per second
-    await fetchEmailStatus(email.messageId, RETRY_MAX_DELAY_MS)
-      .then((res) => emailStatusResults.push(res))
-      .catch((_err) => null)
-  }
-
-  const successIds = []
+  const successIds: number[] = []
   const failedEmailDetails: { id: number; userEmail: string; sentByEmail: string }[] = []
   const todayUTCDate = dayjs.utc()
 
   for (const email of pendingEmails) {
     const id = email.id
-    const emailDetails = emailStatusResults.find((statusResult) => statusResult.messageId === email.messageId)
 
-    if (!emailDetails) {
-      logger.info('No information from AWS for email with messageId %s', email.messageId)
-    }
+    // eslint-disable-next-line no-await-in-loop -- intentional to prevent rate limiting of 1 request per second
+    await fetchEmailStatus(email.messageId, RETRY_MAX_DELAY_MS)
+      .then((emailDetails) => {
+        const insights = emailDetails.insights
 
-    const insights = emailDetails?.insights ?? []
+        const events = insights[0]?.Events ?? []
 
-    const events = insights[0]?.Events ?? []
+        const hoursSinceEmailSent = todayUTCDate.diff(email.timestamp.toISOString(), 'hours', true)
 
-    const hoursSinceEmailSent = todayUTCDate.diff(email.timestamp.toISOString(), 'hours', true)
-
-    if (events.some((event) => event.Type === EventType.DELIVERY)) {
-      successIds.push(id)
-    } else if (
-      events.some(
-        (event) => event.Type === EventType.BOUNCE && event.Details?.Bounce?.BounceType === BounceType.PERMANENT
-      )
-    ) {
-      failedEmailDetails.push({
-        id,
-        userEmail: email.userOrganisation.user.email,
-        sentByEmail: email.sentBy.email,
+        if (events.some((event) => event.Type === EventType.DELIVERY)) {
+          successIds.push(id)
+        } else if (
+          events.some(
+            (event) => event.Type === EventType.BOUNCE && event.Details?.Bounce?.BounceType === BounceType.PERMANENT
+          )
+        ) {
+          failedEmailDetails.push({
+            id,
+            userEmail: email.userOrganisation.user.email,
+            sentByEmail: email.sentBy.email,
+          })
+        } else if (events.some((event) => PERMANENT_EMAIL_FAILURES.includes(event.Type ?? ''))) {
+          failedEmailDetails.push({
+            id,
+            userEmail: email.userOrganisation.user.email,
+            sentByEmail: email.sentBy.email,
+          })
+        } else if (hoursSinceEmailSent > EMAIL_DELIVERY_THRESHOLD_HOURS) {
+          failedEmailDetails.push({
+            id,
+            userEmail: email.userOrganisation.user.email,
+            sentByEmail: email.sentBy.email,
+          })
+        }
       })
-    } else if (events.some((event) => PERMANENT_EMAIL_FAILURES.includes(event.Type ?? ''))) {
-      failedEmailDetails.push({
-        id,
-        userEmail: email.userOrganisation.user.email,
-        sentByEmail: email.sentBy.email,
+      .catch((_err) => {
+        logger.info('No information from AWS for email with messageId %s', email.messageId)
       })
-    } else if (hoursSinceEmailSent > EMAIL_DELIVERY_THRESHOLD_HOURS) {
-      failedEmailDetails.push({
-        id,
-        userEmail: email.userOrganisation.user.email,
-        sentByEmail: email.sentBy.email,
-      })
-    }
   }
 
   const failedIds = failedEmailDetails.map((details) => details.id)
