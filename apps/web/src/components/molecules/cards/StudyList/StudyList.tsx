@@ -36,7 +36,7 @@ export function StudyList({
     <Card>
       {daysSinceAssessmentDue !== null ? (
         <span
-          aria-label={`${shortTitle} is ${daysDueText}`}
+          aria-label={`${shortTitle} has been ${daysDueText}`}
           className="govuk-tag govuk-tag--red absolute top-0 right-0 normal-case"
         >
           <span aria-hidden="true">{daysDueText}</span>
