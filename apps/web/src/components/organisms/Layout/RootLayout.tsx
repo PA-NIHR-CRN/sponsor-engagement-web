@@ -71,7 +71,7 @@ export function RootLayout({ children, backLink, heading = SERVICE_NAME, user, b
       <SideNav.Provider open={sideNavOpen} setOpen={setSideNavOpen}>
         <Header heading={heading} user={user} />
         {backLink}
-        {breadcrumbConfig?.showBreadcrumb ? <Breadcrumbs {...breadcrumbConfig} /> : null}
+        <Breadcrumbs {...breadcrumbConfig} />
         <div className="flex flex-1">
           <SideNav.Panel className="flex flex-col" data-testid="side-panel">
             <SideNav.Link as={Link} href="/" icon={<HomeIcon />}>

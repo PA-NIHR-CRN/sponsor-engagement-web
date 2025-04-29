@@ -54,15 +54,6 @@ const transformDateValue = (input?: DateInputValue | null) => ({
   year: input?.year ?? '',
 })
 
-const getBreadcrumbLabel = (index: number): string | undefined => {
-  const labelOverrides = {
-    0: 'All studies',
-    1: 'Study details',
-  }
-
-  return labelOverrides[index]
-}
-
 export default function EditStudy({ study, currentLSN, query }: EditStudyProps) {
   const [mounted, setMounted] = useState(false)
   useEffect(() => {
@@ -433,8 +424,6 @@ EditStudy.getLayout = function getLayout(page: ReactElement, { user }: EditStudy
     <RootLayout
       breadcrumbConfig={{
         showBreadcrumb: true,
-        indexesToOmit: [2],
-        getLabelOverrides: getBreadcrumbLabel,
       }}
       heading={PAGE_TITLE}
       user={user}

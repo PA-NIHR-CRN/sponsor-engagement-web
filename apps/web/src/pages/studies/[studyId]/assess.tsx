@@ -24,15 +24,6 @@ import { withServerSideProps } from '@/utils/withServerSideProps'
 
 export type AssessmentProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-const getBreadcrumbLabel = (index: number): string | undefined => {
-  const labelOverrides = {
-    0: 'All studies',
-    1: 'Study details',
-  }
-
-  return labelOverrides[index]
-}
-
 export default function Assessment({
   query,
   study,
@@ -193,8 +184,6 @@ Assessment.getLayout = function getLayout(page: ReactElement, { user }: Assessme
     <RootLayout
       breadcrumbConfig={{
         showBreadcrumb: true,
-        indexesToOmit: [2],
-        getLabelOverrides: getBreadcrumbLabel,
       }}
       user={user}
     >

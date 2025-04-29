@@ -34,7 +34,7 @@ test('Adds a class to the body to detect js is enabled', () => {
 })
 
 test('Displays breadcrumbs', () => {
-  mockRouter.asPath = `/section/page`
+  mockRouter.asPath = `/studies/121/edit`
 
   const { getByRole } = render(
     <RootLayout breadcrumbConfig={{ showBreadcrumb: true }} heading="Welcome" user={userNoRoles.user}>
@@ -42,8 +42,8 @@ test('Displays breadcrumbs', () => {
     </RootLayout>
   )
 
-  expect(getByRole('link', { name: 'Navigate to section' })).toBeInTheDocument()
-  expect(getByRole('link', { name: 'Navigate to page' })).toBeInTheDocument()
+  expect(getByRole('link', { name: 'Navigate to All studies page' })).toBeInTheDocument()
+  expect(getByRole('link', { name: 'Navigate to Study details page' })).toBeInTheDocument()
 })
 
 describe('Displays the correct navigation links for a user who is only a Sponsor Contact', () => {

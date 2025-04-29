@@ -3,51 +3,42 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
-export type BreadcrumbConfig = Pick<BreadcrumbsProps, 'indexesToOmit' | 'getLabelOverrides'> & {
-  showBreadcrumb: boolean
-}
+import { getBreadcrumbItems } from './utils'
+
+export type BreadcrumbConfig = Pick<BreadcrumbsProps, 'showBreadcrumb'>
 
 interface BreadcrumbsProps {
-  indexesToOmit?: number[]
-  getLabelOverrides?: (index: number) => string | undefined
+  showBreadcrumb?: boolean
 }
 
-interface Breadcrumb {
-  text: string
+export interface Breadcrumb {
+  label: string
   href: string
 }
 
-function Breadcrumbs({ indexesToOmit = [], getLabelOverrides }: BreadcrumbsProps) {
+function Breadcrumbs({ showBreadcrumb }: BreadcrumbsProps) {
   const router = useRouter()
   const [breadcrumbs, setBreadcrumbs] = useState<Breadcrumb[]>([])
 
   useEffect(() => {
-    const pathItems = router.asPath.split('/')
+    const currentPagePath = router.asPath
+    const pathItems = currentPagePath.split('/')
     pathItems.shift()
 
-    const breadCrumbs = pathItems.map((path, index) => {
-      return {
-        text: path,
-        href: `/${pathItems.slice(0, index + 1).join('/')}`,
-      }
-    })
+    const breadcrumbItems = getBreadcrumbItems(pathItems, currentPagePath)
 
-    setBreadcrumbs(breadCrumbs)
+    setBreadcrumbs(breadcrumbItems)
   }, [router.asPath])
 
-  return (
+  return showBreadcrumb ? (
     <div className="ml-8 govuk-!-padding-top-3">
       <Container>
         <nav aria-label="Breadcrumb" className="govuk-breadcrumbs">
           <ol className="govuk-breadcrumbs__list">
-            {breadcrumbs.map(({ text, href }, index) => {
-              if (indexesToOmit.includes(index)) return
-
-              const label = getLabelOverrides?.(index) ?? text
-
+            {breadcrumbs.map(({ label, href }) => {
               return (
-                <li className="govuk-breadcrumbs__list-item" key={text.split('').join('-')}>
-                  <Link aria-label={`Navigate to ${label}`} className="govuk-breadcrumbs__link" href={href}>
+                <li className="govuk-breadcrumbs__list-item" key={label.split('').join('-')}>
+                  <Link aria-label={`Navigate to ${label} page`} className="govuk-breadcrumbs__link" href={href}>
                     {label}
                   </Link>
                 </li>
@@ -57,7 +48,7 @@ function Breadcrumbs({ indexesToOmit = [], getLabelOverrides }: BreadcrumbsProps
         </nav>
       </Container>
     </div>
-  )
+  ) : null
 }
 
 export default Breadcrumbs
