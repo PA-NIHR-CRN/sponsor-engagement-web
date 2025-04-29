@@ -68,7 +68,7 @@ export default class StudiesPage {
     this.studyLastItem = this.studyListItem.last()
     this.studyLastDue = this.studyLastItem.locator('span', { hasText: 'due' })
     this.studyListItemTitle = this.studyListItem.locator(
-      'div[class="govuk-heading-s govuk-!-margin-bottom-4 govuk-!-padding-top-0 inline-block font-extrabold"]'
+      'div[class="govuk-heading-s govuk-!-margin-bottom-0 govuk-!-padding-top-0 inline-block font-extrabold"]'
     )
     this.studyListItemOrgName = page.locator(
       'div[class="text-darkGrey govuk-!-margin-bottom-1 max-w-[calc(100%-45px)] lg:max-w-auto govuk-body-s"]'

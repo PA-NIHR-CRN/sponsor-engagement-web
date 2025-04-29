@@ -199,34 +199,38 @@ export default class StudyDetailsPage {
     this.viewEditHistory = page.locator('span:has-text("View edit history")')
     this.proposedChangeEditHistory = page.locator('[data-state="open"][data-testid^="edit-history-accordion-item-"]')
     this.proposedChangeUser = this.proposedChangeEditHistory.locator('span > span')
-    this.proposedChangeStatus = this.proposedChangeEditHistory.locator('li:has-text("Study status changed from ")')
+    this.proposedChangeStatus = this.proposedChangeEditHistory.locator(
+      'li:has-text("Study status in the UK changed from ")'
+    )
     this.proposedChangePlannedOpening = this.proposedChangeEditHistory.locator(
-      'li:has-text("Planned opening to recruitment date")'
+      'li:has-text("Planned UK opening to recruitment date")'
     )
     this.proposedChangeActualOpening = this.proposedChangeEditHistory.locator(
-      'li:has-text("Actual opening to recruitment date")'
+      'li:has-text("Actual UK opening to recruitment date")'
     )
     this.proposedChangePlannedClosure = this.proposedChangeEditHistory.locator(
-      'li:has-text("Planned closure to recruitment date")'
+      'li:has-text("Planned UK closure to recruitment date")'
     )
     this.proposedChangeActualClosure = this.proposedChangeEditHistory.locator(
-      'li:has-text("Actual closure to recruitment date")'
+      'li:has-text("Actual UK closure to recruitment date")'
     )
     this.proposedChangeUkTarget = this.proposedChangeEditHistory.locator('li:has-text("UK recruitment target")')
     this.directChangeEditHistory = page.locator('[data-testid^="edit-history-accordion-item-"]').first()
     this.directChangeUser = this.directChangeEditHistory.locator('span > span')
-    this.directChangeStatus = this.proposedChangeEditHistory.locator('li:has-text("Study status changed from ")')
+    this.directChangeStatus = this.proposedChangeEditHistory.locator(
+      'li:has-text("Study status in the UK changed from ")'
+    )
     this.directChangePlannedOpening = this.directChangeEditHistory.locator(
-      'li:has-text("Planned opening to recruitment date")'
+      'li:has-text("Planned UK opening to recruitment date")'
     )
     this.directChangeActualOpening = this.directChangeEditHistory.locator(
-      'li:has-text("Actual opening to recruitment date")'
+      'li:has-text("Actual UK opening to recruitment date")'
     )
     this.directChangePlannedClosure = this.directChangeEditHistory.locator(
-      'li:has-text("Planned closure to recruitment date")'
+      'li:has-text("Planned UK closure to recruitment date")'
     )
     this.directChangeActualClosure = this.directChangeEditHistory.locator(
-      'li:has-text("Actual closure to recruitment date")'
+      'li:has-text("Actual UK closure to recruitment date")'
     )
     this.directChangeUkTarget = this.directChangeEditHistory.locator('li:has-text("UK recruitment target")')
   }
@@ -755,17 +759,19 @@ export default class StudyDetailsPage {
     switch (updateType) {
       case 'status':
         await expect(this.proposedChangeStatus).toBeVisible()
-        await expect(this.proposedChangeStatus).toContainText(`Study status changed from ${oldValue} to ${newValue}`)
+        await expect(this.proposedChangeStatus).toContainText(
+          `Study status in the UK changed from ${oldValue} to ${newValue}`
+        )
         break
       case 'plannedOpening':
         await expect(this.proposedChangePlannedOpening).toBeVisible()
         if (added == true) {
           await expect(this.proposedChangePlannedOpening).toContainText(
-            `Planned opening to recruitment date ${newValue} added`
+            `Planned UK opening to recruitment date ${newValue} added`
           )
         } else {
           await expect(this.proposedChangePlannedOpening).toContainText(
-            `Planned opening to recruitment date changed from ${oldValue} to ${newValue}`
+            `Planned UK opening to recruitment date changed from ${oldValue} to ${newValue}`
           )
         }
         await expect(this.proposedChangePlannedOpening).toContainText(newValue)
@@ -774,33 +780,33 @@ export default class StudyDetailsPage {
         await expect(this.proposedChangeActualOpening).toBeVisible()
         if (added == true) {
           await expect(this.proposedChangeActualOpening).toContainText(
-            `Actual opening to recruitment date ${newValue} added`
+            `Actual UK opening to recruitment date ${newValue} added`
           )
         } else {
           await expect(this.proposedChangeActualOpening).toContainText(
-            `Actual opening to recruitment date changed from ${oldValue} to ${newValue}`
+            `Actual UK opening to recruitment date changed from ${oldValue} to ${newValue}`
           )
         }
         break
       case 'plannedClosure':
         if (added == true) {
           await expect(this.proposedChangePlannedClosure).toContainText(
-            `Planned closure to recruitment date ${newValue} added`
+            `Planned UK closure to recruitment date ${newValue} added`
           )
         } else {
           await expect(this.proposedChangePlannedClosure).toContainText(
-            `Planned closure to recruitment date changed from ${oldValue} to ${newValue}`
+            `Planned UK closure to recruitment date changed from ${oldValue} to ${newValue}`
           )
         }
         break
       case 'actualClosure':
         if (added == true) {
           await expect(this.proposedChangeActualClosure).toContainText(
-            `Actual closure to recruitment date ${newValue} added`
+            `Actual UK closure to recruitment date ${newValue} added`
           )
         } else {
           await expect(this.proposedChangeActualClosure).toContainText(
-            `Actual closure to recruitment date changed from ${oldValue} to ${newValue}`
+            `Actual UK closure to recruitment date changed from ${oldValue} to ${newValue}`
           )
         }
         break

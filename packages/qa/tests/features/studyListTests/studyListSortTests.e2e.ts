@@ -16,7 +16,8 @@ test.beforeAll('Setup Test Users', async () => {
     (SELECT createdAt FROM Assessment WHERE Assessment.studyId = Study.id 
     AND Assessment.isDeleted = 0 ORDER BY createdAt desc LIMIT 1) createdAt FROM Study
     INNER JOIN StudyOrganisation ON StudyOrganisation.studyId = Study.id
-    WHERE Study.isDeleted = 0
+    WHERE Study.isDeleted = 0 
+    AND StudyOrganisation.isDeleted = 0
     AND StudyOrganisation.organisationId = ${startingOrgId}
     ORDER BY Study.dueAssessmentAt IS NULL, Study.dueAssessmentAt asc, Study.id asc;
   `)
@@ -45,7 +46,8 @@ test.beforeAll('Setup Test Users', async () => {
     (SELECT createdAt FROM Assessment WHERE Assessment.studyId = Study.id 
     AND Assessment.isDeleted = 0 ORDER BY createdAt desc LIMIT 1) createdAt FROM Study
     INNER JOIN StudyOrganisation ON StudyOrganisation.studyId = Study.id
-    WHERE Study.isDeleted = 0
+    WHERE Study.isDeleted = 0 
+    AND StudyOrganisation.isDeleted = 0
     AND StudyOrganisation.organisationId = ${startingOrgId}
     ORDER BY createdAt asc, Study.id asc;
   `)
@@ -57,6 +59,7 @@ test.beforeAll('Setup Test Users', async () => {
     AND Assessment.isDeleted = 0 ORDER BY createdAt desc LIMIT 1) createdAt FROM Study
     INNER JOIN StudyOrganisation ON StudyOrganisation.studyId = Study.id
     WHERE Study.isDeleted = 0
+    AND StudyOrganisation.isDeleted = 0
     AND StudyOrganisation.organisationId = ${startingOrgId}
     ORDER BY createdAt desc, Study.id asc;
   `)

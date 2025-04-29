@@ -183,11 +183,11 @@ describe('Organisation page', () => {
     expect(contactCells).toEqual([
       'test1@test1.com',
       '2 January 2001Failed to deliver email',
-      '3 January 2001 ',
+      '3 January 2001',
       'Remove',
       'test2@test2.com',
       '2 January 2001',
-      '- ',
+      '-No last login date',
       'Remove',
     ])
 
