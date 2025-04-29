@@ -3,13 +3,10 @@ import { breadcrumbsConfig } from './config'
 
 const getBreadcrumbLabel = (href: string) => {
   for (const key in breadcrumbsConfig) {
-    const keyWithRegex = key.replace(/\[(?:[^\]]+)\]/g, '([^/]+)')
-
+    const keyWithRegex = key.replace(/\[[^/]+\]/g, '([^/]+)')
     const regex = new RegExp(`^${keyWithRegex}$`)
 
-    const match = href.slice(1).match(regex)
-
-    if (match) {
+    if (href.slice(1).match(regex)) {
       return breadcrumbsConfig[key]
     }
   }
