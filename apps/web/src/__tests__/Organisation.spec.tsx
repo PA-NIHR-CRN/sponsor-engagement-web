@@ -217,7 +217,7 @@ describe('Organisation page', () => {
 
     // Banner
     const banner = screen.getByRole('alert', { name: 'Success' })
-    expect(within(banner).getByText('A new contact was added for this organisation')).toBeInTheDocument()
+    expect(within(banner).getByText(/was added as a contact for this organisation/)).toBeInTheDocument()
   })
 
   test('Success banner shows after removing a contact', async () => {
