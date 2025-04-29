@@ -34,7 +34,8 @@ test('Adds a class to the body to detect js is enabled', () => {
 })
 
 test('Displays breadcrumbs', () => {
-  mockRouter.asPath = `/studies/121/edit`
+  mockRouter.pathname = `/studies/[studyId]/edit`
+  mockRouter.query = { studyId: '121' }
 
   const { getByRole } = render(
     <RootLayout breadcrumbConfig={{ showBreadcrumb: true }} heading="Welcome" user={userNoRoles.user}>

@@ -6,7 +6,8 @@ import Breadcrumbs from './Breadcrumbs'
 
 describe('Breadcrumbs', () => {
   beforeEach(() => {
-    mockRouter.asPath = '/studies/121/edit'
+    mockRouter.pathname = '/studies/[studyId]/edit'
+    mockRouter.query = { studyId: '121' }
   })
 
   it('does not display breadcrumb, when "showBreadcrumb" is false', () => {

@@ -21,29 +21,23 @@ function Breadcrumbs({ showBreadcrumb }: BreadcrumbsProps) {
   const [breadcrumbs, setBreadcrumbs] = useState<Breadcrumb[]>([])
 
   useEffect(() => {
-    const currentPagePath = router.asPath
-    const pathItems = currentPagePath.split('/')
-    pathItems.shift()
-
-    const breadcrumbItems = getBreadcrumbItems(pathItems, currentPagePath)
+    const breadcrumbItems = getBreadcrumbItems(router.pathname, router.query)
 
     setBreadcrumbs(breadcrumbItems)
-  }, [router.asPath])
+  }, [router.pathname, router.query])
 
   return showBreadcrumb ? (
     <div className="ml-8 govuk-!-padding-top-3">
       <Container>
         <nav aria-label="Breadcrumb" className="govuk-breadcrumbs">
           <ol className="govuk-breadcrumbs__list">
-            {breadcrumbs.map(({ label, href }) => {
-              return (
-                <li className="govuk-breadcrumbs__list-item" key={label.split('').join('-')}>
-                  <Link aria-label={`Navigate to ${label} page`} className="govuk-breadcrumbs__link" href={href}>
-                    {label}
-                  </Link>
-                </li>
-              )
-            })}
+            {breadcrumbs.map(({ label, href }) => (
+              <li className="govuk-breadcrumbs__list-item" key={label.split('').join('-')}>
+                <Link aria-label={`Navigate to ${label} page`} className="govuk-breadcrumbs__link" href={href}>
+                  {label}
+                </Link>
+              </li>
+            ))}
           </ol>
         </nav>
       </Container>
