@@ -166,13 +166,13 @@ export default class AssessmentPage {
 
   //Page Methods
   async goto(studyId: string) {
-    await this.page.goto(`assessments/${studyId}`)
+    await this.page.goto(`studies/${studyId}/assess`)
   }
 
   async assertOnAssessmentPage(studyId: string) {
     await expect(this.pageTitle).toBeVisible()
     await expect(this.pageTitle).toHaveText('Assess progress of a study in the UK')
-    await expect(this.page).toHaveURL(`assessments/${studyId}`)
+    await expect(this.page).toHaveURL(`studies/${studyId}/assess`)
   }
 
   async assertIntroText() {

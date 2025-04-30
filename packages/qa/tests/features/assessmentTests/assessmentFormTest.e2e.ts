@@ -87,7 +87,7 @@ test.describe('View the Study Assessment Form - @se_29 @se_29_form', () => {
     })
   })
 
-  test('As a Sponsor I can navigate back from the Study Assessment Form to the Study List and All Studies pages by clicking the breadcrumb links - @se_238_ac1', async ({
+  test('As a Sponsor I can navigate back from the Study Assessment Form to the Study Details and All Studies pages by clicking the breadcrumb links - @se_238_ac1', async ({
     assessmentPage,
     studyDetailsPage,
     studiesPage,
@@ -96,7 +96,7 @@ test.describe('View the Study Assessment Form - @se_29 @se_29_form', () => {
       await assessmentPage.goto(startingStudyId.toString())
       await assessmentPage.assertOnAssessmentPage(startingStudyId.toString())
     })
-    await test.step(`When I click on the 'Study List' breadcrumb`, async () => {
+    await test.step(`When I click on the 'Study details' breadcrumb`, async () => {
       await assessmentPage.studyDetailsBreadcrumb.click()
     })
     await test.step('Then I am taken to the Study Details page', async () => {

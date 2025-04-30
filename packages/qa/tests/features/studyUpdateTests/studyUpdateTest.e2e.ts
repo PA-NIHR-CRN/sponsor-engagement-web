@@ -187,7 +187,7 @@ test.describe('Update study data page - @se_166', () => {
       await studyUpdatePage.goto(startingStudyId.toString())
       await studyUpdatePage.assertOnUpdateStudyPage(startingStudyId.toString())
     })
-    await test.step(`When I click on the 'Study List' breadcrumb`, async () => {
+    await test.step(`When I click on the 'Study details' breadcrumb`, async () => {
       await studyUpdatePage.studyDetailsBreadcrumb.click()
     })
     await test.step('Then I am taken to the Study Details page', async () => {
