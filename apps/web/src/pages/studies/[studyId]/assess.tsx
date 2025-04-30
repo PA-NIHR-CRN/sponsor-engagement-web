@@ -180,7 +180,16 @@ export default function Assessment({
 }
 
 Assessment.getLayout = function getLayout(page: ReactElement, { user }: AssessmentProps) {
-  return <RootLayout user={user}>{page}</RootLayout>
+  return (
+    <RootLayout
+      breadcrumbConfig={{
+        showBreadcrumb: true,
+      }}
+      user={user}
+    >
+      {page}
+    </RootLayout>
+  )
 }
 
 export const getServerSideProps = withServerSideProps([Roles.SponsorContact], async (context, session) => {

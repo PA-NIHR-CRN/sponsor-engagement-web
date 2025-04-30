@@ -14,8 +14,8 @@ import { prismaMock } from '../__mocks__/prisma'
 import { userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
 import { sysRefAssessmentFurtherInformation, sysRefAssessmentStatus } from '../__mocks__/sysRefData'
 import { SIGN_IN_PAGE, SUPPORT_PAGE } from '../constants/routes'
-import type { AssessmentProps } from '../pages/assessments/[studyId]'
-import Assessment, { getServerSideProps } from '../pages/assessments/[studyId]'
+import type { AssessmentProps } from '../pages/studies/[studyId]/assess'
+import Assessment, { getServerSideProps } from '../pages/studies/[studyId]/assess'
 
 jest.mock('next-auth/next')
 jest.mock('next-seo')
@@ -118,7 +118,7 @@ const mockedEnvVars = {
 const renderPage = async (
   context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: String(mockedStudyId) } }),
   firstStudyResponse = study,
-  url = '/assessments/123'
+  url = '/studies/123/assess'
 ) => {
   jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRole)
   prismaMock.$transaction.mockResolvedValueOnce([firstStudyResponse])
@@ -227,7 +227,7 @@ describe('Assessment', () => {
       ).toBeInTheDocument()
       expect(screen.getByRole('link', { name: 'Request support' })).toHaveAttribute(
         'href',
-        `${SUPPORT_PAGE}?returnPath=/assessments/123`
+        `${SUPPORT_PAGE}?returnPath=/studies/123/assess`
       )
 
       // Study sponsor
@@ -467,7 +467,7 @@ describe('Assessment', () => {
 
       await userEvent.click(screen.getByRole('button', { name: 'Submit assessment' }))
 
-      expect(mockRouter.asPath).toBe('/assessments/123?fatal=1')
+      expect(mockRouter.asPath).toBe('/studies/123/assess?fatal=1')
 
       const alert = screen.getByRole('alert')
       expect(

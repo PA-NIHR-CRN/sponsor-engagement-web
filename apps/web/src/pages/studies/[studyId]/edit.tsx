@@ -421,7 +421,13 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
 
 EditStudy.getLayout = function getLayout(page: ReactElement, { user }: EditStudyProps) {
   return (
-    <RootLayout heading={PAGE_TITLE} user={user}>
+    <RootLayout
+      breadcrumbConfig={{
+        showBreadcrumb: true,
+      }}
+      heading={PAGE_TITLE}
+      user={user}
+    >
       {page}
     </RootLayout>
   )

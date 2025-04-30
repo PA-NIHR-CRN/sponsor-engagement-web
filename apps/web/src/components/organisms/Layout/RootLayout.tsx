@@ -15,6 +15,9 @@ import { SERVICE_NAME } from '@/constants'
 import { ORGANISATIONS_PAGE, SIGN_OUT_PAGE } from '@/constants/routes'
 import { isContactManager, isContactManagerAndSponsorContact, isSponsorContact } from '@/utils/auth'
 
+import type { BreadcrumbConfig } from '../Breadcrumbs/Breadcrumbs'
+import Breadcrumbs from '../Breadcrumbs/Breadcrumbs'
+
 export const primaryFont = Roboto({
   weight: ['400', '700'],
   subsets: ['latin'],
@@ -27,9 +30,10 @@ export interface RootLayoutProps {
   heading?: string
   backLink?: ReactNode
   user?: Session['user']
+  breadcrumbConfig?: BreadcrumbConfig
 }
 
-export function RootLayout({ children, backLink, heading = SERVICE_NAME, user }: RootLayoutProps) {
+export function RootLayout({ children, backLink, heading = SERVICE_NAME, user, breadcrumbConfig }: RootLayoutProps) {
   const router = useRouter()
   const [sideNavOpen, setSideNavOpen] = useState(false)
   const { data: session } = useSession()
@@ -67,6 +71,7 @@ export function RootLayout({ children, backLink, heading = SERVICE_NAME, user }:
       <SideNav.Provider open={sideNavOpen} setOpen={setSideNavOpen}>
         <Header heading={heading} user={user} />
         {backLink}
+        <Breadcrumbs {...breadcrumbConfig} />
         <div className="flex flex-1">
           <SideNav.Panel className="flex flex-col" data-testid="side-panel">
             <SideNav.Link as={Link} href="/" icon={<HomeIcon />}>
