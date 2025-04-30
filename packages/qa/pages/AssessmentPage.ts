@@ -4,6 +4,8 @@ import { confirmStringNotNull, convertIsoDateToDisplayDate } from '../utils/Util
 //Declare Page Objects
 export default class AssessmentPage {
   readonly page: Page
+  readonly allStudiesBreadcrumb: Locator
+  readonly studyDetailsBreadcrumb: Locator
   readonly pageTitle: Locator
   readonly introText: Locator
   readonly sponsorLabel: Locator
@@ -86,6 +88,8 @@ export default class AssessmentPage {
 
     //Locators
     this.pageTitle = page.locator('h2[class="govuk-heading-l govuk-!-margin-bottom-4"]')
+    this.allStudiesBreadcrumb = page.locator('.govuk-breadcrumbs__list > .govuk-breadcrumbs__list-item:nth-child(1)')
+    this.studyDetailsBreadcrumb = page.locator('.govuk-breadcrumbs__list > .govuk-breadcrumbs__list-item:nth-child(2)')
     this.introText = page.locator('div[class="w-full"] p').nth(0)
     this.sponsorLabel = page.locator('div[class="text-darkGrey govuk-!-margin-bottom-0 govuk-body-s"]')
     this.studyTitle = page.locator('h3[class="govuk-heading-m govuk-!-margin-bottom-1"]')

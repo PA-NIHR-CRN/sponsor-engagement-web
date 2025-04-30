@@ -177,36 +177,31 @@ test.describe('Update study data page - @se_166', () => {
       await studyUpdatePage.assertRdnSupport()
     })
   })
-})
 
-test('As a Sponsor I can navigate back from the Update Study Page to the Study Details Page by clicking the breadcrumb link - @se_238_ac2', async ({
-  studyUpdatePage,
-  studyDetailsPage,
-}) => {
-  await test.step(`Given I have navigated to the Update Study Page for a Study with SE Id ${startingStudyId}`, async () => {
-    await studyUpdatePage.goto(startingStudyId.toString())
-    await studyUpdatePage.assertOnUpdateStudyPage(startingStudyId.toString())
-  })
-  await test.step(`When I click on the 'Study List' breadcrumb`, async () => {
-    await studyUpdatePage.studyDetailsBreadcrumb.click()
-  })
-  await test.step('Then I am taken to the Studu Details page', async () => {
-    await studyDetailsPage.assertOnStudyDetailsPage(startingStudyId.toString())
-  })
-})
-
-test('As a Sponsor I can navigate back from the Update Study Page to the All Studies Page by clicking the breadcrumb link - @se_238_ac2', async ({
-  studyUpdatePage,
-  studiesPage,
-}) => {
-  await test.step(`Given I have navigated to the Update Study Page for a Study with SE Id ${startingStudyId}`, async () => {
-    await studyUpdatePage.goto(startingStudyId.toString())
-    await studyUpdatePage.assertOnUpdateStudyPage(startingStudyId.toString())
-  })
-  await test.step(`When I click on the 'All studies' breadcrumb`, async () => {
-    await studyUpdatePage.allStudiesBreadcrumb.click()
-  })
-  await test.step('Then I am taken to the Studies page', async () => {
-    await studiesPage.assertOnStudiesPage()
+  test('As a Sponsor I can navigate back from the Update Study Page to the Study Details Page and All Studies Page by clicking the breadcrumb links - @se_238_ac2', async ({
+    studyUpdatePage,
+    studyDetailsPage,
+    studiesPage,
+  }) => {
+    await test.step(`Given I have navigated to the Update Study Page for a Study with SE Id ${startingStudyId}`, async () => {
+      await studyUpdatePage.goto(startingStudyId.toString())
+      await studyUpdatePage.assertOnUpdateStudyPage(startingStudyId.toString())
+    })
+    await test.step(`When I click on the 'Study List' breadcrumb`, async () => {
+      await studyUpdatePage.studyDetailsBreadcrumb.click()
+    })
+    await test.step('Then I am taken to the Study Details page', async () => {
+      await studyDetailsPage.assertOnStudyDetailsPage(startingStudyId.toString())
+    })
+    await test.step(`And I navigate to the Update Study Page again`, async () => {
+      await studyUpdatePage.goto(startingStudyId.toString())
+      await studyUpdatePage.assertOnUpdateStudyPage(startingStudyId.toString())
+    })
+    await test.step(`When I click on the 'All studies' breadcrumb`, async () => {
+      await studyUpdatePage.allStudiesBreadcrumb.click()
+    })
+    await test.step('Then I am taken to the Studies page', async () => {
+      await studiesPage.assertOnStudiesPage()
+    })
   })
 })
