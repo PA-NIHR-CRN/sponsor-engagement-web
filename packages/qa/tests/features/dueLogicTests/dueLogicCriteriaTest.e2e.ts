@@ -11,7 +11,9 @@ test.beforeAll('Setup Tests', async () => {
   const response = await seDatabaseReq(
     `SELECT organisationId FROM UserOrganisation WHERE userId = ${testUserId} AND isDeleted = 0 LIMIT 1;`
   )
-  startingOrgId = response[0].organisationId
+
+  startingOrgId = response[0]?.organisationId
+  if (!startingOrgId) throw new Error('User is not associated to any organisation.')
 
   const allAssessmentIdsForStudy = await seDatabaseReq(
     `SELECT id FROM Assessment WHERE studyId = ${provideAssessmentStudyId};`
