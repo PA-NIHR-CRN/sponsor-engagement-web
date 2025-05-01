@@ -13,6 +13,7 @@ interface FormProps<T extends FieldValues> {
   handleSubmit: UseFormHandleSubmit<T>
   children: ReactNode
   onError: (message: string) => void
+  onSuccess?: (data: T) => void
 }
 
 interface FormApiResponse extends NextApiResponse {
@@ -21,7 +22,14 @@ interface FormApiResponse extends NextApiResponse {
   }
 }
 
-export function Form<T extends FieldValues>({ action, method, children, onError, handleSubmit }: FormProps<T>) {
+export function Form<T extends FieldValues>({
+  action,
+  method,
+  children,
+  onError,
+  onSuccess,
+  handleSubmit,
+}: FormProps<T>) {
   const router = useRouter()
 
   const redirectToFatalError = (code = 1) => {
@@ -59,6 +67,10 @@ export function Form<T extends FieldValues>({ action, method, children, onError,
 
       // Misc error redirect
       void router.replace(`${redirectUrl.pathname}${redirectUrl.search}`)
+
+      if (onSuccess) {
+        onSuccess(values)
+      }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         logger.info(`Form component failed to submit due to ${error.message}`)
