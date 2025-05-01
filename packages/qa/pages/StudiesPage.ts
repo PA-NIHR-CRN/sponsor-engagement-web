@@ -89,7 +89,9 @@ export default class StudiesPage {
     this.studyListItemDataIndicatesValue = page
       .locator('div[class="lg:min-w-[320px]"] p[class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0"]')
       .nth(1)
-    this.studyListItemDueIndicator = page.locator('span')
+    this.studyListItemDueIndicator = page.locator(
+      'span[class="govuk-tag govuk-tag--red float-right -mt-3 -mr-3 normal-case"]'
+    )
     this.searchInput = page.locator('input[class="govuk-input govuk-input h-[50px] border-2 border-black p-2"]')
     this.searchButton = page.locator(
       'button[class="bg-[var(--colour-blue)] text-white active:top-0 focus:shadow-[inset_0_0_0_4px_var(--text-grey)] focus:outline focus:outline-[3px] focus:outline-[var(--focus)] mb-0 w-[50px] h-[50px] flex items-center justify-center text-lg"]'

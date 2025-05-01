@@ -270,7 +270,7 @@ export default class OrganisationDetailsPage {
       const row = this.contactListRow.nth(index)
       const expectedDate = expectedDetails[index].lastLogin
         ? convertIsoDateToDisplayDate(expectedDetails[index].lastLogin)
-        : '-'
+        : '-No last login date'
       await expect(row.locator('td').nth(2)).toHaveText(expectedDate)
     }
   }
