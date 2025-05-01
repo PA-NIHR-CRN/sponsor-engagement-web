@@ -27,6 +27,7 @@ export default class StudiesPage {
   readonly studyListItem: Locator
   readonly studyListItemTitle: Locator
   readonly studyListItemOrgName: Locator
+  readonly studyListItemIrasIdValue: Locator
   readonly studyListItemLastAssessmentLbl: Locator
   readonly studyListItemLastAssessmentValue: Locator
   readonly studyListItemDataIndicatesLbl: Locator
@@ -72,6 +73,9 @@ export default class StudiesPage {
     )
     this.studyListItemOrgName = page.locator(
       'div[class="text-darkGrey govuk-!-margin-bottom-1 max-w-[calc(100%-45px)] lg:max-w-auto govuk-body-s"]'
+    )
+    this.studyListItemIrasIdValue = this.studyListItem.locator(
+      'div[class="govuk-body-s govuk-!-margin-bottom-2 govuk-!-padding-top-0"]'
     )
     this.studyListItemLastAssessmentLbl = page
       .locator('div[class="lg:min-w-[320px]"] strong[class="govuk-heading-s govuk-!-margin-bottom-0"]')
@@ -269,6 +273,18 @@ export default class StudiesPage {
       return studyListOrgName?.substring(sponsorEndIndex + 1, croCtuEndIndex).trim()
     } else {
       return ''
+    }
+  }
+
+  async assertIrasIdValue(dbReq: string, index: number) {
+    const expectedValues = await seDatabaseReq(`${dbReq}`)
+    const fullText = await this.studyListItemIrasIdValue.nth(index).textContent()
+    const actualValue = fullText?.replace('IRAS ID: ', '').trim()
+
+    if (expectedValues.length > 0 && expectedValues[0].irasId) {
+      expect(actualValue).toEqual(expectedValues[0].irasId.toString())
+    } else {
+      expect(actualValue).toEqual('Not available')
     }
   }
 

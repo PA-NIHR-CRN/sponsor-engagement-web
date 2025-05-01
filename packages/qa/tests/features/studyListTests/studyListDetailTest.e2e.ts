@@ -34,6 +34,9 @@ test.describe('Details on Study List Items - @se_22 @se_22_detail', () => {
         studyListItemIndex
       )
     })
+    await test.step('And the `IRAS ID` matches the Expected Value', async () => {
+      await studiesPage.assertIrasIdValue(`SELECT irasId FROM Study WHERE id = ${studyIdFromList};`, studyListItemIndex)
+    })
     await test.step('And the `Last sponsor assessment` matches the Expected Value', async () => {
       await studiesPage.assertLastAssessmentLbl(studyListItemIndex)
       await studiesPage.assertLastAssessmentValue(
@@ -80,6 +83,9 @@ test.describe('Details on Study List Items - @se_22 @se_22_detail', () => {
             WHERE StudyOrganisation.studyId = ${studyIdFromList};`,
         studyListItemIndex
       )
+    })
+    await test.step('And the `IRAS ID` matches the Expected Value', async () => {
+      await studiesPage.assertIrasIdValue(`SELECT irasId FROM Study WHERE id = ${studyIdFromList};`, studyListItemIndex)
     })
     await test.step('And the `Last sponsor assessment` matches the Expected Value', async () => {
       await studiesPage.assertLastAssessmentLbl(studyListItemIndex)
