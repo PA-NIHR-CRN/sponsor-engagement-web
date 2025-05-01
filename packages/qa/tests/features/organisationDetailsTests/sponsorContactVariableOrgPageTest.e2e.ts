@@ -1,10 +1,7 @@
 import { test } from '../../../hooks/CustomFixtures'
 import { seDatabaseReq } from '../../../utils/DbRequests'
 
-const userId = 6
 const organisationId = 9
-const newOrganisationId = 1
-let testUserOrganisationId: number
 
 test.describe('Sponsor Organisation Details Page for Sponsor Contacts - @se_248', () => {
   test.use({ storageState: '.auth/sponsorContact.json' })
@@ -29,14 +26,10 @@ test.describe('Sponsor Organisation List Page for Sponsor Contacts - @se_248', (
   test.use({ storageState: '.auth/sponsorContact.json' })
 
   test.beforeEach(async () => {
-    const result = await seDatabaseReq(`SELECT MAX(id) + 1 AS newId FROM sponsorengagement.UserOrganisation;`)
-    testUserOrganisationId = result[0].newId || 9999
-
     await seDatabaseReq(`
-      INSERT INTO sponsorengagement.UserOrganisation 
-      (id, userId, organisationId, createdById, updatedById, createdAt, updatedAt, isDeleted) 
-      VALUES 
-      (${testUserOrganisationId}, ${userId}, ${newOrganisationId}, 21208, 21208, '2023-12-04 16:55:12.920', '2023-12-04 16:55:12.920', 0);
+      UPDATE sponsorengagement.UserOrganisation 
+      SET isDeleted = 0 
+      WHERE id = 3311;
     `)
   })
 
@@ -53,18 +46,13 @@ test.describe('Sponsor Organisation List Page for Sponsor Contacts - @se_248', (
     await test.step('Then I am taken to the organisation list page, not the organisation details page', async () => {
       await organisationsPage.assertOnOrganisationsPage()
     })
-
-    await seDatabaseReq(`
-      UPDATE sponsorengagement.UserOrganisation 
-      SET isDeleted = 1 
-      WHERE id = ${testUserOrganisationId};
-    `)
   })
 
   test.afterEach(async () => {
     await seDatabaseReq(`
-      DELETE FROM sponsorengagement.UserOrganisation 
-      WHERE id = ${testUserOrganisationId};
+      UPDATE sponsorengagement.UserOrganisation 
+      SET isDeleted = 1 
+      WHERE id = 3311;
     `)
   })
 })
