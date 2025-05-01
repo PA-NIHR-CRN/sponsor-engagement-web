@@ -70,7 +70,7 @@ test.describe('Search the Organisations List - @se_16 @se_252', () => {
        WHERE EXISTS (SELECT 1 FROM UserOrganisation WHERE User.id = UserOrganisation.userId and User.isDeleted = 0 and UserOrganisation.isDeleted = 0);`
     )
 
-    const emailSearchTerm = res[0].email
+    const emailSearchTerm = res[0]?.email
 
     if (!emailSearchTerm) {
       throw new Error('No users associated with any organisations - check test data!')
@@ -116,12 +116,13 @@ test.describe('Search for Organisations as a Sponsor Contact - @se_252', () => {
         AND User.isDeleted = 0 AND UserOrganisation.isDeleted = 0;`
     )
 
-    const emailSearchTerm = res[0].email
-    const selectedUserId = res[0].id
+    const emailSearchTerm = res[0]?.email
 
     if (!emailSearchTerm) {
       throw new Error('No organisations associated with test user and at least one other user - check test data!')
     }
+
+    const selectedUserId = res[0].id
 
     await test.step('Given I have navigated to the Organisation List Page', async () => {
       await page.goto('/organisations')
