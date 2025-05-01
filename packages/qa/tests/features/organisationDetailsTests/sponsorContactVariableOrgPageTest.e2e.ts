@@ -2,6 +2,8 @@ import { test } from '../../../hooks/CustomFixtures'
 import { seDatabaseReq } from '../../../utils/DbRequests'
 
 const organisationId = 9
+const sponsorContactUserId = 6
+let userOrganisationId: number
 
 test.describe('Sponsor Organisation Details Page for Sponsor Contacts - @se_248', () => {
   test.use({ storageState: '.auth/sponsorContact.json' })
@@ -25,18 +27,25 @@ test.describe('Sponsor Organisation Details Page for Sponsor Contacts - @se_248'
 test.describe('Sponsor Organisation List Page for Sponsor Contacts - @se_248', () => {
   test.use({ storageState: '.auth/sponsorContact.json' })
 
-  test.beforeEach(async () => {
-    await seDatabaseReq(`
-      UPDATE sponsorengagement.UserOrganisation 
-      SET isDeleted = 0 
-      WHERE id = 3311;
-    `)
-  })
-
   test('As a Sponsor Contact associated to two or more organisations I can see the expected Organisation list Page Layouts - @se_248_ac2_multiple_organisations', async ({
     commonItemsPage,
     organisationsPage,
   }) => {
+    const result = await seDatabaseReq(`
+      SELECT id FROM UserOrganisation 
+      WHERE userId = ${sponsorContactUserId} 
+      AND isDeleted = 1 
+      LIMIT 1;
+    `)
+    if (!result[0] || !result[0].id) {
+      throw new Error('Expected a delted UserOrgnaisation recod for userID of 6, but none were found')
+    }
+    userOrganisationId = result[0].id
+    await seDatabaseReq(`
+      UPDATE UserOrganisation 
+      SET isDeleted = 0 
+      WHERE id = ${userOrganisationId};
+    `)
     await test.step('Given I have navigated to the Study details Page', async () => {
       await commonItemsPage.goto()
     })
@@ -46,13 +55,10 @@ test.describe('Sponsor Organisation List Page for Sponsor Contacts - @se_248', (
     await test.step('Then I am taken to the organisation list page, not the organisation details page', async () => {
       await organisationsPage.assertOnOrganisationsPage()
     })
-  })
-
-  test.afterEach(async () => {
     await seDatabaseReq(`
-      UPDATE sponsorengagement.UserOrganisation 
+      UPDATE UserOrganisation 
       SET isDeleted = 1 
-      WHERE id = 3311;
+      WHERE id = ${userOrganisationId};
     `)
   })
 })
