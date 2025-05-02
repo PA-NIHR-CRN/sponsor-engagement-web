@@ -3,7 +3,6 @@ import { seDatabaseReq } from '../../../utils/DbRequests'
 
 const organisationId = 9
 const sponsorContactUserId = 6
-let userOrganisationId: number
 
 test.describe('Sponsor Organisation Details Page for Sponsor Contacts - @se_248', () => {
   test.use({ storageState: '.auth/sponsorContact.json' })
@@ -22,10 +21,6 @@ test.describe('Sponsor Organisation Details Page for Sponsor Contacts - @se_248'
       await organisationDetailsPage.assertOnOrganisationDetailsPage(organisationId.toString())
     })
   })
-})
-
-test.describe('Sponsor Organisation List Page for Sponsor Contacts - @se_248', () => {
-  test.use({ storageState: '.auth/sponsorContact.json' })
 
   test('As a Sponsor Contact associated to two or more organisations I can see the expected Organisation list Page Layouts - @se_248_ac2_multiple_organisations', async ({
     commonItemsPage,
@@ -37,10 +32,10 @@ test.describe('Sponsor Organisation List Page for Sponsor Contacts - @se_248', (
       AND isDeleted = 1 
       LIMIT 1;
     `)
-    if (!result[0] || !result[0].id) {
-      throw new Error('Expected a delted UserOrgnaisation recod for userID of 6, but none were found')
+    const userOrganisationId = result[0]?.id
+    if (!userOrganisationId) {
+      throw new Error('Expected a deleted UserOrganisation record for userID of 6, but none were found')
     }
-    userOrganisationId = result[0].id
     await seDatabaseReq(`
       UPDATE UserOrganisation 
       SET isDeleted = 0 
