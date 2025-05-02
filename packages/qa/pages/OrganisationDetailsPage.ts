@@ -275,6 +275,28 @@ export default class OrganisationDetailsPage {
     }
   }
 
+  async assertContactFailedToDeliverTag(expectedDetails: RowDataPacket[]) {
+    await expect(this.contactListRow.first()).toBeVisible()
+    const numberOfContactRows = await this.contactListRow.count()
+    for (let index = 0; index < numberOfContactRows; index++) {
+      const row = this.contactListRow.nth(index)
+      const dateAddedCell = row.locator('td').nth(1)
+      await expect(dateAddedCell.locator('span.govuk-tag--red')).toBeVisible()
+      await expect(dateAddedCell.locator('span.govuk-tag--red')).toHaveText('Failed to deliver email')
+    }
+  }
+
+  async assertContactSuccessfulInvite(expectedDetails: RowDataPacket[]) {
+    await expect(this.contactListRow.first()).toBeVisible()
+    const numberOfContactRows = await this.contactListRow.count()
+    for (let index = 0; index < numberOfContactRows; index++) {
+      const row = this.contactListRow.nth(index)
+      const dateAddedCell = row.locator('td').nth(1)
+      const tagLocator = dateAddedCell.locator('span.govuk-tag--red')
+      await expect(tagLocator).toHaveCount(0)
+    }
+  }
+
   async assertContactActions() {
     await expect(this.contactListRow.first()).toBeVisible()
     const numberOfContactRows = await this.contactListRow.count()
