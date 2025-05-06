@@ -93,9 +93,6 @@ export default class StudyDetailsPage {
   readonly directChangeStatus: Locator
   readonly directChangePlannedOpening: Locator
   readonly directChangeActualOpening: Locator
-  readonly directChangePlannedClosure: Locator
-  readonly directChangeActualClosure: Locator
-  readonly directChangeUkTarget: Locator
   readonly editHistoryMessage: Locator
 
   //Initialize Page Objects
@@ -227,13 +224,6 @@ export default class StudyDetailsPage {
     this.directChangeActualOpening = this.directChangeEditHistory.locator(
       'li:has-text("Actual UK opening to recruitment date")'
     )
-    this.directChangePlannedClosure = this.directChangeEditHistory.locator(
-      'li:has-text("Planned UK closure to recruitment date")'
-    )
-    this.directChangeActualClosure = this.directChangeEditHistory.locator(
-      'li:has-text("Actual UK closure to recruitment date")'
-    )
-    this.directChangeUkTarget = this.directChangeEditHistory.locator('li:has-text("UK recruitment target")')
     this.editHistoryMessage = page.locator('.govuk-details__text [data-orientation="vertical"] > span.text-sm')
   }
 
