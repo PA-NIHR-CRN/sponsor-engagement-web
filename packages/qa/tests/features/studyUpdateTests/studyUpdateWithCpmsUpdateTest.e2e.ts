@@ -4,7 +4,6 @@ import { seDatabaseReq, waitForSeDbRequest, cpmsDatabaseReq } from '../../../uti
 import { convertIsoDateToDisplayDateV2, splitIsoDate } from '../../../utils/UtilFunctions'
 
 const testUserId = 6
-const startingOrgId = 2
 
 // date variables for updating study dates and creating unique values
 const today = new Date()
@@ -30,12 +29,17 @@ if (uniqueTarget.startsWith('0')) {
 
 let startingStudyId = 0
 let studyCoreDetails: RowDataPacket[]
+let startingOrgId
 
 const pOpen = new Date(plannedOpen)
 const pClose = new Date(plannedClose)
 
 test.beforeAll('Setup Tests', async () => {
-  await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
+  const response = await seDatabaseReq(
+    `SELECT organisationId FROM UserOrganisation WHERE userId = ${testUserId} AND isDeleted = 0 LIMIT 1;`
+  )
+  startingOrgId = response[0]?.organisationId
+  if (!startingOrgId) throw new Error('User is not associated to any organisation.')
 
   const randomStudyIdSelected = await seDatabaseReq(`
     SELECT Study.id FROM Study 
