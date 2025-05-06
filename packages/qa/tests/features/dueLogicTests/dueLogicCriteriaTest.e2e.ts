@@ -4,16 +4,21 @@ import { seDatabaseReq } from '../../../utils/DbRequests'
 const testUserId = 6
 let startingOrgId: number
 
-const provideAssessmentStudyId = 10692
-const provideAssessmentCpmsId = 37196
+let provideAssessmentStudyId: number
+let provideAssessmentCpmsId: number
 
 test.beforeAll('Setup Tests', async () => {
   const response = await seDatabaseReq(
-    `SELECT organisationId FROM UserOrganisation WHERE userId = ${testUserId} AND isDeleted = 0 LIMIT 1;`
+    `SELECT UserOrganisation.organisationId, StudyOrganisation.studyId, Study.cpmsId FROM UserOrganisation JOIN StudyOrganisation ON StudyOrganisation.organisationId = UserOrganisation.organisationId JOIN Study ON Study.id = StudyOrganisation.studyId WHERE userId = ${testUserId} AND UserOrganisation.isDeleted = 0 AND StudyOrganisation.isDeleted = 0 AND Study.isDeleted = 0 LIMIT 1;`
   )
 
-  startingOrgId = response[0]?.organisationId
-  if (!startingOrgId) throw new Error('User is not associated to any organisation.')
+  if (!response[0]) {
+    throw new Error('No organisation associated to test user, check test data!')
+  }
+
+  startingOrgId = response[0].organisationId
+  provideAssessmentStudyId = response[0].studyId
+  provideAssessmentCpmsId = response[0].cpmsId
 
   const allAssessmentIdsForStudy = await seDatabaseReq(
     `SELECT id FROM Assessment WHERE studyId = ${provideAssessmentStudyId};`
