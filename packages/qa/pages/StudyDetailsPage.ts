@@ -96,6 +96,7 @@ export default class StudyDetailsPage {
   readonly directChangePlannedClosure: Locator
   readonly directChangeActualClosure: Locator
   readonly directChangeUkTarget: Locator
+  readonly editHistoryMessage: Locator
 
   //Initialize Page Objects
   constructor(page: Page) {
@@ -233,6 +234,7 @@ export default class StudyDetailsPage {
       'li:has-text("Actual UK closure to recruitment date")'
     )
     this.directChangeUkTarget = this.directChangeEditHistory.locator('li:has-text("UK recruitment target")')
+    this.editHistoryMessage = page.locator('.govuk-details__text [data-orientation="vertical"] > span.text-sm')
   }
 
   //Page Methods
@@ -822,5 +824,29 @@ export default class StudyDetailsPage {
       default:
         throw new Error(`${updateType} is not a valid update option`)
     }
+  }
+
+  async viewEditHistoryLeadAdmin(studyCoreDetails: Number) {
+    const actualMessage = await this.editHistoryMessage.textContent()
+    const trimmedMessage = actualMessage?.trim()
+    let expectedMessage = ''
+    switch (studyCoreDetails) {
+      case 1:
+        expectedMessage = 'Change made by RDN'
+        break
+      case 2:
+        expectedMessage = 'Change made by Scotland Admin'
+        break
+      case 3:
+        expectedMessage = 'Change made by NI Portfolio Admin'
+        break
+      case 4:
+        expectedMessage = 'Change made by Health and Care Research Wales Admin'
+        break
+      default:
+        expectedMessage = 'There is no edit history.'
+        break
+    }
+    expect(trimmedMessage).toBe(expectedMessage)
   }
 }
