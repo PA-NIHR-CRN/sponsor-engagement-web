@@ -18,7 +18,9 @@ const noConcernsStudyId = 17122
 const estimatedReopenStudyId = 10692
 
 test.beforeAll('Setup Tests', async () => {
-  await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
+  await seDatabaseReq(
+    `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
+  )
   const randomStudyIdSelected = await seDatabaseReq(`SELECT Study.id FROM Study 
     INNER JOIN StudyOrganisation
     ON Study.id = StudyOrganisation.studyId
@@ -257,7 +259,9 @@ test.describe('Access Study Details Page and view Summary - @se_26', () => {
   test('As a Sponsor I see UK Recruitment data for Non-Commercial Studies - @se_26_ukRecruit', async ({
     studyDetailsPage,
   }) => {
-    await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${nonCommOrgId} WHERE userId = ${testUserId}`)
+    await seDatabaseReq(
+      `UPDATE UserOrganisation SET organisationId = ${nonCommOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
+    )
     const nonCommStudyDetails = await seDatabaseReq(`
       SELECT cpmsId FROM sponsorengagement.Study where id = ${nonCommStudyId};`)
     const getStudyInCpms = await getStudyEngagementInfo(nonCommStudyDetails[0].cpmsId)

@@ -35,7 +35,9 @@ const pOpen = new Date(plannedOpen)
 const pClose = new Date(plannedClose)
 
 test.beforeAll('Setup Tests', async () => {
-  await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
+  await seDatabaseReq(
+    `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
+  )
 
   const randomStudyIdSelected = await seDatabaseReq(`
     SELECT Study.id FROM Study 

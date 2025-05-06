@@ -8,7 +8,9 @@ const noAssessmentStudyId = 16958
 const dueAssessmentAtDate = '2025-03-25 11:23:14.227'
 
 test.beforeEach('Setup Tests', async () => {
-  await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
+  await seDatabaseReq(
+    `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
+  )
   const allAssessmentIdsForStudy = await seDatabaseReq(
     `SELECT id FROM Assessment WHERE studyId = ${noAssessmentStudyId};`
   )

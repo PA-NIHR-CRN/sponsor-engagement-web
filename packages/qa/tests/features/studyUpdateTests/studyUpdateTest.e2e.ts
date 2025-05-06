@@ -13,7 +13,9 @@ let getStudyResponse: JSON
 const noProtocolRefNoStudyId = 17122
 
 test.beforeAll('Setup Tests', async () => {
-  await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
+  await seDatabaseReq(
+    `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
+  )
   await seDatabaseReq(`UPDATE Study SET protocolReferenceNumber = NULL WHERE id = ${noProtocolRefNoStudyId};`)
 
   const randomStudyIdSelected = await seDatabaseReq(`

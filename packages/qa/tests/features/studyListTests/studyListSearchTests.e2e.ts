@@ -18,7 +18,9 @@ const cpmsSearchPhrase = '50574'
 const cpmsSearchId = '17122'
 
 test.beforeAll('Setup Test Users', async () => {
-  await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
+  await seDatabaseReq(
+    `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
+  )
 })
 
 test.describe('Search the Studies List - @se_23', () => {
