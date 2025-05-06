@@ -93,7 +93,9 @@ export default class StudyDetailsPage {
   readonly directChangeStatus: Locator
   readonly directChangePlannedOpening: Locator
   readonly directChangeActualOpening: Locator
-  readonly editHistoryMessage: Locator
+  readonly directChangePlannedClosure: Locator
+  readonly directChangeActualClosure: Locator
+  readonly directChangeUkTarget: Locator
 
   //Initialize Page Objects
   constructor(page: Page) {
@@ -224,7 +226,13 @@ export default class StudyDetailsPage {
     this.directChangeActualOpening = this.directChangeEditHistory.locator(
       'li:has-text("Actual UK opening to recruitment date")'
     )
-    this.editHistoryMessage = page.locator('.govuk-details__text [data-orientation="vertical"] > span.text-sm')
+    this.directChangePlannedClosure = this.directChangeEditHistory.locator(
+      'li:has-text("Planned UK closure to recruitment date")'
+    )
+    this.directChangeActualClosure = this.directChangeEditHistory.locator(
+      'li:has-text("Actual UK closure to recruitment date")'
+    )
+    this.directChangeUkTarget = this.directChangeEditHistory.locator('li:has-text("UK recruitment target")')
   }
 
   //Page Methods
@@ -814,29 +822,5 @@ export default class StudyDetailsPage {
       default:
         throw new Error(`${updateType} is not a valid update option`)
     }
-  }
-
-  async viewEditHistoryLeadAdmin(studyCoreDetails: Number) {
-    const actualMessage = await this.editHistoryMessage.textContent()
-    const trimmedMessage = actualMessage?.trim()
-    let expectedMessage = ''
-    switch (studyCoreDetails) {
-      case 1:
-        expectedMessage = 'Change made by RDN'
-        break
-      case 2:
-        expectedMessage = 'Change made by Scotland Admin'
-        break
-      case 3:
-        expectedMessage = 'Change made by NI Portfolio Admin'
-        break
-      case 4:
-        expectedMessage = 'Change made by Health and Care Research Wales Admin'
-        break
-      default:
-        expectedMessage = 'There is no edit history.'
-        break
-    }
-    expect(trimmedMessage).toBe(expectedMessage)
   }
 }
