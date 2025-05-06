@@ -71,11 +71,11 @@ export default function Assessment({
       <NextSeo title="Study Progress Review - Assess progress of study" />
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
-          <h2 className="govuk-heading-l govuk-!-margin-bottom-4">Assess progress of a study</h2>
+          <h2 className="govuk-heading-l govuk-!-margin-bottom-4">Assess progress of a study in the UK</h2>
 
           <p className="govuk-body govuk-!-margin-bottom-6">
-            You will need to assess if the study is on or off track and if any action is being taken. If you need NIHR
-            RDN support with this study you will need to request this separately.
+            You will need to assess if the study is on or off track in the UK and if any action is being taken. If you
+            need NIHR RDN support with this study you will need to request this separately.
           </p>
 
           <div className="text-darkGrey govuk-!-margin-bottom-0 govuk-body-s">
@@ -125,7 +125,7 @@ export default function Assessment({
               <RadioGroup
                 defaultValue={defaultValues?.status}
                 errors={errors}
-                label="Is this study progressing as planned?"
+                label="Is this study progressing in the UK as planned?"
                 {...register('status')}
               >
                 {statuses.map(({ id, name, description }) => (
@@ -180,7 +180,16 @@ export default function Assessment({
 }
 
 Assessment.getLayout = function getLayout(page: ReactElement, { user }: AssessmentProps) {
-  return <RootLayout user={user}>{page}</RootLayout>
+  return (
+    <RootLayout
+      breadcrumbConfig={{
+        showBreadcrumb: true,
+      }}
+      user={user}
+    >
+      {page}
+    </RootLayout>
+  )
 }
 
 export const getServerSideProps = withServerSideProps([Roles.SponsorContact], async (context, session) => {

@@ -4,6 +4,8 @@ import { confirmStringNotNull, convertIsoDateToDisplayDate } from '../utils/Util
 //Declare Page Objects
 export default class AssessmentPage {
   readonly page: Page
+  readonly allStudiesBreadcrumb: Locator
+  readonly studyDetailsBreadcrumb: Locator
   readonly pageTitle: Locator
   readonly introText: Locator
   readonly sponsorLabel: Locator
@@ -86,6 +88,8 @@ export default class AssessmentPage {
 
     //Locators
     this.pageTitle = page.locator('h2[class="govuk-heading-l govuk-!-margin-bottom-4"]')
+    this.allStudiesBreadcrumb = page.locator('.govuk-breadcrumbs__list > .govuk-breadcrumbs__list-item:nth-child(1)')
+    this.studyDetailsBreadcrumb = page.locator('.govuk-breadcrumbs__list > .govuk-breadcrumbs__list-item:nth-child(2)')
     this.introText = page.locator('div[class="w-full"] p').nth(0)
     this.sponsorLabel = page.locator('div[class="text-darkGrey govuk-!-margin-bottom-0 govuk-body-s"]')
     this.studyTitle = page.locator('h3[class="govuk-heading-m govuk-!-margin-bottom-1"]')
@@ -162,19 +166,19 @@ export default class AssessmentPage {
 
   //Page Methods
   async goto(studyId: string) {
-    await this.page.goto(`assessments/${studyId}`)
+    await this.page.goto(`studies/${studyId}/assess`)
   }
 
   async assertOnAssessmentPage(studyId: string) {
     await expect(this.pageTitle).toBeVisible()
-    await expect(this.pageTitle).toHaveText('Assess progress of a study')
-    await expect(this.page).toHaveURL(`assessments/${studyId}`)
+    await expect(this.pageTitle).toHaveText('Assess progress of a study in the UK')
+    await expect(this.page).toHaveURL(`studies/${studyId}/assess`)
   }
 
   async assertIntroText() {
     await expect(this.introText).toBeVisible()
     await expect(this.introText).toContainText(
-      'You will need to assess if the study is on or off track and if any action is being taken'
+      'You will need to assess if the study is on or off track in the UK and if any action is being taken'
     )
   }
 
@@ -306,7 +310,7 @@ export default class AssessmentPage {
   async assertStudyProgressingPresent() {
     await expect(this.studyProgressingSection).toBeVisible()
     await expect(this.studyProgressSectionHeader).toBeVisible()
-    await expect(this.studyProgressSectionHeader).toHaveText('Is this study progressing as planned?')
+    await expect(this.studyProgressSectionHeader).toHaveText('Is this study progressing in the UK as planned?')
   }
 
   async assertRadioButtonsPresent() {
@@ -318,11 +322,11 @@ export default class AssessmentPage {
     await expect(this.radioButtonOffTrackTxt).toBeVisible()
     await expect(this.radioButtonOnTrackLbl).toHaveText('On track')
     await expect(this.radioButtonOnTrackTxt).toHaveText(
-      'The sponsor or delegate is satisfied the study is progressing as planned.'
+      'The sponsor or delegate is satisfied the study is progressing in the UK as planned.'
     )
     await expect(this.radioButtonOffTrackLbl).toHaveText('Off track')
     await expect(this.radioButtonOffTrackTxt).toHaveText(
-      'The sponsor or delegate has some concerns about the study and is taking action where appropriate.'
+      'The sponsor or delegate has some concerns about the study in the UK and is taking action where appropriate.'
     )
   }
 

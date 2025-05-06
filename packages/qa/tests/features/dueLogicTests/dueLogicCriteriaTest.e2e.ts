@@ -2,13 +2,23 @@ import { test } from '../../../hooks/CustomFixtures'
 import { seDatabaseReq } from '../../../utils/DbRequests'
 
 const testUserId = 6
-const startingOrgId = 9
+let startingOrgId: number
 
-const provideAssessmentStudyId = 10692
-const provideAssessmentCpmsId = 37196
+let provideAssessmentStudyId: number
+let provideAssessmentCpmsId: number
 
 test.beforeAll('Setup Tests', async () => {
-  await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
+  const response = await seDatabaseReq(
+    `SELECT UserOrganisation.organisationId, StudyOrganisation.studyId, Study.cpmsId FROM UserOrganisation JOIN StudyOrganisation ON StudyOrganisation.organisationId = UserOrganisation.organisationId JOIN Study ON Study.id = StudyOrganisation.studyId WHERE userId = ${testUserId} AND UserOrganisation.isDeleted = 0 AND StudyOrganisation.isDeleted = 0 AND Study.isDeleted = 0 LIMIT 1;`
+  )
+
+  if (!response[0]) {
+    throw new Error('No organisation associated to test user, check test data!')
+  }
+
+  startingOrgId = response[0].organisationId
+  provideAssessmentStudyId = response[0].studyId
+  provideAssessmentCpmsId = response[0].cpmsId
 
   const allAssessmentIdsForStudy = await seDatabaseReq(
     `SELECT id FROM Assessment WHERE studyId = ${provideAssessmentStudyId};`

@@ -6,7 +6,7 @@
   "reporters": ["default", "jest-junit"],
   "testPathIgnorePatterns": [".vscode"],
   "coverageReporters": ["json-summary", "text", "html", "lcov"],
-  "coveragePathIgnorePatterns": ["node_modules"],
+  "coveragePathIgnorePatterns": ["node_modules", "packages/templates/sponsor-engagement/email/index.js"],
   "coverageThreshold": {
     "global": {
       "lines": 70,

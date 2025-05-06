@@ -7,6 +7,8 @@ const expectedTemplates = [
   'contact-assigned.text.hbs',
   'contact-removed.html.hbs',
   'contact-removed.text.hbs',
+  'invitation-email-unsuccessful.html.hbs',
+  'invitation-email-unsuccessful.text.hbs',
 ] as const
 
 describe('sponsor engagement templates', () => {

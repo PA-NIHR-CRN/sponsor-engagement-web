@@ -357,10 +357,10 @@ describe('EditStudy', () => {
       await renderPage(undefined, undefined, { ...mockStudyWithRelations, studyStatus: Status.InSetup })
 
       // Header title
-      expect(screen.getByRole('heading', { level: 1, name: 'Update study data' })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { level: 1, name: 'Update UK study data' })).toBeInTheDocument()
 
       // Page title
-      expect(screen.getByRole('heading', { level: 2, name: 'Page title: Update study data' })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { level: 2, name: 'Page title: Update UK study data' })).toBeInTheDocument()
 
       // Sponsor
       expect(
@@ -391,7 +391,7 @@ describe('EditStudy', () => {
       )
 
       // Form Input - Status
-      const statusFieldset = screen.getByRole('radiogroup', { name: 'Study status' })
+      const statusFieldset = screen.getByRole('radiogroup', { name: 'Study status in the UK' })
       expect(statusFieldset).toBeInTheDocument()
 
       expect(within(statusFieldset).getByLabelText('In setup')).toBeInTheDocument()
@@ -453,43 +453,46 @@ describe('EditStudy', () => {
     })
 
     it.each([
-      [Status.InSetup, ['Planned opening to recruitment date', 'Planned closure to recruitment date']],
+      [Status.InSetup, ['Planned UK opening to recruitment date', 'Planned UK closure to recruitment date']],
       [
         Status.OpenToRecruitment,
         [
-          'Planned opening to recruitment date',
-          'Planned closure to recruitment date',
-          'Actual opening to recruitment date',
+          'Planned UK opening to recruitment date',
+          'Planned UK closure to recruitment date',
+          'Actual UK opening to recruitment date',
         ],
       ],
       [
         Status.Suspended,
         [
-          'Planned opening to recruitment date',
-          'Planned closure to recruitment date',
-          'Actual opening to recruitment date (optional)',
-          'Estimated reopening date',
+          'Planned UK opening to recruitment date',
+          'Planned UK closure to recruitment date',
+          'Actual UK opening to recruitment date (optional)',
+          'Estimated UK reopening date',
         ],
       ],
       [
         Status.ClosedToRecruitment,
         [
-          'Planned opening to recruitment date',
-          'Planned closure to recruitment date',
-          'Actual opening to recruitment date',
-          'Actual closure to recruitment date',
+          'Planned UK opening to recruitment date',
+          'Planned UK closure to recruitment date',
+          'Actual UK opening to recruitment date',
+          'Actual UK closure to recruitment date',
         ],
       ],
       [
         Status.ClosedToRecruitmentInFollowUp,
         [
-          'Planned opening to recruitment date',
-          'Planned closure to recruitment date',
-          'Actual opening to recruitment date',
-          'Actual closure to recruitment date',
+          'Planned UK opening to recruitment date',
+          'Planned UK closure to recruitment date',
+          'Actual UK opening to recruitment date',
+          'Actual UK closure to recruitment date',
         ],
       ],
-      [Status.WithdrawnDuringSetup, ['Planned opening to recruitment date', 'Planned closure to recruitment date']],
+      [
+        Status.WithdrawnDuringSetup,
+        ['Planned UK opening to recruitment date', 'Planned UK closure to recruitment date'],
+      ],
     ])('should show the correct date fields based on the status %s', async (status: Status, fieldLabels: string[]) => {
       await renderPage(undefined, undefined, { ...mockStudyWithRelations, studyStatus: status })
 
@@ -536,7 +539,7 @@ describe('EditStudy', () => {
         actualOpeningDate: null,
       })
 
-      expect(screen.getByRole('heading', { level: 1, name: 'Update study data' })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { level: 1, name: 'Update UK study data' })).toBeInTheDocument()
 
       await userEvent.click(screen.getByRole('button', { name: 'Update' }))
 
@@ -554,7 +557,7 @@ describe('EditStudy', () => {
       it.each(['Day', 'Month', 'Year'])('when a date field includes an invalid %s', async (datePart: string) => {
         await renderPage()
 
-        const plannedOpenDateFieldset = screen.getByRole('group', { name: 'Planned opening to recruitment date' })
+        const plannedOpenDateFieldset = screen.getByRole('group', { name: 'Planned UK opening to recruitment date' })
         expect(plannedOpenDateFieldset).toBeInTheDocument()
         const datePartField = within(plannedOpenDateFieldset).getByLabelText(datePart)
         expect(datePartField).toBeInTheDocument()
@@ -568,7 +571,7 @@ describe('EditStudy', () => {
         const errorMessage =
           datePart === 'Year'
             ? 'Year must include 4 numbers'
-            : `Planned opening to recruitment date requires a valid ${datePart.toLowerCase()}`
+            : `Planned UK opening to recruitment date requires a valid ${datePart.toLowerCase()}`
 
         const alert = screen.getByRole('alert')
         expect(within(alert).getByText(errorMessage)).toBeInTheDocument()
@@ -580,7 +583,7 @@ describe('EditStudy', () => {
       it.each(['Day', 'Month', 'Year'])('when a date does not include a %s', async (datePart: string) => {
         await renderPage()
 
-        const plannedOpenDateFieldset = screen.getByRole('group', { name: 'Planned opening to recruitment date' })
+        const plannedOpenDateFieldset = screen.getByRole('group', { name: 'Planned UK opening to recruitment date' })
         expect(plannedOpenDateFieldset).toBeInTheDocument()
         const datePartField = within(plannedOpenDateFieldset).getByLabelText(datePart)
         expect(datePartField).toBeInTheDocument()
@@ -592,20 +595,20 @@ describe('EditStudy', () => {
         // Error message
         const alert = screen.getByRole('alert')
         expect(
-          within(alert).getByText(`Planned opening to recruitment date must include a ${datePart.toLowerCase()}`)
+          within(alert).getByText(`Planned UK opening to recruitment date must include a ${datePart.toLowerCase()}`)
         ).toBeInTheDocument()
 
         // Invalid field
         expect(datePartField).toHaveAttribute('aria-invalid', 'true')
       })
 
-      it('when actual opening to recruitment date is in the future', async () => {
+      it('when actual UK opening to recruitment date is in the future', async () => {
         const currentYear = new Date().getFullYear()
 
         await renderPage()
 
         const actualOpeningDateFieldSet = screen.getByRole('group', {
-          name: 'Actual opening to recruitment date (optional)',
+          name: 'Actual UK opening to recruitment date (optional)',
         })
         expect(actualOpeningDateFieldSet).toBeInTheDocument()
 
@@ -621,17 +624,17 @@ describe('EditStudy', () => {
         // Error message
         const alert = screen.getByRole('alert')
         expect(
-          within(alert).getByText('Actual opening to recruitment date must be today or in the past')
+          within(alert).getByText('Actual UK opening to recruitment date must be today or in the past')
         ).toBeInTheDocument()
       })
 
-      it('when planned closure to recruitment date is before planned opening to recruitment date', async () => {
+      it('when planned UK closure to recruitment date is before planned UK opening to recruitment date', async () => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- in control of test data
         const plannedOpeningDateYear = mockStudyWithRelations.plannedClosureDate!.getFullYear()
 
         await renderPage()
 
-        const plannedClosureFieldSet = screen.getByRole('group', { name: 'Planned closure to recruitment date' })
+        const plannedClosureFieldSet = screen.getByRole('group', { name: 'Planned UK closure to recruitment date' })
         expect(plannedClosureFieldSet).toBeInTheDocument()
 
         const yearField = within(plannedClosureFieldSet).getByLabelText('Year')
@@ -647,12 +650,12 @@ describe('EditStudy', () => {
         const alert = screen.getByRole('alert')
         expect(
           within(alert).getByText(
-            'Planned closure to recruitment date must be after Planned opening to recruitment date'
+            'Planned UK closure to recruitment date must be after Planned UK opening to recruitment date'
           )
         ).toBeInTheDocument()
       })
 
-      it('when planned closure to recruitment date is before actual opening to recruitment date', async () => {
+      it('when planned UK closure to recruitment date is before actual UK opening to recruitment date', async () => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- in control of test data
         const actualOpeningDateYear = mockStudyWithRelations.actualOpeningDate!.getFullYear()
 
@@ -661,7 +664,7 @@ describe('EditStudy', () => {
           plannedOpeningDate: null,
         })
 
-        const plannedClosureFieldSet = screen.getByRole('group', { name: 'Planned closure to recruitment date' })
+        const plannedClosureFieldSet = screen.getByRole('group', { name: 'Planned UK closure to recruitment date' })
         expect(plannedClosureFieldSet).toBeInTheDocument()
 
         const yearField = within(plannedClosureFieldSet).getByLabelText('Year')
@@ -677,12 +680,12 @@ describe('EditStudy', () => {
         const alert = screen.getByRole('alert')
         expect(
           within(alert).getByText(
-            'Planned closure to recruitment date must be after Actual opening to recruitment date'
+            'Planned UK closure to recruitment date must be after Actual UK opening to recruitment date'
           )
         ).toBeInTheDocument()
       })
 
-      it('when actual clsoure to recruitment date is in the future', async () => {
+      it('when actual UK closure to recruitment date is in the future', async () => {
         const currentYear = new Date().getFullYear()
 
         await renderPage(undefined, undefined, {
@@ -690,7 +693,7 @@ describe('EditStudy', () => {
           plannedOpeningDate: null,
           studyStatus: Status.ClosedToRecruitment,
         })
-        const actualClosureDateFieldSet = screen.getByRole('group', { name: 'Actual closure to recruitment date' })
+        const actualClosureDateFieldSet = screen.getByRole('group', { name: 'Actual UK closure to recruitment date' })
         expect(actualClosureDateFieldSet).toBeInTheDocument()
 
         const yearField = within(actualClosureDateFieldSet).getByLabelText('Year')
@@ -705,7 +708,7 @@ describe('EditStudy', () => {
         // Error message
         const alert = screen.getByRole('alert')
         expect(
-          within(alert).getByText('Actual closure to recruitment date must be today or in the past')
+          within(alert).getByText('Actual UK closure to recruitment date must be today or in the past')
         ).toBeInTheDocument()
       })
 
@@ -746,7 +749,7 @@ describe('EditStudy', () => {
       it(`when status is 'In Setup' and both planned opening and planned closure dates are blank`, async () => {
         await renderPage(undefined, undefined, { ...mockStudyWithRelations, studyStatus: Status.InSetup })
 
-        const fieldsToRemove = ['Planned opening to recruitment date', 'Planned closure to recruitment date']
+        const fieldsToRemove = ['Planned UK opening to recruitment date', 'Planned UK closure to recruitment date']
         await Promise.all(
           fieldsToRemove.map(async (label) => {
             await removeDateField(label)
@@ -762,13 +765,13 @@ describe('EditStudy', () => {
         })
       })
 
-      it(`when status is 'Open to recruitment' and planned opening, planned closure and actual opening dates are blank`, async () => {
+      it(`when status is 'Open to recruitment' and planned UK opening, planned UK closure and actual UK opening dates are blank`, async () => {
         await renderPage(undefined, undefined, { ...mockStudyWithRelations, studyStatus: Status.OpenToRecruitment })
 
         const fieldsToRemove = [
-          'Planned opening to recruitment date',
-          'Planned closure to recruitment date',
-          'Actual opening to recruitment date',
+          'Planned UK opening to recruitment date',
+          'Planned UK closure to recruitment date',
+          'Actual UK opening to recruitment date',
         ]
         await Promise.all(
           fieldsToRemove.map(async (label) => {
@@ -785,13 +788,13 @@ describe('EditStudy', () => {
         })
       })
 
-      it(`when status is 'Suspended' and planned opening, planned closure, and estimated reopening dates are blank`, async () => {
+      it(`when status is 'Suspended' and planned opening, planned closure, and estimated UK reopening dates are blank`, async () => {
         await renderPage(undefined, undefined, { ...mockStudyWithRelations, studyStatus: Status.Suspended })
 
         const fieldsToRemove = [
-          'Planned opening to recruitment date',
-          'Planned closure to recruitment date',
-          'Estimated reopening date',
+          'Planned UK opening to recruitment date',
+          'Planned UK closure to recruitment date',
+          'Estimated UK reopening date',
         ]
         await Promise.all(
           fieldsToRemove.map(async (label) => {
@@ -808,10 +811,10 @@ describe('EditStudy', () => {
         })
       })
 
-      it(`when status is 'Withdrawn' and both planned opening and planned closure dates are blank`, async () => {
+      it(`when status is 'Withdrawn' and both planned UK opening and planned UK closure dates are blank`, async () => {
         await renderPage(undefined, undefined, { ...mockStudyWithRelations, studyStatus: Status.WithdrawnDuringSetup })
 
-        const fieldsToRemove = ['Planned opening to recruitment date', 'Planned closure to recruitment date']
+        const fieldsToRemove = ['Planned UK opening to recruitment date', 'Planned UK closure to recruitment date']
         await Promise.all(
           fieldsToRemove.map(async (label) => {
             await removeDateField(label)
@@ -827,13 +830,13 @@ describe('EditStudy', () => {
         })
       })
 
-      it(`when status is 'Closed' and planned opening, planned closure, actual opening and actual closure dates are blank`, async () => {
+      it(`when status is 'Closed' and planned UK opening, planned UK closure, actual UK opening and actual UK closure dates are blank`, async () => {
         await renderPage(undefined, undefined, { ...mockStudyWithRelations, studyStatus: Status.ClosedToRecruitment })
 
         const fieldsToRemove = [
-          'Planned opening to recruitment date',
-          'Planned closure to recruitment date',
-          'Actual closure to recruitment date',
+          'Planned UK opening to recruitment date',
+          'Planned UK closure to recruitment date',
+          'Actual UK closure to recruitment date',
         ]
         await Promise.all(
           fieldsToRemove.map(async (label) => {
@@ -850,17 +853,17 @@ describe('EditStudy', () => {
         })
       })
 
-      it(`when status is 'Closed, In Follow Up' and planned opening, planned closure, actual opening and actual closure dates are blank`, async () => {
+      it(`when status is 'Closed, In Follow Up' and planned UK opening, planned UK closure, actual UK opening and actual UK closure dates are blank`, async () => {
         await renderPage(undefined, undefined, {
           ...mockStudyWithRelations,
           studyStatus: Status.ClosedToRecruitmentInFollowUp,
         })
 
         const fieldsToRemove = [
-          'Planned opening to recruitment date',
-          'Planned closure to recruitment date',
-          'Actual closure to recruitment date',
-          'Actual opening to recruitment date',
+          'Planned UK opening to recruitment date',
+          'Planned UK closure to recruitment date',
+          'Actual UK closure to recruitment date',
+          'Actual UK opening to recruitment date',
         ]
         await Promise.all(
           fieldsToRemove.map(async (label) => {
@@ -878,7 +881,7 @@ describe('EditStudy', () => {
       })
 
       it('when a date field is not visible, it does not validate against it', async () => {
-        // In Setup status does not have estimated reopening date visible
+        // In Setup status does not have estimated UK reopening date visible
         // Estimated reopening has validation that must be today or in the past
         await renderPage(undefined, undefined, {
           ...mockStudyWithRelations,
@@ -888,9 +891,9 @@ describe('EditStudy', () => {
 
         await userEvent.click(screen.getByRole('button', { name: 'Update' }))
 
-        // Assert error does not include estimated reopening date error
+        // Assert error does not include estimated UK reopening date error
         const alert = screen.getByRole('alert')
-        expect(within(alert).queryByText('Estimated reopening date must be today or in the past')).toBeNull()
+        expect(within(alert).queryByText('Estimated UK reopening date must be today or in the past')).toBeNull()
       })
     })
   })

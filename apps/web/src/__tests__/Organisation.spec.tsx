@@ -97,6 +97,13 @@ const mockOrganisation = Mock.of<OrganisationWithRelations>({
       },
       createdAt: new Date('2001-01-01'),
       updatedAt: new Date('2001-01-02'),
+      invitations: [
+        {
+          status: {
+            name: 'Failure',
+          },
+        },
+      ],
     },
     {
       id: 2,
@@ -107,6 +114,7 @@ const mockOrganisation = Mock.of<OrganisationWithRelations>({
       },
       createdAt: new Date('2001-01-01'),
       updatedAt: new Date('2001-01-02'),
+      invitations: [],
     },
   ],
 })
@@ -174,12 +182,12 @@ describe('Organisation page', () => {
 
     expect(contactCells).toEqual([
       'test1@test1.com',
-      '2 January 2001',
-      '3 January 2001 ',
+      '2 January 2001Failed to deliver email',
+      '3 January 2001',
       'Remove',
       'test2@test2.com',
       '2 January 2001',
-      '- ',
+      '-No last login date',
       'Remove',
     ])
 
@@ -226,7 +234,7 @@ describe('Organisation page', () => {
 
     // Banner
     const banner = screen.getByRole('alert', { name: 'Success' })
-    expect(within(banner).getByText('A new contact was added for this organisation')).toBeInTheDocument()
+    expect(within(banner).getByText(/was added as a contact for this organisation/)).toBeInTheDocument()
   })
 
   test('Success banner shows after removing a contact', async () => {

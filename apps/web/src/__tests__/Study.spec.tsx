@@ -446,7 +446,7 @@ describe('Study', () => {
       // Assess study
       expect(screen.getByRole('link', { name: 'Assess study' })).toHaveProperty(
         'href',
-        `http://localhost/assessments/${mockStudy.id}`
+        `http://localhost/studies/${mockStudy.id}/assess`
       )
 
       // Update study data

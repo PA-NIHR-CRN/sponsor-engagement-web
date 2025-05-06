@@ -270,7 +270,7 @@ describe('Organisations page', () => {
     }
     render(Organisations.getLayout(<Organisations {...props} />, { ...props }))
 
-    expect(screen.getByLabelText('Search organisation name')).toHaveValue('test search')
+    expect(screen.getByLabelText('Search by organisation name or contact email address')).toHaveValue('test search')
 
     expect(screen.getByText('Selected filters')).toBeInTheDocument()
 

@@ -12,6 +12,7 @@ export interface StudyListProps {
   trackStatus?: string
   trackStatusHref?: string
   indications?: string[]
+  irasId: string | null
 }
 
 export function StudyList({
@@ -24,6 +25,7 @@ export function StudyList({
   trackStatusHref,
   lastAssessmentDate,
   indications,
+  irasId,
 }: StudyListProps) {
   const daysDueText =
     daysSinceAssessmentDue !== null
@@ -33,7 +35,10 @@ export function StudyList({
   return (
     <Card>
       {daysSinceAssessmentDue !== null ? (
-        <span className="govuk-tag govuk-tag--red absolute top-0 right-0 normal-case">{daysDueText}</span>
+        <>
+          <span className="govuk-visually-hidden">{shortTitle} has been</span>
+          <span className="govuk-tag govuk-tag--red float-right -mt-3 -mr-3 normal-case">{daysDueText}</span>
+        </>
       ) : null}
 
       <div className="md:max-w-[calc(100%-50px)]">
@@ -41,9 +46,11 @@ export function StudyList({
           {sponsorOrgName ?? '-'}
           {Boolean(supportOrgName) && ` (${supportOrgName})`}
         </div>
-
-        <div className="govuk-heading-s govuk-!-margin-bottom-4 govuk-!-padding-top-0 inline-block font-extrabold">
+        <div className="govuk-heading-s govuk-!-margin-bottom-0 govuk-!-padding-top-0 inline-block font-extrabold">
           {shortTitle}
+        </div>
+        <div className="govuk-body-s govuk-!-margin-bottom-2 govuk-!-padding-top-0">
+          IRAS ID: {irasId || 'Not available '}
         </div>
       </div>
 

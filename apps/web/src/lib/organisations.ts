@@ -72,9 +72,26 @@ export const getStudyOrganisations = async ({
     orderBy: [{ name: Prisma.SortOrder.asc }],
     where: {
       ...(searchTerm && {
-        name: {
-          contains: searchTerm,
-        },
+        OR: [
+          {
+            name: {
+              contains: searchTerm,
+            },
+          },
+          {
+            users: {
+              some: {
+                user: {
+                  is: {
+                    email: searchTerm,
+                    isDeleted: false,
+                  },
+                },
+                isDeleted: false,
+              },
+            },
+          },
+        ],
       }),
       studies: {
         some: {},
@@ -110,6 +127,20 @@ const organisationByIdRelations = {
       },
       include: {
         user: true,
+        invitations: {
+          select: {
+            status: {
+              select: {
+                name: true,
+              },
+            },
+          },
+          where: {
+            isDeleted: false,
+          },
+          distinct: [Prisma.UserOrganisationInvitationScalarFieldEnum.userOrganisationId],
+          orderBy: { timestamp: Prisma.SortOrder.desc },
+        },
       },
       orderBy: {
         updatedAt: Prisma.SortOrder.desc,

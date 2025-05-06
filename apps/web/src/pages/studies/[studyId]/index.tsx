@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import type { ReactElement } from 'react'
+import type { LeadAdministrationId } from 'shared-utilities/src/utils/lead-administration-id'
 
 import { Status } from '@/@types/studies'
 import {
@@ -18,7 +19,7 @@ import { getEditHistory } from '@/components/molecules/EditHistory/utils'
 import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
 import { FORM_SUCCESS_MESSAGES } from '@/constants/forms'
-import { ASSESSMENT_PAGE, STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/routes'
+import { getAssessmentPageRoute, STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/routes'
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
 import type { StudyEvalsWithoutGeneratedValues } from '@/lib/studies'
 import {
@@ -98,7 +99,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
               </div>
             )}
             <div className="flex gap-4">
-              <Link className="govuk-button w-auto govuk-!-margin-bottom-0" href={`${ASSESSMENT_PAGE}/${study.id}`}>
+              <Link className="govuk-button w-auto govuk-!-margin-bottom-0" href={getAssessmentPageRoute(study.id)}>
                 Assess study
               </Link>
               <Link
@@ -125,6 +126,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
             editHistoryItems={editHistory ?? []}
             error={Boolean(getEditHistoryError)}
             idToAutoExpand={transactionIdLatestProposedUpdate}
+            leadAdministrationId={study.leadAdministrationId as LeadAdministrationId}
           />
 
           <Table className="govuk-!-margin-top-3">

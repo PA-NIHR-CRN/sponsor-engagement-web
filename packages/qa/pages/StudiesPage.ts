@@ -27,6 +27,7 @@ export default class StudiesPage {
   readonly studyListItem: Locator
   readonly studyListItemTitle: Locator
   readonly studyListItemOrgName: Locator
+  readonly studyListItemIrasIdValue: Locator
   readonly studyListItemLastAssessmentLbl: Locator
   readonly studyListItemLastAssessmentValue: Locator
   readonly studyListItemDataIndicatesLbl: Locator
@@ -68,10 +69,13 @@ export default class StudiesPage {
     this.studyLastItem = this.studyListItem.last()
     this.studyLastDue = this.studyLastItem.locator('span', { hasText: 'due' })
     this.studyListItemTitle = this.studyListItem.locator(
-      'div[class="govuk-heading-s govuk-!-margin-bottom-4 govuk-!-padding-top-0 inline-block font-extrabold"]'
+      'div[class="govuk-heading-s govuk-!-margin-bottom-0 govuk-!-padding-top-0 inline-block font-extrabold"]'
     )
     this.studyListItemOrgName = page.locator(
       'div[class="text-darkGrey govuk-!-margin-bottom-1 max-w-[calc(100%-45px)] lg:max-w-auto govuk-body-s"]'
+    )
+    this.studyListItemIrasIdValue = this.studyListItem.locator(
+      'div[class="govuk-body-s govuk-!-margin-bottom-2 govuk-!-padding-top-0"]'
     )
     this.studyListItemLastAssessmentLbl = page
       .locator('div[class="lg:min-w-[320px]"] strong[class="govuk-heading-s govuk-!-margin-bottom-0"]')
@@ -85,7 +89,9 @@ export default class StudiesPage {
     this.studyListItemDataIndicatesValue = page
       .locator('div[class="lg:min-w-[320px]"] p[class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0"]')
       .nth(1)
-    this.studyListItemDueIndicator = page.locator('span')
+    this.studyListItemDueIndicator = page.locator(
+      'span[class="govuk-tag govuk-tag--red float-right -mt-3 -mr-3 normal-case"]'
+    )
     this.searchInput = page.locator('input[class="govuk-input govuk-input h-[50px] border-2 border-black p-2"]')
     this.searchButton = page.locator(
       'button[class="bg-[var(--colour-blue)] text-white active:top-0 focus:shadow-[inset_0_0_0_4px_var(--text-grey)] focus:outline focus:outline-[3px] focus:outline-[var(--focus)] mb-0 w-[50px] h-[50px] flex items-center justify-center text-lg"]'
@@ -269,6 +275,18 @@ export default class StudiesPage {
       return studyListOrgName?.substring(sponsorEndIndex + 1, croCtuEndIndex).trim()
     } else {
       return ''
+    }
+  }
+
+  async assertIrasIdValue(dbReq: string, index: number) {
+    const expectedValues = await seDatabaseReq(`${dbReq}`)
+    const fullText = await this.studyListItemIrasIdValue.nth(index).textContent()
+    const actualValue = fullText?.replace('IRAS ID: ', '').trim()
+
+    if (expectedValues.length > 0 && expectedValues[0].irasId) {
+      expect(actualValue).toEqual(expectedValues[0].irasId.toString())
+    } else {
+      expect(actualValue).toEqual('Not available')
     }
   }
 

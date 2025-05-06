@@ -5,14 +5,14 @@ import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
-import { type ReactElement, useCallback } from 'react'
+import { type ReactElement, useCallback, useEffect, useState } from 'react'
 import type { FieldError } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 
 import { ErrorSummary, Form } from '@/components/atoms'
 import { TextInput } from '@/components/atoms/Form/TextInput/TextInput'
 import { RootLayout } from '@/components/organisms'
-import { Roles } from '@/constants'
+import { Roles, UserOrganisationInviteStatus } from '@/constants'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
 import { getOrganisationById } from '@/lib/organisations'
 import { formatDate } from '@/utils/date'
@@ -24,10 +24,10 @@ import { withServerSideProps } from '@/utils/withServerSideProps'
 
 export type OrganisationProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-const renderNotificationBanner = (successType: number) => (
+const renderNotificationBanner = (successType: number, email?: string) => (
   <NotificationBanner heading={`Contact ${successType === 1 ? 'added' : 'removed'}`} success>
     {successType === 1
-      ? 'A new contact was added for this organisation'
+      ? `${email} was added as a contact for this organisation`
       : 'The selected contact has been removed from this organisation'}
   </NotificationBanner>
 )
@@ -35,7 +35,7 @@ const renderNotificationBanner = (successType: number) => (
 export default function Organisation({ organisation, query }: OrganisationProps) {
   const router = useRouter()
 
-  const { register, formState, setError, handleSubmit } = useForm<OrganisationAddInputs>({
+  const { register, formState, setError, handleSubmit, reset } = useForm<OrganisationAddInputs>({
     resolver: zodResolver(organisationAddSchema),
     defaultValues: {
       ...getValuesFromSearchParams(organisationAddSchema, query),
@@ -101,8 +101,24 @@ export default function Organisation({ organisation, query }: OrganisationProps)
           {organisation.users.map((user) => (
             <Table.Row key={user.id}>
               <Table.Cell>{user.user.email}</Table.Cell>
-              <Table.Cell>{formatDate(user.updatedAt)}</Table.Cell>
-              <Table.Cell>{user.user.lastLogin ? formatDate(user.user.lastLogin) : '-'} </Table.Cell>
+              <Table.Cell>
+                <div className="flex flex-col gap-2 w-fit">
+                  {formatDate(user.updatedAt)}
+                  {user.invitations[0]?.status.name === UserOrganisationInviteStatus.FAILURE ? (
+                    <span className="govuk-tag govuk-tag--red normal-case">Failed to deliver email</span>
+                  ) : null}
+                </div>
+              </Table.Cell>
+              <Table.Cell>
+                {user.user.lastLogin ? (
+                  formatDate(user.user.lastLogin)
+                ) : (
+                  <>
+                    <span aria-hidden="true">-</span>
+                    <span className="govuk-visually-hidden">No last login date</span>
+                  </>
+                )}
+              </Table.Cell>
               <Table.Cell>
                 <Link aria-label={`Remove ${user.user.email}`} href={`/organisations/remove-contact/${user.id}`}>
                   Remove
@@ -116,12 +132,24 @@ export default function Organisation({ organisation, query }: OrganisationProps)
     [organisation.users]
   )
 
+  const [invitedEmail, setInvitedEmail] = useState<string | undefined>()
+
+  const handleFormSubmission = (values: { emailAddress: string }) => {
+    setInvitedEmail(values.emailAddress)
+  }
+
+  useEffect(() => {
+    if (router.query.success) {
+      reset()
+    }
+  }, [router.query.success])
+
   return (
     <Container>
       <NextSeo title={`Manage organisation contacts - ${organisation.name}`} />
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
-          {Boolean(router.query.success) && renderNotificationBanner(Number(router.query.success))}
+          {Boolean(router.query.success) && renderNotificationBanner(Number(router.query.success), invitedEmail)}
 
           {/* Organisation name */}
           <h2 className="govuk-heading-l govuk-!-margin-bottom-1">
@@ -157,6 +185,7 @@ export default function Organisation({ organisation, query }: OrganisationProps)
                 message,
               })
             }}
+            onSuccess={handleFormSubmission}
           >
             <ErrorSummary errors={errors} />
 
