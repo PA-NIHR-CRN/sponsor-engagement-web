@@ -275,6 +275,18 @@ export default class OrganisationDetailsPage {
     }
   }
 
+  async assertContactFailedToDeliverTag(expectedDetails: RowDataPacket[]) {
+    await expect(this.contactListRow.first()).toBeVisible()
+    for (let index = 0; index < expectedDetails.length; index++) {
+      const row = this.contactListRow.nth(index)
+      if (expectedDetails[index].statusId === 3) {
+        await expect(row.locator('td').nth(1)).toContainText('Failed to deliver email')
+      } else {
+        await expect(row.locator('td').nth(1)).not.toContainText('Failed to deliver email')
+      }
+    }
+  }
+
   async assertContactActions() {
     await expect(this.contactListRow.first()).toBeVisible()
     const numberOfContactRows = await this.contactListRow.count()
