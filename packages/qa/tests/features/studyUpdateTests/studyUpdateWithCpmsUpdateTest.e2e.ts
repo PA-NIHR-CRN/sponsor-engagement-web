@@ -49,7 +49,7 @@ test.beforeAll('Setup Tests', async () => {
   startingStudyId = randomStudyIdSelected[0].id
 
   studyCoreDetails = await seDatabaseReq(`
-    SELECT cpmsId FROM sponsorengagement.Study where id = ${startingStudyId};
+    SELECT cpmsId, leadAdministrationId FROM sponsorengagement.Study where id = ${startingStudyId};
   `)
 
   await cpmsDatabaseReq(`
@@ -185,6 +185,36 @@ test.describe('Sponsor engagement study update with CPMS study update and SE val
     await test.step(`When I have navigated to the study details page for the Study with SE Id ${startingStudyId}`, async () => {
       await sePage2.goto(`studies/${startingStudyId}`)
       await expect(sePage2.locator('.govuk-inset-text')).toBeVisible()
+    })
+
+    await test.step(`Then I should see different edit history messages depending on the Lead Admins location`, async () => {
+      async function viewEditHistoryLeadAdmin(leadAdminId: Number) {
+        const actualMessage = sePage2.locator('[data-testid^="edit-history-accordion-item-"]').first()
+        //  const trimmedMessage = actualMessage?.trim()
+        let expectedMessage = ''
+        switch (leadAdminId) {
+          case 1:
+            expectedMessage = 'Change made by RDN'
+            break
+          case 2:
+            expectedMessage = 'Change made by Scotland Admin'
+            break
+          case 3:
+            expectedMessage = 'Change made by NI Portfolio Admin'
+            break
+          case 4:
+            expectedMessage = 'Change made by Health and Care Research Wales Admin'
+            break
+          default:
+            expectedMessage = 'There is no edit history.'
+            break
+        }
+        expect(actualMessage).toContainText(expectedMessage)
+      }
+      const viewEditHistory = sePage2.locator('span:has-text("View edit history")')
+      await expect(viewEditHistory).toBeVisible()
+      await viewEditHistory.click()
+      await viewEditHistoryLeadAdmin(studyCoreDetails[0].leadAdministrationId)
     })
 
     await test.step(`Then I should see study details updated with my new values from CPMS`, async () => {
