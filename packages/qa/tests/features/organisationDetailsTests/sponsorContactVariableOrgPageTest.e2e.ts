@@ -1,7 +1,6 @@
 import { test } from '../../../hooks/CustomFixtures'
 import { seDatabaseReq } from '../../../utils/DbRequests'
 
-const organisationId = 9
 const sponsorContactUserId = 6
 
 test.describe('Sponsor Organisation Details Page for Sponsor Contacts - @se_248', () => {
@@ -11,6 +10,18 @@ test.describe('Sponsor Organisation Details Page for Sponsor Contacts - @se_248'
     commonItemsPage,
     organisationDetailsPage,
   }) => {
+    const result = await seDatabaseReq(`
+      SELECT organisationId FROM UserOrganisation 
+      WHERE userId = ${sponsorContactUserId} 
+      AND isDeleted = 0
+      LIMIT 1;
+    `)
+
+    const organisationId = result[0]?.organisationId
+    if (!organisationId) {
+      throw new Error('Test user is not associated to any organisations, check test data')
+    }
+
     await test.step('Given I have navigated to the Study details Page', async () => {
       await commonItemsPage.goto()
     })
