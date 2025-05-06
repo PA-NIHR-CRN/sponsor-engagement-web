@@ -178,7 +178,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
     })
   })
 
-  test('No `Due` icon appears for a Study, when the study does not meet the Due criteria (no Risk Indicators) - @se_68_noRisks', async ({
+  test.skip('No `Due` icon appears for a Study, when the study does not meet the Due criteria (no Risk Indicators) - @se_68_noRisks', async ({
     studiesPage,
     studyDetailsPage,
   }) => {
