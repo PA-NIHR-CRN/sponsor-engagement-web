@@ -5,7 +5,9 @@ const testUserId = 6
 const startingOrgId = 9
 
 test.beforeAll('Setup Test Users', async () => {
-  await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
+  await seDatabaseReq(
+    `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
+  )
 })
 
 test.describe('Details on Study List Items - @se_22 @se_22_detail', () => {
