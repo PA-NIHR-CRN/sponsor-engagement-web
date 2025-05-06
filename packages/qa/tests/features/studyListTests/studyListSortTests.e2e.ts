@@ -9,7 +9,9 @@ let studyListSortedByAscDb: RowDataPacket[]
 let studyListSortedByDescDb: RowDataPacket[]
 
 test.beforeAll('Setup Test Users', async () => {
-  await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
+  await seDatabaseReq(
+    `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
+  )
 
   const studyListSortByDue = await seDatabaseReq(`
     SELECT DISTINCT Study.id, Study.cpmsId, Study.shortTitle, Study.dueAssessmentAt,

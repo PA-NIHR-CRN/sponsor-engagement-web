@@ -20,7 +20,9 @@ const noCroOrgRelationshipStudyId = 11133
 const noCtuOrgRelationshipStudyId = 339
 
 test.beforeAll('Setup Tests', async () => {
-  await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
+  await seDatabaseReq(
+    `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
+  )
   await seDatabaseReq(`UPDATE Study SET protocolReferenceNumber = NULL WHERE id = ${noProtocolRefNoStudyId};`)
 
   const randomStudyIdSelected = await seDatabaseReq(`SELECT Study.id FROM Study 
@@ -219,7 +221,9 @@ test.describe('View core study details - @se_27', () => {
   test('The row titled `CTU` only appears in Study Details where a CTU Relationship is present - @se_27_ctu', async ({
     studyDetailsPage,
   }) => {
-    await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${nonCommCTUOrgId} WHERE userId = ${testUserId}`)
+    await seDatabaseReq(
+      `UPDATE UserOrganisation SET organisationId = ${nonCommCTUOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
+    )
     await test.step(`Given I have navigated to the Study Details Page for Study with SE Id ${ctuOrgRelationshipStudyId}`, async () => {
       await studyDetailsPage.goto(ctuOrgRelationshipStudyId.toString())
       await studyDetailsPage.assertOnStudyDetailsPage(ctuOrgRelationshipStudyId.toString())
@@ -246,7 +250,7 @@ test.describe('View core study details - @se_27', () => {
     studyDetailsPage,
   }) => {
     await seDatabaseReq(`
-      UPDATE UserOrganisation SET organisationId = ${nonCommCTUOrgId} WHERE userId = ${testUserId}`)
+      UPDATE UserOrganisation SET organisationId = ${nonCommCTUOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`)
 
     await test.step(`Given I have navigated to the Study Details Page for Non-Commercial Study with SE Id ${noCtuOrgRelationshipStudyId}`, async () => {
       await studyDetailsPage.goto(noCtuOrgRelationshipStudyId.toString())
