@@ -35,9 +35,7 @@ const pOpen = new Date(plannedOpen)
 const pClose = new Date(plannedClose)
 
 test.beforeAll('Setup Tests', async () => {
-  await seDatabaseReq(
-    `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
-  )
+  await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
 
   const randomStudyIdSelected = await seDatabaseReq(`
     SELECT Study.id FROM Study 
@@ -189,8 +187,7 @@ test.describe('Sponsor engagement study update with CPMS study update and SE val
 
     await test.step(`Then I should see different edit history messages depending on the Lead Admins location`, async () => {
       async function viewEditHistoryLeadAdmin(leadAdminId: Number) {
-        const actualMessage = sePage2.locator('[data-testid^="edit-history-accordion-item-"]').first()
-        //  const trimmedMessage = actualMessage?.trim()
+        const editHistoryItem = sePage2.locator('[data-testid^="edit-history-accordion-item-"]').first()
         let expectedMessage = ''
         switch (leadAdminId) {
           case 1:
@@ -209,7 +206,7 @@ test.describe('Sponsor engagement study update with CPMS study update and SE val
             expectedMessage = 'There is no edit history.'
             break
         }
-        expect(actualMessage).toContainText(expectedMessage)
+        expect(editHistoryItem).toContainText(expectedMessage)
       }
       const viewEditHistory = sePage2.locator('span:has-text("View edit history")')
       await expect(viewEditHistory).toBeVisible()
