@@ -1,4 +1,4 @@
-import { GroupIcon, HomeIcon, SettingsIcon, SideNav } from '@nihr-ui/frontend'
+import { GroupIcon, HomeIcon, SideNav } from '@nihr-ui/frontend'
 import { logger } from '@nihr-ui/logger'
 import { useIdle } from '@uidotdev/usehooks'
 import { Roboto } from 'next/font/google'
@@ -13,7 +13,7 @@ import { Footer, Header } from '@/components/molecules'
 import { CookieBanner } from '@/components/organisms/CookieBanner/CookieBanner'
 import { SERVICE_NAME } from '@/constants'
 import { ORGANISATIONS_PAGE, SIGN_OUT_PAGE } from '@/constants/routes'
-import { isContactManager, isContactManagerAndSponsorContact, isSponsorContact } from '@/utils/auth'
+import { isContactManager, isSponsorContact } from '@/utils/auth'
 
 import type { BreadcrumbConfig } from '../Breadcrumbs/Breadcrumbs'
 import Breadcrumbs from '../Breadcrumbs/Breadcrumbs'
@@ -77,12 +77,8 @@ export function RootLayout({ children, backLink, heading = SERVICE_NAME, user, b
             <SideNav.Link as={Link} href="/" icon={<HomeIcon />}>
               Home
             </SideNav.Link>
-            {isContactManager(user?.roles ?? []) || isContactManagerAndSponsorContact(user?.roles ?? []) ? (
-              <SideNav.Link as={Link} href={ORGANISATIONS_PAGE} icon={<SettingsIcon />}>
-                Manage sponsor contacts
-              </SideNav.Link>
-            ) : null}
-            {isSponsorContact(user?.roles ?? []) && userOrganisations.length > 0 ? (
+            {isContactManager(user?.roles ?? []) ||
+            (isSponsorContact(user?.roles ?? []) && userOrganisations.length > 0) ? (
               <SideNav.Link as={Link} href={groupIconLink} icon={<GroupIcon />}>
                 Manage sponsor contacts
               </SideNav.Link>
