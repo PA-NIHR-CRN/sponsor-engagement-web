@@ -14,11 +14,12 @@ This project employs a monorepo architecture with `turborepo` being used to mana
 
 ### Apps
 
-| Name     | Info                              |
-| -------- | --------------------------------- |
-| `web`    | NextJS web application            |
-| `ingest` | CPMS ingest scheduled task        |
-| `notify` | Notification email scheduled task |
+| Name                 | Info                              |
+| -------------------- | --------------------------------- |
+| `web`                | NextJS web application            |
+| `ingest`             | CPMS ingest scheduled task        |
+| `notify`             | Notification email scheduled task |
+| `invitation-monitor` | Invitation monitor scheduled task |
 
 ### Packages
 
