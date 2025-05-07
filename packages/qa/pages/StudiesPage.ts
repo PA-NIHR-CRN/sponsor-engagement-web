@@ -1,5 +1,10 @@
 import { expect, Locator, Page } from '@playwright/test'
-import { convertPromiseStringToNumber, confirmStringNotNull, convertIsoDateToDisplayDate } from '../utils/UtilFunctions'
+import {
+  convertPromiseStringToNumber,
+  confirmStringNotNull,
+  convertIsoDateToDisplayDate,
+  numDaysBetween,
+} from '../utils/UtilFunctions'
 import { seDatabaseReq } from '../utils/DbRequests'
 import { RowDataPacket } from 'mysql2'
 
@@ -22,6 +27,7 @@ export default class StudiesPage {
   readonly studyListItem: Locator
   readonly studyListItemTitle: Locator
   readonly studyListItemOrgName: Locator
+  readonly studyListItemIrasIdValue: Locator
   readonly studyListItemLastAssessmentLbl: Locator
   readonly studyListItemLastAssessmentValue: Locator
   readonly studyListItemDataIndicatesLbl: Locator
@@ -63,10 +69,13 @@ export default class StudiesPage {
     this.studyLastItem = this.studyListItem.last()
     this.studyLastDue = this.studyLastItem.locator('span', { hasText: 'due' })
     this.studyListItemTitle = this.studyListItem.locator(
-      'div[class="govuk-heading-s govuk-!-margin-bottom-4 govuk-!-padding-top-0 inline-block font-extrabold"]'
+      'div[class="govuk-heading-s govuk-!-margin-bottom-0 govuk-!-padding-top-0 inline-block font-extrabold"]'
     )
     this.studyListItemOrgName = page.locator(
       'div[class="text-darkGrey govuk-!-margin-bottom-1 max-w-[calc(100%-45px)] lg:max-w-auto govuk-body-s"]'
+    )
+    this.studyListItemIrasIdValue = this.studyListItem.locator(
+      'div[class="govuk-body-s govuk-!-margin-bottom-2 govuk-!-padding-top-0"]'
     )
     this.studyListItemLastAssessmentLbl = page
       .locator('div[class="lg:min-w-[320px]"] strong[class="govuk-heading-s govuk-!-margin-bottom-0"]')
@@ -80,7 +89,9 @@ export default class StudiesPage {
     this.studyListItemDataIndicatesValue = page
       .locator('div[class="lg:min-w-[320px]"] p[class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0"]')
       .nth(1)
-    this.studyListItemDueIndicator = page.locator('span')
+    this.studyListItemDueIndicator = page.locator(
+      'span[class="govuk-tag govuk-tag--red float-right -mt-3 -mr-3 normal-case"]'
+    )
     this.searchInput = page.locator('input[class="govuk-input govuk-input h-[50px] border-2 border-black p-2"]')
     this.searchButton = page.locator(
       'button[class="bg-[var(--colour-blue)] text-white active:top-0 focus:shadow-[inset_0_0_0_4px_var(--text-grey)] focus:outline focus:outline-[3px] focus:outline-[var(--focus)] mb-0 w-[50px] h-[50px] flex items-center justify-center text-lg"]'
@@ -267,6 +278,18 @@ export default class StudiesPage {
     }
   }
 
+  async assertIrasIdValue(dbReq: string, index: number) {
+    const expectedValues = await seDatabaseReq(`${dbReq}`)
+    const fullText = await this.studyListItemIrasIdValue.nth(index).textContent()
+    const actualValue = fullText?.replace('IRAS ID: ', '').trim()
+
+    if (expectedValues.length > 0 && expectedValues[0].irasId) {
+      expect(actualValue).toEqual(expectedValues[0].irasId.toString())
+    } else {
+      expect(actualValue).toEqual('Not available')
+    }
+  }
+
   async assertLastAssessmentLbl(index: number) {
     expect(await this.studyListItem.nth(index).locator(this.studyListItemLastAssessmentLbl).textContent()).toEqual(
       'Last sponsor assessment'
@@ -337,10 +360,18 @@ export default class StudiesPage {
     await this.searchFilterPanel.waitFor()
   }
 
-  async assertDueIndicatorDisplayed(index: number, isDisplayed: boolean) {
-    if (isDisplayed) {
+  async getDaysSinceAssessmentDue(dueAssessmentAt: Date) {
+    return Math.round(numDaysBetween(new Date(), dueAssessmentAt))
+  }
+
+  async assertDueIndicatorDisplayed(index: number, dueAssessmentAt?: Date | null) {
+    if (dueAssessmentAt) {
+      const numberOfDaysDue = await this.getDaysSinceAssessmentDue(dueAssessmentAt)
+
       await expect(this.studyListItem.nth(index).locator(this.studyListItemDueIndicator)).toBeVisible()
-      await expect(this.studyListItem.nth(index).locator(this.studyListItemDueIndicator)).toHaveText('Due')
+      await expect(this.studyListItem.nth(index).locator(this.studyListItemDueIndicator)).toHaveText(
+        `Due for ${numberOfDaysDue || 1} day${numberOfDaysDue > 1 ? 's' : ''}`
+      )
     } else {
       await expect(this.studyListItem.nth(index).locator(this.studyListItemDueIndicator)).toBeHidden()
     }
@@ -369,19 +400,37 @@ export default class StudiesPage {
     }
   }
 
+  async checkForStudyDue(studies: any) {
+    for (let study of studies) {
+      if (study.dueAssessmentAt) {
+        console.log('At least 1 study is due an assessment')
+        return true
+      }
+    }
+    console.log('All studies are currently not due an assessment')
+    return false
+  }
+
   async assertListBeginsWithDueStudies(sortedList: RowDataPacket[]) {
-    const pageStudyCount = await this.studyListItem.count()
-    for (let index = 0; index < pageStudyCount; index++) {
-      const study = sortedList[index]
-      await expect(this.studyListItemTitle.nth(index)).toHaveText(study.shortTitle)
-      await expect(this.studyListItem.nth(index).locator(this.studyListItemDueIndicator)).toBeVisible()
+    if (await this.checkForStudyDue(sortedList)) {
+      const pageStudyCount = await this.studyListItem.count()
+      for (let index = 0; index < pageStudyCount; index++) {
+        const study = sortedList[index]
+        await expect(this.studyListItemTitle.nth(index)).toHaveText(study.shortTitle)
+
+        if (study.dueAssessmentAt) {
+          await expect(this.studyListItem.nth(index).locator(this.studyListItemDueIndicator)).toBeVisible()
+        }
+      }
+    } else {
+      throw new Error('No studies are due an assessment, check test data...')
     }
   }
 
   async assertListEndsWithNonDueStudies(sortedList: RowDataPacket[]) {
     function checkForStudyNotDue(studies: any) {
       for (let study of studies) {
-        if (study.isDueAssessment === 0) {
+        if (study.dueAssessmentAt === null) {
           console.log('At least 1 study is not due an assessment, checking last study status...')
           return true
         }

@@ -7,7 +7,9 @@ const startingOrgId = 9
 const minStudiesOrgId = 3064
 
 test.beforeAll('Setup Test Users', async () => {
-  await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
+  await seDatabaseReq(
+    `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
+  )
 })
 
 test.describe('Baseline Study List Page for Sponsor Contact - @se_22 se_22_baseline', () => {
@@ -148,7 +150,7 @@ test.describe('Baseline Study List Page for Sponsor Contact - @se_22 se_22_basel
   }) => {
     await test.step('Given I have updated the Sponsor Contact Test User`s Organisation', async () => {
       await seDatabaseReq(
-        `UPDATE UserOrganisation SET organisationId = ${minStudiesOrgId} WHERE userId = ${testUserId}`
+        `UPDATE UserOrganisation SET organisationId = ${minStudiesOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
       )
     })
     await test.step('Given I have navigated to the Studies Page', async () => {

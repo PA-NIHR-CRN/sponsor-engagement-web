@@ -14,8 +14,8 @@ import { prismaMock } from '../__mocks__/prisma'
 import { userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
 import { sysRefAssessmentFurtherInformation, sysRefAssessmentStatus } from '../__mocks__/sysRefData'
 import { SIGN_IN_PAGE, SUPPORT_PAGE } from '../constants/routes'
-import type { AssessmentProps } from '../pages/assessments/[studyId]'
-import Assessment, { getServerSideProps } from '../pages/assessments/[studyId]'
+import type { AssessmentProps } from '../pages/studies/[studyId]/assess'
+import Assessment, { getServerSideProps } from '../pages/studies/[studyId]/assess'
 
 jest.mock('next-auth/next')
 jest.mock('next-seo')
@@ -50,7 +50,6 @@ const study = Mock.of<StudyWithRelations>({
   id: mockedStudyId,
   title: 'Test Study',
   cpmsId: 12345,
-  isDueAssessment: true,
   createdAt: new Date('2001-01-01'),
   managingSpeciality: 'Cancer',
   organisations: [
@@ -119,7 +118,7 @@ const mockedEnvVars = {
 const renderPage = async (
   context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {}, query: { studyId: String(mockedStudyId) } }),
   firstStudyResponse = study,
-  url = '/assessments/123'
+  url = '/studies/123/assess'
 ) => {
   jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRole)
   prismaMock.$transaction.mockResolvedValueOnce([firstStudyResponse])
@@ -200,7 +199,7 @@ describe('Assessment', () => {
     })
   })
 
-  describe('Assess progress of a study', () => {
+  describe('Assess progress of a study in the UK', () => {
     test('Default layout', async () => {
       await renderPage()
 
@@ -208,12 +207,14 @@ describe('Assessment', () => {
       expect(NextSeo).toHaveBeenCalledWith({ title: 'Study Progress Review - Assess progress of study' }, {})
 
       // Title
-      expect(screen.getByRole('heading', { level: 2, name: 'Assess progress of a study' })).toBeInTheDocument()
+      expect(
+        screen.getByRole('heading', { level: 2, name: 'Assess progress of a study in the UK' })
+      ).toBeInTheDocument()
 
       // Description
       expect(
         screen.getByText(
-          'You will need to assess if the study is on or off track and if any action is being taken. If you need NIHR RDN support with this study you will need to request this separately.'
+          'You will need to assess if the study is on or off track in the UK and if any action is being taken. If you need NIHR RDN support with this study you will need to request this separately.'
         )
       ).toBeInTheDocument()
 
@@ -226,7 +227,7 @@ describe('Assessment', () => {
       ).toBeInTheDocument()
       expect(screen.getByRole('link', { name: 'Request support' })).toHaveAttribute(
         'href',
-        `${SUPPORT_PAGE}?returnPath=/assessments/123`
+        `${SUPPORT_PAGE}?returnPath=/studies/123/assess`
       )
 
       // Study sponsor
@@ -248,15 +249,15 @@ describe('Assessment', () => {
       ).toBeInTheDocument()
 
       // Form Input - Status
-      const statusFieldset = screen.getByRole('radiogroup', { name: 'Is this study progressing as planned?' })
+      const statusFieldset = screen.getByRole('radiogroup', { name: 'Is this study progressing in the UK as planned?' })
 
       expect(within(statusFieldset).getByLabelText('On track')).toBeInTheDocument()
       expect(within(statusFieldset).getByLabelText('On track')).toHaveAccessibleDescription(
-        'The sponsor or delegate is satisfied the study is progressing as planned.'
+        'The sponsor or delegate is satisfied the study is progressing in the UK as planned.'
       )
       expect(within(statusFieldset).getByLabelText('Off track')).toBeInTheDocument()
       expect(within(statusFieldset).getByLabelText('Off track')).toHaveAccessibleDescription(
-        'The sponsor or delegate has some concerns about the study and is taking action where appropriate.'
+        'The sponsor or delegate has some concerns about the study in the UK and is taking action where appropriate.'
       )
 
       // Form Input - Further information
@@ -392,7 +393,9 @@ describe('Assessment', () => {
     test('Client side validation errors', async () => {
       await renderPage()
 
-      expect(screen.getByRole('heading', { name: 'Assess progress of a study', level: 2 })).toBeInTheDocument()
+      expect(
+        screen.getByRole('heading', { name: 'Assess progress of a study in the UK', level: 2 })
+      ).toBeInTheDocument()
 
       await userEvent.click(screen.getByRole('button', { name: 'Submit assessment' }))
 
@@ -408,7 +411,7 @@ describe('Assessment', () => {
 
       // Field errors
       expect(
-        screen.getByRole('radiogroup', { name: 'Is this study progressing as planned?' })
+        screen.getByRole('radiogroup', { name: 'Is this study progressing in the UK as planned?' })
       ).toHaveAccessibleErrorMessage('Error: Select how the study is progressing')
       expect(
         screen.getByRole('group', {
@@ -421,7 +424,9 @@ describe('Assessment', () => {
     test('Server side field validation errors', async () => {
       await renderPage(undefined, undefined, '?statusError=Select+how+the+study+is+progressing')
 
-      expect(screen.getByRole('heading', { name: 'Assess progress of a study', level: 2 })).toBeInTheDocument()
+      expect(
+        screen.getByRole('heading', { name: 'Assess progress of a study in the UK', level: 2 })
+      ).toBeInTheDocument()
 
       // Summary errors
       const alert = screen.getByRole('alert', { name: 'There is a problem' })
@@ -435,7 +440,7 @@ describe('Assessment', () => {
 
       // Field errors
       expect(
-        screen.getByRole('radiogroup', { name: 'Is this study progressing as planned?' })
+        screen.getByRole('radiogroup', { name: 'Is this study progressing in the UK as planned?' })
       ).toHaveAccessibleErrorMessage('Error: Select how the study is progressing')
       expect(
         screen.getByRole('group', {
@@ -448,7 +453,9 @@ describe('Assessment', () => {
     test('Fatal server error shows an error at the top of the page', async () => {
       await renderPage()
 
-      expect(screen.getByRole('heading', { name: 'Assess progress of a study', level: 2 })).toBeInTheDocument()
+      expect(
+        screen.getByRole('heading', { name: 'Assess progress of a study in the UK', level: 2 })
+      ).toBeInTheDocument()
 
       // Status
       await userEvent.click(screen.getByLabelText('On track'))
@@ -460,7 +467,7 @@ describe('Assessment', () => {
 
       await userEvent.click(screen.getByRole('button', { name: 'Submit assessment' }))
 
-      expect(mockRouter.asPath).toBe('/assessments/123?fatal=1')
+      expect(mockRouter.asPath).toBe('/studies/123/assess?fatal=1')
 
       const alert = screen.getByRole('alert')
       expect(

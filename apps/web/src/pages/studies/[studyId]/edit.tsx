@@ -35,7 +35,6 @@ import {
   mapCPMSStudyEvalToSEEval,
   mapCPMSStudyToSEStudy,
   mapFormStatusToCPMSStatus,
-  setStudyAssessmentDueFlag,
   updateEvaluationCategories,
   updateStudy,
 } from '@/lib/studies'
@@ -44,6 +43,7 @@ import { getOptionalFormFields, getVisibleFormFields, mapStudyToStudyFormInput }
 import { getValuesFromSearchParams } from '@/utils/form'
 import type { EditStudy as EditStudySchema, EditStudyInputs } from '@/utils/schemas'
 import { studySchema } from '@/utils/schemas'
+import { getStudyAssessmentDueDate } from '@/utils/studies'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
 export type EditStudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
@@ -126,7 +126,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
 
   return (
     <Container>
-      <NextSeo title="Study Progress Review - Update study data" />
+      <NextSeo title="Study Progress Review - Update UK study data" />
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">
@@ -207,7 +207,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                 }}
               />
 
-              {/* Planned opening to recruitment date */}
+              {/* Planned UK opening to recruitment date */}
               {visibleDateFields.includes('plannedOpeningDate') && (
                 <Controller
                   control={control}
@@ -233,7 +233,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                 />
               )}
 
-              {/* Actual opening to recruitment date */}
+              {/* Actual UK opening to recruitment date */}
               {visibleDateFields.includes('actualOpeningDate') && (
                 <Controller
                   control={control}
@@ -263,7 +263,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                 />
               )}
 
-              {/* Planned closure to recruitment date */}
+              {/* Planned UK closure to recruitment date */}
               {visibleDateFields.includes('plannedClosureDate') && (
                 <Controller
                   control={control}
@@ -289,7 +289,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                 />
               )}
 
-              {/* Actual closure to recruitment date */}
+              {/* Actual UK closure to recruitment date */}
               {visibleDateFields.includes('actualClosureDate') && (
                 <Controller
                   control={control}
@@ -315,7 +315,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                 />
               )}
 
-              {/* Estimated reopening date*/}
+              {/* Estimated UK reopening date*/}
               {visibleDateFields.includes('estimatedReopeningDate') && (
                 <Controller
                   control={control}
@@ -421,13 +421,19 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
 
 EditStudy.getLayout = function getLayout(page: ReactElement, { user }: EditStudyProps) {
   return (
-    <RootLayout heading={PAGE_TITLE} user={user}>
+    <RootLayout
+      breadcrumbConfig={{
+        showBreadcrumb: true,
+      }}
+      heading={PAGE_TITLE}
+      user={user}
+    >
       {page}
     </RootLayout>
   )
 }
 
-export const getServerSideProps = withServerSideProps(Roles.SponsorContact, async (context, session) => {
+export const getServerSideProps = withServerSideProps([Roles.SponsorContact], async (context, session) => {
   const userOrganisationIds = session.user?.organisations.map((userOrg) => userOrg.organisationId)
 
   const { data: study } = await getStudyById(Number(context.query.studyId), userOrganisationIds)
@@ -467,6 +473,8 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
   const studyEvalsInCPMS = studyInCPMS.StudyEvaluationCategories
   const mappedStudyEvalsInCPMS = studyEvalsInCPMS.map((studyEval) => mapCPMSStudyEvalToSEEval(studyEval))
 
+  const currentDueAssessmentAt = study.dueAssessmentAt
+
   const { data: updatedStudy } = await updateStudy(Number(cpmsId), mapCPMSStudyToSEStudy(studyInCPMS))
 
   if (!updatedStudy) {
@@ -478,9 +486,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
       },
     }
   }
-
-  const { data: setStudyAssessmentDueResponse } = await setStudyAssessmentDueFlag([study.id])
-  const isStudyDueAssessment = setStudyAssessmentDueResponse !== null ? setStudyAssessmentDueResponse === 1 : false
+  const dueAssessmentAt = await getStudyAssessmentDueDate(study.id, currentDueAssessmentAt)
 
   const currentStudyEvalsInSE = updatedStudy.evaluationCategories
 
@@ -504,7 +510,7 @@ export const getServerSideProps = withServerSideProps(Roles.SponsorContact, asyn
       study: {
         ...updatedStudy,
         evaluationCategories: updatedStudyEvals ?? study.evaluationCategories,
-        isDueAssessment: isStudyDueAssessment,
+        dueAssessmentAt,
       },
       currentLSN: studyInCPMS.CurrentLsn,
       query: context.query,

@@ -84,7 +84,7 @@ describe('Successful study assessment submission', () => {
     // Study is updated to not be due an assessment
     expect(updateStudyMock).toHaveBeenCalledWith({
       where: { id: 999 },
-      data: { isDueAssessment: false, lastAssessmentId: 1 },
+      data: { dueAssessmentAt: null, lastAssessmentId: 1 },
     })
 
     expect(logger.info).toHaveBeenCalledWith('Added assessment with id: 1')
@@ -130,7 +130,7 @@ describe('Successful study assessment submission', () => {
     // Study is updated to not be due an assessment
     expect(updateStudyMock).toHaveBeenCalledWith({
       where: { id: 999 },
-      data: { isDueAssessment: false, lastAssessmentId: 1 },
+      data: { dueAssessmentAt: null, lastAssessmentId: 1 },
     })
 
     expect(logger.info).toHaveBeenCalledWith('Added assessment with id: 1')
@@ -164,14 +164,14 @@ describe('Failed study assessment submission', () => {
     const res = await testHandler(api, { method: 'POST', body, query: {} })
     expect(res.statusCode).toBe(302)
     expect(res._getRedirectUrl()).toBe(`/500`)
-    expect(logger.error).toHaveBeenCalledWith(new Error('No role found for user'))
+    expect(logger.error).toHaveBeenCalledWith(new Error('User does not have a valid role'))
   })
 
   test('Wrong http method redirects back to the form with a fatal error', async () => {
     jest.mocked(getServerSession).mockResolvedValueOnce(userWithSponsorContactRole)
     const res = await testHandler(api, { method: 'GET', body, query: {} })
     expect(res.statusCode).toBe(302)
-    expect(res._getRedirectUrl()).toBe(`/assessments/${body.studyId}/?fatal=1`)
+    expect(res._getRedirectUrl()).toBe(`/studies/${body.studyId}/assess/?fatal=1`)
     expect(logger.error).toHaveBeenCalledWith(new Error('Wrong method'))
   })
 
@@ -191,7 +191,7 @@ describe('Failed study assessment submission', () => {
 
     expect(res.statusCode).toBe(302)
     expect(res._getRedirectUrl()).toBe(
-      `/assessments/999/?statusError=Select+how+the+study+is+progressing&furtherInformation=4%2C5&furtherInformationText=Some+extra+text`
+      `/studies/999/assess/?statusError=Select+how+the+study+is+progressing&furtherInformation=4%2C5&furtherInformationText=Some+extra+text`
     )
     expect(logger.error).toHaveBeenCalledWith(
       new ZodError([

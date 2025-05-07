@@ -9,7 +9,7 @@ import { Mock } from 'ts-mockery'
 import { render, screen, within } from '@/config/TestUtils'
 
 import { prismaMock } from '../__mocks__/prisma'
-import { userWithContactManagerRole, userWithSponsorContactRole } from '../__mocks__/session'
+import { userNoRoles, userWithContactManagerRole } from '../__mocks__/session'
 import { SIGN_IN_PAGE } from '../constants/routes'
 import type { OrganisationWithRelations } from '../lib/organisations'
 import type { OrganisationProps } from '../pages/organisations/[organisationId]'
@@ -33,9 +33,9 @@ describe('getServerSideProps', () => {
     })
   })
 
-  test('redirects back to the homepage for users without contact manager role', async () => {
+  test('redirects back to the homepage for users without contact manager role or sponsor contact role', async () => {
     const context = Mock.of<GetServerSidePropsContext>({ req: {}, res: {} })
-    getServerSessionMock.mockResolvedValueOnce(userWithSponsorContactRole)
+    getServerSessionMock.mockResolvedValueOnce(userNoRoles)
 
     const result = await getServerSideProps(context)
     expect(result).toEqual({
@@ -93,18 +93,28 @@ const mockOrganisation = Mock.of<OrganisationWithRelations>({
       user: {
         email: 'test1@test1.com',
         registrationConfirmed: true,
+        lastLogin: new Date('2001-01-03'),
       },
       createdAt: new Date('2001-01-01'),
       updatedAt: new Date('2001-01-02'),
+      invitations: [
+        {
+          status: {
+            name: 'Failure',
+          },
+        },
+      ],
     },
     {
       id: 2,
       user: {
         email: 'test2@test2.com',
         registrationConfirmed: false,
+        lastLogin: null,
       },
       createdAt: new Date('2001-01-01'),
       updatedAt: new Date('2001-01-02'),
+      invitations: [],
     },
   ],
 })
@@ -159,7 +169,12 @@ describe('Organisation page', () => {
     const contactsTable = screen.getByRole('table', { name: 'Organisation contacts' })
 
     const contactHeaders = within(contactsTable).getAllByRole('columnheader')
-    expect(contactHeaders.map((header) => header.textContent)).toEqual(['Contact email', 'Date added', 'Actions'])
+    expect(contactHeaders.map((header) => header.textContent)).toEqual([
+      'Contact email',
+      'Date added',
+      'Date of last login',
+      'Actions',
+    ])
 
     const contactCells = within(contactsTable)
       .getAllByRole('cell')
@@ -167,10 +182,12 @@ describe('Organisation page', () => {
 
     expect(contactCells).toEqual([
       'test1@test1.com',
-      '2 January 2001',
+      '2 January 2001Failed to deliver email',
+      '3 January 2001',
       'Remove',
       'test2@test2.com',
       '2 January 2001',
+      '-No last login date',
       'Remove',
     ])
 

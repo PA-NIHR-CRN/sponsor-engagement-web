@@ -6,7 +6,9 @@ const startingOrgId = 21
 let startingStudyId = 0
 
 test.beforeAll('Setup Tests', async () => {
-  await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
+  await seDatabaseReq(
+    `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
+  )
   const randomStudyIdSelected = await seDatabaseReq(`SELECT Study.id FROM Study 
     INNER JOIN StudyOrganisation
     ON Study.id = StudyOrganisation.studyId
@@ -23,7 +25,7 @@ test.describe('View the Study Assessment Form - @se_29 @se_29_form', () => {
       await assessmentPage.goto(startingStudyId.toString())
       await assessmentPage.assertOnAssessmentPage(startingStudyId.toString())
     })
-    await test.step(`When I view the section titled 'Is this study progressing as planned?'`, async () => {
+    await test.step(`When I view the section titled 'Is this study progressing in the UK as planned?'`, async () => {
       await assessmentPage.assertStudyProgressingPresent()
     })
     await test.step(`Then I see 2 Radio Button Options for 'On Track' and 'Off Track' with guidance text`, async () => {
@@ -84,6 +86,33 @@ test.describe('View the Study Assessment Form - @se_29 @se_29_form', () => {
     })
     await test.step('Then the remaining char count will reduce to 396', async () => {
       await assessmentPage.assertFurtherInfoCharsRemaining(396)
+    })
+  })
+
+  test('As a Sponsor I can navigate back from the Study Assessment Form to the Study Details and All Studies pages by clicking the breadcrumb links - @se_238_ac1', async ({
+    assessmentPage,
+    studyDetailsPage,
+    studiesPage,
+  }) => {
+    await test.step(`Given I have navigated to the Study Assessment Form for a Study with SE Id ${startingStudyId}`, async () => {
+      await assessmentPage.goto(startingStudyId.toString())
+      await assessmentPage.assertOnAssessmentPage(startingStudyId.toString())
+    })
+    await test.step(`When I click on the 'Study details' breadcrumb`, async () => {
+      await assessmentPage.studyDetailsBreadcrumb.click()
+    })
+    await test.step('Then I am taken to the Study Details page', async () => {
+      await studyDetailsPage.assertOnStudyDetailsPage(startingStudyId.toString())
+    })
+    await test.step(`And I navigate to the Study Assessment Form again`, async () => {
+      await assessmentPage.goto(startingStudyId.toString())
+      await assessmentPage.assertOnAssessmentPage(startingStudyId.toString())
+    })
+    await test.step(`When I click on the 'All Studies' breadcrumb`, async () => {
+      await assessmentPage.allStudiesBreadcrumb.click()
+    })
+    await test.step('Then I am taken to the All Studies page', async () => {
+      await studiesPage.assertOnStudiesPage()
     })
   })
 })

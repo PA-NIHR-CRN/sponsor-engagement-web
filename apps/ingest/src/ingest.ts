@@ -6,7 +6,7 @@ import type {
 } from 'database'
 import { logger } from '@nihr-ui/logger'
 import { config as dotEnvConfig } from 'dotenv'
-import { setStudyAssessmentDue } from 'shared-utilities'
+import { setStudyAssessmentDue, setStudyAssessmentNotDue } from 'shared-utilities'
 import { prismaClient } from './lib/prisma'
 import type { Study, StudySponsor, StudyWithRelationships } from './types'
 import { StudyRecordStatus, StudyStatus } from './types'
@@ -49,8 +49,8 @@ const createStudies = async () => {
       actualOpeningDate: study.ActualOpeningDate ? new Date(study.ActualOpeningDate) : null,
       actualClosureDate: study.ActualClosureDate ? new Date(study.ActualClosureDate) : null,
       estimatedReopeningDate: study.EstimatedReopeningDate ? new Date(study.EstimatedReopeningDate) : null,
-      isDueAssessment: false,
       isDeleted: false,
+      leadAdministrationId: study.LeadAdministrationId,
     }
 
     return prismaClient.study.upsert({
@@ -337,6 +337,7 @@ const fetchStudies = async function* (url: string, username: string, password: s
             StudyStatus.SuspendedActivelyRecruiting,
           ],
           studyRecordStatus: [StudyRecordStatus.Live, StudyRecordStatus.LiveChangesPendingApproval],
+          includeDevolvedAdministrationLedStudies: true,
         },
       })
       totalStudies = data.Result.TotalRecords
@@ -413,18 +414,16 @@ export const ingest = async () => {
   for await (const studyRecords of fetchStudies(API_URL, API_USERNAME, API_PASSWORD)) {
     if (!studyRecords) return
 
-    studies = studyRecords
-      .filter((study) => Boolean(study.QualificationDate))
-      .map((study) => ({
-        ...study,
-        StudySponsors: study.StudySponsors.map(
-          (sponsor) =>
-            ({
-              ...sponsor,
-              OrganisationRole: sponsor.OrganisationRole.trim(),
-            } as StudySponsor)
-        ),
-      }))
+    studies = studyRecords.map((study) => ({
+      ...study,
+      StudySponsors: study.StudySponsors.map(
+        (sponsor) =>
+          ({
+            ...sponsor,
+            OrganisationRole: sponsor.OrganisationRole.trim(),
+          } as StudySponsor)
+      ),
+    }))
 
     await createStudies()
     await createOrganisations()
@@ -433,6 +432,7 @@ export const ingest = async () => {
 
     const ids = studyEntities.map((study) => study.id)
     await setStudyAssessmentDue(ids)
+    await setStudyAssessmentNotDue(ids)
   }
 
   await deleteStudies()

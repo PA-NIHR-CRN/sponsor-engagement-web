@@ -23,6 +23,7 @@ export default class OrganisationDetailsPage {
   readonly contactsListHeaders: Locator
   readonly contactsListEmailHeader: Locator
   readonly contactsListDateHeader: Locator
+  readonly contactsListLastLoginHeader: Locator
   readonly contactsListActionsHeader: Locator
   readonly contactListRow: Locator
   readonly noContactsMsg: Locator
@@ -72,7 +73,8 @@ export default class OrganisationDetailsPage {
     this.contactsListHeaders = this.contactsList.locator('thead tr')
     this.contactsListEmailHeader = this.contactsListHeaders.locator('th').nth(0)
     this.contactsListDateHeader = this.contactsListHeaders.locator('th').nth(1)
-    this.contactsListActionsHeader = this.contactsListHeaders.locator('th').nth(2)
+    this.contactsListLastLoginHeader = this.contactsListHeaders.locator('th').nth(2)
+    this.contactsListActionsHeader = this.contactsListHeaders.locator('th').nth(3)
     this.contactListRow = this.contactsList.locator('tbody tr')
     this.noContactsMsg = page.locator('div[class="w-full"] p').last()
     this.searchInput = page.locator('input[id="emailAddress"]')
@@ -222,6 +224,7 @@ export default class OrganisationDetailsPage {
       await expect(this.contactsListHeaders).toBeVisible()
       await expect(this.contactsListEmailHeader).toHaveText('Contact email')
       await expect(this.contactsListDateHeader).toHaveText('Date added')
+      await expect(this.contactsListLastLoginHeader).toHaveText('Date of last login')
       await expect(this.contactsListActionsHeader).toHaveText('Actions')
     } else {
       await expect(this.contactsListHeaders).toBeHidden()
@@ -260,14 +263,38 @@ export default class OrganisationDetailsPage {
     }
   }
 
+  async assertContactDateOfLastLogin(expectedDetails: RowDataPacket[]) {
+    await expect(this.contactListRow.first()).toBeVisible()
+    const numberOfContactRows = await this.contactListRow.count()
+    for (let index = 0; index < numberOfContactRows; index++) {
+      const row = this.contactListRow.nth(index)
+      const expectedDate = expectedDetails[index].lastLogin
+        ? convertIsoDateToDisplayDate(expectedDetails[index].lastLogin)
+        : '-No last login date'
+      await expect(row.locator('td').nth(2)).toHaveText(expectedDate)
+    }
+  }
+
+  async assertContactFailedToDeliverTag(expectedDetails: RowDataPacket[]) {
+    await expect(this.contactListRow.first()).toBeVisible()
+    for (let index = 0; index < expectedDetails.length; index++) {
+      const row = this.contactListRow.nth(index)
+      if (expectedDetails[index].statusId === 3) {
+        await expect(row.locator('td').nth(1)).toContainText('Failed to deliver email')
+      } else {
+        await expect(row.locator('td').nth(1)).not.toContainText('Failed to deliver email')
+      }
+    }
+  }
+
   async assertContactActions() {
     await expect(this.contactListRow.first()).toBeVisible()
     const numberOfContactRows = await this.contactListRow.count()
     for (let index = 0; index < numberOfContactRows; index++) {
       const row = this.contactListRow.nth(index)
-      await expect(row.locator('td').nth(2).locator('a')).toBeVisible()
-      await expect(row.locator('td').nth(2).locator('a')).toHaveText('Remove')
-      await expect(row.locator('td').nth(2).locator('a')).toHaveAttribute('href')
+      await expect(row.locator('td').nth(3).locator('a')).toBeVisible()
+      await expect(row.locator('td').nth(3).locator('a')).toHaveText('Remove')
+      await expect(row.locator('td').nth(3).locator('a')).toHaveAttribute('href')
     }
   }
 

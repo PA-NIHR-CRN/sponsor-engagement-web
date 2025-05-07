@@ -35,7 +35,7 @@ describe('Logo image', () => {
 describe('Logo link', () => {
   test('Displays with default attributes', () => {
     const { getByRole } = render(<LogoLink href="/example">example</LogoLink>)
-    const link = getByRole('link', { name: 'Go to n i h r .ac.uk (opens in new window)' })
+    const link = getByRole('link', { name: 'Go to n i h r .ac.uk (opens in new tab)' })
     expect(link).toHaveClass('govuk-header__link govuk-!-margin-left-4')
     expect(link).toHaveAttribute('href', '/example')
     expect(link).toHaveAttribute('target', '_blank')
@@ -48,7 +48,7 @@ describe('Logo link', () => {
         example
       </LogoLink>
     )
-    const link = getByRole('link', { name: 'Go to n i h r .ac.uk (opens in new window)' })
+    const link = getByRole('link', { name: 'Go to n i h r .ac.uk (opens in new tab)' })
     expect(link).toHaveClass('custom-class')
   })
 
@@ -59,7 +59,7 @@ describe('Logo link', () => {
         example
       </LogoLink>
     )
-    const link = getByRole('link', { name: 'Go to n i h r .ac.uk (opens in new window)' })
+    const link = getByRole('link', { name: 'Go to n i h r .ac.uk (opens in new tab)' })
     expect(refMock).toHaveBeenCalledWith(link)
   })
 })

@@ -149,7 +149,7 @@ export default class OrganisationsPage {
     await expect(this.searchInput).toBeVisible()
     await expect(this.searchButton).toBeVisible()
     await expect(this.searchLabel).toBeVisible()
-    await expect(this.searchLabel).toHaveText('Search organisation name')
+    await expect(this.searchLabel).toHaveText('Search by organisation name or contact email address')
   }
 
   async selectRandomOrgListItemIndex(): Promise<number> {

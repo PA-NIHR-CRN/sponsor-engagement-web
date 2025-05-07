@@ -9,36 +9,59 @@ let studyListSortedByAscDb: RowDataPacket[]
 let studyListSortedByDescDb: RowDataPacket[]
 
 test.beforeAll('Setup Test Users', async () => {
-  await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
+  await seDatabaseReq(
+    `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
+  )
 
   const studyListSortByDue = await seDatabaseReq(`
-    SELECT DISTINCT Study.id, Study.cpmsId, Study.shortTitle, Study.isDueAssessment,
+    SELECT DISTINCT Study.id, Study.cpmsId, Study.shortTitle, Study.dueAssessmentAt,
     (SELECT createdAt FROM Assessment WHERE Assessment.studyId = Study.id 
     AND Assessment.isDeleted = 0 ORDER BY createdAt desc LIMIT 1) createdAt FROM Study
     INNER JOIN StudyOrganisation ON StudyOrganisation.studyId = Study.id
-    WHERE Study.isDeleted = 0
+    WHERE Study.isDeleted = 0 
+    AND StudyOrganisation.isDeleted = 0
     AND StudyOrganisation.organisationId = ${startingOrgId}
-    ORDER BY isDueAssessment desc, Study.id asc;
+    ORDER BY Study.dueAssessmentAt IS NULL, Study.dueAssessmentAt asc, Study.id asc;
   `)
   studyListSortedByDueDb = studyListSortByDue
 
+  if (!studyListSortedByDueDb.some((study) => study.dueAssessmentAt)) {
+    console.log('No studies due for an assessment, setting up test data...')
+    // Set one study due for an assessment if no studies are currently due
+    const studyIdToUpdate = studyListSortedByDueDb[0].id
+
+    const allAssessmentIdsForStudy = await seDatabaseReq(
+      `SELECT id FROM Assessment WHERE studyId = ${studyIdToUpdate} AND isDeleted = 0`
+    )
+    for (let index = 0; index < allAssessmentIdsForStudy.length; index++) {
+      const assessmentId = allAssessmentIdsForStudy[index].id
+
+      await seDatabaseReq(`DELETE FROM AssessmentFurtherInformation WHERE assessmentId = ${assessmentId};`)
+      await seDatabaseReq(`DELETE FROM Assessment WHERE id = ${assessmentId};`)
+    }
+
+    await seDatabaseReq(`UPDATE Study SET dueAssessmentAt = NOW() WHERE id = ${studyIdToUpdate};`)
+  }
+
   const studyListSortByAsc = await seDatabaseReq(`
-    SELECT DISTINCT Study.id, Study.cpmsId, Study.shortTitle, Study.isDueAssessment,
+    SELECT DISTINCT Study.id, Study.cpmsId, Study.shortTitle, Study.dueAssessmentAt,
     (SELECT createdAt FROM Assessment WHERE Assessment.studyId = Study.id 
     AND Assessment.isDeleted = 0 ORDER BY createdAt desc LIMIT 1) createdAt FROM Study
     INNER JOIN StudyOrganisation ON StudyOrganisation.studyId = Study.id
-    WHERE Study.isDeleted = 0
+    WHERE Study.isDeleted = 0 
+    AND StudyOrganisation.isDeleted = 0
     AND StudyOrganisation.organisationId = ${startingOrgId}
     ORDER BY createdAt asc, Study.id asc;
   `)
   studyListSortedByAscDb = studyListSortByAsc
 
   const studyListSortByDesc = await seDatabaseReq(`
-    SELECT DISTINCT Study.id, Study.cpmsId, Study.shortTitle, Study.isDueAssessment,
+    SELECT DISTINCT Study.id, Study.cpmsId, Study.shortTitle, Study.dueAssessmentAt,
     (SELECT createdAt FROM Assessment WHERE Assessment.studyId = Study.id 
     AND Assessment.isDeleted = 0 ORDER BY createdAt desc LIMIT 1) createdAt FROM Study
     INNER JOIN StudyOrganisation ON StudyOrganisation.studyId = Study.id
     WHERE Study.isDeleted = 0
+    AND StudyOrganisation.isDeleted = 0
     AND StudyOrganisation.organisationId = ${startingOrgId}
     ORDER BY createdAt desc, Study.id asc;
   `)

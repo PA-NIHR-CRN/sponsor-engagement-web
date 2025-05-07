@@ -295,7 +295,6 @@ export const validateStatus = (ctx: z.RefinementCtx, values: EditStudy) => {
   const previousSimplifiedStatus = mapCPMSStatusToFormStatus(previousStatus)
   const newSimplifiedStatus = mapCPMSStatusToFormStatus(newStatus)
 
-  console.log({ previousSimplifiedStatus, newSimplifiedStatus })
   if (previousSimplifiedStatus === newSimplifiedStatus) return
 
   const [_, visibleStatuses] = getVisibleFormFields(previousSimplifiedStatus, newSimplifiedStatus)

@@ -35,9 +35,10 @@ model Study {
   lastAssessmentId           Int?                      @unique
   createdAt                  DateTime                  @default(now())
   updatedAt                  DateTime                  @updatedAt
-  isDueAssessment            Boolean?                  @default(false)
+  dueAssessmentAt            DateTime?
   isDeleted                  Boolean?                  @default(false)
   StudyUpdates               StudyUpdates[]
+  leadAdministrationId       Int?
 
   @@index([cpmsId])
 }
@@ -71,24 +72,25 @@ model OrganisationRole {
 }
 
 model User {
-  id                    Int                  @id @default(autoincrement())
-  name                  String?
-  email                 String               @unique
-  identityGatewayId     String?
-  registrationToken     String?
-  registrationConfirmed Boolean?             @default(false)
-  isDeleted             Boolean?             @default(false)
-  lastLogin             DateTime?
-  organisations         UserOrganisation[]   @relation(name: "userOrganisation")
-  createdOrganisations  UserOrganisation[]   @relation(name: "createdOrganisations")
-  updatedOrganisations  UserOrganisation[]   @relation(name: "updatedOrganisations")
-  roles                 UserRole[]           @relation(name: "userRoles")
-  createdRoles          UserRole[]           @relation(name: "createdRoles")
-  updatedRoles          UserRole[]           @relation(name: "updatedRoles")
-  assessments           Assessment[]
-  assessmentReminders   AssessmentReminder[]
-  createdStudyUpdates   StudyUpdates[]       @relation(name: "createdStudyUpdates")
-  modifiedStudyUpdates  StudyUpdates[]       @relation(name: "modifiedStudyUpdates")
+  id                          Int                          @id @default(autoincrement())
+  name                        String?
+  email                       String                       @unique
+  identityGatewayId           String?
+  registrationToken           String?
+  registrationConfirmed       Boolean?                     @default(false)
+  isDeleted                   Boolean?                     @default(false)
+  lastLogin                   DateTime?
+  organisations               UserOrganisation[]           @relation(name: "userOrganisation")
+  createdOrganisations        UserOrganisation[]           @relation(name: "createdOrganisations")
+  updatedOrganisations        UserOrganisation[]           @relation(name: "updatedOrganisations")
+  roles                       UserRole[]                   @relation(name: "userRoles")
+  createdRoles                UserRole[]                   @relation(name: "createdRoles")
+  updatedRoles                UserRole[]                   @relation(name: "updatedRoles")
+  assessments                 Assessment[]
+  assessmentReminders         AssessmentReminder[]
+  createdStudyUpdates         StudyUpdates[]               @relation(name: "createdStudyUpdates")
+  modifiedStudyUpdates        StudyUpdates[]               @relation(name: "modifiedStudyUpdates")
+  organisationInvitationsSent UserOrganisationInvitation[] @relation(name: "userOrganisationInvitationsSent")
 }
 
 model UserRole {
@@ -109,20 +111,37 @@ model UserRole {
 }
 
 model UserOrganisation {
-  id             Int          @id @default(autoincrement())
-  user           User         @relation(name: "userOrganisation", fields: [userId], references: [id])
+  id             Int                          @id @default(autoincrement())
+  user           User                         @relation(name: "userOrganisation", fields: [userId], references: [id])
   userId         Int
-  organisation   Organisation @relation(fields: [organisationId], references: [id])
+  organisation   Organisation                 @relation(fields: [organisationId], references: [id])
   organisationId Int
-  createdBy      User         @relation(name: "createdOrganisations", fields: [createdById], references: [id])
+  createdBy      User                         @relation(name: "createdOrganisations", fields: [createdById], references: [id])
   createdById    Int
-  updatedBy      User         @relation(name: "updatedOrganisations", fields: [updatedById], references: [id])
+  updatedBy      User                         @relation(name: "updatedOrganisations", fields: [updatedById], references: [id])
   updatedById    Int
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  isDeleted      Boolean?     @default(false)
+  createdAt      DateTime                     @default(now())
+  updatedAt      DateTime                     @updatedAt
+  isDeleted      Boolean?                     @default(false)
+  invitations    UserOrganisationInvitation[] @relation(name: "userOrganisationInvitations")
 
   @@unique([userId, organisationId])
+}
+
+model UserOrganisationInvitation {
+  id                 Int                    @id @default(autoincrement())
+  userOrganisation   UserOrganisation       @relation(name: "userOrganisationInvitations", fields: [userOrganisationId], references: [id])
+  userOrganisationId Int
+  messageId          String
+  timestamp          DateTime
+  status             SysRefInvitationStatus @relation(fields: [statusId], references: [id])
+  statusId           Int
+  failureNotifiedAt  DateTime?
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+  sentById           Int
+  sentBy             User                   @relation(name: "userOrganisationInvitationsSent", fields: [sentById], references: [id])
+  isDeleted          Boolean?               @default(false)
 }
 
 model StudyOrganisation {
@@ -286,4 +305,10 @@ model SysRefOrganisationRole {
   isDeleted     Boolean             @default(false)
 
   @@index([rtsIdentifier])
+}
+
+model SysRefInvitationStatus {
+  id                         Int                          @id @default(autoincrement())
+  name                       String
+  userOrganisationInvitation UserOrganisationInvitation[]
 }

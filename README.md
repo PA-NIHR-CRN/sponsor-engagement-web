@@ -136,7 +136,17 @@ const createJestConfig = nextJest({
 ## Database
 
 To regenerate the local Prisma client run: `npm run db:generate` from within the `database` package.
-To deploy migrations to the database, first set your `DATABASE_URL` environment variable on the command line: `export DATABASE_URL="mysql://<user>@<host>:3306/<database-name>?connection_limit=3&pool_timeout=10"` and then run `npm run migrate:deploy`.
+
+### Deploying migrations to the database:
+
+To create and apply a new migration locally
+
+- Set your `DATABASE_URL` environment variable on the command line: `export DATABASE_URL="mysql://<user>@<host>:3306/<database-name>?connection_limit=3&pool_timeout=10"` and then run `npm run migrate:dev`. When prompted, enter a name for the new migration.
+
+To apply existing migrations
+
+- Set your `DATABASE_URL` environment variable on the command line: `export DATABASE_URL="mysql://<user>@<host>:3306/<database-name>?connection_limit=3&pool_timeout=10"` and then run `npm run migrate:deploy`.
+
 To seed your local database with study data, you can run the ingest scheduled task against the CPMS DEV environment.
 To seed your local database with Sponsor Engagement reference data, first set your `DATABASE_URL` environment variable on the command line: `export DATABASE_URL="mysql://<user>@<host>:3306/<database-name>?connection_limit=3&pool_timeout=10"` and then run `npm run seed` from with the `database` package.
 

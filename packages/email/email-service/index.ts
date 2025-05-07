@@ -1,7 +1,8 @@
 import type { SES } from 'aws-sdk'
 import { logger } from '@nihr-ui/logger'
 import Bottleneck from 'bottleneck'
-import { EMAIL_CHARSET, EMAIL_FROM_ADDRESS } from './constants'
+import type { EmailInsightsList } from 'aws-sdk/clients/sesv2'
+import { EMAIL_CHARSET, EMAIL_FROM_ADDRESS } from '../constants'
 
 export interface EmailArgs {
   to: string | string[]
@@ -9,11 +10,17 @@ export interface EmailArgs {
   htmlTemplate: (data: Record<string, unknown>) => string
   textTemplate: (data: Record<string, unknown>) => string
   templateData: Record<string, unknown>
+  identifier?: number
 }
 
 export interface EmailResult {
   messageId: string
   recipients: string[]
+}
+
+export interface EmailStatusResult {
+  messageId: string
+  insights: EmailInsightsList
 }
 
 export class EmailService {
@@ -70,7 +77,10 @@ export class EmailService {
     }
   }
 
-  sendBulkEmail = async (emails: EmailArgs[], onSuccess: (result: EmailResult) => Promise<void>) => {
+  sendBulkEmail = async (
+    emails: EmailArgs[],
+    onSuccess: (result: EmailResult, identifier?: number) => Promise<void> | void
+  ) => {
     const { MaxSendRate } = await this.sesClient.getSendQuota().promise()
 
     if (!MaxSendRate) {
@@ -90,7 +100,7 @@ export class EmailService {
       limiter.schedule(async () => {
         try {
           const result = await this.sendEmail(email)
-          return onSuccess(result)
+          return onSuccess(result, email.identifier)
         } catch (error) {
           logger.error(error)
         }

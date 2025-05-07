@@ -7,11 +7,12 @@ export interface StudyListProps {
   supportOrgName?: string
   shortTitle: string
   studyHref: string
-  lastAsessmentDate?: string
-  assessmentDue?: boolean
+  lastAssessmentDate?: string
+  daysSinceAssessmentDue: number | null
   trackStatus?: string
   trackStatusHref?: string
   indications?: string[]
+  irasId: string | null
 }
 
 export function StudyList({
@@ -19,24 +20,37 @@ export function StudyList({
   supportOrgName,
   shortTitle,
   studyHref,
-  assessmentDue,
+  daysSinceAssessmentDue,
   trackStatus,
   trackStatusHref,
-  lastAsessmentDate,
+  lastAssessmentDate,
   indications,
+  irasId,
 }: StudyListProps) {
+  const daysDueText =
+    daysSinceAssessmentDue !== null
+      ? `Due for ${daysSinceAssessmentDue || '1'} day${daysSinceAssessmentDue > 1 ? 's' : ''}`
+      : ''
+
   return (
     <Card>
-      {assessmentDue ? <span className="govuk-tag govuk-tag--red absolute top-0 right-0">Due</span> : null}
+      {daysSinceAssessmentDue !== null ? (
+        <>
+          <span className="govuk-visually-hidden">{shortTitle} has been</span>
+          <span className="govuk-tag govuk-tag--red float-right -mt-3 -mr-3 normal-case">{daysDueText}</span>
+        </>
+      ) : null}
 
       <div className="md:max-w-[calc(100%-50px)]">
         <div className="text-darkGrey govuk-!-margin-bottom-1 max-w-[calc(100%-45px)] lg:max-w-auto govuk-body-s">
           {sponsorOrgName ?? '-'}
           {Boolean(supportOrgName) && ` (${supportOrgName})`}
         </div>
-
-        <div className="govuk-heading-s govuk-!-margin-bottom-4 govuk-!-padding-top-0 inline-block font-extrabold">
+        <div className="govuk-heading-s govuk-!-margin-bottom-0 govuk-!-padding-top-0 inline-block font-extrabold">
           {shortTitle}
+        </div>
+        <div className="govuk-body-s govuk-!-margin-bottom-2 govuk-!-padding-top-0">
+          IRAS ID: {irasId || 'Not available '}
         </div>
       </div>
 
@@ -53,7 +67,7 @@ export function StudyList({
                 ) : (
                   trackStatus
                 )}{' '}
-                on {lastAsessmentDate}
+                on {lastAssessmentDate}
               </>
             ) : (
               'None'

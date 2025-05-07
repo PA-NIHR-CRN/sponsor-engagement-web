@@ -67,15 +67,16 @@ exports[`Email template "assessment-reminder.html.hbs" displays correctly 1`] = 
         delegates on behalf of the Department of Health and Social Care (DHSC).
       </p>
 
-      <p>The DHSC have published the
-        <a href='http://terms-conditions-link'>Terms and Conditions for NIHR RDN support</a>, which outlines the requirements for Sponsors to provide up-to-date study data and assessments of progress to the
-        RDN.
+      <p>
+        For studies that have sites based in England, the DHSC have published the
+        <a href='http://terms-conditions-link'>Terms and Conditions for NIHR RDN support</a>, which outlines the
+        requirements for Sponsors to provide up-to-date study data and assessments of progress to the RDN.
       </p>
 
       <p>The Sponsor Engagement Tool has been designed to support Sponsors and their delegates to meet the requirements
         outlined in the T&Cs. Sponsors and their delegates should use the Sponsor Engagement Tool to review the data the
-        RDN holds on their organisation’s portfolio of studies, and to provide study data updates and assessments to
-        ensure the data held by the RDN is complete and up-to-date.
+        RDN holds on their organisation’s portfolio of studies, to provide study data updates and assessments to ensure
+        the data held by the RDN is complete and up-to-date, and to manage contacts linked to their organisation.
       </p>
 
       <p>Sponsors or their delegates are prompted to review and assess the progress of studies when:</p>
@@ -87,7 +88,7 @@ exports[`Email template "assessment-reminder.html.hbs" displays correctly 1`] = 
       </ul>
 
       <p>
-        Sponsors or their delegates can request
+        For studies that have sites based in England, Sponsors or their delegates can request
         <a href='http://localhost:3000/request-support'>NIHR RDN support</a>
         with study delivery and performance at any time.
       </p>
@@ -102,10 +103,10 @@ exports[`Email template "assessment-reminder.html.hbs" displays correctly 1`] = 
 
       <h2>Nominate someone else to assess research studies</h2>
 
-      <p>The NIHR RDN can give other people in your organisation access to this service.
-        
-        <a href='mailto:supportmystudy@nihr.ac.uk'>Contact supportmystudy@nihr.ac.uk</a>
-        to add a new contact.
+      <p>
+        You can give other people in your organisation access to this service by accessing the contacts section of the
+        Sponsor Engagement Tool. Within this section you can view all contacts linked to your organisation, add new
+        contacts, and remove any contacts who no longer need access to the service.
       </p>
 
       <hr />
@@ -162,7 +163,7 @@ exports[`Email template "assessment-reminder.html.hbs" displays correctly 1`] = 
         <a href='https://x.com/NIHRresearch' target='_blank' aria-label='NIHR X (formerly Twitter)'>NIHR X</a>
         &nbsp;|&nbsp;
         <!-- linkedin logo -->
-        <img 
+        <img
           src='https://nihr.widen.net/content/xc1gslcvmt/jpeg/li-in-bug.jpeg'
           alt=''
           width='11'
@@ -238,7 +239,7 @@ The DHSC have published the Terms and Conditions for NIHR RDN support [http://te
 
 The Sponsor Engagement Tool has been designed to support Sponsors and their delegates to meet the requirements outlined in 
 the T&Cs. Sponsors and their delegates should use the Sponsor Engagement Tool to review the data the RDN holds on their organisation’s portfolio of studies, 
-and to provide study data updates and assessments to ensure the data held by the RDN is complete and up-to-date.
+to provide study data updates and assessments to ensure the data held by the RDN is complete and up-to-date, and to manage contacts linked to their organisation.
 
 Sponsors or their delegates are prompted to review and assess the progress of studies when:
 
@@ -246,15 +247,15 @@ Sponsors or their delegates are prompted to review and assess the progress of st
 - A study appears to not be recruiting to target
 - And the last study assessment is over three months old
 
-Sponsors or their delegates can request NIHR RDN support with study delivery and performance at any time. [http://localhost:3000/request-support]
+For studies that have sites based in England, Sponsors or their delegates can request NIHR RDN support with study delivery and performance at any time. [http://localhost:3000/request-support]
 
 Please note that providing regular study updates and assessments are requirements of the Terms and Conditions for NIHR RDN support
 [http://terms-conditions-link]. Failure to do so may result in removal from the NIHR RDN Portfolio.
 
 # Nominate someone else to assess research studies
 
-The NIHR RDN can give other people in your organisation access to this service. Contact supportmystudy@nihr.ac.uk to add
-a new contact.
+You can give other people in your organisation access to this service by accessing the contacts section of the Sponsor Engagement Tool. 
+Within this section you can view all contacts linked to your organisation, add new contacts, and remove any contacts who no longer need access to the service.
 
 This email is not monitored, do not reply. If you’re not sure why you’ve received this email or need to be removed from
 our list contact supportmystudy@nihr.ac.uk."
@@ -631,4 +632,150 @@ review and assess study progress.
 If you think there’s been an error please contact supportmystudy@nihr.ac.uk.
 
 If you’re not sure why you’ve received this email or need to be removed from our list contact supportmystudy@nihr.ac.uk."
+`;
+
+exports[`Email template "invitation-email-unsuccessful.html.hbs" displays correctly 1`] = `
+"<html lang='en'>
+  <body>
+    <div>
+      <h1>
+        The invitation email you sent when adding a new contact to your organisation was not delivered successfully
+      </h1>
+
+      <p>Hello,</p>
+
+      <p>We are notifying you that your email sent to
+        test@test.nihr.ac.uk
+        was not delivered. This means the recipient's email address is likely invalid or unavailable at this time.
+      </p>
+
+      <p>Next steps:</p>
+
+      <p>Please login to the
+        <a href=''>Sponsor Engagement Tool</a>
+        and check you have used the correct email address. If it's incorrect, remove the contact, then re-add them.
+      </p>
+
+      <p>If you need further assistance please contact
+        <a href='mailto:supportmystudy@nihr.ac.uk'>supportmystudy@nihr.ac.uk</a>.</p>
+
+      <hr />
+
+      <p>
+        This email is not monitored, do not reply. If you’re not sure why you’ve received this email or need to be
+        removed from our list contact
+        <a href='mailto:supportmystudy@nihr.ac.uk'> supportmystudy@nihr.ac.uk</a>.
+      </p>
+
+    </div>
+
+    <br />
+
+    <div>
+      <table style='width: 540px; border-collapse: collapse'>
+        <tbody>
+          <tr>
+            <td style='width: 162px'>
+              <p>
+                &nbsp;<img
+                  src='https://nihr.widen.net/content/xazipspiv6/jpeg/nihr-logo.jpeg'
+                  alt=''
+                  width='206'
+                  class='CToWUd'
+                  data-bit='iit'
+                />
+              </p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Follow us:
+        <!-- facebook logo -->
+        <img
+          src='https://nihr.widen.net/content/aqo4dnubmf/jpeg/f_logo_rgb-blue_58.jpeg'
+          alt=''
+          width='11'
+          height='11'
+          class='CToWUd'
+          data-bit='iit'
+        />
+        <a href='https://www.facebook.com/OfficialNIHR' target='_blank'>NIHR Facebook</a>
+        &nbsp;|&nbsp;
+        <!-- twitter logo -->
+        <img
+          src='https://nihr.widen.net/content/egucpu5vgs/jpeg/x-logo-black.jpeg'
+          alt=''
+          width='11'
+          height='11'
+          class='CToWUd'
+          data-bit='iit'
+        />
+        <a href='https://x.com/NIHRresearch' target='_blank' aria-label='NIHR X (formerly Twitter)'>NIHR X</a>
+        &nbsp;|&nbsp;
+        <!-- linkedin logo -->
+        <img
+          src='https://nihr.widen.net/content/xc1gslcvmt/jpeg/li-in-bug.jpeg'
+          alt=''
+          width='11'
+          height='9'
+          class='CToWUd'
+          data-bit='iit'
+        />
+        <a href='https://www.linkedin.com/company/nihr-research' target='_blank'>NIHR LinkedIn</a>
+        &nbsp;|&nbsp;
+        <!-- youtube logo -->
+        <img
+          src='https://nihr.widen.net/content/52cd9uokcy/jpeg/youtube_logo_rgb_light.jpeg'
+          alt=''
+          width='11'
+          height='9'
+          class='CToWUd'
+          data-bit='iit'
+        />
+        <a href='https://www.youtube.com/user/NIHRtv' target='_blank'>NIHR YouTube</a>
+        &nbsp;|&nbsp;
+        <!-- nihr link logo -->
+        <img
+          src='https://nihr.widen.net/content/5mhcdc6utg/jpeg/nihr-link-icon.jpeg'
+          alt=''
+          width='11'
+          height='9'
+          class='CToWUd'
+          data-bit='iit'
+        />
+        <a
+          href='https://www.nihr.ac.uk/?utm_source=gmail&amp;utm_medium=email&amp;utm_campaign=ccsignature'
+          target='_blank'
+        >NIHR Website</a>
+      </p>
+      <br />
+      <br />
+      <p style='color: rgb(34, 34, 34); font-family: arial, sans-serif; background-color: rgb(255, 255, 255)'>
+        Confidential information may be contained in this message. If you are not the intended recipient, any reading,
+        printing, storage, disclosure, copying or any other action taken in respect of this e-mail is prohibited and may
+        be unlawful. If you are not the intended recipient, please notify the sender immediately by using the reply
+        function and then permanently delete what you have received.
+      </p>
+    </div>
+  </body>
+</html>"
+`;
+
+exports[`Email template "invitation-email-unsuccessful.text.hbs" displays correctly 1`] = `
+"# The invitation email you sent when adding a new contact to your organisation was not delivered successfully
+
+Hello,
+
+We are notifying you that your email sent to test@test.nihr.ac.uk was not delivered. 
+This means the recipient's email address is likely invalid or unavailable at this time.
+
+Next steps:
+
+Please login to the Sponsor Engagement Tool  () and check you have used the correct email address. If it's incorrect, remove the contact, then re-add them.
+
+If you need further assistance please contact supportmystudy@nihr.ac.uk.
+
+This email is not monitored, do not reply. If you’re not sure why you’ve received this email or need to be removed from
+our list contact supportmystudy@nihr.ac.uk."
 `;

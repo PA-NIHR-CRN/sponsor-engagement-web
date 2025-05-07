@@ -4,7 +4,6 @@ import { seDatabaseReq, waitForSeDbRequest, cpmsDatabaseReq } from '../../../uti
 import { convertIsoDateToDisplayDateV2, splitIsoDate } from '../../../utils/UtilFunctions'
 
 const testUserId = 6
-const startingOrgId = 2
 
 // date variables for updating study dates and creating unique values
 const today = new Date()
@@ -30,12 +29,17 @@ if (uniqueTarget.startsWith('0')) {
 
 let startingStudyId = 0
 let studyCoreDetails: RowDataPacket[]
+let startingOrgId
 
 const pOpen = new Date(plannedOpen)
 const pClose = new Date(plannedClose)
 
 test.beforeAll('Setup Tests', async () => {
-  await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
+  const response = await seDatabaseReq(
+    `SELECT organisationId FROM UserOrganisation WHERE userId = ${testUserId} AND isDeleted = 0 LIMIT 1;`
+  )
+  startingOrgId = response[0]?.organisationId
+  if (!startingOrgId) throw new Error('User is not associated to any organisation.')
 
   const randomStudyIdSelected = await seDatabaseReq(`
     SELECT Study.id FROM Study 
@@ -47,7 +51,7 @@ test.beforeAll('Setup Tests', async () => {
   startingStudyId = randomStudyIdSelected[0].id
 
   studyCoreDetails = await seDatabaseReq(`
-    SELECT cpmsId FROM sponsorengagement.Study where id = ${startingStudyId};
+    SELECT cpmsId, leadAdministrationId FROM sponsorengagement.Study where id = ${startingStudyId};
   `)
 
   await cpmsDatabaseReq(`
@@ -183,6 +187,35 @@ test.describe('Sponsor engagement study update with CPMS study update and SE val
     await test.step(`When I have navigated to the study details page for the Study with SE Id ${startingStudyId}`, async () => {
       await sePage2.goto(`studies/${startingStudyId}`)
       await expect(sePage2.locator('.govuk-inset-text')).toBeVisible()
+    })
+
+    await test.step(`Then I should see different edit history messages depending on the Lead Admins location`, async () => {
+      async function viewEditHistoryLeadAdmin(leadAdminId: Number) {
+        const editHistoryItem = sePage2.locator('[data-testid^="edit-history-accordion-item-"]').first()
+        let expectedMessage = ''
+        switch (leadAdminId) {
+          case 1:
+            expectedMessage = 'Change made by RDN'
+            break
+          case 2:
+            expectedMessage = 'Change made by Scotland Admin'
+            break
+          case 3:
+            expectedMessage = 'Change made by NI Portfolio Admin'
+            break
+          case 4:
+            expectedMessage = 'Change made by Health and Care Research Wales Admin'
+            break
+          default:
+            expectedMessage = 'There is no edit history.'
+            break
+        }
+        expect(editHistoryItem).toContainText(expectedMessage)
+      }
+      const viewEditHistory = sePage2.locator('span:has-text("View edit history")')
+      await expect(viewEditHistory).toBeVisible()
+      await viewEditHistory.click()
+      await viewEditHistoryLeadAdmin(studyCoreDetails[0].leadAdministrationId)
     })
 
     await test.step(`Then I should see study details updated with my new values from CPMS`, async () => {

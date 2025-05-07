@@ -15,6 +15,8 @@ test.each(templateKeys)('Email template %p displays correctly', (key) => {
       termsAndConditionsLink: 'http://terms-conditions-link',
       organisationName: 'Mocked org name',
       organisationNames: ['Mocked org name', 'Mocked second org name'],
+      sponsorEngagementTool: 'http://localhost:3000',
+      recipientEmailAddress: 'test@test.nihr.ac.uk',
     })
   ).toMatchSnapshot()
 })

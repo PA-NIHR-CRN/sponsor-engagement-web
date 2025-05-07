@@ -13,7 +13,9 @@ let getStudyResponse: JSON
 const noProtocolRefNoStudyId = 17122
 
 test.beforeAll('Setup Tests', async () => {
-  await seDatabaseReq(`UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId}`)
+  await seDatabaseReq(
+    `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
+  )
   await seDatabaseReq(`UPDATE Study SET protocolReferenceNumber = NULL WHERE id = ${noProtocolRefNoStudyId};`)
 
   const randomStudyIdSelected = await seDatabaseReq(`
@@ -175,6 +177,33 @@ test.describe('Update study data page - @se_166', () => {
     })
     await test.step(`Then I will see a Request NIHR RDN support box in the top right corner of the page`, async () => {
       await studyUpdatePage.assertRdnSupport()
+    })
+  })
+
+  test('As a Sponsor I can navigate back from the Update Study Page to the Study Details Page and All Studies Page by clicking the breadcrumb links - @se_238_ac2', async ({
+    studyUpdatePage,
+    studyDetailsPage,
+    studiesPage,
+  }) => {
+    await test.step(`Given I have navigated to the Update Study Page for a Study with SE Id ${startingStudyId}`, async () => {
+      await studyUpdatePage.goto(startingStudyId.toString())
+      await studyUpdatePage.assertOnUpdateStudyPage(startingStudyId.toString())
+    })
+    await test.step(`When I click on the 'Study details' breadcrumb`, async () => {
+      await studyUpdatePage.studyDetailsBreadcrumb.click()
+    })
+    await test.step('Then I am taken to the Study Details page', async () => {
+      await studyDetailsPage.assertOnStudyDetailsPage(startingStudyId.toString())
+    })
+    await test.step(`And I navigate to the Update Study Page again`, async () => {
+      await studyUpdatePage.goto(startingStudyId.toString())
+      await studyUpdatePage.assertOnUpdateStudyPage(startingStudyId.toString())
+    })
+    await test.step(`When I click on the 'All studies' breadcrumb`, async () => {
+      await studyUpdatePage.allStudiesBreadcrumb.click()
+    })
+    await test.step('Then I am taken to the Studies page', async () => {
+      await studiesPage.assertOnStudiesPage()
     })
   })
 })

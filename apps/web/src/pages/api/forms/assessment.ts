@@ -4,6 +4,7 @@ import type { NextApiRequest } from 'next'
 import { ZodError } from 'zod'
 
 import { Roles } from '@/constants'
+import { getAssessmentPageRoute } from '@/constants/routes'
 import { prismaClient } from '@/lib/prisma'
 import type { AssessmentInputs } from '@/utils/schemas'
 import { assessmentSchema } from '@/utils/schemas'
@@ -13,7 +14,7 @@ export interface ExtendedNextApiRequest extends NextApiRequest {
   body: AssessmentInputs
 }
 
-export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, async (req, res, session) => {
+export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], async (req, res, session) => {
   try {
     if (req.method !== 'POST') {
       throw new Error('Wrong method')
@@ -59,7 +60,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
         id: Number(studyId),
       },
       data: {
-        isDueAssessment: false,
+        dueAssessmentAt: null,
         lastAssessmentId: assessmentResult.id,
       },
     })
@@ -98,7 +99,7 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
       })
       if (req.query.returnUrl) searchParams.append('returnUrl', String(req.query.returnUrl))
 
-      return res.redirect(302, `/assessments/${studyId}/?${searchParams.toString()}`)
+      return res.redirect(302, `${getAssessmentPageRoute(studyId)}/?${searchParams.toString()}`)
     }
 
     const searchParams = new URLSearchParams({
@@ -106,6 +107,6 @@ export default withApiHandler<ExtendedNextApiRequest>(Roles.SponsorContact, asyn
     })
     if (req.query.returnUrl) searchParams.append('returnUrl', String(req.query.returnUrl))
 
-    return res.redirect(302, `/assessments/${studyId}/?${searchParams.toString()}`)
+    return res.redirect(302, `${getAssessmentPageRoute(studyId)}/?${searchParams.toString()}`)
   }
 })

@@ -10,6 +10,7 @@ export default class CommonItemsPage {
   readonly txtContactInfo: Locator
   readonly homeIcon: Locator
   readonly manageContactsIcon: Locator
+  readonly manageAbridgedContactsIcon: Locator
   readonly assessStudiesDropdown: Locator
   readonly studiesFoundHeading: Locator
   readonly txtGenericErrorGuidance: Locator
@@ -24,6 +25,13 @@ export default class CommonItemsPage {
   readonly usernameBanner: Locator
   readonly cogIcon: Locator
   readonly logoutOption: Locator
+  readonly footer: Locator
+  readonly shawTrustLogo: Locator
+  readonly termsAndConditionsLink: Locator
+  readonly privacyPolicyLink: Locator
+  readonly cookiePolicyLink: Locator
+  readonly accessibilityLink: Locator
+  readonly releaseNotesLink: Locator
 
   //Initialize Page Objects
   constructor(page: Page) {
@@ -35,6 +43,7 @@ export default class CommonItemsPage {
     this.txtContactInfo = page.locator('p[class="govuk-body"]').nth(1)
     this.homeIcon = page.locator('svg[data-testid="home-icon"]')
     this.manageContactsIcon = page.locator('a[href="/organisations"]')
+    this.manageAbridgedContactsIcon = page.locator('a[class*="navigation-link"]').nth(1)
     this.assessStudiesDropdown = page.locator('span[class="govuk-details__summary-text"]')
     this.studiesFoundHeading = page.locator('p[class="govuk-heading-s mb-0 whitespace-nowrap"]')
     this.txtGenericErrorGuidance = page.locator('p[class="govuk-body"]')
@@ -49,6 +58,23 @@ export default class CommonItemsPage {
     this.usernameBanner = page.locator('span[class="hidden text-sm md:block"]')
     this.cogIcon = page.locator('button[aria-haspopup="menu"]')
     this.logoutOption = page.locator('a[role="menuitem"]')
+    this.footer = page.locator('footer[class*="govuk-footer"]')
+    this.shawTrustLogo = this.footer.locator('img[src*="shaw-trust-logo.png"]')
+    this.termsAndConditionsLink = this.footer.locator(
+      'a[href="https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-terms-and-conditions"]'
+    )
+    this.privacyPolicyLink = this.footer.locator(
+      'a[href="https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-privacy-notice"]'
+    )
+    this.cookiePolicyLink = this.footer.locator(
+      'a[href="https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-cookie-policy"]'
+    )
+    this.accessibilityLink = this.footer.locator(
+      'a[href="https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-accessibility-statement"]'
+    )
+    this.releaseNotesLink = this.footer.locator(
+      'a[href="https://sites.google.com/nihr.ac.uk/nihr-sponsor-engagement-tool/se-tool-release-notes"]'
+    )
   }
 
   //Page Methods
@@ -214,5 +240,33 @@ export default class CommonItemsPage {
   async assertLogoutOptionVisible() {
     await expect(this.logoutOption).toBeVisible()
     await expect(this.logoutOption).toHaveText('Logout')
+  }
+
+  async assertFooterPresent() {
+    await expect(this.footer).toBeVisible()
+    await expect(this.shawTrustLogo).toBeVisible()
+  }
+
+  async assertFooterLinksPresent() {
+    await expect(this.termsAndConditionsLink).toHaveAttribute(
+      'href',
+      'https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-terms-and-conditions'
+    )
+    await expect(this.privacyPolicyLink).toHaveAttribute(
+      'href',
+      'https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-privacy-notice'
+    )
+    await expect(this.cookiePolicyLink).toHaveAttribute(
+      'href',
+      'https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-cookie-policy'
+    )
+    await expect(this.accessibilityLink).toHaveAttribute(
+      'href',
+      'https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-accessibility-statement'
+    )
+    await expect(this.releaseNotesLink).toHaveAttribute(
+      'href',
+      'https://sites.google.com/nihr.ac.uk/nihr-sponsor-engagement-tool/se-tool-release-notes'
+    )
   }
 }

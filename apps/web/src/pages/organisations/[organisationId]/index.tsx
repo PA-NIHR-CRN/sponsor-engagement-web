@@ -12,11 +12,12 @@ import { useForm } from 'react-hook-form'
 import { ErrorSummary, Form } from '@/components/atoms'
 import { TextInput } from '@/components/atoms/Form/TextInput/TextInput'
 import { RootLayout } from '@/components/organisms'
-import { Roles } from '@/constants'
+import { Roles, UserOrganisationInviteStatus } from '@/constants'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
 import { getOrganisationById } from '@/lib/organisations'
 import { formatDate } from '@/utils/date'
 import { getValuesFromSearchParams } from '@/utils/form'
+import { hasOrganisationAccess } from '@/utils/organisations'
 import type { OrganisationAddInputs } from '@/utils/schemas'
 import { organisationAddSchema } from '@/utils/schemas'
 import { withServerSideProps } from '@/utils/withServerSideProps'
@@ -82,13 +83,16 @@ export default function Organisation({ organisation, query }: OrganisationProps)
         <Table.Caption className="govuk-visually-hidden">Organisation contacts</Table.Caption>
         <Table.Header>
           <Table.Row>
-            <Table.CellHeader className="w-1/3" column>
+            <Table.CellHeader className="w-1/4" column>
               Contact email
             </Table.CellHeader>
-            <Table.CellHeader className="w-1/3" column>
+            <Table.CellHeader className="w-1/4" column>
               Date added
             </Table.CellHeader>
-            <Table.CellHeader className="w-1/3" column>
+            <Table.CellHeader className="w-1/4" column>
+              Date of last login
+            </Table.CellHeader>
+            <Table.CellHeader className="w-1/4" column>
               Actions
             </Table.CellHeader>
           </Table.Row>
@@ -97,7 +101,24 @@ export default function Organisation({ organisation, query }: OrganisationProps)
           {organisation.users.map((user) => (
             <Table.Row key={user.id}>
               <Table.Cell>{user.user.email}</Table.Cell>
-              <Table.Cell>{formatDate(user.updatedAt)}</Table.Cell>
+              <Table.Cell>
+                <div className="flex flex-col gap-2 w-fit">
+                  {formatDate(user.updatedAt)}
+                  {user.invitations[0]?.status.name === UserOrganisationInviteStatus.FAILURE ? (
+                    <span className="govuk-tag govuk-tag--red normal-case">Failed to deliver email</span>
+                  ) : null}
+                </div>
+              </Table.Cell>
+              <Table.Cell>
+                {user.user.lastLogin ? (
+                  formatDate(user.user.lastLogin)
+                ) : (
+                  <>
+                    <span aria-hidden="true">-</span>
+                    <span className="govuk-visually-hidden">No last login date</span>
+                  </>
+                )}
+              </Table.Cell>
               <Table.Cell>
                 <Link aria-label={`Remove ${user.user.email}`} href={`/organisations/remove-contact/${user.id}`}>
                   Remove
@@ -199,32 +220,43 @@ Organisation.getLayout = function getLayout(page: ReactElement, { user }: Organi
   return <RootLayout user={user}>{page}</RootLayout>
 }
 
-export const getServerSideProps = withServerSideProps(Roles.ContactManager, async (context, session) => {
-  const organisationId = Number(context.query.organisationId)
+export const getServerSideProps = withServerSideProps(
+  [Roles.ContactManager, Roles.SponsorContact],
+  async (context, session) => {
+    const organisationId = Number(context.query.organisationId)
 
-  if (!organisationId) {
+    if (!organisationId) {
+      return {
+        redirect: {
+          destination: '/404',
+        },
+      }
+    }
+
+    if (!hasOrganisationAccess(session.user?.roles ?? [], session.user?.organisations ?? [], organisationId)) {
+      return {
+        redirect: {
+          destination: '/404',
+        },
+      }
+    }
+
+    const organisation = await getOrganisationById(organisationId)
+
+    if (!organisation) {
+      return {
+        redirect: {
+          destination: '/404',
+        },
+      }
+    }
+
     return {
-      redirect: {
-        destination: '/404',
+      props: {
+        query: context.query,
+        user: session.user,
+        organisation,
       },
     }
   }
-
-  const organisation = await getOrganisationById(organisationId)
-
-  if (!organisation) {
-    return {
-      redirect: {
-        destination: '/404',
-      },
-    }
-  }
-
-  return {
-    props: {
-      query: context.query,
-      user: session.user,
-      organisation,
-    },
-  }
-})
+)

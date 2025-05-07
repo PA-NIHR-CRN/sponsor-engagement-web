@@ -30,7 +30,7 @@ export const LogoLink = forwardRef(
         href={href}
         className={clsx('govuk-header__link govuk-!-margin-left-4', className)}
         target="_blank"
-        aria-label="Go to n i h r .ac.uk (opens in new window)"
+        aria-label="Go to n i h r .ac.uk (opens in new tab)"
         {...props}
       >
         {children}

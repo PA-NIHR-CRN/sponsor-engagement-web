@@ -1,6 +1,6 @@
 import type { DateFieldName, EditStudyInputs } from '@/utils/schemas'
 
-export const PAGE_TITLE = 'Update study data'
+export const PAGE_TITLE = 'Update UK study data'
 export const GENERIC_STUDIES_GUIDANCE_TEXT =
   'Changes to the study status, the key dates and recruitment targets will be communicated to RDN, where possible, your changes will update the study record automatically in CPMS, other changes might be subject to review by the RDN team.'
 
@@ -85,12 +85,12 @@ export const fieldNameToLabelMapping: Record<
   keyof Omit<EditStudyInputs, 'studyId' | 'cpmsId' | 'originalStatus' | 'LSN'>,
   string
 > = {
-  plannedOpeningDate: 'Planned opening to recruitment date',
-  actualOpeningDate: 'Actual opening to recruitment date',
-  plannedClosureDate: 'Planned closure to recruitment date',
-  actualClosureDate: 'Actual closure to recruitment date',
-  estimatedReopeningDate: 'Estimated reopening date',
-  status: 'Study status',
+  plannedOpeningDate: 'Planned UK opening to recruitment date',
+  actualOpeningDate: 'Actual UK opening to recruitment date',
+  plannedClosureDate: 'Planned UK closure to recruitment date',
+  actualClosureDate: 'Actual UK closure to recruitment date',
+  estimatedReopeningDate: 'Estimated UK reopening date',
+  status: 'Study status in the UK',
   recruitmentTarget: 'UK recruitment target',
   furtherInformation: 'Further information (optional)',
 }
