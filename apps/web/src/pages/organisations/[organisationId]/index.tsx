@@ -5,7 +5,7 @@ import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
-import { type ReactElement, useCallback, useState } from 'react'
+import { type ReactElement, useCallback, useEffect, useState } from 'react'
 import type { FieldError } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 
@@ -136,8 +136,13 @@ export default function Organisation({ organisation, query }: OrganisationProps)
 
   const handleFormSubmission = (values: { emailAddress: string }) => {
     setInvitedEmail(values.emailAddress)
-    reset()
   }
+
+  useEffect(() => {
+    if (router.query.success) {
+      reset()
+    }
+  }, [router.query.success, invitedEmail, reset])
 
   return (
     <Container>
