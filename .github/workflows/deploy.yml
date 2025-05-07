@@ -370,7 +370,6 @@ jobs:
 
   deploy-uat:
     needs: e2e-test
-    needs: deploy-test
     environment: UAT
     name: 'Deploy Uat'
     runs-on: ubuntu-latest
