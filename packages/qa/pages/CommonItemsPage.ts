@@ -123,7 +123,7 @@ export default class CommonItemsPage {
     await expect(this.txtGenericErrorGuidance).toBeVisible()
     await expect(this.pageTitle).toHaveText('Sorry, there is a problem with the service')
     await expect(this.txtGenericErrorGuidance).toHaveText(
-      'Please contact crn.servicedesk@nihr.ac.uk for further assistance.'
+      'Please contact rdn.servicedesk@nihr.ac.uk for further assistance.'
     )
     await expect(this.page).toHaveURL('500')
   }

@@ -11,7 +11,10 @@ export default function PageNotFound() {
           <h2 className="govuk-heading-l">Page not found</h2>
           <p className="govuk-body">If you typed the web address, check it is correct.</p>
           <p className="govuk-body">If you pasted the web address, check you copied the entire address.</p>
-          <p className="govuk-body">Please contact crn.servicedesk@nihr.ac.uk for further assistance.</p>
+          <p className="govuk-body" data-testid="PageNotFoundContactForAssistance">
+            Please contact <a href="mailto:rdn.servicedesk@nihr.ac.uk">rdn.servicedesk@nihr.ac.uk</a> for further
+            assistance.
+          </p>
         </div>
       </div>
     </Container>
