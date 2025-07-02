@@ -54,8 +54,8 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.ContactManager], as
           email: emailAddress,
         },
       })
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison -- false positive for constant in conditional
-    } else if (existingUser.roles.find((x) => x.roleId === Roles.ContactManager && x.isDeleted === false)) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison, @typescript-eslint/no-unnecessary-condition -- false positive and nullable is needed
+    } else if (existingUser.roles?.find((x) => x.roleId === Roles.ContactManager && x.isDeleted === false)) {
       const searchParams = new URLSearchParams({ fatal: '4' })
       return res.redirect(302, `${MANAGE_CONTACT_MANAGERS_PAGE}?${searchParams.toString()}`)
     }
@@ -63,8 +63,8 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.ContactManager], as
     const shouldUpdateRegistrationToken = (existingUser.identityGatewayId ?? null) === null
 
     const isPreviousContactManager =
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison -- false positive for constant in conditional
-      existingUser.roles.find((x) => x.roleId === Roles.ContactManager && x.isDeleted === true)
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison,@typescript-eslint/no-unnecessary-condition -- false positive and nullable is needed
+      existingUser.roles?.find((x) => x.roleId === Roles.ContactManager && x.isDeleted === true)
     if (isPreviousContactManager) {
       logger.info(`Re-adding contact manager role for ${existingUser.email}`)
     }
