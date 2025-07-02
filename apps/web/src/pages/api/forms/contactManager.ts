@@ -61,8 +61,8 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.ContactManager], as
     }
 
     const shouldUpdateRegistrationToken = (existingUser.identityGatewayId ?? null) === null
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison, @typescript-eslint/no-unnecessary-condition -- false positive for constant in conditional
-    const isPreviousContactManager = existingUser.roles?.find(
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison -- false positive for constant in conditional
+    const isPreviousContactManager = existingUser.roles.find(
       (x) => x.roleId === Roles.ContactManager && x.isDeleted === true
     )
     if (isPreviousContactManager) {
