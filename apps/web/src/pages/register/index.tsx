@@ -15,6 +15,7 @@ import { useForm } from 'react-hook-form'
 import { ErrorSummary, Fieldset, Form } from '@/components/atoms'
 import { TextInput } from '@/components/atoms/Form/TextInput/TextInput'
 import { RootLayout } from '@/components/organisms'
+import { Roles } from '@/constants'
 import { ERROR_PAGE_500, REGISTRATION_CONFIRMATION_LINKED_PAGE, SIGN_IN_PAGE } from '@/constants/routes'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
 import { prismaClient } from '@/lib/prisma'
@@ -139,6 +140,10 @@ Register.getLayout = function getLayout(page: ReactElement) {
  *    - Provide the user's email address as a prop and allow them to create a password.
  *    - Upon successful password creation, reset the registrationToken and set registrationConfirmed to 1.
  *
+ * 3a. If no IDG account is found and the user already has a contact manager role
+ *    - all users with contact manager role are at this time part of the NIHR org and would have a IDG account avaliable or would be able to create one/ have one created
+ *    - show error page.
+ *
  * 4. If an IDG account already exists:
  *    - Reset the registrationToken and set registrationConfirmed to 1.
  *    - Redirect the user to the registration confirmation page.
@@ -171,6 +176,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     const registrationToken = context.query.registrationToken as string
 
     const user = await prismaClient.user.findFirst({
+      include: { roles: true },
       where: {
         registrationToken,
         isDeleted: false,
@@ -195,6 +201,17 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
       // No user found
       if (totalResults === 0) {
+        // user has no IDG account and has been invited as a contact manager.
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, @typescript-eslint/no-unsafe-enum-comparison -- false positive for constant in conditional
+        if (user.roles?.find((x) => x.roleId === Roles.ContactManager && x.isDeleted === false)) {
+          logger.info(`User, ${user.id},  has contact manager Role and no IDG account, procedding to error page`)
+          return {
+            redirect: {
+              destination: ERROR_PAGE_500,
+            },
+          }
+        }
+
         logger.info('No IDG account found, proceeding to registration screen')
 
         return {
