@@ -204,7 +204,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         // user has no IDG account and has been invited as a contact manager.
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, @typescript-eslint/no-unsafe-enum-comparison -- false positive for constant in conditional
         if (user.roles?.find((x) => x.roleId === Roles.ContactManager && x.isDeleted === false)) {
-          logger.info(`User, ${user.id},  has contact manager Role and no IDG account, procedding to error page`)
+          logger.info(`User :${user.id},  has contact manager Role and no IDG account, procedding to 500 error page`)
           return {
             redirect: {
               destination: ERROR_PAGE_500,

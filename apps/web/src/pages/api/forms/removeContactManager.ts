@@ -39,21 +39,7 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.ContactManager], as
       },
     })
 
-    // needs additional details for logging
-    logger.info('Removed contact manager role')
-
-    // leavioing for future expansion of email functionality.
-    //   if (user.email) {
-    //     await emailService.sendEmail({
-    //       to: user.email,
-    //       subject: `NIHR RDN has removed you as a Sponsor contact for ${organisation.name}`,
-    //       htmlTemplate: emailTemplates['contact-removed.html.hbs'],
-    //       textTemplate: emailTemplates['contact-removed.text.hbs'],
-    //       templateData: {
-    //         organisationName: organisation.name,
-    //       },
-    //     })
-    //   }
+    logger.info(`user ${requestedByUserId} Removed contact manager role for User : ${contactManagerUserId}`)
 
     return res.redirect(302, `${CONTACT_MANAGERS_PAGE}?success=2`)
   } catch (error) {

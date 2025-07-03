@@ -109,7 +109,6 @@ describe('Successful contact Manager invitation', () => {
         registrationConfirmed: false,
         registrationToken,
         roles: {
-          // If a user is not assigned the sponsor contact manager role, assign it
           create: {
             roleId: findSysRefRoleResponse.id,
             createdById: userWithContactManagerRole.user?.id,
@@ -181,7 +180,6 @@ describe('Successful contact Manager invitation', () => {
         registrationConfirmed: false,
         registrationToken,
         roles: {
-          // If a user is not assigned the sponsor contact manager role, assign it
           create: {
             roleId: findSysRefRoleResponse.id,
             createdById: userWithContactManagerRole.user?.id,
@@ -247,30 +245,6 @@ describe('Failed contact manager invitation', () => {
     expect(res._getRedirectUrl()).toBe(`${CONTACT_MANAGERS_PAGE}?fatal=1`)
     expect(logger.error).toHaveBeenCalledWith(new Error('Wrong method'))
   })
-
-  // test('Validation errors redirects back to the form with the errors and original values', async () => {
-  //   jest.mocked(getServerSession).mockResolvedValueOnce(userWithContactManagerRole)
-
-  //   const bodyWithValidationIssue: Partial<ContactManagerAddInputs> = {
-  //     emailAddress: undefined,
-  //   }
-
-  //   const res = await testHandler(api, { method: 'POST', body: bodyWithValidationIssue })
-
-  //   expect(res.statusCode).toBe(302)
-  //   expect(res._getRedirectUrl()).toBe(`${CONTACT_MANAGERS_PAGE}?emailAddressError=Required`)
-  //   expect(logger.error).toHaveBeenCalledWith(
-  //     new ZodError([
-  //       {
-  //         code: 'invalid_type',
-  //         expected: 'string',
-  //         received: 'undefined',
-  //         path: ['emailAddress'],
-  //         message: 'Required',
-  //       },
-  //     ])
-  //   )
-  // })
 
   test('Attempting to invite already existing contact redirects with error', async () => {
     jest.mocked(getServerSession).mockResolvedValueOnce(userWithContactManagerRole)
