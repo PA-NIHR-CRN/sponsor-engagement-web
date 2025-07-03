@@ -24,6 +24,11 @@ export const STUDIES_PAGE = '/studies'
 export const ORGANISATIONS_PAGE = '/organisations'
 
 /**
+ * List of organisations that users with contact manager role can access
+ */
+export const CONTACT_MANAGERS_PAGE = '/contact-managers'
+
+/**
  * Support page
  */
 export const SUPPORT_PAGE = '/request-support'
