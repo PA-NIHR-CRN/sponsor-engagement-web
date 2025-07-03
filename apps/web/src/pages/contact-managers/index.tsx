@@ -78,10 +78,7 @@ export default function ContactManager({ contactManagers }: ContactManagerProps)
                 <div className="flex flex-col gap-2 w-fit">{formatDate(user.roles[0].createdAt)}</div>
               </Table.Cell>
               <Table.Cell>
-                <Link
-                  aria-label={`Remove ${user.email}`}
-                  href={`/manage-contact-managers/remove-contact-manager/${user.id}`}
-                >
+                <Link aria-label={`Remove ${user.email}`} href={`/contact-managers/remove-contact-manager/${user.id}`}>
                   Remove
                 </Link>
               </Table.Cell>

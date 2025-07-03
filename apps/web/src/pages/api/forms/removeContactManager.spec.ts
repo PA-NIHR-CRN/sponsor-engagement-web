@@ -7,7 +7,7 @@ import { createRequest, createResponse } from 'node-mocks-http'
 
 import { userNoRoles, userWithContactManagerRole } from '@/__mocks__/session'
 import { Roles } from '@/constants'
-import { MANAGE_CONTACT_MANAGERS_PAGE, SIGN_IN_PAGE } from '@/constants/routes'
+import { CONTACT_MANAGERS_PAGE, SIGN_IN_PAGE } from '@/constants/routes'
 import { prismaClient } from '@/lib/prisma'
 import { AuthError } from '@/utils/auth'
 import type { RemoveContactManagerInputs } from '@/utils/schemas'
@@ -62,7 +62,7 @@ describe('Successful remove contact manager', () => {
 
     // Redirect back to organisation page
     expect(res.statusCode).toBe(302)
-    expect(res._getRedirectUrl()).toBe(`${MANAGE_CONTACT_MANAGERS_PAGE}?success=2`)
+    expect(res._getRedirectUrl()).toBe(`${CONTACT_MANAGERS_PAGE}?success=2`)
   })
 })
 
@@ -82,7 +82,7 @@ describe('Failed contact manager role removal', () => {
     jest.mocked(getServerSession).mockResolvedValueOnce(userWithContactManagerRole)
     const res = await testHandler(api, { method: 'GET', body, query: {} })
     expect(res.statusCode).toBe(302)
-    expect(res._getRedirectUrl()).toBe(`${MANAGE_CONTACT_MANAGERS_PAGE}/remove-contact-manager/123/?fatal=1`)
+    expect(res._getRedirectUrl()).toBe(`${CONTACT_MANAGERS_PAGE}/remove-contact-manager/123/?fatal=1`)
     expect(logger.error).toHaveBeenCalledWith(new Error('Wrong method'))
   })
   test('User without having a required role is redirected to error page', async () => {

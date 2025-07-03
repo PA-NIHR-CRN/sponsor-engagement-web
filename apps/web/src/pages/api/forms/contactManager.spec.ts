@@ -9,7 +9,7 @@ import { Mock } from 'ts-mockery'
 
 import { userNoRoles, userWithContactManagerRole } from '@/__mocks__/session'
 import { Roles } from '@/constants'
-import { MANAGE_CONTACT_MANAGERS_PAGE, SIGN_IN_PAGE } from '@/constants/routes'
+import { CONTACT_MANAGERS_PAGE, SIGN_IN_PAGE } from '@/constants/routes'
 import type { UserWithRoles } from '@/lib/contactManager'
 import { prismaClient } from '@/lib/prisma'
 import { AuthError } from '@/utils/auth'
@@ -135,7 +135,7 @@ describe('Successful contact Manager invitation', () => {
 
     // Redirect back to organisation page
     expect(res.statusCode).toBe(302)
-    expect(res._getRedirectUrl()).toBe(`${MANAGE_CONTACT_MANAGERS_PAGE}?success=1`)
+    expect(res._getRedirectUrl()).toBe(`${CONTACT_MANAGERS_PAGE}?success=1`)
 
     jest.useRealTimers()
   })
@@ -207,7 +207,7 @@ describe('Successful contact Manager invitation', () => {
 
     // Redirect back to organisation page
     expect(res.statusCode).toBe(302)
-    expect(res._getRedirectUrl()).toBe(`${MANAGE_CONTACT_MANAGERS_PAGE}?success=1`)
+    expect(res._getRedirectUrl()).toBe(`${CONTACT_MANAGERS_PAGE}?success=1`)
 
     jest.useRealTimers()
   })
@@ -244,7 +244,7 @@ describe('Failed contact manager invitation', () => {
     jest.mocked(getServerSession).mockResolvedValueOnce(userWithContactManagerRole)
     const res = await testHandler(api, { method: 'GET', body, query: {} })
     expect(res.statusCode).toBe(302)
-    expect(res._getRedirectUrl()).toBe(`${MANAGE_CONTACT_MANAGERS_PAGE}?fatal=1`)
+    expect(res._getRedirectUrl()).toBe(`${CONTACT_MANAGERS_PAGE}?fatal=1`)
     expect(logger.error).toHaveBeenCalledWith(new Error('Wrong method'))
   })
 
@@ -258,7 +258,7 @@ describe('Failed contact manager invitation', () => {
   //   const res = await testHandler(api, { method: 'POST', body: bodyWithValidationIssue })
 
   //   expect(res.statusCode).toBe(302)
-  //   expect(res._getRedirectUrl()).toBe(`${MANAGE_CONTACT_MANAGERS_PAGE}?emailAddressError=Required`)
+  //   expect(res._getRedirectUrl()).toBe(`${CONTACT_MANAGERS_PAGE}?emailAddressError=Required`)
   //   expect(logger.error).toHaveBeenCalledWith(
   //     new ZodError([
   //       {
@@ -308,6 +308,6 @@ describe('Failed contact manager invitation', () => {
     expect(emailService.sendEmail).not.toHaveBeenCalled()
 
     expect(res.statusCode).toBe(302)
-    expect(res._getRedirectUrl()).toBe(`${MANAGE_CONTACT_MANAGERS_PAGE}?fatal=4`)
+    expect(res._getRedirectUrl()).toBe(`${CONTACT_MANAGERS_PAGE}?fatal=4`)
   })
 })

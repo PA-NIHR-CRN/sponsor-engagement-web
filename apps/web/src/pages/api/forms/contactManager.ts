@@ -7,7 +7,7 @@ import type { NextApiRequest } from 'next'
 import { ZodError } from 'zod'
 
 import { Roles } from '@/constants'
-import { MANAGE_CONTACT_MANAGERS_PAGE, SIGN_IN_PAGE } from '@/constants/routes'
+import { CONTACT_MANAGERS_PAGE, SIGN_IN_PAGE } from '@/constants/routes'
 import { prismaClient } from '@/lib/prisma'
 import { getAbsoluteUrl } from '@/utils/email'
 import type { ContactManagerAddInputs } from '@/utils/schemas'
@@ -57,7 +57,7 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.ContactManager], as
       // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison, @typescript-eslint/no-unnecessary-condition -- false positive and nullable is needed
     } else if (existingUser.roles?.find((x) => x.roleId === Roles.ContactManager && x.isDeleted === false)) {
       const searchParams = new URLSearchParams({ fatal: '4' })
-      return res.redirect(302, `${MANAGE_CONTACT_MANAGERS_PAGE}?${searchParams.toString()}`)
+      return res.redirect(302, `${CONTACT_MANAGERS_PAGE}?${searchParams.toString()}`)
     }
 
     const shouldUpdateRegistrationToken = (existingUser.identityGatewayId ?? null) === null
@@ -98,6 +98,7 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.ContactManager], as
               },
               data: {
                 updatedById: requestedByUserId,
+                createdById: requestedByUserId,
                 isDeleted: false,
               },
             },
@@ -120,7 +121,7 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.ContactManager], as
       },
     })
 
-    return res.redirect(302, `${MANAGE_CONTACT_MANAGERS_PAGE}?success=1`)
+    return res.redirect(302, `${CONTACT_MANAGERS_PAGE}?success=1`)
   } catch (error) {
     logger.error(error)
 
@@ -141,16 +142,16 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.ContactManager], as
 
       const searchParams = new URLSearchParams({ ...fieldErrors })
 
-      return res.redirect(302, `${MANAGE_CONTACT_MANAGERS_PAGE}?${searchParams.toString()}`)
+      return res.redirect(302, `${CONTACT_MANAGERS_PAGE}?${searchParams.toString()}`)
     }
 
     if ((error as Error).stack?.includes('MessageRejected')) {
       const searchParams = new URLSearchParams({ fatal: '3' })
-      return res.redirect(302, `${MANAGE_CONTACT_MANAGERS_PAGE}?${searchParams.toString()}`)
+      return res.redirect(302, `${CONTACT_MANAGERS_PAGE}?${searchParams.toString()}`)
     }
 
     const searchParams = new URLSearchParams({ fatal: '1' })
 
-    return res.redirect(302, `${MANAGE_CONTACT_MANAGERS_PAGE}?${searchParams.toString()}`)
+    return res.redirect(302, `${CONTACT_MANAGERS_PAGE}?${searchParams.toString()}`)
   }
 })

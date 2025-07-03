@@ -2,7 +2,7 @@ import { expect, Locator, Page } from '@playwright/test'
 import { seDatabaseReq } from '../utils/DbRequests'
 
 //Declare Page Objects
-export default class RemoveContactPage {
+export default class RemoveContactManagersPage {
   readonly page: Page
   readonly pageTitle: Locator
   readonly removeContactSection: Locator
@@ -20,19 +20,19 @@ export default class RemoveContactPage {
   }
 
   //Page Methods
-  async goto(userOrgId: string) {
-    await this.page.goto(`organisations/remove-contact/${userOrgId}`)
+  async goto(userId: string) {
+    await this.page.goto(`contact-managers/remove-contact-manager/${userId}`)
   }
 
-  async assertOnRemoveContactPage(userOrgId: string) {
+  async assertOnremoveContactManagersPage(userId: string) {
     await expect(this.pageTitle).toBeVisible()
-    await expect(this.pageTitle).toHaveText('Are you sure you want to remove this contact?')
-    await expect(this.page).toHaveURL(`organisations/remove-contact/${userOrgId}`)
+    await expect(this.pageTitle).toHaveText('Are you sure you want to remove this contact manager?')
+    await expect(this.page).toHaveURL(`contact-managers/remove-contact-manager/${userId}`)
   }
 
-  async getUserOrgId(dbReq: string): Promise<string> {
+  async getUserId(dbReq: string): Promise<string> {
     const results = await seDatabaseReq(dbReq)
-    const userOrgId = results[0].id
-    return userOrgId
+    const userId = results[0].id
+    return userId
   }
 }

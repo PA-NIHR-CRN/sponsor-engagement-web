@@ -11,7 +11,7 @@ import { useForm } from 'react-hook-form'
 import { ErrorSummary, Form } from '@/components/atoms'
 import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
-import { MANAGE_CONTACT_MANAGERS_PAGE } from '@/constants/routes'
+import { CONTACT_MANAGERS_PAGE } from '@/constants/routes'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
 import type { RemoveContactManagerInputs } from '@/utils/schemas'
 import { organisationRemoveContactSchema, removeContactManagerSchema } from '@/utils/schemas'
@@ -73,7 +73,7 @@ export default function RemoveContact({ contactManagerUserId }: RemoveContactMan
               >
                 Yes I&apos;m sure — remove this contact
               </Button>
-              <Link className="govuk-link govuk-link--no-visited-state" href={MANAGE_CONTACT_MANAGERS_PAGE}>
+              <Link className="govuk-link govuk-link--no-visited-state" href={CONTACT_MANAGERS_PAGE}>
                 Cancel
               </Link>
             </div>

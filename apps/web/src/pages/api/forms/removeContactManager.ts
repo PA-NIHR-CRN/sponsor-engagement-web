@@ -2,7 +2,7 @@ import { logger } from '@nihr-ui/logger'
 import type { NextApiRequest } from 'next'
 
 import { Roles } from '@/constants'
-import { MANAGE_CONTACT_MANAGERS_PAGE } from '@/constants/routes'
+import { CONTACT_MANAGERS_PAGE } from '@/constants/routes'
 import { prismaClient } from '@/lib/prisma'
 import type { RemoveContactManagerInputs } from '@/utils/schemas'
 import { removeContactManagerSchema } from '@/utils/schemas'
@@ -55,7 +55,7 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.ContactManager], as
     //     })
     //   }
 
-    return res.redirect(302, `${MANAGE_CONTACT_MANAGERS_PAGE}?success=2`)
+    return res.redirect(302, `${CONTACT_MANAGERS_PAGE}?success=2`)
   } catch (error) {
     logger.error(error)
 
@@ -65,7 +65,7 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.ContactManager], as
       const searchParams = new URLSearchParams({ fatal: '3' })
       return res.redirect(
         302,
-        `/manage-contact-managers/remove-contact-manager/${contactManagerUserId}/?${searchParams.toString()}`
+        `/contact-managers/remove-contact-manager/${contactManagerUserId}/?${searchParams.toString()}`
       )
     }
 
@@ -73,7 +73,7 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.ContactManager], as
 
     return res.redirect(
       302,
-      `/manage-contact-managers/remove-contact-manager/${contactManagerUserId}/?${searchParams.toString()}`
+      `/contact-managers/remove-contact-manager/${contactManagerUserId}/?${searchParams.toString()}`
     )
   }
 })

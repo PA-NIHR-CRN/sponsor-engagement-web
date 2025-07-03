@@ -26,7 +26,7 @@ export const ORGANISATIONS_PAGE = '/organisations'
 /**
  * List of organisations that users with contact manager role can access
  */
-export const MANAGE_CONTACT_MANAGERS_PAGE = '/manage-contact-managers'
+export const CONTACT_MANAGERS_PAGE = '/contact-managers'
 
 /**
  * Support page

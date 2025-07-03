@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react'
 import { Footer, Header } from '@/components/molecules'
 import { CookieBanner } from '@/components/organisms/CookieBanner/CookieBanner'
 import { SERVICE_NAME } from '@/constants'
-import { MANAGE_CONTACT_MANAGERS_PAGE, ORGANISATIONS_PAGE, SIGN_OUT_PAGE } from '@/constants/routes'
+import { CONTACT_MANAGERS_PAGE, ORGANISATIONS_PAGE, SIGN_OUT_PAGE } from '@/constants/routes'
 import { isContactManager, isContactManagerAndSponsorContact, isSponsorContact } from '@/utils/auth'
 
 import type { BreadcrumbConfig } from '../Breadcrumbs/Breadcrumbs'
@@ -88,7 +88,7 @@ export function RootLayout({ children, backLink, heading = SERVICE_NAME, user, b
               </SideNav.Link>
             ) : null}
             {isContactManager(user?.roles ?? []) || isContactManagerAndSponsorContact(user?.roles ?? []) ? (
-              <SideNav.Link as={Link} href={MANAGE_CONTACT_MANAGERS_PAGE} icon={<SettingsIcon />}>
+              <SideNav.Link as={Link} href={CONTACT_MANAGERS_PAGE} icon={<SettingsIcon />}>
                 Manage contact managers
               </SideNav.Link>
             ) : null}

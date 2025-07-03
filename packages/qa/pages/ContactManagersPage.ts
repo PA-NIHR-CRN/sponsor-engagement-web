@@ -35,7 +35,7 @@ export default class ContactManagersPage {
 
     //Locators
     this.pageTitle = page.locator('h2[class="govuk-heading-l govuk-!-margin-bottom-2"]')
-    this.addRemoveHeader = page.locator('h3[class="govuk-heading-l govuk-!-margin-bottom-2"]')
+    this.addRemoveHeader = page.locator('h3[class="govuk-heading-m p-0 govuk-!-margin-bottom-4"]')
     this.addRemoveGuidanceTxt = this.addRemoveHeader.locator('..').locator('p').nth(1)
     this.inviteSection = page.locator('form[action="/api/forms/contactManager"]')
     this.addContactSuccessAlertBox = page.locator(
@@ -63,12 +63,9 @@ export default class ContactManagersPage {
     this.searchButton = page.locator('button[type="submit"]')
   }
 
-  /**
-   * add page header to assert on page, org would change ours will not.
-   */
   //Page Methods
   async goto() {
-    await this.page.goto(`manage-contact-managers`)
+    await this.page.goto(`contact-managers`)
   }
 
   async assertOnManageContactManagersPage() {
@@ -77,11 +74,11 @@ export default class ContactManagersPage {
     await expect(this.inviteSection).toBeVisible()
     await expect(this.pageTitle).toHaveText('RDN and Devolved Administration Contact Managers')
     await expect(this.addRemoveHeader).toHaveText('Add or remove Contact Managers')
-    await expect(this.page).toHaveURL(`manage-contact-managers`)
+    await expect(this.page).toHaveURL(`contact-managers`)
   }
 
   async gotoSuccess() {
-    await this.page.goto(`manage-contact-managers?success=1`)
+    await this.page.goto(`contact-managers?success=1`)
   }
 
   async assertOnManageContactManagersWithSuccess() {
@@ -92,7 +89,7 @@ export default class ContactManagersPage {
     await expect(this.pageTitle).toHaveText('RDN and Devolved Administration Contact Managers')
     await expect(this.addRemoveHeader).toHaveText('Add or remove Contact Managers')
     await expect(this.addContactSuccessAlertBoxTitle).toHaveText('Success')
-    await expect(this.page).toHaveURL(`manage-contact-managers?success=1`)
+    await expect(this.page).toHaveURL(`contact-managers?success=1`)
   }
 
   async assertOnManageContactManagersWithRemove() {
@@ -103,7 +100,7 @@ export default class ContactManagersPage {
     await expect(this.pageTitle).toHaveText('RDN and Devolved Administration Contact Managers')
     await expect(this.addRemoveHeader).toHaveText('Add or remove Contact Managers')
     await expect(this.addContactSuccessAlertBoxTitle).toHaveText('Success')
-    await expect(this.page).toHaveURL(`manage-contact-managers?success=2`)
+    await expect(this.page).toHaveURL(`contact-managers?success=2`)
   }
 
   async assertValidationErrorsPresent() {
@@ -118,14 +115,14 @@ export default class ContactManagersPage {
     await expect(this.searchInput).toBeFocused()
   }
 
-  async assertOrgDetailsPageTitle() {
+  async assertContactManagersPageTitle() {
     await expect(this.pageTitle).toBeVisible()
     await expect(this.pageTitle).toHaveText('RDN and Devolved Administration Contact Managers')
   }
 
   async assertAddRemoveSectionPresent() {
     await expect(this.addRemoveHeader).toBeVisible()
-    await expect(this.addRemoveHeader).toHaveText('Add or remove sponsor contacts')
+    await expect(this.addRemoveHeader).toHaveText('Add or remove Contact Managers')
   }
 
   async assertAddRemoveGuidanceTxt() {
@@ -148,11 +145,6 @@ export default class ContactManagersPage {
     expect(await this.contactManagersListRow.count()).toEqual(expectedNumberOfContacts[0].count)
   }
 
-  async assertOrgHasNoContactsInDB(dbReq: string) {
-    const actualNumberOfContacts = await seDatabaseReq(dbReq)
-    expect(actualNumberOfContacts[0].count).toEqual(0)
-  }
-
   async assertContactEmail(expectedDetails: RowDataPacket[]) {
     await expect(this.contactManagersListRow.first()).toBeVisible()
     const numberOfContactRows = await this.contactManagersListRow.count()
@@ -167,7 +159,7 @@ export default class ContactManagersPage {
     const numberOfContactRows = await this.contactManagersListRow.count()
     for (let index = 0; index < numberOfContactRows; index++) {
       const row = this.contactManagersListRow.nth(index)
-      const expectedDate = convertIsoDateToDisplayDate(expectedDetails[index].updatedAt)
+      const expectedDate = convertIsoDateToDisplayDate(expectedDetails[index].createdAt)
       await expect(row.locator('td').nth(1)).toHaveText(expectedDate)
     }
   }
@@ -177,9 +169,9 @@ export default class ContactManagersPage {
     const numberOfContactRows = await this.contactManagersListRow.count()
     for (let index = 0; index < numberOfContactRows; index++) {
       const row = this.contactManagersListRow.nth(index)
-      await expect(row.locator('td').nth(3).locator('a')).toBeVisible()
-      await expect(row.locator('td').nth(3).locator('a')).toHaveText('Remove')
-      await expect(row.locator('td').nth(3).locator('a')).toHaveAttribute('href')
+      await expect(row.locator('td').nth(2).locator('a')).toBeVisible()
+      await expect(row.locator('td').nth(2).locator('a')).toHaveText('Remove')
+      await expect(row.locator('td').nth(2).locator('a')).toHaveAttribute('href')
     }
   }
 
@@ -198,17 +190,17 @@ export default class ContactManagersPage {
   }
 
   async assertNewEmailAdded(expectedEmail: string, isPresent: boolean) {
-    await expect(this.contactManagersListRow.first()).toBeVisible()
+    await expect(this.contactManagersListRow.last()).toBeVisible()
     if (isPresent) {
-      await expect(this.contactManagersListRow.first().locator('td').nth(0)).toHaveText(expectedEmail)
+      await expect(this.contactManagersListRow.last().locator('td').nth(0)).toHaveText(expectedEmail)
     } else {
-      await expect(this.contactManagersListRow.first().locator('td').nth(0)).not.toHaveText(expectedEmail)
+      await expect(this.contactManagersListRow.last().locator('td').nth(0)).not.toHaveText(expectedEmail)
     }
   }
 
   async assertTodaysDateAdded() {
-    await expect(this.contactManagersListRow.first()).toBeVisible()
+    await expect(this.contactManagersListRow.last()).toBeVisible()
     const todaysDate = convertIsoDateToDisplayDate(new Date())
-    await expect(this.contactManagersListRow.first().locator('td').nth(1)).toHaveText(todaysDate)
+    await expect(this.contactManagersListRow.last().locator('td').nth(1)).toHaveText(todaysDate)
   }
 }
