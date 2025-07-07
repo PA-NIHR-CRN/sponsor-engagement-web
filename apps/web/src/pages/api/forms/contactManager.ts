@@ -69,6 +69,32 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.ContactManager], as
       logger.info(`Re-adding contact manager role for ${existingUser.email}`)
     }
 
+    const roleMutation = isPreviousContactManager
+      ? {
+          update: {
+            where: {
+              userId_roleId: {
+                roleId,
+                userId: existingUser.id,
+              },
+              isDeleted: true,
+            },
+            data: {
+              updatedById: requestedByUserId,
+              createdById: requestedByUserId,
+              isDeleted: false,
+            },
+          },
+        }
+      : {
+          create: {
+            roleId,
+            createdById: requestedByUserId,
+            updatedById: requestedByUserId,
+            isDeleted: false,
+          },
+        }
+
     const user = await prismaClient.user.update({
       where: {
         email: emailAddress,
@@ -78,32 +104,7 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.ContactManager], as
           registrationToken,
           registrationConfirmed: false,
         }),
-        roles: {
-          ...(!isPreviousContactManager && {
-            create: {
-              roleId,
-              createdById: requestedByUserId,
-              updatedById: requestedByUserId,
-              isDeleted: false,
-            },
-          }),
-          ...(isPreviousContactManager && {
-            update: {
-              where: {
-                userId_roleId: {
-                  roleId,
-                  userId: existingUser.id,
-                },
-                isDeleted: true,
-              },
-              data: {
-                updatedById: requestedByUserId,
-                createdById: requestedByUserId,
-                isDeleted: false,
-              },
-            },
-          }),
-        },
+        roles: roleMutation,
       },
     })
 
