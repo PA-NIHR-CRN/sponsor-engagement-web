@@ -21,6 +21,9 @@ export default function Home() {
             The Sponsor Engagement Tool is for use by project sponsors or their delegates in CRO/CTU organisations only.
           </p>
           <p className="govuk-body">Please contact supportmystudy@nihr.ac.uk for further assistance.</p>
+          <a className="govuk-button" href="/auth/signout">
+            Logout
+          </a>
         </div>
       </div>
     </Container>
