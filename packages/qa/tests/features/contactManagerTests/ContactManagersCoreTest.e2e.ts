@@ -6,7 +6,7 @@ let expectedContactManagerDetails: RowDataPacket[]
 
 test.beforeAll('Setup Test Users', async () => {
   const ContactManagerDetails = await seDatabaseReq(`
-    SELECT User.email, UserRole.createdAt FROM User
+    SELECT User.email, UserRole.updatedAt FROM User
     INNER JOIN UserRole ON User.id = UserRole.userId
     WHERE UserRole.roleID = 2 AND UserRole.isDeleted = 0 AND User.isDeleted = 0
     ORDER BY User.email`)
