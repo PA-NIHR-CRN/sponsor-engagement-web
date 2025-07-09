@@ -9,7 +9,10 @@ export default function ServiceUnavailable() {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <h2 className="govuk-heading-l">Sorry, there is a problem with the service</h2>
-          <p className="govuk-body">Please contact crn.servicedesk@nihr.ac.uk for further assistance.</p>
+          <p className="govuk-body" data-testid="ErrorContactForAssitance">
+            Please contact <a href="mailto:rdn.servicedesk@nihr.ac.uk">rdn.servicedesk@nihr.ac.uk</a> for further
+            assistance.
+          </p>
         </div>
       </div>
     </Container>
