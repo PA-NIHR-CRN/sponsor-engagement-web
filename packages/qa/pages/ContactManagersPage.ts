@@ -159,7 +159,7 @@ export default class ContactManagersPage {
     const numberOfContactRows = await this.contactManagersListRow.count()
     for (let index = 0; index < numberOfContactRows; index++) {
       const row = this.contactManagersListRow.nth(index)
-      const expectedDate = convertIsoDateToDisplayDate(expectedDetails[index].createdAt)
+      const expectedDate = convertIsoDateToDisplayDate(expectedDetails[index].updatedAt)
       await expect(row.locator('td').nth(1)).toHaveText(expectedDate)
     }
   }
