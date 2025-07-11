@@ -18,6 +18,10 @@ const noIrasIdStudyId = 16519
 const noChiefInvestigatorStudyId = 15504
 const noCroOrgRelationshipStudyId = 11133
 const noCtuOrgRelationshipStudyId = 339
+const nonComCheifInvestigatorFirstName = 'John'
+const nonComCheifInvestigatorLastName = 'Collinge'
+const nonComStudyId = '13610'
+const nonComOrgId = '635'
 
 test.beforeAll('Setup Tests', async () => {
   await seDatabaseReq(
@@ -107,13 +111,6 @@ test.describe('View core study details - @se_27', () => {
     await test.step('And I can see the Managing Speciality of the Study', async () => {
       await studyDetailsPage.assertManagingSpecialty(getStudyInCpms.ManagingSpecialty)
     })
-    await test.step('And I can see the Chief Investigator of the Study', async () => {
-      //Currently expected to show on both Study Types, if this changes it will need its own separate test (SE-120)
-      await studyDetailsPage.assertChiefInvestigator(
-        getStudyInCpms.ChiefInvestigatorFirstName,
-        getStudyInCpms.ChiefInvestigatorLastName
-      )
-    })
   })
 
   test('As a Sponsor I can navigate back from Study Details page to Studies Page by clicking back link - @se_181_ac1', async ({
@@ -181,9 +178,12 @@ test.describe('View core study details - @se_27', () => {
   test('The value `None available` appears where the Chief Investigator value is null - @se_27_chief', async ({
     studyDetailsPage,
   }) => {
-    await test.step(`Given I have navigated to the Study Details Page for Study with SE Id ${noChiefInvestigatorStudyId}`, async () => {
-      await studyDetailsPage.goto(noChiefInvestigatorStudyId.toString())
-      await studyDetailsPage.assertOnStudyDetailsPage(noChiefInvestigatorStudyId.toString())
+    await seDatabaseReq(`
+      UPDATE UserOrganisation SET organisationId = ${nonComOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`)
+
+    await test.step(`Given I have navigated to the Study Details Page for Study with SE Id ${nonComStudyId}`, async () => {
+      await studyDetailsPage.goto(nonComStudyId.toString())
+      await studyDetailsPage.assertOnStudyDetailsPage(nonComStudyId.toString())
     })
     await test.step(`When I view the Section titled 'About this study'`, async () => {
       await studyDetailsPage.assertAboutStudySectionPresent()
@@ -261,6 +261,20 @@ test.describe('View core study details - @se_27', () => {
     })
     await test.step('Then I cannot see a row displaying the Protocol Reference Number', async () => {
       await studyDetailsPage.assertProtocolRefNo('false')
+    })
+  })
+  test('The row titled `Chief investigator` only appears in for non-Commercial Studies - @se_27_ac1 @se_27_noncom', async ({
+    studyDetailsPage,
+  }) => {
+    await test.step(`Given I have navigated to the Study Details Page for Non-Commercial Study with SE Id ${noCtuOrgRelationshipStudyId}`, async () => {
+      await studyDetailsPage.goto(noCtuOrgRelationshipStudyId.toString())
+      await studyDetailsPage.assertOnStudyDetailsPage(noCtuOrgRelationshipStudyId.toString())
+    })
+    await test.step(`When I view the Section titled 'About this study'`, async () => {
+      await studyDetailsPage.assertAboutStudySectionPresent()
+    })
+    await test.step('Then I can see a Row displaying the Chief Investigator', async () => {
+      await studyDetailsPage.assertChiefInvestigator(nonComCheifInvestigatorFirstName, nonComCheifInvestigatorLastName)
     })
   })
 })
