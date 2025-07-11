@@ -27,7 +27,7 @@ const renderNotificationBanner = (successType: number, email?: string) => (
   <NotificationBanner heading={`Contact ${successType === 1 ? 'added' : 'removed'}`} success>
     {successType === 1
       ? `${email} was added as a contact manager`
-      : 'The selected contact has been removed as a conatact manager'}
+      : 'The selected contact has been removed as a contact manager'}
   </NotificationBanner>
 )
 

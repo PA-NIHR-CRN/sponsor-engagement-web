@@ -13,13 +13,14 @@ import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
 import { CONTACT_MANAGERS_PAGE } from '@/constants/routes'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
+import { GetContactManagerEmail } from '@/lib/contactManager'
 import type { RemoveContactManagerInputs } from '@/utils/schemas'
 import { organisationRemoveContactSchema, removeContactManagerSchema } from '@/utils/schemas'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
 export type RemoveContactManagerProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function RemoveContact({ contactManagerUserId }: RemoveContactManagerProps) {
+export default function RemoveContact({ contactManagerUserId, contactManagerEmail }: RemoveContactManagerProps) {
   const { register, formState, setError, handleSubmit } = useForm<RemoveContactManagerInputs>({
     resolver: zodResolver(removeContactManagerSchema),
     defaultValues: {
@@ -48,9 +49,10 @@ export default function RemoveContact({ contactManagerUserId }: RemoveContactMan
           <ErrorSummary errors={errors} />
           <h2 className="govuk-heading-l">Are you sure you want to remove this contact manager?</h2>
           <p className="govuk-body-m">
-            You are about to remove email@email.com from acting as a Contact Manager for the Sponsor Engagement Tool.
-            This will mean they can no longer manage contacts on the tool. They will still have access to the Sponsor
-            Engagement Tool if they are assigned as a Sponsor Contact to any specific organisations.
+            You are about to remove <strong> {contactManagerEmail?.email} </strong> from acting as a Contact Manager for
+            the Sponsor Engagement Tool. This will mean they can no longer manage contacts on the tool. They will still
+            have access to the Sponsor Engagement Tool if they are assigned as a Sponsor Contact to any specific
+            organisations.
           </p>
           <Form
             action="/api/forms/removeContactManager"
@@ -88,9 +90,10 @@ RemoveContact.getLayout = function getLayout(page: ReactElement, { user }: Remov
   return <RootLayout user={user}>{page}</RootLayout>
 }
 
-export const getServerSideProps = withServerSideProps([Roles.ContactManager], ({ query }, session) => {
+export const getServerSideProps = withServerSideProps([Roles.ContactManager], async ({ query }, session) => {
   const userId = Number(query.userId)
   const user = session.user
+  const contactManagerEmail = await GetContactManagerEmail(userId)
 
   if (!(userId && user)) {
     return {
@@ -103,6 +106,7 @@ export const getServerSideProps = withServerSideProps([Roles.ContactManager], ({
   return {
     props: {
       contactManagerUserId: userId,
+      contactManagerEmail,
       user,
     },
   }
