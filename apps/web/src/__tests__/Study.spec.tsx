@@ -512,7 +512,6 @@ describe('Study', () => {
         'CPMS ID',
         'Sponsor',
         'Managing specialty',
-        'Chief investigator',
       ])
 
       const aboutRows = within(aboutStudyTable).getAllByRole('row')
@@ -523,7 +522,6 @@ describe('Study', () => {
         mockStudy.cpmsId.toString(),
         mockStudy.organisations[0].organisation.name,
         mockStudy.managingSpeciality,
-        `${mockStudy.chiefInvestigatorFirstName} ${mockStudy.chiefInvestigatorLastName}`,
       ])
 
       // Support
