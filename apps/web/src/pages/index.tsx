@@ -8,6 +8,7 @@ import { RootLayout } from '../components/organisms'
 import { ERROR_PAGE_500, ORGANISATIONS_PAGE, SIGN_OUT_CONFIRM_PAGE, STUDIES_PAGE } from '../constants/routes'
 import { isContactManager, isContactManagerAndSponsorContact, isSponsorContact } from '../utils/auth'
 import { authOptions } from './api/auth/[...nextauth]'
+import Link from 'next/link'
 
 export type HomeProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
@@ -21,9 +22,9 @@ export default function Home() {
             The Sponsor Engagement Tool is for use by project sponsors or their delegates in CRO/CTU organisations only.
           </p>
           <p className="govuk-body">Please contact supportmystudy@nihr.ac.uk for further assistance.</p>
-          <a className="govuk-button" href="/auth/signout">
+          <Link className="govuk-button" href="/auth/signout">
             Logout
-          </a>
+          </Link>
         </div>
       </div>
     </Container>
@@ -37,8 +38,10 @@ Home.getLayout = function getLayout(page: ReactElement, { user }: HomeProps) {
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   try {
     const session = await getServerSession(context.req, context.res, authOptions)
+    logger.info(session)
 
     if (!session?.user) {
+      logger.info("no user in session detected.")
       return {
         redirect: {
           destination: SIGN_OUT_CONFIRM_PAGE,

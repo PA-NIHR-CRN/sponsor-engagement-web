@@ -37,7 +37,7 @@ export function RootLayout({ children, backLink, heading = SERVICE_NAME, user, b
   const router = useRouter()
   const [sideNavOpen, setSideNavOpen] = useState(false)
   const { data: session } = useSession()
-  const activeUser = user ?? session?.user
+  const activeUser = user // ?? session?.user
   const idle = useIdle(session ? session.idleTimeout * 1000 : undefined)
   const userOrganisations = user?.organisations.filter((userOrg) => !userOrg.isDeleted) ?? []
   const groupIconLink =

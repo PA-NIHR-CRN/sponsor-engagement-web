@@ -26,6 +26,8 @@ export type SignoutProps = InferGetServerSidePropsType<typeof getServerSideProps
 export default function Signout({ csrfToken, callbackUrl }: SignoutProps) {
   useEffect(() => {
     const handleSignout = async () => {
+      logger.info("within the handlesignout function.")
+      logger.info(callbackUrl)
       await signOut({ callbackUrl })
     }
 
@@ -51,9 +53,13 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   try {
     const session = await getServerSession(context.req, context.res, authOptions)
     const token = await getToken({ req: context.req })
-
+    logger.info("11111111111111")
+    logger.info(session)
+    logger.info("2222222222222222222222")
+    logger.info(token)
     // If there's no session or token, redirect to sign in
     if (!session || !token) {
+      logger.info("no session or no token")
       return {
         redirect: {
           destination: SIGN_IN_PAGE,

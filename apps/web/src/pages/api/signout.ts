@@ -10,7 +10,7 @@ import { getAbsoluteUrl } from '@/utils/email'
  * This is necessary otherwise after clearing the session in our own app, it
  * will automatically sign in the user as they're still signed into IDG
  */
-export default (req: NextApiRequest, res: NextApiResponse) => {
+export  default  (req: NextApiRequest, res: NextApiResponse) => {
   try {
     if (req.method !== 'GET') {
       throw new Error('Wrong method')
@@ -23,8 +23,10 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
     identityProviderLogoutUrl.searchParams.set('id_token_hint', String(req.query.idTokenHint))
 
     logger.info(`sign out api handler - redirecting to idg`)
+        logger.info("*****************************")
+    logger.info(identityProviderLogoutUrl.toString())
 
-    res.redirect(302, identityProviderLogoutUrl.toString())
+ res.redirect(302, identityProviderLogoutUrl.toString())
   } catch (error) {
     logger.error(error)
   }
