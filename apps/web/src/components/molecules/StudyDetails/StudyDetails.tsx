@@ -59,14 +59,16 @@ export function StudyDetails({ study }: StudyDetailsProps) {
           <Table.Cell>{study.managingSpeciality}</Table.Cell>
         </Table.Row>
 
-        <Table.Row>
-          <Table.CellHeader className="w-1/3">Chief investigator</Table.CellHeader>
-          <Table.Cell>
-            {study.chiefInvestigatorFirstName
-              ? `${study.chiefInvestigatorFirstName} ${study.chiefInvestigatorLastName}`
-              : 'None available'}
-          </Table.Cell>
-        </Table.Row>
+        {study.route !== 'Commercial' && (
+          <Table.Row>
+            <Table.CellHeader className="w-1/3">Chief investigator</Table.CellHeader>
+            <Table.Cell>
+              {study.chiefInvestigatorFirstName
+                ? `${study.chiefInvestigatorFirstName} ${study.chiefInvestigatorLastName}`
+                : 'None available'}
+            </Table.Cell>
+          </Table.Row>
+        )}
       </Table.Body>
     </Table>
   )
