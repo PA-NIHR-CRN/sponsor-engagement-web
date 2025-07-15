@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react'
 import { Footer, Header } from '@/components/molecules'
 import { CookieBanner } from '@/components/organisms/CookieBanner/CookieBanner'
 import { SERVICE_NAME } from '@/constants'
-import { ORGANISATIONS_PAGE, SIGN_OUT_PAGE } from '@/constants/routes'
+import { CONTACT_MANAGERS_PAGE, ORGANISATIONS_PAGE, SIGN_OUT_PAGE } from '@/constants/routes'
 import { isContactManager, isContactManagerAndSponsorContact, isSponsorContact } from '@/utils/auth'
 
 import type { BreadcrumbConfig } from '../Breadcrumbs/Breadcrumbs'
@@ -79,13 +79,18 @@ export function RootLayout({ children, backLink, heading = SERVICE_NAME, user, b
               Home
             </SideNav.Link>
             {isContactManager(user?.roles ?? []) || isContactManagerAndSponsorContact(user?.roles ?? []) ? (
-              <SideNav.Link as={Link} href={ORGANISATIONS_PAGE} icon={<SettingsIcon />}>
+              <SideNav.Link as={Link} href={ORGANISATIONS_PAGE} icon={<GroupIcon />}>
                 Manage sponsor contacts
               </SideNav.Link>
             ) : null}
             {isSponsorContact(user?.roles ?? []) && userOrganisations.length > 0 ? (
               <SideNav.Link as={Link} href={groupIconLink} icon={<GroupIcon />}>
                 Manage sponsor contacts
+              </SideNav.Link>
+            ) : null}
+            {isContactManager(user?.roles ?? []) || isContactManagerAndSponsorContact(user?.roles ?? []) ? (
+              <SideNav.Link as={Link} href={CONTACT_MANAGERS_PAGE} icon={<SettingsIcon />}>
+                Manage contact managers
               </SideNav.Link>
             ) : null}
           </SideNav.Panel>
