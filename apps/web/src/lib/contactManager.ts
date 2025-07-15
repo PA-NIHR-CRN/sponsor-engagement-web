@@ -27,3 +27,14 @@ export const getContactManagerUsers = async () => {
     orderBy: [{ email: Prisma.SortOrder.asc }],
   })
 }
+
+export const GetContactManagerEmail = async (userId: number) => {
+  return prismaClient.user.findUnique({
+    select: {
+      email: true,
+    },
+    where: {
+      id: userId,
+    },
+  })
+}
