@@ -4,7 +4,6 @@ import { Mock } from 'ts-mockery'
 import { logger } from '@nihr-ui/logger'
 import { notify } from '../notify'
 import { prismaMock } from '../mocks/prisma'
-import { EXTERNAL_CRN_TERMS_CONDITIONS_URL } from '../constants'
 
 jest.mock('@nihr-ui/logger')
 jest.mock('@nihr-ui/email')
@@ -81,7 +80,8 @@ describe('notify', () => {
           iconUrl: 'https://assessmystudy.nihr.ac.uk/assets/images/exclamation-icon.png',
           requestSupportLink: 'https://assessmystudy.nihr.ac.uk/request-support',
           signInLink: 'https://assessmystudy.nihr.ac.uk/auth/signin',
-          termsAndConditionsLink: EXTERNAL_CRN_TERMS_CONDITIONS_URL,
+          termsAndConditionsLink:
+            'https://www.nihr.ac.uk/eligibility-nihr-research-delivery-network-support#portfolio-terms-and-conditions',
           organisationNames: organisations.map((organisation) => organisation.organisation.name),
         },
         htmlTemplate: expect.any(Function),
