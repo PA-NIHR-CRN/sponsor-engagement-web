@@ -70,7 +70,7 @@ export const ERROR_PAGE_404 = '/404'
 export const EXTERNAL_CRN_URL = 'https://www.nihr.ac.uk/explore-nihr/support/clinical-research-network.htm'
 
 export const EXTERNAL_CRN_TERMS_CONDITIONS_URL =
-  'https://www.nihr.ac.uk/documents/researchers/i-need-help-to-deliver-my-research/terms-and-conditions-for-nihr-crn-support.pdf'
+  'https://www.nihr.ac.uk/eligibility-nihr-research-delivery-network-support#portfolio-terms-and-conditions'
 
 export const EXTERNAL_COOKIE_POLICY_PAGE_URL =
   'https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-cookie-policy'

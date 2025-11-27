@@ -81,7 +81,7 @@ describe('notify', () => {
           requestSupportLink: 'https://assessmystudy.nihr.ac.uk/request-support',
           signInLink: 'https://assessmystudy.nihr.ac.uk/auth/signin',
           termsAndConditionsLink:
-            'https://www.nihr.ac.uk/documents/researchers/i-need-help-to-deliver-my-research/terms-and-conditions-for-nihr-crn-support.pdf',
+            'https://www.nihr.ac.uk/eligibility-nihr-research-delivery-network-support#portfolio-terms-and-conditions',
           organisationNames: organisations.map((organisation) => organisation.organisation.name),
         },
         htmlTemplate: expect.any(Function),
