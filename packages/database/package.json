@@ -19,13 +19,13 @@
   "dependencies": {
     "@nihr-ui/auth": "*",
     "@nihr-ui/logger": "*",
-    "@prisma/client": "~5.15.1"
+    "@prisma/client": "5.15.1"
   },
   "devDependencies": {
     "@types/node": "^20.6.5",
     "csv-parse": "^5.5.2",
     "csv-stringify": "^6.4.4",
-    "prisma": "~5.15.1",
+    "prisma": "5.15.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   }
