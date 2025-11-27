@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@nihr-ui/logger": "*",
-    "@prisma/client": "latest",
+    "@prisma/client": "~5.15.1",
     "database": "*",
     "dayjs": "^1.11.13"
   },
