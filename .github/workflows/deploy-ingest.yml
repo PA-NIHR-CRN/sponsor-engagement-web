@@ -32,6 +32,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-node
+      - name: Install workspace deps
+        run: npm ci --workspaces --include-workspace-root --no-audit --no-fund
+        env:
+          NODE_ENV: development
 
       - name: Configure AWS credentials (dev)
         uses: aws-actions/configure-aws-credentials@v2
@@ -117,6 +122,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-node
+      - name: Install workspace deps
+        run: npm ci --workspaces --include-workspace-root --no-audit --no-fund
+        env:
+          NODE_ENV: development
 
       - name: Configure AWS credentials (test)
         uses: aws-actions/configure-aws-credentials@v2
@@ -201,6 +211,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-node
+      - name: Install workspace deps
+        run: npm ci --workspaces --include-workspace-root --no-audit --no-fund
+        env:
+          NODE_ENV: development
 
       - name: Configure AWS credentials (uat)
         uses: aws-actions/configure-aws-credentials@v2
@@ -285,6 +300,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-node
+      - name: Install workspace deps
+        run: npm ci --workspaces --include-workspace-root --no-audit --no-fund
+        env:
+          NODE_ENV: development
 
       - name: Configure AWS credentials (oat)
         uses: aws-actions/configure-aws-credentials@v2
@@ -370,6 +390,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-node
+      - name: Install workspace deps
+        run: npm ci --workspaces --include-workspace-root --no-audit --no-fund
+        env:
+          NODE_ENV: development
 
       - name: Configure AWS credentials (prod)
         uses: aws-actions/configure-aws-credentials@v2
