@@ -19,6 +19,8 @@ jobs:
       - uses: ./.github/actions/setup-node
       - name: Install
         run: npm ci --workspaces --include-workspace-root --no-audit --no-fund
+        env:
+          NODE_ENV: development
       - name: Build
         run: |
           npm run db:generate
