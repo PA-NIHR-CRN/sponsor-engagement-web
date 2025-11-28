@@ -30,8 +30,14 @@ jobs:
     environment: DEV
     name: 'Deploy Dev'
     runs-on: ubuntu-latest
+    
     steps:
       - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup-node
+      - name: Install workspace deps
+        run: npm ci --workspaces --include-workspace-root --no-audit --no-fund
+        env:
+          NODE_ENV: development
 
       - name: Configure AWS credentials (dev)
         uses: aws-actions/configure-aws-credentials@v2
