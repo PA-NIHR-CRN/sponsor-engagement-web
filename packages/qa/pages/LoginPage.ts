@@ -5,7 +5,7 @@ import { RowDataPacket } from 'mysql2'
 //Declare Page Objects
 export default class LoginPage {
   readonly page: Page
-  readonly idgBanner: Locator
+  readonly bannerMessage: Locator
   readonly usernameInput: Locator
   readonly passwordInput: Locator
   readonly btnNext: Locator
@@ -16,7 +16,7 @@ export default class LoginPage {
     this.page = page
 
     //Locators
-    this.idgBanner = page.locator('img[id="product-logo"]')
+    this.bannerMessage = page.locator('.ui.visible.negative.message')
     this.usernameInput = page.locator('input[id="usernameUserInput"]')
     this.passwordInput = page.locator('input[id="password"]')
     this.btnNext = page.locator('input[id="NEXT"]')
@@ -25,8 +25,8 @@ export default class LoginPage {
 
   //Page Methods
   async assertOnLoginPage() {
-    await expect(this.idgBanner).toBeVisible()
-    await expect(this.idgBanner).toHaveText('This is the TEST Identity Gateway')
+    await expect(this.bannerMessage).toBeVisible()
+    await expect(this.bannerMessage).toHaveText('TEST Identity Gateway')
     expect(this.page.url()).toContain('test.id.nihr.ac.uk/authenticationendpoint/login')
   }
 
