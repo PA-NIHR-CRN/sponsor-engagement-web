@@ -19,8 +19,8 @@ export default class LoginPage {
     this.bannerMessage = page.locator('.ui.visible.negative.message')
     this.usernameInput = page.locator('input[id="usernameUserInput"]')
     this.passwordInput = page.locator('input[id="password"]')
-    this.btnNext = page.locator('input[id="NEXT"]')
-    this.btnContinue = page.locator('button[type="submit"]')
+    this.btnNext = page.locator('button[data-testid="identifier-auth-continue-button"]')
+    this.btnContinue = page.locator('button[data-testid="login-page-continue-login-button"]')
   }
 
   //Page Methods
