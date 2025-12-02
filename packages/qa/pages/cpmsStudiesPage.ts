@@ -3,8 +3,7 @@ import { expect, Locator, Page } from '@playwright/test'
 //Declare Page Objects
 export default class CpmsStudiesPage {
   readonly page: Page
-  readonly signIn: Locator
-  readonly btnNext: Locator
+  readonly btnContinue: Locator
   readonly cpmsStudyBreadcrumb: Locator
   readonly editButton: Locator
   readonly statusTab: Locator
@@ -23,8 +22,7 @@ export default class CpmsStudiesPage {
     this.page = page
 
     //Locators
-    this.signIn = page.locator('#loginForm')
-    this.btnNext = page.locator('#NEXT')
+    this.btnContinue = page.locator('button[data-testid="identifier-auth-continue-button"]')
     this.cpmsStudyBreadcrumb = page.locator('.breadcrumbs')
 
     //Study
@@ -51,7 +49,7 @@ export default class CpmsStudiesPage {
   }
 
   async assertOnSignInPage() {
-    await expect(this.signIn).toBeVisible()
+    await expect(this.btnContinue).toBeVisible()
   }
 
   async assertOnCpmsStudiesPage() {
