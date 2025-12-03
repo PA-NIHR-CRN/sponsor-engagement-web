@@ -38,7 +38,7 @@ export default class CommonItemsPage {
     this.page = page
 
     //Locators
-    this.pageTitle = page.locator('h2[class="govuk-heading-l"]')
+    this.pageTitle = page.locator('h2.govuk-heading-l')
     this.txtUsageGuidance = page.locator('p[class="govuk-body"]').nth(0)
     this.txtContactInfo = page.locator('p[class="govuk-body"]').nth(1)
     this.homeIcon = page.locator('svg[data-testid="home-icon"]')

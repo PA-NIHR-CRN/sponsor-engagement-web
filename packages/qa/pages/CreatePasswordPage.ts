@@ -20,7 +20,7 @@ export default class CreatePasswordPage {
     this.page = page
 
     //Locators
-    this.pageTitle = page.locator('h2[class="govuk-heading-l"]')
+    this.pageTitle = page.locator('h2.govuk-heading-l')
     this.setPasswordHeader = page.locator('legend[class="govuk-fieldset__legend govuk-fieldset__legend--m"]')
     this.saveButton = page.locator('button[type="submit"]')
     this.errorSummaryAlertBox = page.locator('div[class="govuk-error-summary"]')

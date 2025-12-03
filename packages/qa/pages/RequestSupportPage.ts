@@ -15,7 +15,7 @@ export default class RequestSupportPage {
     this.page = page
 
     //Locators
-    this.pageTitle = page.locator('h2[class="govuk-heading-l"]')
+    this.pageTitle = page.locator('h2.govuk-heading-l')
     this.pageContentSection = page.locator('div[class="govuk-grid-column-two-thirds"]')
     this.guidanceTextParagraphs = this.pageContentSection.locator('p')
     this.guidanceTextBullets = this.pageContentSection.locator(' ul li')

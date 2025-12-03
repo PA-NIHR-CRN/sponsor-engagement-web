@@ -12,7 +12,7 @@ export default class SignedOutPage {
     this.page = page
 
     //Locators
-    this.pageTitle = page.locator('h2[class="govuk-heading-l"]', { hasText: 'You are signed out' })
+    this.pageTitle = page.locator('h2.govuk-heading-l', { hasText: 'You are signed out' })
     this.pageText = page.locator('div[class="govuk-width-container govuk-!-padding-left-6 govuk-!-padding-right-6"] p')
     this.btnSignIn = page.locator('a[class="govuk-button"]')
   }

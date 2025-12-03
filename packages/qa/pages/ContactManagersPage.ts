@@ -34,7 +34,7 @@ export default class ContactManagersPage {
     this.page = page
 
     //Locators
-    this.pageTitle = page.locator('h2[class="govuk-heading-l govuk-!-margin-bottom-2"]')
+    this.pageTitle = page.locator('h2.govuk-heading-l')
     this.addRemoveHeader = page.locator('h3[class="govuk-heading-m p-0 govuk-!-margin-bottom-4"]')
     this.addRemoveGuidanceTxt = this.addRemoveHeader.locator('..').locator('p').nth(1)
     this.inviteSection = page.locator('form[action="/api/forms/contactManager"]')

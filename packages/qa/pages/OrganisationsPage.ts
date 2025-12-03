@@ -30,7 +30,7 @@ export default class OrganisationsPage {
     this.page = page
 
     //Locators
-    this.pageTitle = page.locator('h2[class="govuk-heading-l"]')
+    this.pageTitle = page.locator('h2.govuk-heading-l')
     this.txtPageInfo = page.locator('p[class="govuk-body"]')
     this.totalOrgsFoundLabel = page.locator('p[class="govuk-heading-s mb-0 whitespace-nowrap"]')
     this.orgListHeaderTxt = page.locator('th[class="govuk-table__header w-5/6"]')
