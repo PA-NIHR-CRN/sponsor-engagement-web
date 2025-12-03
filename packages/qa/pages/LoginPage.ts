@@ -16,7 +16,7 @@ export default class LoginPage {
     this.page = page
 
     //Locators
-    this.bannerMessage = page.locator('.ui.visible.negative.message')
+    this.bannerMessage = page.locator('div.ui.visible.negative.message:has-text("TEST Identity Gateway")')
     this.usernameInput = page.locator('input[id="usernameUserInput"]')
     this.passwordInput = page.locator('input[id="password"]')
     this.btnNext = page.locator('button[data-testid="identifier-auth-continue-button"]')
@@ -26,7 +26,6 @@ export default class LoginPage {
   //Page Methods
   async assertOnLoginPage() {
     await expect(this.bannerMessage).toBeVisible()
-    await expect(this.bannerMessage).toHaveText('TEST Identity Gateway')
     expect(this.page.url()).toContain('test.id.nihr.ac.uk/authenticationendpoint/login')
   }
 
