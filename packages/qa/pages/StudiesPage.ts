@@ -48,7 +48,7 @@ export default class StudiesPage {
     this.page = page
 
     //Locators
-    this.pageTitle = page.locator('h2[class="govuk-heading-l govuk-!-margin-bottom-4"]')
+    this.pageTitle = page.locator('h2.govuk-heading-l')
     this.assessStudiesDropdown = page.locator('span[class="govuk-details__summary-text"]')
     this.studiesFoundHeading = page.locator('p[class="govuk-heading-s mb-0 whitespace-nowrap"]')
     this.lblDueAssessment = page.locator(

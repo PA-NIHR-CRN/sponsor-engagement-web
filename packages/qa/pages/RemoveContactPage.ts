@@ -13,7 +13,7 @@ export default class RemoveContactPage {
     this.page = page
 
     //Locators
-    this.pageTitle = page.locator('h2[class="govuk-heading-l"]')
+    this.pageTitle = page.locator('h2.govuk-heading-l')
     this.removeContactSection = page.locator('form[action="/api/forms/removeContact"]')
     this.removeButton = page.locator('button[type="submit"]')
     this.cancelButton = page.locator('a[class="govuk-link govuk-link--no-visited-state"]')
