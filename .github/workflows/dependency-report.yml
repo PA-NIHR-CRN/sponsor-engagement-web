@@ -1,0 +1,140 @@
+name: Dependency Report
+
+on:
+  push:
+    branches:
+      - i/3rd-party-dashboard
+  schedule:
+    - cron: "0 8 * * *"
+  workflow_dispatch:
+
+env:
+  REPO_NAME: ${{ github.event.repository.name }}
+
+jobs:
+  sbom-and-dashboard:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      # ------------------------
+      # Checkout this application
+      # ------------------------
+      - name: Checkout app repo
+        uses: actions/checkout@v4
+
+      # ------------------------
+      # SBOM (Syft)
+      # ------------------------
+      - name: Install Syft
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh \
+            | sh -s -- -b /usr/local/bin
+      - name: Generate SBOM
+        run: syft dir:. -o cyclonedx-json > sbom.json
+
+      # ------------------------
+      # Vulnerabilities (Grype)
+      # ------------------------
+      - name: Install Grype
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh \
+            | sh -s -- -b /usr/local/bin
+      - name: Scan vulnerabilities
+        run: grype sbom:sbom.json -o json > grype-output.json
+
+      # ------------------------
+      # Collect version information
+      # ------------------------
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install deps
+        run: npm install
+
+      - name: Collect latest versions
+        run: |
+          npm outdated --json > raw.log 2>&1 || true
+          node << 'EOF'
+          const fs = require('fs');
+          const text = fs.readFileSync('raw.log','utf8').trim();
+          let out = {};
+          function extractJson(t) {
+            try { return JSON.parse(t); } catch {}
+            // Fallback: find first { ... } block
+            const start = t.indexOf('{');
+            const end = t.lastIndexOf('}');
+            if (start !== -1 && end !== -1 && end > start) {
+              const candidate = t.slice(start, end + 1);
+              try { return JSON.parse(candidate); } catch {}
+            }
+            return null;
+          }
+          const obj = extractJson(text) || {};
+          for (const [name, info] of Object.entries(obj)) {
+            const current = info.current ?? info.installed ?? null;
+            const latest  = info.latest  ?? info.wanted    ?? null;
+            if (current !== null || latest !== null) {
+              out[name] = { current, latest };
+            }
+          }
+          fs.writeFileSync("outdated.json", JSON.stringify(out, null, 2));
+          EOF
+      # ------------------------
+      # Select token (DEPENDENCY_DASHBOARD_TOKEN or CRNCC_AUTOMATION_PAT)
+      # ------------------------
+      - name: Select dashboard token
+        run: |
+          if [ -n "${{ secrets.DEPENDENCY_DASHBOARD_TOKEN }}" ]; then
+            echo "Using DEPENDENCY_DASHBOARD_TOKEN"
+            echo "DASHBOARD_TOKEN=${{ secrets.DEPENDENCY_DASHBOARD_TOKEN }}" >> $GITHUB_ENV
+          elif [ -n "${{ secrets.CRNCC_AUTOMATION_PAT }}" ]; then
+            echo "Using CRNCC_AUTOMATION_PAT"
+            echo "DASHBOARD_TOKEN=${{ secrets.CRNCC_AUTOMATION_PAT }}" >> $GITHUB_ENV
+          else
+            echo "❌ ERROR: No DEPENDENCY_DASHBOARD_TOKEN or CRNCC_AUTOMATION_PAT available."
+            exit 1
+          fi
+      # ------------------------
+      # Download builder script
+      # ------------------------
+      - name: Download build-summary.mjs from dashboard repo
+        run: |
+          curl -H "Authorization: token $DASHBOARD_TOKEN" \
+            -L "https://raw.githubusercontent.com/PA-NIHR-CRN/dependency-dashboard/main/scripts/build-summary.mjs" \
+            -o build-summary.mjs
+          if grep -q "404: Not Found" build-summary.mjs; then
+            echo "ERROR: build-summary.mjs not accessible"
+            exit 1
+          fi
+      # ------------------------
+      # Build summary.json
+      # ------------------------
+      - name: Build summary JSON
+        run: node build-summary.mjs
+
+      # ------------------------
+      # Push json file → central dashboard
+      # ------------------------
+      - name: Checkout dashboard repo
+        uses: actions/checkout@v4
+        with:
+          repository: PA-NIHR-CRN/dependency-dashboard
+          token: ${{ env.DASHBOARD_TOKEN }}
+          path: dashboard
+
+      - name: Save report into dashboard/docs/data
+        run: |
+          mkdir -p dashboard/docs/data
+          cp summary.json dashboard/docs/data/${REPO_NAME}.json
+          cd dashboard
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/data/${REPO_NAME}.json
+          git commit -m "Update dependency report for ${REPO_NAME}" || echo "No changes"
+          git push
