@@ -29,9 +29,11 @@ export async function waitForSeDbRequest(query: string) {
 
 export async function cpmsDatabaseReq(query: string): Promise<any[]> {
   try {
-    await cpmsConnectionPool.poolConnect
+    const { pool, poolConnect } = await cpmsConnectionPool
 
-    const result = await cpmsConnectionPool.pool.request().query(query)
+    await poolConnect
+
+    const result = await pool.request().query(query)
     return result.recordset
   } catch (err) {
     console.error('SQL error:', err)

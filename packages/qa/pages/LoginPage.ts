@@ -25,6 +25,13 @@ export default class LoginPage {
 
   //Page Methods
   async assertOnLoginPage() {
+    await this.page.waitForLoadState('domcontentloaded')
+    await this.page.waitForLoadState('networkidle')
+    await this.bannerMessage.waitFor({
+      state: 'visible',
+      timeout: 10000,
+    })
+
     await expect(this.bannerMessage).toBeVisible()
     expect(this.page.url()).toContain('test.id.nihr.ac.uk/authenticationendpoint/login')
   }
@@ -33,33 +40,40 @@ export default class LoginPage {
   async loginWithUserCreds(user: string) {
     let username = ''
     let password = ''
+
     switch (user.toLowerCase()) {
       case 'sponsor contact':
-        username = `${process.env.SPONSOR_CONTACT_USER}`
-        password = `${process.env.SPONSOR_CONTACT_PASS}`
+        username = process.env.SPONSOR_CONTACT_USER!
+        password = process.env.SPONSOR_CONTACT_PASS!
         break
       case 'sponsor contact manager':
-        username = `${process.env.SPONSOR_CONTACT_MANAGER_USER}`
-        password = `${process.env.SPONSOR_CONTACT_MANAGER_PASS}`
+        username = process.env.SPONSOR_CONTACT_MANAGER_USER!
+        password = process.env.SPONSOR_CONTACT_MANAGER_PASS!
         break
       case 'contact manager':
-        username = `${process.env.CONTACT_MANAGER_USER}`
-        password = `${process.env.CONTACT_MANAGER_PASS}`
+        username = process.env.CONTACT_MANAGER_USER!
+        password = process.env.CONTACT_MANAGER_PASS!
         break
       case 'no local account':
-        username = `${process.env.SE_NO_LOCAL_ACCOUNT_USER}`
-        password = `${process.env.SE_NO_LOCAL_ACCOUNT_PASS}`
+        username = process.env.SE_NO_LOCAL_ACCOUNT_USER!
+        password = process.env.SE_NO_LOCAL_ACCOUNT_PASS!
         break
       case 'national portfolio manager':
-        username = `${process.env.CPMS_NPM_USER}`
-        password = `${process.env.CPMS_NPM_PASS}`
+        username = process.env.CPMS_NPM_USER!
+        password = process.env.CPMS_NPM_PASS!
         break
       default:
         throw new Error(`${user} is not a valid option`)
     }
+
+    await this.usernameInput.waitFor({ state: 'visible' })
     await this.usernameInput.fill(username)
-    await this.btnNext.click()
+
+    await Promise.all([this.page.waitForNavigation({ waitUntil: 'domcontentloaded' }), this.btnNext.click()])
+
+    await this.passwordInput.waitFor({ state: 'visible', timeout: 10000 })
     await this.passwordInput.fill(password)
+
     await this.btnContinue.click()
   }
 

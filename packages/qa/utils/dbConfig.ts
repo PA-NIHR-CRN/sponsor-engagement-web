@@ -1,9 +1,9 @@
 import mysql, { PoolOptions } from 'mysql2'
-import sql from 'mssql'
 
-// this was refactored to use a connection pool for automatic reconnection and scalability as the original db connection was flaky
-// this should ensure that the db connection is available throughout the entirety of the test execution without being prematurely closed.
-// this also adds a dedicated pool for both se and cpms db connections.
+async function loadMssql() {
+  const mod = await import('mssql')
+  return mod.default ?? mod
+}
 
 // se env variables and checks
 const seServer =
@@ -43,7 +43,7 @@ const cpmsPassword =
     throw new Error('CPMS_TEST_DB_PASSWORD is not defined')
   })()
 
-// see config object
+// se config object
 const seDbConfig: PoolOptions = {
   host: seServer,
   user: seUsername,
@@ -57,7 +57,7 @@ const seDbConfig: PoolOptions = {
 // cpms config object
 const cpmsDbConfig = {
   server: cpmsServer,
-  port: 1433, // already default but set explicitly to avoid ci issues
+  port: 1433,
   database: 'NIHR.CRN.CPMS.OperationalDatabase',
   user: cpmsUsername,
   password: cpmsPassword,
@@ -79,7 +79,7 @@ function seCreatePool() {
       console.error('SE database connection error:', err)
       if (err.code === 'PROTOCOL_CONNECTION_LOST') {
         console.log('Connection lost! Reconnecting...')
-        seCreatePool() // reconnect if lost
+        seCreatePool()
       } else {
         throw err
       }
@@ -87,30 +87,29 @@ function seCreatePool() {
   })
 
   pool.on('error', (err) => {
-    console.error('Error in the pool:', err)
+    console.error('Error in the SE pool:', err)
   })
 
   return pool
 }
 
 // cpms connection pool
-function cpmsCreatePool() {
+async function cpmsCreatePool() {
+  const sql = await loadMssql()
+
   const pool = new sql.ConnectionPool(cpmsDbConfig)
   const poolConnect = pool
     .connect()
-    .then(() => {
-      console.log('New CPMS database connection established ✔')
-    })
-    .catch((err: any) => {
-      console.error('Error connecting to the CPMS database:', err)
-    })
+    .then(() => console.log('New CPMS database connection established ✔'))
+    .catch((err) => console.error('Error connecting to the CPMS database:', err))
 
-  pool.on('error', (err: any) => {
+  pool.on('error', (err) => {
     console.error('CPMS database connection pool error:', err)
   })
 
   return { pool, poolConnect }
 }
 
+// export synchronous + async pools
 export const seConnectionPool = seCreatePool()
 export const cpmsConnectionPool = cpmsCreatePool()
