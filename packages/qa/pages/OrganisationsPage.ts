@@ -31,7 +31,7 @@ export default class OrganisationsPage {
 
     //Locators
     this.pageTitle = page.locator('h2.govuk-heading-l')
-    this.txtPageInfo = page.locator('p[class="govuk-body"]')
+    this.txtPageInfo = this.page.getByText('Add and remove contacts for sponsor organisations.')
     this.totalOrgsFoundLabel = page.locator('p[class="govuk-heading-s mb-0 whitespace-nowrap"]')
     this.orgListHeaderTxt = page.locator('th[class="govuk-table__header w-5/6"]')
     this.orgListTbl = page.locator('table[class="govuk-table govuk-!-margin-bottom-3"]')
@@ -60,7 +60,6 @@ export default class OrganisationsPage {
     await expect(this.pageTitle).toBeVisible()
     await expect(this.txtPageInfo).toBeVisible()
     await expect(this.pageTitle).toHaveText('Manage sponsor contacts')
-    await expect(this.txtPageInfo).toHaveText('Add and remove contacts for sponsor organisations.')
     await expect(this.page).toHaveURL('organisations')
   }
 
@@ -71,7 +70,6 @@ export default class OrganisationsPage {
 
   async assertOrganisationsGuidanceTxt() {
     await expect(this.txtPageInfo).toBeVisible()
-    await expect(this.txtPageInfo).toHaveText('Add and remove contacts for sponsor organisations.')
   }
 
   async assertOrgsFoundDisplayed() {
