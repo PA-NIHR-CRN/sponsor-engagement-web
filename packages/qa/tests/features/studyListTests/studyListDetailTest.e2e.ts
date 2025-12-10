@@ -1,13 +1,13 @@
 import { test } from '../../../hooks/CustomFixtures'
 import { seDatabaseReq } from '../../../utils/DbRequests'
+import { setupSponsorUser } from '../../../utils/setupSponsorUser'
 
 const testUserId = 6
 const startingOrgId = 9
+const deletedOrgId = 1
 
-test.beforeAll('Setup Test Users', async () => {
-  await seDatabaseReq(
-    `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
-  )
+test.beforeAll('Setup Tests', async () => {
+  await setupSponsorUser(testUserId, deletedOrgId, startingOrgId)
 })
 
 test.describe('Details on Study List Items - @se_22 @se_22_detail', () => {

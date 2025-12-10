@@ -1,16 +1,16 @@
 import { test } from '../../../hooks/CustomFixtures'
 import { seDatabaseReq } from '../../../utils/DbRequests'
+import { setupSponsorUser } from '../../../utils/setupSponsorUser'
 import { convertIsoDateToDisplayDate } from '../../../utils/UtilFunctions'
 
 const testUserId = 6
 const startingOrgId = 21
 const noAssessmentStudyId = 16958
 const dueAssessmentAtDate = '2025-03-25 11:23:14.227'
+const deletedOrgId = 1
 
 test.beforeEach('Setup Tests', async () => {
-  await seDatabaseReq(
-    `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
-  )
+  await setupSponsorUser(testUserId, deletedOrgId, startingOrgId)
   const allAssessmentIdsForStudy = await seDatabaseReq(
     `SELECT id FROM Assessment WHERE studyId = ${noAssessmentStudyId};`
   )

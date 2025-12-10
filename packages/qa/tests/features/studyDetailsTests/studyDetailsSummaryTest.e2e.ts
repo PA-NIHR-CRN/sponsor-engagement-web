@@ -2,6 +2,7 @@ import { RowDataPacket } from 'mysql2'
 import { test } from '../../../hooks/CustomFixtures'
 import { seDatabaseReq, cpmsDatabaseReq } from '../../../utils/DbRequests'
 import { getStudyEngagementInfo } from '../../../utils/ApiRequests'
+import { setupSponsorUser } from '../../../utils/setupSponsorUser'
 
 const testUserId = 6
 const startingOrgId = 9
@@ -16,11 +17,11 @@ let nonCommStudyProgressDetails: RowDataPacket[]
 const nullValuesStudyId = 17103
 const noConcernsStudyId = 17122
 const estimatedReopenStudyId = 10692
+const deletedOrgId = 1
 
 test.beforeAll('Setup Tests', async () => {
-  await seDatabaseReq(
-    `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
-  )
+  await setupSponsorUser(testUserId, deletedOrgId, startingOrgId)
+
   const randomStudyIdSelected = await seDatabaseReq(`SELECT Study.id FROM Study 
     INNER JOIN StudyOrganisation
     ON Study.id = StudyOrganisation.studyId

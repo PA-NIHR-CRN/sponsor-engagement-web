@@ -1,5 +1,6 @@
 import { test } from '../../../hooks/CustomFixtures'
 import { seDatabaseReq } from '../../../utils/DbRequests'
+import { setupSponsorUser } from '../../../utils/setupSponsorUser'
 
 const testUserId = 6
 const startingOrgId = 9
@@ -16,11 +17,10 @@ const protocolSearchId = '16924'
 const numberSearchPhraseBroad = '27'
 const cpmsSearchPhrase = '50574'
 const cpmsSearchId = '17122'
+const deletedOrgId = 1
 
-test.beforeAll('Setup Test Users', async () => {
-  await seDatabaseReq(
-    `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
-  )
+test.beforeAll('Setup Tests', async () => {
+  await setupSponsorUser(testUserId, deletedOrgId, startingOrgId)
 })
 
 test.describe('Search the Studies List - @se_23', () => {

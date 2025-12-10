@@ -2,6 +2,7 @@ import { RowDataPacket } from 'mysql2'
 import { test, expect } from '../../../hooks/CustomFixtures'
 import { cpmsDatabaseReq, seDatabaseReq, waitForSeDbRequest } from '../../../utils/DbRequests'
 import { convertIsoDateToDisplayDateV2, splitIsoDate } from '../../../utils/UtilFunctions'
+import { setupSponsorUser } from '../../../utils/setupSponsorUser'
 
 // NOTE: the tests below do a lot pretty quickly and can sometimes run into merge conflicts
 // between se & cpms when updating. The use of retries in ci and locally seems to resolve this nicely.
@@ -37,11 +38,10 @@ const oldTarget = '12345'
 
 let startingStudyId = 0
 let studyCoreDetails: RowDataPacket[]
+const deletedOrgId = 1
 
 test.beforeAll('Setup Tests', async () => {
-  await seDatabaseReq(
-    `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
-  )
+  await setupSponsorUser(testUserId, deletedOrgId, startingOrgId)
 })
 
 test.describe('Update study and save changes locally in SE @se_184 @se_168', () => {

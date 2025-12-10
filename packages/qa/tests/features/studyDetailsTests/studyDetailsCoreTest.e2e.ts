@@ -2,6 +2,7 @@ import { RowDataPacket } from 'mysql2'
 import { test } from '../../../hooks/CustomFixtures'
 import { seDatabaseReq } from '../../../utils/DbRequests'
 import { getStudyEngagementInfo } from '../../../utils/ApiRequests'
+import { setupSponsorUser } from '../../../utils/setupSponsorUser'
 
 const testUserId = 6
 const startingOrgId = 9
@@ -22,11 +23,10 @@ const nonComCheifInvestigatorFirstName = 'John'
 const nonComCheifInvestigatorLastName = 'Collinge'
 const nonComStudyId = '13610'
 const nonComOrgId = '635'
+const deletedOrgId = 1
 
-test.beforeAll('Setup Tests', async () => {
-  await seDatabaseReq(
-    `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
-  )
+test.beforeAll('Setup sponsor user mappings', async () => {
+  await setupSponsorUser(testUserId, deletedOrgId, startingOrgId)
   await seDatabaseReq(`UPDATE Study SET protocolReferenceNumber = NULL WHERE id = ${noProtocolRefNoStudyId};`)
 
   const randomStudyIdSelected = await seDatabaseReq(`SELECT Study.id FROM Study 

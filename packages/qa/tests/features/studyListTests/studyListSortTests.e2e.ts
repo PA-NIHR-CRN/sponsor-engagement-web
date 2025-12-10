@@ -1,17 +1,17 @@
 import { test } from '../../../hooks/CustomFixtures'
 import { seDatabaseReq } from '../../../utils/DbRequests'
 import { RowDataPacket } from 'mysql2'
+import { setupSponsorUser } from '../../../utils/setupSponsorUser'
 
 const testUserId = 6
 const startingOrgId = 2
 let studyListSortedByDueDb: RowDataPacket[]
 let studyListSortedByAscDb: RowDataPacket[]
 let studyListSortedByDescDb: RowDataPacket[]
+const deletedOrgId = 1
 
-test.beforeAll('Setup Test Users', async () => {
-  await seDatabaseReq(
-    `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
-  )
+test.beforeAll('Setup Tests', async () => {
+  await setupSponsorUser(testUserId, deletedOrgId, startingOrgId)
 
   const studyListSortByDue = await seDatabaseReq(`
     SELECT DISTINCT Study.id, Study.cpmsId, Study.shortTitle, Study.dueAssessmentAt,

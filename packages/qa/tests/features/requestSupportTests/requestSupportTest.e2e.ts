@@ -1,14 +1,15 @@
 import { test } from '../../../hooks/CustomFixtures'
 import { seDatabaseReq } from '../../../utils/DbRequests'
+import { setupSponsorUser } from '../../../utils/setupSponsorUser'
 
 const testUserId = 6
 const startingOrgId = 21
 let startingStudyId = 0
+const deletedOrgId = 1
 
 test.beforeAll('Setup Tests', async () => {
-  // await seDatabaseReq(
-  //   `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
-  // )
+  await setupSponsorUser(testUserId, deletedOrgId, startingOrgId)
+
   const randomStudyIdSelected = await seDatabaseReq(`SELECT Study.id FROM Study 
     INNER JOIN StudyOrganisation
     ON Study.id = StudyOrganisation.studyId

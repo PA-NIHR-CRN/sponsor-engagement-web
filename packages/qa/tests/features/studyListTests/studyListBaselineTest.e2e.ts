@@ -1,15 +1,15 @@
 import { test } from '../../../hooks/CustomFixtures'
 import { seDatabaseReq } from '../../../utils/DbRequests'
+import { setupSponsorUser } from '../../../utils/setupSponsorUser'
 
 //Add another test file for AC4 and SE-68 (Due Logic)
 const testUserId = 6
 const startingOrgId = 9
 const minStudiesOrgId = 3064
+const deletedOrgId = 1
 
-test.beforeAll('Setup Test Users', async () => {
-  await seDatabaseReq(
-    `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
-  )
+test.beforeAll('Setup Tests', async () => {
+  await setupSponsorUser(testUserId, deletedOrgId, startingOrgId)
 })
 
 test.describe('Baseline Study List Page for Sponsor Contact - @se_22 se_22_baseline', () => {

@@ -2,6 +2,7 @@ import { RowDataPacket } from 'mysql2'
 import { test } from '../../../hooks/CustomFixtures'
 import { seDatabaseReq } from '../../../utils/DbRequests'
 import { getStudyEngagementInfo } from '../../../utils/ApiRequests'
+import { setupSponsorUser } from '../../../utils/setupSponsorUser'
 
 const testUserId = 6
 const startingOrgId = 2
@@ -11,11 +12,10 @@ let studyCoreDetails: RowDataPacket[]
 let getStudyResponse: JSON
 //Must ensure that specific SE study Id's below remain in the SE Tool on Test
 const noProtocolRefNoStudyId = 17122
+const deletedOrgId = 1
 
 test.beforeAll('Setup Tests', async () => {
-  await seDatabaseReq(
-    `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
-  )
+  await setupSponsorUser(testUserId, deletedOrgId, startingOrgId)
   await seDatabaseReq(`UPDATE Study SET protocolReferenceNumber = NULL WHERE id = ${noProtocolRefNoStudyId};`)
 
   const randomStudyIdSelected = await seDatabaseReq(`

@@ -2,6 +2,7 @@ import { RowDataPacket } from 'mysql2'
 import { test, expect } from '../../../hooks/CustomFixtures'
 import { seDatabaseReq, waitForSeDbRequest, cpmsDatabaseReq } from '../../../utils/DbRequests'
 import { convertIsoDateToDisplayDateV2, splitIsoDate } from '../../../utils/UtilFunctions'
+import { setupSponsorUser } from '../../../utils/setupSponsorUser'
 
 const testUserId = 6
 const startingOrgId = 2
@@ -33,11 +34,10 @@ let studyCoreDetails: RowDataPacket[]
 
 const pOpen = new Date(plannedOpen)
 const pClose = new Date(plannedClose)
+const deletedOrgId = 1
 
 test.beforeAll('Setup Tests', async () => {
-  await seDatabaseReq(
-    `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
-  )
+  await setupSponsorUser(testUserId, deletedOrgId, startingOrgId)
 
   const randomStudyIdSelected = await seDatabaseReq(`
     SELECT Study.id FROM Study 
