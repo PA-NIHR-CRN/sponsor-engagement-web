@@ -29,7 +29,6 @@
     "jest-mock-extended": "^3.0.5",
     "msw": "^1.3.1",
     "nodemon": "^2.0.15",
-    "prisma": "5.15.1",
     "ts-jest": "^29.1.1",
     "ts-mockery": "^1.2.0",
     "tsconfig": "*",
