@@ -31,6 +31,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      # TODO: This is inefficient - we should package build artifacts from the build job
+      # and deploy them consistently, rather than reinstalling dependencies in each deploy job
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
       - name: Configure AWS credentials (dev)
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -112,6 +117,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      # TODO: This is inefficient - we should package build artifacts from the build job
+      # and deploy them consistently, rather than reinstalling dependencies in each deploy job
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
       - name: Configure AWS credentials (test)
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -192,6 +202,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      # TODO: This is inefficient - we should package build artifacts from the build job
+      # and deploy them consistently, rather than reinstalling dependencies in each deploy job
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
       - name: Configure AWS credentials (uat)
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -270,6 +285,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
+      # TODO: This is inefficient - we should package build artifacts from the build job
+      # and deploy them consistently, rather than reinstalling dependencies in each deploy job
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
 
       - name: Configure AWS credentials (oat)
         uses: aws-actions/configure-aws-credentials@v2
@@ -351,6 +371,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      # TODO: This is inefficient - we should package build artifacts from the build job
+      # and deploy them consistently, rather than reinstalling dependencies in each deploy job
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
 
       - name: Configure AWS credentials (prod)
         uses: aws-actions/configure-aws-credentials@v2
