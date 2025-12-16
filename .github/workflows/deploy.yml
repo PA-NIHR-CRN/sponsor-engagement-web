@@ -348,17 +348,17 @@ jobs:
           path: ./packages/qa/test-report/
           retention-days: 3
 
-      - name: 'Download HTML Report Artifact'
-        uses: actions/download-artifact@v4
-        id: download
-        if: github.event.inputs.publish-report != 'false' && always()
+      # - name: 'Download HTML Report Artifact'
+      #   uses: actions/download-artifact@v4
+      #   id: download
+      #   if: github.event.inputs.publish-report != 'false' && always()
 
-      - name: Publish to GH Pages
-        if: github.event.inputs.publish-report != 'false' && always()
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: ${{steps.download.outputs.download-path}}/test-report/
-          branch: gh-pages
+      # - name: Publish to GH Pages
+      #   if: github.event.inputs.publish-report != 'false' && always()
+      #   uses: JamesIves/github-pages-deploy-action@v4
+      #   with:
+      #     folder: ${{steps.download.outputs.download-path}}/test-report/
+      #     branch: gh-pages
 
       - name: Send slack message failure
         if: failure() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/se-phase-2')
