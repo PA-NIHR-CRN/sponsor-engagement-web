@@ -31,6 +31,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
 
       - name: Configure AWS credentials (dev)
         uses: aws-actions/configure-aws-credentials@v2
