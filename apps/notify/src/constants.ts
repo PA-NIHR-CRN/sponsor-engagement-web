@@ -9,7 +9,7 @@ export const SIGN_IN_PAGE = '/auth/signin'
 export const EXTERNAL_CRN_URL = 'https://www.nihr.ac.uk/explore-nihr/support/clinical-research-network.htm'
 
 export const EXTERNAL_CRN_TERMS_CONDITIONS_URL =
-  'https://www.nihr.ac.uk/documents/researchers/i-need-help-to-deliver-my-research/terms-and-conditions-for-nihr-crn-support.pdf'
+  'https://www.nihr.ac.uk/eligibility-nihr-research-delivery-network-support#portfolio-terms-and-conditions'
 
 /**
  * Support page
