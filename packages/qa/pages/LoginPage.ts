@@ -16,17 +16,17 @@ export default class LoginPage {
     this.page = page
 
     //Locators
-    this.idgBanner = page.locator('div[class="container-fluid"] h1')
+    this.idgBanner = page.locator('body > div.ui.visible.negative.message > p')
     this.usernameInput = page.locator('input[id="usernameUserInput"]')
     this.passwordInput = page.locator('input[id="password"]')
-    this.btnNext = page.locator('input[id="NEXT"]')
-    this.btnContinue = page.locator('button[type="submit"]')
+    this.btnNext = page.locator('button[data-testid="identifier-auth-continue-button"]')
+    this.btnContinue = page.locator('button[data-testid="login-page-continue-login-button"]')
   }
 
   //Page Methods
   async assertOnLoginPage() {
     await expect(this.idgBanner).toBeVisible()
-    await expect(this.idgBanner).toHaveText('This is the TEST Identity Gateway')
+    await expect(this.idgBanner).toHaveText('TEST Identity Gateway')
     expect(this.page.url()).toContain('test.id.nihr.ac.uk/authenticationendpoint/login')
   }
 

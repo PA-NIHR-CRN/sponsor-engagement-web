@@ -109,6 +109,8 @@ const config: PlaywrightTestConfig = {
         screenshot: 'on',
         launchOptions: {
           slowMo: 0,
+          ignoreDefaultArgs: ['--headless'],
+          args: ['--headless=new'],
         },
       },
     },

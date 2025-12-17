@@ -196,6 +196,10 @@ test.describe('View core study details - @se_27', () => {
   test('The row titled `CRO` only appears in Study Details where a CRO Relationship is present - @se_27_cro', async ({
     studyDetailsPage,
   }) => {
+    await seDatabaseReq(
+      `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
+    )
+
     await test.step(`Given I have navigated to the Study Details Page for Study with SE Id ${croOrgRelationshipStudyId}`, async () => {
       await studyDetailsPage.goto(croOrgRelationshipStudyId.toString())
       await studyDetailsPage.assertOnStudyDetailsPage(croOrgRelationshipStudyId.toString())
