@@ -36,6 +36,8 @@ jobs:
       - uses: ./.github/actions/install-cache
       - uses: ./.github/actions/build-cache
       - uses: ./.github/actions/turbo-cache
+      - name: Install
+        run: npm install --no-audit --no-fund
       - name: Build
         run: |
           npx turbo run build --cache-dir=".turbo"
