@@ -67,7 +67,8 @@ export const ERROR_PAGE_404 = '/404'
  * External URLs
  */
 
-export const EXTERNAL_CRN_URL = 'https://www.nihr.ac.uk/explore-nihr/support/clinical-research-network.htm'
+export const EXTERNAL_CRN_URL =
+  'https://www.nihr.ac.uk/support-and-services/support-for-delivering-research/research-delivery-network'
 
 export const EXTERNAL_CRN_TERMS_CONDITIONS_URL =
   'https://www.nihr.ac.uk/eligibility-nihr-research-delivery-network-support#portfolio-terms-and-conditions'
