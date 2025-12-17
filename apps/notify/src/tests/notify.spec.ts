@@ -76,7 +76,8 @@ describe('notify', () => {
         subject: `Assess the progress of your studies`,
         to: email,
         templateData: {
-          rdnLink: 'https://www.nihr.ac.uk/explore-nihr/support/clinical-research-network.htm',
+          rdnLink:
+            'https://www.nihr.ac.uk/support-and-services/support-for-delivering-research/research-delivery-network',
           iconUrl: 'https://assessmystudy.nihr.ac.uk/assets/images/exclamation-icon.png',
           requestSupportLink: 'https://assessmystudy.nihr.ac.uk/request-support',
           signInLink: 'https://assessmystudy.nihr.ac.uk/auth/signin',

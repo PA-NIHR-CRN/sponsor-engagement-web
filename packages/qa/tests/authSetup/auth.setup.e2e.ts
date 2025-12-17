@@ -13,7 +13,7 @@ const cookieConfig = {
   expires: Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60, // sets one year from today
   httpOnly: false,
   secure: true,
-  sameSite: undefined
+  sameSite: undefined,
 }
 
 setup(
@@ -48,7 +48,7 @@ setup('Authenticate the CPMS NPM User', async ({ cpmsStudiesPage, loginPage, pag
   await page.context().addCookies([cookieConfig])
   await cpmsStudiesPage.goToCpmsStudies()
   await cpmsStudiesPage.assertOnSignInPage()
-  await cpmsStudiesPage.btnNext.click()
+  await cpmsStudiesPage.btnContinue.click()
   await loginPage.loginWithUserCreds('National Portfolio Manager')
   await cpmsStudiesPage.assertOnCpmsStudiesPage()
   await page.context().storageState({ path: authNpmFile })

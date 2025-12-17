@@ -102,8 +102,8 @@ export default class StudyDetailsPage {
     this.page = page
 
     //Locators
-    this.pageTitle = page.locator('h2[class="govuk-heading-l govuk-!-margin-bottom-1"]')
-    this.progressHeader = page.locator('h3[class="govuk-heading-m govuk-!-margin-bottom-1 p-0"]', {
+    this.pageTitle = page.locator('h2.govuk-heading-l')
+    this.progressHeader = page.locator('h3.govuk-heading-m', {
       hasText: 'Summary of study’s progress (UK)',
     })
     this.progressSection = page.locator('table[class="govuk-table govuk-!-margin-top-3"]')
