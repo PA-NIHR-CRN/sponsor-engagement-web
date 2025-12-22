@@ -54,9 +54,11 @@ exports[`NIHR Icon Set Displays the "GroupIcon" correctly 1`] = `
 <body>
   <div>
     <svg
+      aria-hidden="true"
       class="undefined h-[1.5em] w-[1.5em]"
       data-testid="group-icon"
       fill="currentColor"
+      focusable="false"
       viewBox="0 -960 960 960"
       xmlns="http://www.w3.org/2000/svg"
     >
@@ -76,6 +78,7 @@ exports[`NIHR Icon Set Displays the "HomeIcon" correctly 1`] = `
       class="h-[21px] w-[21px]"
       data-testid="home-icon"
       fill="currentColor"
+      focusable="false"
       height="17"
       viewBox="0 0 20 17"
       width="20"
@@ -112,6 +115,7 @@ exports[`NIHR Icon Set Displays the "SettingsIcon" correctly 1`] = `
       class="h-[20px] w-[20px]"
       data-testid="settings-icon"
       fill="currentColor"
+      focusable="false"
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
