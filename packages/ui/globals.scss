@@ -147,3 +147,35 @@ body {
   width: 100%;
   z-index: 9999;
 }
+
+// Forced colours in high contrast mode
+@media (forced-colors: active) {
+  :root {
+    --text-grey: CanvasText;
+    --header-bg: Canvas;
+  }
+  html, body { color: CanvasText !important; background: Canvas !important; }
+  a { color: LinkText !important; text-decoration: underline; }
+  svg { fill: currentColor !important; stroke: currentColor !important; }
+
+
+button .absolute.h-\[2px\].w-\[18px\] {
+    background: CanvasText !important;
+  }
+  button .absolute.h-\[2px\].w-\[18px\]::before,
+  button .absolute.h-\[2px\].w-\[18px\]::after {
+    background: CanvasText !important;
+  }
+
+  button[aria-controls="nihr-side-nav"] {
+    background: transparent;
+    color: CanvasText; 
+  }
+
+  button[aria-controls="nihr-side-nav"]:focus {
+    outline: 2px solid CanvasText !important;
+    outline-offset: 2px !important;
+    box-shadow: none !important;
+    background-image: none !important;
+  }
+}

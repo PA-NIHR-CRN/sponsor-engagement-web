@@ -137,9 +137,9 @@ describe('Organisations page', () => {
     // This looks funny because the formatting that GDS visually-hidden applies is stripped out
     expect(rows.map((row) => row.firstChild?.textContent)).toEqual([
       'Organisation',
-      'Organisation name:Org name 1Organisation role:Sponsor',
-      'Organisation name:Org name 2Organisation role:CRO',
-      'Organisation name:Org name 3Organisation role:CTU',
+      'Org name 1 - organisation nameSponsor - organisation role',
+      'Org name 2 - organisation nameCRO - organisation role',
+      'Org name 3 - organisation nameCTU - organisation role',
     ])
 
     expect(rows.map((row) => row.lastChild?.textContent)).toEqual([
@@ -255,7 +255,7 @@ describe('Organisations page', () => {
     const table = within(screen.getByRole('table', { name: 'Manage sponsor organisations' }))
     expect(
       table.getByRole('row', {
-        name: 'Organisation name: Test Org Organisation role: Sponsor, CTU Manage Test Org sponsor contacts',
+        name: 'Test Org - organisation name Sponsor, CTU - organisation role Manage Test Org sponsor contacts',
       })
     ).toBeInTheDocument()
   })

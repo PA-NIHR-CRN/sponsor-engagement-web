@@ -81,12 +81,12 @@ export default function Organisations({
                           <Table.Row key={id}>
                             <Table.Cell>
                               <Link href={`/organisations/${id}`}>
-                                <span className="govuk-visually-hidden">Organisation name:</span>
                                 <strong>{name}</strong>
+                                <span className="govuk-visually-hidden"> - organisation name</span>
                               </Link>
                               <div className="govuk-body-s mb-0 govuk-!-margin-top-1">
-                                <span className="govuk-visually-hidden">Organisation role:</span>
                                 {roles.map((role) => role).join(', ')}
+                                <span className="govuk-visually-hidden"> - organisation role</span>
                               </div>
                             </Table.Cell>
                             <Table.Cell className="align-middle text-right">

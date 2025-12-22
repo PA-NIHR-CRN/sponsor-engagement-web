@@ -6,6 +6,7 @@ export const HomeIcon = () => (
     viewBox="0 0 20 17"
     fill="currentColor"
     aria-hidden="true"
+    focusable="false"
     className="h-[21px] w-[21px]"
     data-testid="home-icon"
   >
