@@ -2,6 +2,7 @@ export const SettingsIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     aria-hidden="true"
+    focusable="false"
     fill="currentColor"
     className="h-[20px] w-[20px]"
     data-testid="settings-icon"
