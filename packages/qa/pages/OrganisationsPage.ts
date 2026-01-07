@@ -164,7 +164,7 @@ export default class OrganisationsPage {
   }
 
   async getActualRoleName(roleName: string): Promise<string> {
-    return roleName.substring(18)
+    return roleName.replace(/\s*-\s*organisation role$/i, '').trim()
   }
 
   async getExpectedRoleName(roleName: string): Promise<string> {
