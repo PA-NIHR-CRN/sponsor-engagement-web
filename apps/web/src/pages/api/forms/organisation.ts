@@ -80,6 +80,7 @@ export default withApiHandler<ExtendedNextApiRequest>(
       }
 
       const existingUser = await prismaClient.user.findUnique({
+        include: { roles: true },
         where: {
           email: emailAddress,
         },
@@ -141,6 +142,42 @@ export default withApiHandler<ExtendedNextApiRequest>(
 
       const userOrganisationId = users[0].id
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison,@typescript-eslint/no-unnecessary-condition -- false positive and nullable is needed
+      const isPreviousSponsorContact =
+        existingUser && existingUser.roles?.find((x) => x.roleId === Roles.SponsorContact && x.isDeleted === true)
+
+      if (isPreviousSponsorContact) {
+        logger.info(`Re-adding sponsor contact role for ${existingUser.email}`)
+      }
+
+      const roleMutation = isPreviousSponsorContact
+        ? {
+            update: {
+              where: {
+                userId_roleId: {
+                  roleId,
+                  userId: existingUser.id,
+                },
+                isDeleted: true,
+              },
+              data: {
+                updatedById: requestedByUserId,
+                createdById: requestedByUserId,
+                isDeleted: false,
+              },
+            },
+          }
+        : {
+            createMany: {
+              data: {
+                roleId,
+                createdById: requestedByUserId,
+                updatedById: requestedByUserId,
+              },
+              skipDuplicates: true,
+            },
+          }
+
       const user = await prismaClient.user.update({
         where: {
           email: emailAddress,
@@ -150,17 +187,7 @@ export default withApiHandler<ExtendedNextApiRequest>(
             registrationToken,
             registrationConfirmed: false,
           }),
-          roles: {
-            // If a user is not assigned the sponsor contact role, assign it
-            createMany: {
-              data: {
-                roleId,
-                createdById: requestedByUserId,
-                updatedById: requestedByUserId,
-              },
-              skipDuplicates: true,
-            },
-          },
+          roles: roleMutation,
         },
       })
 
