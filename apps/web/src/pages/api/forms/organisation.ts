@@ -142,8 +142,8 @@ export default withApiHandler<ExtendedNextApiRequest>(
 
       const userOrganisationId = users[0].id
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison,@typescript-eslint/no-unnecessary-condition -- false positive and nullable is needed
       const isPreviousSponsorContact =
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison,@typescript-eslint/no-unnecessary-condition -- false positive and nullable is needed
         existingUser && existingUser.roles?.find((x) => x.roleId === Roles.SponsorContact && x.isDeleted === true)
 
       if (isPreviousSponsorContact) {
