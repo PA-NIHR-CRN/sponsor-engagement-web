@@ -71,8 +71,6 @@ export function RootLayout({ children, backLink, heading = SERVICE_NAME, user, b
       <CookieBanner />
       <SideNav.Provider open={sideNavOpen} setOpen={setSideNavOpen}>
         <Header heading={heading} user={activeUser} />
-        {backLink}
-        <Breadcrumbs {...breadcrumbConfig} />
         <div className="flex flex-1">
           <SideNav.Panel className="flex flex-col" data-testid="side-panel">
             <SideNav.Link as={Link} href="/" icon={<HomeIcon />}>
@@ -94,7 +92,13 @@ export function RootLayout({ children, backLink, heading = SERVICE_NAME, user, b
               </SideNav.Link>
             ) : null}
           </SideNav.Panel>
-          <SideNav.Main className="flex-1 overflow-auto">{children}</SideNav.Main>
+          <SideNav.Main className="flex-1 overflow-auto">
+            <div className="-mt-2 govuk-!-margin-bottom-4">
+              {backLink}
+              <Breadcrumbs {...breadcrumbConfig} />
+            </div>
+            {children}
+          </SideNav.Main>
         </div>
         <Footer />
       </SideNav.Provider>
