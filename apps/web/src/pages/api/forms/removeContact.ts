@@ -87,14 +87,15 @@ export default withApiHandler<ExtendedNextApiRequest>(
         await removeUserFromGroup(user.email, ODP_ROLE_GROUP_ID)
       }
       // check if user contact for any other orgs and remove role if there is none.
-      const otherOrganisation = await prismaClient.userOrganisation.findFirst({
+      const hasActiveOrganisation = await prismaClient.userOrganisation.findFirst({
         where: {
           userId: user.id,
           isDeleted: false,
         },
+        select: { id: true },
       })
 
-      if (!otherOrganisation) {
+      if (!hasActiveOrganisation) {
         logger.info(
           'User is no longer a sponsor contact for any organisation, removing Sponser contact role for %s',
           user.email

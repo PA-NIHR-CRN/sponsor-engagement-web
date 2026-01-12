@@ -143,8 +143,8 @@ export default withApiHandler<ExtendedNextApiRequest>(
       const userOrganisationId = users[0].id
 
       const isPreviousSponsorContact =
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison,@typescript-eslint/no-unnecessary-condition -- false positive and nullable is needed
-        existingUser && existingUser.roles?.some((x) => x.roleId === Roles.SponsorContact && x.isDeleted === true)
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison -- false positive and nullable is needed
+        existingUser && existingUser.roles.some((x) => x.roleId === Roles.SponsorContact && x.isDeleted === true)
 
       if (isPreviousSponsorContact) {
         logger.info(`Re-adding sponsor contact role for ${existingUser.email}`)
