@@ -19,17 +19,6 @@ import { withApiHandler } from '@/utils/withApiHandler'
 
 import { addUserToGroup, isUserEligibleForOdpRole } from './registration'
 
-interface IdgUsersResponse {
-  success: boolean
-  data: {
-    totalResults: number
-    Resources?: {
-      userName?: string
-      [k: string]: unknown
-    }[]
-  }
-}
-
 export interface ExtendedNextApiRequest extends NextApiRequest {
   body: OrganisationAddInputs
 }
@@ -37,14 +26,9 @@ export interface ExtendedNextApiRequest extends NextApiRequest {
 // ---------- Helper: look up IDG and sync local user ----------
 async function lookupIdgAndSyncLocalUser(emailAddress: string) {
   let identityGatewayId: string | null = null
+  let idgUserFound = false
 
-  let getUserResponse: IdgUsersResponse
-  try {
-    getUserResponse = (await authService.getUser(emailAddress)) as IdgUsersResponse
-  } catch (e) {
-    logger.warn('IDG getUser lookup failed for %s: %o', emailAddress, e)
-    getUserResponse = { success: false, data: { totalResults: 0 } }
-  }
+  const getUserResponse = await authService.getUser(emailAddress)
 
   if (getUserResponse.success) {
     const {
@@ -52,47 +36,45 @@ async function lookupIdgAndSyncLocalUser(emailAddress: string) {
     } = getUserResponse
 
     if (totalResults > 0 && Resources) {
-      identityGatewayId = Resources.find((resource) => Boolean(resource.userName))?.userName ?? null
+      const match = Resources.find((r) => Boolean(r.userName))
+      identityGatewayId = match?.userName ?? null
+      idgUserFound = identityGatewayId !== null
 
-      logger.info('Found IDG account matching email %s', emailAddress)
-
-      await prismaClient.user.upsert({
-        where: { email: emailAddress },
-        update: {
-          identityGatewayId,
-          registrationConfirmed: true,
-          registrationToken: null,
-        },
-        create: {
-          email: emailAddress,
-          identityGatewayId,
-          registrationConfirmed: true,
-          registrationToken: null,
-        },
-      })
+      if (idgUserFound) {
+        logger.info('Found IDG account matching email %s', emailAddress)
+      }
     } else {
       logger.info('No IDG account found for %s — treating as new user', emailAddress)
-
-      await prismaClient.user.upsert({
-        where: { email: emailAddress },
-        update: {},
-        create: { email: emailAddress },
-      })
     }
-  } else {
-    logger.warn('IDG Users request did not match expected schema for %s — proceeding as new user', emailAddress)
-    await prismaClient.user.upsert({
-      where: { email: emailAddress },
-      update: {},
-      create: { email: emailAddress },
-    })
   }
 
-  const localUser = await prismaClient.user.findUniqueOrThrow({
+  let localUser = await prismaClient.user.findUnique({
     where: { email: emailAddress },
   })
 
-  const isNewToIDG = identityGatewayId === null
+  if (!localUser) {
+    localUser = await prismaClient.user.create({
+      data: {
+        email: emailAddress,
+        ...(idgUserFound && {
+          identityGatewayId,
+          registrationConfirmed: true,
+          registrationToken: null,
+        }),
+      },
+    })
+  } else if (idgUserFound) {
+    localUser = await prismaClient.user.update({
+      where: { email: emailAddress },
+      data: {
+        identityGatewayId,
+        registrationConfirmed: true,
+        registrationToken: null,
+      },
+    })
+  }
+
+  const isNewToIDG = !idgUserFound
   return { localUser, isNewToIDG, identityGatewayId }
 }
 
