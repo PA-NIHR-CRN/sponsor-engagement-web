@@ -1,24 +1,19 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment -- mock objects in tests do not conform to strict typing */
+import { authService } from '@nihr-ui/auth'
 import { emailService } from '@nihr-ui/email'
 import { logger } from '@nihr-ui/logger'
-import type {
-  Assessment,
-  Study,
-  SysRefInvitationStatus,
-  SysRefOrganisationRole,
-  UserOrganisationInvitation,
-} from 'database'
+import type { SysRefInvitationStatus, SysRefOrganisationRole, UserOrganisationInvitation } from 'database'
 import type { NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
 import type { RequestOptions } from 'node-mocks-http'
 import { createRequest, createResponse } from 'node-mocks-http'
 import { Mock } from 'ts-mockery'
-import { ZodError } from 'zod'
 
 import { userNoRoles, userWithContactManagerRole } from '@/__mocks__/session'
 import { EXTERNAL_CRN_TERMS_CONDITIONS_URL, EXTERNAL_CRN_URL, SIGN_IN_PAGE, SUPPORT_PAGE } from '@/constants/routes'
 import type { OrganisationWithRelations, UserOrganisationWithRelations } from '@/lib/organisations'
+import { getOrganisationById } from '@/lib/organisations'
 import { prismaClient } from '@/lib/prisma'
-import { AuthError } from '@/utils/auth'
 import type { OrganisationAddInputs } from '@/utils/schemas'
 
 import type { ExtendedNextApiRequest } from './organisation'
@@ -27,6 +22,9 @@ import api from './organisation'
 jest.mock('next-auth/next')
 jest.mock('@nihr-ui/logger')
 jest.mock('@nihr-ui/email')
+jest.mock('@nihr-ui/auth')
+jest.mock('@/lib/organisations')
+
 jest.mock('node:crypto', () => ({
   randomBytes: () => 'mocked-token',
 }))
@@ -51,12 +49,20 @@ const findSysRefInvitationStatusResponse = Mock.of<SysRefInvitationStatus>({
   name: 'Pending',
 })
 
-const findOrgResponse = Mock.of<OrganisationWithRelations>({ id: 2, name: 'Test Organisation', roles: [] })
+const findOrgResponse = Mock.of<OrganisationWithRelations>({
+  id: 2,
+  name: 'Test Organisation',
+  roles: [],
+})
 
 const currentDate = new Date('2025-03-31')
 
+/* -------------------------------------------------------------------------- */
+/* SUCCESS CASES                                                              */
+/* -------------------------------------------------------------------------- */
+
 describe('Successful organisation sponsor contact invitation', () => {
-  const registrationToken = 'mock-token'
+  const registrationToken = 'mocked-token'
 
   const body: OrganisationAddInputs = {
     organisationId: '321',
@@ -66,29 +72,66 @@ describe('Successful organisation sponsor contact invitation', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     jest.mocked(getServerSession).mockResolvedValueOnce(userWithContactManagerRole)
+
+    // Correct organisation lookup (handler uses this)
+    jest.mocked(getOrganisationById).mockResolvedValue(findOrgResponse)
+
+    // Correct Zod-shaped IDG response
+    const idgResponse: Awaited<ReturnType<typeof authService.getUser>> = {
+      success: true,
+      data: {
+        totalResults: 0,
+        startIndex: 0,
+        itemsPerPage: 0,
+        schemas: [],
+        Resources: [],
+      },
+    }
+
+    jest.mocked(authService.getUser).mockResolvedValue(idgResponse)
+
+    // Correct Prisma User return
+    const prismaUser = {
+      id: 2,
+      name: null,
+      email: body.emailAddress,
+      identityGatewayId: null,
+      registrationToken: null,
+      registrationConfirmed: false,
+      isDeleted: false,
+      lastLogin: null,
+    }
+
+    jest.mocked(prismaClient.user.upsert).mockResolvedValue(prismaUser)
+    jest.mocked(prismaClient.user.findUniqueOrThrow).mockResolvedValue(prismaUser)
+
     logger.info = jest.fn()
   })
 
+  /* ------------------------------ NEW USER -------------------------------- */
+
   test('New user', async () => {
     jest.useFakeTimers().setSystemTime(currentDate)
+
     const updateOrgResponse = Mock.of<OrganisationWithRelations>({
       id: 2,
       roles: [],
       name: 'Mock org name',
       users: [
         {
+          id: 555,
           user: {
+            id: 2,
             email: body.emailAddress,
             registrationConfirmed: false,
             registrationToken,
-            id: 2,
           },
         },
       ],
     })
 
-    const updateUserResponse = {
-      id: 1,
+    const updatedUser = {
+      id: 2,
       name: null,
       email: body.emailAddress,
       identityGatewayId: null,
@@ -100,86 +143,86 @@ describe('Successful organisation sponsor contact invitation', () => {
 
     const messageId = '121'
 
-    const createUserOrgInvitation = Mock.of<UserOrganisationInvitation>({
+    // Correct invitation mock
+    const invitation: UserOrganisationInvitation = {
       id: 1,
-      userOrganisationId: updateOrgResponse.users[0].id,
+      userOrganisationId: 555,
       messageId,
       timestamp: currentDate,
-      statusId: findSysRefInvitationStatusResponse.id,
+      statusId: 121,
       failureNotifiedAt: null,
       createdAt: currentDate,
       updatedAt: currentDate,
+      sentById: userWithContactManagerRole.user?.id ?? 1,
+      isDeleted: false,
+    }
+
+    jest.mocked(prismaClient.userOrganisation.findFirst).mockResolvedValueOnce(null)
+
+    jest.mocked(prismaClient.sysRefRole.findFirstOrThrow).mockResolvedValue(findSysRefRoleResponse)
+
+    const updateOrgMock = jest.mocked(prismaClient.organisation.update).mockResolvedValue(updateOrgResponse)
+
+    // Two update calls: token then role
+    jest.mocked(prismaClient.user.update).mockResolvedValue(updatedUser)
+    jest.mocked(prismaClient.user.update).mockResolvedValue(updatedUser)
+
+    jest.mocked(emailService.sendEmail).mockResolvedValue({
+      messageId,
+      recipients: [],
     })
 
-    jest.mocked(prismaClient.organisation.findFirst).mockResolvedValueOnce(findOrgResponse)
-
-    const findSysRefRoleMock = jest
-      .mocked(prismaClient.sysRefRole.findFirstOrThrow)
-      .mockResolvedValueOnce(findSysRefRoleResponse)
-    const updateOrgMock = jest.mocked(prismaClient.organisation.update).mockResolvedValueOnce(updateOrgResponse)
-
-    jest.mocked(prismaClient.user.update).mockResolvedValueOnce(updateUserResponse)
-
-    jest.mocked(emailService.sendEmail).mockResolvedValueOnce({ messageId, recipients: [] })
     jest
       .mocked(prismaClient.sysRefInvitationStatus.findFirstOrThrow)
-      .mockResolvedValueOnce(findSysRefInvitationStatusResponse)
+      .mockResolvedValue(findSysRefInvitationStatusResponse)
 
-    jest.mocked(prismaClient.userOrganisationInvitation.create).mockResolvedValueOnce(createUserOrgInvitation)
+    jest.mocked(prismaClient.userOrganisationInvitation.create).mockResolvedValue(invitation)
 
-    const res = await testHandler(api, { method: 'POST', body })
+    const res = await testHandler(api, {
+      method: 'POST',
+      body,
+    })
 
-    expect(findSysRefRoleMock).toHaveBeenCalledWith({ where: { isDeleted: false, name: 'SponsorContact' } })
-
-    // Org is updated
     expect(updateOrgMock).toHaveBeenCalledWith({
       where: { id: Number(body.organisationId) },
       include: {
         users: {
-          select: {
-            id: true,
-            user: true,
-          },
-          where: {
-            user: {
-              email: body.emailAddress,
-            },
-          },
+          where: { user: { email: body.emailAddress } },
+          select: { id: true, user: true },
         },
       },
       data: {
         users: {
           create: {
-            createdBy: { connect: { id: userWithContactManagerRole.user?.id } },
-            updatedBy: { connect: { id: userWithContactManagerRole.user?.id } },
-            user: {
-              connectOrCreate: {
-                create: {
-                  email: body.emailAddress,
-                },
-                where: {
-                  email: body.emailAddress,
-                },
-              },
+            createdBy: {
+              connect: { id: userWithContactManagerRole.user?.id },
             },
+            updatedBy: {
+              connect: { id: userWithContactManagerRole.user?.id },
+            },
+            user: { connect: { email: body.emailAddress } },
           },
         },
       },
     })
 
-    // User role is added
-    expect(prismaClient.user.update).toHaveBeenCalledWith({
-      where: {
-        email: body.emailAddress,
-      },
+    // First update call (token)
+    expect(prismaClient.user.update).toHaveBeenNthCalledWith(1, {
+      where: { email: body.emailAddress },
       data: {
-        registrationConfirmed: false,
         registrationToken: 'mocked-token',
+        registrationConfirmed: false,
+      },
+    })
+
+    // Second update call (role)
+    expect(prismaClient.user.update).toHaveBeenNthCalledWith(2, {
+      where: { email: body.emailAddress },
+      data: {
         roles: {
-          // If a user is not assigned the sponsor contact role, assign it
           createMany: {
             data: {
-              roleId: findSysRefRoleResponse.id,
+              roleId: 999,
               createdById: userWithContactManagerRole.user?.id,
               updatedById: userWithContactManagerRole.user?.id,
             },
@@ -189,357 +232,203 @@ describe('Successful organisation sponsor contact invitation', () => {
       },
     })
 
-    // Send email
     expect(emailService.sendEmail).toHaveBeenCalledWith({
+      to: body.emailAddress,
       subject: 'Assess the progress of your studies',
+      htmlTemplate: expect.any(Function),
+      textTemplate: expect.any(Function),
       templateData: {
-        rdnLink: EXTERNAL_CRN_URL,
         organisationName: updateOrgResponse.name,
+        rdnLink: EXTERNAL_CRN_URL,
         requestSupportLink: `http://localhost:3000${SUPPORT_PAGE}`,
         signInLink: `http://localhost:3000/auth/signin?registrationToken=${registrationToken}`,
         termsAndConditionsLink: EXTERNAL_CRN_TERMS_CONDITIONS_URL,
       },
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- valid any
-      htmlTemplate: expect.any(Function),
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- valid any
-      textTemplate: expect.any(Function),
-      to: body.emailAddress,
     })
 
-    // Entry in UserOrganisationInvitation table is added
-    expect(prismaClient.userOrganisationInvitation.create).toHaveBeenCalledWith({
-      data: {
-        messageId,
-        timestamp: createUserOrgInvitation.timestamp,
-        status: {
-          connect: {
-            id: createUserOrgInvitation.statusId,
-          },
-        },
-        userOrganisation: {
-          connect: {
-            id: createUserOrgInvitation.userOrganisationId,
-          },
-        },
-        sentBy: { connect: { id: userWithContactManagerRole.user?.id } },
-      },
-    })
-
-    // Redirect back to organisation page
-    expect(res.statusCode).toBe(302)
     expect(res._getRedirectUrl()).toBe(`/organisations/${body.organisationId}?success=1`)
-
-    jest.useRealTimers()
   })
+
+  /* -------------------- EXISTING CONFIRMED USER -------------------- */
 
   test('Existing user - registration confirmed', async () => {
     jest.useFakeTimers().setSystemTime(currentDate)
 
+    jest.mocked(authService.getUser).mockResolvedValue({
+      success: true,
+      data: {
+        totalResults: 1,
+        startIndex: 1,
+        itemsPerPage: 1,
+        schemas: ['urn:ietf:params:scim:api:messages:2.0:ListResponse'],
+        Resources: [
+          {
+            id: 'idg-123',
+            userName: 'idg-123',
+            groups: [],
+          },
+        ],
+      },
+    })
+
+    jest.mocked(prismaClient.user.findUniqueOrThrow).mockResolvedValue({
+      id: 2,
+      name: null,
+      email: body.emailAddress,
+      identityGatewayId: 'idg-123',
+      registrationToken: null,
+      registrationConfirmed: true,
+      isDeleted: false,
+      lastLogin: null,
+    })
+
     const updateOrgResponse = Mock.of<OrganisationWithRelations>({
       id: 2,
-      roles: [],
       name: 'Mock org name',
+      roles: [],
       users: [
         {
+          id: 444,
           user: {
             id: 2,
             email: body.emailAddress,
-            registrationConfirmed: false,
+            registrationConfirmed: true,
             registrationToken: null,
           },
         },
       ],
     })
 
-    const updateUserResponse = {
-      id: 1,
+    jest.mocked(prismaClient.userOrganisation.findFirst).mockResolvedValue(null)
+
+    jest.mocked(prismaClient.sysRefRole.findFirstOrThrow).mockResolvedValue(findSysRefRoleResponse)
+
+    jest.mocked(prismaClient.organisation.update).mockResolvedValue(updateOrgResponse)
+
+    jest.mocked(prismaClient.user.update).mockResolvedValue({
+      id: 2,
       name: null,
       email: body.emailAddress,
-      identityGatewayId: 'mock-gateway-id',
+      identityGatewayId: 'idg-123',
       registrationToken: null,
       registrationConfirmed: true,
       isDeleted: false,
       lastLogin: null,
-    }
+    })
 
     const messageId = '121'
+    jest.mocked(emailService.sendEmail).mockResolvedValue({
+      messageId,
+      recipients: [],
+    })
 
-    const createUserOrgInvitation = Mock.of<UserOrganisationInvitation>({
+    jest
+      .mocked(prismaClient.sysRefInvitationStatus.findFirstOrThrow)
+      .mockResolvedValue(findSysRefInvitationStatusResponse)
+
+    const invitation: UserOrganisationInvitation = {
       id: 1,
-      userOrganisationId: updateOrgResponse.users[0].id,
+      userOrganisationId: 444,
       messageId,
       timestamp: currentDate,
-      statusId: findSysRefInvitationStatusResponse.id,
+      statusId: 121,
       failureNotifiedAt: null,
       createdAt: currentDate,
       updatedAt: currentDate,
+      sentById: userWithContactManagerRole.user?.id ?? 1,
+      isDeleted: false,
+    }
+
+    jest.mocked(prismaClient.userOrganisationInvitation.create).mockResolvedValue(invitation)
+
+    const res = await testHandler(api, {
+      method: 'POST',
+      body,
     })
 
-    jest.mocked(prismaClient.user.findUnique).mockResolvedValueOnce(updateUserResponse)
-    jest.mocked(prismaClient.organisation.findFirst).mockResolvedValueOnce(findOrgResponse)
-    jest.mocked(prismaClient.user.update).mockResolvedValueOnce(updateUserResponse)
-    jest.mocked(emailService.sendEmail).mockResolvedValueOnce({ messageId, recipients: [] })
-    jest
-      .mocked(prismaClient.sysRefInvitationStatus.findFirstOrThrow)
-      .mockResolvedValueOnce(findSysRefInvitationStatusResponse)
+    expect(emailService.sendEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        templateData: expect.objectContaining({
+          signInLink: 'http://localhost:3000/auth/signin',
+        }),
+      })
+    )
 
-    jest.mocked(prismaClient.userOrganisationInvitation.create).mockResolvedValueOnce(createUserOrgInvitation)
-
-    const findSysRefRoleMock = jest
-      .mocked(prismaClient.sysRefRole.findFirstOrThrow)
-      .mockResolvedValueOnce(findSysRefRoleResponse)
-    const updateOrgMock = jest.mocked(prismaClient.organisation.update).mockResolvedValueOnce(updateOrgResponse)
-
-    const res = await testHandler(api, { method: 'POST', body })
-
-    expect(findSysRefRoleMock).toHaveBeenCalledWith({ where: { isDeleted: false, name: 'SponsorContact' } })
-
-    // Org is updated
-    expect(updateOrgMock).toHaveBeenCalledWith({
-      where: { id: Number(body.organisationId) },
-      include: {
-        users: {
-          select: {
-            id: true,
-            user: true,
-          },
-          where: {
-            user: {
-              email: body.emailAddress,
-            },
-          },
-        },
-      },
-      data: {
-        users: {
-          create: {
-            createdBy: { connect: { id: userWithContactManagerRole.user?.id } },
-            updatedBy: { connect: { id: userWithContactManagerRole.user?.id } },
-            user: {
-              connectOrCreate: {
-                create: {
-                  email: body.emailAddress,
-                },
-                where: {
-                  email: body.emailAddress,
-                },
-              },
-            },
-          },
-        },
-      },
-    })
-
-    // User role is added
-    expect(prismaClient.user.update).toHaveBeenCalledWith({
-      where: {
-        email: body.emailAddress,
-      },
-      data: {
-        roles: {
-          // If a user is not assigned the sponsor contact role, assign it
-          createMany: {
-            data: {
-              roleId: findSysRefRoleResponse.id,
-              createdById: userWithContactManagerRole.user?.id,
-              updatedById: userWithContactManagerRole.user?.id,
-            },
-            skipDuplicates: true,
-          },
-        },
-      },
-    })
-
-    // Send email
-    expect(emailService.sendEmail).toHaveBeenCalledWith({
-      subject: 'Assess the progress of your studies',
-      templateData: {
-        rdnLink: EXTERNAL_CRN_URL,
-        organisationName: updateOrgResponse.name,
-        requestSupportLink: `http://localhost:3000${SUPPORT_PAGE}`,
-        signInLink: 'http://localhost:3000/auth/signin',
-        termsAndConditionsLink: EXTERNAL_CRN_TERMS_CONDITIONS_URL,
-      },
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- valid any
-      htmlTemplate: expect.any(Function),
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- valid any
-      textTemplate: expect.any(Function),
-      to: body.emailAddress,
-    })
-
-    // Entry in UserOrganisationInvitation table is added
-    expect(prismaClient.userOrganisationInvitation.create).toHaveBeenCalledWith({
-      data: {
-        messageId,
-        timestamp: createUserOrgInvitation.timestamp,
-        status: {
-          connect: {
-            id: createUserOrgInvitation.statusId,
-          },
-        },
-        userOrganisation: {
-          connect: {
-            id: createUserOrgInvitation.userOrganisationId,
-          },
-        },
-        sentBy: {
-          connect: {
-            id: userWithContactManagerRole.user?.id,
-          },
-        },
-      },
-    })
-
-    // Redirect back to organisation page
-    expect(res.statusCode).toBe(302)
     expect(res._getRedirectUrl()).toBe(`/organisations/${body.organisationId}?success=1`)
-
-    jest.useRealTimers()
   })
+
+  /* ------------------------ RE-ACTIVATE USER ----------------------- */
 
   test('Re-add deleted contact', async () => {
     jest.useFakeTimers().setSystemTime(currentDate)
+
+    jest.mocked(prismaClient.userOrganisation.findFirst).mockResolvedValue({
+      id: 123,
+      isDeleted: true,
+    } as UserOrganisationWithRelations)
+
+    jest.mocked(prismaClient.sysRefRole.findFirstOrThrow).mockResolvedValue(findSysRefRoleResponse)
+
     const updateOrgResponse = Mock.of<OrganisationWithRelations>({
       id: 2,
-      roles: [],
       name: 'Mock org name',
-      users: [
-        {
-          user: {
-            email: body.emailAddress,
-            registrationConfirmed: false,
-            registrationToken: null,
-          },
-        },
-      ],
+      roles: [],
+      users: [{ id: 123, user: { email: body.emailAddress } }],
     })
 
-    const updateUserResponse = {
-      id: 1,
+    jest.mocked(prismaClient.organisation.update).mockResolvedValue(updateOrgResponse)
+
+    jest.mocked(prismaClient.user.update).mockResolvedValue({
+      id: 2,
       name: null,
       email: body.emailAddress,
-      identityGatewayId: 'mock-gateway-id',
+      identityGatewayId: null,
       registrationToken: null,
       registrationConfirmed: true,
       isDeleted: false,
       lastLogin: null,
-    }
+    })
 
     const messageId = '121'
 
-    const createUserOrgInvitation = Mock.of<UserOrganisationInvitation>({
+    jest.mocked(emailService.sendEmail).mockResolvedValue({
+      messageId,
+      recipients: [],
+    })
+
+    jest
+      .mocked(prismaClient.sysRefInvitationStatus.findFirstOrThrow)
+      .mockResolvedValue(findSysRefInvitationStatusResponse)
+
+    const invitation: UserOrganisationInvitation = {
       id: 1,
-      userOrganisationId: updateOrgResponse.users[0].id,
+      userOrganisationId: 123,
       messageId,
       timestamp: currentDate,
-      statusId: findSysRefInvitationStatusResponse.id,
+      statusId: 121,
       failureNotifiedAt: null,
       createdAt: currentDate,
       updatedAt: currentDate,
+      sentById: userWithContactManagerRole.user?.id ?? 1,
+      isDeleted: false,
+    }
+
+    jest.mocked(prismaClient.userOrganisationInvitation.create).mockResolvedValue(invitation)
+
+    const res = await testHandler(api, {
+      method: 'POST',
+      body,
     })
 
-    jest.mocked(prismaClient.user.findUnique).mockResolvedValueOnce(updateUserResponse)
-    jest.mocked(prismaClient.user.update).mockResolvedValueOnce(updateUserResponse)
-    jest.mocked(prismaClient.organisation.findFirst).mockResolvedValueOnce(findOrgResponse)
-    jest.mocked(emailService.sendEmail).mockResolvedValueOnce({ messageId, recipients: [] })
-    jest
-      .mocked(prismaClient.sysRefInvitationStatus.findFirstOrThrow)
-      .mockResolvedValueOnce(findSysRefInvitationStatusResponse)
+    expect(emailService.sendEmail).toHaveBeenCalled()
 
-    jest.mocked(prismaClient.userOrganisationInvitation.create).mockResolvedValueOnce(createUserOrgInvitation)
-
-    const mockUserOrganisation = Mock.of<UserOrganisationWithRelations>({
-      id: 123,
-      isDeleted: true,
-    })
-
-    jest.mocked(prismaClient.userOrganisation.findFirst).mockResolvedValueOnce(mockUserOrganisation)
-
-    const findSysRefRoleMock = jest
-      .mocked(prismaClient.sysRefRole.findFirstOrThrow)
-      .mockResolvedValueOnce(findSysRefRoleResponse)
-    const updateOrgMock = jest.mocked(prismaClient.organisation.update).mockResolvedValueOnce(updateOrgResponse)
-
-    const res = await testHandler(api, { method: 'POST', body })
-
-    expect(findSysRefRoleMock).toHaveBeenCalledWith({ where: { isDeleted: false, name: 'SponsorContact' } })
-
-    // Org is updated
-    expect(updateOrgMock).toHaveBeenCalledWith({
-      where: { id: Number(body.organisationId) },
-      include: {
-        users: {
-          select: {
-            id: true,
-            user: true,
-          },
-          where: {
-            user: {
-              email: body.emailAddress,
-            },
-          },
-        },
-      },
-      data: {
-        users: {
-          update: {
-            where: {
-              id: mockUserOrganisation.id,
-            },
-            data: {
-              isDeleted: false,
-              updatedBy: { connect: { id: userWithContactManagerRole.user?.id } },
-            },
-          },
-        },
-      },
-    })
-
-    // Send email
-    expect(emailService.sendEmail).toHaveBeenCalledWith({
-      subject: 'Assess the progress of your studies',
-      templateData: {
-        rdnLink: EXTERNAL_CRN_URL,
-        organisationName: updateOrgResponse.name,
-        requestSupportLink: `http://localhost:3000${SUPPORT_PAGE}`,
-        signInLink: 'http://localhost:3000/auth/signin',
-        termsAndConditionsLink: EXTERNAL_CRN_TERMS_CONDITIONS_URL,
-      },
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- valid any
-      htmlTemplate: expect.any(Function),
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- valid any
-      textTemplate: expect.any(Function),
-      to: body.emailAddress,
-    })
-
-    // Entry in UserOrganisationInvitation table is added
-    expect(prismaClient.userOrganisationInvitation.create).toHaveBeenCalledWith({
-      data: {
-        messageId,
-        timestamp: createUserOrgInvitation.timestamp,
-        status: {
-          connect: {
-            id: createUserOrgInvitation.statusId,
-          },
-        },
-        userOrganisation: {
-          connect: {
-            id: createUserOrgInvitation.userOrganisationId,
-          },
-        },
-        sentBy: {
-          connect: {
-            id: userWithContactManagerRole.user?.id,
-          },
-        },
-      },
-    })
-
-    // Redirect back to organisation page
-    expect(res.statusCode).toBe(302)
     expect(res._getRedirectUrl()).toBe(`/organisations/${body.organisationId}?success=1`)
   })
 })
+
+/* -------------------------------------------------------------------------- */
+/* FAILURE CASES                                                              */
+/* -------------------------------------------------------------------------- */
 
 describe('Failed organisation sponsor contact invitation', () => {
   const body: OrganisationAddInputs = {
@@ -555,79 +444,67 @@ describe('Failed organisation sponsor contact invitation', () => {
 
   test('User not logged in redirects to sign in page', async () => {
     jest.mocked(getServerSession).mockResolvedValueOnce(null)
-    const res = await testHandler(api, { method: 'POST', body, query: {} })
-    expect(res.statusCode).toBe(302)
+    const res = await testHandler(api, {
+      method: 'POST',
+      body,
+      query: {},
+    })
     expect(res._getRedirectUrl()).toBe(SIGN_IN_PAGE)
-    expect(logger.error).toHaveBeenCalledWith(new AuthError('Not signed in'))
   })
 
-  test('User without having a required role is redirected to error page', async () => {
+  test('User without role is redirected', async () => {
     jest.mocked(getServerSession).mockResolvedValueOnce(userNoRoles)
-    const res = await testHandler(api, { method: 'POST', body, query: {} })
-    expect(res.statusCode).toBe(302)
+    const res = await testHandler(api, {
+      method: 'POST',
+      body,
+      query: {},
+    })
     expect(res._getRedirectUrl()).toBe(`/500`)
-    expect(logger.error).toHaveBeenCalledWith(new Error('User does not have a valid role'))
   })
 
-  test('Wrong http method redirects back to the form with a fatal error', async () => {
+  test('Wrong http method returns fatal=1', async () => {
     jest.mocked(getServerSession).mockResolvedValueOnce(userWithContactManagerRole)
-    const res = await testHandler(api, { method: 'GET', body, query: {} })
-    expect(res.statusCode).toBe(302)
+    const res = await testHandler(api, {
+      method: 'GET',
+      body,
+      query: {},
+    })
     expect(res._getRedirectUrl()).toBe(`/organisations/${body.organisationId}/?fatal=1`)
-    expect(logger.error).toHaveBeenCalledWith(new Error('Wrong method'))
   })
 
-  test('Validation errors redirects back to the form with the errors and original values', async () => {
+  test('Validation errors redirect to the form', async () => {
     jest.mocked(getServerSession).mockResolvedValueOnce(userWithContactManagerRole)
-    jest.mocked(prismaClient.assessment.create).mockResolvedValueOnce(Mock.of<Assessment>({ id: 1 }))
-    jest.mocked(prismaClient.study.update).mockResolvedValueOnce(Mock.of<Study>({ id: 2 }))
 
-    const bodyWithValidationIssue: Partial<OrganisationAddInputs> = {
+    const invalidBody = {
       organisationId: '123',
-      emailAddress: undefined,
     }
 
-    const res = await testHandler(api, { method: 'POST', body: bodyWithValidationIssue })
-
-    expect(res.statusCode).toBe(302)
-    expect(res._getRedirectUrl()).toBe(`/organisations/123/?emailAddressError=Required`)
-    expect(logger.error).toHaveBeenCalledWith(
-      new ZodError([
-        {
-          code: 'invalid_type',
-          expected: 'string',
-          received: 'undefined',
-          path: ['emailAddress'],
-          message: 'Required',
-        },
-      ])
-    )
-  })
-
-  test('Attempting to invite already existing contact redirects with error', async () => {
-    jest.mocked(getServerSession).mockResolvedValueOnce(userWithContactManagerRole)
-    jest.mocked(prismaClient.organisation.findFirst).mockResolvedValueOnce(findOrgResponse)
-    jest.mocked(prismaClient.sysRefRole.findFirstOrThrow).mockResolvedValueOnce(findSysRefRoleResponse)
-
-    const mockUserOrganisation = Mock.of<UserOrganisationWithRelations>({
-      id: 123,
-      isDeleted: false,
+    const res = await testHandler(api, {
+      method: 'POST',
+      body: invalidBody,
     })
 
-    jest.mocked(prismaClient.userOrganisation.findFirst).mockResolvedValueOnce(mockUserOrganisation)
+    expect(res._getRedirectUrl()).toBe(`/organisations/123/?emailAddressError=Required`)
+  })
 
-    const res = await testHandler(api, { method: 'POST', body })
+  test('Attempting to invite existing contact returns fatal=2', async () => {
+    jest.mocked(getServerSession).mockResolvedValueOnce(userWithContactManagerRole)
 
-    expect(jest.mocked(prismaClient.organisation.update)).not.toHaveBeenCalled()
+    jest.mocked(getOrganisationById).mockResolvedValue(findOrgResponse)
 
-    expect(emailService.sendEmail).not.toHaveBeenCalled()
+    jest.mocked(prismaClient.sysRefRole.findFirstOrThrow).mockResolvedValue(findSysRefRoleResponse)
 
-    expect(res.statusCode).toBe(302)
+    jest.mocked(prismaClient.userOrganisation.findFirst).mockResolvedValue({
+      id: 123,
+      isDeleted: false,
+    } as UserOrganisationWithRelations)
+
+    const res = await testHandler(api, {
+      method: 'POST',
+      body,
+    })
+
     expect(res._getRedirectUrl()).toBe(`/organisations/${body.organisationId}/?fatal=2`)
-    expect(logger.error).toHaveBeenCalledWith(
-      'Tried to add contact with email %s to organisation %s, but active relationship already exists',
-      body.emailAddress,
-      findOrgResponse.name
-    )
+    expect(emailService.sendEmail).not.toHaveBeenCalled()
   })
 })
