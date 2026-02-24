@@ -71,7 +71,7 @@ export const EXTERNAL_CRN_URL =
   'https://www.nihr.ac.uk/support-and-services/support-for-delivering-research/research-delivery-network'
 
 export const EXTERNAL_CRN_TERMS_CONDITIONS_URL =
-  'https://www.nihr.ac.uk/eligibility-nihr-research-delivery-network-support#portfolio-terms-and-conditions'
+  'https://www.nihr.ac.uk/support-and-services/support-for-delivering-research/eligibility-rdn-support/rdn-portfolio-terms-and-conditions'
 
 export const EXTERNAL_COOKIE_POLICY_PAGE_URL =
   'https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-cookie-policy'
