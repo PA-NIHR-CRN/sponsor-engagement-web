@@ -135,6 +135,15 @@ export default withApiHandler<ExtendedNextApiRequest>(
         logger.info('Re-adding contact with email %s to organisation %s', emailAddress, organisation.name)
       }
 
+      const existingUser = await prismaClient.user.findUnique({
+        include: { roles: true },
+        where: {
+          email: emailAddress,
+        },
+      })
+
+      const shouldUpdateRegistrationToken = (existingUser?.identityGatewayId ?? null) === null
+
       // Add user to organisation
       const { name: organisationName, users } = await prismaClient.organisation.update({
         where: {
@@ -181,26 +190,38 @@ export default withApiHandler<ExtendedNextApiRequest>(
 
       const userOrganisationId = users[0].id
 
-      let registrationToken: string | null = null
+
+      const isPreviousSponsorContact =
+        existingUser &&
+        existingUser.roles.some((x) => x.roleId === Roles.SponsorContact.valueOf() && x.isDeleted === true)
+
+      if (isPreviousSponsorContact) {
+        logger.info(`Re-adding sponsor contact role for ${existingUser.email}`)
+      }
+      
+       let registrationToken: string | null = null
       if (isNewToIDG) {
         registrationToken = crypto.randomBytes(24).toString('hex')
-
-        await prismaClient.user.update({
-          where: {
-            email: emailAddress,
-          },
-          data: {
-            registrationToken,
-            registrationConfirmed: false,
-          },
-        })
       }
 
-      const user = await prismaClient.user.update({
-        where: { email: emailAddress },
-        data: {
-          roles: {
-            // If a user is not assigned the sponsor contact role, assign it
+
+      const roleMutation = isPreviousSponsorContact
+        ? {
+            update: {
+              where: {
+                userId_roleId: {
+                  roleId,
+                  userId: existingUser.id,
+                },
+                isDeleted: true,
+              },
+              data: {
+                updatedById: requestedByUserId,
+                isDeleted: false,
+              },
+            },
+          }
+        : {
             createMany: {
               data: {
                 roleId,
@@ -209,7 +230,18 @@ export default withApiHandler<ExtendedNextApiRequest>(
               },
               skipDuplicates: true,
             },
-          },
+          }
+
+      const user = await prismaClient.user.update({
+        where: {
+          email: emailAddress,
+        },
+        data: {
+          ...(isNewToIDG && {
+            registrationToken,
+            registrationConfirmed: false,
+          }),
+          roles: roleMutation,
         },
       })
 

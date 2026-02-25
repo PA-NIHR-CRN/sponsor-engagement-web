@@ -139,6 +139,7 @@ describe('Successful organisation sponsor contact invitation', () => {
       registrationConfirmed: false,
       isDeleted: false,
       lastLogin: null,
+      roles: [],
     }
 
     const messageId = '121'
@@ -314,7 +315,9 @@ describe('Successful organisation sponsor contact invitation', () => {
       registrationConfirmed: true,
       isDeleted: false,
       lastLogin: null,
+      roles: [],
     })
+
 
     const messageId = '121'
     jest.mocked(emailService.sendEmail).mockResolvedValue({
@@ -387,7 +390,9 @@ describe('Successful organisation sponsor contact invitation', () => {
       registrationConfirmed: true,
       isDeleted: false,
       lastLogin: null,
+      roles: [],
     })
+
 
     const messageId = '121'
 
