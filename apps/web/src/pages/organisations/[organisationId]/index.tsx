@@ -142,7 +142,7 @@ export default function Organisation({ organisation, query }: OrganisationProps)
     if (router.query.success) {
       reset()
     }
-  }, [router.query.success])
+  }, [router.query.success, invitedEmail, reset])
 
   return (
     <Container>
