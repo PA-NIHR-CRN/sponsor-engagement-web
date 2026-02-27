@@ -1,5 +1,6 @@
 import crypto from 'node:crypto'
 
+import { authService } from '@nihr-ui/auth'
 import { emailService } from '@nihr-ui/email'
 import { logger } from '@nihr-ui/logger'
 import { emailTemplates } from '@nihr-ui/templates/sponsor-engagement'
@@ -20,6 +21,61 @@ import { addUserToGroup, isUserEligibleForOdpRole } from './registration'
 
 export interface ExtendedNextApiRequest extends NextApiRequest {
   body: OrganisationAddInputs
+}
+
+// ---------- Helper: look up IDG and sync local user ----------
+async function lookupIdgAndSyncLocalUser(emailAddress: string) {
+  let identityGatewayId: string | null = null
+  let idgUserFound = false
+
+  const getUserResponse = await authService.getUser(emailAddress)
+
+  if (getUserResponse.success) {
+    const {
+      data: { totalResults, Resources },
+    } = getUserResponse
+
+    if (totalResults > 0 && Resources) {
+      const match = Resources.find((r) => Boolean(r.userName))
+      identityGatewayId = match?.userName ?? null
+      idgUserFound = identityGatewayId !== null
+
+      if (idgUserFound) {
+        logger.info('Found IDG account matching email %s', emailAddress)
+      }
+    } else {
+      logger.info('No IDG account found for %s — treating as new user', emailAddress)
+    }
+  }
+
+  let localUser = await prismaClient.user.findUnique({
+    where: { email: emailAddress },
+  })
+
+  if (!localUser) {
+    localUser = await prismaClient.user.create({
+      data: {
+        email: emailAddress,
+        ...(idgUserFound && {
+          identityGatewayId,
+          registrationConfirmed: true,
+          registrationToken: null,
+        }),
+      },
+    })
+  } else if (idgUserFound) {
+    localUser = await prismaClient.user.update({
+      where: { email: emailAddress },
+      data: {
+        identityGatewayId,
+        registrationConfirmed: true,
+        registrationToken: null,
+      },
+    })
+  }
+
+  const isNewToIDG = !idgUserFound
+  return { localUser, isNewToIDG, identityGatewayId }
 }
 
 export default withApiHandler<ExtendedNextApiRequest>(
@@ -55,7 +111,7 @@ export default withApiHandler<ExtendedNextApiRequest>(
         user: { id: requestedByUserId },
       } = session
 
-      const registrationToken = crypto.randomBytes(24).toString('hex')
+      const { isNewToIDG } = await lookupIdgAndSyncLocalUser(emailAddress)
 
       // Get existing user organisation record
       const userOrganisation = await prismaClient.userOrganisation.findFirst({
@@ -78,14 +134,6 @@ export default withApiHandler<ExtendedNextApiRequest>(
       if (userOrganisation) {
         logger.info('Re-adding contact with email %s to organisation %s', emailAddress, organisation.name)
       }
-
-      const existingUser = await prismaClient.user.findUnique({
-        where: {
-          email: emailAddress,
-        },
-      })
-
-      const shouldUpdateRegistrationToken = (existingUser?.identityGatewayId ?? null) === null
 
       // Add user to organisation
       const { name: organisationName, users } = await prismaClient.organisation.update({
@@ -123,15 +171,7 @@ export default withApiHandler<ExtendedNextApiRequest>(
                 createdBy: { connect: { id: requestedByUserId } },
                 updatedBy: { connect: { id: requestedByUserId } },
                 user: {
-                  connectOrCreate: {
-                    // If a user does not exist, create the user. We'll set registration token later.
-                    create: {
-                      email: emailAddress,
-                    },
-                    where: {
-                      email: emailAddress,
-                    },
-                  },
+                  connect: { email: emailAddress },
                 },
               },
             }),
@@ -141,15 +181,24 @@ export default withApiHandler<ExtendedNextApiRequest>(
 
       const userOrganisationId = users[0].id
 
-      const user = await prismaClient.user.update({
-        where: {
-          email: emailAddress,
-        },
-        data: {
-          ...(shouldUpdateRegistrationToken && {
+      let registrationToken: string | null = null
+      if (isNewToIDG) {
+        registrationToken = crypto.randomBytes(24).toString('hex')
+
+        await prismaClient.user.update({
+          where: {
+            email: emailAddress,
+          },
+          data: {
             registrationToken,
             registrationConfirmed: false,
-          }),
+          },
+        })
+      }
+
+      const user = await prismaClient.user.update({
+        where: { email: emailAddress },
+        data: {
           roles: {
             // If a user is not assigned the sponsor contact role, assign it
             createMany: {
@@ -164,14 +213,13 @@ export default withApiHandler<ExtendedNextApiRequest>(
         },
       })
 
-      const isNewUser = Boolean(user.registrationToken) && !user.registrationConfirmed
-
-      const savedRegistrationToken = user.registrationToken
-
       const isEligibleForOdpRole = await isUserEligibleForOdpRole(user.id)
       if (isEligibleForOdpRole) {
         await addUserToGroup(user.email, ODP_ROLE_GROUP_ID)
       }
+
+      const isNewUser = Boolean(registrationToken)
+      const signInLink = getAbsoluteUrl(`${SIGN_IN_PAGE}${isNewUser ? `?registrationToken=${registrationToken}` : ''}`)
 
       const { messageId } = await emailService.sendEmail({
         to: emailAddress,
@@ -181,9 +229,7 @@ export default withApiHandler<ExtendedNextApiRequest>(
         templateData: {
           organisationName,
           rdnLink: EXTERNAL_CRN_URL,
-          signInLink: getAbsoluteUrl(
-            `${SIGN_IN_PAGE}${isNewUser ? `?registrationToken=${savedRegistrationToken}` : ``}`
-          ),
+          signInLink,
           requestSupportLink: getAbsoluteUrl(SUPPORT_PAGE),
           termsAndConditionsLink: EXTERNAL_CRN_TERMS_CONDITIONS_URL,
         },
