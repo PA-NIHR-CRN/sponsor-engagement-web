@@ -208,22 +208,17 @@ describe('Successful organisation sponsor contact invitation', () => {
     })
 
     // First update call (token)
-    expect(prismaClient.user.update).toHaveBeenNthCalledWith(1, {
-      where: { email: body.emailAddress },
-      data: {
-        registrationToken: 'mocked-token',
-        registrationConfirmed: false,
+    expect(prismaClient.user.update).toHaveBeenCalledWith({
+      where: {
+        email: body.emailAddress,
       },
-    })
-
-    // Second update call (role)
-    expect(prismaClient.user.update).toHaveBeenNthCalledWith(2, {
-      where: { email: body.emailAddress },
       data: {
+        registrationConfirmed: false,
+        registrationToken,
         roles: {
           createMany: {
             data: {
-              roleId: 999,
+              roleId: findSysRefRoleResponse.id,
               createdById: userWithContactManagerRole.user?.id,
               updatedById: userWithContactManagerRole.user?.id,
             },
@@ -315,9 +310,7 @@ describe('Successful organisation sponsor contact invitation', () => {
       registrationConfirmed: true,
       isDeleted: false,
       lastLogin: null,
-      roles: [],
     })
-
 
     const messageId = '121'
     jest.mocked(emailService.sendEmail).mockResolvedValue({
@@ -390,9 +383,7 @@ describe('Successful organisation sponsor contact invitation', () => {
       registrationConfirmed: true,
       isDeleted: false,
       lastLogin: null,
-      roles: [],
     })
-
 
     const messageId = '121'
 

@@ -142,8 +142,6 @@ export default withApiHandler<ExtendedNextApiRequest>(
         },
       })
 
-      const shouldUpdateRegistrationToken = (existingUser?.identityGatewayId ?? null) === null
-
       // Add user to organisation
       const { name: organisationName, users } = await prismaClient.organisation.update({
         where: {
@@ -190,7 +188,6 @@ export default withApiHandler<ExtendedNextApiRequest>(
 
       const userOrganisationId = users[0].id
 
-
       const isPreviousSponsorContact =
         existingUser &&
         existingUser.roles.some((x) => x.roleId === Roles.SponsorContact.valueOf() && x.isDeleted === true)
@@ -198,12 +195,11 @@ export default withApiHandler<ExtendedNextApiRequest>(
       if (isPreviousSponsorContact) {
         logger.info(`Re-adding sponsor contact role for ${existingUser.email}`)
       }
-      
-       let registrationToken: string | null = null
+
+      let registrationToken: string | null = null
       if (isNewToIDG) {
         registrationToken = crypto.randomBytes(24).toString('hex')
       }
-
 
       const roleMutation = isPreviousSponsorContact
         ? {
