@@ -1,5 +1,7 @@
+import type { Document } from '@contentful/rich-text-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Container, NotificationBanner, Table } from '@nihr-ui/frontend'
+import { logger } from '@nihr-ui/logger'
 import clsx from 'clsx'
 import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
@@ -9,15 +11,18 @@ import { type ReactElement, useCallback, useEffect, useState } from 'react'
 import type { FieldError } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 
+import type { TypeSetLabelSkeleton } from '@/@types/generated'
 import { ErrorSummary, Form } from '@/components/atoms'
 import { TextInput } from '@/components/atoms/Form/TextInput/TextInput'
 import { RootLayout } from '@/components/organisms'
 import { Roles, UserOrganisationInviteStatus } from '@/constants'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
+import { getManagedContent } from '@/lib/contentful/contentfulService'
 import { getOrganisationById } from '@/lib/organisations'
 import { formatDate } from '@/utils/date'
 import { getValuesFromSearchParams } from '@/utils/form'
 import { hasOrganisationAccess } from '@/utils/organisations'
+import { RichTextRenderer } from '@/utils/Renderers/RichTextRenderer/RichTextRenderer'
 import type { OrganisationAddInputs } from '@/utils/schemas'
 import { organisationAddSchema } from '@/utils/schemas'
 import { withServerSideProps } from '@/utils/withServerSideProps'
@@ -32,9 +37,8 @@ const renderNotificationBanner = (successType: number, email?: string) => (
   </NotificationBanner>
 )
 
-export default function Organisation({ organisation, query }: OrganisationProps) {
+export default function Organisation({ organisation, query, managedContent }: OrganisationProps) {
   const router = useRouter()
-
   const { register, formState, setError, handleSubmit, reset } = useForm<OrganisationAddInputs>({
     resolver: zodResolver(organisationAddSchema),
     defaultValues: {
@@ -166,13 +170,7 @@ export default function Organisation({ organisation, query }: OrganisationProps)
           {/* Organisation details */}
           {renderDetails()}
 
-          <h3 className="govuk-heading-m p-0 govuk-!-margin-bottom-4">Add or remove sponsor contacts</h3>
-
-          <p>
-            Invite new sponsor contacts to this organisation, allowing them to view all studies for this organisation
-            and provide assessments. If the user has not accessed the tool previously, they will be asked to set up an
-            NIHR Identity Gateway account so they can access this service.
-          </p>
+          <RichTextRenderer>{managedContent.content as Document}</RichTextRenderer>
 
           {/* Invite form */}
           <Form
@@ -224,6 +222,18 @@ export const getServerSideProps = withServerSideProps(
   [Roles.ContactManager, Roles.SponsorContact],
   async (context, session) => {
     const organisationId = Number(context.query.organisationId)
+    const { CONTENTFUL_PAGE_ORG_DETAILS_ID } = process.env
+    const contentfulContent = await getManagedContent<TypeSetLabelSkeleton>(CONTENTFUL_PAGE_ORG_DETAILS_ID)
+    const managedContent = contentfulContent?.fields || null
+
+    if (!managedContent?.content) {
+      logger.error('Error: Contentful response is empty for organisation details page.')
+      return {
+        redirect: {
+          destination: '/500',
+        },
+      }
+    }
 
     if (!organisationId) {
       return {
@@ -256,6 +266,7 @@ export const getServerSideProps = withServerSideProps(
         query: context.query,
         user: session.user,
         organisation,
+        managedContent,
       },
     }
   }

@@ -12,3 +12,4 @@ export type {
   TypeGenericShortTextFields,
   TypeGenericShortTextSkeleton,
 } from './TypeGenericShortText'
+export type {TypeSetLabel,TypeSetLabelFields,TypeSetLabelSkeleton} from './TypeSetLabel'
