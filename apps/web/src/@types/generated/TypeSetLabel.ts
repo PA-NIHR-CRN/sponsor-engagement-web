@@ -22,21 +22,21 @@ export interface TypeSetLabelFields {
 }
 
 /**
- * Entry skeleton type definition for content type 'setLabel' (SET label)
+ * Entry skeleton type definition for content type 'setLabel' (SET organisation details)
  * @name TypeSetLabelSkeleton
  * @type {TypeSetLabelSkeleton}
  * @author 74dRNHIw06jXMrW8vfnjVl
  * @since 2026-04-22T09:40:45.442Z
- * @version 1
+ * @version 3
  */
 export type TypeSetLabelSkeleton = EntrySkeletonType<TypeSetLabelFields, "setLabel">;
 /**
- * Entry type definition for content type 'setLabel' (SET label)
+ * Entry type definition for content type 'setLabel' (SET organisation details)
  * @name TypeSetLabel
  * @type {TypeSetLabel}
  * @author 74dRNHIw06jXMrW8vfnjVl
  * @since 2026-04-22T09:40:45.442Z
- * @version 1
+ * @version 3
  */
 export type TypeSetLabel<Modifiers extends ChainModifiers, Locales extends LocaleCode = LocaleCode> = Entry<TypeSetLabelSkeleton, Modifiers, Locales>;
 

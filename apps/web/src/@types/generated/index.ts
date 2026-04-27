@@ -12,4 +12,9 @@ export type {
   TypeGenericShortTextFields,
   TypeGenericShortTextSkeleton,
 } from './TypeGenericShortText'
-export type {TypeSetLabel,TypeSetLabelFields,TypeSetLabelSkeleton} from './TypeSetLabel'
+export { isTypeSetAssesmentFormPage } from "./TypeSetAssesmentFormPage";
+export type { TypeSetAssesmentFormPage, TypeSetAssesmentFormPageFields, TypeSetAssesmentFormPageSkeleton, TypeSetAssesmentFormPageWithAllLocalesAndWithoutLinkResolutionResponse, TypeSetAssesmentFormPageWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeSetAssesmentFormPageWithAllLocalesResponse, TypeSetAssesmentFormPageWithoutLinkResolutionResponse, TypeSetAssesmentFormPageWithoutUnresolvableLinksResponse } from "./TypeSetAssesmentFormPage";
+export { isTypeSetLabel } from "./TypeSetLabel";
+export type { TypeSetLabel, TypeSetLabelFields, TypeSetLabelSkeleton, TypeSetLabelWithAllLocalesAndWithoutLinkResolutionResponse, TypeSetLabelWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeSetLabelWithAllLocalesResponse, TypeSetLabelWithoutLinkResolutionResponse, TypeSetLabelWithoutUnresolvableLinksResponse } from "./TypeSetLabel";
+export { isTypeStudyDataForm } from "./TypeStudyDataForm";
+export type { TypeStudyDataForm, TypeStudyDataFormFields, TypeStudyDataFormSkeleton, TypeStudyDataFormWithAllLocalesAndWithoutLinkResolutionResponse, TypeStudyDataFormWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeStudyDataFormWithAllLocalesResponse, TypeStudyDataFormWithoutLinkResolutionResponse, TypeStudyDataFormWithoutUnresolvableLinksResponse } from "./TypeStudyDataForm";
