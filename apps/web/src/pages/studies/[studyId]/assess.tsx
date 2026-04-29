@@ -91,12 +91,9 @@ export default function Assessment({
         <div className="w-full">
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">{managedContent?.pageTitle.toString()}</h2>
 
-          <div className="govuk-!-margin-bottom-6" />
-          <RichTextRenderer>{managedContent?.pageDescription as Document}</RichTextRenderer>
-          {/* <p className="govuk-body govuk-!-margin-bottom-6">
-            You will need to assess if the study is on or off track in the UK and if any action is being taken. If you
-            need NIHR RDN support with this study you will need to request this separately.
-          </p> */}
+          <div className="govuk-body govuk-!-margin-bottom-6">
+            <RichTextRenderer>{managedContent?.pageDescription as Document}</RichTextRenderer>
+          </div>
 
           <div className="text-darkGrey govuk-!-margin-bottom-0 govuk-body-s">
             <span className="govuk-visually-hidden">Study sponsor: </span>
