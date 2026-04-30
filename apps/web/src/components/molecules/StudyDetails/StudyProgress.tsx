@@ -7,6 +7,8 @@ const maxDaysSinceAssessmentDue = 90
 
 export interface StudyProgressProps {
     elapsedDays: number
+    textClassName?: string
+    overduePhrase?: string
 }
 
 function GetStudyProgressColor(daysSinceAssessmentDue: number) {
@@ -28,17 +30,17 @@ function AsDaysString(days: number)
         
 }
 
-function GetOverdueText(remainingDays: number) {
+function GetOverdueText(overduePhrase: string, remainingDays: number) {
     
     if (remainingDays < 0) {
-        return "OVERDUE by " + AsDaysString(Math.abs(remainingDays)); 
+        return overduePhrase + " by " + AsDaysString(Math.abs(remainingDays)); 
     }    
     else {
         return AsDaysString(remainingDays) + " remaining";
     }
 }
 
-export function StudyProgress({elapsedDays}: StudyProgressProps) {
+export function StudyProgress({elapsedDays, textClassName = "govuk-body-s", overduePhrase = "Overdue"}: StudyProgressProps) {
     const remainingDays = maxDaysSinceAssessmentDue - elapsedDays;
     const overdueTextClass = remainingDays < 0 ? "text-red" : "";
     return (
@@ -50,10 +52,10 @@ export function StudyProgress({elapsedDays}: StudyProgressProps) {
 
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-two-thirds govuk-body-s">
-                    <p className={clsx("govuk-body-s", overdueTextClass)}>{GetOverdueText(remainingDays)}</p>
+                    <p className={clsx(textClassName, overdueTextClass)}>{GetOverdueText(overduePhrase, remainingDays)}</p>
                 </div>
                 <div className="govuk-grid-column-one-third text-right">
-                    <p className="govuk-body-s">{elapsedDays} of {maxDaysSinceAssessmentDue}</p>
+                    <p className={textClassName}>{elapsedDays} of {maxDaysSinceAssessmentDue}</p>
                 </div>
             </div>
         </div>
