@@ -17,8 +17,8 @@ function GetStudyProgressColor(daysSinceAssessmentDue: number, firstParticipantT
 
 function GetFirstParticipantTargetDays()
 {
-    const FIRST_PARTICIPANT_TIME_LIMIT = process.env.NEXT_PUBLIC_FIRST_PARTICIPANT_TIME_LIMIT as string;
-    return Number(FIRST_PARTICIPANT_TIME_LIMIT);
+    const target = process.env.NEXT_PUBLIC_FIRST_PARTICIPANT_TARGET_DAYS as string;
+    return target && target.length > 0 ? Number(target) : 90;
 }
 
 function AsDaysString(days: number)
