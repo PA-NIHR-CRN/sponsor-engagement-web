@@ -1,7 +1,6 @@
 import type { Document } from '@contentful/rich-text-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Container, NotificationBanner, Table } from '@nihr-ui/frontend'
-import { logger } from '@nihr-ui/logger'
 import clsx from 'clsx'
 import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
@@ -170,7 +169,7 @@ export default function Organisation({ organisation, query, managedContent }: Or
           {/* Organisation details */}
           {renderDetails()}
 
-          <RichTextRenderer>{managedContent.content as Document}</RichTextRenderer>
+          <RichTextRenderer>{managedContent?.content as Document}</RichTextRenderer>
 
           {/* Invite form */}
           <Form
@@ -225,15 +224,6 @@ export const getServerSideProps = withServerSideProps(
     const { CONTENTFUL_PAGE_ORG_DETAILS_ID } = process.env
     const contentfulContent = await getManagedContent<TypeSetLabelSkeleton>(CONTENTFUL_PAGE_ORG_DETAILS_ID)
     const managedContent = contentfulContent?.fields || null
-
-    if (!managedContent?.content) {
-      logger.error('Error: Contentful response is empty for organisation details page.')
-      return {
-        redirect: {
-          destination: '/500',
-        },
-      }
-    }
 
     if (!organisationId) {
       return {

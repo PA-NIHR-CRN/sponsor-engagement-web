@@ -10,6 +10,7 @@ import { userWithSponsorContactRole } from '@/__mocks__/session'
 import { Status } from '@/@types/studies'
 import { render, screen, within } from '@/config/TestUtils'
 import { SUPPORT_PAGE } from '@/constants/routes'
+import { StudyUpdatePageMock } from '@/lib/contentful/StudyUpdatePageMock'
 import { mappedCPMSStudyEvals, mockCPMSStudy, mockStudyWithRelations } from '@/mocks/studies'
 import EditStudy, { type EditStudyProps, getServerSideProps } from '@/pages/studies/[studyId]/edit'
 
@@ -42,6 +43,8 @@ const mockedEnvVars = {
   assessmentLapseMonths: '3',
 }
 
+const mockManagedContent = StudyUpdatePageMock.fields
+
 const organisationsByRole = {
   CRO: 'Test Organisation',
 }
@@ -71,7 +74,7 @@ const renderPage = async (
     props: EditStudyProps
   }
 
-  render(EditStudy.getLayout(<EditStudy {...props} />, { ...props }))
+  render(EditStudy.getLayout(<EditStudy {...props} managedContent={mockManagedContent} />, { ...props }))
 }
 
 const removeDateField = async (label: string) => {
