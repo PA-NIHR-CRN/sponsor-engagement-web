@@ -28,6 +28,7 @@ $govuk-page-width: 1280px;
 $govuk-link-colour: var(--colour-blue);
 
 @import '../../node_modules/govuk-frontend/govuk/all.scss';
+@import './progress-bar.scss';
 
 @layer utilities {
   .focusable {

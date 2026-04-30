@@ -1,6 +1,7 @@
 import type {getStudyById} from '@/lib/studies'
 import {ProgressBar, progressBarColor} from "@/components/atoms/ProgressBar/ProgressBar";
 import {StudyDetailsProps} from "@/components/molecules";
+import clsx from "clsx";
 
 const maxDaysSinceAssessmentDue = 90
 
@@ -16,19 +17,30 @@ function GetStudyProgressColor(daysSinceAssessmentDue: number) {
     }
 }
 
-function GetOverdueText(remainingDays: number) {
-    if (remainingDays == 1) {
-        return "1 day remaining";
-    } else if (remainingDays <= 0) {
-        return "Overdue by " + remainingDays + " days";
-    } else {
-        return remainingDays + " days remaining";
+function AsDaysString(days: number)
+{
+    if (days == 1) {
+        return "1 day";
     }
+    else {
+        return days + " days";
+    }
+        
+}
 
+function GetOverdueText(remainingDays: number) {
+    
+    if (remainingDays < 0) {
+        return "OVERDUE by " + AsDaysString(Math.abs(remainingDays)); 
+    }    
+    else {
+        return AsDaysString(remainingDays) + " remaining";
+    }
 }
 
 export function StudyProgress({elapsedDays}: StudyProgressProps) {
     const remainingDays = maxDaysSinceAssessmentDue - elapsedDays;
+    const overdueTextClass = remainingDays < 0 ? "text-red" : "";
     return (
         <div>
             <div>
@@ -37,11 +49,11 @@ export function StudyProgress({elapsedDays}: StudyProgressProps) {
             </div>
 
             <div className="govuk-grid-row">
-                <div className="govuk-grid-column-two-thirds">
-                    <p>{GetOverdueText(remainingDays)}</p>
+                <div className="govuk-grid-column-two-thirds govuk-body-s">
+                    <p className={clsx("govuk-body-s", overdueTextClass)}>{GetOverdueText(remainingDays)}</p>
                 </div>
                 <div className="govuk-grid-column-one-third text-right">
-                    <p>{elapsedDays} of {maxDaysSinceAssessmentDue}</p>
+                    <p className="govuk-body-s">{elapsedDays} of {maxDaysSinceAssessmentDue}</p>
                 </div>
             </div>
         </div>

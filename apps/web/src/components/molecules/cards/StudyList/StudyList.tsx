@@ -86,7 +86,7 @@ export function StudyList({
 
         <div className="lg:min-w-[320px]">
           <div>
-            <StudyProgress elapsedDays={50}/>
+            <StudyProgress elapsedDays={120}/>
           </div>
         </div>
         
