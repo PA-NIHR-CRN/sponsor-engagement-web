@@ -1,6 +1,8 @@
 import Link from 'next/link'
 
-import { Card } from '@/components/atoms'
+import {Card} from '@/components/atoms'
+import {ProgressBar, progressBarColor} from "@/components/atoms/ProgressBar/ProgressBar";
+import {StudyProgress} from "@/components/molecules/StudyDetails/StudyProgress";
 
 export interface StudyListProps {
   sponsorOrgName?: string
@@ -82,6 +84,12 @@ export function StudyList({
           </p>
         </div>
 
+        <div className="lg:min-w-[320px]">
+          <div>
+            <StudyProgress elapsedDays={50}/>
+          </div>
+        </div>
+        
         <div className="text-right lg:w-full">
           <Link
             aria-label={`View study ${shortTitle}`}
