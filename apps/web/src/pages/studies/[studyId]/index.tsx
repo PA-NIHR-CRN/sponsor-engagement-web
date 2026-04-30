@@ -6,7 +6,6 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import type { ReactElement } from 'react'
 import type { LeadAdministrationId } from 'shared-utilities/src/utils/lead-administration-id'
-
 import { Status } from '@/@types/studies'
 import {
   AssessmentHistory,
@@ -14,6 +13,7 @@ import {
   getAssessmentHistoryFromStudy,
   RequestSupport,
   StudyDetails,
+  StudyProgressExtended,
 } from '@/components/molecules'
 import { getEditHistory } from '@/components/molecules/EditHistory/utils'
 import { RootLayout } from '@/components/organisms'
@@ -98,6 +98,13 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
                 This study needs a new sponsor assessment.
               </div>
             )}
+
+            <StudyProgressExtended
+                hraApprovalDate={new Date('2026-04-01')}
+                endDate={new Date('2026-05-11')}
+                studyStatus={study.studyStatus}
+            />
+            
             <div className="flex gap-4">
               <Link className="govuk-button w-auto govuk-!-margin-bottom-0" href={getAssessmentPageRoute(study.id)}>
                 Assess study
