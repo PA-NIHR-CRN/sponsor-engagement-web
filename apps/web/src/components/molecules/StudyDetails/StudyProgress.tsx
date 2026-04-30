@@ -16,19 +16,30 @@ function GetStudyProgressColor(daysSinceAssessmentDue: number) {
     }
 }
 
-function GetOverdueText(remainingDays: number) {
-    if (remainingDays == 1) {
-        return "1 day remaining";
-    } else if (remainingDays <= 0) {
-        return "Overdue by " + remainingDays + " days";
-    } else {
-        return remainingDays + " days remaining";
+function AsDaysString(days: number)
+{
+    if (days == 1) {
+        return "1 day";
     }
+    else {
+        return days + " days";
+    }
+        
+}
 
+function GetOverdueText(remainingDays: number) {
+    
+    if (remainingDays < 0) {
+        return "OVERDUE by " + AsDaysString(Math.abs(remainingDays)); 
+    }    
+    else {
+        return AsDaysString(remainingDays) + " remaining";
+    }
 }
 
 export function StudyProgress({elapsedDays}: StudyProgressProps) {
     const remainingDays = maxDaysSinceAssessmentDue - elapsedDays;
+    const overdueTextClass = remainingDays < 0 ? "govuk-!-font-weight-bold text-red" : "";
     return (
         <div>
             <div>
@@ -38,7 +49,7 @@ export function StudyProgress({elapsedDays}: StudyProgressProps) {
 
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-two-thirds">
-                    <p>{GetOverdueText(remainingDays)}</p>
+                    <p className={overdueTextClass}>{GetOverdueText(remainingDays)}</p>
                 </div>
                 <div className="govuk-grid-column-one-third text-right">
                     <p>{elapsedDays} of {maxDaysSinceAssessmentDue}</p>
