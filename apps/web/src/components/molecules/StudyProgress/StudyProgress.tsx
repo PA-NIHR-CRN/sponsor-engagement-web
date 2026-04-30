@@ -1,9 +1,5 @@
-import type {getStudyById} from '@/lib/studies'
 import {ProgressBar, progressBarColor} from "@/components/atoms/ProgressBar/ProgressBar";
-import {StudyDetailsProps} from "@/components/molecules";
 import clsx from "clsx";
-
-const maxDaysSinceAssessmentDue = 90
 
 export interface StudyProgressProps {
     elapsedDays: number
@@ -11,12 +7,18 @@ export interface StudyProgressProps {
     overduePhrase?: string
 }
 
-function GetStudyProgressColor(daysSinceAssessmentDue: number) {
-    if (daysSinceAssessmentDue >= maxDaysSinceAssessmentDue) {
+function GetStudyProgressColor(daysSinceAssessmentDue: number, firstParticipantTargetDays: number) {
+    if (daysSinceAssessmentDue >= firstParticipantTargetDays) {
         return progressBarColor.Error;
     } else {
         return progressBarColor.Warning;
     }
+}
+
+function GetFirstParticipantTargetDays()
+{
+    const FIRST_PARTICIPANT_TIME_LIMIT = process.env.NEXT_PUBLIC_FIRST_PARTICIPANT_TIME_LIMIT as string;
+    return Number(FIRST_PARTICIPANT_TIME_LIMIT);
 }
 
 function AsDaysString(days: number)
@@ -41,13 +43,14 @@ function GetOverdueText(overduePhrase: string, remainingDays: number) {
 }
 
 export function StudyProgress({elapsedDays, textClassName = "govuk-body-s", overduePhrase = "Overdue"}: StudyProgressProps) {
-    const remainingDays = maxDaysSinceAssessmentDue - elapsedDays;
+    const firstParticipantTargetDays = GetFirstParticipantTargetDays();
+    const remainingDays = firstParticipantTargetDays - elapsedDays;
     const overdueTextClass = remainingDays < 0 ? "text-red" : "";
     return (
         <div>
             <div>
                 <ProgressBar className="govuk-!-width-full" max={90} value={elapsedDays}
-                             color={GetStudyProgressColor(elapsedDays)}/>
+                             color={GetStudyProgressColor(elapsedDays, firstParticipantTargetDays)}/>
             </div>
 
             <div className="govuk-grid-row">
@@ -55,7 +58,7 @@ export function StudyProgress({elapsedDays, textClassName = "govuk-body-s", over
                     <p className={clsx(textClassName, overdueTextClass)}>{GetOverdueText(overduePhrase, remainingDays)}</p>
                 </div>
                 <div className="govuk-grid-column-one-third text-right">
-                    <p className={textClassName}>{elapsedDays} of {maxDaysSinceAssessmentDue}</p>
+                    <p className={textClassName}>{elapsedDays} of {firstParticipantTargetDays}</p>
                 </div>
             </div>
         </div>

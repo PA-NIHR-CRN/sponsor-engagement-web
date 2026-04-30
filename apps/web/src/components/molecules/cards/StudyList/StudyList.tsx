@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 import {Card} from '@/components/atoms'
 import {ProgressBar, progressBarColor} from "@/components/atoms/ProgressBar/ProgressBar";
-import {StudyProgress} from "@/components/molecules/StudyDetails/StudyProgress";
+import {StudyProgress} from "@/components/molecules/StudyProgress/StudyProgress";
 
 export interface StudyListProps {
   sponsorOrgName?: string
@@ -83,8 +83,12 @@ export function StudyList({
             {indications?.length ? indications.join(', ') : 'No concerns'}
           </p>
         </div>
-
-        <div className="lg:min-w-[320px]">
+      </div>
+      
+        <div className="md:max-w-[calc(100%-50px)] mt-3">
+          <p className="govuk-body-s mb-1">
+            Progress of study setup
+          </p>
           <div>
             <StudyProgress elapsedDays={120}/>
           </div>
@@ -99,7 +103,6 @@ export function StudyList({
             View study
           </Link>
         </div>
-      </div>
     </Card>
   )
 }
