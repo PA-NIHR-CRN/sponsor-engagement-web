@@ -20,7 +20,7 @@ function Tag({
     text,
     children,
     className,
-}: TagProps) {
+}: Readonly<TagProps>) {
     if (!text && !children) return null;
 
     return (

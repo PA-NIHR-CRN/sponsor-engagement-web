@@ -32,10 +32,12 @@ export function StudyList({
 }: StudyListProps) {
   const hasAssessmentDue = daysSinceAssessmentDue !== null
 
-  const daysDueText =
-    hasAssessmentDue
-      ? `Assessment due for ${daysSinceAssessmentDue || '1'} day${daysSinceAssessmentDue > 1 ? 's' : ''}`
-      : ''
+  const daysDueText = hasAssessmentDue
+    ? (() => {
+      const days = daysSinceAssessmentDue || 1;
+      return `Assessment due for ${days} day${days > 1 ? 's' : ''}`;
+    })()
+    : '';
 
   const excludedIndications = new Set([
     'Recruiting at a lower rate than expected (RTT)',
@@ -48,7 +50,7 @@ export function StudyList({
   return (
     <Card>
 
-      {(hasAssessmentDue || areUpdatesRequired) ? <Tag className='absolute top-0 right-0' text="Needs action"/> : null}
+      {(hasAssessmentDue || areUpdatesRequired) ? <Tag className='absolute top-0 right-0' text="Needs action" /> : null}
 
       <div className="md:max-w-[calc(100%-50px)]">
         <div className="text-darkGrey govuk-!-margin-bottom-1 max-w-[calc(100%-45px)] lg:max-w-auto govuk-body-s">

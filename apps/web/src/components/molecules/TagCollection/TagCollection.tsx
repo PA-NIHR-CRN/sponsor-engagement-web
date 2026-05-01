@@ -5,7 +5,9 @@ export interface TagCollectionProps {
     tags: TagProps[];
 }
 
-function TagCollection({ tags }: TagCollectionProps) {
+function TagCollection({
+    tags,
+}: Readonly<TagCollectionProps>) {
     return (
         <div className="flex gap-2">
             {tags.map((tag) => (
