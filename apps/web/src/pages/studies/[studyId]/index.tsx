@@ -101,7 +101,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
 
             {/*TODO: Pass in the actual HRA Approval Date *************************************************************/}
             <StudyProgressExtended
-                hraApprovalDate={new Date('2026-03-05')}
+                hraApprovalDate={new Date('2026-01-05')}
                 studyStatus={study.studyStatus}
             />
             

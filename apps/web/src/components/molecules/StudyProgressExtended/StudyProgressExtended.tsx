@@ -29,11 +29,18 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = ({hra
             ? `OVER TARGET by ${elapsedDays - totalDays} days`
             : `${daysRemaining} days remaining`;
     
-    // TODO: Change to "InSetup" *********************************************************************************************
-    // if (studyStatus !== Status.InSetup || !hraApprovalDate) {
-    //     return null;
-    // }
+    // TODO: Change to any "InSetup..." status *********************************************************************************************
+    //const inSetupStatuses = [
+    //    Status.InSetup,
+    //    Status.InSetupPendingNHSPermission,
+    //    Status.InSetupApprovalReceived,
+    //    Status.InSetupPendingApproval,
+    //    Status.InSetupNHSPermissionReceived
+    //];
     //
+    //if (!inSetupStatuses.includes(studyStatus as Status)) {
+    //    return null;
+    //}
     if (studyStatus !== Status.OpenToRecruitment) {
         return null;
     }
