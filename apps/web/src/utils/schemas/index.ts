@@ -3,3 +3,5 @@ export * from './contactManager.schema'
 export * from './organisation.schema'
 export * from './registration.schema'
 export * from './study.schema'
+export * from './configure.schema'
+

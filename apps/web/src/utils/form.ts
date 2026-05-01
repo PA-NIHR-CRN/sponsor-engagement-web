@@ -13,6 +13,7 @@ import {
   type organisationRemoveContactSchema,
   type registrationSchema,
   type studySchema,
+  type configureSchema
 } from './schemas'
 
 export type Schemas =
@@ -22,6 +23,7 @@ export type Schemas =
   | typeof registrationSchema
   | typeof studySchema
   | typeof contactManagerAddSchema
+  | typeof configureSchema
 
 /**
  * Checks if there's any form errors present in the URL searchParams for a given schema

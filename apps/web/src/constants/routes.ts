@@ -44,6 +44,11 @@ export const REGISTRATION_PAGE = '/register'
 export const getAssessmentPageRoute = (studyId: string | number) => `/studies/${studyId}/assess`
 
 /**
+ * Configure page
+ */
+export const getConfigurePageRoute = (studyId: string | number) => `/studies/${studyId}/configure`
+
+/**
  * Registration confirmation page where users will be redirected to after successful IDG & SE account creation
  */
 export const REGISTRATION_CONFIRMATION_PAGE = '/register/confirmation'
