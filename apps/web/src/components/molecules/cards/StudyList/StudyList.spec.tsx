@@ -13,7 +13,7 @@ describe('StudyList Component', () => {
     lastAssessmentDate: '2023-09-30',
     trackStatus: 'On track',
     trackStatusHref: '/track/on',
-    indications: ['Indication ABC'],
+    indications: undefined,
     daysSinceAssessmentDue: null,
     irasId: '31832',
   }
@@ -28,8 +28,6 @@ describe('StudyList Component', () => {
     const lastAssessmentTrackStatusElement = screen.getByText('On track')
     const lastAssessmentDateHeading = screen.getByText('Last sponsor assessment')
     const lastAssessmentDateElement = screen.getByText('on 2023-09-30')
-    const indicationHeading = screen.getByText('Study data indicates')
-    const indicationElement = screen.getByText('Indication ABC')
     const viewStudyButtonElement = screen.getByText('View study')
 
     expect(sponsorNameElement).toBeInTheDocument()
@@ -38,8 +36,6 @@ describe('StudyList Component', () => {
     expect(lastAssessmentTrackStatusElement).toHaveAttribute('href', defaultProps.trackStatusHref)
     expect(lastAssessmentDateHeading).toBeInTheDocument()
     expect(lastAssessmentDateElement).toBeInTheDocument()
-    expect(indicationHeading).toBeInTheDocument()
-    expect(indicationElement).toBeInTheDocument()
     expect(viewStudyButtonElement).toHaveAttribute('href', defaultProps.studyHref)
   })
 
@@ -47,7 +43,7 @@ describe('StudyList Component', () => {
     render(<StudyList {...defaultProps} daysSinceAssessmentDue={0} />)
 
     // Check if the "Due" tag is rendered
-    const dueTagElement = screen.getByText('Due for 1 day')
+    const dueTagElement = screen.getByText('Assessment due for 1 day')
     expect(dueTagElement).toBeInTheDocument()
   })
 
@@ -55,7 +51,7 @@ describe('StudyList Component', () => {
     render(<StudyList {...defaultProps} daysSinceAssessmentDue={1} />)
 
     // Check if the "Due" tag is rendered
-    const dueTagElement = screen.getByText('Due for 1 day')
+    const dueTagElement = screen.getByText('Assessment due for 1 day')
     expect(dueTagElement).toBeInTheDocument()
   })
 
@@ -63,7 +59,7 @@ describe('StudyList Component', () => {
     render(<StudyList {...defaultProps} daysSinceAssessmentDue={2} />)
 
     // Check if the "Due" tag is rendered
-    const dueTagElement = screen.getByText('Due for 2 days')
+    const dueTagElement = screen.getByText('Assessment due for 2 days')
     expect(dueTagElement).toBeInTheDocument()
   })
 
@@ -73,6 +69,62 @@ describe('StudyList Component', () => {
     // Check if the "Due" tag is not rendered
     const dueTagElement = screen.queryByText('Due')
     expect(dueTagElement).toBeNull()
+  })
+
+  test('renders correct "Data updates required" tag when indications conatins only included values', () => {
+    render(<StudyList {...defaultProps} indications={['Recruitment target met']} />)
+
+    // Check if the "Data updates required" tag is rendered
+    const dataUpdatesRequiredTagElement = screen.getByText('Data updates required')
+    expect(dataUpdatesRequiredTagElement).toBeInTheDocument()
+  })
+
+  test('renders correct "Data updates required" tag when indications conatins included and excluded values', () => {
+    render(<StudyList {...defaultProps} indications={['Recruitment target met', 'No recruitment for 6 months']} />)
+
+    // Check if the "Data updates required" tag is rendered
+    const dataUpdatesRequiredTagElement = screen.getByText('Data updates required')
+    expect(dataUpdatesRequiredTagElement).toBeInTheDocument()
+  })
+
+  test('does not render "Data updates required" tag when indications conatins only excluded values', () => {
+    render(<StudyList {...defaultProps} indications={['Recruiting at a lower rate than expected (RTT)', 'No recruitment in past 6 months']} />)
+
+    // Check if the "Data updates required" tag is not rendered
+    const dataUpdatesRequiredTagElement = screen.queryByText('Due')
+    expect(dataUpdatesRequiredTagElement).toBeNull()
+  })
+
+  test('renders correct "Needs action" tag when data updates required', () => {
+    render(<StudyList {...defaultProps} indications={['Recruitment target met', 'No recruitment for 6 months']} />)
+
+    // Check if the "Needs action" tag is rendered
+    const needsActionTagElement = screen.getByText('Needs action')
+    expect(needsActionTagElement).toBeInTheDocument()
+  })
+
+  test('renders correct "Needs action" tag when when daysSinceAssessmentDue is greater than 1', () => {
+    render(<StudyList {...defaultProps} daysSinceAssessmentDue={2} />)
+
+    // Check if the "Needs action" tag is rendered
+    const needsActionTagElement = screen.getByText('Needs action')
+    expect(needsActionTagElement).toBeInTheDocument()
+  })
+
+  test('renders correct "Needs action" tag when when daysSinceAssessmentDue is greater than 1 and Data updates required', () => {
+    render(<StudyList {...defaultProps} daysSinceAssessmentDue={2} indications={['No recruitment for 6 months']}  />)
+
+    // Check if the "Needs action" tag is rendered
+    const needsActionTagElement = screen.getByText('Needs action')
+    expect(needsActionTagElement).toBeInTheDocument()
+  })
+
+  test('does not render "Needs action" tag when when daysSinceAssessmentDue is undefined and Data updates are not required', () => {
+    render(<StudyList {...defaultProps} daysSinceAssessmentDue={null} indications={['No recruitment in past 6 months']}  />)
+
+    // Check if the "Needs action" tag is rendered
+    const needsActionTagElement = screen.queryByText('Needs action')
+    expect(needsActionTagElement).toBeNull()
   })
 
   test('renders with different sponsorName, irasId and shortTitle', () => {

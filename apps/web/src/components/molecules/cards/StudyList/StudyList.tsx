@@ -1,6 +1,9 @@
 import Link from 'next/link'
 
 import { Card } from '@/components/atoms'
+import Tag from '@/components/atoms/Tag/Tag'
+
+import TagCollection from '../../TagCollection/TagCollection'
 
 export interface StudyListProps {
   sponsorOrgName?: string
@@ -27,19 +30,25 @@ export function StudyList({
   indications,
   irasId,
 }: StudyListProps) {
+  const hasAssessmentDue = daysSinceAssessmentDue !== null
+
   const daysDueText =
-    daysSinceAssessmentDue !== null
-      ? `Due for ${daysSinceAssessmentDue || '1'} day${daysSinceAssessmentDue > 1 ? 's' : ''}`
+    hasAssessmentDue
+      ? `Assessment due for ${daysSinceAssessmentDue || '1'} day${daysSinceAssessmentDue > 1 ? 's' : ''}`
       : ''
+
+  const excludedIndications = new Set([
+    'Recruiting at a lower rate than expected (RTT)',
+    'No recruitment in past 6 months',
+  ])
+
+  const areUpdatesRequired =
+    indications?.some(indication => !excludedIndications.has(indication)) ?? false
 
   return (
     <Card>
-      {daysSinceAssessmentDue !== null ? (
-        <>
-          <span className="govuk-visually-hidden">{shortTitle} has been</span>
-          <span className="govuk-tag govuk-tag--red float-right -mt-3 -mr-3 normal-case">{daysDueText}</span>
-        </>
-      ) : null}
+
+      {(hasAssessmentDue || areUpdatesRequired) ? <Tag className='absolute top-0 right-0' text="Needs action"/> : null}
 
       <div className="md:max-w-[calc(100%-50px)]">
         <div className="text-darkGrey govuk-!-margin-bottom-1 max-w-[calc(100%-45px)] lg:max-w-auto govuk-body-s">
@@ -57,7 +66,7 @@ export function StudyList({
       <div className="sm:flex sm:justify-between lg:justify-normal sm:gap-3">
         <div className="lg:min-w-[320px]">
           <strong className="govuk-heading-s govuk-!-margin-bottom-0">Last sponsor assessment</strong>
-          <p className="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
+          <p className="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-2">
             {trackStatus ? (
               <>
                 {trackStatusHref ? (
@@ -74,14 +83,20 @@ export function StudyList({
             )}
           </p>
         </div>
+      </div>
 
-        <div className="lg:min-w-[320px]">
-          <strong className="govuk-heading-s govuk-!-margin-bottom-0">Study data indicates</strong>
-          <p className="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
-            {indications?.length ? indications.join(', ') : 'No concerns'}
-          </p>
-        </div>
+      <TagCollection
+        tags={[
+          ...(hasAssessmentDue
+            ? [{ text: daysDueText }]
+            : []),
+          ...(areUpdatesRequired
+            ? [{ text: 'Data updates required' }]
+            : []),
+        ]}
+      />
 
+      <div className="sm:justify-between lg:justify-normal sm:gap-3">
         <div className="text-right lg:w-full">
           <Link
             aria-label={`View study ${shortTitle}`}
