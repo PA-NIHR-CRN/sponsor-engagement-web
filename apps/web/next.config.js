@@ -5,6 +5,9 @@ const nextConfig = {
   experimental: {
     instrumentationHook: true,
   },
+  experimental:{
+    serverComponentsExternalPackages: ['pino', 'pino-pretty']
+  }
 }
 
 const { withSuperjson } = require('next-superjson')
