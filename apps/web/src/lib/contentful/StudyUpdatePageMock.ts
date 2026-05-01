@@ -177,7 +177,7 @@ export const StudyUpdatePageMock: Entry<TypeStudyDataFormSkeleton> = {
       ],
       nodeType: BLOCKS.DOCUMENT,
     },
-    futherInformationLabel: 'Further information',
+    futherInformationLabel: 'Further information (optional)',
     furtherInformationGuidanceText: {
       data: {},
       content: [
@@ -187,7 +187,7 @@ export const StudyUpdatePageMock: Entry<TypeStudyDataFormSkeleton> = {
             {
               data: {},
               marks: [],
-              value: 'if needed, provide futher context or justification for changes made above.',
+              value: 'If needed, provide further context or justification for changes made above.',
               nodeType: 'text',
             },
           ],
@@ -205,7 +205,7 @@ export const StudyUpdatePageMock: Entry<TypeStudyDataFormSkeleton> = {
             {
               data: {},
               marks: [],
-              value: 'If you need support updating your data, ',
+              value: 'If you need support updating your data, please ',
               nodeType: 'text',
             },
             {
@@ -216,7 +216,7 @@ export const StudyUpdatePageMock: Entry<TypeStudyDataFormSkeleton> = {
                 {
                   data: {},
                   marks: [],
-                  value: 'please contact the RDN Team',
+                  value: 'contact the RDN Team',
                   nodeType: 'text',
                 },
               ],
