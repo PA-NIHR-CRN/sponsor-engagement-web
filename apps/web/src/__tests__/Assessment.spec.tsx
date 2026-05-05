@@ -124,7 +124,7 @@ const mockedEnvVars = {
   apiUrl: 'cpms-api',
   apiUsername: 'testuser',
   apiPassword: 'testpwd',
-  assesmentContentfulContent: 'mock-content-id',
+  assessmentContentfulContent: 'mock-content-id',
 }
 
 const renderPage = async (
@@ -153,7 +153,7 @@ describe('Assessment', () => {
     process.env.CPMS_API_URL = mockedEnvVars.apiUrl
     process.env.CPMS_API_USERNAME = mockedEnvVars.apiUsername
     process.env.CPMS_API_PASSWORD = mockedEnvVars.apiPassword
-    process.env.CONTENTFUL_PAGE_STUDY_ASSES_ID = mockedEnvVars.assesmentContentfulContent
+    process.env.CONTENTFUL_PAGE_STUDY_ASSESS_ID = mockedEnvVars.assessmentContentfulContent
   })
 
   afterAll(() => {

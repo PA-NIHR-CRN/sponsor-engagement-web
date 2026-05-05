@@ -2,11 +2,11 @@ import type { ChainModifiers, Entry, EntryFieldTypes, EntrySkeletonType, LocaleC
 
 /**
  * Fields type definition for content type 'TypeSetAssesmentFormPage'
- * @name TypeSetAssesmentFormPageFields
- * @type {TypeSetAssesmentFormPageFields}
+ * @name TypeSetAssessmentFormPageFields
+ * @type {TypeSetAssessmentFormPageFields}
  * @memberof TypeSetAssesmentFormPage
  */
-export interface TypeSetAssesmentFormPageFields {
+export interface TypeSetAssessmentFormPageFields {
     /**
      * Field type definition for field 'pageTitle' (Page title)
      * @name Page title
@@ -59,7 +59,7 @@ export interface TypeSetAssesmentFormPageFields {
  * @since 2026-04-23T15:03:34.544Z
  * @version 1
  */
-export type TypeSetAssesmentFormPageSkeleton = EntrySkeletonType<TypeSetAssesmentFormPageFields, "setAssesmentFormPage">;
+export type TypeSetAssesmentFormPageSkeleton = EntrySkeletonType<TypeSetAssessmentFormPageFields, "setAssesmentFormPage">;
 /**
  * Entry type definition for content type 'setAssesmentFormPage' (SET assesment form page)
  * @name TypeSetAssesmentFormPage

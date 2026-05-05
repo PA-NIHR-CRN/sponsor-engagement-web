@@ -41,7 +41,7 @@ const mockedEnvVars = {
   apiUsername: 'testuser',
   apiPassword: 'testpwd',
   assessmentLapseMonths: '3',
-  orgUpdateCOntentfulId: 'study-update-page-id',
+  orgUpdateContentfulId: 'study-update-page-id',
 }
 
 const mockManagedContent = StudyUpdatePageMock.fields
@@ -105,7 +105,7 @@ describe('EditStudy', () => {
     process.env.CPMS_API_USERNAME = mockedEnvVars.apiUsername
     process.env.CPMS_API_PASSWORD = mockedEnvVars.apiPassword
     process.env.ASSESSMENT_LAPSE_MONTHS = mockedEnvVars.assessmentLapseMonths
-    process.env.CONTENTFUL_PAGE_UPDATE_STUDY_ID = mockedEnvVars.orgUpdateCOntentfulId
+    process.env.CONTENTFUL_PAGE_UPDATE_STUDY_ID = mockedEnvVars.orgUpdateContentfulId
   })
 
   afterAll(() => {
