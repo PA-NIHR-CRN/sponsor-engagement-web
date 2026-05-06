@@ -5,7 +5,7 @@ export interface SummaryCardCollectionProps {
   panels: SummaryCardProps[]
 }
 
-function SummaryCardCollection({ panels }: SummaryCardCollectionProps) {
+function SummaryCardCollection({ panels }: Readonly<SummaryCardCollectionProps>) {
   return (
     <div className="govuk-summary-cards">
       {panels.map(panel => (

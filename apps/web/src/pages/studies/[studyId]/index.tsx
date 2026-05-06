@@ -86,17 +86,11 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
       },
       {
         title: 'Recruitment total',
-        content:
-          study.totalRecruitmentToDate !== null
-            ? study.totalRecruitmentToDate.toString()
-            : '-',
+        content: study.totalRecruitmentToDate?.toString() ?? '-',
       },
       {
         title: 'Estimated reopening date',
-        content:
-          study.estimatedReopeningDate !== null
-            ? study.estimatedReopeningDate.toLocaleDateString('en-GB')
-            : '-',
+        content: study.estimatedReopeningDate?.toLocaleDateString('en-GB') ?? '-',
       },
     ],
 
@@ -107,17 +101,11 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
       },
       {
         title: 'Planned UK target',
-        content:
-          study.sampleSize !== null
-            ? study.sampleSize.toString()
-            : '-',
+        content: study.sampleSize?.toString() ?? '-',
       },
       {
         title: 'Planned open to recruitment date',
-        content:
-          study.plannedOpeningDate !== null
-            ? study.plannedOpeningDate.toLocaleDateString('en-GB')
-            : '-',
+        content: study.plannedOpeningDate?.toLocaleDateString('en-GB') ?? '-',
       },
     ],
 
@@ -135,10 +123,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
       },
       {
         title: 'Planned closure date',
-        content:
-          study.plannedClosureDate !== null
-            ? study.plannedClosureDate.toLocaleDateString('en-GB')
-            : '-',
+        content: study.plannedClosureDate?.toLocaleDateString('en-GB') ?? '-',
       },
     ],
   }

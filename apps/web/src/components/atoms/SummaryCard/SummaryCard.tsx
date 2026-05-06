@@ -3,7 +3,7 @@ export interface SummaryCardProps {
   content: React.ReactNode
 }
 
-function SummaryCard({ title, content }: SummaryCardProps) {
+function SummaryCard({ title, content }: Readonly<SummaryCardProps>) {
   return (
     <div className="govuk-summary-card govuk-!-margin-top-4 govuk-!-margin-bottom-4">
       <div className="govuk-summary-card__title-wrapper">
