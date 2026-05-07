@@ -24,6 +24,7 @@ import {
 import { RootLayout } from '@/components/organisms'
 import CmsNotificationBanner from '@/components/organisms/CmsNotificationBanner/CmsNotificationBanner'
 import { Roles, STUDIES_PER_PAGE } from '@/constants'
+import { FORM_SUCCESS_MESSAGES } from '@/constants/forms'
 import { STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/routes'
 import { useFormListeners } from '@/hooks/useFormListeners'
 import { getNotificationBanner } from '@/lib/contentful/contentfulService'
@@ -34,14 +35,18 @@ import { getFiltersFromQuery } from '@/utils/filters'
 import { pluraliseStudy } from '@/utils/pluralise'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
-const renderNotificationBanner = (success: boolean) =>
-  success ? (
-    <NotificationBanner heading="The study assessment was successfully saved" success>
-      Request{' '}
-      <Link className="govuk-notification-banner__link" href={SUPPORT_PAGE}>
-        NIHR RDN support
-      </Link>{' '}
-      for this study.
+const renderNotificationBanner = (success: string | undefined, showRequestSupportLink: boolean) =>
+  success || !Number.isNaN(Number(success)) ? (
+    <NotificationBanner heading={FORM_SUCCESS_MESSAGES[Number(success)]} isRichText success>
+      {showRequestSupportLink ? (
+        <>
+          Request{' '}
+          <Link className="govuk-notification-banner__link" href={SUPPORT_PAGE}>
+            NIHR RDN support
+          </Link>{' '}
+          for this study.
+        </>
+      ) : null}
     </NotificationBanner>
   ) : null
 
@@ -58,6 +63,7 @@ export default function Studies({
   const { isLoading, handleFilterChange } = useFormListeners()
   const isOdpUser = user.groups.includes(ODP_ROLE)
   const dashboardLink = process.env.NEXT_PUBLIC_ODP_DASHBOARD_LINK || ''
+  const successType = router.query.success as string
 
   const titleResultsText =
     totalItems === 0
@@ -76,7 +82,7 @@ export default function Studies({
 
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
-          {renderNotificationBanner(Boolean(router.query.success))}
+          {renderNotificationBanner(successType, successType === '1')}
 
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">Assess progress of studies</h2>
 

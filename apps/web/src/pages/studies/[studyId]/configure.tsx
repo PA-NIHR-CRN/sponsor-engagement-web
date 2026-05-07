@@ -4,20 +4,21 @@ import clsx from 'clsx'
 import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
 import { NextSeo } from 'next-seo'
-import { type ReactElement, useCallback } from 'react'
+import { type ReactElement, useCallback, useEffect } from 'react'
 import type { FieldError } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 
-import { ErrorSummary, Fieldset, Form, Radio, RadioGroup } from '@/components/atoms'
+import { Fieldset, Form, Radio, RadioGroup } from '@/components/atoms'
+import { Textarea } from '@/components/atoms/Form/Textarea/Textarea'
 import { RequestSupport } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
+import { TEXTAREA_MAX_CHARACTERS } from '@/constants/forms'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
 import { getStudyById } from '@/lib/studies'
 import type { ConfigureInputs } from '@/utils/schemas/configure.schema'
 import { configureSchema } from '@/utils/schemas/configure.schema'
 import { withServerSideProps } from '@/utils/withServerSideProps'
-import { getValuesFromSearchParams } from '@/utils/form'
 
 export type ConfigureProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
@@ -27,13 +28,31 @@ export default function Configure({ study, returnUrl }: ConfigureProps) {
     formState,
     setError,
     handleSubmit,
+    watch,
+    setValue,
   } = useForm<ConfigureInputs>({
     resolver: zodResolver(configureSchema),
     defaultValues: {
       studyId: String(study.id),
-      status: 'yes',
+      status: study.willRecruitWithinTimeline ? 'true' : 'false',
+      noReason: study.reasonNotRecruitingWithinTimeline,
     },
   })
+
+  const status = watch('status')
+  const noReasonText = watch('noReason') ?? ''
+
+  const remainingCharacters =
+    noReasonText.length >= TEXTAREA_MAX_CHARACTERS
+      ? 0
+      : TEXTAREA_MAX_CHARACTERS - noReasonText.length
+
+  // Clear conditional field when switching back to "Yes"
+  useEffect(() => {
+    if (status === 'true') {
+      setValue('noReason', null)
+    }
+  }, [status, setValue])
 
   const handleFoundError = useCallback(
     (field: keyof ConfigureInputs, error: FieldError) => {
@@ -42,32 +61,29 @@ export default function Configure({ study, returnUrl }: ConfigureProps) {
     [setError]
   )
 
-  const { errors } = useFormErrorHydration<ConfigureInputs>({    
+  const { errors } = useFormErrorHydration<ConfigureInputs>({
     schema: configureSchema,
     formState,
     onFoundError: handleFoundError,
   })
-  
 
-  const { defaultValues } = formState
   const { organisationsByRole } = study
-
   const supportOrgName = organisationsByRole.CRO ?? organisationsByRole.CTU
 
   return (
     <Container>
-      <NextSeo title="Study Progress Review - Configure progress of study setup" />
+      <NextSeo title="Study Progress Review - Configure Progress of Study Setup" />
 
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">
-            Configure progress of study setup
+            Configure Progress of Study Setup
           </h2>
 
-          <div className="text-darkGrey govuk-!-margin-bottom-0 govuk-body-s">
+          <div className="govuk-body-s govuk-!-margin-bottom-0 text-darkGrey">
             <span className="govuk-visually-hidden">Study sponsor: </span>
             {organisationsByRole.Sponsor}
-            {supportOrgName && ` (${supportOrgName})`}
+            {supportOrgName ? ` (${supportOrgName})` : null}
           </div>
 
           <h3 className="govuk-heading-m govuk-!-margin-bottom-1">
@@ -77,39 +93,45 @@ export default function Configure({ study, returnUrl }: ConfigureProps) {
 
           <div className="govuk-inset-text">
             Selecting a timeline confirms whether the study should be monitored against that timeframe.
-            Missing an agreed timeline without mitigation or exemption may affect eligibility for funding or support.
-            Refer to the <Link href="/">Terms and Conditions</Link> guidance for more information.
+            Missing an agreed timeline without mitigation or exemption may affect eligibility for funding
+            or support. Refer to the <Link href="/">Terms and Conditions</Link> guidance for more information.
           </div>
 
           <Form
             action={`/api/forms/configureStudy?returnUrl=${returnUrl}`}
             handleSubmit={handleSubmit}
             method="post"
-            onError={(message: string) => {
-              setError('root.serverError', {
-                type: '400',
-                message,
-              })
-            }}
+            onError={(message: string) =>
+              { setError('root.serverError', { type: '400', message }); }
+            }
           >
-            <ErrorSummary errors={errors} />
-
-            <input
-              type="hidden"
-              {...register('studyId')}
-              defaultValue={defaultValues?.studyId}
-            />
+            <input type="hidden" {...register('studyId')} />
 
             <Fieldset>
               <RadioGroup
                 errors={errors}
+                hint="Will you achieve this in 90 days?"
                 label="Do you expect to achieve the first participant in this timeline?"
                 labelSize="m"
                 {...register('status')}
               >
-                <Radio label="Yes" value="yes" />
-                <Radio label="No" value="no" />
+                <Radio label="Yes" value="true" />
+                <Radio label="No" value="false" />
               </RadioGroup>
+
+              {status === 'false' && (
+                <Textarea
+                  {...register('noReason')}
+                  defaultValue=''
+                  errors={errors}
+                  hint="If needed, provide further context or justification for changes made above."
+                  label="If ‘No’ briefly explain why"
+                  labelSize="m"
+                  maxLength={TEXTAREA_MAX_CHARACTERS}
+                  remainingCharacters={remainingCharacters}
+                  required
+                />
+              )}
 
               <div className="govuk-button-group">
                 <button
@@ -154,25 +176,16 @@ export const getServerSideProps = withServerSideProps(
     const studyId = Number(context.query.studyId)
 
     if (!studyId) {
-      return {
-        redirect: {
-          destination: '/404',
-        },
-      }
+      return { redirect: { destination: '/404' } }
     }
 
-    const userOrganisationIds = session.user?.organisations.map(
-      ({ organisationId }) => organisationId
-    )
+    const userOrganisationIds =
+      session.user?.organisations.map(({ organisationId }) => organisationId)
 
     const { data: study } = await getStudyById(studyId, userOrganisationIds)
 
     if (!study) {
-      return {
-        redirect: {
-          destination: '/404',
-        },
-      }
+      return { redirect: { destination: '/404' } }
     }
 
     return {

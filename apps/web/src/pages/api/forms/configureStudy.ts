@@ -1,4 +1,3 @@
-//TODO: copy of apps/web/src/pages/api/forms/assessment.ts
 import { logger } from '@nihr-ui/logger'
 import type { NextApiRequest } from 'next'
 import { ZodError } from 'zod'
@@ -14,67 +13,82 @@ export interface ExtendedNextApiRequest extends NextApiRequest {
   body: ConfigureInputs
 }
 
-export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], async (req, res, session) => {
-  try {
+export default withApiHandler<ExtendedNextApiRequest>(
+  [Roles.SponsorContact],
+  async (req, res) => {
     if (req.method !== 'POST') {
-      throw new Error('Wrong method')
+      res.setHeader('Allow', 'POST')
+      return res.status(405).end('Method Not Allowed')
     }
 
-    const { studyId, status} = configureSchema.parse(req.body)
+    try {
+      const parsed = configureSchema.parse(req.body)
+      const { studyId, status, noReason } = parsed
 
-    const studyResult = await prismaClient.study.update({
-      where: {
-        id: Number(studyId),
-      },
-      data: {
-        willRecruitWithin90Days: status,
-        updatedAt: new Date(),
-        updatedById: session.user?.id,
-      },
-    })
+      const updatedStudy = await prismaClient.study.update({
+        where: { id: Number(studyId) },
+        data: {
+          willRecruitWithinTimeline: status === 'true',
+          reasonNotRecruitingWithinTimeline: noReason,
+          updatedAt: new Date(),
+        },
+      })
 
-    logger.info(`Updated study with id: ${studyResult.id}`)
+      logger.info(`Updated study with id: ${updatedStudy.id}`)
 
-    // Redirect back to study detail page
-    if (String(req.query.returnUrl).includes(studyId)) {
-      return res.redirect(302, `/studies/${studyId}?success=1`)
-    }
+      const returnUrl = typeof req.query.returnUrl === 'string'
+        ? req.query.returnUrl
+        : ''
 
-    // Otherwise, redirect back to studies list page
-    return res.redirect(302, `/studies?success=1`)
-  } catch (error) {
-    logger.error(error)
-
-    const studyId = req.body.studyId
-
-    if (error instanceof ZodError) {
-      // Create an object containing the Zod validation errors
-      const fieldErrors: Record<string, string> = Object.fromEntries(
-        error.errors.map(({ path: [fieldId], message }) => [`${fieldId}Error`, message])
+      return res.redirect(
+        302,
+        returnUrl.includes(studyId)
+          ? `/studies/${studyId}?success=4`
+          : `/studies?success=1`
       )
+    } catch (error) {
+      logger.error(error)
 
-      // Insert the original values
-      Object.keys(configureSchema.shape).forEach((field) => {
-        if (req.body[field]) {
-          fieldErrors[field] = req.body[field] as string
+      if (error instanceof ZodError) {
+        const searchParams = new URLSearchParams()
+
+        for (const issue of error.errors) {
+          const field = issue.path[0]
+          if (typeof field === 'string') {
+            searchParams.set(`${field}Error`, issue.message)
+          }
         }
-      })
 
-      delete fieldErrors.studyId
+        // Echo values back safely (only strings)
+        const body = req.body as Partial<Record<string, unknown>>
+        for (const [key, value] of Object.entries(body)) {
+          if (typeof value === 'string' && key !== 'studyId') {
+            searchParams.set(key, value)
+          }
+        }
 
-      const searchParams = new URLSearchParams({
-        ...fieldErrors,
-      })
-      if (req.query.returnUrl) searchParams.append('returnUrl', String(req.query.returnUrl))
+        if (typeof req.query.returnUrl === 'string') {
+          searchParams.set('returnUrl', req.query.returnUrl)
+        }
 
-      return res.redirect(302, `${getConfigurePageRoute(studyId)}/?${searchParams.toString()}`)
+        const failedStudyId =
+          typeof body.studyId === 'string' ? body.studyId : ''
+
+        return res.redirect(
+          302,
+          `${getConfigurePageRoute(failedStudyId)}/?${searchParams.toString()}`
+        )
+      }
+
+      const fatalParams = new URLSearchParams({ fatal: '1' })
+      if (typeof req.query.returnUrl === 'string') {
+        fatalParams.set('returnUrl', req.query.returnUrl)
+      }
+
+      return res.redirect(
+        302,
+        `${getConfigurePageRoute('')}/?${fatalParams.toString()}`
+      )
     }
-
-    const searchParams = new URLSearchParams({
-      fatal: '1',
-    })
-    if (req.query.returnUrl) searchParams.append('returnUrl', String(req.query.returnUrl))
-
-    return res.redirect(302, `${getConfigurePageRoute(studyId)}/?${searchParams.toString()}`)
   }
-})
+)

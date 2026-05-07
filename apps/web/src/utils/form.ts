@@ -8,13 +8,12 @@ import type { DateInputValue } from '@/components/atoms/Form/DateInput/types'
 import { editStudyDateFields } from './editStudyForm'
 import {
   type assessmentSchema,
+  type configureSchema,
   type contactManagerAddSchema,
   type organisationAddSchema,
   type organisationRemoveContactSchema,
   type registrationSchema,
-  type studySchema,
-  type configureSchema
-} from './schemas'
+  type studySchema} from './schemas'
 
 export type Schemas =
   | typeof assessmentSchema
