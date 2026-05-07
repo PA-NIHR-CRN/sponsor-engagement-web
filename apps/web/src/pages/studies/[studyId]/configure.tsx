@@ -22,7 +22,7 @@ import { withServerSideProps } from '@/utils/withServerSideProps'
 
 export type ConfigureProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function Configure({ study, returnUrl }: ConfigureProps) {
+export default function Configure({ study, returnUrl }: Readonly<ConfigureProps>) {
   const {
     register,
     formState,
