@@ -28,6 +28,7 @@ $govuk-page-width: 1280px;
 $govuk-link-colour: var(--colour-blue);
 
 @import '../../node_modules/govuk-frontend/govuk/all.scss';
+@import './summary-card.scss';
 
 @layer utilities {
   .focusable {
@@ -178,25 +179,4 @@ button .absolute.h-\[2px\].w-\[18px\] {
     box-shadow: none !important;
     background-image: none !important;
   }
-}
-
-.govuk-summary-cards {
-  display: flex;
-  gap: 1.5rem;
-}
-
-.govuk-summary-cards > * {
-  flex: 1;
-  display: flex;
-}
-
-.govuk-summary-card {
-  border: none;
-  border-top: 5px solid var(--colour-blue);
-  background-color: var(--colour-grey-50);
-  flex: 1;
-}
-
-.govuk-summary-card__title-wrapper {
-  min-height: 6rem;
 }
