@@ -6,7 +6,6 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import type { ReactElement } from 'react'
 import type { LeadAdministrationId } from 'shared-utilities/src/utils/lead-administration-id'
-
 import { Status } from '@/@types/studies'
 import type { SummaryCardProps } from '@/components/atoms/SummaryCard/SummaryCard'
 import {
@@ -15,6 +14,7 @@ import {
   getAssessmentHistoryFromStudy,
   RequestSupport,
   StudyDetails,
+  StudyProgressExtended,
 } from '@/components/molecules'
 import { getEditHistory } from '@/components/molecules/EditHistory/utils'
 import SummaryCardCollection from '@/components/molecules/SummaryCollection/SummaryCardCollection'
@@ -157,6 +157,13 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
                 This study needs a new sponsor assessment.
               </div>
             )}
+
+            {/*TODO: Pass in the actual HRA Approval Date *************************************************************/}
+            <StudyProgressExtended
+                hraApprovalDate={new Date('2026-01-05')}
+                studyStatus={study.studyStatus}
+            />
+            
             <div className="flex gap-4">
               <Link className="govuk-button w-auto govuk-!-margin-bottom-0" href={getAssessmentPageRoute(study.id)}>
                 Assess study
