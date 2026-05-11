@@ -12,3 +12,9 @@ export type {
   TypeGenericShortTextFields,
   TypeGenericShortTextSkeleton,
 } from './TypeGenericShortText'
+export { isTypeSetAssesmentFormPage } from "./TypeSetAssessmentFormPage";
+export type { TypeSetAssesmentFormPage, TypeSetAssessmentFormPageFields, TypeSetAssesmentFormPageSkeleton, TypeSetAssesmentFormPageWithAllLocalesAndWithoutLinkResolutionResponse, TypeSetAssesmentFormPageWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeSetAssesmentFormPageWithAllLocalesResponse, TypeSetAssesmentFormPageWithoutLinkResolutionResponse, TypeSetAssesmentFormPageWithoutUnresolvableLinksResponse } from "./TypeSetAssessmentFormPage";
+export { isTypeSetLabel } from "./TypeSetLabel";
+export type { TypeSetLabel, TypeSetLabelFields, TypeSetLabelSkeleton, TypeSetLabelWithAllLocalesAndWithoutLinkResolutionResponse, TypeSetLabelWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeSetLabelWithAllLocalesResponse, TypeSetLabelWithoutLinkResolutionResponse, TypeSetLabelWithoutUnresolvableLinksResponse } from "./TypeSetLabel";
+export { isTypeStudyDataForm } from "./TypeStudyDataForm";
+export type { TypeStudyDataForm, TypeStudyDataFormFields, TypeStudyDataFormSkeleton, TypeStudyDataFormWithAllLocalesAndWithoutLinkResolutionResponse, TypeStudyDataFormWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeStudyDataFormWithAllLocalesResponse, TypeStudyDataFormWithoutLinkResolutionResponse, TypeStudyDataFormWithoutUnresolvableLinksResponse } from "./TypeStudyDataForm";

@@ -1,9 +1,10 @@
+import type { Document } from '@contentful/rich-text-types'
 import clsx from 'clsx'
-import type { ReactNode } from 'react'
 import { forwardRef } from 'react'
 import type { FieldErrors } from 'react-hook-form'
 
 import { TEXTAREA_MAX_CHARACTERS } from '@/constants/forms'
+import { RichTextRenderer } from '@/utils/Renderers/RichTextRenderer/RichTextRenderer'
 
 import { ErrorInline } from '../ErrorInline/ErrorInline'
 
@@ -11,7 +12,7 @@ interface TextareaProps {
   label: string
   labelSize?: 's' | 'm' | 'l'
   name: string
-  hint?: ReactNode
+  hint?: string | Document
   required?: boolean
   errors: FieldErrors
   defaultValue: string | undefined
@@ -44,7 +45,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           </label>
           {hint ? (
             <div className="govuk-hint" id={`${rest.name}-hint`}>
-              {hint}
+              {typeof hint === 'string' ? hint : <RichTextRenderer>{hint}</RichTextRenderer>}
             </div>
           ) : null}
         </div>
