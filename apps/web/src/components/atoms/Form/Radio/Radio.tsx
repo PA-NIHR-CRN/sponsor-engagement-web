@@ -1,11 +1,14 @@
+import type { Document } from '@contentful/rich-text-types'
 import { forwardRef } from 'react'
+
+import { RichTextRenderer } from '@/utils/Renderers/RichTextRenderer/RichTextRenderer'
 
 export interface RadioProps {
   label: string
   value: string
   name?: string
   id?: string
-  hint?: string
+  hint?: string | Document
 }
 
 export const Radio = forwardRef<HTMLInputElement, RadioProps>(({ label, value, id, hint, ...rest }, ref) => (
@@ -24,7 +27,7 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(({ label, value, i
     </label>
     {hint ? (
       <div className="govuk-hint govuk-radios__hint" id={`${id}-hint`}>
-        {hint}
+        {typeof hint === 'string' ? hint : <RichTextRenderer>{hint}</RichTextRenderer>}
       </div>
     ) : null}
   </div>
