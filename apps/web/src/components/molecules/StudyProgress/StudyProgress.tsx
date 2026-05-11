@@ -49,7 +49,7 @@ export function StudyProgress({elapsedDays, textClassName = "govuk-body-s", over
     return (
         <div>
             <div>
-                <ProgressBar className="govuk-!-width-full" max={90} value={elapsedDays}
+                <ProgressBar className="govuk-!-width-full" max={firstParticipantTargetDays} value={elapsedDays}
                              color={GetStudyProgressColor(elapsedDays, firstParticipantTargetDays)}/>
             </div>
 
