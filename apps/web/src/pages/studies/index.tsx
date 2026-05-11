@@ -12,6 +12,7 @@ import type { ReactElement } from 'react'
 import type { OrderType } from '@/@types/filters'
 import type { TypeBannerSkeleton } from '@/@types/generated'
 import { Card } from '@/components/atoms'
+import Tag from '@/components/atoms/Tag/Tag'
 import {
   Filters,
   Pagination,
@@ -24,6 +25,7 @@ import {
 import { RootLayout } from '@/components/organisms'
 import CmsNotificationBanner from '@/components/organisms/CmsNotificationBanner/CmsNotificationBanner'
 import { Roles, STUDIES_PER_PAGE } from '@/constants'
+import { FORM_SUCCESS_MESSAGES } from '@/constants/forms'
 import { STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/routes'
 import { useFormListeners } from '@/hooks/useFormListeners'
 import { getNotificationBanner } from '@/lib/contentful/contentfulService'
@@ -34,14 +36,18 @@ import { getFiltersFromQuery } from '@/utils/filters'
 import { pluraliseStudy } from '@/utils/pluralise'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
-const renderNotificationBanner = (success: boolean) =>
-  success ? (
-    <NotificationBanner heading="The study assessment was successfully saved" success>
-      Request{' '}
-      <Link className="govuk-notification-banner__link" href={SUPPORT_PAGE}>
-        NIHR RDN support
-      </Link>{' '}
-      for this study.
+const renderNotificationBanner = (success: string | undefined, showRequestSupportLink: boolean) =>
+  success || !Number.isNaN(Number(success)) ? (
+    <NotificationBanner heading={FORM_SUCCESS_MESSAGES[Number(success)]} isRichText success>
+      {showRequestSupportLink ? (
+        <>
+          Request{' '}
+          <Link className="govuk-notification-banner__link" href={SUPPORT_PAGE}>
+            NIHR RDN support
+          </Link>{' '}
+          for this study.
+        </>
+      ) : null}
     </NotificationBanner>
   ) : null
 
@@ -58,13 +64,14 @@ export default function Studies({
   const { isLoading, handleFilterChange } = useFormListeners()
   const isOdpUser = user.groups.includes(ODP_ROLE)
   const dashboardLink = process.env.NEXT_PUBLIC_ODP_DASHBOARD_LINK || ''
+  const successType = router.query.success as string
 
   const titleResultsText =
     totalItems === 0
       ? `(no matching search results)`
       : `(${totalItems} ${pluraliseStudy(totalItems)}, page ${initialPage} of ${Math.ceil(
-          totalItems / initialPageSize
-        )})`
+        totalItems / initialPageSize
+      )})`
 
   const today = dayjs()
 
@@ -76,15 +83,17 @@ export default function Studies({
 
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
-          {renderNotificationBanner(Boolean(router.query.success))}
+          {renderNotificationBanner(successType, successType === '1')}
 
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">Assess progress of studies</h2>
 
-          <div className="flex items-center gap-2 govuk-!-margin-bottom-4">
-            <AlertIcon />{' '}
-            <strong className="govuk-heading-s govuk-!-margin-bottom-0">
-              There are {totalItemsDue} studies to assess
-            </strong>
+          <div className="govuk-!-margin-bottom-4">
+            <Tag className="flex items-center gap-2 govuk-!-padding-3 block w-full">
+                <AlertIcon />
+                <strong className="govuk-heading-s govuk-!-margin-bottom-0">
+                  There are {totalItemsDue} studies needing action
+                </strong>
+            </Tag>
           </div>
 
           <p className="govuk-body">
@@ -118,7 +127,7 @@ export default function Studies({
           <div className="flex-wrap items-center justify-between gap-3 md:flex govuk-!-margin-bottom-4">
             <p className="govuk-heading-s mb-0 whitespace-nowrap">{`${totalItems} ${pluraliseStudy(
               totalItems
-            )} found (${totalItemsDue} due for assessment)`}</p>
+            )} found (${totalItemsDue} need action)`}</p>
             <div className="govuk-form-group mt-2 items-center justify-end md:my-0 md:flex">
               <div className="items-center whitespace-nowrap md:flex">
                 <Sort defaultOrder={filters.order} form="filters-form" />
@@ -143,7 +152,7 @@ export default function Studies({
                           <StudyList
                             daysSinceAssessmentDue={daysSinceAssessmentDue}
                             indications={study.evaluationCategories
-                              .map((evalCategory) => evalCategory.indicatorType)
+                              .map((evalCategory) => evalCategory.indicatorValue)
                               .filter((evalCategory, index, items) => items.indexOf(evalCategory) === index)}
                             irasId={study.irasId}
                             lastAssessmentDate={study.lastAssessment ? formatDate(study.lastAssessment.createdAt) : ''}
