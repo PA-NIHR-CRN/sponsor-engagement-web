@@ -29,6 +29,7 @@ $govuk-link-colour: var(--colour-blue);
 
 @import '../../node_modules/govuk-frontend/govuk/all.scss';
 @import './progress-bar.scss';
+@import './summary-card.scss';
 
 @layer utilities {
   .focusable {

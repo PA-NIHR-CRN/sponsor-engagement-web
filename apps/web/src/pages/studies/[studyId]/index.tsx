@@ -7,6 +7,7 @@ import { NextSeo } from 'next-seo'
 import type { ReactElement } from 'react'
 import type { LeadAdministrationId } from 'shared-utilities/src/utils/lead-administration-id'
 import { Status } from '@/@types/studies'
+import type { SummaryCardProps } from '@/components/atoms/SummaryCard/SummaryCard'
 import {
   AssessmentHistory,
   EditHistory,
@@ -16,8 +17,10 @@ import {
   StudyProgressExtended,
 } from '@/components/molecules'
 import { getEditHistory } from '@/components/molecules/EditHistory/utils'
+import SummaryCardCollection from '@/components/molecules/SummaryCollection/SummaryCardCollection'
 import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
+import { FormStudyStatus } from '@/constants/editStudyForm'
 import { FORM_SUCCESS_MESSAGES } from '@/constants/forms'
 import { getAssessmentPageRoute, STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/routes'
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
@@ -73,6 +76,60 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
     [Status.Suspended, Status.SuspendedFromOpenToRecruitment, Status.SuspendedFromOpenWithRecruitment] as string[]
   ).includes(study.studyStatus)
 
+  const formStatus = mapCPMSStatusToFormStatus(study.studyStatus) as FormStudyStatus;
+
+  const panelsByStatus: Partial<Record<FormStudyStatus, SummaryCardProps[]>> = {
+    [FormStudyStatus.Suspended]: [
+      {
+        title: 'Study status',
+        content: formStatus,
+      },
+      {
+        title: 'Recruitment total',
+        content: study.totalRecruitmentToDate?.toString() ?? '-',
+      },
+      {
+        title: 'Estimated reopening date',
+        content: study.estimatedReopeningDate?.toLocaleDateString('en-GB') ?? '-',
+      },
+    ],
+
+    [FormStudyStatus.InSetup]: [
+      {
+        title: 'Study status',
+        content: formStatus,
+      },
+      {
+        title: 'Planned UK target',
+        content: study.sampleSize?.toString() ?? '-',
+      },
+      {
+        title: 'Planned open to recruitment date',
+        content: study.plannedOpeningDate?.toLocaleDateString('en-GB') ?? '-',
+      },
+    ],
+
+    [FormStudyStatus.OpenToRecruitment]: [
+      {
+        title: 'Study status',
+        content: formStatus,
+      },
+      {
+        title: 'Recruitment numbers',
+        content:
+          study.totalRecruitmentToDate !== null && study.sampleSize !== null
+            ? `${study.totalRecruitmentToDate} of ${study.sampleSize}`
+            : '-',
+      },
+      {
+        title: 'Planned closure date',
+        content: study.plannedClosureDate?.toLocaleDateString('en-GB') ?? '-',
+      },
+    ],
+  }
+
+  const panels = panelsByStatus[formStatus] ?? []
+
   return (
     <Container>
       <NextSeo title={`Study Progress Review - ${study.shortTitle}`} />
@@ -90,6 +147,8 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
             {organisationsByRole.Sponsor}
             {Boolean(supportOrgName) && ` (${supportOrgName})`}
           </span>
+
+          <SummaryCardCollection panels={panels} />
 
           <div className="flex flex-col govuk-!-margin-bottom-4 govuk-!-margin-top-4 gap-6">
             {Boolean(study.dueAssessmentAt) && (
@@ -141,7 +200,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
             <Table.Body>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Study Status</Table.CellHeader>
-                <Table.Cell>{mapCPMSStatusToFormStatus(study.studyStatus)}</Table.Cell>
+                <Table.Cell>{formStatus}</Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Study data indicates</Table.CellHeader>
