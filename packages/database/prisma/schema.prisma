@@ -35,7 +35,7 @@ model Study {
   leadAdministrationId       Int?
   willRecruitWithinTimeline  Boolean                   @default(true)
   reasonNotRecruitingWithinTimeline String?            @db.Text
-  HraApprovalDate            DateTime?
+  hraApprovalDate            DateTime?
   assessments                Assessment[]
   lastAssessment             Assessment?               @relation("StudyLastAssessment", fields: [lastAssessmentId], references: [id])
   evaluationCategories       StudyEvaluationCategory[]
