@@ -2,8 +2,9 @@ import Link from 'next/link'
 
 import { Card } from '@/components/atoms'
 import Tag from '@/components/atoms/Tag/Tag'
-
 import TagCollection from '../../TagCollection/TagCollection'
+import {ProgressBar, progressBarColor} from "@/components/atoms/ProgressBar/ProgressBar";
+import {StudyProgress} from "@/components/molecules/StudyDetails/StudyProgress";
 
 export interface StudyListProps {
   sponsorOrgName?: string
@@ -99,6 +100,12 @@ export function StudyList({
       />
 
       <div className="sm:justify-between lg:justify-normal sm:gap-3">
+        <div className="lg:min-w-[320px]">
+          <div>
+            <StudyProgress elapsedDays={120}/>
+          </div>
+        </div>
+        
         <div className="text-right lg:w-full">
           <Link
             aria-label={`View study ${shortTitle}`}
