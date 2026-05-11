@@ -1,3 +1,4 @@
+import type { Document } from '@contentful/rich-text-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Container } from '@nihr-ui/frontend'
 import clsx from 'clsx'
@@ -8,6 +9,7 @@ import { type ReactElement, useCallback } from 'react'
 import type { FieldError } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 
+import type { TypeSetAssesmentFormPageSkeleton } from '@/@types/generated'
 import { Checkbox, CheckboxGroup, ErrorSummary, Fieldset, Form, Radio, RadioGroup } from '@/components/atoms'
 import { Textarea } from '@/components/atoms/Form/Textarea/Textarea'
 import { AssessmentHistory, getAssessmentHistoryFromStudy, RequestSupport, StudyDetails } from '@/components/molecules'
@@ -15,9 +17,11 @@ import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
 import { TEXTAREA_MAX_CHARACTERS } from '@/constants/forms'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
+import { getManagedContent } from '@/lib/contentful/contentfulService'
 import { prismaClient } from '@/lib/prisma'
 import { getStudyById } from '@/lib/studies'
 import { getValuesFromSearchParams } from '@/utils/form'
+import { RichTextRenderer } from '@/utils/Renderers/RichTextRenderer/RichTextRenderer'
 import type { AssessmentInputs } from '@/utils/schemas/assessment.schema'
 import { assessmentSchema } from '@/utils/schemas/assessment.schema'
 import { withServerSideProps } from '@/utils/withServerSideProps'
@@ -31,6 +35,7 @@ export default function Assessment({
   furtherInformation,
   returnUrl,
   assessments,
+  managedContent,
 }: AssessmentProps) {
   const { register, formState, setError, watch, handleSubmit } = useForm<AssessmentInputs>({
     resolver: zodResolver(assessmentSchema),
@@ -66,17 +71,29 @@ export default function Assessment({
 
   const supportOrgName = organisationsByRole.CRO ?? organisationsByRole.CTU
 
+  function getStudyRadioDescription(id: number, description: string): string | Document {
+    switch (id) {
+      case 1:
+        // on track
+        return managedContent?.studyProgressionOnTrackGuidanceText as Document
+      case 2:
+        //off track
+        return managedContent?.studyProgressionOffTrackGuidanceText as Document
+      default:
+        return description
+    }
+  }
+
   return (
     <Container>
       <NextSeo title="Study Progress Review - Assess progress of study" />
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
-          <h2 className="govuk-heading-l govuk-!-margin-bottom-4">Assess progress of a study in the UK</h2>
+          <h2 className="govuk-heading-l govuk-!-margin-bottom-4">{managedContent?.pageTitle.toString()}</h2>
 
-          <p className="govuk-body govuk-!-margin-bottom-6">
-            You will need to assess if the study is on or off track in the UK and if any action is being taken. If you
-            need NIHR RDN support with this study you will need to request this separately.
-          </p>
+          <div className="govuk-body govuk-!-margin-bottom-6">
+            <RichTextRenderer>{managedContent?.pageDescription as Document}</RichTextRenderer>
+          </div>
 
           <div className="text-darkGrey govuk-!-margin-bottom-0 govuk-body-s">
             <span className="govuk-visually-hidden">Study sponsor: </span>
@@ -125,11 +142,11 @@ export default function Assessment({
               <RadioGroup
                 defaultValue={defaultValues?.status}
                 errors={errors}
-                label="Is this study progressing in the UK as planned?"
+                label={managedContent?.studyProgressionQuestionLabel.toString()}
                 {...register('status')}
               >
                 {statuses.map(({ id, name, description }) => (
-                  <Radio hint={description} key={id} label={name} value={String(id)} />
+                  <Radio hint={getStudyRadioDescription(id, description)} key={id} label={name} value={String(id)} />
                 ))}
               </RadioGroup>
 
@@ -141,7 +158,7 @@ export default function Assessment({
                     : []
                 }
                 errors={errors}
-                label="Is there any additional information that would help NIHR RDN understand this progress assessment? (optional)"
+                label={managedContent?.additionalInfoLabel.toString()}
                 required={false}
                 {...register('furtherInformation')}
               >
@@ -154,7 +171,9 @@ export default function Assessment({
               <Textarea
                 defaultValue={defaultValues?.furtherInformationText}
                 errors={errors}
-                label="Further information (optional)"
+                label={
+                  managedContent?.furtherInformationLabel ? (managedContent.furtherInformationLabel as string) : ''
+                }
                 remainingCharacters={remainingCharacters}
                 required={false}
                 {...register('furtherInformationText')}
@@ -207,6 +226,10 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
 
   const { data: study } = await getStudyById(Number(studyId), userOrganisationIds)
 
+  const { CONTENTFUL_PAGE_STUDY_ASSESS_ID } = process.env
+  const contentfulContent = await getManagedContent<TypeSetAssesmentFormPageSkeleton>(CONTENTFUL_PAGE_STUDY_ASSESS_ID)
+  const managedContent = contentfulContent?.fields || null
+
   const [statusRefData, furtherInformationRefData] = await prismaClient.$transaction([
     prismaClient.sysRefAssessmentStatus.findMany(),
     prismaClient.sysRefAssessmentFurtherInformation.findMany({
@@ -234,6 +257,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
       statuses: statusRefData.map(({ id, name, description }) => ({ id, name, description })),
       furtherInformation: furtherInformationRefData.map(({ id, name }) => ({ id, name })),
       returnUrl: context.query.returnUrl === 'studies' ? 'studies' : `studies/${study.id}`,
+      managedContent,
     },
   }
 })
