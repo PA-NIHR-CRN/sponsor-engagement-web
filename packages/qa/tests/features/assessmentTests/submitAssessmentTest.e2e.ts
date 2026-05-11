@@ -213,7 +213,7 @@ test.describe('Submit a Study Assessment and Validate Form Inputs - @se_38', () 
     })
   })
 
-  test('Assesment Form Page will show only the Most Recent Assessment on Last Assessment Panel - @se_38_ac2_last_assessment_multi', async ({
+  test('Assessment Form Page will show only the Most Recent Assessment on Last Assessment Panel - @se_38_ac2_last_assessment_multi', async ({
     studyDetailsPage,
     assessmentPage,
   }) => {
