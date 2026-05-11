@@ -59,6 +59,8 @@ export interface Study {
   organisationsByRole?: Partial<Record<OrganisationRoleShortName, string>>
   ChangeHistory: ChangeHistory[]
   LeadAdministrationId: LeadAdministrationId | null
+  HraApprovalDate: string | null
+  WillRecruitWithinTimeline: boolean
 }
 
 export enum StudyRecordStatus {
