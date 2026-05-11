@@ -8,12 +8,12 @@ import type { DateInputValue } from '@/components/atoms/Form/DateInput/types'
 import { editStudyDateFields } from './editStudyForm'
 import {
   type assessmentSchema,
+  type configureSchema,
   type contactManagerAddSchema,
   type organisationAddSchema,
   type organisationRemoveContactSchema,
   type registrationSchema,
-  type studySchema,
-} from './schemas'
+  type studySchema} from './schemas'
 
 export type Schemas =
   | typeof assessmentSchema
@@ -22,6 +22,7 @@ export type Schemas =
   | typeof registrationSchema
   | typeof studySchema
   | typeof contactManagerAddSchema
+  | typeof configureSchema
 
 /**
  * Checks if there's any form errors present in the URL searchParams for a given schema
