@@ -3,16 +3,24 @@ import React from "react";
 
 import { Status } from '@/@types/studies';
 import { ProgressBar, progressBarColor } from "@/components/atoms/ProgressBar/ProgressBar";
+import clsx from "clsx";
 import { pluraliseDays } from '@/utils/pluralise';
 
 interface StudyProgressExtendedProps {
     hraApprovalDate: Date | null;
     studyStatus: string;
     willRecruitWithinTimeline: boolean;
+    showBorder?: boolean;
+    showTitle?: boolean;
+    showDates?: boolean;
+    showMoreDetails?: boolean;
     moreDetailsHref?: string;
 }
 
-export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = ({ hraApprovalDate, studyStatus, willRecruitWithinTimeline, moreDetailsHref }) => {
+export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
+    {hraApprovalDate, studyStatus, willRecruitWithinTimeline, moreDetailsHref, showBorder = true, showTitle = true, 
+        showDates = true, showMoreDetails = true }) => {
+
     
     const inSetupStatuses = [
         Status.InSetup,
@@ -53,19 +61,27 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = ({ hr
         return progressBarColor.Warning;
     }
 
+    const divClass = showBorder ? "govuk-!-padding-3 relative bg-white border-grey-120 border border-b-2" : "govuk-!-padding-3";
+
     return (
-        <div className="border-grey-50 border-b-2 border-t-2 govuk-!-margin-bottom-4">
-            <h3 className="govuk-heading-m govuk-!-margin-bottom-1 govuk-!-margin-top-4 p-0">
+        <div className={divClass}>
+
+            {showTitle && (
+                <>
+                    <h3 className="govuk-heading-m govuk-!-margin-bottom-1 p-0">
                 Progress of study setup
             </h3>
 
             <span className="govuk-body-s text-darkGrey block govuk-!-margin-bottom-2">
                 Based on the latest data from HRA approval from start date to end date
             </span>
+                </>
+                )}
 
             <ProgressBar className="govuk-!-width-full" color={GetStudyProgressColor(elapsedDays)} max={totalDays}
                 value={elapsedDays} />
 
+                
             <div className="flex justify-between">
                 <div className="flex flex-col">
                     <span
@@ -73,28 +89,32 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = ({ hr
                             }`}>
                         {progressLabel}
                     </span>
-
+                    {showDates &&(
                     <span className="govuk-body-s govuk-!-font-weight-bold text-darkGrey">
                         HRA approval date: {hraApprovalDate.toLocaleDateString('en-GB')}
                     </span>
+                    )}
                 </div>
 
                 <div className="flex flex-col text-right">
                     <span className="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-2 text-darkGrey">
                         {elapsedDays} / {totalDays} Days
                     </span>
+                    {showDates &&(
                     <span className="govuk-body-s govuk-!-font-weight-bold text-darkGrey">
                         End date: {endDate.toLocaleDateString('en-GB')}
                     </span>
+                    )}
                 </div>
             </div>
 
-            {moreDetailsHref ? <span className="govuk-body-m block govuk-!-margin-bottom-4">
+            {showMoreDetails && moreDetailsHref &&(
                 <Link href={moreDetailsHref}>
                     More details
                 </Link>
-            </span> : null}
 
+            )}
         </div>
+
     );
 };
