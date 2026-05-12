@@ -98,11 +98,11 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
                 This study needs a new sponsor assessment.
               </div>
             )}
-
-            {/*TODO: Pass in the actual HRA Approval Date *************************************************************/}
+            
             <StudyProgressExtended
-                hraApprovalDate={new Date('2026-01-05')}
+                hraApprovalDate={study.hraApprovalDate}
                 studyStatus={study.studyStatus}
+                willRecruitWithinTimeline={study.willRecruitWithinTimeline}
             />
             
             <div className="flex gap-4">

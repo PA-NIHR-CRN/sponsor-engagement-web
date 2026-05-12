@@ -5,12 +5,29 @@ import { Status } from '@/@types/studies'
 import {ProgressBar, progressBarColor} from "@/components/atoms/ProgressBar/ProgressBar";
 
 type StudyProgressExtendedProps = {
-    hraApprovalDate: Date;
+    hraApprovalDate: Date | null;
     studyStatus: string;
+    willRecruitWithinTimeline: boolean;
 };
 
-export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = ({hraApprovalDate, studyStatus }) => {
+export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = ({hraApprovalDate, studyStatus, willRecruitWithinTimeline }) => {
 
+    const inSetupStatuses = [
+        Status.InSetup,
+        Status.InSetupPendingNHSPermission,
+        Status.InSetupApprovalReceived,
+        Status.InSetupPendingApproval,
+        Status.InSetupNHSPermissionReceived
+    ];
+
+    if (
+        !inSetupStatuses.includes(studyStatus as Status) ||
+        hraApprovalDate == null ||
+        !willRecruitWithinTimeline
+    ) {
+        return null;
+    }
+    
     const today = new Date();
     const totalDays = 90;
     const endDate = new Date(hraApprovalDate);
@@ -28,23 +45,6 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = ({hra
         elapsedDays >= totalDays
             ? `OVER TARGET by ${elapsedDays - totalDays} days`
             : `${daysRemaining} days remaining`;
-    
-    // TODO: Change to any "InSetup..." status *********************************************************************************************
-    //const inSetupStatuses = [
-    //    Status.InSetup,
-    //    Status.InSetupPendingNHSPermission,
-    //    Status.InSetupApprovalReceived,
-    //    Status.InSetupPendingApproval,
-    //    Status.InSetupNHSPermissionReceived
-    //];
-    //
-    //if (!inSetupStatuses.includes(studyStatus as Status)) {
-    //    return null;
-    //}
-    if (studyStatus !== Status.OpenToRecruitment) {
-        return null;
-    }
-    // *************************************************************************************************************************
 
     function GetStudyProgressColor(daysSinceAssessmentDue: number) {
         if (daysSinceAssessmentDue >= totalDays) {
