@@ -33,6 +33,9 @@ import {
 import { formatDate } from '@/utils/date'
 import { getStudyAssessmentDueDate } from '@/utils/studies'
 import { withServerSideProps } from '@/utils/withServerSideProps'
+import { FormStudyStatus } from '@/constants/editStudyForm'
+import { SummaryCardProps } from '@/components/atoms/SummaryCard/SummaryCard'
+import SummaryCardCollection from '@/components/molecules/SummaryCardCollection/SummaryCardCollection'
 
 const renderNotificationBanner = (success: string | undefined, showRequestSupportLink: boolean) =>
   success || !Number.isNaN(Number(success)) ? (
@@ -73,6 +76,60 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
     [Status.Suspended, Status.SuspendedFromOpenToRecruitment, Status.SuspendedFromOpenWithRecruitment] as string[]
   ).includes(study.studyStatus)
 
+  const formStatus = mapCPMSStatusToFormStatus(study.studyStatus) as FormStudyStatus;
+
+  const panelsByStatus: Partial<Record<FormStudyStatus, SummaryCardProps[]>> = {
+    [FormStudyStatus.Suspended]: [
+      {
+        title: 'Study status',
+        content: formStatus,
+      },
+      {
+        title: 'Recruitment total',
+        content: study.totalRecruitmentToDate?.toString() ?? '-',
+      },
+      {
+        title: 'Estimated reopening date',
+        content: study.estimatedReopeningDate?.toLocaleDateString('en-GB') ?? '-',
+      },
+    ],
+
+    [FormStudyStatus.InSetup]: [
+      {
+        title: 'Study status',
+        content: formStatus,
+      },
+      {
+        title: 'Planned UK target',
+        content: study.sampleSize?.toString() ?? '-',
+      },
+      {
+        title: 'Planned open to recruitment date',
+        content: study.plannedOpeningDate?.toLocaleDateString('en-GB') ?? '-',
+      },
+    ],
+
+    [FormStudyStatus.OpenToRecruitment]: [
+      {
+        title: 'Study status',
+        content: formStatus,
+      },
+      {
+        title: 'Recruitment numbers',
+        content:
+          study.totalRecruitmentToDate !== null && study.sampleSize !== null
+            ? `${study.totalRecruitmentToDate} of ${study.sampleSize}`
+            : '-',
+      },
+      {
+        title: 'Planned closure date',
+        content: study.plannedClosureDate?.toLocaleDateString('en-GB') ?? '-',
+      },
+    ],
+  }
+
+  const panels = panelsByStatus[formStatus] ?? []
+
   return (
     <Container>
       <NextSeo title={`Study Progress Review - ${study.shortTitle}`} />
@@ -90,6 +147,8 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
             {organisationsByRole.Sponsor}
             {Boolean(supportOrgName) && ` (${supportOrgName})`}
           </span>
+
+          <SummaryCardCollection panels={panels} />
 
           <div className="flex flex-col govuk-!-margin-bottom-4 govuk-!-margin-top-4 gap-6">
             {Boolean(study.dueAssessmentAt) && (
@@ -141,7 +200,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
             <Table.Body>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Study Status</Table.CellHeader>
-                <Table.Cell>{mapCPMSStatusToFormStatus(study.studyStatus)}</Table.Cell>
+                <Table.Cell>{formStatus}</Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Study data indicates</Table.CellHeader>
