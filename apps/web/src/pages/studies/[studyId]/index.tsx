@@ -178,13 +178,13 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
                 <SummaryList rows={rows} />
               </>
             )}
-
-            {/*TODO: Pass in the actual HRA Approval Date *************************************************************/}
+            
             <StudyProgressExtended
-              hraApprovalDate={new Date('2026-01-05')}
-              studyStatus={study.studyStatus}
+                hraApprovalDate={study.hraApprovalDate}
+                studyStatus={study.studyStatus}
+                willRecruitWithinTimeline={study.willRecruitWithinTimeline}
             />
-
+            
             <div className="flex gap-4">
               <Link className="govuk-button w-auto govuk-!-margin-bottom-0" href={getAssessmentPageRoute(study.id)}>
                 Assess study

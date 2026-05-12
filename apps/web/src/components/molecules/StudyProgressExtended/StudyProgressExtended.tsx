@@ -1,17 +1,33 @@
+import React from "react";
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React from "react";
-
 import { Status } from '@/@types/studies'
 import {ProgressBar, progressBarColor} from "@/components/atoms/ProgressBar/ProgressBar";
 
-interface StudyProgressExtendedProps {
-    hraApprovalDate: Date;
+type StudyProgressExtendedProps = {
+    hraApprovalDate: Date | null;
     studyStatus: string;
-}
+    willRecruitWithinTimeline: boolean;
+};
 
-export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = ({hraApprovalDate, studyStatus }) => {
+export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = ({hraApprovalDate, studyStatus, willRecruitWithinTimeline }) => {
 
+    const inSetupStatuses = [
+        Status.InSetup,
+        Status.InSetupPendingNHSPermission,
+        Status.InSetupApprovalReceived,
+        Status.InSetupPendingApproval,
+        Status.InSetupNHSPermissionReceived
+    ];
+
+    if (
+        !inSetupStatuses.includes(studyStatus as Status) ||
+        hraApprovalDate == null ||
+        !willRecruitWithinTimeline
+    ) {
+        return null;
+    }
+    
     const today = new Date();
     const totalDays = 90;
     const endDate = new Date(hraApprovalDate);
@@ -29,30 +45,13 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = ({hra
         elapsedDays >= totalDays
             ? `OVER TARGET by ${elapsedDays - totalDays} days`
             : `${daysRemaining} days remaining`;
-    
-    // TODO: Change to any "InSetup..." status *********************************************************************************************
-    //const inSetupStatuses = [
-    //    Status.InSetup,
-    //    Status.InSetupPendingNHSPermission,
-    //    Status.InSetupApprovalReceived,
-    //    Status.InSetupPendingApproval,
-    //    Status.InSetupNHSPermissionReceived
-    //];
-    //
-    //if (!inSetupStatuses.includes(studyStatus as Status)) {
-    //    return null;
-    //}
-    if (studyStatus !== Status.OpenToRecruitment) {
-        return null;
-    }
-    // *************************************************************************************************************************
 
     function GetStudyProgressColor(daysSinceAssessmentDue: number) {
         if (daysSinceAssessmentDue >= totalDays) {
             return progressBarColor.Error;
-        } 
+        } else {
             return progressBarColor.Warning;
-        
+        }
     }
 
     return (
@@ -65,8 +64,8 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = ({hra
                 Based on the latest data from HRA approval from start date to end date
             </span>
 
-            <ProgressBar className="govuk-!-width-full" color={GetStudyProgressColor(elapsedDays)} max={90}
-                         value={elapsedDays}/>
+            <ProgressBar className="govuk-!-width-full" max={90} value={elapsedDays}
+                         color={GetStudyProgressColor(elapsedDays)}/>
             
             <div className="flex justify-between">
                 <div className="flex flex-col">

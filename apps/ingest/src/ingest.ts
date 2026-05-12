@@ -51,6 +51,7 @@ const createStudies = async () => {
       estimatedReopeningDate: study.EstimatedReopeningDate ? new Date(study.EstimatedReopeningDate) : null,
       isDeleted: false,
       leadAdministrationId: study.LeadAdministrationId,
+      hraApprovalDate: study.HraApprovalDate ? new Date(study.HraApprovalDate) : null
     }
 
     return prismaClient.study.upsert({
