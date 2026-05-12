@@ -6,6 +6,7 @@ import TagCollection from '../../TagCollection/TagCollection'
 import {ProgressBar, progressBarColor} from "@/components/atoms/ProgressBar/ProgressBar";
 import {StudyProgress} from "@/components/molecules/StudyProgress/StudyProgress";
 import dayjs from "dayjs";
+import {StudyProgressExtended} from "@/components/molecules";
 
 export interface StudyListProps {
   sponsorOrgName?: string
@@ -18,7 +19,9 @@ export interface StudyListProps {
   trackStatusHref?: string
   indications?: string[]
   irasId: string | null
-  hraApprovalDate?: Date | null
+  hraApprovalDate: Date | null
+  studyStatus: string,
+  willRecruitWithinTimeline : boolean
 }
 
 export function StudyList({
@@ -32,7 +35,10 @@ export function StudyList({
   lastAssessmentDate,
   indications,
   irasId, 
-  hraApprovalDate
+  hraApprovalDate,
+  studyStatus, 
+  willRecruitWithinTimeline
+    
 }: StudyListProps) {
   const hasAssessmentDue = daysSinceAssessmentDue !== null
 
@@ -52,9 +58,6 @@ export function StudyList({
     indications?.some(indication => !excludedIndications.has(indication)) ?? false
 
   const today = dayjs()
-  const daysSinceHraApproval = hraApprovalDate
-      ? Math.round(today.diff(hraApprovalDate, 'day', true))
-      : null
 
   return (
     <Card>
@@ -109,13 +112,14 @@ export function StudyList({
 
       <div className="sm:justify-between lg:justify-normal sm:gap-3">
 
-        {daysSinceHraApproval && (
         <div className="lg:min-w-[320px]">
           <div>
-            <StudyProgress elapsedDays={daysSinceHraApproval}/>
+            <StudyProgressExtended hraApprovalDate={hraApprovalDate}
+                                   willRecruitWithinTimeline={willRecruitWithinTimeline}
+                                  studyStatus={studyStatus} showBorder={false} showTitle={false} 
+                                   showDates={false} showMoreDetails={false}/>
           </div>
-        </div>
-        )}
+        </div>        
         
         <div className="text-right lg:w-full">
           <Link

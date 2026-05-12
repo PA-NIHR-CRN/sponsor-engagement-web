@@ -3,14 +3,21 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Status } from '@/@types/studies'
 import {ProgressBar, progressBarColor} from "@/components/atoms/ProgressBar/ProgressBar";
+import clsx from "clsx";
 
 type StudyProgressExtendedProps = {
     hraApprovalDate: Date | null;
     studyStatus: string;
     willRecruitWithinTimeline: boolean;
+    showBorder?: boolean;
+    showTitle?: boolean;
+    showDates?: boolean;
+    showMoreDetails?: boolean;
 };
 
-export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = ({hraApprovalDate, studyStatus, willRecruitWithinTimeline }) => {
+export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
+    {hraApprovalDate, studyStatus, willRecruitWithinTimeline, showBorder = true, showTitle = true, 
+        showDates = true, showMoreDetails = true }) => {
 
     const inSetupStatuses = [
         Status.InSetup,
@@ -53,20 +60,28 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = ({hra
             return progressBarColor.Warning;
         }
     }
+    
+    const divClass = showBorder ? "govuk-!-padding-3 relative bg-white border-grey-120 border border-b-2" : "govuk-!-padding-3";
 
     return (
-        <div className="govuk-!-padding-3 relative bg-white border-grey-120 border border-b-2">
-            <h3 className="govuk-heading-m govuk-!-margin-bottom-1 p-0">
-                Progress of study setup
-            </h3>
+        <div className={divClass}>
 
-            <span className="govuk-body-s text-darkGrey block mb-2">
-                Based on the latest data from HRA approval from start date to end date
-            </span>
+            {showTitle && (
+                <>
+                    <h3 className="govuk-heading-m govuk-!-margin-bottom-1 p-0">
+                        Progress of study setup
+                    </h3>
+        
+                    <span className="govuk-body-s text-darkGrey block mb-2">
+                        Based on the latest data from HRA approval from start date to end date
+                    </span>
+                </>
+                )}
 
             <ProgressBar className="govuk-!-width-full" max={90} value={elapsedDays}
                          color={GetStudyProgressColor(elapsedDays)}/>
-            
+
+                
             <div className="flex justify-between">
                 <div className="flex flex-col">
                     <span
@@ -75,26 +90,31 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = ({hra
                         }`}>
                         {progressLabel}
                     </span>
-
-                    <span className="govuk-body-s govuk-!-font-weight-bold text-darkGrey">
-                        HRA approval date: {hraApprovalDate.toLocaleDateString('en-GB')}
-                    </span>
+                    {showDates &&(
+                        <span className="govuk-body-s govuk-!-font-weight-bold text-darkGrey">
+                            HRA approval date: {hraApprovalDate.toLocaleDateString('en-GB')}
+                        </span>
+                    )}
                 </div>
                 
                 <div className="flex flex-col text-right">
                     <span className="govuk-body-s govuk-!-font-weight-bold text-darkGrey">
                         {elapsedDays} / {totalDays} Days
                     </span>
-                    <span className="govuk-body-s govuk-!-font-weight-bold text-darkGrey">
-                        End date: {endDate.toLocaleDateString('en-GB')}
-                    </span>
+                    {showDates &&(
+                        <span className="govuk-body-s govuk-!-font-weight-bold text-darkGrey">
+                            End date: {endDate.toLocaleDateString('en-GB')}
+                        </span>
+                    )}
                 </div>
             </div>
 
-            <Link href={`${pathname}/configure`}>
-                More details
-            </Link>
-
+            {showMoreDetails &&(
+                <Link href={`${pathname}/configure`}>
+                    More details
+                </Link>                
+            )}
         </div>
+
     );
 };
