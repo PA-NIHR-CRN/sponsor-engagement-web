@@ -1,10 +1,11 @@
 import Link from 'next/link'
 
 import { Card } from '@/components/atoms'
-import Tag from '@/components/atoms/Tag/Tag'
-import TagCollection from '../../TagCollection/TagCollection'
 import {ProgressBar, progressBarColor} from "@/components/atoms/ProgressBar/ProgressBar";
+import Tag from '@/components/atoms/Tag/Tag'
 import {StudyProgress} from "@/components/molecules/StudyDetails/StudyProgress";
+
+import TagCollection from '../../TagCollection/TagCollection'
 
 export interface StudyListProps {
   sponsorOrgName?: string
