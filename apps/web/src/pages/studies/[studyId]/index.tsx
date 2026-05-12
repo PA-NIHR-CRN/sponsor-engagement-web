@@ -79,11 +79,6 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
 
   const formStatus = mapCPMSStatusToFormStatus(study.studyStatus) as FormStudyStatus
 
-  const shouldShowStudyProgress =
-    study.hraApprovalDate !== null &&
-    study.willRecruitWithinTimeline &&
-    formStatus === FormStudyStatus.InSetup;
-
   const panelsByStatus: Partial<Record<FormStudyStatus, SummaryCardProps[]>> = {
     [FormStudyStatus.Suspended]: [
       {
@@ -164,10 +159,12 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
               </div>
             )}
 
-            {shouldShowStudyProgress ? <StudyProgressExtended
-                hraApprovalDate={study.hraApprovalDate!}
-                moreDetailsHref={`${STUDIES_PAGE}/${study.id}/configure`}
-              /> : null}
+            <StudyProgressExtended
+              hraApprovalDate={study.hraApprovalDate}
+              moreDetailsHref={`${STUDIES_PAGE}/${study.id}/configure`}
+              studyStatus={study.studyStatus}
+              willRecruitWithinTimeline={study.willRecruitWithinTimeline}
+            />
 
             <div className="flex gap-4">
               <Link className="govuk-button w-auto govuk-!-margin-bottom-0" href={getAssessmentPageRoute(study.id)}>
