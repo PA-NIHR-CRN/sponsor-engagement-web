@@ -6,6 +6,7 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import type { ReactElement } from 'react'
 import type { LeadAdministrationId } from 'shared-utilities/src/utils/lead-administration-id'
+
 import { Status } from '@/@types/studies'
 import type { SummaryCardProps } from '@/components/atoms/SummaryCard/SummaryCard'
 import {
@@ -18,6 +19,7 @@ import {
 } from '@/components/molecules'
 import { getEditHistory } from '@/components/molecules/EditHistory/utils'
 import SummaryCardCollection from '@/components/molecules/SummaryCollection/SummaryCardCollection'
+import SummaryList from '@/components/molecules/SummaryList/SummaryList'
 import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
 import { FormStudyStatus } from '@/constants/editStudyForm'
@@ -26,6 +28,9 @@ import { getAssessmentPageRoute, STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
 import type { StudyEvalsWithoutGeneratedValues } from '@/lib/studies'
 import {
+  buildSummaryRows,
+  getAssessmentDueIndicator,
+  getDaysSinceAssessmentDue,
   getStudyById,
   mapCPMSStatusToFormStatus,
   mapCPMSStudyEvalToSEEval,
@@ -130,6 +135,19 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
 
   const panels = panelsByStatus[formStatus] ?? []
 
+  const indicators: string[] = [
+    getAssessmentDueIndicator(
+      study.dueAssessmentAt !== null,
+      getDaysSinceAssessmentDue(study.dueAssessmentAt),
+    ),
+
+    ...study.evaluationCategories.map(
+      (ec) => ec.indicatorValue
+    ),
+  ].filter(Boolean) as string[];
+
+  const rows = buildSummaryRows(indicators);
+
   return (
     <Container>
       <NextSeo title={`Study Progress Review - ${study.shortTitle}`} />
@@ -151,19 +169,22 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
           <SummaryCardCollection panels={panels} />
 
           <div className="flex flex-col govuk-!-margin-bottom-4 govuk-!-margin-top-4 gap-6">
-            {Boolean(study.dueAssessmentAt) && (
-              <div>
-                <span className="govuk-tag govuk-tag--red mr-2">Due</span>
-                This study needs a new sponsor assessment.
-              </div>
+
+            {indicators.length > 0 && (
+              <>
+                <h3 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Actions needed
+                </h3>
+                <SummaryList rows={rows} />
+              </>
             )}
 
             {/*TODO: Pass in the actual HRA Approval Date *************************************************************/}
             <StudyProgressExtended
-                hraApprovalDate={new Date('2026-01-05')}
-                studyStatus={study.studyStatus}
+              hraApprovalDate={new Date('2026-01-05')}
+              studyStatus={study.studyStatus}
             />
-            
+
             <div className="flex gap-4">
               <Link className="govuk-button w-auto govuk-!-margin-bottom-0" href={getAssessmentPageRoute(study.id)}>
                 Assess study

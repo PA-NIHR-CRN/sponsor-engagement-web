@@ -1,8 +1,10 @@
 import { logger } from '@nihr-ui/logger'
+import dayjs from 'dayjs'
 import { setStudyAssessmentDue, setStudyAssessmentNotDue as setStudyAssessmentNotDueUtil } from 'shared-utilities'
 
-import type { Study, StudyEvaluationCategory } from '@/@types/studies'
-import { Status as CPMSStatus } from '@/@types/studies'
+import type { ActionKey, Study, StudyEvaluationCategory } from '@/@types/studies'
+import { INDICATOR_TO_ACTION,Status as CPMSStatus } from '@/@types/studies'
+import type { TagProps } from '@/components/atoms/Tag/Tag'
 import { FormStudyStatus } from '@/constants/editStudyForm'
 import { getErrorMessage } from '@/utils/error'
 
@@ -502,4 +504,78 @@ export const setStudyAssessmentNotDue = async (studyIds: number[]) => {
       error: errorMessage,
     }
   }
+}
+
+export function getDaysSinceAssessmentDue(dueAssessmentAt: Date | null): number | null {
+    const today = dayjs();
+  
+    return dueAssessmentAt
+      ? Math.round(today.diff(dueAssessmentAt, 'day', true))
+      : null
+}
+
+export function getAssessmentDueIndicator(
+  hasAssessmentDue: boolean,
+  daysSinceAssessmentDue: number | null
+): string | null {
+  if (!hasAssessmentDue) return null;
+
+  const days = daysSinceAssessmentDue || 1;
+
+  return `Assessment due for ${days} day${days > 1 ? 's' : ''}`;
+}
+
+function getActionKeyForIndicator(indicator: string): ActionKey | null {
+  if (indicator.startsWith('Assessment due for')) {
+    return 'ASSESS_STUDY';
+  }
+
+  return INDICATOR_TO_ACTION[indicator];
+}
+
+export const ACTION_CONFIG = {
+  ASSESS_STUDY: {
+    href: '/assess-study',
+    actionText: 'Assess study',
+  },
+  REVIEW_PLANNED_OPENING: {
+    href: '/update-study-dates',
+    actionText: 'Review planned opening date and study status',
+  },
+  REVIEW_PLANNED_CLOSING: {
+    href: '/update-recruitment',
+    actionText: 'Review planned closure date and study status',
+  },
+  REVIEW_EXPECTED_REOPENING: {
+    href: '/update-study-dates',
+    actionText: 'Review expected re-opening date and study status',
+  },
+  REVIEW_RECRUITMENT_TARGET: {
+    href: '/update-recruitment',
+    actionText: 'Review UK Recruitment target',
+  },
+  REVIEW_ACTUAL_OPENING: {
+    href: '/update-recruitment',
+    actionText: 'Review actual opening date and study status',
+  },
+};
+
+export function buildSummaryRows(indicators: string[]) {
+  const grouped = new Map<ActionKey, TagProps[]>();
+
+  indicators.forEach((indicator) => {
+    const actionKey = getActionKeyForIndicator(indicator);
+    if (!actionKey) return;
+
+    if (!grouped.has(actionKey)) {
+      grouped.set(actionKey, []);
+    }
+
+    grouped.get(actionKey)?.push({ text: indicator });
+  });
+
+  return Array.from(grouped.entries()).map(([actionKey, tags]) => ({
+    ...ACTION_CONFIG[actionKey],
+    tags,
+  }));
 }

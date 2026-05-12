@@ -1,7 +1,8 @@
-import type {getStudyById} from '@/lib/studies'
+import clsx from "clsx";
+
 import {ProgressBar, progressBarColor} from "@/components/atoms/ProgressBar/ProgressBar";
 import {StudyDetailsProps} from "@/components/molecules";
-import clsx from "clsx";
+import type {getStudyById} from '@/lib/studies'
 
 const maxDaysSinceAssessmentDue = 90
 
@@ -12,9 +13,9 @@ export interface StudyProgressProps {
 function GetStudyProgressColor(daysSinceAssessmentDue: number) {
     if (daysSinceAssessmentDue >= maxDaysSinceAssessmentDue) {
         return progressBarColor.Error;
-    } else {
+    } 
         return progressBarColor.Warning;
-    }
+    
 }
 
 function AsDaysString(days: number)
@@ -22,20 +23,20 @@ function AsDaysString(days: number)
     if (days == 1) {
         return "1 day";
     }
-    else {
-        return days + " days";
-    }
+    
+        return `${days  } days`;
+    
         
 }
 
 function GetOverdueText(remainingDays: number) {
     
     if (remainingDays < 0) {
-        return "OVERDUE by " + AsDaysString(Math.abs(remainingDays)); 
+        return `OVERDUE by ${  AsDaysString(Math.abs(remainingDays))}`; 
     }    
-    else {
-        return AsDaysString(remainingDays) + " remaining";
-    }
+    
+        return `${AsDaysString(remainingDays)  } remaining`;
+    
 }
 
 export function StudyProgress({elapsedDays}: StudyProgressProps) {
@@ -44,8 +45,8 @@ export function StudyProgress({elapsedDays}: StudyProgressProps) {
     return (
         <div>
             <div>
-                <ProgressBar className="govuk-!-width-full" max={90} value={elapsedDays}
-                             color={GetStudyProgressColor(elapsedDays)}/>
+                <ProgressBar className="govuk-!-width-full" color={GetStudyProgressColor(elapsedDays)} max={90}
+                             value={elapsedDays}/>
             </div>
 
             <div className="govuk-grid-row">

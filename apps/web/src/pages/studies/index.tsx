@@ -2,7 +2,6 @@ import { ODP_ROLE } from '@nihr-ui/auth/src/constants/constants'
 import { AlertIcon, Container, Details, NotificationBanner } from '@nihr-ui/frontend'
 import { logger } from '@nihr-ui/logger'
 import type { Entry } from 'contentful'
-import dayjs from 'dayjs'
 import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -30,7 +29,7 @@ import { STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/routes'
 import { useFormListeners } from '@/hooks/useFormListeners'
 import { getNotificationBanner } from '@/lib/contentful/contentfulService'
 import { getSponsorOrgName, getSupportOrgName } from '@/lib/organisations'
-import { getStudiesForOrgs } from '@/lib/studies'
+import { getDaysSinceAssessmentDue, getStudiesForOrgs } from '@/lib/studies'
 import { formatDate } from '@/utils/date'
 import { getFiltersFromQuery } from '@/utils/filters'
 import { pluraliseStudy } from '@/utils/pluralise'
@@ -73,8 +72,6 @@ export default function Studies({
         totalItems / initialPageSize
       )})`
 
-  const today = dayjs()
-
   return (
     <Container>
       <NextSeo title={`Study Progress Review - Search results ${titleResultsText}`} />
@@ -87,14 +84,17 @@ export default function Studies({
 
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">Assess progress of studies</h2>
 
-          <div className="govuk-!-margin-bottom-4">
-            <Tag className="flex items-center gap-2 govuk-!-padding-3 block w-full">
+          {totalItemsDue > 0 && (
+            <div className="govuk-!-margin-bottom-4">
+              <Tag className="flex items-center gap-2 govuk-!-padding-3 block w-full">
                 <AlertIcon />
                 <strong className="govuk-heading-s govuk-!-margin-bottom-0">
-                  There are {totalItemsDue} studies needing action
+                  There {totalItemsDue === 1 ? 'is' : 'are'} {totalItemsDue}{' '}
+                  {pluraliseStudy(totalItemsDue)} needing action
                 </strong>
-            </Tag>
-          </div>
+              </Tag>
+            </div>
+          )}
 
           <p className="govuk-body">
             Review study data and provide data updates where necessary. You will also be able to assess if studies are
@@ -143,9 +143,7 @@ export default function Studies({
                 <>
                   <ol aria-label="Studies" className="govuk-list govuk-list--spaced">
                     {studies.map((study) => {
-                      const daysSinceAssessmentDue = study.dueAssessmentAt
-                        ? Math.round(today.diff(study.dueAssessmentAt, 'day', true))
-                        : null
+                      const daysSinceAssessmentDue = getDaysSinceAssessmentDue(study.dueAssessmentAt);
 
                       return (
                         <li key={study.id}>

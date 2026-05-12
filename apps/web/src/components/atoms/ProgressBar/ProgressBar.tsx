@@ -21,9 +21,9 @@ function GetProgressBarColorClass(color: progressBarColor) {
     return "progress-bar-warning";
   } else if (color === progressBarColor.Error) {
     return "progress-bar-error";
-  } else {
+  } 
     return ""
-  }
+  
 }
 
 export function ProgressBar({ max, color = progressBarColor.Default, value, className }: ProgressBarProps) {
@@ -32,6 +32,6 @@ export function ProgressBar({ max, color = progressBarColor.Default, value, clas
   const limitedValue = Math.min(max, Math.max(0, value));
   
   return (
-      <progress max={max} value={limitedValue} className={clsx("progress-bar", colorClass, className)}></progress>
+      <progress className={clsx("progress-bar", colorClass, className)} max={max} value={limitedValue} />
   )
 }

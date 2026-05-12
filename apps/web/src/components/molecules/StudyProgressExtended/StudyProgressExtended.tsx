@@ -1,13 +1,14 @@
-import React from "react";
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import React from "react";
+
 import { Status } from '@/@types/studies'
 import {ProgressBar, progressBarColor} from "@/components/atoms/ProgressBar/ProgressBar";
 
-type StudyProgressExtendedProps = {
+interface StudyProgressExtendedProps {
     hraApprovalDate: Date;
     studyStatus: string;
-};
+}
 
 export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = ({hraApprovalDate, studyStatus }) => {
 
@@ -49,9 +50,9 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = ({hra
     function GetStudyProgressColor(daysSinceAssessmentDue: number) {
         if (daysSinceAssessmentDue >= totalDays) {
             return progressBarColor.Error;
-        } else {
+        } 
             return progressBarColor.Warning;
-        }
+        
     }
 
     return (
@@ -64,8 +65,8 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = ({hra
                 Based on the latest data from HRA approval from start date to end date
             </span>
 
-            <ProgressBar className="govuk-!-width-full" max={90} value={elapsedDays}
-                         color={GetStudyProgressColor(elapsedDays)}/>
+            <ProgressBar className="govuk-!-width-full" color={GetStudyProgressColor(elapsedDays)} max={90}
+                         value={elapsedDays}/>
             
             <div className="flex justify-between">
                 <div className="flex flex-col">

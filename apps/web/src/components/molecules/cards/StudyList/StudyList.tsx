@@ -1,10 +1,14 @@
 import Link from 'next/link'
 
 import { Card } from '@/components/atoms'
-import Tag from '@/components/atoms/Tag/Tag'
-import TagCollection from '../../TagCollection/TagCollection'
 import {ProgressBar, progressBarColor} from "@/components/atoms/ProgressBar/ProgressBar";
+import Tag from '@/components/atoms/Tag/Tag'
 import {StudyProgress} from "@/components/molecules/StudyDetails/StudyProgress";
+import {
+  getAssessmentDueIndicator
+} from '@/lib/studies'
+
+import TagCollection from '../../TagCollection/TagCollection'
 
 export interface StudyListProps {
   sponsorOrgName?: string
@@ -33,12 +37,7 @@ export function StudyList({
 }: StudyListProps) {
   const hasAssessmentDue = daysSinceAssessmentDue !== null
 
-  const daysDueText = hasAssessmentDue
-    ? (() => {
-      const days = daysSinceAssessmentDue || 1;
-      return `Assessment due for ${days} day${days > 1 ? 's' : ''}`;
-    })()
-    : '';
+  const daysDueText = getAssessmentDueIndicator(hasAssessmentDue, daysSinceAssessmentDue!);
 
   const excludedIndications = new Set([
     'Recruiting at a lower rate than expected (RTT)',
@@ -91,7 +90,7 @@ export function StudyList({
       <TagCollection
         tags={[
           ...(hasAssessmentDue
-            ? [{ text: daysDueText }]
+            ? [{ text: daysDueText! }]
             : []),
           ...(areUpdatesRequired
             ? [{ text: 'Data updates required' }]
