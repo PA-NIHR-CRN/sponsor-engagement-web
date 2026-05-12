@@ -61,7 +61,7 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
         return progressBarColor.Warning;
     }
 
-    const divClass = showBorder ? "govuk-!-padding-3 relative bg-white border-grey-120 border border-b-2" : "govuk-!-padding-0";
+    const divClass = showBorder ? "govuk-!-padding-3 relative bg-white border-grey-120 border border-b-2" : "";
 
     return (
         <div className={divClass}>
