@@ -1,7 +1,7 @@
-import type {getStudyById} from '@/lib/studies'
-import {ProgressBar, progressBarColor} from "@/components/atoms/ProgressBar/ProgressBar";
-import {StudyDetailsProps} from "@/components/molecules";
 import clsx from "clsx";
+
+import { ProgressBar, progressBarColor } from "@/components/atoms/ProgressBar/ProgressBar";
+import { pluraliseDays } from "@/utils/pluralise";
 
 const maxDaysSinceAssessmentDue = 90
 
@@ -12,40 +12,28 @@ export interface StudyProgressProps {
 function GetStudyProgressColor(daysSinceAssessmentDue: number) {
     if (daysSinceAssessmentDue >= maxDaysSinceAssessmentDue) {
         return progressBarColor.Error;
-    } else {
-        return progressBarColor.Warning;
     }
-}
+    return progressBarColor.Warning;
 
-function AsDaysString(days: number)
-{
-    if (days == 1) {
-        return "1 day";
-    }
-    else {
-        return days + " days";
-    }
-        
 }
 
 function GetOverdueText(remainingDays: number) {
-    
+
     if (remainingDays < 0) {
-        return "OVERDUE by " + AsDaysString(Math.abs(remainingDays)); 
-    }    
-    else {
-        return AsDaysString(remainingDays) + " remaining";
+        return `OVERDUE by ${Math.abs(remainingDays)} ${pluraliseDays(Math.abs(remainingDays))}`;
     }
+
+    return `${remainingDays} ${pluraliseDays(remainingDays)} remaining`;
 }
 
-export function StudyProgress({elapsedDays}: StudyProgressProps) {
+export function StudyProgress({ elapsedDays }: StudyProgressProps) {
     const remainingDays = maxDaysSinceAssessmentDue - elapsedDays;
     const overdueTextClass = remainingDays < 0 ? "text-red" : "";
     return (
         <div>
             <div>
-                <ProgressBar className="govuk-!-width-full" max={90} value={elapsedDays}
-                             color={GetStudyProgressColor(elapsedDays)}/>
+                <ProgressBar className="govuk-!-width-full" color={GetStudyProgressColor(elapsedDays)} max={maxDaysSinceAssessmentDue}
+                    value={elapsedDays} />
             </div>
 
             <div className="govuk-grid-row">

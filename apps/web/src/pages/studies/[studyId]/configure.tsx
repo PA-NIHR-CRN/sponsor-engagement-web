@@ -10,7 +10,7 @@ import { useForm } from 'react-hook-form'
 
 import { Fieldset, Form, Radio, RadioGroup } from '@/components/atoms'
 import { Textarea } from '@/components/atoms/Form/Textarea/Textarea'
-import { RequestSupport } from '@/components/molecules'
+import { RequestSupport, StudyProgressExtended } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
 import { TEXTAREA_MAX_CHARACTERS } from '@/constants/forms'
@@ -97,12 +97,17 @@ export default function Configure({ study, returnUrl }: Readonly<ConfigureProps>
             or support. Refer to the <Link href="/">Terms and Conditions</Link> guidance for more information.
           </div>
 
+          {study.hraApprovalDate !== null && (
+            <StudyProgressExtended
+              hraApprovalDate={study.hraApprovalDate}
+            />
+          )}
+
           <Form
             action={`/api/forms/configureStudy?returnUrl=${returnUrl}`}
             handleSubmit={handleSubmit}
             method="post"
-            onError={(message: string) =>
-              { setError('root.serverError', { type: '400', message }); }
+            onError={(message: string) => { setError('root.serverError', { type: '400', message }); }
             }
           >
             <input type="hidden" {...register('studyId')} />
