@@ -4,11 +4,7 @@ const nextConfig = {
   transpilePackages: ['ui', 'database'],
   experimental: {
     instrumentationHook: true,
-    serverComponentsExternalPackages: ['pino', 'pino-pretty']
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-},
 }
 
 const { withSuperjson } = require('next-superjson')

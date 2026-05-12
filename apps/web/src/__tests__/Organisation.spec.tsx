@@ -7,7 +7,6 @@ import { NextSeo } from 'next-seo'
 import { Mock } from 'ts-mockery'
 
 import { render, screen, within } from '@/config/TestUtils'
-import { OrgDetailsPageMock } from '@/lib/contentful/OrgDetailsPageMock'
 
 import { prismaMock } from '../__mocks__/prisma'
 import { userNoRoles, userWithContactManagerRole } from '../__mocks__/session'
@@ -20,8 +19,6 @@ jest.mock('@nihr-ui/logger')
 jest.mock('next-auth/next')
 jest.mock('next-seo')
 jest.mock('axios')
-
-const mockManagedContent = OrgDetailsPageMock.fields
 
 describe('getServerSideProps', () => {
   const getServerSessionMock = jest.mocked(getServerSession)
@@ -134,7 +131,7 @@ describe('Organisation page', () => {
       props: OrganisationProps
     }
 
-    render(Organisation.getLayout(<Organisation {...props} managedContent={mockManagedContent} />, { ...props }))
+    render(Organisation.getLayout(<Organisation {...props} />, { ...props }))
 
     // SEO
     expect(NextSeo).toHaveBeenCalledWith({ title: `Manage organisation contacts - ${mockOrganisation.name}` }, {})

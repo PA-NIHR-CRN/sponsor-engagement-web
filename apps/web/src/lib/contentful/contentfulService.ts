@@ -38,20 +38,6 @@ export const getEntryById = async <T extends EntrySkeletonType>(id: string): Pro
   return contentClient.getEntry<T>(id)
 }
 
-export const getManagedContent = async <T extends EntrySkeletonType>(
-  id: string | undefined
-): Promise<Entry<T> | null> => {
-  if (id) {
-    try {
-      return await getEntryById<T>(id)
-    } catch (error) {
-      logger.error(`Encountered error fetching entry from Contentful: ${error}`)
-      return null
-    }
-  }
-  return null
-}
-
 export const getNotificationBanner = async (): Promise<Entry<TypeBannerSkeleton> | null> => {
   const { CONTENTFUL_BANNER_ENTRY_ID } = process.env
 

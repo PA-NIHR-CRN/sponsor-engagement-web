@@ -1,4 +1,3 @@
-import type { Document } from '@contentful/rich-text-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Container } from '@nihr-ui/frontend'
 import { logger } from '@nihr-ui/logger'
@@ -10,7 +9,6 @@ import { type ReactElement, useCallback, useEffect, useMemo, useState } from 're
 import type { FieldError } from 'react-hook-form'
 import { Controller, useForm } from 'react-hook-form'
 
-import type { TypeStudyDataFormSkeleton } from '@/@types/generated'
 import { ErrorSummary, Fieldset, Form, Radio, RadioGroup } from '@/components/atoms'
 import { DateInput } from '@/components/atoms/Form/DateInput/DateInput'
 import type { DateInputValue } from '@/components/atoms/Form/DateInput/types'
@@ -24,12 +22,12 @@ import { Roles } from '@/constants'
 import {
   fieldNameToLabelMapping,
   FURTHER_INFO_MAX_CHARACTERS,
+  GENERIC_STUDIES_GUIDANCE_TEXT,
   PAGE_TITLE,
   statusMap,
   studyStatuses,
 } from '@/constants/editStudyForm'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
-import { getManagedContent } from '@/lib/contentful/contentfulService'
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
 import {
   getStudyById,
@@ -43,7 +41,6 @@ import {
 import { areAllDatePartsEmpty } from '@/utils/date'
 import { getOptionalFormFields, getVisibleFormFields, mapStudyToStudyFormInput } from '@/utils/editStudyForm'
 import { getValuesFromSearchParams } from '@/utils/form'
-import { RichTextRenderer } from '@/utils/Renderers/RichTextRenderer/RichTextRenderer'
 import type { EditStudy as EditStudySchema, EditStudyInputs } from '@/utils/schemas'
 import { studySchema } from '@/utils/schemas'
 import { getStudyAssessmentDueDate } from '@/utils/studies'
@@ -57,7 +54,7 @@ const transformDateValue = (input?: DateInputValue | null) => ({
   year: input?.year ?? '',
 })
 
-export default function EditStudy({ study, currentLSN, query, managedContent }: EditStudyProps) {
+export default function EditStudy({ study, currentLSN, query }: EditStudyProps) {
   const [mounted, setMounted] = useState(false)
   useEffect(() => {
     setMounted(true)
@@ -127,31 +124,6 @@ export default function EditStudy({ study, currentLSN, query, managedContent }: 
     }
   }, [errors])
 
-  function getManagedStatusDescription(id: number, description: string): string | Document {
-    switch (id) {
-      case 1:
-        // in setup
-        return managedContent?.inSetupGuidanceText as Document
-      case 2:
-        //Open to recruitment
-        return managedContent?.openToRecruitmentGuidanceText as Document
-      case 3:
-        //Closed, in follow-up
-        return managedContent?.closedInFollowUpGuidanceText as Document
-      case 4:
-        //Closed
-        return managedContent?.closedGuidanceText as Document
-      case 5:
-        //Withdrawn
-        return managedContent?.withdrawnGuidanceText as Document
-      case 6:
-        //Suspended
-        return managedContent?.suspendedGuidanceText as Document
-      default:
-        return description
-    }
-  }
-
   return (
     <Container>
       <NextSeo title="Study Progress Review - Update UK study data" />
@@ -159,7 +131,7 @@ export default function EditStudy({ study, currentLSN, query, managedContent }: 
         <div className="w-full">
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">
             <span className="govuk-visually-hidden">Page title: </span>
-            {managedContent?.pageTitle.toString()}
+            {PAGE_TITLE}
           </h2>
           <span className="govuk-body-m mb-0 text-darkGrey">
             <span className="govuk-visually-hidden">Study sponsor: </span>
@@ -172,9 +144,7 @@ export default function EditStudy({ study, currentLSN, query, managedContent }: 
 
           <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
 
-          <div className="govuk-inset-text">
-            <RichTextRenderer>{managedContent?.pageDescription as Document}</RichTextRenderer>
-          </div>
+          <div className="govuk-inset-text">{GENERIC_STUDIES_GUIDANCE_TEXT}</div>
 
           <p className="govuk-body govuk-!-margin-bottom-4">All fields are required unless labelled as optional.</p>
 
@@ -229,12 +199,7 @@ export default function EditStudy({ study, currentLSN, query, managedContent }: 
                         if (!visibleStatuses.includes(status.value)) return
 
                         return (
-                          <Radio
-                            hint={getManagedStatusDescription(Number(status.id), status.description)}
-                            key={status.id}
-                            label={status.name}
-                            value={status.value}
-                          />
+                          <Radio hint={status.description} key={status.id} label={status.name} value={status.value} />
                         )
                       })}
                     </RadioGroup>
@@ -403,8 +368,8 @@ export default function EditStudy({ study, currentLSN, query, managedContent }: 
               <Textarea
                 defaultValue={defaultValues?.furtherInformation}
                 errors={errors}
-                hint={managedContent?.furtherInformationGuidanceText as Document}
-                label={managedContent?.futherInformationLabel as string}
+                hint="If needed, provide further context or justification for changes made above."
+                label={fieldNameToLabelMapping.furtherInformation}
                 labelSize="m"
                 remainingCharacters={remainingCharacters}
                 required={false}
@@ -438,9 +403,10 @@ export default function EditStudy({ study, currentLSN, query, managedContent }: 
                 </Link>
               </div>
 
-              <div className="govuk-body">
-                <RichTextRenderer>{managedContent?.endMessage as Document}</RichTextRenderer>
-              </div>
+              <p className="govuk-body">
+                If you need support updating your data, please{' '}
+                <a href="mailto:supportmystudy@nihr.ac.uk">contact the RDN Team</a>.
+              </p>
             </Fieldset>
           </Form>
         </div>
@@ -493,9 +459,6 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
     }
   }
   const { study: studyInCPMS } = await getStudyByIdFromCPMS(Number(cpmsId))
-  const { CONTENTFUL_PAGE_UPDATE_STUDY_ID } = process.env
-  const contentfulContent = await getManagedContent<TypeStudyDataFormSkeleton>(CONTENTFUL_PAGE_UPDATE_STUDY_ID)
-  const managedContent = contentfulContent?.fields || null
 
   if (!studyInCPMS) {
     return {
@@ -503,7 +466,6 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
         user: session.user,
         study,
         query: context.query,
-        managedContent,
       },
     }
   }
@@ -521,7 +483,6 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
         user: session.user,
         study,
         query: context.query,
-        managedContent,
       },
     }
   }
@@ -553,7 +514,6 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
       },
       currentLSN: studyInCPMS.CurrentLsn,
       query: context.query,
-      managedContent,
     },
   }
 })

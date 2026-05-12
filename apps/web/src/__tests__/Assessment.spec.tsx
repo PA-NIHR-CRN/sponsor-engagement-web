@@ -9,7 +9,6 @@ import { NextSeo } from 'next-seo'
 import { Mock } from 'ts-mockery'
 
 import { render, screen, within } from '@/config/TestUtils'
-import { AssesmentPageMock } from '@/lib/contentful/AssesmentPageMock'
 
 import { prismaMock } from '../__mocks__/prisma'
 import { userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
@@ -22,16 +21,6 @@ jest.mock('next-auth/next')
 jest.mock('next-seo')
 jest.mock('axios')
 jest.mock('@nihr-ui/logger')
-
-const mockGetEntry = jest.fn()
-
-jest.mock('contentful', () => ({
-  createClient: jest.fn(() => {
-    return {
-      getEntry: mockGetEntry,
-    }
-  }),
-}))
 
 type StudyWithRelations = Prisma.StudyGetPayload<{
   include: {
@@ -124,7 +113,6 @@ const mockedEnvVars = {
   apiUrl: 'cpms-api',
   apiUsername: 'testuser',
   apiPassword: 'testpwd',
-  assessmentContentfulContent: 'mock-content-id',
 }
 
 const renderPage = async (
@@ -135,13 +123,14 @@ const renderPage = async (
   jest.mocked(getServerSession).mockResolvedValue(userWithSponsorContactRole)
   prismaMock.$transaction.mockResolvedValueOnce([firstStudyResponse])
   prismaMock.$transaction.mockResolvedValueOnce([sysRefAssessmentStatus, sysRefAssessmentFurtherInformation])
+
   await mockRouter.push(url)
 
   const { props } = (await getServerSideProps(context)) as {
     props: AssessmentProps
   }
 
-  render(Assessment.getLayout(<Assessment {...props} managedContent={AssesmentPageMock.fields} />, { ...props }))
+  render(Assessment.getLayout(<Assessment {...props} />, { ...props }))
 }
 
 describe('Assessment', () => {
@@ -153,7 +142,6 @@ describe('Assessment', () => {
     process.env.CPMS_API_URL = mockedEnvVars.apiUrl
     process.env.CPMS_API_USERNAME = mockedEnvVars.apiUsername
     process.env.CPMS_API_PASSWORD = mockedEnvVars.apiPassword
-    process.env.CONTENTFUL_PAGE_STUDY_ASSESS_ID = mockedEnvVars.assessmentContentfulContent
   })
 
   afterAll(() => {
