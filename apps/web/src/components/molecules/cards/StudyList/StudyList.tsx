@@ -108,13 +108,14 @@ export function StudyList({
       />
 
       <div className="sm:justify-between lg:justify-normal sm:gap-3">
-        
-        
+
+        {daysSinceHraApproval && (
         <div className="lg:min-w-[320px]">
           <div>
             <StudyProgress elapsedDays={daysSinceHraApproval}/>
           </div>
         </div>
+        )}
         
         <div className="text-right lg:w-full">
           <Link
