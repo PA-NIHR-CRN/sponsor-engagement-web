@@ -53,9 +53,7 @@ export function StudyList({
   ])
 
   const areUpdatesRequired =
-    indications?.some(indication => !excludedIndications.has(indication)) ?? false
-
-  const today = dayjs()
+    indications?.some(indication => !excludedIndications.has(indication)) ?? false;
 
   return (
     <Card>
@@ -111,7 +109,7 @@ export function StudyList({
       <div className="sm:justify-between lg:justify-normal sm:gap-3">
 
         <div className="lg:min-w-[320px]">
-          <div>
+          <div className='my-3'>
             <StudyProgressExtended hraApprovalDate={hraApprovalDate}
                                    willRecruitWithinTimeline={willRecruitWithinTimeline}
                                   studyStatus={studyStatus} showBorder={false} showTitle={false} 
