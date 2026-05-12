@@ -10,6 +10,7 @@ import { userWithSponsorContactRole } from '@/__mocks__/session'
 import { Status } from '@/@types/studies'
 import { render, screen, within } from '@/config/TestUtils'
 import { SUPPORT_PAGE } from '@/constants/routes'
+import { StudyUpdatePageMock } from '@/lib/contentful/StudyUpdatePageMock'
 import { mappedCPMSStudyEvals, mockCPMSStudy, mockStudyWithRelations } from '@/mocks/studies'
 import EditStudy, { type EditStudyProps, getServerSideProps } from '@/pages/studies/[studyId]/edit'
 
@@ -40,7 +41,10 @@ const mockedEnvVars = {
   apiUsername: 'testuser',
   apiPassword: 'testpwd',
   assessmentLapseMonths: '3',
+  orgUpdateContentfulId: 'study-update-page-id',
 }
+
+const mockManagedContent = StudyUpdatePageMock.fields
 
 const organisationsByRole = {
   CRO: 'Test Organisation',
@@ -71,7 +75,7 @@ const renderPage = async (
     props: EditStudyProps
   }
 
-  render(EditStudy.getLayout(<EditStudy {...props} />, { ...props }))
+  render(EditStudy.getLayout(<EditStudy {...props} managedContent={mockManagedContent} />, { ...props }))
 }
 
 const removeDateField = async (label: string) => {
@@ -101,6 +105,7 @@ describe('EditStudy', () => {
     process.env.CPMS_API_USERNAME = mockedEnvVars.apiUsername
     process.env.CPMS_API_PASSWORD = mockedEnvVars.apiPassword
     process.env.ASSESSMENT_LAPSE_MONTHS = mockedEnvVars.assessmentLapseMonths
+    process.env.CONTENTFUL_PAGE_UPDATE_STUDY_ID = mockedEnvVars.orgUpdateContentfulId
   })
 
   afterAll(() => {
@@ -162,6 +167,7 @@ describe('EditStudy', () => {
           },
           currentLSN: mockLSN,
           query: mockQuery,
+          managedContent: null,
         },
       })
 
@@ -185,6 +191,7 @@ describe('EditStudy', () => {
           user: userWithSponsorContactRole.user,
           study: { ...mockStudyWithRelations, organisationsByRole },
           query: mockQuery,
+          managedContent: null,
         },
       })
 
@@ -210,6 +217,7 @@ describe('EditStudy', () => {
             organisationsByRole,
           },
           query: mockQuery,
+          managedContent: null,
         },
       })
 
@@ -238,6 +246,7 @@ describe('EditStudy', () => {
           },
           currentLSN: mockLSN,
           query: mockQuery,
+          managedContent: null,
         },
       })
 
@@ -268,6 +277,7 @@ describe('EditStudy', () => {
           },
           currentLSN: mockLSN,
           query: mockQuery,
+          managedContent: null,
         },
       })
 
@@ -303,6 +313,7 @@ describe('EditStudy', () => {
           },
           currentLSN: mockLSN,
           query: mockQuery,
+          managedContent: null,
         },
       })
 
@@ -339,6 +350,7 @@ describe('EditStudy', () => {
           },
           currentLSN: mockLSN,
           query: mockQuery,
+          managedContent: null,
         },
       })
 
@@ -374,7 +386,7 @@ describe('EditStudy', () => {
       expect(
         screen.getByText(
           'Changes to the study status, the key dates and recruitment targets will be communicated to RDN, where possible, your changes will update the study record automatically in CPMS, other changes might be subject to review by the RDN team.',
-          { selector: 'div' }
+          { selector: 'p' }
         )
       ).toBeInTheDocument()
 
