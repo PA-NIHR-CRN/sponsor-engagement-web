@@ -21,21 +21,18 @@ function SummaryList({ rows }: Readonly<SummaryListProps>) {
                     key={index}
                 >
                     <dt className="govuk-summary-list__key">
-                        <TagCollection tags={row.tags} />
-                    </dt>
-                    <dd className="govuk-summary-list__value">
-                    {row.actionText}
-                    </dd>
-                    <dd className="govuk-summary-list__actions">
                         <a
                             className="govuk-link"
                             href={row.href}
                         >
-                            Resolve
+                            {row.actionText}
                             <span className="govuk-visually-hidden">
                                 action required
                             </span>
                         </a>
+                    </dt>
+                    <dd className="govuk-summary-list__actions">
+                        <TagCollection tags={row.tags} />
                     </dd>
                 </div>
             ))}
