@@ -1,15 +1,35 @@
 import Link from 'next/link';
 import React from "react";
 
+import { Status } from '@/@types/studies';
 import { ProgressBar, progressBarColor } from "@/components/atoms/ProgressBar/ProgressBar";
 import { pluraliseDays } from '@/utils/pluralise';
 
 interface StudyProgressExtendedProps {
-    hraApprovalDate: Date;
+    hraApprovalDate: Date | null;
+    studyStatus: string;
+    willRecruitWithinTimeline: boolean;
     moreDetailsHref?: string;
 }
 
-export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = ({ hraApprovalDate, moreDetailsHref }) => {
+export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = ({ hraApprovalDate, studyStatus, willRecruitWithinTimeline, moreDetailsHref }) => {
+    
+    const inSetupStatuses = [
+        Status.InSetup,
+        Status.InSetupPendingNHSPermission,
+        Status.InSetupApprovalReceived,
+        Status.InSetupPendingApproval,
+        Status.InSetupNHSPermissionReceived
+    ];
+
+    if (
+        !inSetupStatuses.includes(studyStatus as Status) ||
+        hraApprovalDate === null ||
+        !willRecruitWithinTimeline
+    ) {
+        return null;
+    }
+    
     const today = new Date();
     const totalDays = 90;
     const endDate = new Date(hraApprovalDate);

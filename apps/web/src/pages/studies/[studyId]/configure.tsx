@@ -97,11 +97,11 @@ export default function Configure({ study, returnUrl }: Readonly<ConfigureProps>
             or support. Refer to the <Link href="/">Terms and Conditions</Link> guidance for more information.
           </div>
 
-          {study.hraApprovalDate !== null && (
-            <StudyProgressExtended
-              hraApprovalDate={study.hraApprovalDate}
-            />
-          )}
+          <StudyProgressExtended
+            hraApprovalDate={study.hraApprovalDate}
+            studyStatus={study.studyStatus}
+            willRecruitWithinTimeline={study.willRecruitWithinTimeline}
+          />
 
           <Form
             action={`/api/forms/configureStudy?returnUrl=${returnUrl}`}
