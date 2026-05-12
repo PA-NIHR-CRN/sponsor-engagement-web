@@ -17,7 +17,7 @@ type StudyProgressExtendedProps = {
 
 export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
     {hraApprovalDate, studyStatus, willRecruitWithinTimeline, showBorder = true, showTitle = true, 
-        showDates = true, showMoreDetails = true }) => {
+        showDates = true, showMoreDetails = true}) => {
 
     const inSetupStatuses = [
         Status.InSetup,
@@ -61,7 +61,7 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
         }
     }
     
-    const divClass = showBorder ? "govuk-!-padding-3 relative bg-white border-grey-120 border border-b-2" : "govuk-!-padding-3";
+    const divClass = showBorder ? "govuk-!-padding-3 relative bg-white border-grey-120 border border-b-2" : "";
 
     return (
         <div className={divClass}>
