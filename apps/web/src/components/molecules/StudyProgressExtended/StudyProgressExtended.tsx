@@ -61,14 +61,14 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
         return progressBarColor.Warning;
     }
 
-    const divClass = showBorder ? "govuk-!-padding-3 relative bg-white border-grey-120 border border-b-2" : "";
+    const divClass = showBorder ? "border-grey-50 border-b-2 border-t-2 govuk-!-margin-bottom-4" : "";
 
     return (
         <div className={divClass}>
 
             {showTitle && (
                 <>
-                    <h3 className="govuk-heading-m govuk-!-margin-bottom-1 p-0">
+                    <h3 className="govuk-heading-m govuk-!-margin-bottom-1 govuk-!-margin-top-4 p-0">
                 Progress of study setup
             </h3>
 
@@ -109,9 +109,11 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
             </div>
 
             {showMoreDetails && moreDetailsHref && (
-                <Link href={moreDetailsHref}>
-                    More details
-                </Link>
+                <span className="govuk-body-m block govuk-!-margin-bottom-4">
+                    <Link href={moreDetailsHref}>
+                        More details
+                    </Link>
+                </span> 
             )}
         </div>
     );
