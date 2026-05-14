@@ -37,6 +37,7 @@ import {
 import { formatDate } from '@/utils/date'
 import { getStudyAssessmentDueDate } from '@/utils/studies'
 import { withServerSideProps } from '@/utils/withServerSideProps'
+import { ReportFirst } from '@/components/molecules/cards/ReportFirst/ReportFirst'
 
 const renderNotificationBanner = (success: string | undefined, showRequestSupportLink: boolean) =>
   success || !Number.isNaN(Number(success)) ? (
@@ -263,6 +264,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
           <StudyDetails study={study} />
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
+          <ReportFirst showAsStartButton studyId={study.id} />
           <RequestSupport showCallToAction sticky />
         </div>
       </div>

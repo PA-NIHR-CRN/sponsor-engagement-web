@@ -231,6 +231,47 @@ export const getStudiesForOrgs = async ({
   }
 }
 
+export const getStudyTitlesForOrgs = async ({
+  organisationIds
+}: {
+  organisationIds: number[]
+}) => {
+  const query = {
+    where: {
+      isDeleted: false,
+      organisations: {
+        some: {
+          organisationId: { in: organisationIds },
+          organisationRole: {
+            rtsIdentifier: {
+              in: [
+                StudySponsorOrganisationRoleRTSIdentifier.ClinicalResearchSponsor,
+                StudySponsorOrganisationRoleRTSIdentifier.ClinicalTrialsUnit,
+                StudySponsorOrganisationRoleRTSIdentifier.ContractResearchOrganisation,
+              ],
+            },
+          },
+          isDeleted: false,
+        },
+      },
+    },
+    select: {
+      id: true,
+      shortTitle: true,
+      irasId: true,
+    },
+    orderBy: [ { shortTitle: Prisma.SortOrder.asc }],
+  }
+
+  const [studies] = await prismaClient.$transaction([
+    prismaClient.study.findMany(query)
+  ])
+
+  return {
+    data: studies,
+  }
+}
+
 const studiesForExportFields = {
   include: {
     lastAssessment: {

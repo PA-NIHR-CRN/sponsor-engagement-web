@@ -35,6 +35,7 @@ import { formatDate } from '@/utils/date'
 import { getFiltersFromQuery } from '@/utils/filters'
 import { pluraliseStudy } from '@/utils/pluralise'
 import { withServerSideProps } from '@/utils/withServerSideProps'
+import { ReportFirst } from '@/components/molecules/cards/ReportFirst/ReportFirst'
 
 const renderNotificationBanner = (success: string | undefined, showRequestSupportLink: boolean) =>
   success || !Number.isNaN(Number(success)) ? (
@@ -186,6 +187,7 @@ export default function Studies({
           )}
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
+          <ReportFirst />
           <Card className="mt-4" data-testid="export-study-data" filled padding={4}>
             <h3 className="govuk-heading-m">Download study data</h3>
             <p>

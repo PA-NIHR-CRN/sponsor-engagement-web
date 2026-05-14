@@ -10,6 +10,7 @@ import type { DateInputValue } from './types'
 interface DateInputProps {
   label?: string
   name: string
+  hint?: string
   value?: DateInputValue
   required?: boolean
   errors: FieldErrors
@@ -24,7 +25,7 @@ const initialDateInputState: DateInputValue = {
 }
 
 export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
-  ({ label, errors, required, value = { ...initialDateInputState }, onChange, disabled, ...rest }, ref) => {
+  ({ label, hint, errors, required, value = { ...initialDateInputState }, onChange, disabled, ...rest }, ref) => {
     const dayError = errors[`${rest.name}-day`]
     const monthError = errors[`${rest.name}-month`]
     const yearError = errors[`${rest.name}-year`]
@@ -62,6 +63,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
           id={rest.name}
           legend={label}
           name={rest.name}
+          hint={hint}
           role="group"
         >
           <ErrorInline errors={errors} name={`${rest.name}-day`} />
