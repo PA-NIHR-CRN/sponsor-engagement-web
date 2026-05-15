@@ -187,6 +187,9 @@ export const getStudiesForOrgs = async ({
       shortTitle: true,
       dueAssessmentAt: true,
       irasId: true,
+      hraApprovalDate: true,
+      studyStatus: true,
+      willRecruitWithinTimeline: true,
       lastAssessment: {
         include: {
           status: true,

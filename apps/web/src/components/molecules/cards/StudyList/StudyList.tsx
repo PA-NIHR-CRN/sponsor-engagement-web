@@ -1,14 +1,10 @@
 import Link from 'next/link'
 
 import { Card } from '@/components/atoms'
-import {ProgressBar, progressBarColor} from "@/components/atoms/ProgressBar/ProgressBar";
 import Tag from '@/components/atoms/Tag/Tag'
-import {StudyProgress} from "@/components/molecules/StudyDetails/StudyProgress";
-import {
-  getAssessmentDueIndicator
-} from '@/lib/studies'
-
 import TagCollection from '../../TagCollection/TagCollection'
+import dayjs from "dayjs";
+import {StudyProgressExtended} from "@/components/molecules";
 
 export interface StudyListProps {
   sponsorOrgName?: string
@@ -21,6 +17,9 @@ export interface StudyListProps {
   trackStatusHref?: string
   indications?: string[]
   irasId: string | null
+  hraApprovalDate: Date | null
+  studyStatus: string,
+  willRecruitWithinTimeline : boolean
 }
 
 export function StudyList({
@@ -34,10 +33,19 @@ export function StudyList({
   lastAssessmentDate,
   indications,
   irasId,
+  hraApprovalDate,
+  studyStatus, 
+  willRecruitWithinTimeline
+    
 }: StudyListProps) {
   const hasAssessmentDue = daysSinceAssessmentDue !== null
 
-  const daysDueText = getAssessmentDueIndicator(hasAssessmentDue, daysSinceAssessmentDue!);
+  const daysDueText = hasAssessmentDue
+    ? (() => {
+      const days = daysSinceAssessmentDue || 1;
+      return `Assessment due for ${days} day${days > 1 ? 's' : ''}`;
+    })()
+    : '';
 
   const excludedIndications = new Set([
     'Recruiting at a lower rate than expected (RTT)',
@@ -45,7 +53,7 @@ export function StudyList({
   ])
 
   const areUpdatesRequired =
-    indications?.some(indication => !excludedIndications.has(indication)) ?? false
+    indications?.some(indication => !excludedIndications.has(indication)) ?? false;
 
   return (
     <Card>
@@ -90,7 +98,7 @@ export function StudyList({
       <TagCollection
         tags={[
           ...(hasAssessmentDue
-            ? [{ text: daysDueText! }]
+            ? [{ text: daysDueText }]
             : []),
           ...(areUpdatesRequired
             ? [{ text: 'Data updates required' }]
@@ -99,11 +107,13 @@ export function StudyList({
       />
 
       <div className="sm:justify-between lg:justify-normal sm:gap-3">
-        <div className="lg:min-w-[320px]">
-          <div>
-            <StudyProgress elapsedDays={120}/>
+
+        <div className="lg:min-w-[320px] govuk-!-margin-top-3">
+            <StudyProgressExtended hraApprovalDate={hraApprovalDate}
+                                   willRecruitWithinTimeline={willRecruitWithinTimeline}
+                                  studyStatus={studyStatus} showBorder={false} showTitle={false} 
+                                   showDates={false} showMoreDetails={false}/>
           </div>
-        </div>
         
         <div className="text-right lg:w-full">
           <Link

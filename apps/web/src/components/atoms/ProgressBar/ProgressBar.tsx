@@ -1,5 +1,4 @@
 import clsx from 'clsx'
-import type { ReactNode } from 'react'
 
 export interface ProgressBarProps {
   max: number
@@ -21,17 +20,16 @@ function GetProgressBarColorClass(color: progressBarColor) {
     return "progress-bar-warning";
   } else if (color === progressBarColor.Error) {
     return "progress-bar-error";
-  } 
-    return ""
-  
+  }
+  return ""
 }
 
 export function ProgressBar({ max, color = progressBarColor.Default, value, className }: ProgressBarProps) {
   const colorClass = GetProgressBarColorClass(color);
-  
+
   const limitedValue = Math.min(max, Math.max(0, value));
-  
+
   return (
-      <progress className={clsx("progress-bar", colorClass, className)} max={max} value={limitedValue} />
+    <progress className={clsx("progress-bar", colorClass, className)} max={max} value={limitedValue} />
   )
 }

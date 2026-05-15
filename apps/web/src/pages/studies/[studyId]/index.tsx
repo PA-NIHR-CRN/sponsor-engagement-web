@@ -28,9 +28,6 @@ import { getAssessmentPageRoute, STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
 import type { StudyEvalsWithoutGeneratedValues } from '@/lib/studies'
 import {
-  buildSummaryRows,
-  getAssessmentDueIndicator,
-  getDaysSinceAssessmentDue,
   getStudyById,
   mapCPMSStatusToFormStatus,
   mapCPMSStudyEvalToSEEval,
@@ -80,6 +77,60 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
   const isStudyStatusSuspended = (
     [Status.Suspended, Status.SuspendedFromOpenToRecruitment, Status.SuspendedFromOpenWithRecruitment] as string[]
   ).includes(study.studyStatus)
+
+  const formStatus = mapCPMSStatusToFormStatus(study.studyStatus) as FormStudyStatus
+
+  const panelsByStatus: Partial<Record<FormStudyStatus, SummaryCardProps[]>> = {
+    [FormStudyStatus.Suspended]: [
+      {
+        title: 'Study status',
+        content: formStatus,
+      },
+      {
+        title: 'Recruitment total',
+        content: study.totalRecruitmentToDate?.toString() ?? '-',
+      },
+      {
+        title: 'Estimated reopening date',
+        content: study.estimatedReopeningDate?.toLocaleDateString('en-GB') ?? '-',
+      },
+    ],
+
+    [FormStudyStatus.InSetup]: [
+      {
+        title: 'Study status',
+        content: formStatus,
+      },
+      {
+        title: 'Planned UK target',
+        content: study.sampleSize?.toString() ?? '-',
+      },
+      {
+        title: 'Planned open to recruitment date',
+        content: study.plannedOpeningDate?.toLocaleDateString('en-GB') ?? '-',
+      },
+    ],
+
+    [FormStudyStatus.OpenToRecruitment]: [
+      {
+        title: 'Study status',
+        content: formStatus,
+      },
+      {
+        title: 'Recruitment numbers',
+        content:
+          study.totalRecruitmentToDate !== null && study.sampleSize !== null
+            ? `${study.totalRecruitmentToDate} of ${study.sampleSize}`
+            : '-',
+      },
+      {
+        title: 'Planned closure date',
+        content: study.plannedClosureDate?.toLocaleDateString('en-GB') ?? '-',
+      },
+    ],
+  }
+
+  const panels = panelsByStatus[formStatus] ?? []
 
   const formStatus = mapCPMSStatusToFormStatus(study.studyStatus) as FormStudyStatus;
 
@@ -178,13 +229,14 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
                 <SummaryList rows={rows} />
               </>
             )}
-            
+
             <StudyProgressExtended
-                hraApprovalDate={study.hraApprovalDate}
-                studyStatus={study.studyStatus}
-                willRecruitWithinTimeline={study.willRecruitWithinTimeline}
+              hraApprovalDate={study.hraApprovalDate}
+              moreDetailsHref={`${STUDIES_PAGE}/${study.id}/configure`}
+              studyStatus={study.studyStatus}
+              willRecruitWithinTimeline={study.willRecruitWithinTimeline}
             />
-            
+
             <div className="flex gap-4">
               <Link className="govuk-button w-auto govuk-!-margin-bottom-0" href={getAssessmentPageRoute(study.id)}>
                 Assess study

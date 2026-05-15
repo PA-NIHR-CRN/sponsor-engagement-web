@@ -1,17 +1,27 @@
-import React from "react";
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Status } from '@/@types/studies'
-import {ProgressBar, progressBarColor} from "@/components/atoms/ProgressBar/ProgressBar";
+import React from "react";
 
-type StudyProgressExtendedProps = {
+import { Status } from '@/@types/studies';
+import { ProgressBar, progressBarColor } from "@/components/atoms/ProgressBar/ProgressBar";
+import clsx from "clsx";
+import { pluraliseDays } from '@/utils/pluralise';
+
+interface StudyProgressExtendedProps {
     hraApprovalDate: Date | null;
     studyStatus: string;
     willRecruitWithinTimeline: boolean;
-};
+    showBorder?: boolean;
+    showTitle?: boolean;
+    showDates?: boolean;
+    showMoreDetails?: boolean;
+    moreDetailsHref?: string;
+}
 
-export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = ({hraApprovalDate, studyStatus, willRecruitWithinTimeline }) => {
+export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
+    {hraApprovalDate, studyStatus, willRecruitWithinTimeline, moreDetailsHref, showBorder = true, showTitle = true, 
+        showDates = true, showMoreDetails = true }) => {
 
+    
     const inSetupStatuses = [
         Status.InSetup,
         Status.InSetupPendingNHSPermission,
@@ -22,7 +32,7 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = ({hra
 
     if (
         !inSetupStatuses.includes(studyStatus as Status) ||
-        hraApprovalDate == null ||
+        hraApprovalDate === null ||
         !willRecruitWithinTimeline
     ) {
         return null;
@@ -32,69 +42,79 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = ({hra
     const totalDays = 90;
     const endDate = new Date(hraApprovalDate);
     endDate.setDate(endDate.getDate() + totalDays);
-    
+
     const elapsedDays = Math.ceil(
         (today.getTime() - hraApprovalDate.getTime()) / (1000 * 60 * 60 * 24)
     );
 
     const daysRemaining = Math.max(totalDays - elapsedDays, 0);
 
-    const pathname = usePathname();
-
     const progressLabel =
         elapsedDays >= totalDays
-            ? `OVER TARGET by ${elapsedDays - totalDays} days`
-            : `${daysRemaining} days remaining`;
+            ? `OVER TARGET by ${elapsedDays - totalDays} ${pluraliseDays(elapsedDays - totalDays)}`
+            : `${daysRemaining} ${pluraliseDays(daysRemaining)} remaining`;
 
     function GetStudyProgressColor(daysSinceAssessmentDue: number) {
         if (daysSinceAssessmentDue >= totalDays) {
             return progressBarColor.Error;
-        } else {
-            return progressBarColor.Warning;
         }
+        return progressBarColor.Warning;
     }
 
+    const divClass = showBorder ? "border-grey-50 border-b-2 border-t-2 govuk-!-margin-bottom-4" : "";
+
     return (
-        <div className="govuk-!-padding-3 relative bg-white border-grey-120 border border-b-2">
-            <h3 className="govuk-heading-m govuk-!-margin-bottom-1 p-0">
+        <div className={divClass}>
+
+            {showTitle && (
+                <>
+                    <h3 className="govuk-heading-m govuk-!-margin-bottom-1 govuk-!-margin-top-4 p-0">
                 Progress of study setup
             </h3>
 
-            <span className="govuk-body-s text-darkGrey block mb-2">
+            <span className="govuk-body-s text-darkGrey block govuk-!-margin-bottom-2">
                 Based on the latest data from HRA approval from start date to end date
             </span>
+                </>
+                )}
 
-            <ProgressBar className="govuk-!-width-full" max={90} value={elapsedDays}
-                         color={GetStudyProgressColor(elapsedDays)}/>
-            
+            <ProgressBar className="govuk-!-width-full" color={GetStudyProgressColor(elapsedDays)} max={totalDays}
+                value={elapsedDays} />
+
+                
             <div className="flex justify-between">
                 <div className="flex flex-col">
                     <span
-                        className={`govuk-body-s govuk-!-font-weight-bold ${
-                            daysRemaining === 0 ? "govuk-error-message text-red-600" : "text-darkGrey"
-                        }`}>
+                        className={`govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-2 ${daysRemaining === 0 ? "govuk-error-message text-red-600" : ""
+                            }`}>
                         {progressLabel}
                     </span>
-
+                    {showDates &&(
                     <span className="govuk-body-s govuk-!-font-weight-bold text-darkGrey">
                         HRA approval date: {hraApprovalDate.toLocaleDateString('en-GB')}
                     </span>
+                    )}
                 </div>
-                
+
                 <div className="flex flex-col text-right">
-                    <span className="govuk-body-s govuk-!-font-weight-bold text-darkGrey">
+                    <span className="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-2 text-darkGrey">
                         {elapsedDays} / {totalDays} Days
                     </span>
+                    {showDates &&(
                     <span className="govuk-body-s govuk-!-font-weight-bold text-darkGrey">
                         End date: {endDate.toLocaleDateString('en-GB')}
                     </span>
+                    )}
                 </div>
             </div>
 
-            <Link href={`${pathname}/configure`}>
-                More details
-            </Link>
-
+            {showMoreDetails && moreDetailsHref && (
+                <span className="govuk-body-m block govuk-!-margin-bottom-4">
+                    <Link href={moreDetailsHref}>
+                        More details
+                    </Link>
+                </span> 
+            )}
         </div>
     );
 };

@@ -159,6 +159,9 @@ export default function Studies({
                             studyHref={`${STUDIES_PAGE}/${study.id}`}
                             supportOrgName={getSupportOrgName(study.organisations)}
                             trackStatus={study.lastAssessment?.status.name}
+                            hraApprovalDate={study.hraApprovalDate}
+                            studyStatus = {study.studyStatus}
+                            willRecruitWithinTimeline = {study.willRecruitWithinTimeline}
                           />
                         </li>
                       )

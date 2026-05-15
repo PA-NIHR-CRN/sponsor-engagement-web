@@ -32,6 +32,8 @@ $govuk-link-colour: var(--colour-blue);
 @import './summary-card.scss';
 @import './summary-list.scss';
 
+@import './summary-card.scss';
+
 @layer utilities {
   .focusable {
     &:focus {
