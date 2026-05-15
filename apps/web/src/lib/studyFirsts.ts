@@ -1,6 +1,6 @@
 import { prismaClient } from '@/lib/prisma'
 
-export type GetStudyFirstByStudyIdResult = {
+export interface GetStudyFirstByStudyIdResult {
   data: {
     studyId: number
     type: string

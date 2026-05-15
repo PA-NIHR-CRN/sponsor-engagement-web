@@ -29,7 +29,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
     const getError = (path: string) => {
       const direct = (errors as any)?.[path]
       if (direct) return direct
-      return path.split('.').reduce<any>((acc, key) => acc?.[key], errors as any)
+      return path.split('.').reduce<any>((acc, key) => acc?.[key], errors)
     }
 
     const dayError = getError(`${rest.name}.day`) ?? getError(`${rest.name}-day`)
@@ -62,10 +62,10 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
           })}
           aria-disabled={disabled}
           disabled={disabled}
+          hint={hint}
           id={rest.name}
           legend={label}
           name={rest.name}
-          hint={hint}
           role="group"
         >
           {/* Prefer nested names so Zod/RHF errors show */}
@@ -82,7 +82,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 inputClassName="govuk-input--width-2"
                 label="Day"
                 labelClassName="font-normal"
-                onChange={(e) => handleInputChange(e, 'day')}
+                onChange={(e) => { handleInputChange(e, 'day'); }}
                 ref={ref}
                 required={required}
                 type="text"
@@ -102,7 +102,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 inputClassName="govuk-input--width-2"
                 label="Month"
                 labelClassName="font-normal"
-                onChange={(e) => handleInputChange(e, 'month')}
+                onChange={(e) => { handleInputChange(e, 'month'); }}
                 ref={ref}
                 required={required}
                 type="text"
@@ -122,7 +122,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
                 inputClassName="govuk-input--width-4"
                 label="Year"
                 labelClassName="font-normal"
-                onChange={(e) => handleInputChange(e, 'year')}
+                onChange={(e) => { handleInputChange(e, 'year'); }}
                 ref={ref}
                 required={required}
                 type="text"

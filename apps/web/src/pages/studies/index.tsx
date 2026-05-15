@@ -22,6 +22,7 @@ import {
   StudiesListSkeleton,
   StudyList,
 } from '@/components/molecules'
+import { ReportFirst } from '@/components/molecules/cards/ReportFirst/ReportFirst'
 import { RootLayout } from '@/components/organisms'
 import CmsNotificationBanner from '@/components/organisms/CmsNotificationBanner/CmsNotificationBanner'
 import { Roles, STUDIES_PER_PAGE } from '@/constants'
@@ -35,7 +36,6 @@ import { formatDate } from '@/utils/date'
 import { getFiltersFromQuery } from '@/utils/filters'
 import { pluraliseStudy } from '@/utils/pluralise'
 import { withServerSideProps } from '@/utils/withServerSideProps'
-import { ReportFirst } from '@/components/molecules/cards/ReportFirst/ReportFirst'
 
 const renderNotificationBanner = (success: string | undefined, showRequestSupportLink: boolean) =>
   success || !Number.isNaN(Number(success)) ? (
@@ -152,6 +152,7 @@ export default function Studies({
                         <li key={study.id}>
                           <StudyList
                             daysSinceAssessmentDue={daysSinceAssessmentDue}
+                            hraApprovalDate={study.hraApprovalDate}
                             indications={study.evaluationCategories
                               .map((evalCategory) => evalCategory.indicatorValue)
                               .filter((evalCategory, index, items) => items.indexOf(evalCategory) === index)}
@@ -160,10 +161,9 @@ export default function Studies({
                             shortTitle={study.shortTitle}
                             sponsorOrgName={getSponsorOrgName(study.organisations)}
                             studyHref={`${STUDIES_PAGE}/${study.id}`}
+                            studyStatus = {study.studyStatus}
                             supportOrgName={getSupportOrgName(study.organisations)}
                             trackStatus={study.lastAssessment?.status.name}
-                            hraApprovalDate={study.hraApprovalDate}
-                            studyStatus = {study.studyStatus}
                             willRecruitWithinTimeline = {study.willRecruitWithinTimeline}
                           />
                         </li>

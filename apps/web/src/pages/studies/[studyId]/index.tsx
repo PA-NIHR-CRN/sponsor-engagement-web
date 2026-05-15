@@ -17,6 +17,7 @@ import {
   StudyDetails,
   StudyProgressExtended,
 } from '@/components/molecules'
+import { ReportFirst } from '@/components/molecules/cards/ReportFirst/ReportFirst'
 import { getEditHistory } from '@/components/molecules/EditHistory/utils'
 import SummaryCardCollection from '@/components/molecules/SummaryCardCollection/SummaryCardCollection'
 import { RootLayout } from '@/components/organisms'
@@ -37,7 +38,6 @@ import {
 import { formatDate } from '@/utils/date'
 import { getStudyAssessmentDueDate } from '@/utils/studies'
 import { withServerSideProps } from '@/utils/withServerSideProps'
-import { ReportFirst } from '@/components/molecules/cards/ReportFirst/ReportFirst'
 
 const renderNotificationBanner = (success: string | undefined, showRequestSupportLink: boolean) =>
   success || !Number.isNaN(Number(success)) ? (

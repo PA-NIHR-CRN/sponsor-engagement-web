@@ -1,5 +1,6 @@
-import { TEXTAREA_MAX_CHARACTERS } from '@/constants/forms'
 import * as z from 'zod'
+
+import { TEXTAREA_MAX_CHARACTERS } from '@/constants/forms'
 
 const requiredDate = z
   .object({

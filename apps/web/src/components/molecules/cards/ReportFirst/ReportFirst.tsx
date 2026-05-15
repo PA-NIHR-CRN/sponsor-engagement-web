@@ -1,5 +1,5 @@
-import clsx from 'clsx'
 import { StartIcon } from '@nihr-ui/frontend'
+import clsx from 'clsx'
 
 import { Card } from '@/components/atoms'
 import { REPORT_FIRSTS_PAGE } from '@/constants/routes'
@@ -35,7 +35,7 @@ export function ReportFirst({ showAsStartButton = false, studyId }: ReportFirstP
                 rel="noopener noreferrer"
             >
                 Report a first
-                {showAsStartButton && <StartIcon />}
+                {showAsStartButton ? <StartIcon /> : null}
             </a>
         </Card>
     )

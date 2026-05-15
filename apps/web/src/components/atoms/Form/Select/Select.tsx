@@ -1,5 +1,6 @@
 import clsx from 'clsx'
-import { forwardRef, ReactNode, useRef } from 'react'
+import type { ReactNode} from 'react';
+import { forwardRef, useRef } from 'react'
 import type { FieldErrors } from 'react-hook-form'
 
 import { ErrorInline } from '../ErrorInline/ErrorInline'
@@ -55,30 +56,22 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         )}
       >
         <div className="govuk-label-wrapper">
-          {label && (
-            <label
+          {label ? <label
               className={clsx('govuk-label', `govuk-label--${labelSize}`, labelClassName)}
               htmlFor={name}
               id={`${name}-label`}
             >
               {label}
-            </label>
-          )}
+            </label> : null}
 
-          {hint && (
-            <div className="govuk-hint" id={`${name}-hint`}>
+          {hint ? <div className="govuk-hint" id={`${name}-hint`}>
               {hint}
-            </div>
-          )}
+            </div> : null}
         </div>
 
-        {errors && displayInlineError && <ErrorInline errors={errors} name={name} />}
+        {errors && displayInlineError ? <ErrorInline errors={errors} name={name} /> : null}
 
         <select
-          id={name}
-          name={name}
-          ref={ref}
-          disabled={disabled}
           aria-describedby={clsx({
             [`${name}-hint`]: hint,
             [`${name}-error`]: error,
@@ -90,24 +83,26 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             { 'govuk-select--error': Boolean(error) },
             inputClassName
           )}
+          disabled={disabled}
+          id={name}
+          name={name}
           onChange={(e) => {
             if (submitOnChange) submitRef.current?.click()
             onChange?.(e)
           }}
+          ref={ref}
           {...selectProps}
         >
           {options}
         </select>
 
-        {submitOnChange && (
-          <button
+        {submitOnChange ? <button
+            className="govuk-button govuk-button--secondary govuk-!-margin-left-3 govuk-!-margin-bottom-0"
             ref={submitRef}
             type="submit"
-            className="govuk-button govuk-button--secondary govuk-!-margin-left-3 govuk-!-margin-bottom-0"
           >
             Submit
-          </button>
-        )}
+          </button> : null}
       </div>
     )
   }

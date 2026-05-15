@@ -1,9 +1,9 @@
 import { logger } from '@nihr-ui/logger'
-import type { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiResponse } from 'next'
 
 import { prismaClient } from '@/lib/prisma'
 
-export default async function handler(req, res: NextApiResponse, session) {
+export default async function handler(req, res: NextApiResponse) {
     
   if (req.method !== 'GET') {
       res.setHeader('Allow', 'GET')
@@ -16,7 +16,7 @@ export default async function handler(req, res: NextApiResponse, session) {
     const studyId = typeof studyIdStr === 'string' ? Number(studyIdStr) : NaN
 
     if (!Number.isFinite(studyId)) {
-      return res.status(400).json({ message: 'Invalid studyId' })
+      res.status(400).json({ message: 'Invalid studyId' }); return;
     }
 
     try {
@@ -34,9 +34,9 @@ export default async function handler(req, res: NextApiResponse, session) {
       })
 
       res.setHeader('Cache-Control', 'no-store')
-      return res.status(200).json({ first: first ?? null })
+      res.status(200).json({ first: first ?? null }); 
     } catch (error) {
       logger.error(error)
-      return res.status(500).json({ message: 'Failed to load first record' })
+      res.status(500).json({ message: 'Failed to load first record' }); 
     }
 }

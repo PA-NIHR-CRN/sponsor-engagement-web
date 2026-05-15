@@ -1,26 +1,22 @@
 import { logger } from '@nihr-ui/logger'
-import type { NextApiRequest } from 'next'
+import type { NextApiRequest, NextApiResponse } from 'next'
 import { ZodError } from 'zod'
 
 import { Roles } from '@/constants'
 import { REPORT_FIRSTS_PAGE } from '@/constants/routes'
 import { prismaClient } from '@/lib/prisma'
-import { reportFirstSchema, type ReportFirstInputs } from '@/utils/schemas/reportFirst.schema'
+import { type ReportFirstInputs,reportFirstSchema } from '@/utils/schemas/reportFirst.schema'
 import { withApiHandler } from '@/utils/withApiHandler'
 
 export interface ExtendedNextApiRequest extends NextApiRequest {
   body: ReportFirstInputs
 }
 
+const ALLOWED_METHOD = 'POST' as const
+const CONFIRMATION_PATH = '/report-first/confirmation' as const
+
 function isSafeReturnUrl(value: unknown): value is string {
   return typeof value === 'string' && value.startsWith('/') && !value.startsWith('//')
-}
-
-function appendSearchParam(url: string, key: string, value: string) {
-  const [path, qs] = url.split('?')
-  const params = new URLSearchParams(qs ?? '')
-  params.set(key, value)
-  return `${path}?${params.toString()}`
 }
 
 function datePartsToDate(firstAt: { day: string; month: string; year: string }) {
@@ -30,133 +26,117 @@ function datePartsToDate(firstAt: { day: string; month: string; year: string }) 
   return new Date(year, month - 1, day)
 }
 
+function nullIfBlank(value: string | null | undefined) {
+  const trimmed = value?.trim()
+  return trimmed ? trimmed : null
+}
+
+function redirectToReportFirst(res: NextApiResponse, params: URLSearchParams) {
+  return res.redirect(302, `${REPORT_FIRSTS_PAGE}?${params.toString()}`)
+}
+
+function buildValidationRedirectParams(req: NextApiRequest, zodError: ZodError): URLSearchParams {
+  const params = new URLSearchParams()
+
+  for (const issue of zodError.errors) {
+    const top = issue.path[0]
+
+    if (top === 'firstAt') {
+      params.set('firstAtError', issue.message)
+      continue
+    }
+
+    if (typeof top === 'string') {
+      params.set(`${top}Error`, issue.message)
+    }
+  }
+
+  const body = req.body as Partial<Record<string, unknown>>
+
+  if (typeof body.studyId === 'string') {
+    params.set('studyId', body.studyId)
+  }
+
+  for (const [key, value] of Object.entries(body)) {
+    if (key === 'studyId') continue
+    if (typeof value === 'string') {
+      params.set(key, value)
+    }
+  }
+
+  const firstAt = body.firstAt as { day?: unknown; month?: unknown; year?: unknown } | undefined
+  if (firstAt && typeof firstAt === 'object') {
+    if (typeof firstAt.day === 'string') params.set('firstAtDay', firstAt.day)
+    if (typeof firstAt.month === 'string') params.set('firstAtMonth', firstAt.month)
+    if (typeof firstAt.year === 'string') params.set('firstAtYear', firstAt.year)
+  }
+
+  if (isSafeReturnUrl(req.query.returnUrl)) {
+    params.set('returnUrl', req.query.returnUrl)
+  }
+
+  return params
+}
+
+function buildFatalRedirectParams(req: NextApiRequest): URLSearchParams {
+  const params = new URLSearchParams({ fatal: '1' })
+  if (isSafeReturnUrl(req.query.returnUrl)) {
+    params.set('returnUrl', req.query.returnUrl)
+  }
+  return params
+}
+
 export default withApiHandler<ExtendedNextApiRequest>(
   [Roles.SponsorContact],
   async (req, res, session) => {
-    if (req.method !== 'POST') {
-      res.setHeader('Allow', 'POST')
+    if (req.method !== ALLOWED_METHOD) {
+      res.setHeader('Allow', ALLOWED_METHOD)
       return res.status(405).end('Method Not Allowed')
     }
 
     try {
       const parsed = reportFirstSchema.parse(req.body)
 
-      const {
-        studyId,
-        type,
-        firstAt,
-        siteName,
-        piTitle,
-        piFullName,
-        piEmail,
-      } = parsed
-
-      const studyIdNumber = Number(studyId)
-      const firstAtDate = datePartsToDate(firstAt)
+      const studyIdNumber = Number(parsed.studyId)
+      const firstAtDate = datePartsToDate(parsed.firstAt)
 
       const upserted = await prismaClient.studyFirst.upsert({
         where: { studyId: studyIdNumber },
         create: {
           studyId: studyIdNumber,
-          type,
+          type: parsed.type,
           firstAt: firstAtDate,
-          siteName,
-          piTitle: piTitle?.trim() ? piTitle.trim() : null,
-          piFullName,
-          piEmail,
+          siteName: parsed.siteName,
+          piTitle: nullIfBlank(parsed.piTitle),
+          piFullName: parsed.piFullName,
+          piEmail: parsed.piEmail,
           createdById: session.user.id,
           modifiedById: session.user.id,
         },
         update: {
-          type,
+          type: parsed.type,
           firstAt: firstAtDate,
-          siteName,
-          piTitle: piTitle?.trim() ? piTitle.trim() : null,
-          piFullName,
-          piEmail,
+          siteName: parsed.siteName,
+          piTitle: nullIfBlank(parsed.piTitle),
+          piFullName: parsed.piFullName,
+          piEmail: parsed.piEmail,
           modifiedById: session.user.id,
           updatedAt: new Date(),
         },
       })
 
       logger.info(`Upserted StudyFirst for studyId: ${upserted.studyId}`)
-
-      const returnUrl = isSafeReturnUrl(req.query.returnUrl) ? req.query.returnUrl : ''
-
-      // ✅ Decide where you want to go after success:
-      // - If returnUrl was supplied, go there (and add success flag)
-      // - Otherwise go to the study detail page
-      if (returnUrl) {
-        return res.redirect(302, appendSearchParam(returnUrl, 'success', 'first'))
-      }
-
-      return res.redirect(302, `/studies/${studyId}?success=first`)
+      return res.redirect(302, CONFIRMATION_PATH)
     } catch (error) {
       logger.error(error)
 
-      // ---------- Zod validation errors ----------
       if (error instanceof ZodError) {
-        const searchParams = new URLSearchParams()
-
-        // Attach field-level errors as query params: <field>Error=<message>
-        for (const issue of error.errors) {
-          // If you validate the date object as a whole, path might be ['firstAt']
-          // If it’s per-part, path might be ['firstAt','day'] etc.
-          const top = issue.path[0]
-          const sub = issue.path[1]
-
-          if (top === 'firstAt') {
-            // Prefer a single message for the whole date input
-            searchParams.set('firstAtError', issue.message)
-
-            // If your UI expects per-part errors, you could also do:
-            // if (typeof sub === 'string') searchParams.set(`firstAt${sub[0].toUpperCase()}${sub.slice(1)}Error`, issue.message)
-            continue
-          }
-
-          if (typeof top === 'string') {
-            searchParams.set(`${top}Error`, issue.message)
-          }
-        }
-
-        // Echo values back safely so the form can be repopulated after redirect
-        const body = req.body as Partial<Record<string, unknown>>
-
-        // Keep study selection
-        if (typeof body.studyId === 'string') {
-          searchParams.set('studyId', body.studyId)
-        }
-
-        // Simple string fields
-        for (const [key, value] of Object.entries(body)) {
-          if (typeof value === 'string' && key !== 'studyId') {
-            searchParams.set(key, value)
-          }
-        }
-
-        // Date object (if present)
-        const firstAt = body.firstAt as { day?: unknown; month?: unknown; year?: unknown } | undefined
-        if (firstAt && typeof firstAt === 'object') {
-          if (typeof firstAt.day === 'string') searchParams.set('firstAtDay', firstAt.day)
-          if (typeof firstAt.month === 'string') searchParams.set('firstAtMonth', firstAt.month)
-          if (typeof firstAt.year === 'string') searchParams.set('firstAtYear', firstAt.year)
-        }
-
-        // Propagate returnUrl
-        if (isSafeReturnUrl(req.query.returnUrl)) {
-          searchParams.set('returnUrl', req.query.returnUrl)
-        }
-
-        return res.redirect(302, `${REPORT_FIRSTS_PAGE}?${searchParams.toString()}`)
+        const params = buildValidationRedirectParams(req, error)
+        return redirectToReportFirst(res, params)
       }
 
-      // ---------- Fatal errors ----------
-      const fatalParams = new URLSearchParams({ fatal: '1' })
-      if (isSafeReturnUrl(req.query.returnUrl)) {
-        fatalParams.set('returnUrl', req.query.returnUrl)
-      }
-
-      return res.redirect(302, `${REPORT_FIRSTS_PAGE}?${fatalParams.toString()}`)
+      const fatalParams = buildFatalRedirectParams(req)
+      return redirectToReportFirst(res, fatalParams)
     }
   }
 )
