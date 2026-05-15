@@ -14,25 +14,28 @@ export interface SummaryListProps {
 
 function SummaryList({ rows }: Readonly<SummaryListProps>) {
     return (
-        <dl className="govuk-summary-list summary-list--tags">
+        <dl className="govuk-summary-list summary-list--study">
             {rows.map((row, index) => (
                 <div
                     className="govuk-summary-list__row"
                     key={index}
                 >
-                    <dt className="govuk-summary-list__key">
+                    <dt className="govuk-summary-list__key govuk-summary-list__key--width-one-quarter">
+                        {row.actionText}
+                    </dt>
+                    <dd className="govuk-summary-list__value">
+                        <TagCollection tags={row.tags} />
+                    </dd>
+                    <dd className="govuk-summary-list__actions govuk-summary-list__actions--width-one-quarter">
                         <a
                             className="govuk-link"
                             href={row.href}
                         >
-                            {row.actionText}
+                            Resolve
                             <span className="govuk-visually-hidden">
-                                action required
+                                Resolve
                             </span>
                         </a>
-                    </dt>
-                    <dd className="govuk-summary-list__actions">
-                        <TagCollection tags={row.tags} />
                     </dd>
                 </div>
             ))}

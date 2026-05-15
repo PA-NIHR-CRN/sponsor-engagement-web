@@ -539,32 +539,32 @@ function getActionKeyForIndicator(indicator: string): ActionKey | null {
 
 export const ACTION_CONFIG = {
   ASSESS_STUDY: {
-    href: '/assess-study',
+    path: 'assess',
     actionText: 'Assess study',
   },
   REVIEW_PLANNED_OPENING: {
-    href: '/update-study-dates',
+    path: 'edit',
     actionText: 'Review planned opening date and study status',
   },
   REVIEW_PLANNED_CLOSING: {
-    href: '/update-recruitment',
+    path: 'edit',
     actionText: 'Review planned closure date and study status',
   },
   REVIEW_EXPECTED_REOPENING: {
-    href: '/update-study-dates',
+    path: 'edit',
     actionText: 'Review expected re-opening date and study status',
   },
   REVIEW_RECRUITMENT_TARGET: {
-    href: '/update-recruitment',
+    path: 'edit',
     actionText: 'Review UK Recruitment target',
   },
   REVIEW_ACTUAL_OPENING: {
-    href: '/update-recruitment',
+    path: 'edit',
     actionText: 'Review actual opening date and study status',
   },
 };
 
-export function buildSummaryRows(indicators: string[]) {
+export function buildSummaryRows(indicators: string[], basePath: string) {
   const grouped = new Map<ActionKey, TagProps[]>();
 
   indicators.forEach((indicator) => {
@@ -578,8 +578,13 @@ export function buildSummaryRows(indicators: string[]) {
     grouped.get(actionKey)?.push({ text: indicator });
   });
 
-  return Array.from(grouped.entries()).map(([actionKey, tags]) => ({
-    ...ACTION_CONFIG[actionKey],
-    tags,
-  }));
+  return Array.from(grouped.entries()).map(([actionKey, tags]) => {
+    const { path, actionText } = ACTION_CONFIG[actionKey]
+
+    return {
+      href: `${basePath}/${path}`,
+      actionText,
+      tags,
+    }
+  })
 }

@@ -149,6 +149,7 @@ export default function Studies({
                         <li key={study.id}>
                           <StudyList
                             daysSinceAssessmentDue={daysSinceAssessmentDue}
+                            hraApprovalDate={study.hraApprovalDate}
                             indications={study.evaluationCategories
                               .map((evalCategory) => evalCategory.indicatorValue)
                               .filter((evalCategory, index, items) => items.indexOf(evalCategory) === index)}
@@ -157,10 +158,9 @@ export default function Studies({
                             shortTitle={study.shortTitle}
                             sponsorOrgName={getSponsorOrgName(study.organisations)}
                             studyHref={`${STUDIES_PAGE}/${study.id}`}
+                            studyStatus = {study.studyStatus}
                             supportOrgName={getSupportOrgName(study.organisations)}
                             trackStatus={study.lastAssessment?.status.name}
-                            hraApprovalDate={study.hraApprovalDate}
-                            studyStatus = {study.studyStatus}
                             willRecruitWithinTimeline = {study.willRecruitWithinTimeline}
                           />
                         </li>
