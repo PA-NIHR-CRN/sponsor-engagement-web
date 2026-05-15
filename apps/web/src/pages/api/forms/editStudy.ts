@@ -122,16 +122,51 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
         Status.ClosedToRecruitmentNoFollowUp
       ]
 
+      type ClosedNoteInputs = {
+        finalRecruitmentTargetCorrect: boolean;
+        performanceAlignedToExpectations: boolean;
+        performanceExplainer: string;
+        furtherInformation: string;    
+        ukRecruitmentTarget: number;      
+      };
+
+      //Test data
+      const closedNoteInputs: ClosedNoteInputs = {
+        finalRecruitmentTargetCorrect: true,
+        performanceAlignedToExpectations: false,
+        performanceExplainer: "Test performance explainer",
+        furtherInformation: "Test further information",
+        ukRecruitmentTarget: 250
+      };
+
+      const yesNo = (v: boolean) => (v ? "Yes" : "No");
+
+      const buildClosedAdditionalNote = (inputs: ClosedNoteInputs) =>
+          `Final Recruitment Target Correct: ${yesNo(inputs.finalRecruitmentTargetCorrect)}; ` +
+          `Performance Aligned To Expectations: ${yesNo(inputs.performanceAlignedToExpectations)}; ` +
+          `Performance Explainer: ${inputs.performanceExplainer?.trim() || "None Provided"}; ` +
+          `Further information: ${inputs.furtherInformation?.trim() || "None Provided"}; ` +
+          `UK recruitment target: ${
+              Number.isFinite(inputs.ukRecruitmentTarget)
+                  ? inputs.ukRecruitmentTarget
+                  : "None Provided"
+          }`;
+
+
+
+      const isClosed = closedStatuses.includes(studyDataToUpdate.status);
+      const isNewlySuspended =
+          suspendedStatuses.includes(studyDataToUpdate.status) &&
+          !suspendedStatuses.includes(originalValues?.status ?? "");
+
       const additionalNote =
-          (
-              (
-                  suspendedStatuses.includes(studyDataToUpdate.status) &&
-                  !suspendedStatuses.includes(originalValues?.status ?? '')
-              ) ||
-              closedStatuses.includes(studyDataToUpdate.status)
-          )
-              ? UPDATE_FROM_SE_TEXT
-              : ''
+          isClosed
+              ? buildClosedAdditionalNote(closedNoteInputs)
+              : isNewlySuspended
+                  ? UPDATE_FROM_SE_TEXT
+                  : "";
+
+
 
       const { study, error: updateStudyError } = await updateStudyInCPMS(Number(studyDataToUpdate.cpmsId), {
         ...cpmsStudyInput,
