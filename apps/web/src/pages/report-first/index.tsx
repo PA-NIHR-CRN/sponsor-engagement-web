@@ -19,7 +19,7 @@ import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
 import { TEXTAREA_MAX_CHARACTERS } from '@/constants/forms'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
-import { getStudyTitlesForOrgs } from '@/lib/studies'
+import { getStudyById, getStudyTitlesForOrgs } from '@/lib/studies'
 import { getStudyFirstByStudyId } from '@/lib/studyFirsts'
 import { reportFirstSchema, type ReportFirstInputs } from '@/utils/schemas/reportFirst.schema'
 import { withServerSideProps } from '@/utils/withServerSideProps'
@@ -66,15 +66,14 @@ type StudyFirstApiResponse = { first: ReportFirstProps['initialFirst'] | null }
 export default function ReportFirst({
     studies,
     initialStudyId,
-    initialStudyTitle,
     initialFirst,
     returnUrl,
     isStudyLocked,
+    study
 }: Readonly<ReportFirstProps>) {
     const router = useRouter()
 
     const [isFetchingFirst, setIsFetchingFirst] = useState(false)
-    const [fetchError, setFetchError] = useState<string | null>(null)
 
     const {
         control,
@@ -84,17 +83,14 @@ export default function ReportFirst({
         handleSubmit,
         formState,
         watch,
-        setValue,
     } = useForm<ReportFirstInputs>({
         resolver: zodResolver(reportFirstSchema),
         defaultValues: buildDefaultValues(initialStudyId, initialFirst) as ReportFirstInputs,
     })
 
-    // Keep track of the previous selected studyId so we can revert select if user cancels discard
     const previousStudyIdRef = useRef<string>(initialStudyId || '')
 
     useEffect(() => {
-        // SSR hydration on first load / when query changes due to refresh etc.
         reset(buildDefaultValues(initialStudyId, initialFirst) as ReportFirstInputs)
         previousStudyIdRef.current = initialStudyId || ''
     }, [initialStudyId, initialFirst, reset])
@@ -135,14 +131,12 @@ export default function ReportFirst({
     const handleStudyChange = async (nextStudyId: string) => {
         try {
             if (!nextStudyId) {
-                // Nothing selected -> clear everything
                 reset(buildDefaultValues('', null) as ReportFirstInputs, {
                     keepDirty: false,
                     keepErrors: false,
                     keepTouched: false,
                 })
                 previousStudyIdRef.current = ''
-                // Optional: keep URL tidy
                 await router.replace(
                     { pathname: router.pathname, query: { returnUrl: safeReturnUrl } },
                     undefined,
@@ -153,7 +147,6 @@ export default function ReportFirst({
 
             const first = await fetchStudyFirst(nextStudyId)
 
-            // Populate form from API result (or clear if null)
             reset(buildDefaultValues(nextStudyId, first) as ReportFirstInputs, {
                 keepDirty: false,
                 keepErrors: false,
@@ -162,17 +155,12 @@ export default function ReportFirst({
 
             previousStudyIdRef.current = nextStudyId
 
-            // Optional: update URL for refresh/back/share WITHOUT triggering SSR
             await router.replace(
                 { pathname: router.pathname, query: { returnUrl: safeReturnUrl, studyId: nextStudyId } },
                 undefined,
                 { shallow: true }
             )
         } catch (e: unknown) {
-            const message = e instanceof Error ? e.message : 'Failed to load first record'
-            setFetchError(message)
-
-            // Clear form (but keep selected studyId)
             reset(buildDefaultValues(nextStudyId, null) as ReportFirstInputs, {
                 keepDirty: false,
                 keepErrors: false,
@@ -201,19 +189,22 @@ export default function ReportFirst({
                     <div className="w-full">
                         <h2 className="govuk-heading-l govuk-!-margin-bottom-6">Report a 'First'</h2>
 
-                        {isStudyLocked && initialStudyTitle ? (
-                            <div className='govuk-!-margin-bottom-6'>
+                        {study ? (
+                            <>
                                 <div className="govuk-body-s govuk-!-margin-bottom-0 text-darkGrey">
                                     <span className="govuk-visually-hidden">Study sponsor: </span>
-                                    {initialStudyTitle}
-                                    {initialStudyTitle ? ` (${initialStudyTitle})` : null}
+                                    {study.organisationsByRole.Sponsor}
+                                    {(() => {
+                                        const supportOrgName = study.organisationsByRole.CRO ?? study.organisationsByRole.CTU
+                                        return supportOrgName ? ` (${supportOrgName})` : null
+                                    })()}
                                 </div>
 
-                                <h3 className="govuk-heading-m govuk-!-margin-bottom-1">
+                                <h3 className="govuk-heading-m govuk-!-margin-bottom-6">
                                     <span className="govuk-visually-hidden">Study title: </span>
-                                    {initialStudyTitle}
+                                    {study.shortTitle}
                                 </h3>
-                            </div>
+                            </>
                         ) : null}
 
                         <p className="govuk-body govuk-!-margin-bottom-6">
@@ -255,7 +246,12 @@ export default function ReportFirst({
                                     )}
                                 />) : null}
 
-                            <RadioGroup errors={errors} label="Type of First" labelSize="m" {...register('type')}>
+                            <RadioGroup
+                                errors={errors}
+                                label="Type of First"
+                                labelSize="m"
+                                {...register('type')}
+                            >
                                 <Radio label="Global" value="global" hint="The UK has consented the first participant in a global study." />
                                 <Radio label="European" value="european" hint="The UK has consented the first participant in a European study." />
                             </RadioGroup>
@@ -310,13 +306,12 @@ export default function ReportFirst({
                             </div>
                         </Fieldset>
                     </div>
+
+                    <div className="lg:min-w-[300px] lg:max-w-[300px]">
+                        <RequestSupport showCallToAction sticky />
+                    </div>
                 </div>
-
             </Form>
-
-            <div className="lg:min-w-[300px] lg:max-w-[300px]">
-                <RequestSupport showCallToAction sticky />
-            </div>
         </Container>
     )
 }
@@ -333,56 +328,94 @@ ReportFirst.getLayout = function getLayout(page: ReactElement, props: ReportFirs
     )
 }
 
-export const getServerSideProps = withServerSideProps([Roles.SponsorContact], async (context, session) => {
-    try {
-        if (!session.user?.organisations.length) {
-            return { redirect: { destination: '/' } }
+export const getServerSideProps = withServerSideProps(
+    [Roles.SponsorContact],
+    async (context, session) => {
+        try {
+            if (!session.user?.organisations.length) {
+                return { redirect: { destination: '/' } }
+            }
+
+            const organisationIds = session.user.organisations.map((o) => o.organisationId)
+
+            const studyIdFromQuery =
+                typeof context.query.studyId === 'string' ? context.query.studyId : ''
+
+            const studyIdNumber = Number(studyIdFromQuery)
+            const hasStudyIdInQuery =
+                Boolean(studyIdFromQuery) && Number.isFinite(studyIdNumber) && studyIdNumber > 0
+
+            const returnUrlFromQuery =
+                typeof context.query.returnUrl === 'string' ? context.query.returnUrl : ''
+
+            const safeReturnUrl =
+                returnUrlFromQuery &&
+                    returnUrlFromQuery.startsWith('/') &&
+                    !returnUrlFromQuery.startsWith('//')
+                    ? returnUrlFromQuery
+                    : null
+
+            // -------------------------
+            // From a study page
+            // -------------------------
+            if (hasStudyIdInQuery) {
+                const studyResult = await getStudyById(studyIdNumber, organisationIds)
+
+                if (!studyResult?.data) {
+                    return { notFound: true }
+                }
+
+                const initialStudyId = String(studyResult.data.id)
+                const isStudyLocked = true
+
+                const initialFirstResult = await getStudyFirstByStudyId(studyIdNumber, organisationIds)
+
+                const returnUrl = safeReturnUrl ?? `/studies/${initialStudyId}/`
+
+                return {
+                    props: {
+                        user: session.user,
+                        studies: [],
+                        initialStudyId,
+                        isStudyLocked,
+                        study: studyResult.data,
+                        initialFirst: initialFirstResult.data,
+                        returnUrl,
+                    },
+                }
+            }
+
+            // -------------------------
+            // From study list page
+            // -------------------------
+            const studies = await getStudyTitlesForOrgs({ organisationIds })
+
+            const allowedIds = new Set(studies.data.map((s) => String(s.id)))
+            const initialStudyId = allowedIds.has(studyIdFromQuery) ? studyIdFromQuery : ''
+
+            const isStudyLocked = Boolean(initialStudyId)
+
+            const initialFirstResult = initialStudyId
+                ? await getStudyFirstByStudyId(Number(initialStudyId), organisationIds)
+                : { data: null }
+
+            const returnUrl =
+                safeReturnUrl ??
+                (initialStudyId ? `/studies/${initialStudyId}/` : '/studies')
+
+            return {
+                props: {
+                    user: session.user,
+                    studies: studies.data,
+                    initialStudyId,
+                    isStudyLocked,
+                    study: null,
+                    initialFirst: initialFirstResult.data,
+                    returnUrl,
+                },
+            }
+        } catch {
+            return { redirect: { destination: '/500' } }
         }
-
-        const organisationIds = session.user.organisations.map((o) => o.organisationId)
-
-        const studies = await getStudyTitlesForOrgs({ organisationIds })
-
-        const studyIdFromQuery = typeof context.query.studyId === 'string' ? context.query.studyId : ''
-        const allowedIds = new Set(studies.data.map((s) => String(s.id)))
-        const initialStudyId = allowedIds.has(studyIdFromQuery) ? studyIdFromQuery : ''
-
-
-        // Determine lock state:
-        // - If studyId was provided and valid, lock the page to that study
-        const isStudyLocked = Boolean(initialStudyId)
-
-        // Find study title for heading if locked
-        const initialStudyTitle =
-            isStudyLocked ? (studies.data.find((s) => String(s.id) === initialStudyId)?.shortTitle ?? '') : ''
-
-        const initialStudyOrgName = 
-            isStudyLocked ? (studies.data.find((s) => String(s.id) === initialStudyId)?.organisations.at(0)?.organisation ?? '') : ''
-
-        const initialFirstResult =
-            initialStudyId ? await getStudyFirstByStudyId(Number(initialStudyId), organisationIds) : { data: null }
-
-        const returnUrlFromQuery = typeof context.query.returnUrl === 'string' ? context.query.returnUrl : ''
-        const returnUrl =
-            returnUrlFromQuery && returnUrlFromQuery.startsWith('/') && !returnUrlFromQuery.startsWith('//')
-                ? returnUrlFromQuery
-                : initialStudyId
-                    ? `/studies/${initialStudyId}/`
-                    : '/studies'
-
-        return {
-            props: {
-                user: session.user,
-                studies: studies.data,
-                initialStudyId,
-                initialStudyTitle,
-                initialStudyOrgName,
-                initialFirst: initialFirstResult.data,
-                returnUrl,
-                isStudyLocked
-            },
-        }
-    } catch {
-        return { redirect: { destination: '/500' } }
     }
-})
+)
