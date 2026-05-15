@@ -78,7 +78,7 @@ export const reportFirstSchema = z.object({
     .string()
     .trim()
     .min(1, 'Enter the principal investigator’s full name')
-    .max(500, 'First name must be 500 characters or fewer'),
+    .max(100, 'Full name must be 100 characters or fewer'),
 
   piEmail: z
     .string()
