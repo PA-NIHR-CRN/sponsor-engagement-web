@@ -1,12 +1,52 @@
 import { TEXTAREA_MAX_CHARACTERS } from '@/constants/forms'
 import * as z from 'zod'
 
-const dateSchema = z
+const requiredDate = z
   .object({
-    day: z.string().trim(),
-    month: z.string().trim(),
-    year: z.string().trim(),
+    day: z.string().trim().min(1, 'Enter a day'),
+    month: z.string().trim().min(1, 'Enter a month'),
+    year: z.string().trim().min(1, 'Enter a year'),
   })
+  .superRefine((val, ctx) => {
+    if (!val.day || !val.month || !val.year) return
+
+    const d = Number(val.day)
+    const m = Number(val.month)
+    const y = Number(val.year)
+
+    if (!Number.isInteger(d) || !Number.isInteger(m) || !Number.isInteger(y)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Enter a valid date',
+        path: [],
+      })
+      return
+    }
+
+    if (val.year.length !== 4) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Year must be 4 digits',
+        path: ['year'],
+      })
+      return
+    }
+
+    const date = new Date(y, m - 1, d)
+    const valid =
+      date.getFullYear() === y &&
+      date.getMonth() === m - 1 &&
+      date.getDate() === d
+
+    if (!valid) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Enter a valid date',
+        path: [],
+      })
+    }
+  })
+
 
 export const reportFirstSchema = z.object({
   studyId: z
@@ -18,7 +58,7 @@ export const reportFirstSchema = z.object({
     errorMap: () => ({ message: 'Select the type of first' }),
   }),
 
-  firstAt: dateSchema,
+  firstAt: requiredDate,
 
   siteName: z
     .string()

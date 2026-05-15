@@ -24,6 +24,7 @@ import { getStudyFirstByStudyId } from '@/lib/studyFirsts'
 import { reportFirstSchema, type ReportFirstInputs } from '@/utils/schemas/reportFirst.schema'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 import { FirstType } from 'database'
+import { areAllDatePartsEmpty } from '@/utils/date'
 
 export type ReportFirstProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
@@ -47,6 +48,12 @@ const toDateParts = (date: string | Date): DateInputValue => {
         year: String(d.getFullYear()),
     }
 }
+
+const transformDateValue = (input?: DateInputValue | null) => ({
+  day: input?.day ?? '',
+  month: input?.month ?? '',
+  year: input?.year ?? '',
+})
 
 const buildDefaultValues = (
     studyId: string,
@@ -257,18 +264,25 @@ export default function ReportFirst({
                             </RadioGroup>
 
                             <Controller
-                                name="firstAt"
-                                control={control}
-                                render={({ field }) => (
-                                    <DateInput
-                                        label="First patient / First visit"
-                                        name="firstAt"
-                                        hint="The date the first participant was consented to the study"
-                                        errors={errors}
-                                        value={field.value as any}
-                                        onChange={(value: DateInputValue) => field.onChange(value)}
-                                    />
-                                )}
+                            control={control}
+                            name="firstAt"
+                            render={({ field }) => {
+                                const { value, onChange, ref, name } = field
+                                return (
+                                <DateInput
+                                    errors={errors}
+                                    label="First patient / First visit"
+                                    hint="The date the first participant was consented to the study"
+                                    name={name}
+                                    onChange={(input) => {
+                                        onChange(input)
+                                    }}
+                                    ref={ref}
+                                    value={transformDateValue(value)}
+                                    required
+                                />
+                                )
+                            }}
                             />
 
                             <Textarea
