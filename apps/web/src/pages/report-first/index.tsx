@@ -24,7 +24,6 @@ import { getStudyFirstByStudyId } from '@/lib/studyFirsts'
 import { reportFirstSchema, type ReportFirstInputs } from '@/utils/schemas/reportFirst.schema'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 import { FirstType } from 'database'
-import { log } from 'console'
 
 export type ReportFirstProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
@@ -54,7 +53,7 @@ const buildDefaultValues = (
     first: ReportFirstProps['initialFirst']
 ): Partial<ReportFirstInputs> => ({
     studyId: studyId || '',
-    type: FirstType.european,
+    type: first?.type as FirstType ?? undefined,
     firstAt: first?.firstAt ? toDateParts(first.firstAt) : EMPTY_DATE,
     siteName: first?.siteName ?? '',
     piTitle: first?.piTitle ?? '',
@@ -67,8 +66,10 @@ type StudyFirstApiResponse = { first: ReportFirstProps['initialFirst'] | null }
 export default function ReportFirst({
     studies,
     initialStudyId,
+    initialStudyTitle,
     initialFirst,
     returnUrl,
+    isStudyLocked,
 }: Readonly<ReportFirstProps>) {
     const router = useRouter()
 
@@ -185,58 +186,74 @@ export default function ReportFirst({
 
     return (
         <Container>
-            <NextSeo title="Report a First" />
+            <Form
+                action={`/api/forms/reportFirst?returnUrl=${encodeURIComponent(safeReturnUrl)}`}
+                handleSubmit={handleSubmit}
+                method="post"
+                onError={(message: string) => {
+                    setError('root' as any, { type: '400', message } as any)
+                }}
+            >
 
-            <div className="lg:flex lg:gap-6">
-                <div className="w-full">
-                    <h2 className="govuk-heading-l govuk-!-margin-bottom-6">Report a 'First'</h2>
+                <NextSeo title="Report a First" />
 
-                    <p className="govuk-body govuk-!-margin-bottom-6">
-                        Reporting a first helps us capture key study milestones quickly and accurately. Your direct submission reduces follow‑up
-                        emails, improves data quality, and ensures important achievements - such as global or European firsts - are recorded and
-                        linked to wider systems in real time.
-                    </p>
+                <div className="lg:flex lg:gap-6">
+                    <div className="w-full">
+                        <h2 className="govuk-heading-l govuk-!-margin-bottom-6">Report a 'First'</h2>
 
-                    <Form
-                        action={`/api/forms/reportFirst?returnUrl=${encodeURIComponent(safeReturnUrl)}`}
-                        handleSubmit={handleSubmit}
-                        method="post"
-                        onError={(message: string) => {
-                            setError('root' as any, { type: '400', message } as any)
-                        }}
-                    >
+                        {isStudyLocked && initialStudyTitle ? (
+                            <div className='govuk-!-margin-bottom-6'>
+                                <div className="govuk-body-s govuk-!-margin-bottom-0 text-darkGrey">
+                                    <span className="govuk-visually-hidden">Study sponsor: </span>
+                                    {initialStudyTitle}
+                                    {initialStudyTitle ? ` (${initialStudyTitle})` : null}
+                                </div>
+
+                                <h3 className="govuk-heading-m govuk-!-margin-bottom-1">
+                                    <span className="govuk-visually-hidden">Study title: </span>
+                                    {initialStudyTitle}
+                                </h3>
+                            </div>
+                        ) : null}
+
+                        <p className="govuk-body govuk-!-margin-bottom-6">
+                            Reporting a first helps us capture key study milestones quickly and accurately. Your direct submission reduces follow‑up
+                            emails, improves data quality, and ensures important achievements - such as global or European firsts - are recorded and
+                            linked to wider systems in real time.
+                        </p>
+
                         <Fieldset>
-
-                            <Controller
-                                name="studyId"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        name={field.name}
-                                        label="Select study"
-                                        labelSize="m"
-                                        errors={errors}
-                                        required
-                                        value={field.value ?? ''}
-                                        onBlur={field.onBlur}
-                                        onChange={(e) => {
-                                            const nextStudyId = e.target.value
-                                            field.onChange(nextStudyId)
-                                            void handleStudyChange(nextStudyId)
-                                        }}
-                                        options={[
-                                            <option key="placeholder" value="">
-                                                Select a study
-                                            </option>,
-                                            ...studies.map((study) => (
-                                                <option key={study.id} value={String(study.id)}>
-                                                    {study.shortTitle}
-                                                </option>
-                                            )),
-                                        ]}
-                                    />
-                                )}
-                            />
+                            {!isStudyLocked ? (
+                                <Controller
+                                    name="studyId"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            name={field.name}
+                                            label="Select study"
+                                            labelSize="m"
+                                            errors={errors}
+                                            required
+                                            value={field.value ?? ''}
+                                            onBlur={field.onBlur}
+                                            onChange={(e) => {
+                                                const nextStudyId = e.target.value
+                                                field.onChange(nextStudyId)
+                                                void handleStudyChange(nextStudyId)
+                                            }}
+                                            options={[
+                                                <option key="placeholder" value="">
+                                                    Select a study
+                                                </option>,
+                                                ...studies.map((study) => (
+                                                    <option key={study.id} value={String(study.id)}>
+                                                        {study.shortTitle}
+                                                    </option>
+                                                )),
+                                            ]}
+                                        />
+                                    )}
+                                />) : null}
 
                             <RadioGroup errors={errors} label="Type of First" labelSize="m" {...register('type')}>
                                 <Radio label="Global" value="global" hint="The UK has consented the first participant in a global study." />
@@ -292,12 +309,13 @@ export default function ReportFirst({
                                 </Link>
                             </div>
                         </Fieldset>
-                    </Form>
+                    </div>
                 </div>
 
-                <div className="lg:min-w-[300px] lg:max-w-[300px]">
-                    <RequestSupport showCallToAction sticky />
-                </div>
+            </Form>
+
+            <div className="lg:min-w-[300px] lg:max-w-[300px]">
+                <RequestSupport showCallToAction sticky />
             </div>
         </Container>
     )
@@ -329,6 +347,18 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
         const allowedIds = new Set(studies.data.map((s) => String(s.id)))
         const initialStudyId = allowedIds.has(studyIdFromQuery) ? studyIdFromQuery : ''
 
+
+        // Determine lock state:
+        // - If studyId was provided and valid, lock the page to that study
+        const isStudyLocked = Boolean(initialStudyId)
+
+        // Find study title for heading if locked
+        const initialStudyTitle =
+            isStudyLocked ? (studies.data.find((s) => String(s.id) === initialStudyId)?.shortTitle ?? '') : ''
+
+        const initialStudyOrgName = 
+            isStudyLocked ? (studies.data.find((s) => String(s.id) === initialStudyId)?.organisations.at(0)?.organisation ?? '') : ''
+
         const initialFirstResult =
             initialStudyId ? await getStudyFirstByStudyId(Number(initialStudyId), organisationIds) : { data: null }
 
@@ -345,13 +375,14 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
                 user: session.user,
                 studies: studies.data,
                 initialStudyId,
+                initialStudyTitle,
+                initialStudyOrgName,
                 initialFirst: initialFirstResult.data,
                 returnUrl,
+                isStudyLocked
             },
         }
-    } catch (e){
-
-  console.error('report-first getServerSideProps failed', e)
+    } catch {
         return { redirect: { destination: '/500' } }
     }
 })

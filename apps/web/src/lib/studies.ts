@@ -259,6 +259,14 @@ export const getStudyTitlesForOrgs = async ({
       id: true,
       shortTitle: true,
       irasId: true,
+      organisations: {
+        where: {
+          isDeleted: false,
+        },
+        include: {
+          organisation: true,
+        },
+      },
     },
     orderBy: [ { shortTitle: Prisma.SortOrder.asc }],
   }
