@@ -1,9 +1,9 @@
-import clsx from "clsx";
 import Link from 'next/link';
 import React from "react";
 
 import { Status } from '@/@types/studies';
 import { ProgressBar, progressBarColor } from "@/components/atoms/ProgressBar/ProgressBar";
+import clsx from "clsx";
 import { pluraliseDays } from '@/utils/pluralise';
 
 interface StudyProgressExtendedProps {
@@ -66,7 +66,8 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
     return (
         <div className={divClass}>
 
-            {showTitle ? <>
+            {showTitle && (
+                <>
                     <h3 className="govuk-heading-m govuk-!-margin-bottom-1 govuk-!-margin-top-4 p-0">
                 Progress of study setup
             </h3>
@@ -74,7 +75,8 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
             <span className="govuk-body-s text-darkGrey block govuk-!-margin-bottom-2">
                 Based on the latest data from HRA approval from start date to end date
             </span>
-                </> : null}
+                </>
+                )}
 
             <ProgressBar className="govuk-!-width-full" color={GetStudyProgressColor(elapsedDays)} max={totalDays}
                 value={elapsedDays} />
@@ -87,26 +89,32 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
                             }`}>
                         {progressLabel}
                     </span>
-                    {showDates ? <span className="govuk-body-s govuk-!-font-weight-bold text-darkGrey">
+                    {showDates &&(
+                    <span className="govuk-body-s govuk-!-font-weight-bold text-darkGrey">
                         HRA approval date: {hraApprovalDate.toLocaleDateString('en-GB')}
-                    </span> : null}
+                    </span>
+                    )}
                 </div>
 
                 <div className="flex flex-col text-right">
                     <span className="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-2 text-darkGrey">
                         {elapsedDays} / {totalDays} Days
                     </span>
-                    {showDates ? <span className="govuk-body-s govuk-!-font-weight-bold text-darkGrey">
+                    {showDates &&(
+                    <span className="govuk-body-s govuk-!-font-weight-bold text-darkGrey">
                         End date: {endDate.toLocaleDateString('en-GB')}
-                    </span> : null}
+                    </span>
+                    )}
                 </div>
             </div>
 
-            {showMoreDetails && moreDetailsHref ? <span className="govuk-body-m block govuk-!-margin-bottom-4">
+            {showMoreDetails && moreDetailsHref && (
+                <span className="govuk-body-m block govuk-!-margin-bottom-4">
                     <Link href={moreDetailsHref}>
                         More details
                     </Link>
-                </span> : null}
+                </span> 
+            )}
         </div>
     );
 };
