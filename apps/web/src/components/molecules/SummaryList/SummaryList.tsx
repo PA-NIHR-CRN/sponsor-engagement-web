@@ -23,7 +23,7 @@ function SummaryList({ rows, className }: Readonly<SummaryListProps>) {
             .join(' ')}
         >
             {rows.map((row) => (
-                <div className="govuk-summary-list__row">
+                <div className="govuk-summary-list__row" key={row.actionText}>
                     <dt className="govuk-summary-list__key govuk-summary-list__key--width-one-quarter">
                         {row.actionText}
                     </dt>
