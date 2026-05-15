@@ -22,11 +22,8 @@ function SummaryList({ rows, className }: Readonly<SummaryListProps>) {
             .filter(Boolean)
             .join(' ')}
         >
-            {rows.map((row, index) => (
-                <div
-                    className="govuk-summary-list__row"
-                    key={index}
-                >
+            {rows.map((row) => (
+                <div className="govuk-summary-list__row">
                     <dt className="govuk-summary-list__key govuk-summary-list__key--width-one-quarter">
                         {row.actionText}
                     </dt>
@@ -39,9 +36,6 @@ function SummaryList({ rows, className }: Readonly<SummaryListProps>) {
                             href={row.href}
                         >
                             Resolve
-                            <span className="govuk-visually-hidden">
-                                Resolve
-                            </span>
                         </a>
                     </dd>
                 </div>

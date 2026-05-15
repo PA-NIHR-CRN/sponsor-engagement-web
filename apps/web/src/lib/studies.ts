@@ -522,9 +522,13 @@ export function getAssessmentDueIndicator(
   hasAssessmentDue: boolean,
   daysSinceAssessmentDue: number | null
 ): string | null {
-  if (!hasAssessmentDue) return null;
+  
+  if (!hasAssessmentDue || daysSinceAssessmentDue === null)
+  {
+    return null
+  };
 
-  const days = daysSinceAssessmentDue || 1;
+  const days = daysSinceAssessmentDue;
 
   return `Assessment due for ${days} day${days > 1 ? 's' : ''}`;
 }
