@@ -134,7 +134,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
   }
 
   const panels = panelsByStatus[formStatus] ?? []
-
+  
   const indicators: string[] = [
     getAssessmentDueIndicator(
       study.dueAssessmentAt !== null,

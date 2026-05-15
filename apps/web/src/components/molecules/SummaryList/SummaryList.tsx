@@ -14,7 +14,7 @@ export interface SummaryListProps {
 
 function SummaryList({ rows }: Readonly<SummaryListProps>) {
     return (
-        <dl className="govuk-summary-list summary-list--study">
+        <dl className="govuk-summary-list summary-list--study-indicators">
             {rows.map((row, index) => (
                 <div
                     className="govuk-summary-list__row"
