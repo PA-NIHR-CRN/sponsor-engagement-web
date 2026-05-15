@@ -111,7 +111,6 @@ export default function ReportFirst({
 }: Readonly<ReportFirstProps>) {
   const router = useRouter()
 
-  // Ensure studies is safe (prevents "any" member access lint issues)
   const safeStudies = useMemo<StudyTitle[]>(() => (isStudyTitleArray(studies) ? studies : []), [studies])
 
   const [isFetchingFirst, setIsFetchingFirst] = useState(false)
@@ -167,7 +166,7 @@ export default function ReportFirst({
           })
 
           await router.replace(
-            { pathname: router.pathname, query: { returnUrl: returnUrl } },
+            { pathname: router.pathname, query: { returnUrl } },
             undefined,
             { shallow: true }
           )
@@ -184,7 +183,7 @@ export default function ReportFirst({
         })
 
         await router.replace(
-          { pathname: router.pathname, query: { returnUrl: returnUrl, studyId: nextStudyId } },
+          { pathname: router.pathname, query: { returnUrl, studyId: nextStudyId } },
           undefined,
           { shallow: true }
         )
@@ -198,7 +197,7 @@ export default function ReportFirst({
         })
 
         await router.replace(
-          { pathname: router.pathname, query: { returnUrl: returnUrl, studyId: nextStudyId } },
+          { pathname: router.pathname, query: { returnUrl, studyId: nextStudyId } },
           undefined,
           { shallow: true }
         )
@@ -218,7 +217,6 @@ export default function ReportFirst({
         handleSubmit={handleSubmit}
         method="post"
         onError={(message: string) => {
-          // ✅ no any casts needed
           setError('root', { type: 'server', message })
         }}
       >

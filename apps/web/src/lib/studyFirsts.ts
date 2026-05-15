@@ -14,13 +14,12 @@ export interface GetStudyFirstByStudyIdResult {
 
 export async function getStudyFirstByStudyId(
   studyId: number,
-  organisationIds: number[]
+  organisationIds?: number[]
 ): Promise<GetStudyFirstByStudyIdResult> {
   if (!studyId || !Number.isFinite(studyId)) {
     return { data: null }
   }
 
-  // Ensure the user has access to this study via organisation
   const study = await prismaClient.study.findFirst({
     where: {
       id: studyId,
