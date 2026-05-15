@@ -1,6 +1,5 @@
-import clsx from "clsx";
-
 import {ProgressBar, progressBarColor} from "@/components/atoms/ProgressBar/ProgressBar";
+import clsx from "clsx";
 
 export interface StudyProgressProps {
     elapsedDays: number
@@ -11,9 +10,9 @@ export interface StudyProgressProps {
 function GetStudyProgressColor(daysSinceAssessmentDue: number, firstParticipantTargetDays: number) {
     if (daysSinceAssessmentDue >= firstParticipantTargetDays) {
         return progressBarColor.Error;
-    } 
+    } else {
         return progressBarColor.Warning;
-    
+    }
 }
 
 function GetFirstParticipantTargetDays()
@@ -27,20 +26,20 @@ function AsDaysString(days: number)
     if (days == 1) {
         return "1 day";
     }
-    
-        return `${days  } days`;
-    
+    else {
+        return days + " days";
+    }
         
 }
 
 function GetOverdueText(overduePhrase: string, remainingDays: number) {
     
     if (remainingDays < 0) {
-        return `${overduePhrase  } by ${  AsDaysString(Math.abs(remainingDays))}`; 
+        return overduePhrase + " by " + AsDaysString(Math.abs(remainingDays)); 
     }    
-    
-        return `${AsDaysString(remainingDays)  } remaining`;
-    
+    else {
+        return AsDaysString(remainingDays) + " remaining";
+    }
 }
 
 export function StudyProgress({elapsedDays, textClassName = "govuk-body-s", overduePhrase = "Overdue"}: StudyProgressProps) {
@@ -50,8 +49,8 @@ export function StudyProgress({elapsedDays, textClassName = "govuk-body-s", over
     return (
         <div>
             <div>
-                <ProgressBar className="govuk-!-width-full" color={GetStudyProgressColor(elapsedDays, firstParticipantTargetDays)} max={firstParticipantTargetDays}
-                             value={elapsedDays}/>
+                <ProgressBar className="govuk-!-width-full" max={firstParticipantTargetDays} value={elapsedDays}
+                             color={GetStudyProgressColor(elapsedDays, firstParticipantTargetDays)}/>
             </div>
 
             <div className="govuk-grid-row">

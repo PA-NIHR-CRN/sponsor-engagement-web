@@ -68,7 +68,6 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
           name={rest.name}
           role="group"
         >
-          {/* Prefer nested names so Zod/RHF errors show */}
           <ErrorInline errors={errors} name={`${rest.name}.day`} />
           <ErrorInline errors={errors} name={`${rest.name}.month`} />
           <ErrorInline errors={errors} name={`${rest.name}.year`} />

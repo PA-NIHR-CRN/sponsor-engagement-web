@@ -1,11 +1,10 @@
-import dayjs from "dayjs";
 import Link from 'next/link'
 
 import { Card } from '@/components/atoms'
 import Tag from '@/components/atoms/Tag/Tag'
-import {StudyProgressExtended} from "@/components/molecules";
-
 import TagCollection from '../../TagCollection/TagCollection'
+import dayjs from "dayjs";
+import {StudyProgressExtended} from "@/components/molecules";
 
 export interface StudyListProps {
   sponsorOrgName?: string
@@ -111,9 +110,9 @@ export function StudyList({
 
         <div className="lg:min-w-[320px] govuk-!-margin-top-3">
             <StudyProgressExtended hraApprovalDate={hraApprovalDate}
-                                   showBorder={false}
-                                  showDates={false} showMoreDetails={false} showTitle={false} 
-                                   studyStatus={studyStatus} willRecruitWithinTimeline={willRecruitWithinTimeline}/>
+                                   willRecruitWithinTimeline={willRecruitWithinTimeline}
+                                  studyStatus={studyStatus} showBorder={false} showTitle={false} 
+                                   showDates={false} showMoreDetails={false}/>
           </div>
         
         <div className="text-right lg:w-full">
