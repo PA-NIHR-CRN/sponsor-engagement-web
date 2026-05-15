@@ -30,7 +30,6 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
       errors,
       displayInlineError = true,
       hint,
-      defaultValue,
       required = true,
       className,
       labelClassName,
@@ -79,7 +78,6 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           id={name}
           name={name}
           ref={ref}
-          defaultValue={defaultValue ?? ''}
           disabled={disabled}
           aria-describedby={clsx({
             [`${name}-hint`]: hint,

@@ -358,10 +358,9 @@ model StudyFirst {
   studyId      Int       @unique
   type         FirstType
   firstAt      DateTime
-  siteName     String
+  siteName     String    @db.Text
   piTitle      String?
-  piFirstName  String
-  piLastName   String
+  piFullName   String
   piEmail      String
   createdById  Int
   modifiedById Int?

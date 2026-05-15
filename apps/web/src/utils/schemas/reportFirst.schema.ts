@@ -7,56 +7,7 @@ const dateSchema = z
     month: z.string().trim(),
     year: z.string().trim(),
   })
-  .superRefine((val, ctx) => {
-    const hasAny = val.day || val.month || val.year
-    const hasAll = val.day && val.month && val.year
 
-    if (!hasAny) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: [],
-        message: 'Enter the date of the first participant',
-      })
-      return
-    }
-
-    if (!hasAll) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: [],
-        message: 'Enter a complete date (day, month and year)',
-      })
-      return
-    }
-
-    const day = Number(val.day)
-    const month = Number(val.month)
-    const year = Number(val.year)
-
-    if (![day, month, year].every(Number.isInteger)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: [],
-        message: 'Enter a real date',
-      })
-      return
-    }
-
-    const d = new Date(year, month - 1, day)
-    const isRealDate =
-      d.getFullYear() === year &&
-      d.getMonth() === month - 1 &&
-      d.getDate() === day
-
-    if (!isRealDate) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: [],
-        message: 'Enter a real date',
-      })
-    }
-  })
-  
 export const reportFirstSchema = z.object({
   studyId: z
     .string()
@@ -82,17 +33,11 @@ export const reportFirstSchema = z.object({
     .optional()
     .or(z.literal('')),
 
-  piFirstName: z
+  piFullName: z
     .string()
     .trim()
-    .min(1, 'Enter the principal investigator’s first name')
-    .max(100, 'First name must be 100 characters or fewer'),
-
-  piLastName: z
-    .string()
-    .trim()
-    .min(1, 'Enter the principal investigator’s last name')
-    .max(100, 'Last name must be 100 characters or fewer'),
+    .min(1, 'Enter the principal investigator’s full name')
+    .max(500, 'First name must be 500 characters or fewer'),
 
   piEmail: z
     .string()
