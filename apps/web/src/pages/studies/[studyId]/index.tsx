@@ -175,7 +175,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
                 <h3 className="govuk-heading-m govuk-!-margin-bottom-0">
                   Actions needed
                 </h3>
-                <SummaryList rows={rows} />
+                <SummaryList rows={rows} className='summary-list--study-indicators' />
               </>
             )}
 

@@ -10,11 +10,18 @@ export interface SummaryActionRow {
 
 export interface SummaryListProps {
     rows: SummaryActionRow[];
+    className?: string;
 }
 
-function SummaryList({ rows }: Readonly<SummaryListProps>) {
+function SummaryList({ rows, className }: Readonly<SummaryListProps>) {
     return (
-        <dl className="govuk-summary-list summary-list--study-indicators">
+        <dl className={[
+            'govuk-summary-list',
+            className,
+        ]
+            .filter(Boolean)
+            .join(' ')}
+        >
             {rows.map((row, index) => (
                 <div
                     className="govuk-summary-list__row"
