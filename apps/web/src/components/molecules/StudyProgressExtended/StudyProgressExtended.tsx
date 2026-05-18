@@ -81,21 +81,17 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
         <div className={divClass}>
 
             {showTitle && (
-                <>
-                    <h3 className={clsx(`govuk-heading-${titleSize}`, 'govuk-!-margin-bottom-1 govuk-!-margin-top-4 p-0', titleClassName)}>
-                        Progress of study setup
-                    </h3>
-                </>
+                <h3 className={clsx(`govuk-heading-${titleSize}`, 'govuk-!-margin-bottom-1 govuk-!-margin-top-4 p-0', titleClassName)}>
+                    Progress of study setup
+                </h3>
             )}
 
             {willRecruitWithinTimeline ? (
                 <div>
                     {showTimeframeHint && (
-                        <>
-                            <span className="govuk-body-s text-darkGrey block govuk-!-margin-bottom-2">
-                                Based on the latest data from HRA approval from start date to end date
-                            </span>
-                        </>
+                        <span className="govuk-body-s text-darkGrey block govuk-!-margin-bottom-2">
+                            Based on the latest data from HRA approval from start date to end date
+                        </span>
                     )}
                     <ProgressBar className="govuk-!-width-full" color={GetStudyProgressColor(elapsedDays)} max={totalDays}
                         value={elapsedDays} />
@@ -129,7 +125,7 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
             ) :
                 <div>
                     <span className="govuk-body-s text-darkGrey block govuk-!-margin-bottom-2">
-                    {optedOutText}
+                        {optedOutText}
                     </span>
                 </div>
             }
