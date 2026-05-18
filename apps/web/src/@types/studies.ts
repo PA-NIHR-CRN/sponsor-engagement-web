@@ -59,7 +59,7 @@ export interface Study {
   organisationsByRole?: Partial<Record<OrganisationRoleShortName, string>>
   ChangeHistory: ChangeHistory[]
   LeadAdministrationId: LeadAdministrationId | null
-  HraApprovalDate: string | null
+  RegulatoryApprovalDate: string | null
   WillRecruitWithinTimeline: boolean
 }
 
