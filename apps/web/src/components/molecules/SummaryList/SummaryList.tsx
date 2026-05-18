@@ -23,14 +23,14 @@ function SummaryList({ rows, className }: Readonly<SummaryListProps>) {
             .join(' ')}
         >
             {rows.map((row) => (
-                <div className="govuk-summary-list__row" key={row.actionText}>
-                    <dt className="govuk-summary-list__key govuk-summary-list__key--width-one-quarter">
+                <div className="govuk-summary-list__row govuk-!-margin-bottom-0" key={row.actionText}>
+                    <dt className="govuk-summary-list__key">
                         {row.actionText}
                     </dt>
                     <dd className="govuk-summary-list__value">
                         <TagCollection tags={row.tags} />
                     </dd>
-                    <dd className="govuk-summary-list__actions govuk-summary-list__actions--width-one-quarter">
+                    <dd className="govuk-summary-list__actions">
                         <a
                             className="govuk-link"
                             href={row.href}

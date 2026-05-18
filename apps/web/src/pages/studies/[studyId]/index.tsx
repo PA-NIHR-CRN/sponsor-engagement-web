@@ -175,16 +175,9 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
                 <h3 className="govuk-heading-m govuk-!-margin-bottom-0">
                   Actions needed
                 </h3>
-                <SummaryList rows={rows} className='summary-list--study-indicators' />
+                <SummaryList rows={rows} className='summary-list--study-indicators govuk-!-margin-bottom-0' />
               </>
             )}
-
-            <StudyProgressExtended
-              hraApprovalDate={study.hraApprovalDate}
-              moreDetailsHref={`${STUDIES_PAGE}/${study.id}/configure`}
-              studyStatus={study.studyStatus}
-              willRecruitWithinTimeline={study.willRecruitWithinTimeline}
-            />
 
             <div className="flex gap-4">
               <Link className="govuk-button w-auto govuk-!-margin-bottom-0" href={getAssessmentPageRoute(study.id)}>
@@ -197,6 +190,14 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
                 Update study data
               </Link>
             </div>
+
+            <StudyProgressExtended
+              hraApprovalDate={study.hraApprovalDate}
+              moreDetailsHref={`${STUDIES_PAGE}/${study.id}/configure`}
+              studyStatus={study.studyStatus}
+              willRecruitWithinTimeline={study.willRecruitWithinTimeline}
+            />
+
           </div>
 
           <div className="govuk-inset-text mt-7">
