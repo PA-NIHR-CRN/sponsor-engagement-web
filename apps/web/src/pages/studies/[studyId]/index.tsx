@@ -197,6 +197,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
               moreDetailsHref={`${STUDIES_PAGE}/${study.id}/configure`}
               studyStatus={study.studyStatus}
               willRecruitWithinTimeline={study.willRecruitWithinTimeline}
+              optedOutText='No expectation to achieve the first participant in 90 days for this study'
             />
 
           </div>
