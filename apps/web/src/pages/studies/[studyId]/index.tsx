@@ -17,8 +17,10 @@ import {
   StudyDetails,
   StudyProgressExtended,
 } from '@/components/molecules'
+import { ReportFirst } from '@/components/molecules/cards/ReportFirst/ReportFirst'
 import { getEditHistory } from '@/components/molecules/EditHistory/utils'
-import SummaryCardCollection from '@/components/molecules/SummaryCardCollection/SummaryCardCollection'
+import SummaryCardCollection from '@/components/molecules/SummaryCollection/SummaryCardCollection'
+import SummaryList from '@/components/molecules/SummaryList/SummaryList'
 import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
 import { FormStudyStatus } from '@/constants/editStudyForm'
@@ -27,6 +29,9 @@ import { getAssessmentPageRoute, STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
 import type { StudyEvalsWithoutGeneratedValues } from '@/lib/studies'
 import {
+  buildSummaryRows,
+  getAssessmentDueIndicator,
+  getDaysSinceAssessmentDue,
   getStudyById,
   mapCPMSStatusToFormStatus,
   mapCPMSStudyEvalToSEEval,
@@ -130,6 +135,19 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
   }
 
   const panels = panelsByStatus[formStatus] ?? []
+  
+  const indicators: string[] = [
+    getAssessmentDueIndicator(
+      study.dueAssessmentAt !== null,
+      getDaysSinceAssessmentDue(study.dueAssessmentAt),
+    ),
+
+    ...study.evaluationCategories.map(
+      (ec) => ec.indicatorValue
+    ),
+  ].filter(Boolean) as string[];
+
+  const rows = buildSummaryRows(indicators, router.asPath);
 
   return (
     <Container>
@@ -152,19 +170,15 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
           <SummaryCardCollection panels={panels} />
 
           <div className="flex flex-col govuk-!-margin-bottom-4 govuk-!-margin-top-4 gap-6">
-            {Boolean(study.dueAssessmentAt) && (
-              <div>
-                <span className="govuk-tag govuk-tag--red mr-2">Due</span>
-                This study needs a new sponsor assessment.
-              </div>
-            )}
 
-            <StudyProgressExtended
-              hraApprovalDate={study.hraApprovalDate}
-              moreDetailsHref={`${STUDIES_PAGE}/${study.id}/configure`}
-              studyStatus={study.studyStatus}
-              willRecruitWithinTimeline={study.willRecruitWithinTimeline}
-            />
+            {indicators.length > 0 && (
+              <>
+                <h3 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Actions needed
+                </h3>
+                <SummaryList rows={rows} className='summary-list--study-indicators govuk-!-margin-bottom-0' />
+              </>
+            )}
 
             <div className="flex gap-4">
               <Link className="govuk-button w-auto govuk-!-margin-bottom-0" href={getAssessmentPageRoute(study.id)}>
@@ -177,6 +191,15 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
                 Update study data
               </Link>
             </div>
+
+            <StudyProgressExtended
+              hraApprovalDate={study.hraApprovalDate}
+              moreDetailsHref={`${STUDIES_PAGE}/${study.id}/configure`}
+              studyStatus={study.studyStatus}
+              willRecruitWithinTimeline={study.willRecruitWithinTimeline}
+              optedOutText='No expectation to achieve the first participant in 90 days for this study'
+            />
+
           </div>
 
           <div className="govuk-inset-text mt-7">
@@ -263,6 +286,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
           <StudyDetails study={study} />
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
+          <ReportFirst showAsStartButton studyId={study.id} />
           <RequestSupport showCallToAction sticky />
         </div>
       </div>
