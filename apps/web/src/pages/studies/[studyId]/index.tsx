@@ -17,6 +17,7 @@ import {
   StudyDetails,
   StudyProgressExtended,
 } from '@/components/molecules'
+import { ReportFirst } from '@/components/molecules/cards/ReportFirst/ReportFirst'
 import { getEditHistory } from '@/components/molecules/EditHistory/utils'
 import SummaryCardCollection from '@/components/molecules/SummaryCollection/SummaryCardCollection'
 import SummaryList from '@/components/molecules/SummaryList/SummaryList'
@@ -284,6 +285,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
           <StudyDetails study={study} />
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
+          <ReportFirst showAsStartButton studyId={study.id} />
           <RequestSupport showCallToAction sticky />
         </div>
       </div>

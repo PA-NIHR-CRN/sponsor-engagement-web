@@ -83,6 +83,12 @@ export function Form<T extends FieldValues>({
 
   const onInvalid = () => {
     const url = new URL(router.asPath, document.location.href)
+    
+    if (!url.searchParams.has('fatal')) {
+      logger.error('Form submission failed - %s', url.toString())
+      return
+    }
+
     url.searchParams.delete('fatal')
     void router.replace(url, undefined)
     logger.error('Form submission failed - %s', url.toString())
