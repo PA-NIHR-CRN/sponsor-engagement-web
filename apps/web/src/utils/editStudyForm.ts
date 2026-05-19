@@ -230,7 +230,7 @@ const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, valu
   ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: `${label} must be today or in the past`,
+      message: `${label} cannot be in the future`,
       path: [fieldName],
     })
   } else if (
