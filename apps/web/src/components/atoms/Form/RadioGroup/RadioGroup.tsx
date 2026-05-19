@@ -16,7 +16,7 @@ interface RadioGroupProps {
   hint?: ReactNode
   required?: boolean
   errors: FieldErrors
-  defaultValue: string | undefined
+  defaultValue?: string
   disabled?: boolean
   onChange?: (e: React.ChangeEvent<EventTarget>) => void
 }

@@ -379,7 +379,7 @@ jobs:
           SLACK_TITLE: 'Sponsor Engagement E2E UI Tests - ENV: TEST : SUCCESS :tick:'
 
   deploy-uat:
-    needs: e2e-test
+    needs: deploy-test
     environment: UAT
     name: 'Deploy Uat'
     runs-on: ubuntu-latest

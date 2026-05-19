@@ -9,10 +9,7 @@ datasource db {
 
 model Study {
   id                         Int                       @id @default(autoincrement())
-  title                      String                    @db.Text
-  shortTitle                 String
   cpmsId                     Int                       @unique
-  studyStatus                String
   recordStatus               String
   route                      String
   irasId                     String?
@@ -25,20 +22,25 @@ model Study {
   plannedClosureDate         DateTime?
   actualOpeningDate          DateTime?
   actualClosureDate          DateTime?
-  estimatedReopeningDate     DateTime?
-  totalRecruitmentToDate     Int?
-  assessments                Assessment[]
-  organisations              StudyOrganisation[]
-  funders                    StudyFunder[]
-  evaluationCategories       StudyEvaluationCategory[]
-  lastAssessment             Assessment?               @relation("StudyLastAssessment", fields: [lastAssessmentId], references: [id])
-  lastAssessmentId           Int?                      @unique
   createdAt                  DateTime                  @default(now())
   updatedAt                  DateTime                  @updatedAt
-  dueAssessmentAt            DateTime?
   isDeleted                  Boolean?                  @default(false)
-  StudyUpdates               StudyUpdates[]
+  shortTitle                 String
+  studyStatus                String
+  title                      String                    @db.Text
+  totalRecruitmentToDate     Int?
+  lastAssessmentId           Int?                      @unique
+  estimatedReopeningDate     DateTime?
+  dueAssessmentAt            DateTime?
   leadAdministrationId       Int?
+  willRecruitWithinTimeline  Boolean                   @default(true)
+  reasonNotRecruitingWithinTimeline String?            @db.Text
+  assessments                Assessment[]
+  lastAssessment             Assessment?               @relation("StudyLastAssessment", fields: [lastAssessmentId], references: [id])
+  evaluationCategories       StudyEvaluationCategory[]
+  funders                    StudyFunder[]
+  organisations              StudyOrganisation[]
+  StudyUpdates               StudyUpdates[]
 
   @@index([cpmsId])
 }
@@ -50,118 +52,130 @@ model Organisation {
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
   isDeleted     Boolean?            @default(false)
-  users         UserOrganisation[]
   roles         OrganisationRole[]
-  studies       StudyOrganisation[]
   fundedStudies StudyFunder[]
+  studies       StudyOrganisation[]
+  users         UserOrganisation[]
 
   @@index([rtsIdentifier])
 }
 
 model OrganisationRole {
   id             Int                    @id @default(autoincrement())
-  organisation   Organisation           @relation(fields: [organisationId], references: [id])
   organisationId Int
-  role           SysRefOrganisationRole @relation(fields: [roleId], references: [id])
   roleId         Int
   createdAt      DateTime               @default(now())
   updatedAt      DateTime               @updatedAt
   isDeleted      Boolean?               @default(false)
+  organisation   Organisation           @relation(fields: [organisationId], references: [id])
+  role           SysRefOrganisationRole @relation(fields: [roleId], references: [id])
 
   @@unique([organisationId, roleId])
+  @@index([roleId], map: "OrganisationRole_roleId_fkey")
 }
 
 model User {
   id                          Int                          @id @default(autoincrement())
-  name                        String?
-  email                       String                       @unique
   identityGatewayId           String?
   registrationToken           String?
   registrationConfirmed       Boolean?                     @default(false)
   isDeleted                   Boolean?                     @default(false)
+  email                       String                       @unique
+  name                        String?
   lastLogin                   DateTime?
-  organisations               UserOrganisation[]           @relation(name: "userOrganisation")
-  createdOrganisations        UserOrganisation[]           @relation(name: "createdOrganisations")
-  updatedOrganisations        UserOrganisation[]           @relation(name: "updatedOrganisations")
-  roles                       UserRole[]                   @relation(name: "userRoles")
-  createdRoles                UserRole[]                   @relation(name: "createdRoles")
-  updatedRoles                UserRole[]                   @relation(name: "updatedRoles")
   assessments                 Assessment[]
   assessmentReminders         AssessmentReminder[]
-  createdStudyUpdates         StudyUpdates[]               @relation(name: "createdStudyUpdates")
-  modifiedStudyUpdates        StudyUpdates[]               @relation(name: "modifiedStudyUpdates")
-  organisationInvitationsSent UserOrganisationInvitation[] @relation(name: "userOrganisationInvitationsSent")
+  createdStudyUpdates         StudyUpdates[]               @relation("createdStudyUpdates")
+  modifiedStudyUpdates        StudyUpdates[]               @relation("modifiedStudyUpdates")
+  createdOrganisations        UserOrganisation[]           @relation("createdOrganisations")
+  updatedOrganisations        UserOrganisation[]           @relation("updatedOrganisations")
+  organisations               UserOrganisation[]           @relation("userOrganisation")
+  organisationInvitationsSent UserOrganisationInvitation[] @relation("userOrganisationInvitationsSent")
+  createdRoles                UserRole[]                   @relation("createdRoles")
+  updatedRoles                UserRole[]                   @relation("updatedRoles")
+  roles                       UserRole[]                   @relation("userRoles")
 }
 
 model UserRole {
   id          Int        @id @default(autoincrement())
-  user        User       @relation(name: "userRoles", fields: [userId], references: [id])
   userId      Int
-  role        SysRefRole @relation(fields: [roleId], references: [id])
   roleId      Int
-  createdBy   User       @relation(name: "createdRoles", fields: [createdById], references: [id])
   createdById Int
-  updatedBy   User       @relation(name: "updatedRoles", fields: [updatedById], references: [id])
   updatedById Int
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   isDeleted   Boolean?   @default(false)
+  createdBy   User       @relation("createdRoles", fields: [createdById], references: [id])
+  role        SysRefRole @relation(fields: [roleId], references: [id])
+  updatedBy   User       @relation("updatedRoles", fields: [updatedById], references: [id])
+  user        User       @relation("userRoles", fields: [userId], references: [id])
 
   @@unique([userId, roleId])
+  @@index([createdById], map: "UserRole_createdById_fkey")
+  @@index([roleId], map: "UserRole_roleId_fkey")
+  @@index([updatedById], map: "UserRole_updatedById_fkey")
 }
 
 model UserOrganisation {
   id             Int                          @id @default(autoincrement())
-  user           User                         @relation(name: "userOrganisation", fields: [userId], references: [id])
   userId         Int
-  organisation   Organisation                 @relation(fields: [organisationId], references: [id])
   organisationId Int
-  createdBy      User                         @relation(name: "createdOrganisations", fields: [createdById], references: [id])
   createdById    Int
-  updatedBy      User                         @relation(name: "updatedOrganisations", fields: [updatedById], references: [id])
   updatedById    Int
   createdAt      DateTime                     @default(now())
   updatedAt      DateTime                     @updatedAt
   isDeleted      Boolean?                     @default(false)
-  invitations    UserOrganisationInvitation[] @relation(name: "userOrganisationInvitations")
+  createdBy      User                         @relation("createdOrganisations", fields: [createdById], references: [id])
+  organisation   Organisation                 @relation(fields: [organisationId], references: [id])
+  updatedBy      User                         @relation("updatedOrganisations", fields: [updatedById], references: [id])
+  user           User                         @relation("userOrganisation", fields: [userId], references: [id])
+  invitations    UserOrganisationInvitation[] @relation("userOrganisationInvitations")
 
   @@unique([userId, organisationId])
+  @@index([createdById], map: "UserOrganisation_createdById_fkey")
+  @@index([organisationId], map: "UserOrganisation_organisationId_fkey")
+  @@index([updatedById], map: "UserOrganisation_updatedById_fkey")
 }
 
 model UserOrganisationInvitation {
   id                 Int                    @id @default(autoincrement())
-  userOrganisation   UserOrganisation       @relation(name: "userOrganisationInvitations", fields: [userOrganisationId], references: [id])
   userOrganisationId Int
   messageId          String
   timestamp          DateTime
-  status             SysRefInvitationStatus @relation(fields: [statusId], references: [id])
   statusId           Int
   failureNotifiedAt  DateTime?
   createdAt          DateTime               @default(now())
   updatedAt          DateTime               @updatedAt
-  sentById           Int
-  sentBy             User                   @relation(name: "userOrganisationInvitationsSent", fields: [sentById], references: [id])
   isDeleted          Boolean?               @default(false)
+  sentById           Int
+  sentBy             User                   @relation("userOrganisationInvitationsSent", fields: [sentById], references: [id])
+  status             SysRefInvitationStatus @relation(fields: [statusId], references: [id])
+  userOrganisation   UserOrganisation       @relation("userOrganisationInvitations", fields: [userOrganisationId], references: [id])
+
+  @@index([sentById], map: "UserOrganisationInvitation_sentById_fkey")
+  @@index([statusId], map: "UserOrganisationInvitation_statusId_fkey")
+  @@index([userOrganisationId], map: "UserOrganisationInvitation_userOrganisationId_fkey")
 }
 
 model StudyOrganisation {
   id                 Int                    @id @default(autoincrement())
-  study              Study                  @relation(fields: [studyId], references: [id])
   studyId            Int
-  organisation       Organisation           @relation(fields: [organisationId], references: [id])
   organisationId     Int
-  organisationRole   SysRefOrganisationRole @relation(fields: [organisationRoleId], references: [id])
   organisationRoleId Int
   createdAt          DateTime               @default(now())
   updatedAt          DateTime               @updatedAt
   isDeleted          Boolean?               @default(false)
+  organisation       Organisation           @relation(fields: [organisationId], references: [id])
+  organisationRole   SysRefOrganisationRole @relation(fields: [organisationRoleId], references: [id])
+  study              Study                  @relation(fields: [studyId], references: [id])
 
   @@unique([studyId, organisationId])
+  @@index([organisationId], map: "StudyOrganisation_organisationId_fkey")
+  @@index([organisationRoleId], map: "StudyOrganisation_organisationRoleId_fkey")
 }
 
 model StudyEvaluationCategory {
   id                     Int       @id @default(autoincrement())
-  study                  Study     @relation(fields: [studyId], references: [id])
   studyId                Int
   indicatorType          String
   indicatorValue         String
@@ -175,85 +189,102 @@ model StudyEvaluationCategory {
   createdAt              DateTime  @default(now())
   updatedAt              DateTime  @updatedAt
   isDeleted              Boolean?  @default(false)
+  study                  Study     @relation(fields: [studyId], references: [id])
 
   @@unique([studyId, indicatorValue])
 }
 
 model StudyFunder {
   id                Int          @id @default(autoincrement())
-  study             Study        @relation(fields: [studyId], references: [id])
   studyId           Int
-  organisation      Organisation @relation(fields: [organisationId], references: [id])
   organisationId    Int
   grantCode         String
   fundingStreamName String
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
   isDeleted         Boolean?     @default(false)
+  organisation      Organisation @relation(fields: [organisationId], references: [id])
+  study             Study        @relation(fields: [studyId], references: [id])
 
   @@unique([studyId, organisationId])
+  @@index([organisationId], map: "StudyFunder_organisationId_fkey")
 }
 
 model Assessment {
   id                 Int                            @id @default(autoincrement())
-  study              Study                          @relation(fields: [studyId], references: [id])
   studyId            Int
-  status             SysRefAssessmentStatus         @relation(fields: [statusId], references: [id])
   statusId           Int
-  furtherInformation AssessmentFurtherInformation[]
-  createdBy          User                           @relation(fields: [createdById], references: [id])
   createdById        Int
   createdAt          DateTime                       @default(now())
   updatedAt          DateTime                       @updatedAt
   isDeleted          Boolean?                       @default(false)
+  createdBy          User                           @relation(fields: [createdById], references: [id])
+  status             SysRefAssessmentStatus         @relation(fields: [statusId], references: [id])
+  study              Study                          @relation(fields: [studyId], references: [id])
+  furtherInformation AssessmentFurtherInformation[]
   lastAssessmentFor  Study?                         @relation("StudyLastAssessment")
+
+  @@index([createdById], map: "Assessment_createdById_fkey")
+  @@index([statusId], map: "Assessment_statusId_fkey")
+  @@index([studyId], map: "Assessment_studyId_fkey")
 }
 
 model AssessmentFurtherInformation {
   id                     Int                                 @id @default(autoincrement())
-  assessment             Assessment                          @relation(fields: [assessmentId], references: [id])
   assessmentId           Int
-  furtherInformation     SysRefAssessmentFurtherInformation? @relation(fields: [furtherInformationId], references: [id])
   furtherInformationId   Int?
   furtherInformationText String?                             @db.Text
   isDeleted              Boolean?                            @default(false)
+  assessment             Assessment                          @relation(fields: [assessmentId], references: [id])
+  furtherInformation     SysRefAssessmentFurtherInformation? @relation(fields: [furtherInformationId], references: [id])
+
+  @@index([assessmentId], map: "AssessmentFurtherInformation_assessmentId_fkey")
+  @@index([furtherInformationId], map: "AssessmentFurtherInformation_furtherInformationId_fkey")
 }
 
 model AssessmentReminder {
   id        Int       @id @default(autoincrement())
-  user      User      @relation(fields: [userId], references: [id])
   userId    Int
-  messageId String?
   sentAt    DateTime?
   createdAt DateTime  @default(now())
+  messageId String?
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@index([userId], map: "AssessmentReminder_userId_fkey")
 }
 
 model StudyUpdates {
   id                              Int                    @id @default(autoincrement())
-  study                           Study                  @relation(fields: [studyId], references: [id])
   studyId                         Int
   studyStatus                     String?
-  studyStatusGroup                String
   plannedOpeningDate              DateTime?
   actualOpeningDate               DateTime?
   plannedClosureToRecruitmentDate DateTime?
   actualClosureToRecruitmentDate  DateTime?
   estimatedReopeningDate          DateTime?
   ukRecruitmentTarget             Int?
-  studyUpdateType                 SysRefStudyUpdateType  @relation(fields: [studyUpdateTypeId], references: [id])
   studyUpdateTypeId               Int
   comment                         String?                @db.VarChar(500)
-  isDeleted                       Boolean?               @default(false) @db.TinyInt()
+  isDeleted                       Boolean?               @default(false)
   LSN                             Bytes?                 @db.Binary(10)
-  transactionId                   String
-  studyUpdateState                SysRefStudyUpdateState @relation(fields: [studyUpdateStateId], references: [id])
-  studyUpdateStateId              Int
   createdAt                       DateTime               @default(now())
-  createdBy                       User                   @relation("createdStudyUpdates", fields: [createdById], references: [id])
   createdById                     Int
   modifiedAt                      DateTime               @updatedAt
-  modifiedBy                      User                   @relation("modifiedStudyUpdates", fields: [modifiedById], references: [id])
   modifiedById                    Int
+  studyStatusGroup                String
+  studyUpdateStateId              Int
+  transactionId                   String
+  createdBy                       User                   @relation("createdStudyUpdates", fields: [createdById], references: [id])
+  modifiedBy                      User                   @relation("modifiedStudyUpdates", fields: [modifiedById], references: [id])
+  study                           Study                  @relation(fields: [studyId], references: [id])
+  studyUpdateState                SysRefStudyUpdateState @relation(fields: [studyUpdateStateId], references: [id])
+  studyUpdateType                 SysRefStudyUpdateType  @relation(fields: [studyUpdateTypeId], references: [id])
+
+  @@index([createdById], map: "StudyUpdates_createdById_fkey")
+  @@index([modifiedById], map: "StudyUpdates_modifiedById_fkey")
+  @@index([studyId], map: "StudyUpdates_studyId_fkey")
+  @@index([studyUpdateStateId], map: "StudyUpdates_studyUpdateStateId_fkey")
+  @@index([studyUpdateTypeId], map: "StudyUpdates_studyUpdateTypeId_fkey")
 }
 
 model SysRefStudyUpdateState {
@@ -300,9 +331,9 @@ model SysRefOrganisationRole {
   name          String
   description   String              @db.Text
   rtsIdentifier String              @unique
+  isDeleted     Boolean             @default(false)
   organisations OrganisationRole[]
   studies       StudyOrganisation[]
-  isDeleted     Boolean             @default(false)
 
   @@index([rtsIdentifier])
 }
