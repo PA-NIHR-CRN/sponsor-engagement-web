@@ -189,3 +189,28 @@ export enum StudyFunderOrganisationRole {
 export enum StudyFunderOrganisationRoleRTSIdentifier {
   Crfndr216840111388321385111107 = 'CRFNDR@2.16.840.1.113883.2.1.3.8.5.11.1.107',
 }
+
+export type ActionKey =
+  | 'ASSESS_STUDY'
+  | 'REVIEW_PLANNED_OPENING'
+  | 'REVIEW_PLANNED_CLOSING'
+  | 'REVIEW_EXPECTED_REOPENING'
+  | 'REVIEW_RECRUITMENT_TARGET'
+  | 'REVIEW_ACTUAL_OPENING';
+
+export const INDICATOR_TO_ACTION: Record<string, ActionKey> = {
+  'Study is past planned opening date': 'REVIEW_PLANNED_OPENING',
+  'Study is past planned closure to recruitment date': 'REVIEW_PLANNED_CLOSING',
+  'Study is past expected re-opening date': 'REVIEW_EXPECTED_REOPENING',
+
+  'Recruitment target met': 'REVIEW_RECRUITMENT_TARGET',
+  'Recruiting at a lower rate than expected (RTT)': 'ASSESS_STUDY',
+  'No recruitment in past 6 months': 'ASSESS_STUDY',
+
+  'Missing sample size': 'REVIEW_RECRUITMENT_TARGET',
+
+  'Missing planned opening date': 'REVIEW_PLANNED_OPENING',
+  'Missing planned closing date': 'REVIEW_PLANNED_CLOSING',
+  'Missing expected reopen date': 'REVIEW_EXPECTED_REOPENING',
+  'Missing actual opening date': 'REVIEW_ACTUAL_OPENING',
+};
