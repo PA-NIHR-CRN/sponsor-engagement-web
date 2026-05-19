@@ -23,6 +23,7 @@ import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
 import {
   fieldNameToLabelMapping,
+  FormStudyStatus,
   FURTHER_INFO_MAX_CHARACTERS,
   PAGE_TITLE,
   statusMap,
@@ -115,6 +116,11 @@ export default function EditStudy({ study, currentLSN, query, managedContent }: 
       ),
     [statusInputValue, study.studyStatus, mounted]
   )
+
+  // Closure journey
+  const selectedStatus = mapCPMSStatusToFormStatus(statusInputValue ?? study.studyStatus)
+  const isClosureJourney = selectedStatus === FormStudyStatus.Closed || statusInputValue === FormStudyStatus.ClosedFollowUp
+  const primaryActionText = isClosureJourney ? 'Next' : 'Update'
 
   const showLoadingState = formState.isSubmitting || (formState.isSubmitSuccessful && Object.keys(errors).length === 0)
 
@@ -400,17 +406,19 @@ export default function EditStudy({ study, currentLSN, query, managedContent }: 
               />
 
               {/* Further information */}
-              <Textarea
-                defaultValue={defaultValues?.furtherInformation}
-                errors={errors}
-                hint={managedContent?.furtherInformationGuidanceText as Document}
-                label={managedContent?.futherInformationLabel as string}
-                labelSize="m"
-                remainingCharacters={remainingCharacters}
-                required={false}
-                {...register('furtherInformation')}
-                maxLength={FURTHER_INFO_MAX_CHARACTERS}
-              />
+              {!isClosureJourney && (
+                <Textarea
+                  defaultValue={defaultValues?.furtherInformation}
+                  errors={errors}
+                  hint={managedContent?.furtherInformationGuidanceText as Document}
+                  label={managedContent?.futherInformationLabel as string}
+                  labelSize="m"
+                  remainingCharacters={remainingCharacters}
+                  required={false}
+                  {...register('furtherInformation')}
+                  maxLength={FURTHER_INFO_MAX_CHARACTERS}
+                />
+              )}
 
               {showLoadingState ? (
                 <Warning>
@@ -427,10 +435,10 @@ export default function EditStudy({ study, currentLSN, query, managedContent }: 
                 >
                   {showLoadingState ? (
                     <>
-                      Updating... <Spinner />
+                      {isClosureJourney ? 'Loading...' : 'Updating...'} <Spinner />
                     </>
                   ) : (
-                    'Update'
+                    primaryActionText
                   )}
                 </button>
                 <Link className="govuk-button govuk-button--secondary" href={`/studies/${study.id}`}>
