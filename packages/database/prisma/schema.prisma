@@ -7,41 +7,47 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum FirstType {
+  global
+  european
+}
+
 model Study {
-  id                         Int                       @id @default(autoincrement())
-  cpmsId                     Int                       @unique
-  recordStatus               String
-  route                      String
-  irasId                     String?
-  protocolReferenceNumber    String?
-  sampleSize                 Int?
-  chiefInvestigatorFirstName String?
-  chiefInvestigatorLastName  String?
-  managingSpeciality         String
-  plannedOpeningDate         DateTime?
-  plannedClosureDate         DateTime?
-  actualOpeningDate          DateTime?
-  actualClosureDate          DateTime?
-  createdAt                  DateTime                  @default(now())
-  updatedAt                  DateTime                  @updatedAt
-  isDeleted                  Boolean?                  @default(false)
-  shortTitle                 String
-  studyStatus                String
-  title                      String                    @db.Text
-  totalRecruitmentToDate     Int?
-  lastAssessmentId           Int?                      @unique
-  estimatedReopeningDate     DateTime?
-  dueAssessmentAt            DateTime?
-  leadAdministrationId       Int?
-  willRecruitWithinTimeline  Boolean                   @default(true)
-  reasonNotRecruitingWithinTimeline String?            @db.Text
-  hraApprovalDate            DateTime?
-  assessments                Assessment[]
-  lastAssessment             Assessment?               @relation("StudyLastAssessment", fields: [lastAssessmentId], references: [id])
-  evaluationCategories       StudyEvaluationCategory[]
-  funders                    StudyFunder[]
-  organisations              StudyOrganisation[]
-  StudyUpdates               StudyUpdates[]
+  id                                Int                       @id @default(autoincrement())
+  cpmsId                            Int                       @unique
+  recordStatus                      String
+  route                             String
+  irasId                            String?
+  protocolReferenceNumber           String?
+  sampleSize                        Int?
+  chiefInvestigatorFirstName        String?
+  chiefInvestigatorLastName         String?
+  managingSpeciality                String
+  plannedOpeningDate                DateTime?
+  plannedClosureDate                DateTime?
+  actualOpeningDate                 DateTime?
+  actualClosureDate                 DateTime?
+  createdAt                         DateTime                  @default(now())
+  updatedAt                         DateTime                  @updatedAt
+  isDeleted                         Boolean?                  @default(false)
+  shortTitle                        String
+  studyStatus                       String
+  title                             String                    @db.Text
+  totalRecruitmentToDate            Int?
+  lastAssessmentId                  Int?                      @unique
+  estimatedReopeningDate            DateTime?
+  dueAssessmentAt                   DateTime?
+  leadAdministrationId              Int?
+  willRecruitWithinTimeline         Boolean                   @default(true)
+  reasonNotRecruitingWithinTimeline String?                   @db.Text
+  hraApprovalDate                   DateTime?
+  assessments                       Assessment[]
+  lastAssessment                    Assessment?               @relation("StudyLastAssessment", fields: [lastAssessmentId], references: [id])
+  evaluationCategories              StudyEvaluationCategory[]
+  funders                           StudyFunder[]
+  organisations                     StudyOrganisation[]
+  StudyUpdates                      StudyUpdates[]
+  StudyFirst                        StudyFirst?
 
   @@index([cpmsId])
 }
@@ -95,6 +101,8 @@ model User {
   createdRoles                UserRole[]                   @relation("createdRoles")
   updatedRoles                UserRole[]                   @relation("updatedRoles")
   roles                       UserRole[]                   @relation("userRoles")
+  createdStudyFirsts          StudyFirst[]                 @relation("StudyFirstCreatedBy")
+  modifiedStudyFirsts         StudyFirst[]                 @relation("StudyFirstModifiedBy")
 }
 
 model UserRole {
@@ -343,4 +351,26 @@ model SysRefInvitationStatus {
   id                         Int                          @id @default(autoincrement())
   name                       String
   userOrganisationInvitation UserOrganisationInvitation[]
+}
+
+model StudyFirst {
+  id           Int       @id @default(autoincrement())
+  studyId      Int       @unique
+  type         FirstType
+  firstAt      DateTime
+  siteName     String    @db.Text
+  piTitle      String?
+  piFullName   String
+  piEmail      String
+  createdById  Int
+  modifiedById Int?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  createdBy    User      @relation("StudyFirstCreatedBy", fields: [createdById], references: [id])
+  modifiedBy   User?     @relation("StudyFirstModifiedBy", fields: [modifiedById], references: [id])
+  study        Study     @relation(fields: [studyId], references: [id])
+
+  @@index([createdById], map: "StudyFirst_createdById_fkey")
+  @@index([modifiedById], map: "StudyFirst_modifiedById_fkey")
+  @@index([studyId], map: "StudyFirst_studyId_fkey")
 }
