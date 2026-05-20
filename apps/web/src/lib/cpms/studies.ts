@@ -30,7 +30,7 @@ export const getStudyByIdFromCPMS = async (
     assert(CPMS_API_USERNAME, 'CPMS_API_USERNAME is not defined')
     assert(CPMS_API_PASSWORD, 'CPMS_API_PASSWORD is not defined')
 
-    const requestUrl = `${CPMS_API_URL}/studies/${studyId}/engagement-info`
+    const requestUrl = `${CPMS_API_URL}/api/v1/studies/${studyId}/engagement-info`
     const { data } = await axios.get<CPMSGetStudyResponse>(requestUrl, {
       headers: { username: CPMS_API_USERNAME, password: CPMS_API_PASSWORD },
       params: {
@@ -84,7 +84,7 @@ export const updateStudyInCPMS = async (
 
     const body = JSON.stringify(studyData)
 
-    const requestUrl = `${CPMS_API_URL}/studies/${cpmsId}/engagement-info`
+    const requestUrl = `${CPMS_API_URL}/api/v2/studies/${cpmsId}/engagement-info`
 
     const { data } = await axios.put<CPMSUpdateStudyResponse>(requestUrl, body, {
       headers: {
@@ -139,7 +139,7 @@ export const validateStudyUpdate = async (
 
     const body = JSON.stringify(studyData)
 
-    const requestUrl = `${CPMS_API_URL}/studies/${cpmsId}/engagement-info/validate`
+    const requestUrl = `${CPMS_API_URL}/api/v2/studies/${cpmsId}/engagement-info/validate`
 
     const { data } = await axios.post<CPMSValidateStudyResponse>(requestUrl, body, {
       headers: {
