@@ -127,26 +127,26 @@ export default function EditStudy({ study, currentLSN, query, managedContent }: 
     }
   }, [errors])
 
-  function getManagedStatusDescription(id: number, description: string): string | Document {
+  function getManagedStatusDescription(id: number, description: string): string {
     switch (id) {
       case 1:
         // in setup
-        return managedContent?.inSetupGuidanceText as Document
+        return managedContent?.guidanceTextInSetup as string
       case 2:
         //Open to recruitment
-        return managedContent?.openToRecruitmentGuidanceText as Document
+        return managedContent?.guidanceTextOpenToRecruitment as string
       case 3:
         //Closed, in follow-up
-        return managedContent?.closedInFollowUpGuidanceText as Document
+        return managedContent?.guidanceTextClosedInFollowUp as string
       case 4:
         //Closed
-        return managedContent?.closedGuidanceText as Document
+        return managedContent?.guidanceTextClosed as string
       case 5:
         //Withdrawn
-        return managedContent?.withdrawnGuidanceText as Document
+        return managedContent?.guidanceTextWithdrawn as string
       case 6:
         //Suspended
-        return managedContent?.suspendedGuidanceText as Document
+        return managedContent?.guidanceTextSuspended as string
       default:
         return description
     }

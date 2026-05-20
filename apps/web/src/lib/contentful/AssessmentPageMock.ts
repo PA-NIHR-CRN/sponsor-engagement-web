@@ -67,45 +67,10 @@ export const AssessmentPageMock: Entry<TypeSetAssessmentFormPageSkeleton> = {
       nodeType: BLOCKS.DOCUMENT,
     },
     studyProgressionQuestionLabel: 'Is this study progressing in the UK as planned?',
-    studyProgressionOnTrackGuidanceText: {
-      data: {},
-      content: [
-        {
-          data: {},
-          content: [
-            {
-              data: {},
-              marks: [],
-              value: 'The sponsor or delegate is satisfied the study is progressing in the UK as planned.',
-              nodeType: 'text',
-            },
-          ],
-          nodeType: BLOCKS.PARAGRAPH,
-        },
-      ],
-      nodeType: BLOCKS.DOCUMENT,
-    },
-    studyProgressionOffTrackGuidanceText: {
-      nodeType: BLOCKS.DOCUMENT,
-      data: {},
-      content: [
-        {
-          nodeType: BLOCKS.PARAGRAPH,
-          data: {},
-          content: [
-            {
-              nodeType: 'text',
-              value:
-                'The sponsor or delegate has some concerns about the study in the UK and is taking action where appropriate.',
-              marks: [],
-              data: {},
-            },
-          ],
-        },
-      ],
-    },
     additionalInfoLabel:
       'Is there any additional information that would help NIHR RDN understand this progress assessment? (optional)',
     furtherInformationLabel: 'Further information (optional)',
+    guidanceTextOnTrack: 'The sponsor or delegate is satisfied the study is progressing in the UK as planned.',
+    guidanceTextOffTrack: 'The sponsor or delegate has some concerns about the study in the UK and is taking action where appropriate.',
   },
 }

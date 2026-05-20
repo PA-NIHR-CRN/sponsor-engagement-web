@@ -71,14 +71,14 @@ export default function Assessment({
 
   const supportOrgName = organisationsByRole.CRO ?? organisationsByRole.CTU
 
-  function getStudyRadioDescription(id: number, description: string): string | Document {
+  function getStudyRadioDescription(id: number, description: string): string  {
     switch (id) {
       case 1:
         // on track
-        return managedContent?.studyProgressionOnTrackGuidanceText as Document
+        return managedContent?.guidanceTextOnTrack as string
       case 2:
         //off track
-        return managedContent?.studyProgressionOffTrackGuidanceText as Document
+        return managedContent?.guidanceTextOffTrack as string
       default:
         return description
     }
