@@ -7,6 +7,7 @@ import { SessionProvider } from 'next-auth/react'
 import type { ReactElement, ReactNode } from 'react'
 
 import { primaryFont, RootLayout } from '../components/organisms'
+import { ClosureDraftProvider } from '@/context/closureDraftContext'
 
 export type NextPageWithLayout<P = Record<string, unknown>, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement, props: P) => ReactNode
@@ -35,13 +36,15 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
 
   return (
     <SessionProvider session={session}>
-      <style global jsx>
-        {`
-        html {
-          font-family: ${primaryFont.style.fontFamily};
-        `}
-      </style>
-      {getLayout(<Component {...pageProps} />, pageProps)}
+      <ClosureDraftProvider>
+        <style global jsx>
+          {`
+          html {
+            font-family: ${primaryFont.style.fontFamily};
+          `}
+        </style>
+        {getLayout(<Component {...pageProps} />, pageProps)}
+      </ClosureDraftProvider>
     </SessionProvider>
   )
 }
