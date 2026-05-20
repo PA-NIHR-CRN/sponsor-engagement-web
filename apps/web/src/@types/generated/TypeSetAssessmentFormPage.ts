@@ -1,10 +1,10 @@
 import type { ChainModifiers, Entry, EntryFieldTypes, EntrySkeletonType, LocaleCode } from "contentful";
 
 /**
- * Fields type definition for content type 'TypeSetAssesmentFormPage'
+ * Fields type definition for content type 'TypeSetAssessmentFormPage'
  * @name TypeSetAssessmentFormPageFields
  * @type {TypeSetAssessmentFormPageFields}
- * @memberof TypeSetAssesmentFormPage
+ * @memberof TypeSetAssessmentFormPage
  */
 export interface TypeSetAssessmentFormPageFields {
     /**
@@ -52,30 +52,30 @@ export interface TypeSetAssessmentFormPageFields {
 }
 
 /**
- * Entry skeleton type definition for content type 'setAssesmentFormPage' (SET assesment form page)
- * @name TypeSetAssesmentFormPageSkeleton
- * @type {TypeSetAssesmentFormPageSkeleton}
+ * Entry skeleton type definition for content type 'setAssessmentFormPage' (SET assessment form page)
+ * @name TypeSetAssessmentFormPageSkeleton
+ * @type {TypeSetAssessmentFormPageSkeleton}
  * @author 74dRNHIw06jXMrW8vfnjVl
  * @since 2026-04-23T15:03:34.544Z
  * @version 1
  */
-export type TypeSetAssesmentFormPageSkeleton = EntrySkeletonType<TypeSetAssessmentFormPageFields, "setAssesmentFormPage">;
+export type TypeSetAssessmentFormPageSkeleton = EntrySkeletonType<TypeSetAssessmentFormPageFields, "setAssessmentFormPage">;
 /**
- * Entry type definition for content type 'setAssesmentFormPage' (SET assesment form page)
- * @name TypeSetAssesmentFormPage
- * @type {TypeSetAssesmentFormPage}
+ * Entry type definition for content type 'setAssessmentFormPage' (SET assessment form page)
+ * @name TypeSetAssessmentFormPage
+ * @type {TypeSetAssessmentFormPage}
  * @author 74dRNHIw06jXMrW8vfnjVl
  * @since 2026-04-23T15:03:34.544Z
  * @version 1
  */
-export type TypeSetAssesmentFormPage<Modifiers extends ChainModifiers, Locales extends LocaleCode = LocaleCode> = Entry<TypeSetAssesmentFormPageSkeleton, Modifiers, Locales>;
+export type TypeSetAssessmentFormPage<Modifiers extends ChainModifiers, Locales extends LocaleCode = LocaleCode> = Entry<TypeSetAssessmentFormPageSkeleton, Modifiers, Locales>;
 
-export function isTypeSetAssesmentFormPage<Modifiers extends ChainModifiers, Locales extends LocaleCode>(entry: Entry<EntrySkeletonType, Modifiers, Locales>): entry is TypeSetAssesmentFormPage<Modifiers, Locales> {
-    return entry.sys.contentType.sys.id === 'setAssesmentFormPage'
+export function isTypeSetAssessmentFormPage<Modifiers extends ChainModifiers, Locales extends LocaleCode>(entry: Entry<EntrySkeletonType, Modifiers, Locales>): entry is TypeSetAssessmentFormPage<Modifiers, Locales> {
+    return entry.sys.contentType.sys.id === 'setAssessmentFormPage'
 }
 
-export type TypeSetAssesmentFormPageWithoutLinkResolutionResponse = TypeSetAssesmentFormPage<"WITHOUT_LINK_RESOLUTION">;
-export type TypeSetAssesmentFormPageWithoutUnresolvableLinksResponse = TypeSetAssesmentFormPage<"WITHOUT_UNRESOLVABLE_LINKS">;
-export type TypeSetAssesmentFormPageWithAllLocalesResponse<Locales extends LocaleCode = LocaleCode> = TypeSetAssesmentFormPage<"WITH_ALL_LOCALES", Locales>;
-export type TypeSetAssesmentFormPageWithAllLocalesAndWithoutLinkResolutionResponse<Locales extends LocaleCode = LocaleCode> = TypeSetAssesmentFormPage<"WITHOUT_LINK_RESOLUTION" | "WITH_ALL_LOCALES", Locales>;
-export type TypeSetAssesmentFormPageWithAllLocalesAndWithoutUnresolvableLinksResponse<Locales extends LocaleCode = LocaleCode> = TypeSetAssesmentFormPage<"WITHOUT_UNRESOLVABLE_LINKS" | "WITH_ALL_LOCALES", Locales>;
+export type TypeSetAssessmentFormPageWithoutLinkResolutionResponse = TypeSetAssessmentFormPage<"WITHOUT_LINK_RESOLUTION">;
+export type TypeSetAssessmentFormPageWithoutUnresolvableLinksResponse = TypeSetAssessmentFormPage<"WITHOUT_UNRESOLVABLE_LINKS">;
+export type TypeSetAssessmentFormPageWithAllLocalesResponse<Locales extends LocaleCode = LocaleCode> = TypeSetAssessmentFormPage<"WITH_ALL_LOCALES", Locales>;
+export type TypeSetAssessmentFormPageWithAllLocalesAndWithoutLinkResolutionResponse<Locales extends LocaleCode = LocaleCode> = TypeSetAssessmentFormPage<"WITHOUT_LINK_RESOLUTION" | "WITH_ALL_LOCALES", Locales>;
+export type TypeSetAssessmentFormPageWithAllLocalesAndWithoutUnresolvableLinksResponse<Locales extends LocaleCode = LocaleCode> = TypeSetAssessmentFormPage<"WITHOUT_UNRESOLVABLE_LINKS" | "WITH_ALL_LOCALES", Locales>;

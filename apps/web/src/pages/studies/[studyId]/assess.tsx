@@ -9,7 +9,7 @@ import { type ReactElement, useCallback } from 'react'
 import type { FieldError } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 
-import type { TypeSetAssesmentFormPageSkeleton } from '@/@types/generated'
+import type { TypeSetAssessmentFormPageSkeleton } from '@/@types/generated'
 import { Checkbox, CheckboxGroup, ErrorSummary, Fieldset, Form, Radio, RadioGroup } from '@/components/atoms'
 import { Textarea } from '@/components/atoms/Form/Textarea/Textarea'
 import { AssessmentHistory, getAssessmentHistoryFromStudy, RequestSupport, StudyDetails } from '@/components/molecules'
@@ -227,7 +227,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
   const { data: study } = await getStudyById(Number(studyId), userOrganisationIds)
 
   const { CONTENTFUL_PAGE_STUDY_ASSESS_ID } = process.env
-  const contentfulContent = await getManagedContent<TypeSetAssesmentFormPageSkeleton>(CONTENTFUL_PAGE_STUDY_ASSESS_ID)
+  const contentfulContent = await getManagedContent<TypeSetAssessmentFormPageSkeleton>(CONTENTFUL_PAGE_STUDY_ASSESS_ID)
   const managedContent = contentfulContent?.fields || null
 
   const [statusRefData, furtherInformationRefData] = await prismaClient.$transaction([

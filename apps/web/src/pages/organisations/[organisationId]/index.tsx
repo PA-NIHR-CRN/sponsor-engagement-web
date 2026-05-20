@@ -169,6 +169,8 @@ export default function Organisation({ organisation, query, managedContent }: Or
           {/* Organisation details */}
           {renderDetails()}
 
+          <h3 className="govuk-heading-m p-0 govuk-!-margin-bottom-4">Add or remove sponsor contacts</h3>
+
           <RichTextRenderer>{managedContent?.content as Document}</RichTextRenderer>
 
           {/* Invite form */}
