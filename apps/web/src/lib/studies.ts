@@ -209,6 +209,7 @@ export const getStudiesForOrgs = async ({
           isDeleted: false,
         },
       },
+      StudyFirst: {},
     },
     orderBy: [sortMap[sortOrder], { id: Prisma.SortOrder.asc }],
   }
