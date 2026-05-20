@@ -119,6 +119,12 @@ export const dateValidationRules: Record<
       },
     ],
   },
-  actualClosureDate: { restrictions: ['requiredPastOrCurrent'], dependencies: [] },
+  actualClosureDate: { restrictions: ['requiredPastOrCurrent'], dependencies: [
+      {
+        fieldName: 'actualOpeningDate',
+        requiredAfter: true,
+      }
+    ],
+  },
   estimatedReopeningDate: { restrictions: ['requiredFuture'], dependencies: [] },
 }
