@@ -106,6 +106,7 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
       : validationResult.StudyUpdateRoute === StudyUpdateRoute.Direct
 
     let afterLSN = ''
+    const transactionId = uuid()
 
     const isClosed = [
       Status.ClosedToRecruitment,
@@ -152,12 +153,12 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
       const yesNoText = (v?: boolean) => (v === true ? 'Yes' : v === false ? 'No' : 'None provided')
 
       const buildClosedAdditionalNote = (inputs: ClosedNoteInputs) =>
-        `Final Recruitment Target correct: ${yesNoText(inputs.finalRecruitmentTargetCorrect)}; ` +
-        `Performance Aligned To Expectations: ${yesNoText(inputs.performanceAlignedToExpectations)}; ` +
-        `Performance Explainer: ${inputs.performanceExplainer || 'None provided'}; ` +
-        `Further information: ${inputs.furtherInformation || 'None provided'}; ` +
-        `UK recruitment target: ${Number.isFinite(inputs.ukRecruitmentTarget as number) ? inputs.ukRecruitmentTarget : 'None provided'
-        }`
+        `Final Recruitment Target correct: ${yesNoText(inputs.finalRecruitmentTargetCorrect)};\r\n ` +
+        `Performance Aligned To Expectations: ${yesNoText(inputs.performanceAlignedToExpectations)};\r\n ` +
+        `Performance Explainer: ${inputs.performanceExplainer || 'None provided'};\r\n ` +
+        `Further information: ${inputs.furtherInformation || 'None provided'};\r\n ` +
+        `UK recruitment target: ${Number.isFinite(inputs.ukRecruitmentTarget as number) ? inputs.ukRecruitmentTarget : 'None provided'};\r\n ` + 
+          `SE Audit History Id: ${transactionId}`;
 
 
       const isNewlySuspended =
@@ -187,8 +188,6 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
         await updateStudy(Number(studyDataToUpdate.cpmsId), { isDeleted: true })
       }
     }
-
-    const transactionId = uuid()
 
     await logStudyUpdate(
       Number(studyId),
