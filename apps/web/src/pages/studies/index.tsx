@@ -165,6 +165,7 @@ export default function Studies({
                             supportOrgName={getSupportOrgName(study.organisations)}
                             trackStatus={study.lastAssessment?.status.name}
                             willRecruitWithinTimeline = {study.willRecruitWithinTimeline}
+                            firstType={study.StudyFirst?.type}
                           />
                         </li>
                       )

@@ -1,9 +1,9 @@
 import { BLOCKS } from '@contentful/rich-text-types'
 import type { Entry } from 'contentful'
 
-import type { TypeSetAssesmentFormPageSkeleton } from '@/@types/generated'
+import type { TypeSetAssessmentFormPageSkeleton } from '@/@types/generated'
 
-export const AssesmentPageMock: Entry<TypeSetAssesmentFormPageSkeleton> = {
+export const AssessmentPageMock: Entry<TypeSetAssessmentFormPageSkeleton> = {
   metadata: {
     tags: [
       {
@@ -40,7 +40,7 @@ export const AssesmentPageMock: Entry<TypeSetAssesmentFormPageSkeleton> = {
       sys: {
         type: 'Link',
         linkType: 'ContentType',
-        id: 'setAssesmentFormPage',
+        id: 'setAssessmentFormPage',
       },
     },
     locale: 'en-GB',

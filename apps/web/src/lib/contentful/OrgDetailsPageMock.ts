@@ -52,18 +52,6 @@ export const OrgDetailsPageMock: Entry<TypeSetLabelSkeleton> = {
       data: {},
       content: [
         {
-          nodeType: BLOCKS.HEADING_3,
-          data: {},
-          content: [
-            {
-              nodeType: 'text',
-              value: 'Add or remove sponsor contacts',
-              marks: [],
-              data: {},
-            },
-          ],
-        },
-        {
           nodeType: BLOCKS.PARAGRAPH,
           data: {},
           content: [

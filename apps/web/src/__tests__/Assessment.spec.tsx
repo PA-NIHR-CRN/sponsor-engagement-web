@@ -9,7 +9,7 @@ import { NextSeo } from 'next-seo'
 import { Mock } from 'ts-mockery'
 
 import { render, screen, within } from '@/config/TestUtils'
-import { AssesmentPageMock } from '@/lib/contentful/AssesmentPageMock'
+import { AssessmentPageMock } from '@/lib/contentful/AssessmentPageMock'
 
 import { prismaMock } from '../__mocks__/prisma'
 import { userNoRoles, userWithSponsorContactRole } from '../__mocks__/session'
@@ -141,7 +141,7 @@ const renderPage = async (
     props: AssessmentProps
   }
 
-  render(Assessment.getLayout(<Assessment {...props} managedContent={AssesmentPageMock.fields} />, { ...props }))
+  render(Assessment.getLayout(<Assessment {...props} managedContent={AssessmentPageMock.fields} />, { ...props }))
 }
 
 describe('Assessment', () => {
