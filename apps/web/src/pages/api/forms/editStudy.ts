@@ -142,10 +142,10 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
       const yesNo = (v: boolean) => (v ? "Yes" : "No");
 
       const buildClosedAdditionalNote = (inputs: ClosedNoteInputs) =>
-          `Final Recruitment Target Correct: ${yesNo(inputs.finalRecruitmentTargetCorrect)}; ` +
-          `Performance Aligned To Expectations: ${yesNo(inputs.performanceAlignedToExpectations)}; ` +
-          `Performance Explainer: ${inputs.performanceExplainer?.trim() || "None Provided"}; ` +
-          `Further information: ${inputs.furtherInformation?.trim() || "None Provided"}; ` +
+          `Final Recruitment Target Correct: ${yesNo(inputs.finalRecruitmentTargetCorrect)};\r\n ` +
+          `Performance Aligned To Expectations: ${yesNo(inputs.performanceAlignedToExpectations)};\r\n ` +
+          `Performance Explainer: ${inputs.performanceExplainer?.trim() || "None Provided"};\r\n ` +
+          `Further information: ${inputs.furtherInformation?.trim() || "None Provided"};\r\n ` +
           `UK recruitment target: ${
               Number.isFinite(inputs.ukRecruitmentTarget)
                   ? inputs.ukRecruitmentTarget
