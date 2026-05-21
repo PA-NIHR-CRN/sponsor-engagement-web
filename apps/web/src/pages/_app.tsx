@@ -36,7 +36,6 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
 
   return (
     <SessionProvider session={session}>
-      <ClosureDraftProvider>
         <style global jsx>
           {`
           html {
@@ -44,7 +43,6 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
           `}
         </style>
         {getLayout(<Component {...pageProps} />, pageProps)}
-      </ClosureDraftProvider>
     </SessionProvider>
   )
 }

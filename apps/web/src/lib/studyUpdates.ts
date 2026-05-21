@@ -15,7 +15,8 @@ export const logStudyUpdate = async (
   isDirectUpdate: boolean,
   userId: number,
   beforeLSN?: string | null,
-  afterLSN?: string | null
+  afterLSN?: string | null,
+  isClosure?: boolean
 ) => {
   const studyUpdateBefore: Prisma.StudyUpdatesCreateManyInput = {
     studyId,
@@ -57,6 +58,7 @@ export const logStudyUpdate = async (
     studyUpdateTypeId: isDirectUpdate ? StudyUpdateType.Direct : StudyUpdateType.Proposed,
     createdById: userId,
     modifiedById: userId,
+    isDeleted: isClosure && isDirectUpdate
   }
 
   await prismaClient.studyUpdates.createMany({

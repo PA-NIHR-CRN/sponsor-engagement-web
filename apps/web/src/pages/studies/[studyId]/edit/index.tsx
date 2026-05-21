@@ -31,7 +31,7 @@ import {
   statusMap,
   studyStatuses,
 } from '@/constants/editStudyForm'
-import { useClosureDraft } from '@/context/closureDraftContext'
+import { ClosureDraftProvider, useClosureDraft } from '@/context/closureDraftContext'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
 import { getManagedContent } from '@/lib/contentful/contentfulService'
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
@@ -70,20 +70,20 @@ export default function EditStudy({ study, currentLSN, query, managedContent }: 
     setMounted(true)
   }, [])
 
-const mappedFormInput = useMemo<EditStudySchema>(() => {
-  const base = mapStudyToStudyFormInput(study) as EditStudySchema
-  
-  if (Object.keys(query).length <= 1) {
-    return base
-  }
+  const mappedFormInput = useMemo<EditStudySchema>(() => {
+    const base = mapStudyToStudyFormInput(study) as EditStudySchema
 
-  const fromQuery = getValuesFromSearchParams(studySchema, query) as unknown as Partial<EditStudySchema>
+    if (Object.keys(query).length <= 1) {
+      return base
+    }
 
-  return {
-    ...base,
-    ...fromQuery,
-  }
-}, [query, study])
+    const fromQuery = getValuesFromSearchParams(studySchema, query) as unknown as Partial<EditStudySchema>
+
+    return {
+      ...base,
+      ...fromQuery,
+    }
+  }, [query, study])
 
   const {
     register,
@@ -211,9 +211,11 @@ const mappedFormInput = useMemo<EditStudySchema>(() => {
       recruitmentTarget: values.recruitmentTarget,
       actualOpeningDate: values.actualOpeningDate ?? null,
       plannedClosureDate: values.plannedClosureDate ?? null,
+      LSN: defaultValues?.LSN ?? null,
+      originalValues: values.originalValues,
     }))
 
-    await router.push(`/studies/${values.studyId}/closure`)
+    await router.push(`/studies/${values.studyId}/edit/closure`)
   }, [getValues, router, setDraft, setError, trigger])
 
   function getManagedStatusDescription(id: number, description: string): string | Document {
@@ -285,7 +287,6 @@ const mappedFormInput = useMemo<EditStudySchema>(() => {
               defaultValue={JSON.stringify(defaultValues?.originalValues)}
             />
             <Fieldset>
-              {/* Status */}
               <Controller
                 control={control}
                 name="status"
@@ -329,7 +330,6 @@ const mappedFormInput = useMemo<EditStudySchema>(() => {
                 }}
               />
 
-              {/* Planned UK opening to recruitment date */}
               {visibleDateFields.includes('plannedOpeningDate') && (
                 <Controller
                   control={control}
@@ -355,7 +355,6 @@ const mappedFormInput = useMemo<EditStudySchema>(() => {
                 />
               )}
 
-              {/* Actual UK opening to recruitment date */}
               {visibleDateFields.includes('actualOpeningDate') && (
                 <Controller
                   control={control}
@@ -385,7 +384,6 @@ const mappedFormInput = useMemo<EditStudySchema>(() => {
                 />
               )}
 
-              {/* Planned UK closure to recruitment date */}
               {visibleDateFields.includes('plannedClosureDate') && (
                 <Controller
                   control={control}
@@ -411,7 +409,6 @@ const mappedFormInput = useMemo<EditStudySchema>(() => {
                 />
               )}
 
-              {/* Actual UK closure to recruitment date */}
               {visibleDateFields.includes('actualClosureDate') && (
                 <Controller
                   control={control}
@@ -437,7 +434,6 @@ const mappedFormInput = useMemo<EditStudySchema>(() => {
                 />
               )}
 
-              {/* Estimated UK reopening date */}
               {visibleDateFields.includes('estimatedReopeningDate') && (
                 <Controller
                   control={control}
@@ -463,7 +459,6 @@ const mappedFormInput = useMemo<EditStudySchema>(() => {
                 />
               )}
 
-              {/* UK recruitment target */}
               <Controller
                 control={control}
                 name="recruitmentTarget"
@@ -486,7 +481,6 @@ const mappedFormInput = useMemo<EditStudySchema>(() => {
                 }}
               />
 
-              {/* Further information (hidden on closure journey to prevent duplicate notes entry) */}
               {!isClosureJourney && (
                 <Textarea
                   defaultValue={defaultValues?.furtherInformation}
@@ -501,7 +495,6 @@ const mappedFormInput = useMemo<EditStudySchema>(() => {
                 />
               )}
 
-              {/* Only show loading warning when we are actually submitting (Update path) */}
               {!isClosureJourney && showLoadingState ? (
                 <Warning>
                   It may take a few seconds for the record to update. Please stay on this page until redirected.
@@ -552,17 +545,19 @@ const mappedFormInput = useMemo<EditStudySchema>(() => {
   )
 }
 
-EditStudy.getLayout = function getLayout(page: ReactElement, { user }: EditStudyProps) {
+EditStudy.getLayout = function getLayout(page: ReactElement, { user, study }: EditStudyProps) {
   return (
-    <RootLayout
-      breadcrumbConfig={{
-        showBreadcrumb: true,
-      }}
-      heading={PAGE_TITLE}
-      user={user}
-    >
-      {page}
-    </RootLayout>
+    <ClosureDraftProvider studyId={study.id.toString()}>
+      <RootLayout
+        breadcrumbConfig={{
+          showBreadcrumb: true,
+        }}
+        heading={PAGE_TITLE}
+        user={user}
+      >
+        {page}
+      </RootLayout>
+    </ClosureDraftProvider>
   )
 }
 

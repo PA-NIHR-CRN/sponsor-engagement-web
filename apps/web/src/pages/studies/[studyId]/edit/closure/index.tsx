@@ -17,8 +17,9 @@ import { Roles } from '@/constants'
 import { PAGE_TITLE } from '@/constants/editStudyForm'
 import { getStudyById } from '@/lib/studies'
 import { withServerSideProps } from '@/utils/withServerSideProps'
-import { useClosureDraft } from '@/context/closureDraftContext'
+import { ClosureDraftProvider, useClosureDraft } from '@/context/closureDraftContext'
 import { TEXTAREA_MAX_CHARACTERS } from '@/constants/forms'
+import { closureDraftStorageKey } from '@/utils/storageKeys'
 
 export type ClosureOfStudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
@@ -31,6 +32,16 @@ type ClosureOfStudyFormValues = {
     performanceNoReason?: string
     furtherInformation?: string
 }
+
+const renderBackLink = (returnUrl: string) => (
+    <div className="ml-8 govuk-!-padding-top-3">
+        <Container>
+            <Link className="govuk-back-link govuk-!-font-size-19 font-light" href={returnUrl}>
+                Back
+            </Link>
+        </Container>
+    </div>
+)
 
 export default function ClosureOfStudy({ study }: ClosureOfStudyProps) {
     const router = useRouter()
@@ -118,8 +129,13 @@ export default function ClosureOfStudy({ study }: ClosureOfStudyProps) {
             furtherInformation: values.furtherInformation,
         }))
 
-        await router.push(`/studies/${study.id}/closure/review`)
+        await router.push(`/studies/${study.id}/edit/closure/review`)
     })
+
+    const onCancel = () => {
+        sessionStorage.removeItem(closureDraftStorageKey(study.id))
+        router.push(`/studies/${study.id}`)
+    }
 
     return (
         <Container>
@@ -159,7 +175,6 @@ export default function ClosureOfStudy({ study }: ClosureOfStudyProps) {
                         <ErrorSummary errors={{}} />
 
                         <Fieldset>
-                            {/* Recruitment check */}
                             <Controller
                                 control={control}
                                 name="isFinalRecruitmentTotalCorrect"
@@ -178,7 +193,6 @@ export default function ClosureOfStudy({ study }: ClosureOfStudyProps) {
                                 )}
                             />
 
-                            {/* Recruitment update field */}
                             <Controller
                                 control={control}
                                 name="correctedRecruitmentTotal"
@@ -198,7 +212,6 @@ export default function ClosureOfStudy({ study }: ClosureOfStudyProps) {
                                 )}
                             />
 
-                            {/* Performance check */}
                             <Controller
                                 control={control}
                                 name="didPerformanceDeliverInline"
@@ -217,7 +230,6 @@ export default function ClosureOfStudy({ study }: ClosureOfStudyProps) {
                                 )}
                             />
 
-                            {/* Explanation textarea (always shown - AC2 says it must exist; no gating required) */}
                             <Textarea
                                 errors={{}}
                                 label="If 'No' please briefly explain why"
@@ -230,7 +242,6 @@ export default function ClosureOfStudy({ study }: ClosureOfStudyProps) {
                                 {...register('performanceNoReason')}
                             />
 
-                            {/* Further information (Step 2 only) */}
                             <Textarea
                                 errors={{}}
                                 label="Further information (optional)"
@@ -252,9 +263,15 @@ export default function ClosureOfStudy({ study }: ClosureOfStudyProps) {
                                     Next
                                 </button>
 
-                                <Link className="govuk-button govuk-button--secondary" href={`/studies/${study.id}`}>
+
+                                <button
+                                    type="button"
+                                    className="govuk-button govuk-button--secondary"
+                                    onClick={onCancel}
+                                >
                                     Cancel
-                                </Link>
+                                </button>
+
                             </div>
                         </Fieldset>
                     </Form>
@@ -268,17 +285,13 @@ export default function ClosureOfStudy({ study }: ClosureOfStudyProps) {
     )
 }
 
-ClosureOfStudy.getLayout = function getLayout(page: ReactElement, { user }: ClosureOfStudyProps) {
+ClosureOfStudy.getLayout = function getLayout(page: ReactElement, { user, study }: ClosureOfStudyProps) {
     return (
-        <RootLayout
-            breadcrumbConfig={{
-                showBreadcrumb: true,
-            }}
-            heading={PAGE_TITLE}
-            user={user}
-        >
-            {page}
-        </RootLayout>
+        <ClosureDraftProvider studyId={study.id.toString()}>
+            <RootLayout breadcrumbConfig={{ showBreadcrumb: true }} heading={PAGE_TITLE} user={user}>
+                {page}
+            </RootLayout>
+        </ClosureDraftProvider>
     )
 }
 

@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
 
 import type { DateInputValue } from '@/components/atoms/Form/DateInput/types'
+import { EditStudy } from '@/utils/schemas/study.schema'
+import { closureDraftStorageKey } from '@/utils/storageKeys'
 
 export type YesNo = 'YES' | 'NO'
 
@@ -13,6 +15,8 @@ export type ClosureDraft = {
   recruitmentTarget?: string
   actualOpeningDate?: DateInputValue | null
   plannedClosureDate?: DateInputValue | null
+  LSN?: string | null
+  originalValues?: EditStudy['originalValues']
 
   // Step 2 values
   isFinalRecruitmentTotalCorrect?: YesNo
@@ -30,8 +34,6 @@ type ClosureDraftContextValue = {
 }
 
 const ClosureDraftContext = createContext<ClosureDraftContextValue | undefined>(undefined)
-
-const STORAGE_KEY = 'se:closureDraft:v1'
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null
@@ -77,25 +79,38 @@ const coerceClosureDraft = (value: unknown): ClosureDraft => {
   }
 }
 
-export function ClosureDraftProvider({ children }: { children: React.ReactNode }) {
+export function ClosureDraftProvider({
+  children,
+  studyId,
+}: {
+  children: React.ReactNode
+  studyId: string
+}) {
   const [draft, setDraft] = useState<ClosureDraft>({})
+
+  const storageKey = useMemo(() => closureDraftStorageKey(studyId), [studyId])
 
   useEffect(() => {
     try {
-      const raw = sessionStorage.getItem(STORAGE_KEY)
-      if (!raw) return
+      const raw = sessionStorage.getItem(storageKey)
+      if (!raw) {
+        setDraft({})
+        return
+      }
+
       const parsed: unknown = JSON.parse(raw)
       setDraft(coerceClosureDraft(parsed))
     } catch {
+      setDraft({})
     }
-  }, [])
+  }, [storageKey])
 
   useEffect(() => {
     try {
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(draft))
+      sessionStorage.setItem(storageKey, JSON.stringify(draft))
     } catch {
     }
-  }, [draft])
+  }, [storageKey, draft])
 
   const replaceDraft = (next: ClosureDraft) => {
     setDraft(next)
@@ -104,7 +119,7 @@ export function ClosureDraftProvider({ children }: { children: React.ReactNode }
   const clearDraft = () => {
     setDraft({})
     try {
-      sessionStorage.removeItem(STORAGE_KEY)
+      sessionStorage.removeItem(storageKey)
     } catch {
     }
   }

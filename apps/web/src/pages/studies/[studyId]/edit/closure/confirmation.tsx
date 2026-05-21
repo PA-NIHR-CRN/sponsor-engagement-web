@@ -2,10 +2,31 @@ import { Container } from '@nihr-ui/frontend'
 import { NextSeo } from 'next-seo'
 
 import { ConfirmationPage } from '@/components/organisms/ConfirmationPage/ConfirmationPage'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+import { closureDraftStorageKey } from '@/utils/storageKeys'
+
+export function ClearClosureDraftOnMount() {
+    const router = useRouter()
+    const { studyId } = router.query
+
+    useEffect(() => {
+        const id = typeof studyId === 'string' ? studyId : Array.isArray(studyId) ? studyId[0] : undefined
+        if (!id) return
+
+        try {
+            sessionStorage.removeItem(closureDraftStorageKey(id))
+        } catch {
+        }
+    }, [studyId])
+
+    return null
+}
 
 export default function ClosureConfirmation() {
     return (
         <Container>
+            <ClearClosureDraftOnMount />
             <div className="lg:flex lg:gap-6">
                 <div className="w-full">
                     <h2 className="govuk-heading-l govuk-!-margin-bottom-0">Closure of study</h2>
