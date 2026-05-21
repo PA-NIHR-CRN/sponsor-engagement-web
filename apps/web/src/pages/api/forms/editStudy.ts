@@ -106,6 +106,7 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
       : validationResult.StudyUpdateRoute === StudyUpdateRoute.Direct
 
     let afterLSN = ''
+    const transactionId = uuid()
 
     if (isDirectUpdate) {
       // Only send additional note if new status is Suspended or Closed and not the original status
@@ -137,20 +138,21 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
         performanceExplainer: "Test performance explainer",
         furtherInformation: "Test further information",
         ukRecruitmentTarget: 250
-      };
+      }
 
       const yesNo = (v: boolean) => (v ? "Yes" : "No");
 
       const buildClosedAdditionalNote = (inputs: ClosedNoteInputs) =>
-          `Final Recruitment Target Correct: ${yesNo(inputs.finalRecruitmentTargetCorrect)}; ` +
-          `Performance Aligned To Expectations: ${yesNo(inputs.performanceAlignedToExpectations)}; ` +
-          `Performance Explainer: ${inputs.performanceExplainer?.trim() || "None Provided"}; ` +
-          `Further information: ${inputs.furtherInformation?.trim() || "None Provided"}; ` +
-          `UK recruitment target: ${
+          `Final Recruitment Target Correct: ${yesNo(inputs.finalRecruitmentTargetCorrect)};\r\n ` +
+          `Performance Aligned To Expectations: ${yesNo(inputs.performanceAlignedToExpectations)};\r\n ` +
+          `Performance Explainer: ${inputs.performanceExplainer?.trim() || "None Provided"};\r\n ` +
+          `Further Information: ${inputs.furtherInformation?.trim() || "None Provided"};\r\n ` +
+          `UK Recruitment Target: ${
               Number.isFinite(inputs.ukRecruitmentTarget)
                   ? inputs.ukRecruitmentTarget
                   : "None Provided"
-          }`;
+          };\r\n ` +
+          `SE Audit History Id: ${transactionId}`;
 
 
 
@@ -180,8 +182,6 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
 
       afterLSN = study.UpdateLsn
     }
-
-    const transactionId = uuid()
 
     await logStudyUpdate(
       Number(studyId),
