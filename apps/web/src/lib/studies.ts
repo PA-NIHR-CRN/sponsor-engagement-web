@@ -518,6 +518,8 @@ export function getDaysSinceAssessmentDue(dueAssessmentAt: Date | null): number 
       : null
 }
 
+const isAssessmentDueIndicator = (indicator: string | undefined) => indicator?.startsWith('Assessment due for')
+
 export function getAssessmentDueIndicator(
   hasAssessmentDue: boolean,
   daysSinceAssessmentDue: number | null
@@ -534,7 +536,7 @@ export function getAssessmentDueIndicator(
 }
 
 function getActionKeyForIndicator(indicator: string): ActionKey | null {
-  if (indicator.startsWith('Assessment due for')) {
+  if (isAssessmentDueIndicator(indicator)) {
     return 'ASSESS_STUDY';
   }
 
@@ -581,6 +583,16 @@ export function buildSummaryRows(indicators: string[], basePath: string) {
 
     grouped.get(actionKey)?.push({ text: indicator });
   });
+
+  // Remove ASSESS_STUDY if an assessment is not due regardless of other indicators
+  const assessTags = grouped.get('ASSESS_STUDY')
+  if (assessTags) {
+    const hasAssessmentDueIndicators = assessTags.some((t) => isAssessmentDueIndicator(t.text))
+    logger.info(hasAssessmentDueIndicators)
+    if (!hasAssessmentDueIndicators) {
+      grouped.delete('ASSESS_STUDY')
+    }
+  }
 
   return Array.from(grouped.entries()).map(([actionKey, tags]) => {
     const { path, actionText } = ACTION_CONFIG[actionKey]

@@ -146,7 +146,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
     ),
   ].filter(Boolean) as string[];
 
-  const rows = buildSummaryRows(indicators, router.asPath);
+  const indicatorSummaryRows = buildSummaryRows(indicators, `${STUDIES_PAGE}/${study.id}`);
 
   return (
     <Container>
@@ -170,12 +170,12 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
 
           <div className="flex flex-col govuk-!-margin-bottom-4 govuk-!-margin-top-4 gap-6">
 
-            {indicators.length > 0 && (
+            {indicatorSummaryRows.length > 0 && (
               <>
                 <h3 className="govuk-heading-m govuk-!-margin-bottom-0">
                   Actions needed
                 </h3>
-                <SummaryList rows={rows} className='summary-list--study-indicators govuk-!-margin-bottom-0' />
+                <SummaryList rows={indicatorSummaryRows} className='summary-list--study-indicators govuk-!-margin-bottom-0' />
               </>
             )}
 
