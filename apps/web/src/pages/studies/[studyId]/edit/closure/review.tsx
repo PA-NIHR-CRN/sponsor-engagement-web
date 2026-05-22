@@ -69,7 +69,7 @@ export default function ClosureReviewPage({ study }: Readonly<ClosureOfStudyProp
                     <h1 className="govuk-heading-l govuk-!-margin-bottom-4">Closure of study</h1>
 
                     <span className="govuk-body-m text-darkGrey block">
-                        <span className="govuk-visually-hidden">Guidance: </span>
+                        <span className="govuk-visually-hidden">Guidance: </span>{' '}
                         Ensure all information is correct before submitting. You must select “Submit and close” at the end for any
                         action to take place.
                     </span>

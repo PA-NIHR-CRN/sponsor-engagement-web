@@ -144,7 +144,7 @@ export default function ClosureOfStudy({ study }: Readonly<ClosureOfStudyProps>)
             <div className="lg:flex lg:gap-6">
                 <div className="w-full">
                     <h2 className="govuk-heading-l govuk-!-margin-bottom-6">
-                        <span className="govuk-visually-hidden">Page title: </span>
+                        <span className="govuk-visually-hidden">Page title: </span>{' '}
                         Closure of study
                     </h2>
 
