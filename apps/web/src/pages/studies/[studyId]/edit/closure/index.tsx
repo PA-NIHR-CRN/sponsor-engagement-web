@@ -43,7 +43,7 @@ const renderBackLink = (returnUrl: string) => (
     </div>
 )
 
-export default function ClosureOfStudy({ study }: ClosureOfStudyProps) {
+export default function ClosureOfStudy({ study }: Readonly<ClosureOfStudyProps>) {
     const router = useRouter()
     const { draft, setDraft } = useClosureDraft()
 
@@ -184,7 +184,7 @@ export default function ClosureOfStudy({ study }: ClosureOfStudyProps) {
                                         label="Is final recruitment total correct?"
                                         labelSize="m"
                                         name={field.name}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => field.onChange(e.target.value as YesNo)}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => field.onChange(e.target.value)}
                                         defaultValue={field.value}
                                     >
                                         <Radio label="Yes" value="YES" />
@@ -221,7 +221,7 @@ export default function ClosureOfStudy({ study }: ClosureOfStudyProps) {
                                         label="Did the UK performance deliver inline with expectations?"
                                         labelSize="m"
                                         name={field.name}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => field.onChange(e.target.value as YesNo)}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => field.onChange(e.target.value)}
                                         defaultValue={field.value}
                                     >
                                         <Radio label="Yes" value="YES" />

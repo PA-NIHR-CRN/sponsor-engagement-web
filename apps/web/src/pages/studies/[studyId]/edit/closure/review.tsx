@@ -16,7 +16,7 @@ import { closureDraftStorageKey } from '@/utils/storageKeys'
 import { ClosureOfStudyProps } from '.'
 import { useRouter } from 'next/router'
 
-export default function ClosureReviewPage({ study }: ClosureOfStudyProps) {
+export default function ClosureReviewPage({ study }: Readonly<ClosureOfStudyProps>) {
     const { draft } = useClosureDraft()
     const router = useRouter()
 

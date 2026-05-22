@@ -7,7 +7,6 @@ import { SessionProvider } from 'next-auth/react'
 import type { ReactElement, ReactNode } from 'react'
 
 import { primaryFont, RootLayout } from '../components/organisms'
-import { ClosureDraftProvider } from '@/context/closureDraftContext'
 
 export type NextPageWithLayout<P = Record<string, unknown>, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement, props: P) => ReactNode

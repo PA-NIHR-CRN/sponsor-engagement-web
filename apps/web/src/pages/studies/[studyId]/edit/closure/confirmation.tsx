@@ -11,7 +11,15 @@ export function ClearClosureDraftOnMount() {
     const { studyId } = router.query
 
     useEffect(() => {
-        const id = typeof studyId === 'string' ? studyId : Array.isArray(studyId) ? studyId[0] : undefined
+        let id: string | undefined
+
+        if (typeof studyId === 'string') {
+            id = studyId
+        } else if (Array.isArray(studyId)) {
+            id = studyId[0]
+        } else {
+            id = undefined
+        }
         if (!id) return
 
         try {

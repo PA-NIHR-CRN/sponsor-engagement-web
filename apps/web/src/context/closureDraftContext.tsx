@@ -79,13 +79,15 @@ const coerceClosureDraft = (value: unknown): ClosureDraft => {
   }
 }
 
+type ClosureDraftProviderProps = Readonly<{
+  children: React.ReactNode
+  studyId: string
+}>
+
 export function ClosureDraftProvider({
   children,
   studyId,
-}: {
-  children: React.ReactNode
-  studyId: string
-}) {
+}: ClosureDraftProviderProps) {
   const [draft, setDraft] = useState<ClosureDraft>({})
 
   const storageKey = useMemo(() => closureDraftStorageKey(studyId), [studyId])

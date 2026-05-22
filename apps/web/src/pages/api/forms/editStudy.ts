@@ -44,6 +44,18 @@ export interface ExtendedNextApiRequest extends NextApiRequest {
   body: EditStudy | (EditStudy & Partial<DateFieldWithParts>)
 }
 
+const yesNoText = (v?: boolean) => {
+  let result = 'None provided'
+
+  if (v === true) {
+    result = 'Yes'
+  } else if (v === false) {
+    result = 'No'
+  }
+
+  return result
+}
+
 export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], async (req, res, session) => {
   const { DISABLE_DIRECT_STUDY_UPDATES } = process.env
 
@@ -150,27 +162,26 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
           : undefined,
       }
 
-      const yesNoText = (v?: boolean) => (v === true ? 'Yes' : v === false ? 'No' : 'None provided')
-
       const buildClosedAdditionalNote = (inputs: ClosedNoteInputs) =>
         `Final Recruitment Target correct: ${yesNoText(inputs.finalRecruitmentTargetCorrect)};\r\n ` +
         `Performance Aligned To Expectations: ${yesNoText(inputs.performanceAlignedToExpectations)};\r\n ` +
         `Performance Explainer: ${inputs.performanceExplainer || 'None provided'};\r\n ` +
         `Further information: ${inputs.furtherInformation || 'None provided'};\r\n ` +
-        `UK recruitment target: ${Number.isFinite(inputs.ukRecruitmentTarget as number) ? inputs.ukRecruitmentTarget : 'None provided'};\r\n ` + 
-          `SE Audit History Id: ${transactionId}`;
+        `UK recruitment target: ${Number.isFinite(inputs.ukRecruitmentTarget) ? inputs.ukRecruitmentTarget : 'None provided'};\r\n ` +
+        `SE Audit History Id: ${transactionId}`;
 
 
       const isNewlySuspended =
         suspendedStatuses.includes(studyDataToUpdate.status) &&
         !suspendedStatuses.includes(originalValues?.status ?? '')
 
-      const additionalNote =
-        isClosed
-          ? buildClosedAdditionalNote(closedNoteInputs)
-          : isNewlySuspended
-            ? UPDATE_FROM_SE_TEXT
-            : ''
+      let additionalNote = ''
+
+      if (isClosed) {
+        additionalNote = buildClosedAdditionalNote(closedNoteInputs)
+      } else if (isNewlySuspended) {
+        additionalNote = UPDATE_FROM_SE_TEXT
+      }
 
       const { study, error: updateStudyError } = await updateStudyInCPMS(Number(studyDataToUpdate.cpmsId), {
         ...cpmsStudyInput,
