@@ -22,7 +22,7 @@ export default function ClosureReviewPage({ study }: Readonly<ClosureOfStudyProp
 
     const studyId = draft.studyId
     const editStep1Href = `/studies/${studyId}/edit`
-    const editStep2Href = `/studies/${studyId}/closure`
+    const editStep2Href = `/studies/${studyId}/edit/closure`
 
     const formatDateParts = (parts?: DateInputValue | null) => {
         const iso = constructDateStrFromParts(parts ?? null, true)
