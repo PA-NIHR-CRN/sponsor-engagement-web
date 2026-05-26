@@ -31,11 +31,12 @@ import { STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/routes'
 import { useFormListeners } from '@/hooks/useFormListeners'
 import { getNotificationBanner } from '@/lib/contentful/contentfulService'
 import { getSponsorOrgName, getSupportOrgName } from '@/lib/organisations'
-import { getStudiesForOrgs } from '@/lib/studies'
+import { getStudiesForOrgs, mapFilterStatusesToStatuses } from '@/lib/studies'
 import { formatDate } from '@/utils/date'
 import { getFiltersFromQuery } from '@/utils/filters'
 import { pluraliseStudy } from '@/utils/pluralise'
 import { withServerSideProps } from '@/utils/withServerSideProps'
+import { StudyStatusFilters } from '@/components/molecules/Filters/StudyStatusFilters'
 
 const renderNotificationBanner = (success: string | undefined, showRequestSupportLink: boolean) =>
   success || !Number.isNaN(Number(success)) ? (
@@ -90,10 +91,10 @@ export default function Studies({
 
           <div className="govuk-!-margin-bottom-4">
             <Tag className="flex items-center gap-2 govuk-!-padding-3 block w-full">
-                <AlertIcon />
-                <strong className="govuk-heading-s govuk-!-margin-bottom-0">
-                  There are {totalItemsDue} studies needing action
-                </strong>
+              <AlertIcon />
+              <strong className="govuk-heading-s govuk-!-margin-bottom-0">
+                There are {totalItemsDue} studies needing action
+              </strong>
             </Tag>
           </div>
 
@@ -119,6 +120,7 @@ export default function Studies({
               filters={filters}
               onFilterChange={handleFilterChange}
               searchLabel="Search study title, protocol number, IRAS ID or CPMS ID"
+              renderExtraFilters={({ onChange }) => (<StudyStatusFilters selected={filters.status} onChange={onChange} disabled={isLoading} />)}
             />
           </div>
 
@@ -161,10 +163,10 @@ export default function Studies({
                             shortTitle={study.shortTitle}
                             sponsorOrgName={getSponsorOrgName(study.organisations)}
                             studyHref={`${STUDIES_PAGE}/${study.id}`}
-                            studyStatus = {study.studyStatus}
+                            studyStatus={study.studyStatus}
                             supportOrgName={getSupportOrgName(study.organisations)}
                             trackStatus={study.lastAssessment?.status.name}
-                            willRecruitWithinTimeline = {study.willRecruitWithinTimeline}
+                            willRecruitWithinTimeline={study.willRecruitWithinTimeline}
                             firstType={study.StudyFirst?.type}
                           />
                         </li>
@@ -255,15 +257,19 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
     const searchTerm = searchParams.get('q')
     const sortOrder = searchParams.get('order') as OrderType
 
+    const filters = getFiltersFromQuery(context.query)
+
+    const statusFilter = mapFilterStatusesToStatuses(filters.status);
+
     const studies = await getStudiesForOrgs({
       organisationIds,
       searchTerm,
       currentPage: initialPage,
       pageSize: STUDIES_PER_PAGE,
       sortOrder,
+      status: statusFilter
     })
 
-    const filters = getFiltersFromQuery(context.query)
     const entry: Entry<TypeBannerSkeleton> | null = await getNotificationBanner()
 
     return {

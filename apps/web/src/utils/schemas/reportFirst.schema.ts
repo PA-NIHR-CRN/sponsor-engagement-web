@@ -46,6 +46,18 @@ const requiredDate = z
         path: [],
       })
     }
+
+    const today = new Date()
+    const dateOnly = new Date(y, m - 1, d) // already midnight local
+    const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+
+    if (dateOnly > todayOnly) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'First patient / First visit date must be today or in the past',
+        path: [],
+      })
+    }
   })
 
 
