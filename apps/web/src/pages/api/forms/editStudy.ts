@@ -185,7 +185,7 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
 
       const { study, error: updateStudyError } = await updateStudyInCPMS(Number(studyDataToUpdate.cpmsId), {
         ...cpmsStudyInput,
-        CurrentLsn: beforeLSN?.trim() === '' ? null : beforeLSN?.trim(),
+        CurrentLsn: beforeLSN?.trim() || null,
         notes: additionalNote,
       })
 

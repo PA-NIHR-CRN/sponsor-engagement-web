@@ -250,7 +250,7 @@ export default function EditStudy({ study, currentLSN, query, managedContent }: 
         <div className="w-full">
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">
             <span className="govuk-visually-hidden">Page title: </span>
-            {managedContent?.pageTitle.toString()}
+            {managedContent?.pageTitle as string}
           </h2>
           <span className="govuk-body-m mb-0 text-darkGrey">
             <span className="govuk-visually-hidden">Study sponsor: </span>
