@@ -9,7 +9,7 @@ function TagCollection({
     tags,
 }: Readonly<TagCollectionProps>) {
     return (
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2 max-w-full">
             {tags.map((tag) => (
                 <Tag key={tag.text} {...tag} />
             ))}

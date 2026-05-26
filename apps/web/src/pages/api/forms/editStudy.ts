@@ -106,20 +106,69 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
       : validationResult.StudyUpdateRoute === StudyUpdateRoute.Direct
 
     let afterLSN = ''
+    const transactionId = uuid()
 
     if (isDirectUpdate) {
-      // Only send additional note if new status is Suspended and not the original status
-      // i.e. a status has been changed to Suspended
+      // Only send additional note if new status is Suspended or Closed and not the original status
+      // i.e. a status has been changed to Suspended or Closed
       const suspendedStatuses: string[] = [
         Status.SuspendedFromOpenToRecruitment,
         Status.SuspendedFromOpenWithRecruitment,
         Status.Suspended,
       ]
+
+      const closedStatuses: string[] = [
+        Status.ClosedToRecruitment,
+        Status.ClosedToRecruitmentInFollowUp,
+        Status.ClosedToRecruitmentNoFollowUp
+      ]
+
+      type ClosedNoteInputs = {
+        finalRecruitmentTargetCorrect: boolean;
+        performanceAlignedToExpectations: boolean;
+        performanceExplainer: string;
+        furtherInformation: string;    
+        ukRecruitmentTarget: number;      
+      };
+
+      //Test data
+      const closedNoteInputs: ClosedNoteInputs = {
+        finalRecruitmentTargetCorrect: true,
+        performanceAlignedToExpectations: false,
+        performanceExplainer: "Test performance explainer",
+        furtherInformation: "Test further information",
+        ukRecruitmentTarget: 250
+      }
+
+      const yesNo = (v: boolean) => (v ? "Yes" : "No");
+
+      const buildClosedAdditionalNote = (inputs: ClosedNoteInputs) =>
+          `Final Recruitment Target Correct: ${yesNo(inputs.finalRecruitmentTargetCorrect)};\r\n ` +
+          `Performance Aligned To Expectations: ${yesNo(inputs.performanceAlignedToExpectations)};\r\n ` +
+          `Performance Explainer: ${inputs.performanceExplainer?.trim() || "None Provided"};\r\n ` +
+          `Further Information: ${inputs.furtherInformation?.trim() || "None Provided"};\r\n ` +
+          `UK Recruitment Target: ${
+              Number.isFinite(inputs.ukRecruitmentTarget)
+                  ? inputs.ukRecruitmentTarget
+                  : "None Provided"
+          };\r\n ` +
+          `SE Audit History Id: ${transactionId}`;
+
+
+
+      const isClosed = closedStatuses.includes(studyDataToUpdate.status);
+      const isNewlySuspended =
+          suspendedStatuses.includes(studyDataToUpdate.status) &&
+          !suspendedStatuses.includes(originalValues?.status ?? "");
+
       const additionalNote =
-        suspendedStatuses.includes(studyDataToUpdate.status) &&
-        !suspendedStatuses.includes(originalValues?.status ?? '')
-          ? UPDATE_FROM_SE_TEXT
-          : ''
+          isClosed
+              ? buildClosedAdditionalNote(closedNoteInputs)
+              : isNewlySuspended
+                  ? UPDATE_FROM_SE_TEXT
+                  : "";
+
+
 
       const { study, error: updateStudyError } = await updateStudyInCPMS(Number(studyDataToUpdate.cpmsId), {
         ...cpmsStudyInput,
@@ -133,8 +182,6 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
 
       afterLSN = study.UpdateLsn
     }
-
-    const transactionId = uuid()
 
     await logStudyUpdate(
       Number(studyId),
