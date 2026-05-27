@@ -106,8 +106,12 @@ export function Filters({ filters, onFilterChange, searchLabel, renderExtraFilte
           </div>
         </div>
 
-        {hasExtraFilters && filtersOpen ? (
-          <div id={extraPanelId} className="govuk-inset-text govuk-!-margin-top-4 govuk-!-margin-bottom-4">
+        {hasExtraFilters ? (
+          <div
+            id={extraPanelId}
+            className={clsx('govuk-inset-text govuk-!-margin-top-4 govuk-!-margin-bottom-4', !filtersOpen && 'hidden')}
+            aria-hidden={!filtersOpen}
+          >
             {renderExtraFilters({
               onChange,
               isOpen: filtersOpen,
