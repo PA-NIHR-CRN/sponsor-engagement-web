@@ -12,7 +12,6 @@ import type { OrderType, StatusFilter } from '../@types/filters'
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
 import { type OrganisationRoleShortName, organisationRoleShortName } from './organisations'
 import { Prisma, prismaClient } from './prisma'
-import { StudyStatusFilters } from '@/components/molecules/Filters/StudyStatusFilters'
 
 export type StudyEvalsWithoutGeneratedValues = Prisma.StudyEvaluationCategoryGetPayload<{
   select: {

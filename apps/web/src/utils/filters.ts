@@ -2,7 +2,7 @@ import type { ParsedUrlQuery } from 'node:querystring'
 
 import type { Filters, OrderType, StatusFilter } from '../@types/filters'
 
-const ALLOWED_STATUSES: StatusFilter[] = ['in-setup', 'open', 'suspended']
+const ALLOWED_STATUSES = new Set<StatusFilter>(['in-setup', 'open', 'suspended'])
 
 const toStringArray = (value: string | string[] | undefined): string[] => {
   if (!value) return []
@@ -10,7 +10,7 @@ const toStringArray = (value: string | string[] | undefined): string[] => {
 }
 
 const isAllowedStatus = (value: string): value is StatusFilter =>
-  ALLOWED_STATUSES.includes(value as StatusFilter)
+  ALLOWED_STATUSES.has(value as StatusFilter)
 
 export const getFiltersFromQuery = (query: ParsedUrlQuery): Filters => {
   const filters: Filters = {

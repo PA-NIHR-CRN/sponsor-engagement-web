@@ -21,7 +21,7 @@ export interface FiltersProps {
   }) => React.ReactNode
 }
 
-export function Filters({ filters, onFilterChange, searchLabel, renderExtraFilters }: FiltersProps) {
+export function Filters({ filters, onFilterChange, searchLabel, renderExtraFilters }: Readonly<FiltersProps>) {
   const formRef = useRef<HTMLFormElement | null>(null)
   const { onChange, onSubmit } = useFilters(formRef, onFilterChange)
   const [searchInputText, setSearchInputText] = useState(filters.q ?? '')

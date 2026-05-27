@@ -16,11 +16,11 @@ export function StudyStatusFilters({
   selected = [],
   onChange,
   disabled,
-}: {
+}: Readonly<{
   selected?: StatusFilter[]
   onChange: () => void
   disabled?: boolean
-}) {
+}>) {
   return (
     <fieldset className="govuk-fieldset" aria-describedby="study-status-hint">
       <legend className="govuk-fieldset__legend govuk-fieldset__legend--s govuk-!-margin-bottom-4">
