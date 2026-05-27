@@ -161,7 +161,7 @@ export default function ClosureOfStudy({ study }: Readonly<ClosureOfStudyProps>)
                     <dl className="govuk-summary-list govuk-summary-list--no-border govuk-!-margin-top-6 govuk-!-margin-bottom-6">
                         <div className="govuk-summary-list__row">
                             <dt className="govuk-summary-list__key">UK recruitment target</dt>
-                            <dd className="govuk-summary-list__value">{study.sampleSize ?? '-'}</dd>
+                            <dd className="govuk-summary-list__value">{draft.recruitmentTarget ?? '-'}</dd>
                         </div>
 
                         <div className="govuk-summary-list__row">
