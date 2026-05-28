@@ -101,7 +101,14 @@ export default function ClosureReviewPage({ study }: Readonly<ClosureOfStudyProp
 
                         <div className="govuk-summary-list__row">
                             <dt className="govuk-summary-list__key">Final recruitment total correct</dt>
-                            <dd className="govuk-summary-list__value">{yesNoLabel(draft.isFinalRecruitmentTotalCorrect)}</dd>
+                            <dd className="govuk-summary-list__value">
+                                <p className="govuk-body govuk-!-margin-bottom-1">{yesNoLabel(draft.isFinalRecruitmentTotalCorrect)}</p>
+                                {draft.correctedRecruitmentTotal ? (
+                                    <p className="govuk-body-s govuk-!-margin-bottom-0 text-darkGrey">
+                                        Corrected recruitment total: {draft.correctedRecruitmentTotal}
+                                    </p>
+                                ) : null}
+                            </dd>
                             <dd className="govuk-summary-list__actions">
                                 <Link className="govuk-link" href={editStep2Href}>
                                     Edit<span className="govuk-visually-hidden"> final recruitment total correct</span>

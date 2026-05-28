@@ -146,6 +146,7 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
 
       type ClosedNoteInputs = {
         finalRecruitmentTargetCorrect?: boolean
+        correctedRecruitmentTotal?: string
         performanceAlignedToExpectations?: boolean
         performanceExplainer?: string
         furtherInformation?: string
@@ -154,6 +155,7 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
 
       const closedNoteInputs: ClosedNoteInputs = {
         finalRecruitmentTargetCorrect: yesNoToBool((req.body as any).isFinalRecruitmentTotalCorrect),
+        correctedRecruitmentTotal: cleanText((req.body as any).correctedRecruitmentTotal),
         performanceAlignedToExpectations: yesNoToBool((req.body as any).didPerformanceDeliverInline),
         performanceExplainer: cleanText((req.body as any).performanceNoReason),
         furtherInformation: cleanText((req.body as any).closureFurtherInformation),
@@ -164,6 +166,9 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
 
       const buildClosedAdditionalNote = (inputs: ClosedNoteInputs) =>
         `Final Recruitment Target correct: ${yesNoText(inputs.finalRecruitmentTargetCorrect)};\r\n ` +
+        `${inputs.correctedRecruitmentTotal?.trim()
+          ? `Corrected recruitment total: ${inputs.correctedRecruitmentTotal.trim()};\r\n `
+          : ''}\r\n` +
         `Performance Aligned To Expectations: ${yesNoText(inputs.performanceAlignedToExpectations)};\r\n ` +
         `Performance Explainer: ${inputs.performanceExplainer || 'None provided'};\r\n ` +
         `Further information: ${inputs.furtherInformation || 'None provided'};\r\n ` +
