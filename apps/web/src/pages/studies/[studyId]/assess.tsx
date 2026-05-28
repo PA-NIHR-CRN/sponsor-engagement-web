@@ -23,7 +23,7 @@ import { getStudyById } from '@/lib/studies'
 import { getValuesFromSearchParams } from '@/utils/form'
 import { RichTextRenderer } from '@/utils/Renderers/RichTextRenderer/RichTextRenderer'
 import type { AssessmentInputs } from '@/utils/schemas/assessment.schema'
-import { assessmentSchema } from '@/utils/schemas/assessment.schema'
+import { buildAssessmentSchema } from '@/utils/schemas/assessment.schema'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
 export type AssessmentProps = InferGetServerSidePropsType<typeof getServerSideProps>
@@ -37,12 +37,17 @@ export default function Assessment({
   assessments,
   managedContent,
 }: AssessmentProps) {
+  const studyHasNotRecruitedWithinSixMonths = study.evaluationCategories.find(indicator => indicator.indicatorValue === 'No recruitment in past 6 months') ? true : false
+
+  const schema = buildAssessmentSchema(studyHasNotRecruitedWithinSixMonths)
+
   const { register, formState, setError, watch, handleSubmit } = useForm<AssessmentInputs>({
-    resolver: zodResolver(assessmentSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
-      ...getValuesFromSearchParams(assessmentSchema, query),
+      ...getValuesFromSearchParams(schema, query),
       studyId: String(study.id),
     },
+    shouldUnregister: true,
   })
 
   const handleFoundError = useCallback(
@@ -53,7 +58,7 @@ export default function Assessment({
   )
 
   const { errors } = useFormErrorHydration<AssessmentInputs>({
-    schema: assessmentSchema,
+    schema,
     formState,
     onFoundError: handleFoundError,
   })
@@ -90,8 +95,6 @@ export default function Assessment({
         return description
     }
   }
-
-  const studyHasNoRecruitedWithinSixMonths = study.evaluationCategories.find(indicator => indicator.indicatorValue === 'No recruitment in past 6 months')
 
   return (
     <Container>
@@ -160,14 +163,14 @@ export default function Assessment({
               </RadioGroup>
 
               {/* Reason for no recruitment in the last 6 months text */}
-              {studyHasNoRecruitedWithinSixMonths ?
+              {studyHasNotRecruitedWithinSixMonths ?
                 <Textarea
-                  defaultValue={defaultValues?.reasonForNoRecruitment}
+                  defaultValue=''
                   errors={errors}
                   label='Study has not recruited for 6 months'
                   hint='Provide reasoning for no recruitment '
                   remainingCharacters={reasonForNoRecruitmentremainingCharacters}
-                  required={false}
+                  required
                   {...register('reasonForNoRecruitment')}
                 /> : null}
 

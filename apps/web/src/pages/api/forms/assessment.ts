@@ -1,43 +1,56 @@
 import { logger } from '@nihr-ui/logger'
 import type { Prisma } from 'database'
 import type { NextApiRequest } from 'next'
-import { ZodError } from 'zod'
+import { ZodError, z } from 'zod'
 
 import { Roles } from '@/constants'
 import { getAssessmentPageRoute } from '@/constants/routes'
 import { prismaClient } from '@/lib/prisma'
-import type { AssessmentInputs } from '@/utils/schemas'
-import { assessmentSchema } from '@/utils/schemas'
+import { buildAssessmentSchema } from '@/utils/schemas'
 import { withApiHandler } from '@/utils/withApiHandler'
 
-export interface ExtendedNextApiRequest extends NextApiRequest {
-  body: AssessmentInputs
-}
+const preSchema = z.object({
+  studyId: z.union([z.string(), z.number()]).transform((v) => String(v)),
+})
 
-export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], async (req, res, session) => {
+export default withApiHandler([Roles.SponsorContact], async (req, res, session) => {
   try {
-    if (req.method !== 'POST') {
-      throw new Error('Wrong method')
+    if (req.method !== 'POST') throw new Error('Wrong method')
+
+    const { studyId } = preSchema.parse(req.body)
+
+    const study = await prismaClient.study.findUnique({
+      where: { id: Number(studyId) },
+      select: {
+        id: true,
+        evaluationCategories: true,
+      },
+    })
+
+    if (!study) {
+      return res.redirect(302, `/404`)
     }
 
-    const { studyId, status, furtherInformation, furtherInformationText, reasonForNoRecruitment } = assessmentSchema.parse(req.body)
+    const studyHasNotRecruitedWithinSixMonths = Boolean(
+      study.evaluationCategories?.find(
+        (indicator: any) => indicator.indicatorValue === 'No recruitment in past 6 months',
+      ),
+    )
+
+    const schema = buildAssessmentSchema(studyHasNotRecruitedWithinSixMonths)
+
+    const { status, furtherInformation, furtherInformationText, reasonForNoRecruitment } = schema.parse(req.body)
 
     const furtherInformationInputs: Prisma.AssessmentFurtherInformationUncheckedCreateWithoutAssessmentInput[] = []
 
-    // Create a furtherInformation record for each selected checkbox
     if (Array.isArray(furtherInformation)) {
       for (const id of furtherInformation) {
-        furtherInformationInputs.push({
-          furtherInformationId: Number(id),
-        })
+        furtherInformationInputs.push({ furtherInformationId: Number(id) })
       }
     }
 
-    // Create a record for the furtherInformation text field
     if (furtherInformationText) {
-      furtherInformationInputs.push({
-        furtherInformationText,
-      })
+      furtherInformationInputs.push({ furtherInformationText })
     }
 
     const assessmentResult = await prismaClient.assessment.create({
@@ -45,67 +58,53 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
         createdById: session.user.id,
         studyId: Number(studyId),
         statusId: Number(status),
-        reasonForNoRecruitment: reasonForNoRecruitment,
+        reasonForNoRecruitment: reasonForNoRecruitment ?? null,
         furtherInformation: {
-          createMany: {
-            data: furtherInformationInputs,
-          },
+          createMany: { data: furtherInformationInputs },
         },
       },
     })
 
     logger.info(`Added assessment with id: ${assessmentResult.id}`)
 
-    const studyResult = await prismaClient.study.update({
-      where: {
-        id: Number(studyId),
-      },
+    await prismaClient.study.update({
+      where: { id: Number(studyId) },
       data: {
         dueAssessmentAt: null,
         lastAssessmentId: assessmentResult.id,
       },
     })
 
-    logger.info(`Updated study with id: ${studyResult.id}`)
-
-    // Redirect back to study detail page
     if (String(req.query.returnUrl).includes(studyId)) {
       return res.redirect(302, `/studies/${studyId}?success=1`)
     }
-
-    // Otherwise, redirect back to studies list page
     return res.redirect(302, `/studies?success=1`)
   } catch (error) {
     logger.error(error)
 
-    const studyId = req.body.studyId
+    const studyId = (req.body?.studyId ?? '') as string
 
     if (error instanceof ZodError) {
-      // Create an object containing the Zod validation errors
       const fieldErrors: Record<string, string> = Object.fromEntries(
-        error.errors.map(({ path: [fieldId], message }) => [`${fieldId}Error`, message])
+        error.errors.map(({ path: [fieldId], message }) => [`${String(fieldId)}Error`, message]),
       )
 
-      // Insert the original values
-      Object.keys(assessmentSchema.shape).forEach((field) => {
-        if (req.body[field]) {
-          fieldErrors[field] = req.body[field] as string
+      const allowedFields = ['studyId', 'status', 'furtherInformation', 'furtherInformationText', 'reasonForNoRecruitment'] as const
+      for (const field of allowedFields) {
+        if (Object.prototype.hasOwnProperty.call(req.body, field)) {
+          fieldErrors[field] = Array.isArray(req.body[field]) ? req.body[field].join(',') : String(req.body[field] ?? '')
         }
-      })
+      }
 
       delete fieldErrors.studyId
 
-      const searchParams = new URLSearchParams({
-        ...fieldErrors,
-      })
+      const searchParams = new URLSearchParams(fieldErrors)
       if (req.query.returnUrl) searchParams.append('returnUrl', String(req.query.returnUrl))
 
       return res.redirect(302, `${getAssessmentPageRoute(studyId)}/?${searchParams.toString()}`)
     }
 
-    const searchParams = new URLSearchParams({
-      fatal: '1',
-    })
+    const searchParams = new URLSearchParams({ fatal: '1' })
     if (req.query.returnUrl) searchParams.append('returnUrl', String(req.query.returnUrl))
 
     return res.redirect(302, `${getAssessmentPageRoute(studyId)}/?${searchParams.toString()}`)
