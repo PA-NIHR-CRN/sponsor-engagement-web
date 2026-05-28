@@ -70,12 +70,21 @@ export function AssessmentHistory({ heading, assessments, firstItemExpanded }: A
                       ))}
                     </ul>
                   ) : null}
+
                   {assessment.furtherInformationText ? (
-                    <p className="govuk-body-s govuk-!-margin-bottom-0">{assessment.furtherInformationText}</p>
+                    <p className="govuk-body-s govuk-!-margin-bottom-0">
+                      <strong>Further information:</strong>{' '}
+                      <span className="whitespace-pre-wrap">{assessment.furtherInformationText}</span>
+                    </p>
                   ) : null}
+
                   {assessment.reasonForNoRecruitment ? (
-                    <p className="govuk-body-s govuk-!-margin-bottom-0">Reason for not recruiting for 6 months: {assessment.reasonForNoRecruitment}</p>
+                    <p className="govuk-body-s govuk-!-margin-bottom-0">
+                      <strong>Reason for not recruiting for 6 months:</strong>{' '}
+                      <span className="whitespace-pre-wrap">{assessment.reasonForNoRecruitment}</span>
+                    </p>
                   ) : null}
+
                 </AccordionContent>
               </AccordionItem>
             </Accordion>

@@ -68,20 +68,6 @@ export default function Assessment({
     onFoundError: handleFoundError,
   })
 
-  // Watch & update the character count for the "Support summary" textarea
-  const furtherInformationText = watch('furtherInformationText') ?? ''
-  const remainingCharacters =
-    furtherInformationText.length >= TEXTAREA_MAX_CHARACTERS
-      ? 0
-      : TEXTAREA_MAX_CHARACTERS - furtherInformationText.length
-
-  // Watch & update the character count for the "no recruitment" textarea
-  const reasonForNoRecruitmentText = watch('reasonForNoRecruitment') ?? ''
-  const reasonForNoRecruitmentremainingCharacters =
-    reasonForNoRecruitmentText.length >= TEXTAREA_MAX_CHARACTERS
-      ? 0
-      : TEXTAREA_MAX_CHARACTERS - reasonForNoRecruitmentText.length
-
   const { defaultValues } = formState
 
   const { organisationsByRole } = study
@@ -178,7 +164,6 @@ export default function Assessment({
                   label="Study has not recruited for 6 months"
                   hint="Provide reasoning for no recruitment"
                   maxLength={TEXTAREA_MAX_CHARACTERS}
-                  remainingCharacters={reasonForNoRecruitmentremainingCharacters}
                   required
                 />
                 : null}
@@ -207,8 +192,8 @@ export default function Assessment({
                 label={
                   managedContent?.furtherInformationLabel ? (managedContent.furtherInformationLabel as string) : ''
                 }
-                remainingCharacters={remainingCharacters}
                 required={false}
+                maxLength={TEXTAREA_MAX_CHARACTERS}
                 {...register('furtherInformationText')}
               />
 
