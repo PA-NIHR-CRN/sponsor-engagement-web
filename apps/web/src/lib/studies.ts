@@ -3,12 +3,12 @@ import dayjs from 'dayjs'
 import { setStudyAssessmentDue, setStudyAssessmentNotDue as setStudyAssessmentNotDueUtil } from 'shared-utilities'
 
 import type { ActionKey, Study, StudyEvaluationCategory } from '@/@types/studies'
-import { INDICATOR_TO_ACTION,Status as CPMSStatus } from '@/@types/studies'
+import { INDICATOR_TO_ACTION, Status as CPMSStatus, Status } from '@/@types/studies'
 import type { TagProps } from '@/components/atoms/Tag/Tag'
 import { FormStudyStatus } from '@/constants/editStudyForm'
 import { getErrorMessage } from '@/utils/error'
 
-import type { OrderType } from '../@types/filters'
+import type { OrderType, StatusFilter } from '../@types/filters'
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
 import { type OrganisationRoleShortName, organisationRoleShortName } from './organisations'
 import { Prisma, prismaClient } from './prisma'
@@ -128,12 +128,14 @@ export const getStudiesForOrgs = async ({
   pageSize,
   searchTerm,
   sortOrder,
+  status,
 }: {
   organisationIds: number[]
   currentPage: number
   pageSize: number
   searchTerm: string | null
   sortOrder: OrderType
+  status?: Status[]
 }) => {
   const query = {
     skip: currentPage * pageSize - pageSize,
@@ -164,6 +166,9 @@ export const getStudiesForOrgs = async ({
           },
           ...(Number(searchTerm) ? [{ cpmsId: Number(searchTerm) }] : []),
         ],
+      }),
+      ...(status?.length && {
+        studyStatus: { in: status },
       }),
       organisations: {
         some: {
@@ -263,7 +268,7 @@ export const getStudyTitlesForOrgs = async ({
       shortTitle: true,
       irasId: true,
     },
-    orderBy: [ { shortTitle: Prisma.SortOrder.asc }],
+    orderBy: [{ shortTitle: Prisma.SortOrder.asc }],
   }
 
   const [studies] = await prismaClient.$transaction([
@@ -378,6 +383,38 @@ export const mapFormStatusToCPMSStatus = (newStatus: string, currentStatus: stri
 
   return statusMap[newStatus] || newStatus
 }
+
+export const mapFilterStatusesToStatuses = (
+  filterStatuses: StatusFilter[] | undefined
+): Status[] | undefined => {
+  const filterStatusMap: Record<StatusFilter, Status[]> = {
+    'in-setup': [
+      Status.InSetup,
+      Status.InSetupPendingNHSPermission,
+      Status.InSetupApprovalReceived,
+      Status.InSetupPendingApproval,
+      Status.InSetupNHSPermissionReceived],
+    open: [
+      Status.OpenToRecruitment,
+      Status.OpenWithRecruitment,
+    ],
+    suspended: [
+      Status.Suspended,
+      Status.SuspendedFromOpenWithRecruitment,
+      Status.SuspendedFromOpenToRecruitment,
+    ],
+  }
+
+  if (!filterStatuses?.length) {
+    return undefined
+  }
+
+  const mapped = filterStatuses.flatMap((s) => filterStatusMap[s] ?? [])
+  const unique = Array.from(new Set(mapped))
+
+  return unique.length ? unique : undefined
+}
+
 
 export const mapCPMSStudyToSEStudy = (study: Study): UpdateStudyInput => ({
   cpmsId: study.StudyId,
@@ -553,20 +590,21 @@ export const setStudyAssessmentNotDue = async (studyIds: number[]) => {
 }
 
 export function getDaysSinceAssessmentDue(dueAssessmentAt: Date | null): number | null {
-    const today = dayjs();
-  
-    return dueAssessmentAt
-      ? Math.round(today.diff(dueAssessmentAt, 'day', true))
-      : null
+  const today = dayjs();
+
+  return dueAssessmentAt
+    ? Math.round(today.diff(dueAssessmentAt, 'day', true))
+    : null
 }
+
+const isAssessmentDueIndicator = (indicator: string | undefined) => indicator?.startsWith('Assessment due for')
 
 export function getAssessmentDueIndicator(
   hasAssessmentDue: boolean,
   daysSinceAssessmentDue: number | null
 ): string | null {
-  
-  if (!hasAssessmentDue || daysSinceAssessmentDue === null)
-  {
+
+  if (!hasAssessmentDue || daysSinceAssessmentDue === null) {
     return null
   };
 
@@ -576,7 +614,7 @@ export function getAssessmentDueIndicator(
 }
 
 function getActionKeyForIndicator(indicator: string): ActionKey | null {
-  if (indicator.startsWith('Assessment due for')) {
+  if (isAssessmentDueIndicator(indicator)) {
     return 'ASSESS_STUDY';
   }
 
@@ -623,6 +661,16 @@ export function buildSummaryRows(indicators: string[], basePath: string) {
 
     grouped.get(actionKey)?.push({ text: indicator });
   });
+
+  // Remove ASSESS_STUDY if an assessment is not due regardless of other indicators
+  const assessTags = grouped.get('ASSESS_STUDY')
+  if (assessTags) {
+    const hasAssessmentDueIndicators = assessTags.some((t) => isAssessmentDueIndicator(t.text))
+    logger.info(hasAssessmentDueIndicators)
+    if (!hasAssessmentDueIndicators) {
+      grouped.delete('ASSESS_STUDY')
+    }
+  }
 
   return Array.from(grouped.entries()).map(([actionKey, tags]) => {
     const { path, actionText } = ACTION_CONFIG[actionKey]

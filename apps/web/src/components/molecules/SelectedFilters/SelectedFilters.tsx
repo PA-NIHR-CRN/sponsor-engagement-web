@@ -8,6 +8,7 @@ import type { ReactNode } from 'react'
 
 import type { FilterKey, Filters, FilterValue } from '@/@types/filters'
 import { SELECTABLE_FILTERS } from '@/constants'
+import { STATUS_LABEL } from '../Filters/StudyStatusFilters'
 
 export interface SelectedFiltersProps {
   filters: Filters
@@ -48,20 +49,27 @@ function SelectedFilter({ children, name, value }: { name: string; value?: strin
   )
 }
 
-const renderSelectedFilters = (name: FilterKey, value: FilterValue, index: number) => {
+const renderSelectedFilters = (name: FilterKey, value: FilterValue) => {
   if (!value) return
 
+  const display = (raw: string) =>
+    name === 'status' ? (STATUS_LABEL[raw] ?? raw) : raw
+
   if (Array.isArray(value)) {
-    return value.map((subValue) => (
-      <SelectedFilter key={name} name={name} value={subValue as string}>
-        {subValue}
-      </SelectedFilter>
-    ))
+    return value.map((subValue) => {
+      const raw = String(subValue)
+      return (
+        <SelectedFilter key={`${name}-${raw}`} name={name} value={raw}>
+          {display(raw)}
+        </SelectedFilter>
+      )
+    })
   }
 
+  const raw = String(value)
   return (
-    <SelectedFilter key={`${name}-${index}`} name={name}>
-      {value}
+    <SelectedFilter key={`${name}-${raw}`} name={name} value={raw}>
+      {display(raw)}
     </SelectedFilter>
   )
 }
@@ -90,7 +98,7 @@ export function SelectedFilters({ filters, isLoading }: SelectedFiltersProps) {
       >
         {Object.keys(filters)
           .filter((filter) => SELECTABLE_FILTERS.includes(filter as keyof Filters))
-          .map((filter, i) => renderSelectedFilters(filter as keyof Filters, filters[filter as keyof Filters], i))}
+          .map((filter, i) => renderSelectedFilters(filter as keyof Filters, filters[filter as keyof Filters]))}
       </ul>
       <div className="order-2 ml-auto whitespace-nowrap pl-1 md:order-3">
         <Link className="govuk-link--no-visited-state govuk-body-s mb-0" href={pathname} scroll={false}>
