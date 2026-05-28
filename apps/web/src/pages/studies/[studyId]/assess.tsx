@@ -36,7 +36,7 @@ export default function Assessment({
   assessments,
   managedContent,
 }: AssessmentProps) {
-  const studyHasNotRecruitedWithinSixMonths = study.evaluationCategories.find(indicator => indicator.indicatorValue === 'No recruitment in past 6 months') ? true : false
+  const studyHasNotRecruitedWithinSixMonths = study.evaluationCategories.some(indicator => indicator.indicatorValue === 'No recruitment in past 6 months')
 
   const {
     register,
@@ -44,7 +44,6 @@ export default function Assessment({
     setError,
     handleSubmit,
     watch,
-    setValue,
   } = useForm<AssessmentInputs>({
     resolver: zodResolver(assessmentSchema),
     defaultValues: {
@@ -159,7 +158,7 @@ export default function Assessment({
             <Fieldset>
               {/* Status */}
               <RadioGroup
-                defaultValue={defaultValues?.status}
+                defaultValue=''
                 errors={errors}
                 label={managedContent?.studyProgressionQuestionLabel.toString()}
                 {...register('status')}

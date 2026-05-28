@@ -7,17 +7,9 @@ export const assessmentSchema = z
 
     studyHasNotRecruitedWithinSixMonths: z.enum(['true', 'false']).default('false'),
 
-    status: z.string({
-      errorMap: () => ({ message: 'Select how the study is progressing' }),
-    }),
+    status: z.string().optional().nullable(),
 
-    furtherInformation: z
-      .string({
-        errorMap: () => ({ message: 'Select any additional further information' }),
-      })
-      .array()
-      .nonempty()
-      .or(z.boolean()),
+    furtherInformation: z.union([z.array(z.string()), z.boolean()]).optional(),
 
     furtherInformationText: z
       .string()
@@ -34,25 +26,23 @@ export const assessmentSchema = z
       .nullable(),
   })
   .superRefine((data, ctx) => {
-    if (data.studyHasNotRecruitedWithinSixMonths !== 'true') return
-
-    const reason = data.reasonForNoRecruitment?.trim()
-
-    if (!reason) {
+    if (!data.status) {
       ctx.addIssue({
-        path: ['reasonForNoRecruitment'],
-        message: 'Please provide a reason for no recruitment',
+        path: ['status'],
         code: z.ZodIssueCode.custom,
+        message: 'Select how the study is progressing',
       })
-      return
     }
 
-    if (reason.length > TEXTAREA_MAX_CHARACTERS) {
-      ctx.addIssue({
-        path: ['reasonForNoRecruitment'],
-        message: `Must be ${TEXTAREA_MAX_CHARACTERS} characters or less`,
-        code: z.ZodIssueCode.custom,
-      })
+    if (data.studyHasNotRecruitedWithinSixMonths === 'true') {
+      const reason = data.reasonForNoRecruitment?.trim()
+      if (!reason) {
+        ctx.addIssue({
+          path: ['reasonForNoRecruitment'],
+          code: z.ZodIssueCode.custom,
+          message: 'Please provide a reason for no recruitment',
+        })
+      }
     }
   })
 
