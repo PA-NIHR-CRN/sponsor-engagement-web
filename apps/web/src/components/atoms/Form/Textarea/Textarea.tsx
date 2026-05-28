@@ -14,7 +14,7 @@ interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
   hint?: string | Document
   required?: boolean
   errors: FieldErrors
-  defaultValue?: string | undefined
+  defaultValue?: string
   remainingCharacters?: number
   maxLength?: number
 }
@@ -64,7 +64,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     }
 
     const handleInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
-      updateRemaining((e.currentTarget as HTMLTextAreaElement).value)
+      updateRemaining(e.currentTarget.value)
       onInput?.(e)
     }
 

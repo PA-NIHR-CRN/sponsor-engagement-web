@@ -43,7 +43,6 @@ export default function Assessment({
     formState,
     setError,
     handleSubmit,
-    watch,
   } = useForm<AssessmentInputs>({
     resolver: zodResolver(assessmentSchema),
     defaultValues: {
