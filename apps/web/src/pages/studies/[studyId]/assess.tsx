@@ -65,6 +65,13 @@ export default function Assessment({
       ? 0
       : TEXTAREA_MAX_CHARACTERS - furtherInformationText.length
 
+  // Watch & update the character count for the "no recruitment" textarea
+  const reasonForNoRecruitmentText = watch('reasonForNoRecruitment') ?? ''
+  const reasonForNoRecruitmentremainingCharacters =
+    reasonForNoRecruitmentText.length >= TEXTAREA_MAX_CHARACTERS
+      ? 0
+      : TEXTAREA_MAX_CHARACTERS - reasonForNoRecruitmentText.length
+
   const { defaultValues } = formState
 
   const { organisationsByRole } = study
@@ -83,6 +90,8 @@ export default function Assessment({
         return description
     }
   }
+
+  const studyHasNoRecruitedWithinSixMonths = study.evaluationCategories.find(indicator => indicator.indicatorValue === 'No recruitment in past 6 months')
 
   return (
     <Container>
@@ -149,6 +158,18 @@ export default function Assessment({
                   <Radio hint={getStudyRadioDescription(id, description)} key={id} label={name} value={String(id)} />
                 ))}
               </RadioGroup>
+
+              {/* Reason for no recruitment in the last 6 months text */}
+              {studyHasNoRecruitedWithinSixMonths ?
+                <Textarea
+                  defaultValue={defaultValues?.reasonForNoRecruitment}
+                  errors={errors}
+                  label='Study has not recruited for 6 months'
+                  hint='Provide reasoning for no recruitment '
+                  remainingCharacters={reasonForNoRecruitmentremainingCharacters}
+                  required={false}
+                  {...register('reasonForNoRecruitment')}
+                /> : null}
 
               {/* Further information */}
               <CheckboxGroup

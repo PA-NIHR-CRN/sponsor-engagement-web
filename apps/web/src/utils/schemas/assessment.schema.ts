@@ -35,5 +35,17 @@ export const assessmentSchema = z
           }
         )
       }),
+
+      reasonForNoRecruitment: z
+      .string()
+      .optional()
+      .refine((val) => {
+        return (
+          val && val.split(' ').length >= TEXTAREA_MAX_CHARACTERS,
+          {
+            message: `Please provide reasoning for no recruitment with less than the maximum of ${TEXTAREA_MAX_CHARACTERS} characters`,
+          }
+        )
+      }),
   })
   .required()

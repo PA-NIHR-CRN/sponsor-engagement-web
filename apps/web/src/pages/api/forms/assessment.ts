@@ -20,7 +20,7 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
       throw new Error('Wrong method')
     }
 
-    const { studyId, status, furtherInformation, furtherInformationText } = assessmentSchema.parse(req.body)
+    const { studyId, status, furtherInformation, furtherInformationText, reasonForNoRecruitment } = assessmentSchema.parse(req.body)
 
     const furtherInformationInputs: Prisma.AssessmentFurtherInformationUncheckedCreateWithoutAssessmentInput[] = []
 
@@ -45,6 +45,7 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
         createdById: session.user.id,
         studyId: Number(studyId),
         statusId: Number(status),
+        reasonForNoRecruitment: reasonForNoRecruitment,
         furtherInformation: {
           createMany: {
             data: furtherInformationInputs,
