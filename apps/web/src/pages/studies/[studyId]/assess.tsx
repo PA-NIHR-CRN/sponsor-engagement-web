@@ -22,8 +22,7 @@ import { prismaClient } from '@/lib/prisma'
 import { getStudyById } from '@/lib/studies'
 import { getValuesFromSearchParams } from '@/utils/form'
 import { RichTextRenderer } from '@/utils/Renderers/RichTextRenderer/RichTextRenderer'
-import type { AssessmentInputs } from '@/utils/schemas/assessment.schema'
-import { buildAssessmentSchema } from '@/utils/schemas/assessment.schema'
+import { AssessmentInputs, assessmentSchema } from '@/utils/schemas/assessment.schema'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
 export type AssessmentProps = InferGetServerSidePropsType<typeof getServerSideProps>
@@ -39,13 +38,20 @@ export default function Assessment({
 }: AssessmentProps) {
   const studyHasNotRecruitedWithinSixMonths = study.evaluationCategories.find(indicator => indicator.indicatorValue === 'No recruitment in past 6 months') ? true : false
 
-  const schema = buildAssessmentSchema(studyHasNotRecruitedWithinSixMonths)
-
-  const { register, formState, setError, watch, handleSubmit } = useForm<AssessmentInputs>({
-    resolver: zodResolver(schema),
+  const {
+    register,
+    formState,
+    setError,
+    handleSubmit,
+    watch,
+    setValue,
+  } = useForm<AssessmentInputs>({
+    resolver: zodResolver(assessmentSchema),
     defaultValues: {
-      ...getValuesFromSearchParams(schema, query),
+      ...getValuesFromSearchParams(assessmentSchema, query),
       studyId: String(study.id),
+      studyHasNotRecruitedWithinSixMonths: studyHasNotRecruitedWithinSixMonths ? 'true' : 'false',
+      reasonForNoRecruitment: null,
     },
     shouldUnregister: true,
   })
@@ -58,7 +64,7 @@ export default function Assessment({
   )
 
   const { errors } = useFormErrorHydration<AssessmentInputs>({
-    schema,
+    schema: assessmentSchema,
     formState,
     onFoundError: handleFoundError,
   })
@@ -149,6 +155,7 @@ export default function Assessment({
 
             <input type="hidden" {...register('studyId')} defaultValue={defaultValues?.studyId} />
 
+            <input type="hidden" {...register('studyHasNotRecruitedWithinSixMonths')} />
             <Fieldset>
               {/* Status */}
               <RadioGroup
@@ -164,15 +171,18 @@ export default function Assessment({
 
               {/* Reason for no recruitment in the last 6 months text */}
               {studyHasNotRecruitedWithinSixMonths ?
+
                 <Textarea
                   defaultValue=''
+                  {...register('reasonForNoRecruitment')}
                   errors={errors}
-                  label='Study has not recruited for 6 months'
-                  hint='Provide reasoning for no recruitment '
+                  label="Study has not recruited for 6 months"
+                  hint="Provide reasoning for no recruitment"
+                  maxLength={TEXTAREA_MAX_CHARACTERS}
                   remainingCharacters={reasonForNoRecruitmentremainingCharacters}
                   required
-                  {...register('reasonForNoRecruitment')}
-                /> : null}
+                />
+                : null}
 
               {/* Further information */}
               <CheckboxGroup
