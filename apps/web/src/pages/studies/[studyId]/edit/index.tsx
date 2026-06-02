@@ -166,8 +166,7 @@ export default function EditStudy({ study, currentLSN, query, managedContent }: 
 
   // Closure journey
   const selectedStatus = mapCPMSStatusToFormStatus(statusInputValue ?? study.studyStatus)
-  const isClosureJourney =
-    selectedStatus === FormStudyStatus.Closed || selectedStatus === FormStudyStatus.ClosedFollowUp
+  const isClosureJourney = selectedStatus === FormStudyStatus.Closed
 
   const showLoadingState =
     formState.isSubmitting || (formState.isSubmitSuccessful && Object.keys(errors).length === 0)
@@ -227,15 +226,12 @@ export default function EditStudy({ study, currentLSN, query, managedContent }: 
         //Open to recruitment
         return managedContent?.openToRecruitmentGuidanceText as Document
       case 3:
-        //Closed, in follow-up
-        return managedContent?.closedInFollowUpGuidanceText as Document
-      case 4:
         //Closed
         return managedContent?.closedGuidanceText as Document
-      case 5:
+      case 4:
         //Withdrawn
         return managedContent?.withdrawnGuidanceText as Document
-      case 6:
+      case 5:
         //Suspended
         return managedContent?.suspendedGuidanceText as Document
       default:
