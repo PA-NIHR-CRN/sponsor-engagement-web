@@ -1,7 +1,7 @@
 /**
  * Max amount of characters for a textarea
  */
-export const TEXTAREA_MAX_CHARACTERS = 400
+export const TEXTAREA_MAX_CHARACTERS = 500
 
 /**
  * Error messaging for different form submission failures
