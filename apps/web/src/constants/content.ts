@@ -22,3 +22,8 @@ export const DATE_FORMAT = 'D MMMM YYYY'
  * Date format to with three letter month
  */
 export const DATE_FORMAT_SHORT = 'DD MMM YYYY'
+
+/**
+ * Date slash format
+ */
+export const DATE_FORMAT_SLASH = 'DD/MM/YYYY'

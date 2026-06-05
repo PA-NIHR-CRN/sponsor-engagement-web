@@ -7,7 +7,6 @@ export const GENERIC_STUDIES_GUIDANCE_TEXT =
 export enum FormStudyStatus {
   InSetup = 'In setup',
   OpenToRecruitment = 'Open to recruitment',
-  ClosedFollowUp = 'Closed to Recruitment, In Follow Up',
   Closed = 'Closed',
   Withdrawn = 'Withdrawn',
   Suspended = 'Suspended',
@@ -22,8 +21,7 @@ export const statusMap: Record<string, FormStudyStatus> = {
   'Open to Recruitment': FormStudyStatus.OpenToRecruitment,
   'Open, With Recruitment': FormStudyStatus.OpenToRecruitment,
   'Closed to Recruitment': FormStudyStatus.Closed,
-  'Closed to Recruitment, In Follow Up': FormStudyStatus.ClosedFollowUp,
-  'Closed to Recruitment, Follow Up Complete': FormStudyStatus.Closed,
+  'Closed to Recruitment, No Follow Up': FormStudyStatus.Closed,
   'Suspended (from Open, With Recruitment)': FormStudyStatus.Suspended,
   'Suspended (from Open to Recruitment)': FormStudyStatus.Suspended,
   'Withdrawn in Pre-Setup': FormStudyStatus.Withdrawn,
@@ -48,29 +46,22 @@ export const studyStatuses = [
     value: FormStudyStatus.OpenToRecruitment,
   },
   {
-    name: 'Closed, in follow-up',
-    description:
-      'Ongoing, (i.e. participants are being treated or observed), but recruitment is complete. Provide an actual closure date below.',
-    id: '3',
-    value: FormStudyStatus.ClosedFollowUp,
-  },
-  {
     name: 'Closed',
     description:
       'Completed recruitment and any subsequent patient related activities (follow up). Provide an actual closure date below.',
-    id: '4',
+    id: '3',
     value: FormStudyStatus.Closed,
   },
   {
     name: 'Withdrawn',
     description: 'Withdrawn during the setup phase and will not be opening to recruitment in the UK.',
-    id: '5',
+    id: '4',
     value: FormStudyStatus.Withdrawn,
   },
   {
     name: 'Suspended',
     description: 'Recruitment of participants has halted, but may resume. Provide an estimated re-opening date below.',
-    id: '6',
+    id: '5',
     value: FormStudyStatus.Suspended,
   },
 ]

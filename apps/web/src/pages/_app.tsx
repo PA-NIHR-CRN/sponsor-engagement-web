@@ -35,13 +35,13 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
 
   return (
     <SessionProvider session={session}>
-      <style global jsx>
-        {`
-        html {
-          font-family: ${primaryFont.style.fontFamily};
-        `}
-      </style>
-      {getLayout(<Component {...pageProps} />, pageProps)}
+        <style global jsx>
+          {`
+          html {
+            font-family: ${primaryFont.style.fontFamily};
+          `}
+        </style>
+        {getLayout(<Component {...pageProps} />, pageProps)}
     </SessionProvider>
   )
 }

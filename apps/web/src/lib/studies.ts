@@ -352,7 +352,7 @@ export const mapCPMSStatusToFormStatus = (cpmsStatus: string): string => {
     [CPMSStatus.OpenToRecruitment]: FormStudyStatus.OpenToRecruitment,
     [CPMSStatus.OpenWithRecruitment]: FormStudyStatus.OpenToRecruitment,
     [CPMSStatus.ClosedToRecruitment]: FormStudyStatus.Closed,
-    [CPMSStatus.ClosedToRecruitmentInFollowUp]: FormStudyStatus.ClosedFollowUp,
+    [CPMSStatus.ClosedToRecruitmentNoFollowUp]: FormStudyStatus.Closed,
     [CPMSStatus.ClosedToRecruitmentFollowUpComplete]: FormStudyStatus.Closed,
     [CPMSStatus.SuspendedFromOpenWithRecruitment]: FormStudyStatus.Suspended,
     [CPMSStatus.SuspendedFromOpenToRecruitment]: FormStudyStatus.Suspended,
@@ -370,8 +370,7 @@ export const mapFormStatusToCPMSStatus = (newStatus: string, currentStatus: stri
 
   const statusMap = {
     [FormStudyStatus.InSetup]: CPMSStatus.InSetup,
-    [FormStudyStatus.Closed]: CPMSStatus.ClosedToRecruitmentFollowUpComplete,
-    [FormStudyStatus.ClosedFollowUp]: CPMSStatus.ClosedToRecruitmentInFollowUp,
+    [FormStudyStatus.Closed]: CPMSStatus.ClosedToRecruitmentNoFollowUp,
     [FormStudyStatus.OpenToRecruitment]: isCurrentStatusSuspendedFromOpenWithRecruitment
       ? CPMSStatus.OpenWithRecruitment
       : CPMSStatus.OpenToRecruitment,
