@@ -165,14 +165,14 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
       }
 
       const buildClosedAdditionalNote = (inputs: ClosedNoteInputs) =>
-        `Final Recruitment Target correct: ${yesNoText(inputs.finalRecruitmentTargetCorrect)};\r\n ` +
+        `Final Recruitment Total Correct: ${yesNoText(inputs.finalRecruitmentTargetCorrect)};\r\n ` +
         `${inputs.correctedRecruitmentTotal?.trim()
-          ? `Corrected recruitment total: ${inputs.correctedRecruitmentTotal.trim()};\r\n `
+          ? `Corrected Recruitment Total: ${inputs.correctedRecruitmentTotal.trim()};\r\n `
           : ''}` +
         `Performance Aligned To Expectations: ${yesNoText(inputs.performanceAlignedToExpectations)};\r\n ` +
         `Performance Explainer: ${inputs.performanceExplainer || 'None provided'};\r\n ` +
-        `Further information: ${inputs.furtherInformation || 'None provided'};\r\n ` +
-        `UK recruitment target: ${Number.isFinite(inputs.ukRecruitmentTarget) ? inputs.ukRecruitmentTarget : 'None provided'};\r\n ` +
+        `Further Information: ${inputs.furtherInformation || 'None provided'};\r\n ` +
+        `UK Recruitment Target: ${Number.isFinite(inputs.ukRecruitmentTarget) ? inputs.ukRecruitmentTarget : 'None provided'};\r\n ` +
         `SE Audit History Id: ${transactionId}`;
 
 
