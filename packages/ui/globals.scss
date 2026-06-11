@@ -183,15 +183,3 @@ button .absolute.h-\[2px\].w-\[18px\] {
   }
 }
 
-
-// overrides for rich text hint text
-
-.govuk-hint{
-  p{
-    font: inherit !important;
-    color: inherit !important;
-  }
-  a{
-    font:inherit !important;
-  }
-}

@@ -26,18 +26,6 @@ export interface TypeSetAssessmentFormPageFields {
      */
     studyProgressionQuestionLabel: EntryFieldTypes.Symbol;
     /**
-     * Field type definition for field 'studyProgressionOnTrackGuidanceText' (Study Progression, on track guidance text)
-     * @name Study Progression, on track guidance text
-     * @localized false
-     */
-    studyProgressionOnTrackGuidanceText: EntryFieldTypes.RichText;
-    /**
-     * Field type definition for field 'studyProgressionOffTrackGuidanceText' (Study Progression, off track guidance text)
-     * @name Study Progression, off track guidance text
-     * @localized false
-     */
-    studyProgressionOffTrackGuidanceText: EntryFieldTypes.RichText;
-    /**
      * Field type definition for field 'additionalInfoLabel' (Additional info label)
      * @name Additional info label
      * @localized false
@@ -49,6 +37,18 @@ export interface TypeSetAssessmentFormPageFields {
      * @localized false
      */
     furtherInformationLabel?: EntryFieldTypes.Symbol;
+    /**
+     * Field type definition for field 'guidanceTextOnTrack' (Guidance text, on track)
+     * @name Guidance text, on track
+     * @localized false
+     */
+    guidanceTextOnTrack: EntryFieldTypes.Symbol;
+    /**
+     * Field type definition for field 'guidanceTextOffTrack' (Guidance text, off track)
+     * @name Guidance text, off track
+     * @localized false
+     */
+    guidanceTextOffTrack: EntryFieldTypes.Symbol;
 }
 
 /**
@@ -57,7 +57,7 @@ export interface TypeSetAssessmentFormPageFields {
  * @type {TypeSetAssessmentFormPageSkeleton}
  * @author 74dRNHIw06jXMrW8vfnjVl
  * @since 2026-04-23T15:03:34.544Z
- * @version 1
+ * @version 7
  */
 export type TypeSetAssessmentFormPageSkeleton = EntrySkeletonType<TypeSetAssessmentFormPageFields, "setAssessmentFormPage">;
 /**
@@ -66,7 +66,7 @@ export type TypeSetAssessmentFormPageSkeleton = EntrySkeletonType<TypeSetAssessm
  * @type {TypeSetAssessmentFormPage}
  * @author 74dRNHIw06jXMrW8vfnjVl
  * @since 2026-04-23T15:03:34.544Z
- * @version 1
+ * @version 7
  */
 export type TypeSetAssessmentFormPage<Modifiers extends ChainModifiers, Locales extends LocaleCode = LocaleCode> = Entry<TypeSetAssessmentFormPageSkeleton, Modifiers, Locales>;
 

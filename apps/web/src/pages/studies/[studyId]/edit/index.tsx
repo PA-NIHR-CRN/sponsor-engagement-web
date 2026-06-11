@@ -217,23 +217,23 @@ export default function EditStudy({ study, currentLSN, query, managedContent }: 
     await router.push(`/studies/${values.studyId}/edit/closure`)
   }, [getValues, router, setDraft, setError, trigger])
 
-  function getManagedStatusDescription(id: number, description: string): string | Document {
+  function getManagedStatusDescription(id: number, description: string): string {
     switch (id) {
       case 1:
         // in setup
-        return managedContent?.inSetupGuidanceText as Document
+        return managedContent?.guidanceTextInSetup as string
       case 2:
         //Open to recruitment
-        return managedContent?.openToRecruitmentGuidanceText as Document
+        return managedContent?.guidanceTextOpenToRecruitment as string
       case 3:
         //Closed
-        return managedContent?.closedGuidanceText as Document
+        return managedContent?.guidanceTextClosed as string
       case 4:
         //Withdrawn
-        return managedContent?.withdrawnGuidanceText as Document
+        return managedContent?.guidanceTextWithdrawn as string
       case 5:
         //Suspended
-        return managedContent?.suspendedGuidanceText as Document
+        return managedContent?.guidanceTextSuspended as string
       default:
         return description
     }
@@ -482,7 +482,7 @@ export default function EditStudy({ study, currentLSN, query, managedContent }: 
                   defaultValue={defaultValues?.furtherInformation}
                   errors={errors}
                   hint={managedContent?.furtherInformationGuidanceText as Document}
-                  label={managedContent?.futherInformationLabel as string}
+                  label={managedContent?.furtherInformationLabel as string}
                   labelSize="m"
                   remainingCharacters={remainingCharacters}
                   required={false}

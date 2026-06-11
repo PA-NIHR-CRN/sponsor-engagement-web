@@ -66,118 +66,7 @@ export const StudyUpdatePageMock: Entry<TypeStudyDataFormSkeleton> = {
         },
       ],
     },
-    inSetupGuidanceText: {
-      data: {},
-      content: [
-        {
-          data: {},
-          content: [
-            {
-              data: {},
-              marks: [],
-              value: 'Not yet open to recruitment.',
-              nodeType: 'text',
-            },
-          ],
-          nodeType: BLOCKS.PARAGRAPH,
-        },
-      ],
-      nodeType: BLOCKS.DOCUMENT,
-    },
-    openToRecruitmentGuidanceText: {
-      data: {},
-      content: [
-        {
-          data: {},
-          content: [
-            {
-              data: {},
-              marks: [],
-              value: 'Open to recruit participants in at least one UK site. Provide an actual opening date below.',
-              nodeType: 'text',
-            },
-          ],
-          nodeType: BLOCKS.PARAGRAPH,
-        },
-      ],
-      nodeType: BLOCKS.DOCUMENT,
-    },
-    closedInFollowUpGuidanceText: {
-      data: {},
-      content: [
-        {
-          data: {},
-          content: [
-            {
-              data: {},
-              marks: [],
-              value:
-                'Ongoing, (i.e. participants are being treated or observed), but recruitment is complete. Provide an actual closure date below.',
-              nodeType: 'text',
-            },
-          ],
-          nodeType: BLOCKS.PARAGRAPH,
-        },
-      ],
-      nodeType: BLOCKS.DOCUMENT,
-    },
-    closedGuidanceText: {
-      data: {},
-      content: [
-        {
-          data: {},
-          content: [
-            {
-              data: {},
-              marks: [],
-              value:
-                'Completed recruitment and any subsequent patient related activities (follow up). Provide an actual closure date below.',
-              nodeType: 'text',
-            },
-          ],
-          nodeType: BLOCKS.PARAGRAPH,
-        },
-      ],
-      nodeType: BLOCKS.DOCUMENT,
-    },
-    withdrawnGuidanceText: {
-      data: {},
-      content: [
-        {
-          data: {},
-          content: [
-            {
-              data: {},
-              marks: [],
-              value: 'Withdrawn during the setup phase and will not be opening to recruitment in the UK.',
-              nodeType: 'text',
-            },
-          ],
-          nodeType: BLOCKS.PARAGRAPH,
-        },
-      ],
-      nodeType: BLOCKS.DOCUMENT,
-    },
-    suspendedGuidanceText: {
-      data: {},
-      content: [
-        {
-          data: {},
-          content: [
-            {
-              data: {},
-              marks: [],
-              value:
-                'Recruitment of participants has halted, but may resume. Provide an estimated re-opening date below.',
-              nodeType: 'text',
-            },
-          ],
-          nodeType: BLOCKS.PARAGRAPH,
-        },
-      ],
-      nodeType: BLOCKS.DOCUMENT,
-    },
-    futherInformationLabel: 'Further information (optional)',
+    furtherInformationLabel: 'Further information (optional)',
     furtherInformationGuidanceText: {
       data: {},
       content: [
@@ -234,5 +123,11 @@ export const StudyUpdatePageMock: Entry<TypeStudyDataFormSkeleton> = {
       ],
       nodeType: BLOCKS.DOCUMENT,
     },
+    guidanceTextInSetup:'Not yet open to recruitment.',
+    guidanceTextOpenToRecruitment:'Open to recruit participants in at least one UK site. Provide an actual opening date below.',
+    guidanceTextClosedInFollowUp:'Ongoing, (i.e. participants are being treated or observed), but recruitment is complete. Provide an actual closure date below.',
+    guidanceTextClosed:'Completed recruitment and any subsequent patient related activities (follow up). Provide an actual closure date below.',
+    guidanceTextWithdrawn:'Withdrawn during the setup phase and will not be opening to recruitment in the UK.',
+    guidanceTextSuspended:'Recruitment of participants has halted, but may resume. Provide an estimated re-opening date below.',
   },
 }
