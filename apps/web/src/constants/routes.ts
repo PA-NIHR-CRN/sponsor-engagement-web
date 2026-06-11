@@ -59,6 +59,11 @@ export const REGISTRATION_CONFIRMATION_PAGE = '/register/confirmation'
 export const REGISTRATION_CONFIRMATION_LINKED_PAGE = '/register/confirmation/linked'
 
 /**
+ * Report a First Global/European Participant page
+ */
+export const REPORT_FIRSTS_PAGE = '/report-first'
+
+/**
  * Error page for internal server errors
  */
 export const ERROR_PAGE_500 = '/500'

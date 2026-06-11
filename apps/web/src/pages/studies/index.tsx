@@ -22,6 +22,7 @@ import {
   StudiesListSkeleton,
   StudyList,
 } from '@/components/molecules'
+import { ReportFirst } from '@/components/molecules/cards/ReportFirst/ReportFirst'
 import { RootLayout } from '@/components/organisms'
 import CmsNotificationBanner from '@/components/organisms/CmsNotificationBanner/CmsNotificationBanner'
 import { Roles, STUDIES_PER_PAGE } from '@/constants'
@@ -151,6 +152,7 @@ export default function Studies({
                         <li key={study.id}>
                           <StudyList
                             daysSinceAssessmentDue={daysSinceAssessmentDue}
+                            hraApprovalDate={study.hraApprovalDate}
                             indications={study.evaluationCategories
                               .map((evalCategory) => evalCategory.indicatorValue)
                               .filter((evalCategory, index, items) => items.indexOf(evalCategory) === index)}
@@ -159,8 +161,11 @@ export default function Studies({
                             shortTitle={study.shortTitle}
                             sponsorOrgName={getSponsorOrgName(study.organisations)}
                             studyHref={`${STUDIES_PAGE}/${study.id}`}
+                            studyStatus = {study.studyStatus}
                             supportOrgName={getSupportOrgName(study.organisations)}
                             trackStatus={study.lastAssessment?.status.name}
+                            willRecruitWithinTimeline = {study.willRecruitWithinTimeline}
+                            firstType={study.StudyFirst?.type}
                           />
                         </li>
                       )
@@ -183,6 +188,7 @@ export default function Studies({
           )}
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
+          <ReportFirst />
           <Card className="mt-4" data-testid="export-study-data" filled padding={4}>
             <h3 className="govuk-heading-m">Download study data</h3>
             <p>
