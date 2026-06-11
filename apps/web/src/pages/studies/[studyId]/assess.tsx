@@ -22,8 +22,7 @@ import { prismaClient } from '@/lib/prisma'
 import { getStudyById } from '@/lib/studies'
 import { getValuesFromSearchParams } from '@/utils/form'
 import { RichTextRenderer } from '@/utils/Renderers/RichTextRenderer/RichTextRenderer'
-import type { AssessmentInputs } from '@/utils/schemas/assessment.schema'
-import { assessmentSchema } from '@/utils/schemas/assessment.schema'
+import { AssessmentInputs, assessmentSchema } from '@/utils/schemas/assessment.schema'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
 export type AssessmentProps = InferGetServerSidePropsType<typeof getServerSideProps>
@@ -37,12 +36,22 @@ export default function Assessment({
   assessments,
   managedContent,
 }: AssessmentProps) {
-  const { register, formState, setError, watch, handleSubmit } = useForm<AssessmentInputs>({
+  const studyHasNotRecruitedWithinSixMonths = study.evaluationCategories.some(indicator => indicator.indicatorValue === 'No recruitment in past 6 months')
+
+  const {
+    register,
+    formState,
+    setError,
+    handleSubmit,
+  } = useForm<AssessmentInputs>({
     resolver: zodResolver(assessmentSchema),
     defaultValues: {
       ...getValuesFromSearchParams(assessmentSchema, query),
       studyId: String(study.id),
+      studyHasNotRecruitedWithinSixMonths: studyHasNotRecruitedWithinSixMonths ? 'true' : 'false',
+      reasonForNoRecruitment: null,
     },
+    shouldUnregister: true,
   })
 
   const handleFoundError = useCallback(
@@ -57,13 +66,6 @@ export default function Assessment({
     formState,
     onFoundError: handleFoundError,
   })
-
-  // Watch & update the character count for the "Support summary" textarea
-  const furtherInformationText = watch('furtherInformationText') ?? ''
-  const remainingCharacters =
-    furtherInformationText.length >= TEXTAREA_MAX_CHARACTERS
-      ? 0
-      : TEXTAREA_MAX_CHARACTERS - furtherInformationText.length
 
   const { defaultValues } = formState
 
@@ -137,10 +139,11 @@ export default function Assessment({
 
             <input type="hidden" {...register('studyId')} defaultValue={defaultValues?.studyId} />
 
+            <input type="hidden" {...register('studyHasNotRecruitedWithinSixMonths')} />
             <Fieldset>
               {/* Status */}
               <RadioGroup
-                defaultValue={defaultValues?.status}
+                defaultValue=''
                 errors={errors}
                 label={managedContent?.studyProgressionQuestionLabel.toString()}
                 {...register('status')}
@@ -149,6 +152,20 @@ export default function Assessment({
                   <Radio hint={getStudyRadioDescription(id, description)} key={id} label={name} value={String(id)} />
                 ))}
               </RadioGroup>
+
+              {/* Reason for no recruitment in the last 6 months text */}
+              {studyHasNotRecruitedWithinSixMonths ?
+
+                <Textarea
+                  defaultValue=''
+                  {...register('reasonForNoRecruitment')}
+                  errors={errors}
+                  label="Study has not recruited for 6 months"
+                  hint="Provide reasoning for no recruitment"
+                  maxLength={TEXTAREA_MAX_CHARACTERS}
+                  required
+                />
+                : null}
 
               {/* Further information */}
               <CheckboxGroup
@@ -174,8 +191,8 @@ export default function Assessment({
                 label={
                   managedContent?.furtherInformationLabel ? (managedContent.furtherInformationLabel as string) : ''
                 }
-                remainingCharacters={remainingCharacters}
                 required={false}
+                maxLength={TEXTAREA_MAX_CHARACTERS}
                 {...register('furtherInformationText')}
               />
 

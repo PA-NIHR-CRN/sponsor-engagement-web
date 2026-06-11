@@ -220,18 +220,19 @@ model StudyFunder {
 }
 
 model Assessment {
-  id                 Int                            @id @default(autoincrement())
-  studyId            Int
-  statusId           Int
-  createdById        Int
-  createdAt          DateTime                       @default(now())
-  updatedAt          DateTime                       @updatedAt
-  isDeleted          Boolean?                       @default(false)
-  createdBy          User                           @relation(fields: [createdById], references: [id])
-  status             SysRefAssessmentStatus         @relation(fields: [statusId], references: [id])
-  study              Study                          @relation(fields: [studyId], references: [id])
-  furtherInformation AssessmentFurtherInformation[]
-  lastAssessmentFor  Study?                         @relation("StudyLastAssessment")
+  id                      Int                            @id @default(autoincrement())
+  studyId                 Int
+  statusId                Int
+  createdById             Int
+  createdAt               DateTime                       @default(now())
+  updatedAt               DateTime                       @updatedAt
+  isDeleted               Boolean?                       @default(false)
+  reasonForNoRecruitment  String?                        @db.Text
+  createdBy               User                           @relation(fields: [createdById], references: [id])
+  status                  SysRefAssessmentStatus         @relation(fields: [statusId], references: [id])
+  study                   Study                          @relation(fields: [studyId], references: [id])
+  furtherInformation      AssessmentFurtherInformation[]
+  lastAssessmentFor       Study?                         @relation("StudyLastAssessment")
 
   @@index([createdById], map: "Assessment_createdById_fkey")
   @@index([statusId], map: "Assessment_statusId_fkey")

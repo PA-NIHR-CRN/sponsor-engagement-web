@@ -1,21 +1,20 @@
+import type React from 'react'
 import type { Document } from '@contentful/rich-text-types'
 import clsx from 'clsx'
-import { forwardRef } from 'react'
+import { forwardRef, useEffect, useMemo, useState } from 'react'
 import type { FieldErrors } from 'react-hook-form'
 
-import { TEXTAREA_MAX_CHARACTERS } from '@/constants/forms'
 import { RichTextRenderer } from '@/utils/Renderers/RichTextRenderer/RichTextRenderer'
-
 import { ErrorInline } from '../ErrorInline/ErrorInline'
 
-interface TextareaProps {
+interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label: string
   labelSize?: 's' | 'm' | 'l'
   name: string
   hint?: string | Document
   required?: boolean
   errors: FieldErrors
-  defaultValue: string | undefined
+  defaultValue?: string
   remainingCharacters?: number
   maxLength?: number
 }
@@ -27,53 +26,97 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       labelSize = 's',
       errors,
       hint,
-      remainingCharacters,
       defaultValue,
       required = true,
-      maxLength = TEXTAREA_MAX_CHARACTERS,
+      maxLength,
+      remainingCharacters: remainingCharactersProp,
+      onChange,
+      onInput,
       ...rest
     },
     ref
   ) => {
-    const error = errors[rest.name]
+    const name = rest.name
+    const error = errors[name]
+
+    const showCount = typeof maxLength === 'number'
+    const countId = `${name}-count`
+
+    const initialLen = useMemo(() => String(defaultValue ?? '').length, [defaultValue])
+
+    const [remainingInternal, setRemainingInternal] = useState(() =>
+      showCount ? Math.max(0, maxLength - initialLen) : 0
+    )
+
+    useEffect(() => {
+      if (!showCount) return
+      setRemainingInternal(Math.max(0, maxLength - String(defaultValue ?? '').length))
+    }, [defaultValue, maxLength, showCount])
+
+    const updateRemaining = (value: string) => {
+      if (!showCount) return
+      setRemainingInternal(Math.max(0, maxLength - value.length))
+    }
+
+    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      updateRemaining(e.currentTarget.value)
+      onChange?.(e)
+    }
+
+    const handleInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
+      updateRemaining(e.currentTarget.value)
+      onInput?.(e)
+    }
+
+    const remainingToDisplay =
+      typeof remainingCharactersProp === 'number' ? remainingCharactersProp : remainingInternal
+
+    const describedBy = clsx({
+      [`${name}-hint`]: hint,
+      [`${name}-error`]: error,
+      [countId]: showCount,
+    })
 
     return (
       <div className={clsx('govuk-form-group', { 'govuk-form-group--error': Boolean(error) })}>
         <div className="govuk-label-wrapper">
-          <label className={`govuk-label govuk-label--${labelSize}`} htmlFor={rest.name} id={`${rest.name}-label`}>
+          <label className={`govuk-label govuk-label--${labelSize}`} htmlFor={name} id={`${name}-label`}>
             {label}
           </label>
+
           {hint ? (
-            <div className="govuk-hint" id={`${rest.name}-hint`}>
+            <div className="govuk-hint" id={`${name}-hint`}>
               {typeof hint === 'string' ? hint : <RichTextRenderer>{hint}</RichTextRenderer>}
             </div>
           ) : null}
         </div>
-        <ErrorInline errors={errors} name={rest.name} />
+
+        <ErrorInline errors={errors} name={name} />
+
         <textarea
-          aria-describedby={clsx('with-hint-info', {
-            [`${rest.name}-hint`]: hint,
-            [`${rest.name}-error`]: error,
-          })}
-          aria-errormessage={clsx({
-            [`${rest.name}-error`]: error,
-          })}
+          aria-describedby={describedBy}
+          aria-errormessage={error ? `${name}-error` : undefined}
           aria-invalid={error ? 'true' : 'false'}
           aria-required={required}
           className={clsx('govuk-textarea', {
             'govuk-textarea--error': Boolean(error),
-            'govuk-!-margin-bottom-1': typeof remainingCharacters !== 'undefined',
+            'govuk-!-margin-bottom-1': showCount,
           })}
           defaultValue={defaultValue}
-          id={rest.name}
+          id={name}
           maxLength={maxLength}
           {...rest}
+          onChange={handleChange}
+          onInput={handleInput}
           ref={ref}
           rows={5}
         />
-        <div className="govuk-hint govuk-character-count__message js-disabled-hide" id="with-hint-info">
-          You have {remainingCharacters} characters remaining
-        </div>
+
+        {showCount ? (
+          <div className="govuk-hint govuk-character-count__message js-disabled-hide" id={countId}>
+            You have {remainingToDisplay} characters remaining
+          </div>
+        ) : null}
       </div>
     )
   }

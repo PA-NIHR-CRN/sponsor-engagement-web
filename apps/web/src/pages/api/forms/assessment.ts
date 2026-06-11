@@ -6,8 +6,7 @@ import { ZodError } from 'zod'
 import { Roles } from '@/constants'
 import { getAssessmentPageRoute } from '@/constants/routes'
 import { prismaClient } from '@/lib/prisma'
-import type { AssessmentInputs } from '@/utils/schemas'
-import { assessmentSchema } from '@/utils/schemas'
+import { assessmentSchema, type AssessmentInputs } from '@/utils/schemas'
 import { withApiHandler } from '@/utils/withApiHandler'
 
 export interface ExtendedNextApiRequest extends NextApiRequest {
@@ -20,7 +19,7 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
       throw new Error('Wrong method')
     }
 
-    const { studyId, status, furtherInformation, furtherInformationText } = assessmentSchema.parse(req.body)
+    const { studyId, status, furtherInformation, furtherInformationText, reasonForNoRecruitment } = assessmentSchema.parse(req.body)
 
     const furtherInformationInputs: Prisma.AssessmentFurtherInformationUncheckedCreateWithoutAssessmentInput[] = []
 
@@ -45,6 +44,7 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
         createdById: session.user.id,
         studyId: Number(studyId),
         statusId: Number(status),
+        reasonForNoRecruitment: reasonForNoRecruitment,
         furtherInformation: {
           createMany: {
             data: furtherInformationInputs,
@@ -86,7 +86,7 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
       )
 
       // Insert the original values
-      Object.keys(assessmentSchema.shape).forEach((field) => {
+      Object.keys(assessmentSchema).forEach((field) => {
         if (req.body[field]) {
           fieldErrors[field] = req.body[field] as string
         }
