@@ -66,7 +66,7 @@ export const StudyUpdatePageMock: Entry<TypeStudyDataFormSkeleton> = {
         },
       ],
     },
-    futherInformationLabel: 'Further information (optional)',
+    furtherInformationLabel: 'Further information (optional)',
     furtherInformationGuidanceText: {
       data: {},
       content: [

@@ -404,7 +404,7 @@ export default function EditStudy({ study, currentLSN, query, managedContent }: 
                 defaultValue={defaultValues?.furtherInformation}
                 errors={errors}
                 hint={managedContent?.furtherInformationGuidanceText as Document}
-                label={managedContent?.futherInformationLabel as string}
+                label={managedContent?.furtherInformationLabel as string}
                 labelSize="m"
                 remainingCharacters={remainingCharacters}
                 required={false}

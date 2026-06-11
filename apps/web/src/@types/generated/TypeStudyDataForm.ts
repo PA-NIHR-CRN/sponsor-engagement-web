@@ -20,11 +20,11 @@ export interface TypeStudyDataFormFields {
      */
     pageDescription: EntryFieldTypes.RichText;
     /**
-     * Field type definition for field 'futherInformationLabel' (Futher information Label)
+     * Field type definition for field 'furtherInformationLabel' (Futher information Label)
      * @name Futher information Label
      * @localized false
      */
-    futherInformationLabel: EntryFieldTypes.Symbol;
+    furtherInformationLabel: EntryFieldTypes.Symbol;
     /**
      * Field type definition for field 'furtherInformationGuidanceText' (Further information guidance text)
      * @name Further information guidance text
