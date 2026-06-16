@@ -1,20 +1,88 @@
-export type { TypeBanner, TypeBannerFields, TypeBannerSkeleton } from './TypeBanner'
 export type { TypePage, TypePageFields, TypePageSkeleton } from './TypePage'
 export type { TypeBporFooter, TypeBporFooterFields, TypeBporFooterSkeleton } from './TypeBporFooter'
-export type { TypeGenericRichText, TypeGenericRichTextFields, TypeGenericRichTextSkeleton } from './TypeGenericRichText'
-export type {
-  TypeGenericRichTextLinksOnly,
-  TypeGenericRichTextLinksOnlyFields,
-  TypeGenericRichTextLinksOnlySkeleton,
-} from './TypeGenericRichTextLinksOnly'
-export type {
-  TypeGenericShortText,
-  TypeGenericShortTextFields,
-  TypeGenericShortTextSkeleton,
-} from './TypeGenericShortText'
 export { isTypeSetAssessmentFormPage } from "./TypeSetAssessmentFormPage";
 export type { TypeSetAssessmentFormPage, TypeSetAssessmentFormPageFields, TypeSetAssessmentFormPageSkeleton, TypeSetAssessmentFormPageWithAllLocalesAndWithoutLinkResolutionResponse, TypeSetAssessmentFormPageWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeSetAssessmentFormPageWithAllLocalesResponse, TypeSetAssessmentFormPageWithoutLinkResolutionResponse, TypeSetAssessmentFormPageWithoutUnresolvableLinksResponse } from "./TypeSetAssessmentFormPage";
+export { isTypeAccordion } from "./TypeAccordion";
+export type { TypeAccordion, TypeAccordionFields, TypeAccordionSkeleton, TypeAccordionWithAllLocalesAndWithoutLinkResolutionResponse, TypeAccordionWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeAccordionWithAllLocalesResponse, TypeAccordionWithoutLinkResolutionResponse, TypeAccordionWithoutUnresolvableLinksResponse } from "./TypeAccordion";
+export { isTypeAccordionSection } from "./TypeAccordionSection";
+export type { TypeAccordionSection, TypeAccordionSectionFields, TypeAccordionSectionSkeleton, TypeAccordionSectionWithAllLocalesAndWithoutLinkResolutionResponse, TypeAccordionSectionWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeAccordionSectionWithAllLocalesResponse, TypeAccordionSectionWithoutLinkResolutionResponse, TypeAccordionSectionWithoutUnresolvableLinksResponse } from "./TypeAccordionSection";
+export { isTypeArticle } from "./TypeArticle";
+export type { TypeArticle, TypeArticleFields, TypeArticleSkeleton, TypeArticleWithAllLocalesAndWithoutLinkResolutionResponse, TypeArticleWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeArticleWithAllLocalesResponse, TypeArticleWithoutLinkResolutionResponse, TypeArticleWithoutUnresolvableLinksResponse } from "./TypeArticle";
+export { isTypeBanner } from "./TypeBanner";
+export type { TypeBanner, TypeBannerFields, TypeBannerSkeleton, TypeBannerWithAllLocalesAndWithoutLinkResolutionResponse, TypeBannerWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeBannerWithAllLocalesResponse, TypeBannerWithoutLinkResolutionResponse, TypeBannerWithoutUnresolvableLinksResponse } from "./TypeBanner";
+export { isTypeButton } from "./TypeButton";
+export type { TypeButton, TypeButtonFields, TypeButtonSkeleton, TypeButtonWithAllLocalesAndWithoutLinkResolutionResponse, TypeButtonWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeButtonWithAllLocalesResponse, TypeButtonWithoutLinkResolutionResponse, TypeButtonWithoutUnresolvableLinksResponse } from "./TypeButton";
+export { isTypeButtonGroup } from "./TypeButtonGroup";
+export type { TypeButtonGroup, TypeButtonGroupFields, TypeButtonGroupSkeleton, TypeButtonGroupWithAllLocalesAndWithoutLinkResolutionResponse, TypeButtonGroupWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeButtonGroupWithAllLocalesResponse, TypeButtonGroupWithoutLinkResolutionResponse, TypeButtonGroupWithoutUnresolvableLinksResponse } from "./TypeButtonGroup";
+export { isTypeCampaignPage } from "./TypeCampaignPage";
+export type { TypeCampaignPage, TypeCampaignPageFields, TypeCampaignPageSkeleton, TypeCampaignPageWithAllLocalesAndWithoutLinkResolutionResponse, TypeCampaignPageWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeCampaignPageWithAllLocalesResponse, TypeCampaignPageWithoutLinkResolutionResponse, TypeCampaignPageWithoutUnresolvableLinksResponse } from "./TypeCampaignPage";
+export { isTypeCard } from "./TypeCard";
+export type { TypeCard, TypeCardFields, TypeCardSkeleton, TypeCardWithAllLocalesAndWithoutLinkResolutionResponse, TypeCardWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeCardWithAllLocalesResponse, TypeCardWithoutLinkResolutionResponse, TypeCardWithoutUnresolvableLinksResponse } from "./TypeCard";
+export { isTypeCarousel } from "./TypeCarousel";
+export type { TypeCarousel, TypeCarouselFields, TypeCarouselSkeleton, TypeCarouselWithAllLocalesAndWithoutLinkResolutionResponse, TypeCarouselWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeCarouselWithAllLocalesResponse, TypeCarouselWithoutLinkResolutionResponse, TypeCarouselWithoutUnresolvableLinksResponse } from "./TypeCarousel";
+export { isTypeContactUs } from "./TypeContactUs";
+export type { TypeContactUs, TypeContactUsFields, TypeContactUsSkeleton, TypeContactUsWithAllLocalesAndWithoutLinkResolutionResponse, TypeContactUsWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeContactUsWithAllLocalesResponse, TypeContactUsWithoutLinkResolutionResponse, TypeContactUsWithoutUnresolvableLinksResponse } from "./TypeContactUs";
+export { isTypeEmailTemplate } from "./TypeEmailTemplate";
+export type { TypeEmailTemplate, TypeEmailTemplateFields, TypeEmailTemplateSkeleton, TypeEmailTemplateWithAllLocalesAndWithoutLinkResolutionResponse, TypeEmailTemplateWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeEmailTemplateWithAllLocalesResponse, TypeEmailTemplateWithoutLinkResolutionResponse, TypeEmailTemplateWithoutUnresolvableLinksResponse } from "./TypeEmailTemplate";
+export { isTypeEmbeddedLink } from "./TypeEmbeddedLink";
+export type { TypeEmbeddedLink, TypeEmbeddedLinkFields, TypeEmbeddedLinkSkeleton, TypeEmbeddedLinkWithAllLocalesAndWithoutLinkResolutionResponse, TypeEmbeddedLinkWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeEmbeddedLinkWithAllLocalesResponse, TypeEmbeddedLinkWithoutLinkResolutionResponse, TypeEmbeddedLinkWithoutUnresolvableLinksResponse } from "./TypeEmbeddedLink";
+export { isTypeGenericPage } from "./TypeGenericPage";
+export type { TypeGenericPage, TypeGenericPageFields, TypeGenericPageSkeleton, TypeGenericPageWithAllLocalesAndWithoutLinkResolutionResponse, TypeGenericPageWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeGenericPageWithAllLocalesResponse, TypeGenericPageWithoutLinkResolutionResponse, TypeGenericPageWithoutUnresolvableLinksResponse } from "./TypeGenericPage";
+export { isTypeGenericRichText } from "./TypeGenericRichText";
+export type { TypeGenericRichText, TypeGenericRichTextFields, TypeGenericRichTextSkeleton, TypeGenericRichTextWithAllLocalesAndWithoutLinkResolutionResponse, TypeGenericRichTextWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeGenericRichTextWithAllLocalesResponse, TypeGenericRichTextWithoutLinkResolutionResponse, TypeGenericRichTextWithoutUnresolvableLinksResponse } from "./TypeGenericRichText";
+export { isTypeGenericRichTextLinksOnly } from "./TypeGenericRichTextLinksOnly";
+export type { TypeGenericRichTextLinksOnly, TypeGenericRichTextLinksOnlyFields, TypeGenericRichTextLinksOnlySkeleton, TypeGenericRichTextLinksOnlyWithAllLocalesAndWithoutLinkResolutionResponse, TypeGenericRichTextLinksOnlyWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeGenericRichTextLinksOnlyWithAllLocalesResponse, TypeGenericRichTextLinksOnlyWithoutLinkResolutionResponse, TypeGenericRichTextLinksOnlyWithoutUnresolvableLinksResponse } from "./TypeGenericRichTextLinksOnly";
+export { isTypeGenericShortText } from "./TypeGenericShortText";
+export type { TypeGenericShortText, TypeGenericShortTextFields, TypeGenericShortTextSkeleton, TypeGenericShortTextWithAllLocalesAndWithoutLinkResolutionResponse, TypeGenericShortTextWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeGenericShortTextWithAllLocalesResponse, TypeGenericShortTextWithoutLinkResolutionResponse, TypeGenericShortTextWithoutUnresolvableLinksResponse } from "./TypeGenericShortText";
+export { isTypeGenericText } from "./TypeGenericText";
+export type { TypeGenericText, TypeGenericTextFields, TypeGenericTextSkeleton, TypeGenericTextWithAllLocalesAndWithoutLinkResolutionResponse, TypeGenericTextWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeGenericTextWithAllLocalesResponse, TypeGenericTextWithoutLinkResolutionResponse, TypeGenericTextWithoutUnresolvableLinksResponse } from "./TypeGenericText";
+export { isTypeImage } from "./TypeImage";
+export type { TypeImage, TypeImageFields, TypeImageSkeleton, TypeImageWithAllLocalesAndWithoutLinkResolutionResponse, TypeImageWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeImageWithAllLocalesResponse, TypeImageWithoutLinkResolutionResponse, TypeImageWithoutUnresolvableLinksResponse } from "./TypeImage";
+export { isTypeImageLink } from "./TypeImageLink";
+export type { TypeImageLink, TypeImageLinkFields, TypeImageLinkSkeleton, TypeImageLinkWithAllLocalesAndWithoutLinkResolutionResponse, TypeImageLinkWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeImageLinkWithAllLocalesResponse, TypeImageLinkWithoutLinkResolutionResponse, TypeImageLinkWithoutUnresolvableLinksResponse } from "./TypeImageLink";
+export { isTypeJdrHealthCare } from "./TypeJdrHealthCare";
+export type { TypeJdrHealthCare, TypeJdrHealthCareFields, TypeJdrHealthCareSkeleton, TypeJdrHealthCareWithAllLocalesAndWithoutLinkResolutionResponse, TypeJdrHealthCareWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeJdrHealthCareWithAllLocalesResponse, TypeJdrHealthCareWithoutLinkResolutionResponse, TypeJdrHealthCareWithoutUnresolvableLinksResponse } from "./TypeJdrHealthCare";
+export { isTypeLink } from "./TypeLink";
+export type { TypeLink, TypeLinkFields, TypeLinkSkeleton, TypeLinkWithAllLocalesAndWithoutLinkResolutionResponse, TypeLinkWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeLinkWithAllLocalesResponse, TypeLinkWithoutLinkResolutionResponse, TypeLinkWithoutUnresolvableLinksResponse } from "./TypeLink";
+export { isTypeListItem } from "./TypeListItem";
+export type { TypeListItem, TypeListItemFields, TypeListItemSkeleton, TypeListItemWithAllLocalesAndWithoutLinkResolutionResponse, TypeListItemWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeListItemWithAllLocalesResponse, TypeListItemWithoutLinkResolutionResponse, TypeListItemWithoutUnresolvableLinksResponse } from "./TypeListItem";
+export { isTypeNhsLoginButton } from "./TypeNhsLoginButton";
+export type { TypeNhsLoginButton, TypeNhsLoginButtonFields, TypeNhsLoginButtonSkeleton, TypeNhsLoginButtonWithAllLocalesAndWithoutLinkResolutionResponse, TypeNhsLoginButtonWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeNhsLoginButtonWithAllLocalesResponse, TypeNhsLoginButtonWithoutLinkResolutionResponse, TypeNhsLoginButtonWithoutUnresolvableLinksResponse } from "./TypeNhsLoginButton";
+export { isTypeOnlineResourcesSection } from "./TypeOnlineResourcesSection";
+export type { TypeOnlineResourcesSection, TypeOnlineResourcesSectionFields, TypeOnlineResourcesSectionSkeleton, TypeOnlineResourcesSectionWithAllLocalesAndWithoutLinkResolutionResponse, TypeOnlineResourcesSectionWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeOnlineResourcesSectionWithAllLocalesResponse, TypeOnlineResourcesSectionWithoutLinkResolutionResponse, TypeOnlineResourcesSectionWithoutUnresolvableLinksResponse } from "./TypeOnlineResourcesSection";
+export { isTypeOrderedListSection } from "./TypeOrderedListSection";
+export type { TypeOrderedListSection, TypeOrderedListSectionFields, TypeOrderedListSectionSkeleton, TypeOrderedListSectionWithAllLocalesAndWithoutLinkResolutionResponse, TypeOrderedListSectionWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeOrderedListSectionWithAllLocalesResponse, TypeOrderedListSectionWithoutLinkResolutionResponse, TypeOrderedListSectionWithoutUnresolvableLinksResponse } from "./TypeOrderedListSection";
+export { isTypeRichTextSection } from "./TypeRichTextSection";
+export type { TypeRichTextSection, TypeRichTextSectionFields, TypeRichTextSectionSkeleton, TypeRichTextSectionWithAllLocalesAndWithoutLinkResolutionResponse, TypeRichTextSectionWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeRichTextSectionWithAllLocalesResponse, TypeRichTextSectionWithoutLinkResolutionResponse, TypeRichTextSectionWithoutUnresolvableLinksResponse } from "./TypeRichTextSection";
+export { isTypeRmsPage } from "./TypeRmsPage";
+export type { TypeRmsPage, TypeRmsPageFields, TypeRmsPageSkeleton, TypeRmsPageWithAllLocalesAndWithoutLinkResolutionResponse, TypeRmsPageWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeRmsPageWithAllLocalesResponse, TypeRmsPageWithoutLinkResolutionResponse, TypeRmsPageWithoutUnresolvableLinksResponse } from "./TypeRmsPage";
+export { isTypeSetAssesmentFormPage } from "./TypeSetAssesmentFormPage";
+export type { TypeSetAssesmentFormPage, TypeSetAssesmentFormPageFields, TypeSetAssesmentFormPageSkeleton, TypeSetAssesmentFormPageWithAllLocalesAndWithoutLinkResolutionResponse, TypeSetAssesmentFormPageWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeSetAssesmentFormPageWithAllLocalesResponse, TypeSetAssesmentFormPageWithoutLinkResolutionResponse, TypeSetAssesmentFormPageWithoutUnresolvableLinksResponse } from "./TypeSetAssesmentFormPage";
 export { isTypeSetLabel } from "./TypeSetLabel";
 export type { TypeSetLabel, TypeSetLabelFields, TypeSetLabelSkeleton, TypeSetLabelWithAllLocalesAndWithoutLinkResolutionResponse, TypeSetLabelWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeSetLabelWithAllLocalesResponse, TypeSetLabelWithoutLinkResolutionResponse, TypeSetLabelWithoutUnresolvableLinksResponse } from "./TypeSetLabel";
+export { isTypeSetPage } from "./TypeSetPage";
+export type { TypeSetPage, TypeSetPageFields, TypeSetPageSkeleton, TypeSetPageWithAllLocalesAndWithoutLinkResolutionResponse, TypeSetPageWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeSetPageWithAllLocalesResponse, TypeSetPageWithoutLinkResolutionResponse, TypeSetPageWithoutUnresolvableLinksResponse } from "./TypeSetPage";
 export { isTypeStudyDataForm } from "./TypeStudyDataForm";
 export type { TypeStudyDataForm, TypeStudyDataFormFields, TypeStudyDataFormSkeleton, TypeStudyDataFormWithAllLocalesAndWithoutLinkResolutionResponse, TypeStudyDataFormWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeStudyDataFormWithAllLocalesResponse, TypeStudyDataFormWithoutLinkResolutionResponse, TypeStudyDataFormWithoutUnresolvableLinksResponse } from "./TypeStudyDataForm";
+export { isTypeTextSection } from "./TypeTextSection";
+export type { TypeTextSection, TypeTextSectionFields, TypeTextSectionSkeleton, TypeTextSectionWithAllLocalesAndWithoutLinkResolutionResponse, TypeTextSectionWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeTextSectionWithAllLocalesResponse, TypeTextSectionWithoutLinkResolutionResponse, TypeTextSectionWithoutUnresolvableLinksResponse } from "./TypeTextSection";
+export { isTypeValidationText } from "./TypeValidationText";
+export type { TypeValidationText, TypeValidationTextFields, TypeValidationTextSkeleton, TypeValidationTextWithAllLocalesAndWithoutLinkResolutionResponse, TypeValidationTextWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeValidationTextWithAllLocalesResponse, TypeValidationTextWithoutLinkResolutionResponse, TypeValidationTextWithoutUnresolvableLinksResponse } from "./TypeValidationText";
+export { isTypeVideo } from "./TypeVideo";
+export type { TypeVideo, TypeVideoFields, TypeVideoSkeleton, TypeVideoWithAllLocalesAndWithoutLinkResolutionResponse, TypeVideoWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeVideoWithAllLocalesResponse, TypeVideoWithoutLinkResolutionResponse, TypeVideoWithoutUnresolvableLinksResponse } from "./TypeVideo";
+export { isTypeVsAccordion } from "./TypeVsAccordion";
+export type { TypeVsAccordion, TypeVsAccordionFields, TypeVsAccordionSkeleton, TypeVsAccordionWithAllLocalesAndWithoutLinkResolutionResponse, TypeVsAccordionWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeVsAccordionWithAllLocalesResponse, TypeVsAccordionWithoutLinkResolutionResponse, TypeVsAccordionWithoutUnresolvableLinksResponse } from "./TypeVsAccordion";
+export { isTypeVsButtonText } from "./TypeVsButtonText";
+export type { TypeVsButtonText, TypeVsButtonTextFields, TypeVsButtonTextSkeleton, TypeVsButtonTextWithAllLocalesAndWithoutLinkResolutionResponse, TypeVsButtonTextWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeVsButtonTextWithAllLocalesResponse, TypeVsButtonTextWithoutLinkResolutionResponse, TypeVsButtonTextWithoutUnresolvableLinksResponse } from "./TypeVsButtonText";
+export { isTypeVsContent } from "./TypeVsContent";
+export type { TypeVsContent, TypeVsContentFields, TypeVsContentSkeleton, TypeVsContentWithAllLocalesAndWithoutLinkResolutionResponse, TypeVsContentWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeVsContentWithAllLocalesResponse, TypeVsContentWithoutLinkResolutionResponse, TypeVsContentWithoutUnresolvableLinksResponse } from "./TypeVsContent";
+export { isTypeVsDocumentTitle } from "./TypeVsDocumentTitle";
+export type { TypeVsDocumentTitle, TypeVsDocumentTitleFields, TypeVsDocumentTitleSkeleton, TypeVsDocumentTitleWithAllLocalesAndWithoutLinkResolutionResponse, TypeVsDocumentTitleWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeVsDocumentTitleWithAllLocalesResponse, TypeVsDocumentTitleWithoutLinkResolutionResponse, TypeVsDocumentTitleWithoutUnresolvableLinksResponse } from "./TypeVsDocumentTitle";
+export { isTypeVsHeader } from "./TypeVsHeader";
+export type { TypeVsHeader, TypeVsHeaderFields, TypeVsHeaderSkeleton, TypeVsHeaderWithAllLocalesAndWithoutLinkResolutionResponse, TypeVsHeaderWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeVsHeaderWithAllLocalesResponse, TypeVsHeaderWithoutLinkResolutionResponse, TypeVsHeaderWithoutUnresolvableLinksResponse } from "./TypeVsHeader";
+export { isTypeVsPage } from "./TypeVsPage";
+export type { TypeVsPage, TypeVsPageFields, TypeVsPageSkeleton, TypeVsPageWithAllLocalesAndWithoutLinkResolutionResponse, TypeVsPageWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeVsPageWithAllLocalesResponse, TypeVsPageWithoutLinkResolutionResponse, TypeVsPageWithoutUnresolvableLinksResponse } from "./TypeVsPage";
+export { isTypeVsReusable } from "./TypeVsReusable";
+export type { TypeVsReusable, TypeVsReusableFields, TypeVsReusableSkeleton, TypeVsReusableWithAllLocalesAndWithoutLinkResolutionResponse, TypeVsReusableWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeVsReusableWithAllLocalesResponse, TypeVsReusableWithoutLinkResolutionResponse, TypeVsReusableWithoutUnresolvableLinksResponse } from "./TypeVsReusable";
+export { isTypeVsValidation } from "./TypeVsValidation";
+export type { TypeVsValidation, TypeVsValidationFields, TypeVsValidationSkeleton, TypeVsValidationWithAllLocalesAndWithoutLinkResolutionResponse, TypeVsValidationWithAllLocalesAndWithoutUnresolvableLinksResponse, TypeVsValidationWithAllLocalesResponse, TypeVsValidationWithoutLinkResolutionResponse, TypeVsValidationWithoutUnresolvableLinksResponse } from "./TypeVsValidation";

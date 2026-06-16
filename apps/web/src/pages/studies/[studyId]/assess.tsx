@@ -9,7 +9,7 @@ import { type ReactElement, useCallback } from 'react'
 import type { FieldError } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 
-import type { TypeSetAssessmentFormPageSkeleton } from '@/@types/generated'
+import type { TypeSetAssessmentFormPageSkeleton, TypeSetPageSkeleton } from '@/@types/generated'
 import { Checkbox, CheckboxGroup, ErrorSummary, Fieldset, Form, Radio, RadioGroup } from '@/components/atoms'
 import { Textarea } from '@/components/atoms/Form/Textarea/Textarea'
 import { AssessmentHistory, getAssessmentHistoryFromStudy, RequestSupport, StudyDetails } from '@/components/molecules'
@@ -17,7 +17,7 @@ import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
 import { TEXTAREA_MAX_CHARACTERS } from '@/constants/forms'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
-import { getManagedContent } from '@/lib/contentful/contentfulService'
+import { getManagedContent, getManagedContentByKey, mapDynamicManagedContent } from '@/lib/contentful/contentfulService'
 import { prismaClient } from '@/lib/prisma'
 import { getStudyById } from '@/lib/studies'
 import { getValuesFromSearchParams } from '@/utils/form'
@@ -35,6 +35,8 @@ export default function Assessment({
   returnUrl,
   assessments,
   managedContent,
+  contentfulTestContent,
+  contentfulTestContentFields
 }: AssessmentProps) {
   const studyHasNotRecruitedWithinSixMonths = study.evaluationCategories.some(indicator => indicator.indicatorValue === 'No recruitment in past 6 months')
 
@@ -97,6 +99,9 @@ export default function Assessment({
             <RichTextRenderer>{managedContent?.pageDescription as Document}</RichTextRenderer>
           </div>
 
+          <div className="govuk-body govuk-!-margin-bottom-6">
+            {contentfulTestContentFields['someGenericKey']}
+          </div>
           <div className="text-darkGrey govuk-!-margin-bottom-0 govuk-body-s">
             <span className="govuk-visually-hidden">Study sponsor: </span>
             {organisationsByRole.Sponsor}
@@ -245,6 +250,13 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
 
   const { CONTENTFUL_PAGE_STUDY_ASSESS_ID } = process.env
   const contentfulContent = await getManagedContent<TypeSetAssessmentFormPageSkeleton>(CONTENTFUL_PAGE_STUDY_ASSESS_ID)
+  const contentfulTestContent = await getManagedContentByKey<TypeSetPageSkeleton>("set-test-page-tk")
+
+  const contentfulTestContentFields = mapDynamicManagedContent(contentfulTestContent?.fields?.managedContent)
+
+  console.log(contentfulTestContentFields["someGenericKey"])
+  console.log(contentfulTestContentFields.get("someGenericKey"))
+  console.log(contentfulTestContentFields)
   const managedContent = contentfulContent?.fields || null
 
   const [statusRefData, furtherInformationRefData] = await prismaClient.$transaction([
@@ -275,6 +287,8 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
       furtherInformation: furtherInformationRefData.map(({ id, name }) => ({ id, name })),
       returnUrl: context.query.returnUrl === 'studies' ? 'studies' : `studies/${study.id}`,
       managedContent,
+      contentfulTestContent,
+      contentfulTestContentFields
     },
   }
 })
