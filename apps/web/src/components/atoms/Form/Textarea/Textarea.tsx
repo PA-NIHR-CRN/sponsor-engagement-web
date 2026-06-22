@@ -8,7 +8,7 @@ import { RichTextRenderer } from '@/utils/Renderers/RichTextRenderer/RichTextRen
 import { ErrorInline } from '../ErrorInline/ErrorInline'
 
 interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-  label: string
+  label: string | undefined
   labelSize?: 's' | 'm' | 'l'
   name: string
   hint?: string | Document

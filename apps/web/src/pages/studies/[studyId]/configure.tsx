@@ -19,10 +19,17 @@ import { getStudyById } from '@/lib/studies'
 import type { ConfigureInputs } from '@/utils/schemas/configure.schema'
 import { configureSchema } from '@/utils/schemas/configure.schema'
 import { withServerSideProps } from '@/utils/withServerSideProps'
+import { getSetPageByKey } from '@/lib/contentful/contentfulService'
+import { TypeSetPageSkeleton } from '@/@types/generated'
+import { ContentfulPage } from '@/constants/contentful/pages'
+import { RichTextRenderer } from '@/utils/Renderers/RichTextRenderer/RichTextRenderer'
+import type { Document } from '@contentful/rich-text-types'
+import { mapDynamicManagedContent } from '@/lib/contentful/contentfulUtils'
+import { ContentfulEntries } from '@/constants/contentful/entries'
 
 export type ConfigureProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function Configure({ study, returnUrl }: Readonly<ConfigureProps>) {
+export default function Configure({ study, returnUrl, managedContent, progressBarManagedContent,managedContentFields }: Readonly<ConfigureProps>) {
   const {
     register,
     formState,
@@ -77,7 +84,7 @@ export default function Configure({ study, returnUrl }: Readonly<ConfigureProps>
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">
-            Configure Progress of Study Setup
+            {managedContent?.title.toString()}
           </h2>
 
           <div className="govuk-body-s govuk-!-margin-bottom-0 text-darkGrey">
@@ -92,15 +99,14 @@ export default function Configure({ study, returnUrl }: Readonly<ConfigureProps>
           </h3>
 
           <div className="govuk-inset-text">
-            Selecting a timeline confirms whether the study should be monitored against that timeframe.
-            Missing an agreed timeline without mitigation or exemption may affect eligibility for funding
-            or support. Refer to the <Link href="/">Terms and Conditions</Link> guidance for more information.
+            <RichTextRenderer>{managedContent?.guidanceText as Document}</RichTextRenderer>
           </div>
 
           <StudyProgressExtended
             hraApprovalDate={study.hraApprovalDate}
             studyStatus={study.studyStatus}
             willRecruitWithinTimeline={study.willRecruitWithinTimeline}
+            progressBarManagedContent={progressBarManagedContent}
           />
 
           <Form
@@ -115,8 +121,8 @@ export default function Configure({ study, returnUrl }: Readonly<ConfigureProps>
             <Fieldset>
               <RadioGroup
                 errors={errors}
-                hint="Will you achieve this in 90 days?"
-                label="Do you expect to achieve the first participant in this timeline?"
+                hint={managedContentFields.get(ContentfulEntries.CONFIGURE_STUDY_SUB_QUESTION)?.toString()}
+                label={managedContentFields.get(ContentfulEntries.CONFIGURE_STUDY_SETUP_QUESTION)?.toString()}
                 labelSize="m"
                 {...register('status')}
               >
@@ -130,7 +136,7 @@ export default function Configure({ study, returnUrl }: Readonly<ConfigureProps>
                   defaultValue=''
                   errors={errors}
                   hint="If needed, provide further context or justification for changes made above."
-                  label="If ‘No’ briefly explain why"
+                  label={managedContentFields.get(ContentfulEntries.CONFIGURE_STUDY_SETUP_CONDITIONAL_BOX)?.toString()}
                   labelSize="m"
                   maxLength={TEXTAREA_MAX_CHARACTERS}
                   remainingCharacters={remainingCharacters}
@@ -184,6 +190,11 @@ export const getServerSideProps = withServerSideProps(
       return { redirect: { destination: '/404' } }
     }
 
+    const progressBarManagedContent = await getSetPageByKey<TypeSetPageSkeleton>(ContentfulPage.PROGRESS_BAR)
+    const managedContentResp = await getSetPageByKey<TypeSetPageSkeleton>(ContentfulPage.CONFIGURE_STUDY_SETUP)
+    const managedContent = managedContentResp?.fields
+    const managedContentFields = mapDynamicManagedContent(managedContent?.managedContent)
+
     const userOrganisationIds =
       session.user?.organisations.map(({ organisationId }) => organisationId)
 
@@ -202,6 +213,9 @@ export const getServerSideProps = withServerSideProps(
           context.query.returnUrl === 'studies'
             ? 'studies'
             : `studies/${study.id}/`,
+        managedContent,
+        progressBarManagedContent,
+        managedContentFields
       },
     }
   }

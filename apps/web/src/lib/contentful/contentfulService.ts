@@ -1,7 +1,7 @@
 import assert from 'node:assert'
 
 import { logger } from '@nihr-ui/logger'
-import type { Entry, EntryCollection, EntrySkeletonType } from 'contentful'
+import type { Entry, EntryCollection, EntryLink, EntrySkeletonType, UnresolvedLink } from 'contentful'
 import { createClient } from 'contentful'
 import type { Document } from '@contentful/rich-text-types'
 
@@ -40,7 +40,7 @@ export const getEntryById = async <T extends EntrySkeletonType>(id: string): Pro
 }
 export const getEntryByKeyField = async <T extends EntrySkeletonType>(key: string): Promise<EntryCollection<T>> => {
   const contentClient = getContentClient()
-  return contentClient.getEntries({
+   return contentClient.getEntries({
     'fields.key': key,
     content_type: 'setPage',
     limit:1
@@ -104,29 +104,17 @@ export const getBporFooter = async (): Promise<Entry<TypeBporFooterSkeleton> | n
   return null
 }
 
-export const getManagedContentByKey = async <T extends EntrySkeletonType>(
+export const getSetPageByKey = async <T extends EntrySkeletonType>(
   key: string | undefined
 ): Promise<Entry<T> | null> => {
   if (key) {
     try {
-      return await (await getEntryByKeyField<T>(key)).items[0]
+      var temp =  await (await getEntryByKeyField<T>(key)).items[0]
+      return temp
     } catch (error) {
       logger.error(`Encountered error fetching entry from Contentful: ${error}`)
       return null
     }
   }
   return null
-}
-
-export const mapDynamicManagedContent = (managedContent: EntrySkeletonType[]): Map<string, string | Document> => {
-
-var contentMap = new Map()
-
-
-managedContent.forEach((x)=>{ 
-  var keys = Object.keys(x.fields)
-  console.log(x.fields[keys[0]])
-  contentMap.set(x.fields[keys[0]], x.fields[keys[1]])
-})
-return contentMap
 }

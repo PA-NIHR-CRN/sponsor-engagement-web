@@ -5,6 +5,10 @@ import { Status } from '@/@types/studies';
 import { ProgressBar, progressBarColor } from "@/components/atoms/ProgressBar/ProgressBar";
 import clsx from "clsx";
 import { pluraliseDays } from '@/utils/pluralise';
+import { TypeSetPageSkeleton } from '@/@types/generated';
+import { Entry } from 'contentful';
+import { mapDynamicManagedContent } from '@/lib/contentful/contentfulUtils';
+import { ContentfulEntries } from '@/constants/contentful/entries';
 
 interface StudyProgressExtendedProps {
     hraApprovalDate: Date | null;
@@ -17,8 +21,8 @@ interface StudyProgressExtendedProps {
     showTimeframeHint?: boolean;
     showDates?: boolean;
     showMoreDetails?: boolean;
-    optedOutText?: string;
     moreDetailsHref?: string;
+    progressBarManagedContent: Entry<TypeSetPageSkeleton> | null;
 }
 
 export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
@@ -34,7 +38,7 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
         showTimeframeHint = true,
         showDates = true,
         showMoreDetails = true,
-        optedOutText = "No expectation to achieve the first participant in 90 days"
+        progressBarManagedContent,
     }) => {
 
     const inSetupStatuses = [
@@ -62,10 +66,12 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
     );
 
     const daysRemaining = Math.max(totalDays - elapsedDays, 0);
+    const progressBarManagedContentFields = progressBarManagedContent ? progressBarManagedContent.fields : null
+    const managedContentFields = progressBarManagedContentFields?.managedContent ? mapDynamicManagedContent(progressBarManagedContentFields.managedContent as Entry[]) : null;
 
     const progressLabel =
         elapsedDays >= totalDays
-            ? `OVER TARGET by ${elapsedDays - totalDays} ${pluraliseDays(elapsedDays - totalDays)}`
+            ? `${managedContentFields?.get(ContentfulEntries.PROGRESS_BAR_OVER_TARGET)?.toString()} ${elapsedDays - totalDays} ${pluraliseDays(elapsedDays - totalDays)}`
             : `${daysRemaining} ${pluraliseDays(daysRemaining)} remaining`;
 
     function GetStudyProgressColor(daysSinceAssessmentDue: number) {
@@ -79,10 +85,9 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
 
     return (
         <div className={divClass}>
-
             {showTitle && (
                 <h3 className={clsx(`govuk-heading-${titleSize}`, 'govuk-!-margin-bottom-1 govuk-!-margin-top-4 p-0', titleClassName)}>
-                    Progress of study setup
+                    {progressBarManagedContentFields?.title.toString()}
                 </h3>
             )}
 
@@ -105,7 +110,7 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
                             </span>
                             {showDates && (
                                 <span className="govuk-body-s govuk-!-font-weight-bold text-darkGrey">
-                                    HRA approval date: {hraApprovalDate.toLocaleDateString('en-GB')}
+                                    {managedContentFields?.get(ContentfulEntries.PROGRESS_BAR_HRA_APPROVAL_DATE)?.toString()} {hraApprovalDate.toLocaleDateString('en-GB')}
                                 </span>
                             )}
                         </div>
@@ -116,7 +121,7 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
                             </span>
                             {showDates && (
                                 <span className="govuk-body-s govuk-!-font-weight-bold text-darkGrey">
-                                    End date: {endDate.toLocaleDateString('en-GB')}
+                                    {managedContentFields?.get(ContentfulEntries.PROGRESS_BAR_END_DATE)?.toString()} {endDate.toLocaleDateString('en-GB')}
                                 </span>
                             )}
                         </div>
@@ -125,7 +130,7 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
             ) :
                 <div>
                     <span className="govuk-body-s text-darkGrey block govuk-!-margin-bottom-2">
-                        {optedOutText}
+                        {managedContentFields?.get(ContentfulEntries.PROGRESS_BAR_OPT_OUT)?.toString()}
                     </span>
                 </div>
             }

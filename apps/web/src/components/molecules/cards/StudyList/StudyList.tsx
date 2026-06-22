@@ -6,6 +6,8 @@ import TagCollection from '../../TagCollection/TagCollection'
 import {StudyProgressExtended} from "@/components/molecules";
 import { capitaliseFirstLetter } from '@/utils/capitalise';
 import { FirstMedal } from '@/components/atoms/FirstMedal/FirstMedal';
+import { TypeSetPageSkeleton } from '@/@types/generated';
+import { Entry } from 'contentful';
 
 export interface StudyListProps {
   sponsorOrgName?: string
@@ -22,6 +24,7 @@ export interface StudyListProps {
   studyStatus: string,
   willRecruitWithinTimeline : boolean
   firstType?: string | null
+  progressBarManagedContent: Entry<TypeSetPageSkeleton> | null
 }
 
 export function StudyList({
@@ -38,7 +41,8 @@ export function StudyList({
   hraApprovalDate,
   studyStatus, 
   willRecruitWithinTimeline,
-  firstType
+  firstType,
+  progressBarManagedContent
 }: StudyListProps) {
   const hasAssessmentDue = daysSinceAssessmentDue !== null
 
@@ -121,6 +125,7 @@ export function StudyList({
                 showTimeframeHint={false}
                 showDates={false}
                 showMoreDetails={false}
+                progressBarManagedContent={progressBarManagedContent}
               />
             </div>
           </div>

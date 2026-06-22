@@ -42,6 +42,9 @@ import {
 import { formatDate } from '@/utils/date'
 import { getStudyAssessmentDueDate } from '@/utils/studies'
 import { withServerSideProps } from '@/utils/withServerSideProps'
+import { getSetPageByKey } from '@/lib/contentful/contentfulService'
+import { TypeSetPageSkeleton } from '@/@types/generated'
+import { ContentfulPage } from '@/constants/contentful/pages'
 
 const renderNotificationBanner = (success: string | undefined, showRequestSupportLink: boolean) =>
   success || !Number.isNaN(Number(success)) ? (
@@ -70,7 +73,7 @@ const renderBackLink = () => (
 
 export type StudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function Study({ study, assessments, editHistory, getEditHistoryError }: StudyProps) {
+export default function Study({ study, assessments, editHistory, getEditHistoryError, progressBarManagedContent }: StudyProps) {
   const router = useRouter()
   const successType = router.query.success as string
   const transactionIdLatestProposedUpdate = router.query.latestProposedUpdate as string | undefined
@@ -197,7 +200,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
               moreDetailsHref={`${STUDIES_PAGE}/${study.id}/configure`}
               studyStatus={study.studyStatus}
               willRecruitWithinTimeline={study.willRecruitWithinTimeline}
-              optedOutText='No expectation to achieve the first participant in 90 days for this study'
+              progressBarManagedContent={progressBarManagedContent}
             />
 
           </div>
@@ -326,6 +329,8 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
   }
 
   logger.info('Successfully retrieved study from SE with studyId: %s', studyId)
+  
+  const progressBarManagedContent = await getSetPageByKey<TypeSetPageSkeleton>(ContentfulPage.PROGRESS_BAR)
 
   const changeHistoryFromDate = process.env.EDIT_HISTORY_START_DATE ?? ''
   const { study: studyInCPMS } = await getStudyByIdFromCPMS(study.cpmsId, changeHistoryFromDate)
@@ -336,6 +341,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
         user: session.user,
         assessments: getAssessmentHistoryFromStudy(study),
         study,
+        progressBarManagedContent,
       },
     }
   }
@@ -353,6 +359,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
         user: session.user,
         assessments: getAssessmentHistoryFromStudy(study),
         study,
+        progressBarManagedContent,
       },
     }
   }
@@ -389,6 +396,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
       },
       editHistory,
       getEditHistoryError,
+      progressBarManagedContent,
     },
   }
 })

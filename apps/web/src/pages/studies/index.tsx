@@ -10,7 +10,7 @@ import { NextSeo } from 'next-seo'
 import type { ReactElement } from 'react'
 
 import type { OrderType } from '@/@types/filters'
-import type { TypeBannerSkeleton } from '@/@types/generated'
+import type { TypeBannerSkeleton, TypeSetPageSkeleton } from '@/@types/generated'
 import { Card } from '@/components/atoms'
 import Tag from '@/components/atoms/Tag/Tag'
 import {
@@ -29,7 +29,7 @@ import { Roles, STUDIES_PER_PAGE } from '@/constants'
 import { FORM_SUCCESS_MESSAGES } from '@/constants/forms'
 import { STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/routes'
 import { useFormListeners } from '@/hooks/useFormListeners'
-import { getNotificationBanner } from '@/lib/contentful/contentfulService'
+import { getSetPageByKey, getNotificationBanner } from '@/lib/contentful/contentfulService'
 import { getSponsorOrgName, getSupportOrgName } from '@/lib/organisations'
 import { getStudiesForOrgs, mapFilterStatusesToStatuses } from '@/lib/studies'
 import { formatDate } from '@/utils/date'
@@ -37,6 +37,7 @@ import { getFiltersFromQuery } from '@/utils/filters'
 import { pluraliseStudy } from '@/utils/pluralise'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 import { StudyStatusFilters } from '@/components/molecules/Filters/StudyStatusFilters'
+import { ContentfulPage } from '@/constants/contentful/pages'
 
 const renderNotificationBanner = (success: string | undefined, showRequestSupportLink: boolean) =>
   success || !Number.isNaN(Number(success)) ? (
@@ -61,6 +62,7 @@ export default function Studies({
   meta: { totalItems, totalItemsDue, initialPage, initialPageSize },
   filters,
   entry,
+  progressBarManagedContent,
 }: StudiesProps) {
   const router = useRouter()
   const { isLoading, handleFilterChange } = useFormListeners()
@@ -168,6 +170,7 @@ export default function Studies({
                             trackStatus={study.lastAssessment?.status.name}
                             willRecruitWithinTimeline={study.willRecruitWithinTimeline}
                             firstType={study.StudyFirst?.type}
+                            progressBarManagedContent={progressBarManagedContent}
                           />
                         </li>
                       )
@@ -271,6 +274,8 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
     })
 
     const entry: Entry<TypeBannerSkeleton> | null = await getNotificationBanner()
+    const progressBarManagedContent = await getSetPageByKey<TypeSetPageSkeleton>(ContentfulPage.PROGRESS_BAR)
+  
 
     return {
       props: {
@@ -284,6 +289,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
         studies: studies.data,
         filters,
         entry,
+        progressBarManagedContent,
       },
     }
   } catch (error) {
