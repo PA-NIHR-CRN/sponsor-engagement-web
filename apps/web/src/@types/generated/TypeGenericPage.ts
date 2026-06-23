@@ -1,7 +1,6 @@
 import type { ChainModifiers, Entry, EntryFieldTypes, EntrySkeletonType, LocaleCode } from "contentful";
 import type { TypeGenericTextSkeleton } from "./TypeGenericText";
 import type { TypeRichTextSectionSkeleton } from "./TypeRichTextSection";
-import type { TypeTableSkeleton } from "./TypeTable";
 
 /**
  * Fields type definition for content type 'TypeGenericPage'
@@ -51,7 +50,7 @@ export interface TypeGenericPageFields {
      * @name Page sections
      * @localized false
      */
-    pageSections: EntryFieldTypes.Array<EntryFieldTypes.EntryLink<TypeGenericTextSkeleton | TypeRichTextSectionSkeleton | TypeTableSkeleton>>;
+    pageSections: EntryFieldTypes.Array<EntryFieldTypes.EntryLink<TypeGenericTextSkeleton | TypeRichTextSectionSkeleton >>;
 }
 
 /**
