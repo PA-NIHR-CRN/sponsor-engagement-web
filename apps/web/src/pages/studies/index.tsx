@@ -274,7 +274,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
     })
 
     const entry: Entry<TypeBannerSkeleton> | null = await getNotificationBanner()
-    const progressBarManagedContent = await getSetPageByKey<TypeSetPageSkeleton>(ContentfulPage.PROGRESS_BAR)
+    const progressBarManagedContent = await getSetPageByKey(ContentfulPage.PROGRESS_BAR)
   
 
     return {

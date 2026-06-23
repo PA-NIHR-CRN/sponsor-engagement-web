@@ -20,42 +20,6 @@ export interface TypeStudyDataFormFields {
      */
     pageDescription: EntryFieldTypes.RichText;
     /**
-     * Field type definition for field 'inSetupGuidanceText' (In setup guidance text)
-     * @name In setup guidance text
-     * @localized false
-     */
-    inSetupGuidanceText: EntryFieldTypes.RichText;
-    /**
-     * Field type definition for field 'openToRecruitmentGuidanceText' (Open to Recruitment Guidance text)
-     * @name Open to Recruitment Guidance text
-     * @localized false
-     */
-    openToRecruitmentGuidanceText: EntryFieldTypes.RichText;
-    /**
-     * Field type definition for field 'closedInFollowUpGuidanceText' (Closed, in follow-up guidance text)
-     * @name Closed, in follow-up guidance text
-     * @localized false
-     */
-    closedInFollowUpGuidanceText: EntryFieldTypes.RichText;
-    /**
-     * Field type definition for field 'closedGuidanceText' (Closed guidance text)
-     * @name Closed guidance text
-     * @localized false
-     */
-    closedGuidanceText: EntryFieldTypes.RichText;
-    /**
-     * Field type definition for field 'withdrawnGuidanceText' (Withdrawn guidance text)
-     * @name Withdrawn guidance text
-     * @localized false
-     */
-    withdrawnGuidanceText: EntryFieldTypes.RichText;
-    /**
-     * Field type definition for field 'suspendedGuidanceText' (Suspended Guidance text)
-     * @name Suspended Guidance text
-     * @localized false
-     */
-    suspendedGuidanceText: EntryFieldTypes.RichText;
-    /**
      * Field type definition for field 'furtherInformationLabel' (Further information Label)
      * @name Further information Label
      * @localized false

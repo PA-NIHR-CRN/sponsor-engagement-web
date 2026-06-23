@@ -5,7 +5,7 @@ import type { Entry, EntryCollection, EntryLink, EntrySkeletonType, UnresolvedLi
 import { createClient } from 'contentful'
 import type { Document } from '@contentful/rich-text-types'
 
-import type { TypeBannerSkeleton, TypeBporFooterSkeleton, TypePageSkeleton } from '@/@types/generated'
+import type { TypeBannerSkeleton, TypeBporFooterSkeleton, TypePageSkeleton, TypeSetPageFields, TypeSetPageSkeleton } from '@/@types/generated'
 
 function getContentClient() {
   const {
@@ -38,11 +38,11 @@ export const getEntryById = async <T extends EntrySkeletonType>(id: string): Pro
   const contentClient = getContentClient()
   return contentClient.getEntry<T>(id)
 }
-export const getEntryByKeyField = async <T extends EntrySkeletonType>(key: string): Promise<EntryCollection<T>> => {
+export const getSetPageByKeyField = async (key: string): Promise<EntryCollection<TypeSetPageSkeleton>> => {
   const contentClient = getContentClient()
-   return contentClient.getEntries({
+   return contentClient.getEntries<TypeSetPageSkeleton>({
     'fields.key': key,
-    content_type: 'setPage',
+    content_type : 'setPage',
     limit:1
   })
 }
@@ -104,13 +104,12 @@ export const getBporFooter = async (): Promise<Entry<TypeBporFooterSkeleton> | n
   return null
 }
 
-export const getSetPageByKey = async <T extends EntrySkeletonType>(
+export const getSetPageByKey = async(
   key: string | undefined
-): Promise<Entry<T> | null> => {
+): Promise<Entry<TypeSetPageSkeleton> | null> => {
   if (key) {
     try {
-      var temp =  await (await getEntryByKeyField<T>(key)).items[0]
-      return temp
+      return  await (await getSetPageByKeyField(key)).items[0]
     } catch (error) {
       logger.error(`Encountered error fetching entry from Contentful: ${error}`)
       return null

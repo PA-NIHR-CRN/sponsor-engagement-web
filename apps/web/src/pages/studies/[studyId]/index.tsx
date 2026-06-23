@@ -330,7 +330,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
 
   logger.info('Successfully retrieved study from SE with studyId: %s', studyId)
   
-  const progressBarManagedContent = await getSetPageByKey<TypeSetPageSkeleton>(ContentfulPage.PROGRESS_BAR)
+  const progressBarManagedContent = await getSetPageByKey(ContentfulPage.PROGRESS_BAR)
 
   const changeHistoryFromDate = process.env.EDIT_HISTORY_START_DATE ?? ''
   const { study: studyInCPMS } = await getStudyByIdFromCPMS(study.cpmsId, changeHistoryFromDate)

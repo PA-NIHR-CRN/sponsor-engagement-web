@@ -26,10 +26,11 @@ import { RichTextRenderer } from '@/utils/Renderers/RichTextRenderer/RichTextRen
 import type { Document } from '@contentful/rich-text-types'
 import { mapDynamicManagedContent } from '@/lib/contentful/contentfulUtils'
 import { ContentfulEntries } from '@/constants/contentful/entries'
+import { Entry } from 'contentful'
 
 export type ConfigureProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function Configure({ study, returnUrl, managedContent, progressBarManagedContent,managedContentFields }: Readonly<ConfigureProps>) {
+export default function Configure({ study, returnUrl, managedContent, progressBarManagedContent, managedContentFields }: Readonly<ConfigureProps>) {
   const {
     register,
     formState,
@@ -121,8 +122,8 @@ export default function Configure({ study, returnUrl, managedContent, progressBa
             <Fieldset>
               <RadioGroup
                 errors={errors}
-                hint={managedContentFields.get(ContentfulEntries.CONFIGURE_STUDY_SUB_QUESTION)?.toString()}
-                label={managedContentFields.get(ContentfulEntries.CONFIGURE_STUDY_SETUP_QUESTION)?.toString()}
+                hint={managedContentFields?.get(ContentfulEntries.CONFIGURE_STUDY_SUB_QUESTION)?.toString()}
+                label={managedContentFields?.get(ContentfulEntries.CONFIGURE_STUDY_SETUP_QUESTION)?.toString()}
                 labelSize="m"
                 {...register('status')}
               >
@@ -136,7 +137,7 @@ export default function Configure({ study, returnUrl, managedContent, progressBa
                   defaultValue=''
                   errors={errors}
                   hint="If needed, provide further context or justification for changes made above."
-                  label={managedContentFields.get(ContentfulEntries.CONFIGURE_STUDY_SETUP_CONDITIONAL_BOX)?.toString()}
+                  label={managedContentFields?.get(ContentfulEntries.CONFIGURE_STUDY_SETUP_CONDITIONAL_BOX)?.toString()}
                   labelSize="m"
                   maxLength={TEXTAREA_MAX_CHARACTERS}
                   remainingCharacters={remainingCharacters}
@@ -190,10 +191,10 @@ export const getServerSideProps = withServerSideProps(
       return { redirect: { destination: '/404' } }
     }
 
-    const progressBarManagedContent = await getSetPageByKey<TypeSetPageSkeleton>(ContentfulPage.PROGRESS_BAR)
-    const managedContentResp = await getSetPageByKey<TypeSetPageSkeleton>(ContentfulPage.CONFIGURE_STUDY_SETUP)
+    const progressBarManagedContent = await getSetPageByKey(ContentfulPage.PROGRESS_BAR)
+    const managedContentResp = await getSetPageByKey(ContentfulPage.CONFIGURE_STUDY_SETUP)
     const managedContent = managedContentResp?.fields
-    const managedContentFields = mapDynamicManagedContent(managedContent?.managedContent)
+    const managedContentFields = mapDynamicManagedContent(managedContent?.managedContent as Entry[])
 
     const userOrganisationIds =
       session.user?.organisations.map(({ organisationId }) => organisationId)
