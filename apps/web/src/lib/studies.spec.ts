@@ -596,6 +596,7 @@ describe('mapCPMSStudyToSEStudy', () => {
     actualOpeningDate: new Date(mockCPMSStudy.ActualOpeningDate as string),
     actualClosureDate: new Date(mockCPMSStudy.ActualClosureToRecruitmentDate as string),
     estimatedReopeningDate: new Date(mockCPMSStudy.EstimatedReopeningDate as string),
+    hraApprovalDate: null,
   }
 
   it('correctly maps data when all fields exist', () => {
