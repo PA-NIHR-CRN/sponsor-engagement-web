@@ -141,7 +141,7 @@ const renderPage = async (
     props: AssessmentProps
   }
 
-  render(Assessment.getLayout(<Assessment {...props} managedContent={AssessmentPageMock.fields} />, { ...props }))
+  render(Assessment.getLayout(<Assessment {...props} pageContent={AssessmentPageMock.fields} />, { ...props }))
 }
 
 describe('Assessment', () => {

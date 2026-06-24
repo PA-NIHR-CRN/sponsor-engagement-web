@@ -9,7 +9,7 @@ import { type ReactElement, useCallback } from 'react'
 import type { FieldError } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 
-import type { TypeSetAssessmentFormPageSkeleton, TypeSetPageSkeleton } from '@/@types/generated'
+import type { TypeSetAssessmentFormPageSkeleton } from '@/@types/generated'
 import { Checkbox, CheckboxGroup, ErrorSummary, Fieldset, Form, Radio, RadioGroup } from '@/components/atoms'
 import { Textarea } from '@/components/atoms/Form/Textarea/Textarea'
 import { AssessmentHistory, getAssessmentHistoryFromStudy, RequestSupport, StudyDetails } from '@/components/molecules'
@@ -17,12 +17,13 @@ import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
 import { TEXTAREA_MAX_CHARACTERS } from '@/constants/forms'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
-import { getManagedContent} from '@/lib/contentful/contentfulService'
+import { getPageContent } from '@/lib/contentful/contentfulService'
 import { prismaClient } from '@/lib/prisma'
 import { getStudyById } from '@/lib/studies'
 import { getValuesFromSearchParams } from '@/utils/form'
 import { RichTextRenderer } from '@/utils/Renderers/RichTextRenderer/RichTextRenderer'
-import { AssessmentInputs, assessmentSchema } from '@/utils/schemas/assessment.schema'
+import type { AssessmentInputs} from '@/utils/schemas/assessment.schema';
+import { assessmentSchema } from '@/utils/schemas/assessment.schema'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
 export type AssessmentProps = InferGetServerSidePropsType<typeof getServerSideProps>
@@ -34,9 +35,7 @@ export default function Assessment({
   furtherInformation,
   returnUrl,
   assessments,
-  managedContent,
-  // contentfulTestContent,
-  // contentfulTestContentFields
+  pageContent,
 }: AssessmentProps) {
   const studyHasNotRecruitedWithinSixMonths = study.evaluationCategories.some(indicator => indicator.indicatorValue === 'No recruitment in past 6 months')
 
@@ -79,10 +78,10 @@ export default function Assessment({
     switch (id) {
       case 1:
         // on track
-        return managedContent?.guidanceTextOnTrack as string
+        return pageContent?.guidanceTextOnTrack as string
       case 2:
         //off track
-        return managedContent?.guidanceTextOffTrack as string
+        return pageContent?.guidanceTextOffTrack as string
       default:
         return description
     }
@@ -93,10 +92,10 @@ export default function Assessment({
       <NextSeo title="Study Progress Review - Assess progress of study" />
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
-          <h2 className="govuk-heading-l govuk-!-margin-bottom-4">{managedContent?.pageTitle.toString()}</h2>
+          <h2 className="govuk-heading-l govuk-!-margin-bottom-4">{pageContent?.pageTitle.toString()}</h2>
 
           <div className="govuk-body govuk-!-margin-bottom-6">
-            <RichTextRenderer>{managedContent?.pageDescription as Document}</RichTextRenderer>
+            <RichTextRenderer>{pageContent?.pageDescription as Document}</RichTextRenderer>
           </div>
 
           <div className="text-darkGrey govuk-!-margin-bottom-0 govuk-body-s">
@@ -147,7 +146,7 @@ export default function Assessment({
               <RadioGroup
                 defaultValue=''
                 errors={errors}
-                label={managedContent?.studyProgressionQuestionLabel.toString()}
+                label={pageContent?.studyProgressionQuestionLabel.toString()}
                 {...register('status')}
               >
                 {statuses.map(({ id, name, description }) => (
@@ -162,8 +161,8 @@ export default function Assessment({
                   defaultValue=''
                   {...register('reasonForNoRecruitment')}
                   errors={errors}
-                  label="Study has not recruited for 6 months"
                   hint="Provide reasoning for no recruitment"
+                  label="Study has not recruited for 6 months"
                   maxLength={TEXTAREA_MAX_CHARACTERS}
                   required
                 />
@@ -177,7 +176,7 @@ export default function Assessment({
                     : []
                 }
                 errors={errors}
-                label={managedContent?.additionalInfoLabel.toString()}
+                label={pageContent?.additionalInfoLabel.toString()}
                 required={false}
                 {...register('furtherInformation')}
               >
@@ -191,10 +190,10 @@ export default function Assessment({
                 defaultValue={defaultValues?.furtherInformationText}
                 errors={errors}
                 label={
-                  managedContent?.furtherInformationLabel ? (managedContent.furtherInformationLabel as string) : ''
+                  pageContent?.furtherInformationLabel ? (pageContent.furtherInformationLabel as string) : ''
                 }
-                required={false}
                 maxLength={TEXTAREA_MAX_CHARACTERS}
+                required={false}
                 {...register('furtherInformationText')}
               />
 
@@ -246,9 +245,8 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
   const { data: study } = await getStudyById(Number(studyId), userOrganisationIds)
 
   const { CONTENTFUL_PAGE_STUDY_ASSESS_ID } = process.env
-  const contentfulContent = await getManagedContent<TypeSetAssessmentFormPageSkeleton>(CONTENTFUL_PAGE_STUDY_ASSESS_ID)
-
-  const managedContent = contentfulContent?.fields || null
+  const contentfulContent = await getPageContent<TypeSetAssessmentFormPageSkeleton>(CONTENTFUL_PAGE_STUDY_ASSESS_ID)
+  const pageContent = contentfulContent?.fields || null
 
   const [statusRefData, furtherInformationRefData] = await prismaClient.$transaction([
     prismaClient.sysRefAssessmentStatus.findMany(),
@@ -277,9 +275,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
       statuses: statusRefData.map(({ id, name, description }) => ({ id, name, description })),
       furtherInformation: furtherInformationRefData.map(({ id, name }) => ({ id, name })),
       returnUrl: context.query.returnUrl === 'studies' ? 'studies' : `studies/${study.id}`,
-      managedContent,
-      // contentfulTestContent,
-      // contentfulTestContentFields
+      pageContent,
     },
   }
 })

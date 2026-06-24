@@ -11,6 +11,7 @@ import { Mock } from 'ts-mockery'
 
 import { render, screen, within } from '@/config/TestUtils'
 import { StudyUpdateState, StudyUpdateType } from '@/constants'
+import { StudyProgressBarMock } from '@/lib/contentful/studyProgressBarMock'
 import {
   getMockEditHistoryFromCPMS,
   mappedCPMSStudyEvals,
@@ -130,7 +131,7 @@ const renderPage = async (
     props: StudyProps
   }
 
-  render(Study.getLayout(<Study {...props} />, { ...props }))
+  render(Study.getLayout(<Study {...props} progressBarPageContent={StudyProgressBarMock} />, { ...props }))
 }
 
 describe('Study', () => {

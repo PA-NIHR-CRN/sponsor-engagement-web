@@ -1,6 +1,8 @@
+import type { Document } from '@contentful/rich-text-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Container } from '@nihr-ui/frontend'
 import clsx from 'clsx'
+import type { Entry } from 'contentful'
 import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
 import { NextSeo } from 'next-seo'
@@ -8,29 +10,27 @@ import { type ReactElement, useCallback, useEffect } from 'react'
 import type { FieldError } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 
+
 import { Fieldset, Form, Radio, RadioGroup } from '@/components/atoms'
 import { Textarea } from '@/components/atoms/Form/Textarea/Textarea'
 import { RequestSupport, StudyProgressExtended } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
+import { ContentfulEntries } from '@/constants/contentful/entries'
+import { ContentfulPage } from '@/constants/contentful/pages'
 import { TEXTAREA_MAX_CHARACTERS } from '@/constants/forms'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
+import { getSetPageByKey } from '@/lib/contentful/contentfulService'
+import { mapDynamicPageContent } from '@/lib/contentful/contentfulUtils'
 import { getStudyById } from '@/lib/studies'
+import { RichTextRenderer } from '@/utils/Renderers/RichTextRenderer/RichTextRenderer'
 import type { ConfigureInputs } from '@/utils/schemas/configure.schema'
 import { configureSchema } from '@/utils/schemas/configure.schema'
 import { withServerSideProps } from '@/utils/withServerSideProps'
-import { getSetPageByKey } from '@/lib/contentful/contentfulService'
-import { TypeSetPageSkeleton } from '@/@types/generated'
-import { ContentfulPage } from '@/constants/contentful/pages'
-import { RichTextRenderer } from '@/utils/Renderers/RichTextRenderer/RichTextRenderer'
-import type { Document } from '@contentful/rich-text-types'
-import { mapDynamicManagedContent } from '@/lib/contentful/contentfulUtils'
-import { ContentfulEntries } from '@/constants/contentful/entries'
-import { Entry } from 'contentful'
 
 export type ConfigureProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function Configure({ study, returnUrl, managedContent, progressBarManagedContent, managedContentFields }: Readonly<ConfigureProps>) {
+export default function Configure({ study, returnUrl, pageContent, progressBarPageContent, pageContentFields }: Readonly<ConfigureProps>) {
   const {
     register,
     formState,
@@ -85,7 +85,7 @@ export default function Configure({ study, returnUrl, managedContent, progressBa
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">
-            {managedContent?.title.toString()}
+            {pageContent?.title.toString()}
           </h2>
 
           <div className="govuk-body-s govuk-!-margin-bottom-0 text-darkGrey">
@@ -100,14 +100,14 @@ export default function Configure({ study, returnUrl, managedContent, progressBa
           </h3>
 
           <div className="govuk-inset-text">
-            <RichTextRenderer>{managedContent?.guidanceText as Document}</RichTextRenderer>
+            <RichTextRenderer>{pageContent?.guidanceText as Document}</RichTextRenderer>
           </div>
 
           <StudyProgressExtended
             hraApprovalDate={study.hraApprovalDate}
+            progressBarPageContent={progressBarPageContent}
             studyStatus={study.studyStatus}
             willRecruitWithinTimeline={study.willRecruitWithinTimeline}
-            progressBarManagedContent={progressBarManagedContent}
           />
 
           <Form
@@ -122,8 +122,8 @@ export default function Configure({ study, returnUrl, managedContent, progressBa
             <Fieldset>
               <RadioGroup
                 errors={errors}
-                hint={managedContentFields?.get(ContentfulEntries.CONFIGURE_STUDY_SUB_QUESTION)?.toString()}
-                label={managedContentFields?.get(ContentfulEntries.CONFIGURE_STUDY_SETUP_QUESTION)?.toString()}
+                hint={pageContentFields?.get(ContentfulEntries.CONFIGURE_STUDY_SUB_QUESTION)?.toString()}
+                label={pageContentFields?.get(ContentfulEntries.CONFIGURE_STUDY_SETUP_QUESTION)?.toString()}
                 labelSize="m"
                 {...register('status')}
               >
@@ -137,7 +137,7 @@ export default function Configure({ study, returnUrl, managedContent, progressBa
                   defaultValue=''
                   errors={errors}
                   hint="If needed, provide further context or justification for changes made above."
-                  label={managedContentFields?.get(ContentfulEntries.CONFIGURE_STUDY_SETUP_CONDITIONAL_BOX)?.toString()}
+                  label={pageContentFields?.get(ContentfulEntries.CONFIGURE_STUDY_SETUP_CONDITIONAL_BOX)?.toString()}
                   labelSize="m"
                   maxLength={TEXTAREA_MAX_CHARACTERS}
                   remainingCharacters={remainingCharacters}
@@ -191,11 +191,10 @@ export const getServerSideProps = withServerSideProps(
       return { redirect: { destination: '/404' } }
     }
 
-    const progressBarManagedContent = await getSetPageByKey(ContentfulPage.PROGRESS_BAR)
-    const managedContentResp = await getSetPageByKey(ContentfulPage.CONFIGURE_STUDY_SETUP)
-    const managedContent = managedContentResp?.fields
-    const managedContentFields = mapDynamicManagedContent(managedContent?.managedContent as Entry[])
-
+    const progressBarPageContent = await getSetPageByKey(ContentfulPage.ProgressBar)
+    const pageContentResp = await getSetPageByKey(ContentfulPage.ConfigureStudySetup)
+    const pageContent = pageContentResp?.fields
+    const pageContentFields = mapDynamicPageContent(pageContent?.pageContent as Entry[])
     const userOrganisationIds =
       session.user?.organisations.map(({ organisationId }) => organisationId)
 
@@ -214,9 +213,9 @@ export const getServerSideProps = withServerSideProps(
           context.query.returnUrl === 'studies'
             ? 'studies'
             : `studies/${study.id}/`,
-        managedContent,
-        progressBarManagedContent,
-        managedContentFields
+        pageContent,
+        progressBarPageContent,
+        pageContentFields
       },
     }
   }

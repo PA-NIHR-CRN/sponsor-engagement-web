@@ -35,11 +35,11 @@ export interface TypeSetPageFields {
      */
     guidanceText?: EntryFieldTypes.RichText;
     /**
-     * Field type definition for field 'managedContent' (Managed content)
-     * @name Managed content
+     * Field type definition for field 'pageContent' (Page Content)
+     * @name Page Content
      * @localized false
      */
-    managedContent?: EntryFieldTypes.Array<EntryFieldTypes.EntryLink<TypeGenericRichTextLinksOnlySkeleton | TypeGenericRichTextSkeleton | TypeGenericTextSkeleton>>;
+    pageContent?: EntryFieldTypes.Array<EntryFieldTypes.EntryLink<TypeGenericRichTextLinksOnlySkeleton | TypeGenericRichTextSkeleton | TypeGenericTextSkeleton>>;
     /**
      * Field type definition for field 'jsonTest' (Json Test)
      * @name Json Test

@@ -1,10 +1,10 @@
-import type React from 'react'
 import type { Document } from '@contentful/rich-text-types'
 import clsx from 'clsx'
-import { forwardRef, useEffect, useMemo, useState } from 'react'
+import React, { forwardRef, useEffect, useMemo, useState } from 'react'
 import type { FieldErrors } from 'react-hook-form'
 
 import { RichTextRenderer } from '@/utils/Renderers/RichTextRenderer/RichTextRenderer'
+
 import { ErrorInline } from '../ErrorInline/ErrorInline'
 
 interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {

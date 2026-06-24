@@ -1,13 +1,14 @@
-import type { Entry, EntryCollection, EntryLink, EntrySkeletonType, UnresolvedLink } from 'contentful'
 import type { Document } from '@contentful/rich-text-types'
+import type { Entry } from 'contentful'
 
 
-export function mapDynamicManagedContent(managedContent: Entry[] ) : Map<string, string | Document > | null{
+export function mapDynamicPageContent(pageContent: Entry[] | null ) : Map<string, string | Document > | null{
 
-var contentMap = new Map()
-if (managedContent){
-  managedContent.forEach((x)=>{ 
-    var keys = Object.keys(x.fields)
+const contentMap = new Map()
+
+if (pageContent){
+  pageContent.forEach((x)=>{ 
+    const keys = Object.keys(x.fields)
     contentMap.set(x.fields[keys[0]], x.fields[keys[1]])
   })
 }

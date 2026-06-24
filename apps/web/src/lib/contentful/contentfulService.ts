@@ -1,11 +1,10 @@
 import assert from 'node:assert'
 
 import { logger } from '@nihr-ui/logger'
-import type { Entry, EntryCollection, EntryLink, EntrySkeletonType, UnresolvedLink } from 'contentful'
+import type { Entry, EntryCollection, EntrySkeletonType } from 'contentful'
 import { createClient } from 'contentful'
-import type { Document } from '@contentful/rich-text-types'
 
-import type { TypeBannerSkeleton, TypeBporFooterSkeleton, TypePageSkeleton, TypeSetPageFields, TypeSetPageSkeleton } from '@/@types/generated'
+import type { TypeBannerSkeleton, TypeBporFooterSkeleton, TypePageSkeleton, TypeSetPageSkeleton } from '@/@types/generated'
 
 function getContentClient() {
   const {
@@ -47,7 +46,7 @@ export const getSetPageByKeyField = async (key: string): Promise<EntryCollection
   })
 }
 
-export const getManagedContent = async <T extends EntrySkeletonType>(
+export const getPageContent = async <T extends EntrySkeletonType>(
   id: string | undefined
 ): Promise<Entry<T> | null> => {
   if (id) {
@@ -109,7 +108,7 @@ export const getSetPageByKey = async(
 ): Promise<Entry<TypeSetPageSkeleton> | null> => {
   if (key) {
     try {
-      return  await (await getSetPageByKeyField(key)).items[0]
+      return (await getSetPageByKeyField(key)).items[0]
     } catch (error) {
       logger.error(`Encountered error fetching entry from Contentful: ${error}`)
       return null

@@ -1,13 +1,14 @@
+import type { Entry } from 'contentful';
 import Link from 'next/link'
 
+import type { TypeSetPageSkeleton } from '@/@types/generated';
 import { Card } from '@/components/atoms'
+import { FirstMedal } from '@/components/atoms/FirstMedal/FirstMedal';
 import Tag from '@/components/atoms/Tag/Tag'
-import TagCollection from '../../TagCollection/TagCollection'
 import {StudyProgressExtended} from "@/components/molecules";
 import { capitaliseFirstLetter } from '@/utils/capitalise';
-import { FirstMedal } from '@/components/atoms/FirstMedal/FirstMedal';
-import { TypeSetPageSkeleton } from '@/@types/generated';
-import { Entry } from 'contentful';
+
+import TagCollection from '../../TagCollection/TagCollection'
 
 export interface StudyListProps {
   sponsorOrgName?: string
@@ -24,7 +25,7 @@ export interface StudyListProps {
   studyStatus: string,
   willRecruitWithinTimeline : boolean
   firstType?: string | null
-  progressBarManagedContent: Entry<TypeSetPageSkeleton> | null
+  progressBarPageContent: Entry<TypeSetPageSkeleton> | null
 }
 
 export function StudyList({
@@ -42,7 +43,7 @@ export function StudyList({
   studyStatus, 
   willRecruitWithinTimeline,
   firstType,
-  progressBarManagedContent
+  progressBarPageContent
 }: StudyListProps) {
   const hasAssessmentDue = daysSinceAssessmentDue !== null
 
@@ -116,16 +117,16 @@ export function StudyList({
             <div className="max-w-[600px]">
               <StudyProgressExtended 
                 hraApprovalDate={hraApprovalDate}
-                willRecruitWithinTimeline={willRecruitWithinTimeline}
-                studyStatus={studyStatus}
+                progressBarPageContent={progressBarPageContent}
                 showBorder={false}
-                showTitle={true}
-                titleSize='s'
-                titleClassName='text-darkGrey'
-                showTimeframeHint={false}
                 showDates={false}
                 showMoreDetails={false}
-                progressBarManagedContent={progressBarManagedContent}
+                showTimeframeHint={false}
+                showTitle
+                studyStatus={studyStatus}
+                titleClassName='text-darkGrey'
+                titleSize='s'
+                willRecruitWithinTimeline={willRecruitWithinTimeline}
               />
             </div>
           </div>

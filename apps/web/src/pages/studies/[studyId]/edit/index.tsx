@@ -33,7 +33,7 @@ import {
 } from '@/constants/editStudyForm'
 import { ClosureDraftProvider, useClosureDraft } from '@/context/closureDraftContext'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
-import { getManagedContent } from '@/lib/contentful/contentfulService'
+import { getPageContent } from '@/lib/contentful/contentfulService'
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
 import {
   getStudyById,
@@ -61,7 +61,7 @@ const transformDateValue = (input?: DateInputValue | null) => ({
   year: input?.year ?? '',
 })
 
-export default function EditStudy({ study, currentLSN, query, managedContent }: EditStudyProps) {
+export default function EditStudy({ study, currentLSN, query, pageContent }: EditStudyProps) {
   const router = useRouter()
   const { draft, setDraft } = useClosureDraft()
 
@@ -112,7 +112,7 @@ export default function EditStudy({ study, currentLSN, query, managedContent }: 
 
   useEffect(() => {
     if (!mounted) return
-    if (!draft?.studyId) return
+    if (!draft.studyId) return
 
     const currentStudyId = String(mappedFormInput.studyId ?? study.id)
     if (String(draft.studyId) !== currentStudyId) return
@@ -221,19 +221,19 @@ export default function EditStudy({ study, currentLSN, query, managedContent }: 
     switch (id) {
       case 1:
         // in setup
-        return managedContent?.guidanceTextInSetup as string
+        return pageContent?.guidanceTextInSetup as string
       case 2:
         //Open to recruitment
-        return managedContent?.guidanceTextOpenToRecruitment as string
+        return pageContent?.guidanceTextOpenToRecruitment as string
       case 3:
         //Closed
-        return managedContent?.guidanceTextClosed as string
+        return pageContent?.guidanceTextClosed as string
       case 4:
         //Withdrawn
-        return managedContent?.guidanceTextWithdrawn as string
+        return pageContent?.guidanceTextWithdrawn as string
       case 5:
         //Suspended
-        return managedContent?.guidanceTextSuspended as string
+        return pageContent?.guidanceTextSuspended as string
       default:
         return description
     }
@@ -246,7 +246,7 @@ export default function EditStudy({ study, currentLSN, query, managedContent }: 
         <div className="w-full">
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">
             <span className="govuk-visually-hidden">Page title: </span>
-            {managedContent?.pageTitle as string}
+            {pageContent?.pageTitle as string}
           </h2>
           <span className="govuk-body-m mb-0 text-darkGrey">
             <span className="govuk-visually-hidden">Study sponsor: </span>
@@ -260,7 +260,7 @@ export default function EditStudy({ study, currentLSN, query, managedContent }: 
           <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
 
           <div className="govuk-inset-text">
-            <RichTextRenderer>{managedContent?.pageDescription as Document}</RichTextRenderer>
+            <RichTextRenderer>{pageContent?.pageDescription as Document}</RichTextRenderer>
           </div>
 
           <p className="govuk-body govuk-!-margin-bottom-4">All fields are required unless labelled as optional.</p>
@@ -300,9 +300,9 @@ export default function EditStudy({ study, currentLSN, query, managedContent }: 
                   }
                   return (
                     <RadioGroup
-                      key={`status-${mappedSEStatusValue ?? 'unset'}`}
                       defaultValue={mappedSEStatusValue}
                       errors={errors}
+                      key={`status-${mappedSEStatusValue ?? 'unset'}`}
                       label={fieldNameToLabelMapping.status}
                       labelSize="m"
                       name={name}
@@ -481,8 +481,8 @@ export default function EditStudy({ study, currentLSN, query, managedContent }: 
                 <Textarea
                   defaultValue={defaultValues?.furtherInformation}
                   errors={errors}
-                  hint={managedContent?.furtherInformationGuidanceText as Document}
-                  label={managedContent?.furtherInformationLabel as string}
+                  hint={pageContent?.furtherInformationGuidanceText as Document}
+                  label={pageContent?.furtherInformationLabel as string}
                   labelSize="m"
                   remainingCharacters={remainingCharacters}
                   required={false}
@@ -500,9 +500,9 @@ export default function EditStudy({ study, currentLSN, query, managedContent }: 
               <div className="govuk-button-group">
                 {isClosureJourney ? (
                   <button
-                    type="button"
                     className={clsx('govuk-button', { 'pointer-events-none': showLoadingState })}
                     onClick={handleClosureNext}
+                    type="button"
                   >
                     Next
                   </button>
@@ -527,7 +527,7 @@ export default function EditStudy({ study, currentLSN, query, managedContent }: 
               </div>
 
               <div className="govuk-body">
-                <RichTextRenderer>{managedContent?.endMessage as Document}</RichTextRenderer>
+                <RichTextRenderer>{pageContent?.endMessage as Document}</RichTextRenderer>
               </div>
             </Fieldset>
           </Form>
@@ -584,8 +584,8 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
   }
   const { study: studyInCPMS } = await getStudyByIdFromCPMS(Number(cpmsId))
   const { CONTENTFUL_PAGE_UPDATE_STUDY_ID } = process.env
-  const contentfulContent = await getManagedContent<TypeStudyDataFormSkeleton>(CONTENTFUL_PAGE_UPDATE_STUDY_ID)
-  const managedContent = contentfulContent?.fields || null
+  const contentfulContent = await getPageContent<TypeStudyDataFormSkeleton>(CONTENTFUL_PAGE_UPDATE_STUDY_ID)
+  const pageContent = contentfulContent?.fields || null
 
   if (!studyInCPMS) {
     return {
@@ -593,7 +593,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
         user: session.user,
         study,
         query: context.query,
-        managedContent,
+        pageContent,
       },
     }
   }
@@ -611,7 +611,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
         user: session.user,
         study,
         query: context.query,
-        managedContent,
+        pageContent,
       },
     }
   }
@@ -643,7 +643,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
       },
       currentLSN: studyInCPMS.CurrentLsn,
       query: context.query,
-      managedContent,
+      pageContent,
     },
   }
 })

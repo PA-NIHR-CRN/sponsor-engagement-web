@@ -10,7 +10,7 @@ import { NextSeo } from 'next-seo'
 import type { ReactElement } from 'react'
 
 import type { OrderType } from '@/@types/filters'
-import type { TypeBannerSkeleton, TypeSetPageSkeleton } from '@/@types/generated'
+import type { TypeBannerSkeleton } from '@/@types/generated'
 import { Card } from '@/components/atoms'
 import Tag from '@/components/atoms/Tag/Tag'
 import {
@@ -23,21 +23,21 @@ import {
   StudyList,
 } from '@/components/molecules'
 import { ReportFirst } from '@/components/molecules/cards/ReportFirst/ReportFirst'
+import { StudyStatusFilters } from '@/components/molecules/Filters/StudyStatusFilters'
 import { RootLayout } from '@/components/organisms'
 import CmsNotificationBanner from '@/components/organisms/CmsNotificationBanner/CmsNotificationBanner'
 import { Roles, STUDIES_PER_PAGE } from '@/constants'
+import { ContentfulPage } from '@/constants/contentful/pages'
 import { FORM_SUCCESS_MESSAGES } from '@/constants/forms'
 import { STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/routes'
 import { useFormListeners } from '@/hooks/useFormListeners'
-import { getSetPageByKey, getNotificationBanner } from '@/lib/contentful/contentfulService'
+import { getNotificationBanner,getSetPageByKey } from '@/lib/contentful/contentfulService'
 import { getSponsorOrgName, getSupportOrgName } from '@/lib/organisations'
 import { getStudiesForOrgs, mapFilterStatusesToStatuses } from '@/lib/studies'
 import { formatDate } from '@/utils/date'
 import { getFiltersFromQuery } from '@/utils/filters'
 import { pluraliseStudy } from '@/utils/pluralise'
 import { withServerSideProps } from '@/utils/withServerSideProps'
-import { StudyStatusFilters } from '@/components/molecules/Filters/StudyStatusFilters'
-import { ContentfulPage } from '@/constants/contentful/pages'
 
 const renderNotificationBanner = (success: string | undefined, showRequestSupportLink: boolean) =>
   success || !Number.isNaN(Number(success)) ? (
@@ -62,7 +62,7 @@ export default function Studies({
   meta: { totalItems, totalItemsDue, initialPage, initialPageSize },
   filters,
   entry,
-  progressBarManagedContent,
+  progressBarPageContent,
 }: StudiesProps) {
   const router = useRouter()
   const { isLoading, handleFilterChange } = useFormListeners()
@@ -121,8 +121,8 @@ export default function Studies({
             <Filters
               filters={filters}
               onFilterChange={handleFilterChange}
+              renderExtraFilters={({ onChange }) => (<StudyStatusFilters disabled={isLoading} onChange={onChange} selected={filters.status} />)}
               searchLabel="Search study title, protocol number, IRAS ID or CPMS ID"
-              renderExtraFilters={({ onChange }) => (<StudyStatusFilters selected={filters.status} onChange={onChange} disabled={isLoading} />)}
             />
           </div>
 
@@ -156,12 +156,14 @@ export default function Studies({
                         <li key={study.id}>
                           <StudyList
                             daysSinceAssessmentDue={daysSinceAssessmentDue}
+                            firstType={study.StudyFirst?.type}
                             hraApprovalDate={study.hraApprovalDate}
                             indications={study.evaluationCategories
                               .map((evalCategory) => evalCategory.indicatorValue)
                               .filter((evalCategory, index, items) => items.indexOf(evalCategory) === index)}
                             irasId={study.irasId}
                             lastAssessmentDate={study.lastAssessment ? formatDate(study.lastAssessment.createdAt) : ''}
+                            progressBarPageContent={progressBarPageContent}
                             shortTitle={study.shortTitle}
                             sponsorOrgName={getSponsorOrgName(study.organisations)}
                             studyHref={`${STUDIES_PAGE}/${study.id}`}
@@ -169,8 +171,6 @@ export default function Studies({
                             supportOrgName={getSupportOrgName(study.organisations)}
                             trackStatus={study.lastAssessment?.status.name}
                             willRecruitWithinTimeline={study.willRecruitWithinTimeline}
-                            firstType={study.StudyFirst?.type}
-                            progressBarManagedContent={progressBarManagedContent}
                           />
                         </li>
                       )
@@ -274,7 +274,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
     })
 
     const entry: Entry<TypeBannerSkeleton> | null = await getNotificationBanner()
-    const progressBarManagedContent = await getSetPageByKey(ContentfulPage.PROGRESS_BAR)
+    const progressBarPageContent = await getSetPageByKey(ContentfulPage.ProgressBar)
   
 
     return {
@@ -289,7 +289,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
         studies: studies.data,
         filters,
         entry,
-        progressBarManagedContent,
+        progressBarPageContent,
       },
     }
   } catch (error) {

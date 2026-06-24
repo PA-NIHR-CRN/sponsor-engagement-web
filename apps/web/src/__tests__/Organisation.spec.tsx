@@ -21,7 +21,7 @@ jest.mock('next-auth/next')
 jest.mock('next-seo')
 jest.mock('axios')
 
-const mockManagedContent = OrgDetailsPageMock.fields
+const mockPageContent = OrgDetailsPageMock.fields
 
 describe('getServerSideProps', () => {
   const getServerSessionMock = jest.mocked(getServerSession)
@@ -134,7 +134,7 @@ describe('Organisation page', () => {
       props: OrganisationProps
     }
 
-    render(Organisation.getLayout(<Organisation {...props} managedContent={mockManagedContent} />, { ...props }))
+    render(Organisation.getLayout(<Organisation {...props} pageContent={mockPageContent} />, { ...props }))
 
     // SEO
     expect(NextSeo).toHaveBeenCalledWith({ title: `Manage organisation contacts - ${mockOrganisation.name}` }, {})

@@ -16,7 +16,7 @@ import { TextInput } from '@/components/atoms/Form/TextInput/TextInput'
 import { RootLayout } from '@/components/organisms'
 import { Roles, UserOrganisationInviteStatus } from '@/constants'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
-import { getManagedContent } from '@/lib/contentful/contentfulService'
+import { getPageContent } from '@/lib/contentful/contentfulService'
 import { getOrganisationById } from '@/lib/organisations'
 import { formatDate } from '@/utils/date'
 import { getValuesFromSearchParams } from '@/utils/form'
@@ -36,7 +36,7 @@ const renderNotificationBanner = (successType: number, email?: string) => (
   </NotificationBanner>
 )
 
-export default function Organisation({ organisation, query, managedContent }: OrganisationProps) {
+export default function Organisation({ organisation, query, pageContent }: OrganisationProps) {
   const router = useRouter()
   const { register, formState, setError, handleSubmit, reset } = useForm<OrganisationAddInputs>({
     resolver: zodResolver(organisationAddSchema),
@@ -171,7 +171,7 @@ export default function Organisation({ organisation, query, managedContent }: Or
 
           <h3 className="govuk-heading-m p-0 govuk-!-margin-bottom-4">Add or remove sponsor contacts</h3>
 
-          <RichTextRenderer>{managedContent?.content as Document}</RichTextRenderer>
+          <RichTextRenderer>{pageContent?.content as Document}</RichTextRenderer>
 
           {/* Invite form */}
           <Form
@@ -224,8 +224,8 @@ export const getServerSideProps = withServerSideProps(
   async (context, session) => {
     const organisationId = Number(context.query.organisationId)
     const { CONTENTFUL_PAGE_ORG_DETAILS_ID } = process.env
-    const contentfulContent = await getManagedContent<TypeSetLabelSkeleton>(CONTENTFUL_PAGE_ORG_DETAILS_ID)
-    const managedContent = contentfulContent?.fields || null
+    const contentfulContent = await getPageContent<TypeSetLabelSkeleton>(CONTENTFUL_PAGE_ORG_DETAILS_ID)
+    const pageContent = contentfulContent?.fields || null
 
     if (!organisationId) {
       return {
@@ -258,7 +258,7 @@ export const getServerSideProps = withServerSideProps(
         query: context.query,
         user: session.user,
         organisation,
-        managedContent,
+        pageContent,
       },
     }
   }

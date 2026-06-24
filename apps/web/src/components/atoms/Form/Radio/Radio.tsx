@@ -1,7 +1,4 @@
-import type { Document } from '@contentful/rich-text-types'
 import { forwardRef } from 'react'
-
-import { RichTextRenderer } from '@/utils/Renderers/RichTextRenderer/RichTextRenderer'
 
 export interface RadioProps {
   label: string

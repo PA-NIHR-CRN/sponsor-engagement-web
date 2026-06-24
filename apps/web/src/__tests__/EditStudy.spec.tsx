@@ -44,7 +44,7 @@ const mockedEnvVars = {
   orgUpdateContentfulId: 'study-update-page-id',
 }
 
-const mockManagedContent = StudyUpdatePageMock.fields
+const mockPageContent = StudyUpdatePageMock.fields
 
 const organisationsByRole = {
   CRO: 'Test Organisation',
@@ -75,7 +75,7 @@ const renderPage = async (
     props: EditStudyProps
   }
 
-  render(EditStudy.getLayout(<EditStudy {...props} managedContent={mockManagedContent} />, { ...props }))
+  render(EditStudy.getLayout(<EditStudy {...props} pageContent={mockPageContent} />, { ...props }))
 }
 
 const removeDateField = async (label: string) => {
@@ -167,7 +167,7 @@ describe('EditStudy', () => {
           },
           currentLSN: mockLSN,
           query: mockQuery,
-          managedContent: null,
+          pageContent: null,
         },
       })
 
@@ -191,7 +191,7 @@ describe('EditStudy', () => {
           user: userWithSponsorContactRole.user,
           study: { ...mockStudyWithRelations, organisationsByRole },
           query: mockQuery,
-          managedContent: null,
+          pageContent: null,
         },
       })
 
@@ -217,7 +217,7 @@ describe('EditStudy', () => {
             organisationsByRole,
           },
           query: mockQuery,
-          managedContent: null,
+          pageContent: null,
         },
       })
 
@@ -246,7 +246,7 @@ describe('EditStudy', () => {
           },
           currentLSN: mockLSN,
           query: mockQuery,
-          managedContent: null,
+          pageContent: null,
         },
       })
 
@@ -277,7 +277,7 @@ describe('EditStudy', () => {
           },
           currentLSN: mockLSN,
           query: mockQuery,
-          managedContent: null,
+          pageContent: null,
         },
       })
 
@@ -313,7 +313,7 @@ describe('EditStudy', () => {
           },
           currentLSN: mockLSN,
           query: mockQuery,
-          managedContent: null,
+          pageContent: null,
         },
       })
 
@@ -350,7 +350,7 @@ describe('EditStudy', () => {
           },
           currentLSN: mockLSN,
           query: mockQuery,
-          managedContent: null,
+          pageContent: null,
         },
       })
 

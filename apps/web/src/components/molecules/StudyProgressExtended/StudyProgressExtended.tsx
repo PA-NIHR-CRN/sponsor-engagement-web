@@ -1,14 +1,14 @@
+import clsx from "clsx";
+import type { Entry } from 'contentful';
 import Link from 'next/link';
 import React from "react";
 
+import type { TypeSetPageSkeleton } from '@/@types/generated';
 import { Status } from '@/@types/studies';
 import { ProgressBar, progressBarColor } from "@/components/atoms/ProgressBar/ProgressBar";
-import clsx from "clsx";
-import { pluraliseDays } from '@/utils/pluralise';
-import { TypeSetPageSkeleton } from '@/@types/generated';
-import { Entry } from 'contentful';
-import { mapDynamicManagedContent } from '@/lib/contentful/contentfulUtils';
 import { ContentfulEntries } from '@/constants/contentful/entries';
+import { mapDynamicPageContent } from '@/lib/contentful/contentfulUtils';
+import { pluraliseDays } from '@/utils/pluralise';
 
 interface StudyProgressExtendedProps {
     hraApprovalDate: Date | null;
@@ -22,7 +22,7 @@ interface StudyProgressExtendedProps {
     showDates?: boolean;
     showMoreDetails?: boolean;
     moreDetailsHref?: string;
-    progressBarManagedContent: Entry<TypeSetPageSkeleton> | null;
+    progressBarPageContent: Entry<TypeSetPageSkeleton> | null;
 }
 
 export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
@@ -38,7 +38,7 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
         showTimeframeHint = true,
         showDates = true,
         showMoreDetails = true,
-        progressBarManagedContent,
+        progressBarPageContent,
     }) => {
 
     const inSetupStatuses = [
@@ -66,12 +66,12 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
     );
 
     const daysRemaining = Math.max(totalDays - elapsedDays, 0);
-    const progressBarManagedContentFields = progressBarManagedContent ? progressBarManagedContent.fields : null
-    const managedContentFields = progressBarManagedContentFields?.managedContent ? mapDynamicManagedContent(progressBarManagedContentFields.managedContent as Entry[]) : null;
+    const progressBarPageContentFields = progressBarPageContent ? progressBarPageContent.fields : null
+    const pageContentFields = progressBarPageContentFields?.pageContent ? mapDynamicPageContent(progressBarPageContentFields.pageContent as Entry[]) : null;
 
     const progressLabel =
         elapsedDays >= totalDays
-            ? `${managedContentFields?.get(ContentfulEntries.PROGRESS_BAR_OVER_TARGET)?.toString()} ${elapsedDays - totalDays} ${pluraliseDays(elapsedDays - totalDays)}`
+            ? `${pageContentFields?.get(ContentfulEntries.PROGRESS_BAR_OVER_TARGET)?.toString()} ${elapsedDays - totalDays} ${pluraliseDays(elapsedDays - totalDays)}`
             : `${daysRemaining} ${pluraliseDays(daysRemaining)} remaining`;
 
     function GetStudyProgressColor(daysSinceAssessmentDue: number) {
@@ -87,7 +87,7 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
         <div className={divClass}>
             {showTitle && (
                 <h3 className={clsx(`govuk-heading-${titleSize}`, 'govuk-!-margin-bottom-1 govuk-!-margin-top-4 p-0', titleClassName)}>
-                    {progressBarManagedContentFields?.title.toString()}
+                    {progressBarPageContentFields?.title.toString()}
                 </h3>
             )}
 
@@ -110,7 +110,7 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
                             </span>
                             {showDates && (
                                 <span className="govuk-body-s govuk-!-font-weight-bold text-darkGrey">
-                                    {managedContentFields?.get(ContentfulEntries.PROGRESS_BAR_HRA_APPROVAL_DATE)?.toString()} {hraApprovalDate.toLocaleDateString('en-GB')}
+                                    {pageContentFields?.get(ContentfulEntries.PROGRESS_BAR_HRA_APPROVAL_DATE)?.toString()} {hraApprovalDate.toLocaleDateString('en-GB')}
                                 </span>
                             )}
                         </div>
@@ -121,7 +121,7 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
                             </span>
                             {showDates && (
                                 <span className="govuk-body-s govuk-!-font-weight-bold text-darkGrey">
-                                    {managedContentFields?.get(ContentfulEntries.PROGRESS_BAR_END_DATE)?.toString()} {endDate.toLocaleDateString('en-GB')}
+                                    {pageContentFields?.get(ContentfulEntries.PROGRESS_BAR_END_DATE)?.toString()} {endDate.toLocaleDateString('en-GB')}
                                 </span>
                             )}
                         </div>
@@ -130,7 +130,7 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
             ) :
                 <div>
                     <span className="govuk-body-s text-darkGrey block govuk-!-margin-bottom-2">
-                        {managedContentFields?.get(ContentfulEntries.PROGRESS_BAR_OPT_OUT)?.toString()}
+                        {pageContentFields?.get(ContentfulEntries.PROGRESS_BAR_OPT_OUT)?.toString()}
                     </span>
                 </div>
             }
