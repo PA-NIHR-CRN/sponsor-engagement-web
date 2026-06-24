@@ -16,7 +16,7 @@ import { TextInput } from '@/components/atoms/Form/TextInput/TextInput'
 import { RootLayout } from '@/components/organisms'
 import { Roles, UserOrganisationInviteStatus } from '@/constants'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
-import { getPageContent } from '@/lib/contentful/contentfulService'
+import { getManagedContent } from '@/lib/contentful/contentfulService'
 import { getOrganisationById } from '@/lib/organisations'
 import { formatDate } from '@/utils/date'
 import { getValuesFromSearchParams } from '@/utils/form'
@@ -224,7 +224,7 @@ export const getServerSideProps = withServerSideProps(
   async (context, session) => {
     const organisationId = Number(context.query.organisationId)
     const { CONTENTFUL_PAGE_ORG_DETAILS_ID } = process.env
-    const contentfulContent = await getPageContent<TypeSetLabelSkeleton>(CONTENTFUL_PAGE_ORG_DETAILS_ID)
+    const contentfulContent = await getManagedContent<TypeSetLabelSkeleton>(CONTENTFUL_PAGE_ORG_DETAILS_ID)
     const pageContent = contentfulContent?.fields || null
 
     if (!organisationId) {

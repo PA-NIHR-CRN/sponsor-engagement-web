@@ -1,4 +1,4 @@
 export enum ContentfulPage {
-  ProgressBar = 'set-progress-bar',
-  ConfigureStudySetup = 'set-configure-study-setup'
+  PROGRESS_BAR = 'set-progress-bar',
+  CONFIGURE_STUDY_SETUP = 'set-configure-study-setup'
 }

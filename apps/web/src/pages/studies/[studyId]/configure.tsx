@@ -10,7 +10,6 @@ import { type ReactElement, useCallback, useEffect } from 'react'
 import type { FieldError } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 
-
 import { Fieldset, Form, Radio, RadioGroup } from '@/components/atoms'
 import { Textarea } from '@/components/atoms/Form/Textarea/Textarea'
 import { RequestSupport, StudyProgressExtended } from '@/components/molecules'
@@ -191,8 +190,8 @@ export const getServerSideProps = withServerSideProps(
       return { redirect: { destination: '/404' } }
     }
 
-    const progressBarPageContent = await getSetPageByKey(ContentfulPage.ProgressBar)
-    const pageContentResp = await getSetPageByKey(ContentfulPage.ConfigureStudySetup)
+    const progressBarPageContent = await getSetPageByKey(ContentfulPage.PROGRESS_BAR)
+    const pageContentResp = await getSetPageByKey(ContentfulPage.CONFIGURE_STUDY_SETUP)
     const pageContent = pageContentResp?.fields
     const pageContentFields = mapDynamicPageContent(pageContent?.pageContent as Entry[])
     const userOrganisationIds =

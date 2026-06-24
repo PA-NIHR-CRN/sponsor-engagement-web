@@ -33,7 +33,7 @@ import {
 } from '@/constants/editStudyForm'
 import { ClosureDraftProvider, useClosureDraft } from '@/context/closureDraftContext'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
-import { getPageContent } from '@/lib/contentful/contentfulService'
+import { getManagedContent } from '@/lib/contentful/contentfulService'
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
 import {
   getStudyById,
@@ -584,7 +584,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
   }
   const { study: studyInCPMS } = await getStudyByIdFromCPMS(Number(cpmsId))
   const { CONTENTFUL_PAGE_UPDATE_STUDY_ID } = process.env
-  const contentfulContent = await getPageContent<TypeStudyDataFormSkeleton>(CONTENTFUL_PAGE_UPDATE_STUDY_ID)
+  const contentfulContent = await getManagedContent<TypeStudyDataFormSkeleton>(CONTENTFUL_PAGE_UPDATE_STUDY_ID)
   const pageContent = contentfulContent?.fields || null
 
   if (!studyInCPMS) {

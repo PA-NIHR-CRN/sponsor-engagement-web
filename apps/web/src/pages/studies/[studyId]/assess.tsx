@@ -17,7 +17,7 @@ import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
 import { TEXTAREA_MAX_CHARACTERS } from '@/constants/forms'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
-import { getPageContent } from '@/lib/contentful/contentfulService'
+import { getManagedContent } from '@/lib/contentful/contentfulService'
 import { prismaClient } from '@/lib/prisma'
 import { getStudyById } from '@/lib/studies'
 import { getValuesFromSearchParams } from '@/utils/form'
@@ -245,7 +245,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
   const { data: study } = await getStudyById(Number(studyId), userOrganisationIds)
 
   const { CONTENTFUL_PAGE_STUDY_ASSESS_ID } = process.env
-  const contentfulContent = await getPageContent<TypeSetAssessmentFormPageSkeleton>(CONTENTFUL_PAGE_STUDY_ASSESS_ID)
+  const contentfulContent = await getManagedContent<TypeSetAssessmentFormPageSkeleton>(CONTENTFUL_PAGE_STUDY_ASSESS_ID)
   const pageContent = contentfulContent?.fields || null
 
   const [statusRefData, furtherInformationRefData] = await prismaClient.$transaction([
