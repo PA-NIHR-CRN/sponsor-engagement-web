@@ -6,5 +6,10 @@ export enum ContentfulEntries {
   CONFIGURE_STUDY_SETUP_QUESTION = 'set-study-configure-question',
   CONFIGURE_STUDY_SUB_QUESTION = 'set-progress-configure-sub-question',
   CONFIGURE_STUDY_SETUP_CONDITIONAL_BOX = 'set-progress-configure-conditional-labal',
-
+  REPORT_A_FIRST_BOX_BUTTON = 'set-studies-list-report-a-first-button',
+  REPORT_A_FIRST_BOX_BUTTON_ARIA_LABEL = 'set-studies-list-report-a-first-button-aria-label',
+  REPORT_A_FIRST_FORM_QUESTION_TYPE_OF_FIRST_GLOBAL_GUIDANCE = 'set--report-a-first-form--type-of-first--global--guidance',
+  REPORT_A_FIRST_FORM_QUESTION_TYPE_OF_FIRST_EUROPEAN_GUIDANCE = 'set--report-a-first-form--type-of-first--european--guidance',
+  REPORT_A_FIRST_FORM_QUESTION_FIRST_PATIENT_FIRST_VISIT_GUIDANCE = 'set--report-a-first-form--first-patient-first-visit--guidance',
+  REPORT_A_FIRST_FORM_QUESTION_SITE_NAME_GUIDANCE = 'set--report-a-first-form--site-name--guidance',
 }

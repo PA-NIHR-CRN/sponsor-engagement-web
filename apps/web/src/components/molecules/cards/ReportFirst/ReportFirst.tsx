@@ -1,27 +1,40 @@
+import type { Document } from '@contentful/rich-text-types'
 import { StartIcon } from '@nihr-ui/frontend'
 import clsx from 'clsx'
+import type { Entry } from 'contentful'
 
+import type { TypeSetPageSkeleton } from '@/@types/generated/TypeSetPage'
 import { Card } from '@/components/atoms'
+import { ContentfulEntries } from '@/constants/contentful/entries'
 import { REPORT_FIRSTS_PAGE } from '@/constants/routes'
+import { mapDynamicPageContent } from '@/lib/contentful/contentfulUtils'
+import { RichTextRenderer } from '@/utils/Renderers/RichTextRenderer/RichTextRenderer'
 
 interface ReportFirstProps {
     showAsStartButton?: boolean
     studyId?: number
+    reportaFirstContentfulContent: Entry<TypeSetPageSkeleton> | null;
 }
 
-export function ReportFirst({ showAsStartButton = false, studyId }: ReportFirstProps) {
+
+export function ReportFirst({ showAsStartButton = false, studyId, reportaFirstContentfulContent }: ReportFirstProps) {
+
+    
+const reportaFirstContentfulContentFields = reportaFirstContentfulContent?.fields
+const reportaFirstPagecontent = mapDynamicPageContent(reportaFirstContentfulContentFields?.pageContent as Entry[])
+
     return (
         <Card className='mb-4' data-testid="report-first" filled padding={4}>
             <h3 className="govuk-heading-m">
-                First Global/European Participant
+                { reportaFirstContentfulContentFields?.title.toString() }
             </h3>
 
             <p className="govuk-body">
-                Report where the UK has achieved the first global or European participant.
+                <RichTextRenderer>{reportaFirstContentfulContentFields?.guidanceText as Document}</RichTextRenderer>
             </p>
 
             <a
-                aria-label="Report a first global/european participant"
+                aria-label={reportaFirstPagecontent?.get(ContentfulEntries.REPORT_A_FIRST_BOX_BUTTON_ARIA_LABEL)?.toString()}
                 className={
                     clsx(
                         'govuk-button mb-0',
@@ -34,7 +47,7 @@ export function ReportFirst({ showAsStartButton = false, studyId }: ReportFirstP
                 }
                 rel="noopener noreferrer"
             >
-                Report a first
+                {reportaFirstPagecontent?.get(ContentfulEntries.REPORT_A_FIRST_BOX_BUTTON)?.toString()}
                 {showAsStartButton ? <StartIcon /> : null}
             </a>
         </Card>

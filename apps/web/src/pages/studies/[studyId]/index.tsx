@@ -72,7 +72,7 @@ const renderBackLink = () => (
 
 export type StudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function Study({ study, assessments, editHistory, getEditHistoryError, progressBarPageContent }: StudyProps) {
+export default function Study({ study, assessments, editHistory, getEditHistoryError, progressBarPageContent, reportaFristManagedContent }: StudyProps) {
   const router = useRouter()
   const successType = router.query.success as string
   const transactionIdLatestProposedUpdate = router.query.latestProposedUpdate as string | undefined
@@ -288,7 +288,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
           <StudyDetails study={study} />
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
-          <ReportFirst showAsStartButton studyId={study.id} />
+          <ReportFirst reportaFirstContentfulContent={reportaFristManagedContent} showAsStartButton studyId={study.id} />
           <RequestSupport showCallToAction sticky />
         </div>
       </div>
@@ -330,6 +330,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
   logger.info('Successfully retrieved study from SE with studyId: %s', studyId)
   
   const progressBarPageContent = await getSetPageByKey(ContentfulPage.PROGRESS_BAR)
+  const reportaFristManagedContent = await getSetPageByKey(ContentfulPage.REPORT_A_FIRST_BOX) 
 
   const changeHistoryFromDate = process.env.EDIT_HISTORY_START_DATE ?? ''
   const { study: studyInCPMS } = await getStudyByIdFromCPMS(study.cpmsId, changeHistoryFromDate)
@@ -341,6 +342,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
         assessments: getAssessmentHistoryFromStudy(study),
         study,
         progressBarPageContent,
+        reportaFristManagedContent
       },
     }
   }
@@ -359,6 +361,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
         assessments: getAssessmentHistoryFromStudy(study),
         study,
         progressBarPageContent,
+        reportaFristManagedContent
       },
     }
   }
@@ -396,6 +399,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
       editHistory,
       getEditHistoryError,
       progressBarPageContent,
+      reportaFristManagedContent
     },
   }
 })

@@ -1,6 +1,8 @@
+import type { Document } from '@contentful/rich-text-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Container } from '@nihr-ui/frontend'
 import clsx from 'clsx'
+import type { Entry } from 'contentful'
 import type { FirstType } from 'database'
 import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
@@ -18,10 +20,15 @@ import { TextInput } from '@/components/atoms/Form/TextInput/TextInput'
 import { RequestSupport } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
+import { ContentfulEntries } from '@/constants/contentful/entries'
+import { ContentfulPage } from '@/constants/contentful/pages'
 import { TEXTAREA_MAX_CHARACTERS } from '@/constants/forms'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
+import { getSetPageByKey } from '@/lib/contentful/contentfulService'
+import { mapDynamicPageContent } from '@/lib/contentful/contentfulUtils'
 import { getStudyById, getStudyTitlesForOrgs } from '@/lib/studies'
 import { getStudyFirstByStudyId } from '@/lib/studyFirsts'
+import { RichTextRenderer } from '@/utils/Renderers/RichTextRenderer/RichTextRenderer'
 import { type ReportFirstInputs, reportFirstSchema } from '@/utils/schemas/reportFirst.schema'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
@@ -108,12 +115,16 @@ export default function ReportFirst({
   returnUrl,
   isStudyLocked,
   study,
+  reportaFirstContentfulContent
 }: Readonly<ReportFirstProps>) {
   const router = useRouter()
 
   const safeStudies = useMemo<StudyTitle[]>(() => (isStudyTitleArray(studies) ? studies : []), [studies])
 
   const [isFetchingFirst, setIsFetchingFirst] = useState(false)
+
+  const reportaFirstFields = reportaFirstContentfulContent?.fields
+  const reportaFirstPagecontent = mapDynamicPageContent(reportaFirstFields?.pageContent as Entry[])
 
   const defaultValues = useMemo(
     () => buildDefaultValues(initialStudyId, initialFirst),
@@ -225,7 +236,7 @@ export default function ReportFirst({
         <div className="lg:flex lg:gap-6">
           <div className="w-full">
             <h2 className="govuk-heading-l govuk-!-margin-bottom-6">
-              Report a &apos;First&apos;
+              {reportaFirstFields?.title.toString()}
             </h2>
 
             {study ? (
@@ -243,11 +254,9 @@ export default function ReportFirst({
               </>
             ) : null}
 
-            <p className="govuk-body govuk-!-margin-bottom-6">
-              Reporting a first helps us capture key study milestones quickly and accurately. Your direct
-              submission reduces follow‑up emails, improves data quality, and ensures important achievements
-              - such as global or European firsts - are recorded and linked to wider systems in real time.
-            </p>
+            <div className="govuk-body govuk-!-margin-bottom-6">
+              <RichTextRenderer>{reportaFirstFields?.guidanceText as Document}</RichTextRenderer>
+            </div>
 
             <Fieldset>
               {!isStudyLocked ? (
@@ -284,8 +293,8 @@ export default function ReportFirst({
               ) : null}
 
               <RadioGroup errors={errors} label="Type of First" labelSize="m" {...register('type')}>
-                <Radio hint="The UK has consented the first participant in a global study." label="Global" value="global" />
-                <Radio hint="The UK has consented the first participant in a European study." label="European" value="european" />
+                <Radio hint={reportaFirstPagecontent?.get(ContentfulEntries.REPORT_A_FIRST_FORM_QUESTION_TYPE_OF_FIRST_GLOBAL_GUIDANCE)?.toString()} label="Global" value="global" />
+                <Radio hint={reportaFirstPagecontent?.get(ContentfulEntries.REPORT_A_FIRST_FORM_QUESTION_TYPE_OF_FIRST_EUROPEAN_GUIDANCE)?.toString()} label="European" value="european" />
               </RadioGroup>
 
               <Controller
@@ -294,7 +303,7 @@ export default function ReportFirst({
                 render={({ field }) => (
                   <DateInput
                     errors={errors}
-                    hint="The date the first participant was consented to the study"
+                    hint={reportaFirstPagecontent?.get(ContentfulEntries.REPORT_A_FIRST_FORM_QUESTION_FIRST_PATIENT_FIRST_VISIT_GUIDANCE)?.toString()}
                     label="First patient / First visit"
                     name={field.name}
                     onChange={field.onChange}
@@ -309,7 +318,7 @@ export default function ReportFirst({
                 {...register('siteName')}
                 defaultValue=""
                 errors={errors}
-                hint="Name of site that consented the first global/European participant"
+                hint={reportaFirstPagecontent?.get(ContentfulEntries.REPORT_A_FIRST_FORM_QUESTION_SITE_NAME_GUIDANCE)?.toString()}
                 label="Site name"
                 labelSize="m"
                 maxLength={TEXTAREA_MAX_CHARACTERS}
@@ -370,6 +379,8 @@ export const getServerSideProps = withServerSideProps(
         return { redirect: { destination: '/' } }
       }
 
+      const reportaFirstContentfulContent = await getSetPageByKey(ContentfulPage.REPORT_A_FIRST_FORM)
+
       const organisationIds = session.user.organisations.map((o) => o.organisationId)
 
       const studyIdFromQuery = typeof context.query.studyId === 'string' ? context.query.studyId : ''
@@ -393,6 +404,7 @@ export const getServerSideProps = withServerSideProps(
             study: studyResult.data,
             initialFirst: initialFirstResult.data,
             returnUrl: `/studies/${initialStudyId}/`,
+            reportaFirstContentfulContent
           },
         }
       }
@@ -418,6 +430,7 @@ export const getServerSideProps = withServerSideProps(
           returnUrl: initialStudyId
               ? `/studies/${initialStudyId}/`
               : '/studies',
+          reportaFirstContentfulContent
         },
       }
     } catch {
