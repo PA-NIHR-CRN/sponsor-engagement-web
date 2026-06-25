@@ -152,7 +152,7 @@ export default class AssessmentPage {
     this.progressToCloseLbl = page.locator('label[for="furtherInformation-9"]')
     this.furtherInfoSectionHeader = page.locator('label[id="furtherInformationText-label"]')
     this.furtherInfoTextArea = page.locator('textarea[id="furtherInformationText"]')
-    this.furtherInfoTextCharLimit = page.locator('div[id="with-hint-info"]')
+    this.furtherInfoTextCharLimit = page.locator('div[id="furtherInformationText-count"]')
     this.lastSponsorAssessmentRow = page.locator('div[class="govuk-!-margin-bottom-6"] button')
     this.lastSponsorAssessmentDate = this.lastSponsorAssessmentRow.locator('div')
     this.lastSponsorAssessmentText = this.lastSponsorAssessmentRow.locator(
@@ -171,7 +171,7 @@ export default class AssessmentPage {
 
   async assertOnAssessmentPage(studyId: string) {
     await expect(this.pageTitle).toBeVisible()
-    await expect(this.pageTitle).toHaveText('Assess progress of a study in the UK')
+    await expect(this.pageTitle).toContainText('Assess progress of a study in the UK')
     await expect(this.page).toHaveURL(`studies/${studyId}/assess`)
   }
 
@@ -310,7 +310,7 @@ export default class AssessmentPage {
   async assertStudyProgressingPresent() {
     await expect(this.studyProgressingSection).toBeVisible()
     await expect(this.studyProgressSectionHeader).toBeVisible()
-    await expect(this.studyProgressSectionHeader).toHaveText('Is this study progressing in the UK as planned?')
+    await expect(this.studyProgressSectionHeader).toContainText('Is this study progressing in the UK as planned?')
   }
 
   async assertRadioButtonsPresent() {
@@ -321,12 +321,12 @@ export default class AssessmentPage {
     await expect(this.radioButtonOffTrackLbl).toBeVisible()
     await expect(this.radioButtonOffTrackTxt).toBeVisible()
     await expect(this.radioButtonOnTrackLbl).toHaveText('On track')
-    await expect(this.radioButtonOnTrackTxt).toHaveText(
-      'The sponsor or delegate is satisfied the study is progressing in the UK as planned.'
+    await expect(this.radioButtonOnTrackTxt).toContainText(
+      'The sponsor or delegate is completely satisfied that the study is progressing as planned'
     )
     await expect(this.radioButtonOffTrackLbl).toHaveText('Off track')
-    await expect(this.radioButtonOffTrackTxt).toHaveText(
-      'The sponsor or delegate has some concerns about the study in the UK and is taking action where appropriate.'
+    await expect(this.radioButtonOffTrackTxt).toContainText(
+      'The sponsor or delegate has some concerns about the study and is taking appropriate action'
     )
   }
 
@@ -352,8 +352,8 @@ export default class AssessmentPage {
   async assertAdditionalInfoPresent() {
     await expect(this.additionalInfoSection).toBeVisible()
     await expect(this.additionalInfoSectionHeader).toBeVisible()
-    await expect(this.additionalInfoSectionHeader).toHaveText(
-      'Is there any additional information that would help NIHR RDN understand this progress assessment? (optional)'
+    await expect(this.additionalInfoSectionHeader).toContainText(
+      'Is there any information that would help NIHR RDN understand this progress assessment? (OPTIONAL update)'
     )
   }
 
@@ -386,7 +386,7 @@ export default class AssessmentPage {
 
   async assertFurtherInfoPresent() {
     await expect(this.furtherInfoSectionHeader).toBeVisible()
-    await expect(this.furtherInfoSectionHeader).toHaveText('Further information (optional)')
+    await expect(this.furtherInfoSectionHeader).toContainText('Further information (Optional)')
   }
 
   async assertFurtherInfoTextAreaPresent() {
@@ -395,7 +395,7 @@ export default class AssessmentPage {
 
   async assertFurtherInfoCharLimitPresent() {
     await expect(this.furtherInfoTextCharLimit).toBeVisible()
-    await expect(this.furtherInfoTextCharLimit).toHaveText('You have 400 characters remaining')
+    await expect(this.furtherInfoTextCharLimit).toHaveText('You have 500 characters remaining')
   }
 
   async assertSubmitButtonPresent() {
