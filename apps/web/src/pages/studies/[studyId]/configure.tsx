@@ -121,8 +121,8 @@ export default function Configure({ study, returnUrl, pageContent, progressBarPa
             <Fieldset>
               <RadioGroup
                 errors={errors}
-                hint={pageContentFields?.get(ContentfulEntries.CONFIGURE_STUDY_SUB_QUESTION)?.toString()}
-                label={pageContentFields?.get(ContentfulEntries.CONFIGURE_STUDY_SETUP_QUESTION)?.toString()}
+                hint={pageContentFields?.get(ContentfulEntries.CONFIGURE_STUDY_PROGRESS_90_DAYS_QUESTION)?.toString()}
+                label={pageContentFields?.get(ContentfulEntries.CONFIGURE_STUDY_PROGRESS_QUESTION_PARTICIPANT_TIMELINE)?.toString()}
                 labelSize="m"
                 {...register('status')}
               >
@@ -136,7 +136,7 @@ export default function Configure({ study, returnUrl, pageContent, progressBarPa
                   defaultValue=''
                   errors={errors}
                   hint="If needed, provide further context or justification for changes made above."
-                  label={pageContentFields?.get(ContentfulEntries.CONFIGURE_STUDY_SETUP_CONDITIONAL_BOX)?.toString()}
+                  label={pageContentFields?.get(ContentfulEntries.CONFIGURE_STUDY_PROGRESS_NO_FURTHER_INFO_QUESTION)?.toString()}
                   labelSize="m"
                   maxLength={TEXTAREA_MAX_CHARACTERS}
                   remainingCharacters={remainingCharacters}
