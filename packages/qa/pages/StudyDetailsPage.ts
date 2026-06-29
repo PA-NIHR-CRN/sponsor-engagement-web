@@ -61,6 +61,8 @@ export default class StudyDetailsPage {
   readonly noAssessmentValue: Locator
   readonly firstSponsorAssessmentFurtherInfo: Locator
   readonly secondSponsorAssessmentFurtherInfo: Locator
+  readonly firstSponsorAssessmentNoRecruitmentReason: Locator
+  readonly secondSponsorAssessmentNoRecruitmentReason: Locator
   readonly firstSponsorAssessmentFurtherInfoBullets: Locator
   readonly secondSponsorAssessmentFurtherInfoBullets: Locator
   readonly firstSponsorAssessmentFurtherInfoText: Locator
@@ -176,7 +178,18 @@ export default class StudyDetailsPage {
     this.secondSponsorAssessmentFurtherInfo = page.locator('div[id="radix-:r5:"] div')
     this.firstSponsorAssessmentFurtherInfoBullets = this.firstSponsorAssessmentFurtherInfo.locator('ul li')
     this.secondSponsorAssessmentFurtherInfoBullets = this.secondSponsorAssessmentFurtherInfo.locator('ul li')
-    this.firstSponsorAssessmentFurtherInfoText = this.firstSponsorAssessmentFurtherInfo.locator('p')
+    this.firstSponsorAssessmentFurtherInfoText = this.firstSponsorAssessmentFurtherInfo
+      .locator('p', { hasText: 'Further information' })
+      .locator('span')
+    this.secondSponsorAssessmentFurtherInfoText = this.secondSponsorAssessmentFurtherInfo
+      .locator('p', { hasText: 'Further information' })
+      .locator('span')
+    this.firstSponsorAssessmentNoRecruitmentReason = this.firstSponsorAssessmentFurtherInfo
+      .locator('p', { hasText: 'Reason for not recruiting for 6 months:' })
+      .locator('span')
+    this.secondSponsorAssessmentNoRecruitmentReason = this.secondSponsorAssessmentFurtherInfo
+      .locator('p', { hasText: 'Reason for not recruiting for 6 months:' })
+      .locator('span')
     this.secondSponsorAssessmentFurtherInfoText = this.secondSponsorAssessmentFurtherInfo.locator('p')
     this.sponsorAssessmentHistory = page.locator('[class="govuk-!-margin-bottom-6"]')
     this.firstSponsorAssessmentRow = this.sponsorAssessmentHistory.locator('button')
@@ -606,7 +619,8 @@ export default class StudyDetailsPage {
   }
 
   async assertAssessmentHasNoFurtherInfo() {
-    await expect(this.firstSponsorAssessmentFurtherInfo).toBeEmpty()
+    await expect(this.firstSponsorAssessmentFurtherInfo.locator('p', { hasText: 'Further information' })).toHaveCount(0)
+    await expect(this.firstSponsorAssessmentFurtherInfoBullets).toHaveCount(0)
   }
 
   async assertAssessmentFurtherInfoSelections(assessmentIndex: number, bulletIndex: number, expectedValue: string) {
@@ -616,6 +630,19 @@ export default class StudyDetailsPage {
         break
       case 1:
         await expect(this.secondSponsorAssessmentFurtherInfoBullets.nth(bulletIndex)).toHaveText(expectedValue)
+        break
+      default:
+        throw new Error(`${assessmentIndex} is not a valid index`)
+    }
+  }
+
+  async assertAssessmentNoRecruitmentReasonText(assessmentIndex: number, expectedValue: string) {
+    switch (assessmentIndex) {
+      case 0:
+        await expect(this.firstSponsorAssessmentNoRecruitmentReason).toHaveText(expectedValue)
+        break
+      case 1:
+        await expect(this.secondSponsorAssessmentNoRecruitmentReason).toHaveText(expectedValue)
         break
       default:
         throw new Error(`${assessmentIndex} is not a valid index`)

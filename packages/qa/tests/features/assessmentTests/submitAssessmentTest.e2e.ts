@@ -1,6 +1,5 @@
 import { test } from '../../../hooks/CustomFixtures'
 import { seDatabaseReq } from '../../../utils/DbRequests'
-import { convertIsoDateToDisplayDate } from '../../../utils/UtilFunctions'
 
 const testUserId = 6
 const startingOrgId = 21
@@ -30,18 +29,26 @@ test.describe('Submit a Study Assessment and Validate Form Inputs - @se_38', () 
       await assessmentPage.goto(noAssessmentStudyId.toString())
       await assessmentPage.assertOnAssessmentPage(noAssessmentStudyId.toString())
     })
-    await test.step('When I submit the form without selecting either of the On/Off track options', async () => {
+    await test.step('When I submit the form without selecting either of the On/Off track options and without specifying a reason for no recruitment for six months', async () => {
       await assessmentPage.submitButton.click()
-      await assessmentPage.assertValidationErrorsPresent()
     })
     await test.step('Then a `Select how the study is progressing` Validation Error appears in a Summary box and above the On/Off track options', async () => {
-      await assessmentPage.assertValidationErrorsPresent()
+      await assessmentPage.assertStatusValidationErrorsPresent()
     })
     await test.step('And clicking the Summary Box Error link', async () => {
-      await assessmentPage.errorSummaryAlertBoxLink.click()
+      await assessmentPage.errorSummaryAlertBoxStatusLink.click()
     })
     await test.step('Then takes me to the On/Off track options, highlighting On', async () => {
       await assessmentPage.assertOnTrackFocused()
+    })
+    await test.step('Then a `Please provide a reason for no recruitment` Validation Error also appears in a Summary box and above the On/Off track options', async () => {
+      await assessmentPage.assertReasonForNoRecruitmentValidationErrorsPresent()
+    })
+    await test.step('And clicking the Summary Box Error link', async () => {
+      await assessmentPage.errorSummaryAlertBoxReasonForNoRecruitmentLink.click()
+    })
+    await test.step('Then takes me to the no recruitment text area, highlighting the box', async () => {
+      await assessmentPage.assertReasonForNoRecruitmentFocused()
     })
   })
 
@@ -64,6 +71,9 @@ test.describe('Submit a Study Assessment and Validate Form Inputs - @se_38', () 
     })
     await test.step(`When I select the 'On Track' option`, async () => {
       await assessmentPage.radioButtonOnTrack.check()
+    })
+    await test.step(`And I enter 'TESTING' in the Reason For No Recruitment Text Area`, async () => {
+      await assessmentPage.reasonForNoRecruitmentTextArea.fill('TESTING')
     })
     await test.step(`And I click the Submit button`, async () => {
       await assessmentPage.submitButton.click()
@@ -90,7 +100,10 @@ test.describe('Submit a Study Assessment and Validate Form Inputs - @se_38', () 
       await studyDetailsPage.firstSponsorAssessmentRow.click()
       await studyDetailsPage.assertSponsorAssessmentCollapsed(0, false)
     })
-    await test.step(`Then I can see that No Further Info has been recorded`, async () => {
+    await test.step(`Then I can see that my Reason For No Recruitment has been recorded`, async () => {
+      await studyDetailsPage.assertAssessmentNoRecruitmentReasonText(0, 'TESTING')
+    })
+    await test.step(`And I can see that No Further Info has been recorded`, async () => {
       await studyDetailsPage.assertAssessmentHasNoFurtherInfo()
     })
   })
@@ -114,6 +127,9 @@ test.describe('Submit a Study Assessment and Validate Form Inputs - @se_38', () 
     })
     await test.step(`When I select the 'On Track' option`, async () => {
       await assessmentPage.radioButtonOnTrack.check()
+    })
+    await test.step(`And I enter 'TESTING' in the Reason For No Recruitment Text Area`, async () => {
+      await assessmentPage.reasonForNoRecruitmentTextArea.fill('TESTING')
     })
     await test.step(`And I select the 'In discussion with stakeholders to agree next steps' Further Info option`, async () => {
       await assessmentPage.discussionStakeholdersInput.check()
@@ -147,6 +163,9 @@ test.describe('Submit a Study Assessment and Validate Form Inputs - @se_38', () 
     await test.step(`And I can see that my Further Info Text has been recorded`, async () => {
       await studyDetailsPage.assertAssessmentFurtherInfoText(0, 'TESTING')
     })
+    await test.step(`And I can see that my Reason For No Recruitment has been recorded`, async () => {
+      await studyDetailsPage.assertAssessmentNoRecruitmentReasonText(0, 'TESTING')
+    })
   })
 
   test('Submit Assessment Form with Further Information which displays on Last Assessment Panel - @se_38_ac2_last_assessment_single', async ({
@@ -165,6 +184,9 @@ test.describe('Submit a Study Assessment and Validate Form Inputs - @se_38', () 
     })
     await test.step(`When I select the 'Off Track' option`, async () => {
       await assessmentPage.radioButtonOffTrack.check()
+    })
+    await test.step(`And I enter 'TESTING' in the Reason For No Recruitment Text Area`, async () => {
+      await assessmentPage.reasonForNoRecruitmentTextArea.fill('TESTING')
     })
     await test.step(`And I select the 'Waiting for HRA or MHRA approvals' Further Info option`, async () => {
       await assessmentPage.waitingForHraInput.check()
@@ -204,6 +226,9 @@ test.describe('Submit a Study Assessment and Validate Form Inputs - @se_38', () 
       await assessmentPage.lastSponsorAssessmentRow.click()
       await assessmentPage.assertLastSponsorAssessmentCollapsed(false)
     })
+    await test.step(`Then I can see that my Reason For No Recruitment has been recorded`, async () => {
+      await assessmentPage.assertLastSponsorAssessmentNoRecruitmentReasonText('TESTING')
+    })
     await test.step(`And I can see that my Further Info Selections have been recorded`, async () => {
       await assessmentPage.assertAssessmentFurtherInfoSelections(0, 'Waiting for HRA or MHRA approvals')
       await assessmentPage.assertAssessmentFurtherInfoSelections(1, 'Study closed to recruitment, in follow up')
@@ -213,7 +238,7 @@ test.describe('Submit a Study Assessment and Validate Form Inputs - @se_38', () 
     })
   })
 
-  test('Assesment Form Page will show only the Most Recent Assessment on Last Assessment Panel - @se_38_ac2_last_assessment_multi', async ({
+  test('Assessment Form Page will show only the Most Recent Assessment on Last Assessment Panel - @se_38_ac2_last_assessment_multi', async ({
     studyDetailsPage,
     assessmentPage,
   }) => {
@@ -223,6 +248,9 @@ test.describe('Submit a Study Assessment and Validate Form Inputs - @se_38', () 
     })
     await test.step(`When I select the 'Off Track' option`, async () => {
       await assessmentPage.radioButtonOffTrack.check()
+    })
+    await test.step(`And I enter 'TESTING' in the Reason For No Recruitment Text Area`, async () => {
+      await assessmentPage.reasonForNoRecruitmentTextArea.fill('TESTING')
     })
     await test.step(`And I click the Submit button`, async () => {
       await assessmentPage.submitButton.click()
@@ -236,6 +264,9 @@ test.describe('Submit a Study Assessment and Validate Form Inputs - @se_38', () 
     })
     await test.step(`When I select the 'On Track' option`, async () => {
       await assessmentPage.radioButtonOnTrack.check()
+    })
+    await test.step(`And I enter 'TESTING' in the Reason For No Recruitment Text Area`, async () => {
+      await assessmentPage.reasonForNoRecruitmentTextArea.fill('TESTING')
     })
     await test.step(`And I click the Submit button`, async () => {
       await assessmentPage.submitButton.click()

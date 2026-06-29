@@ -21,6 +21,7 @@ export default class AssessmentPage {
   readonly lastSponsorAssessmentFurtherInfo: Locator
   readonly lastSponsorAssessmentFurtherInfoBullets: Locator
   readonly lastSponsorAssessmentFurtherInfoText: Locator
+  readonly lastSponsorAssessmentNoRecruitmentReason: Locator
   //Study Details Section
   readonly studyDetailsSection: Locator
   readonly studyDetailsIconClosed: Locator
@@ -43,9 +44,12 @@ export default class AssessmentPage {
   // Validation Errors
   readonly errorSummaryAlertBox: Locator
   readonly errorSummaryAlertBoxTitle: Locator
-  readonly errorSummaryAlertBoxLink: Locator
-  readonly errorFormGroup: Locator
-  readonly errorFormGroupMessage: Locator
+  readonly errorSummaryAlertBoxStatusLink: Locator
+  readonly errorSummaryAlertBoxReasonForNoRecruitmentLink: Locator
+  readonly statusErrorFormGroup: Locator
+  readonly reasonForNoRecruitmentErrorFormGroup: Locator
+  readonly errorFormGroupStatusMessage: Locator
+  readonly errorFormGroupReasonForNoRecruitmentMessage: Locator
   // Form elements
   readonly studyProgressingSection: Locator
   readonly studyProgressSectionHeader: Locator
@@ -55,6 +59,7 @@ export default class AssessmentPage {
   readonly radioButtonOffTrack: Locator
   readonly radioButtonOffTrackLbl: Locator
   readonly radioButtonOffTrackTxt: Locator
+  readonly reasonForNoRecruitmentTextArea: Locator
   readonly additionalInfoSection: Locator
   readonly additionalInfoSectionHeader: Locator
   readonly furtherInfoSectionHeader: Locator
@@ -115,9 +120,16 @@ export default class AssessmentPage {
     this.submitButton = page.locator('button[type="submit"]')
     this.errorSummaryAlertBox = page.locator('div[class="govuk-error-summary"]')
     this.errorSummaryAlertBoxTitle = page.locator('h2[id="form-summary-errors"]')
-    this.errorSummaryAlertBoxLink = page.locator('a[href="#status"]')
-    this.errorFormGroup = page.locator('div[class="govuk-form-group govuk-form-group--error"]')
-    this.errorFormGroupMessage = page.locator('p[id="status-error"]')
+    this.errorSummaryAlertBoxStatusLink = page.locator('a[href="#status"]')
+    this.errorSummaryAlertBoxReasonForNoRecruitmentLink = page.locator('a[href="#reasonForNoRecruitment"]')
+    this.statusErrorFormGroup = page.locator('.govuk-form-group--error', {
+      hasText: 'Is this study progressing in the UK as planned?',
+    })
+    this.reasonForNoRecruitmentErrorFormGroup = page.locator('.govuk-form-group--error', {
+      hasText: 'Study has not recruited for 6 months',
+    })
+    this.errorFormGroupStatusMessage = page.locator('p[id="status-error"]')
+    this.errorFormGroupReasonForNoRecruitmentMessage = page.locator('p[id="reasonForNoRecruitment-error"]')
     this.lastSponsorAssessmentLbl = page.locator('h3[class="govuk-heading-m govuk-!-margin-bottom-1 p-0"]')
     this.noPrevAssessmentTxt = page.locator('p[class="govuk-body-s"]')
     this.studyProgressingSection = page.locator('fieldset[role="radiogroup"]')
@@ -128,6 +140,7 @@ export default class AssessmentPage {
     this.radioButtonOffTrack = page.locator('input[id="status-1"]')
     this.radioButtonOffTrackLbl = page.locator('label[for="status-1"]')
     this.radioButtonOffTrackTxt = page.locator('div[id="status-1-hint"]')
+    this.reasonForNoRecruitmentTextArea = page.locator('textarea[id="reasonForNoRecruitment"]')
     this.additionalInfoSection = page.locator('div[class="govuk-checkboxes"]')
     this.additionalInfoSectionHeader = this.additionalInfoSection.locator('..').locator('legend')
     this.noLongerInUkInput = page.locator('input[id="furtherInformation"]')
@@ -161,7 +174,12 @@ export default class AssessmentPage {
     this.lastSponsorAssessmentTrack = this.lastSponsorAssessmentText.locator('strong')
     this.lastSponsorAssessmentFurtherInfo = page.locator('div[id="radix-:r5:"] div')
     this.lastSponsorAssessmentFurtherInfoBullets = this.lastSponsorAssessmentFurtherInfo.locator('ul li')
-    this.lastSponsorAssessmentFurtherInfoText = this.lastSponsorAssessmentFurtherInfo.locator('p')
+    this.lastSponsorAssessmentFurtherInfoText = this.lastSponsorAssessmentFurtherInfo
+      .locator('p', { hasText: 'Further information:' })
+      .locator('span')
+    this.lastSponsorAssessmentNoRecruitmentReason = this.lastSponsorAssessmentFurtherInfo
+      .locator('p', { hasText: 'Reason for not recruiting for 6 months:' })
+      .locator('span')
   }
 
   //Page Methods
@@ -290,12 +308,24 @@ export default class AssessmentPage {
     await expect(this.tableChiefInvestigatorValue).toHaveText(expectedChiefInvestigator)
   }
 
-  async assertValidationErrorsPresent() {
+  async assertStatusValidationErrorsPresent() {
     await expect(this.errorSummaryAlertBox).toBeVisible()
-    await expect(this.errorFormGroup).toBeVisible()
+    await expect(this.statusErrorFormGroup).toBeVisible()
     await expect(this.errorSummaryAlertBoxTitle).toHaveText('There is a problem')
-    await expect(this.errorSummaryAlertBoxLink).toHaveText('Select how the study is progressing')
-    await expect(this.errorFormGroupMessage).toContainText('Select how the study is progressing')
+    await expect(this.errorSummaryAlertBoxStatusLink).toHaveText('Select how the study is progressing')
+    await expect(this.errorFormGroupStatusMessage).toContainText('Select how the study is progressing')
+  }
+
+  async assertReasonForNoRecruitmentValidationErrorsPresent() {
+    await expect(this.errorSummaryAlertBox).toBeVisible()
+    await expect(this.reasonForNoRecruitmentErrorFormGroup).toBeVisible()
+    await expect(this.errorSummaryAlertBoxTitle).toHaveText('There is a problem')
+    await expect(this.errorSummaryAlertBoxReasonForNoRecruitmentLink).toHaveText(
+      'Please provide a reason for no recruitment'
+    )
+    await expect(this.errorFormGroupReasonForNoRecruitmentMessage).toContainText(
+      'Please provide a reason for no recruitment'
+    )
   }
 
   async assertLastSponsorSectionPresent() {
@@ -416,6 +446,10 @@ export default class AssessmentPage {
     await expect(this.radioButtonOnTrack).toBeFocused()
   }
 
+  async assertReasonForNoRecruitmentFocused() {
+    await expect(this.reasonForNoRecruitmentTextArea).toBeFocused()
+  }
+
   async assertLastSponsorAssessmentPresent() {
     await expect(this.lastSponsorAssessmentRow).toBeVisible()
   }
@@ -440,6 +474,10 @@ export default class AssessmentPage {
     } else {
       await expect(this.lastSponsorAssessmentTrack).toContainText('Off track')
     }
+  }
+
+  async assertLastSponsorAssessmentNoRecruitmentReasonText(expectedValue: string) {
+    await expect(this.lastSponsorAssessmentNoRecruitmentReason).toHaveText(expectedValue)
   }
 
   async assertAssessedBy() {
