@@ -92,7 +92,6 @@ export const reportAFirstBoxMock: Entry<TypeSetPageSkeleton> =
         linkType: "Environment",
       },
     },
-    publishedVersion: 14,
     revision: 1,
     contentType: {
       sys: {
