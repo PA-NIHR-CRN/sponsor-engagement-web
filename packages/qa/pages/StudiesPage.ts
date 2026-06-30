@@ -14,7 +14,6 @@ export default class StudiesPage {
   readonly pageTitle: Locator
   readonly assessStudiesDropdown: Locator
   readonly studiesFoundHeading: Locator
-  readonly lblDueAssessment: Locator
   readonly txtIntroGuidance: Locator
   readonly expandCollapseSection: Locator
   readonly expandCollapseSectionContents: Locator
@@ -51,9 +50,6 @@ export default class StudiesPage {
     this.pageTitle = page.locator('h2[class="govuk-heading-l govuk-!-margin-bottom-4"]')
     this.assessStudiesDropdown = page.locator('span[class="govuk-details__summary-text"]')
     this.studiesFoundHeading = page.locator('p[class="govuk-heading-s mb-0 whitespace-nowrap"]')
-    this.lblDueAssessment = page.locator(
-      'div[class="flex items-center gap-2 govuk-!-margin-bottom-4"] strong[class="govuk-heading-s govuk-!-margin-bottom-0"]'
-    )
     this.txtIntroGuidance = page.locator('div[class="w-full"] p[class="govuk-body"]')
     this.expandCollapseSection = page.locator(
       'details[class="[&>summary]:text-blue govuk-details govuk-!-margin-bottom-4"]'
@@ -116,12 +112,6 @@ export default class StudiesPage {
     await expect(this.pageTitle).toBeVisible()
     await expect(this.pageTitle).toHaveText('Assess progress of studies')
     await expect(this.page).toHaveURL('studies?success=1')
-  }
-
-  async assertDueLabelPresent() {
-    await expect(this.lblDueAssessment).toBeVisible()
-    await expect(this.lblDueAssessment).toContainText('There are ')
-    await expect(this.lblDueAssessment).toContainText('studies to assess')
   }
 
   async assertIntroGuideTxt() {
