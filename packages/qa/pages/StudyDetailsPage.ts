@@ -3,6 +3,7 @@ import {
   confirmStringNotNull,
   convertIsoDateToDisplayDate,
   convertIsoDateToDisplayDateV2,
+  numDaysBetween,
 } from '../utils/UtilFunctions'
 import { RowDataPacket } from 'mysql2'
 
@@ -76,7 +77,6 @@ export default class StudyDetailsPage {
   readonly firstSponsorAssessmentTrack: Locator
   readonly secondSponsorAssessmentTrack: Locator
   readonly dueIndicator: Locator
-  readonly dueIndicatorSupportingText: Locator
   readonly allStudiesLink: Locator
   readonly sponsorAssessmentHistory: Locator
   readonly updateSuccessBanner: Locator
@@ -204,8 +204,9 @@ export default class StudyDetailsPage {
     )
     this.firstSponsorAssessmentTrack = this.firstSponsorAssessmentText.locator('strong')
     this.secondSponsorAssessmentTrack = this.secondSponsorAssessmentText.locator('strong')
-    this.dueIndicator = page.locator('span[class="govuk-tag govuk-tag--red mr-2"]')
-    this.dueIndicatorSupportingText = this.dueIndicator.locator('..')
+    this.dueIndicator = page
+      .locator('span.govuk-tag.govuk-tag--red.normal-case')
+      .filter({ hasText: /Assessment due for \d+ days?/ })
     this.allStudiesLink = page.locator('a[href="/studies"]')
     this.updateSuccessBanner = page.locator('.govuk-notification-banner.govuk-notification-banner--success')
     this.updateSuccessContent = page.locator('.govuk-notification-banner__heading')
@@ -662,15 +663,22 @@ export default class StudyDetailsPage {
     }
   }
 
-  async assertDueIndicatorDisplayed(isDisplayed: boolean) {
+  async getDaysSinceAssessmentDue(dueAssessmentAt: Date) {
+    return Math.round(numDaysBetween(new Date(), dueAssessmentAt))
+  }
+
+  async assertDueIndicatorDisplayed(isDisplayed: boolean, dueAssessmentAt?: Date | null) {
     if (isDisplayed) {
+      if (!dueAssessmentAt) {
+        throw new Error('dueAssessmentAt is required when asserting the due indicator is displayed')
+      }
+      const daysDue = await this.getDaysSinceAssessmentDue(dueAssessmentAt)
+      const expectedText = `Assessment due for ${daysDue} day${daysDue > 1 ? 's' : ''}`
+
       await expect(this.dueIndicator).toBeVisible()
-      await expect(this.dueIndicatorSupportingText).toBeVisible()
-      await expect(this.dueIndicator).toHaveText('Due')
-      await expect(this.dueIndicatorSupportingText).toContainText('This study needs a new sponsor assessment.')
+      await expect(this.dueIndicator).toHaveText(expectedText)
     } else {
       await expect(this.dueIndicator).toBeHidden()
-      await expect(this.dueIndicatorSupportingText).toBeHidden()
     }
   }
 
