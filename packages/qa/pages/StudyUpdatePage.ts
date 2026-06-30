@@ -128,7 +128,7 @@ export default class StudyUpdatePage {
   async assertOnUpdateStudyPage(studyId: string) {
     await expect(this.pageTitle).toBeVisible()
     await expect(this.bannerTitle).toContainText('Update UK study data')
-    await expect(this.pageTitle).toContainText('Update UK study data')
+    await expect(this.pageTitle).toContainText('Update United Kingdom study data')
     await expect(this.page).toHaveURL(`studies/${studyId}/edit`)
   }
 
