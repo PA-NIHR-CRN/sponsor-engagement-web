@@ -63,10 +63,7 @@ export default class RequestSupportPage {
 
   async assertRdnLinkPresent() {
     await expect(this.guidanceTextLink).toBeVisible()
-    await expect(this.guidanceTextLink).toHaveAttribute(
-      'href',
-      `https://www.nihr.ac.uk/documents/study-support-service-contacts/11921`
-    )
+    await expect(this.guidanceTextLink).toHaveAttribute('href', `https://www.nihr.ac.uk/study-support-service-contacts`)
   }
 
   async assertReturnPreviousPresent() {
