@@ -406,7 +406,11 @@ export default class StudiesPage {
         await expect(this.studyListItemTitle.nth(index)).toHaveText(study.shortTitle)
 
         if (study.dueAssessmentAt) {
-          await expect(this.studyListItem.nth(index).locator(this.studyListItemDueIndicator)).toBeVisible()
+          const dueIndicator = this.studyListItem
+            .nth(index)
+            .locator('span.govuk-tag.govuk-tag--red.normal-case')
+            .filter({ hasText: /Assessment due for \d+ days?/ })
+          await expect(dueIndicator).toBeVisible()
         }
       }
     } else {
