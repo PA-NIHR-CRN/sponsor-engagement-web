@@ -29,7 +29,6 @@ export default class StudiesPage {
   readonly studyListItemIrasIdValue: Locator
   readonly studyListItemLastAssessmentLbl: Locator
   readonly studyListItemLastAssessmentValue: Locator
-  readonly studyListItemDataIndicatesLbl: Locator
   readonly studyListItemDataIndicatesValue: Locator
   readonly studyListItemDueIndicator: Locator
   readonly searchInput: Locator
@@ -76,9 +75,6 @@ export default class StudiesPage {
     this.studyListItemLastAssessmentLbl = page
       .locator('div[class="lg:min-w-[320px]"] strong[class="govuk-heading-s govuk-!-margin-bottom-0"]')
       .nth(0)
-    this.studyListItemDataIndicatesLbl = page
-      .locator('div[class="lg:min-w-[320px]"] strong[class="govuk-heading-s govuk-!-margin-bottom-0"]')
-      .nth(1)
     this.studyListItemLastAssessmentValue = page
       .locator('div.lg\\:min-w-\\[320px\\] p.govuk-body-s.govuk-\\!-margin-top-1')
       .nth(0)
@@ -306,10 +302,19 @@ export default class StudiesPage {
     expect(actualValue).toEqual(expectedValue)
   }
 
-  async assertDataIndicatesLbl(index: number) {
-    expect(await this.studyListItem.nth(index).locator(this.studyListItemDataIndicatesLbl).textContent()).toEqual(
-      'Study data indicates'
-    )
+  async assertDataUpdatesRequiredTagDisplayed(index: number, isDisplayed: boolean) {
+    const studyItem = this.studyListItem.nth(index)
+
+    const dataUpdatesRequiredTag = studyItem
+      .locator('span.govuk-tag.govuk-tag--red.normal-case')
+      .filter({ hasText: 'Data updates required' })
+
+    if (isDisplayed) {
+      await expect(dataUpdatesRequiredTag).toBeVisible()
+      await expect(dataUpdatesRequiredTag).toHaveText('Data updates required')
+    } else {
+      await expect(dataUpdatesRequiredTag).toBeHidden()
+    }
   }
 
   async assertDataIndicatesValue(dbReq: string, index: number) {
