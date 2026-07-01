@@ -29,7 +29,6 @@ export default class StudiesPage {
   readonly studyListItemIrasIdValue: Locator
   readonly studyListItemLastAssessmentLbl: Locator
   readonly studyListItemLastAssessmentValue: Locator
-  readonly studyListItemDataIndicatesValue: Locator
   readonly studyListItemDueIndicator: Locator
   readonly searchInput: Locator
   readonly searchButton: Locator
@@ -78,9 +77,6 @@ export default class StudiesPage {
     this.studyListItemLastAssessmentValue = page
       .locator('div.lg\\:min-w-\\[320px\\] p.govuk-body-s.govuk-\\!-margin-top-1')
       .nth(0)
-    this.studyListItemDataIndicatesValue = page
-      .locator('div[class="lg:min-w-[320px]"] p[class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0"]')
-      .nth(1)
     this.studyListItemDueIndicator = page.locator('span.govuk-tag.govuk-tag--red.normal-case')
     this.searchInput = page.locator('input[class="govuk-input govuk-input h-[50px] border-2 border-black p-2"]')
     this.searchButton = page.locator(
@@ -314,18 +310,6 @@ export default class StudiesPage {
       await expect(dataUpdatesRequiredTag).toHaveText('Data updates required')
     } else {
       await expect(dataUpdatesRequiredTag).toBeHidden()
-    }
-  }
-
-  async assertDataIndicatesValue(dbReq: string, index: number) {
-    const expectedValues = await seDatabaseReq(`${dbReq}`)
-    const actualValue = await this.studyListItem.nth(index).locator(this.studyListItemDataIndicatesValue).textContent()
-    if (expectedValues.length > 1) {
-      expect(actualValue).toEqual(await this.getExpectedMultipleIndicatorsAsString(expectedValues))
-    } else if (expectedValues.length > 0) {
-      expect(actualValue).toContain(expectedValues[0].indicatorType)
-    } else {
-      expect(actualValue).toEqual('No concerns')
     }
   }
 
