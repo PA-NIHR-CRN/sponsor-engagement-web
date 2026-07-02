@@ -214,7 +214,7 @@ test.describe('Submit a Study Assessment and Validate Form Inputs - @se_38', () 
       await assessmentPage.assertLastSponsorAssessmentCollapsed(true)
     })
     await test.step(`And the Assessment Date is todays date`, async () => {
-      await assessmentPage.assertlastSponsorAssessmentDate()
+      await assessmentPage.assertLastSponsorAssessmentDate()
     })
     await test.step(`And the Assessment has been recorded as Off Track`, async () => {
       await assessmentPage.assertLastSponsorAssessmentOnOffTrack('Off')

@@ -70,7 +70,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
     })
 
     await test.step('Then the Study List item will display a `Assessment Due` indicator', async () => {
-      await studiesPage.assertDueIndicatorDisplayed(0, testStudy[0].dueAssessmentAt)
+      await studiesPage.assertAssessmentDueIndicatorDisplayed(0, testStudy[0].dueAssessmentAt)
     })
 
     await test.step('And if I enter the Study Details page for the Study', async () => {
@@ -79,10 +79,9 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
     })
 
     await test.step('Then the Study Details page will also display a `Assessment Due` indicator', async () => {
-      await studyDetailsPage.assertDueIndicatorDisplayed(true, testStudy[0].dueAssessmentAt)
+      await studyDetailsPage.assertAssessmentDueIndicatorDisplayed(true, testStudy[0].dueAssessmentAt)
     })
   })
-
   test('The `Assessment Due` indicator appears for a Study, when the study meets the Due criteria, with actual opening date >= 90 days ago - @se_68_withOpen', async ({
     studiesPage,
     studyDetailsPage,
@@ -117,7 +116,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
     })
 
     await test.step('Then the Study List item will display a `Assessment Due` indicator', async () => {
-      await studiesPage.assertDueIndicatorDisplayed(0, testStudy[0].dueAssessmentAt)
+      await studiesPage.assertAssessmentDueIndicatorDisplayed(0, testStudy[0].dueAssessmentAt)
     })
 
     await test.step('And if I enter the Study Details page for the Study', async () => {
@@ -126,7 +125,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
     })
 
     await test.step('Then the Study Details page will also display a `Assessment Due` indicator', async () => {
-      await studyDetailsPage.assertDueIndicatorDisplayed(true, testStudy[0].dueAssessmentAt)
+      await studyDetailsPage.assertAssessmentDueIndicatorDisplayed(true, testStudy[0].dueAssessmentAt)
     })
   })
 
@@ -165,7 +164,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
     })
 
     await test.step('Then the Study List item will display a `Assessment Due` indicator', async () => {
-      await studiesPage.assertDueIndicatorDisplayed(0, testStudy[0].dueAssessmentAt)
+      await studiesPage.assertAssessmentDueIndicatorDisplayed(0, testStudy[0].dueAssessmentAt)
     })
 
     await test.step('And if I enter the Study Details page for the Study', async () => {
@@ -174,7 +173,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
     })
 
     await test.step('Then the Study Details page will also display a `Assessment Due` indicator', async () => {
-      await studyDetailsPage.assertDueIndicatorDisplayed(true, testStudy[0].dueAssessmentAt)
+      await studyDetailsPage.assertAssessmentDueIndicatorDisplayed(true, testStudy[0].dueAssessmentAt)
     })
   })
 
@@ -209,7 +208,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
     })
 
     await test.step('Then the Study List item will not display a `Due` indicator', async () => {
-      await studiesPage.assertDueIndicatorDisplayed(0, testStudy[0].dueAssessmentAt)
+      await studiesPage.assertAssessmentDueIndicatorDisplayed(0, testStudy[0].dueAssessmentAt)
     })
 
     await test.step('And if I enter the Study Details page for the Study', async () => {
@@ -218,7 +217,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
     })
 
     await test.step('Then the Study Details page will also not display a `Assessment Due` indicator', async () => {
-      await studyDetailsPage.assertDueIndicatorDisplayed(false)
+      await studyDetailsPage.assertAssessmentDueIndicatorDisplayed(false)
     })
   })
 
@@ -250,14 +249,14 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
       await studiesPage.assertSpecificLastAssessmentValue('None', 0)
     })
     await test.step('And the Study List item displays a `Assessment Due` indicator', async () => {
-      await studiesPage.assertDueIndicatorDisplayed(0, testStudy[0].dueAssessmentAt)
+      await studiesPage.assertAssessmentDueIndicatorDisplayed(0, testStudy[0].dueAssessmentAt)
     })
     await test.step('And if I enter the Study Details page for the Study', async () => {
       await studiesPage.viewStudyButton.nth(0).click()
       await studyDetailsPage.assertOnStudyDetailsPage(provideAssessmentStudyId.toString())
     })
     await test.step('And the Study Details page also displays a `Assessment Due` indicator', async () => {
-      await studyDetailsPage.assertDueIndicatorDisplayed(true, testStudy[0].dueAssessmentAt)
+      await studyDetailsPage.assertAssessmentDueIndicatorDisplayed(true, testStudy[0].dueAssessmentAt)
     })
     await test.step(`And I click the Assess button`, async () => {
       await studyDetailsPage.assessButton.click()
@@ -278,7 +277,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
       await studyDetailsPage.assertOnStudyDetailsPageWithSuccess(provideAssessmentStudyId.toString())
     })
     await test.step('Then the Study Details page will not display a `Assessment Due` indicator', async () => {
-      await studyDetailsPage.assertDueIndicatorDisplayed(false)
+      await studyDetailsPage.assertAssessmentDueIndicatorDisplayed(false)
     })
     await test.step(`And if return to the Study List Page`, async () => {
       await studiesPage.goto()
@@ -291,7 +290,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
       await studiesPage.assertSpecificNumberStudies(1)
     })
     await test.step('Then the Study List item will also not display a `Assessment Due` indicator', async () => {
-      await studiesPage.assertDueIndicatorDisplayed(0, null)
+      await studiesPage.assertAssessmentDueIndicatorDisplayed(0, null)
     })
   })
 })

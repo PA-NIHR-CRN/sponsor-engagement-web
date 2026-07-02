@@ -29,7 +29,7 @@ export default class StudiesPage {
   readonly studyListItemIrasIdValue: Locator
   readonly studyListItemLastAssessmentLbl: Locator
   readonly studyListItemLastAssessmentValue: Locator
-  readonly studyListItemDueIndicator: Locator
+  readonly assessmentDueIndicator: Locator
   readonly searchInput: Locator
   readonly searchButton: Locator
   readonly searchFilterPanel: Locator
@@ -77,7 +77,7 @@ export default class StudiesPage {
     this.studyListItemLastAssessmentValue = page
       .locator('div.lg\\:min-w-\\[320px\\] p.govuk-body-s.govuk-\\!-margin-top-1')
       .nth(0)
-    this.studyListItemDueIndicator = page.locator('span.govuk-tag.govuk-tag--red.normal-case')
+    this.assessmentDueIndicator = this.studyListItem.locator('span[class="govuk-tag govuk-tag--red normal-case"]')
     this.searchInput = page.locator('input[class="govuk-input govuk-input h-[50px] border-2 border-black p-2"]')
     this.searchButton = page.locator(
       'button[class="bg-[var(--colour-blue)] text-white active:top-0 focus:shadow-[inset_0_0_0_4px_var(--text-grey)] focus:outline focus:outline-[3px] focus:outline-[var(--focus)] mb-0 w-[50px] h-[50px] flex items-center justify-center text-lg"]'
@@ -341,25 +341,15 @@ export default class StudiesPage {
     return Math.round(numDaysBetween(new Date(), dueAssessmentAt))
   }
 
-  async assertDueIndicatorDisplayed(index: number, dueAssessmentAt?: Date | null) {
-    const studyItem = this.studyListItem.nth(index)
-
+  async assertAssessmentDueIndicatorDisplayed(index: number, dueAssessmentAt?: Date | null) {
+    const dueIndicator = this.assessmentDueIndicator.nth(index)
     if (dueAssessmentAt) {
       const numberOfDaysDue = await this.getDaysSinceAssessmentDue(dueAssessmentAt)
       const daysDue = numberOfDaysDue || 1
-
       const expectedText = `Assessment due for ${daysDue} day${daysDue > 1 ? 's' : ''}`
-
-      const dueIndicator = studyItem
-        .locator('span.govuk-tag.govuk-tag--red.normal-case')
-        .filter({ hasText: expectedText })
-
       await expect(dueIndicator).toBeVisible()
       await expect(dueIndicator).toHaveText(expectedText)
     } else {
-      const dueIndicator = studyItem
-        .locator('span.govuk-tag.govuk-tag--red.normal-case')
-        .filter({ hasText: /Assessment due for \d+ days?/ })
       await expect(dueIndicator).toBeHidden()
     }
   }
@@ -401,16 +391,14 @@ export default class StudiesPage {
   async assertListBeginsWithDueStudies(sortedList: RowDataPacket[]) {
     if (await this.checkForStudyDue(sortedList)) {
       const pageStudyCount = await this.studyListItem.count()
+
       for (let index = 0; index < pageStudyCount; index++) {
         const study = sortedList[index]
+
         await expect(this.studyListItemTitle.nth(index)).toHaveText(study.shortTitle)
 
         if (study.dueAssessmentAt) {
-          const dueIndicator = this.studyListItem
-            .nth(index)
-            .locator('span.govuk-tag.govuk-tag--red.normal-case')
-            .filter({ hasText: /Assessment due for \d+ days?/ })
-          await expect(dueIndicator).toBeVisible()
+          await expect(this.assessmentDueIndicator.nth(index)).toBeVisible()
         }
       }
     } else {

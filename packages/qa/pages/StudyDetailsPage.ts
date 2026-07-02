@@ -76,7 +76,7 @@ export default class StudyDetailsPage {
   readonly secondSponsorAssessmentText: Locator
   readonly firstSponsorAssessmentTrack: Locator
   readonly secondSponsorAssessmentTrack: Locator
-  readonly dueIndicator: Locator
+  readonly assessmentDueIndicator: Locator
   readonly allStudiesLink: Locator
   readonly sponsorAssessmentHistory: Locator
   readonly updateSuccessBanner: Locator
@@ -190,7 +190,6 @@ export default class StudyDetailsPage {
     this.secondSponsorAssessmentNoRecruitmentReason = this.secondSponsorAssessmentFurtherInfo
       .locator('p', { hasText: 'Reason for not recruiting for 6 months:' })
       .locator('span')
-    this.secondSponsorAssessmentFurtherInfoText = this.secondSponsorAssessmentFurtherInfo.locator('p')
     this.sponsorAssessmentHistory = page.locator('[class="govuk-!-margin-bottom-6"]')
     this.firstSponsorAssessmentRow = this.sponsorAssessmentHistory.locator('button')
     this.secondSponsorAssessmentRow = this.sponsorAssessmentHistory.locator('button').nth(1)
@@ -204,9 +203,9 @@ export default class StudyDetailsPage {
     )
     this.firstSponsorAssessmentTrack = this.firstSponsorAssessmentText.locator('strong')
     this.secondSponsorAssessmentTrack = this.secondSponsorAssessmentText.locator('strong')
-    this.dueIndicator = page
-      .locator('span.govuk-tag.govuk-tag--red.normal-case')
-      .filter({ hasText: /Assessment due for \d+ days?/ })
+    this.assessmentDueIndicator = page
+      .locator('span[class="govuk-tag govuk-tag--red normal-case"]')
+      .filter({ hasText: 'Assessment due for' })
     this.allStudiesLink = page.locator('a[href="/studies"]')
     this.updateSuccessBanner = page.locator('.govuk-notification-banner.govuk-notification-banner--success')
     this.updateSuccessContent = page.locator('.govuk-notification-banner__heading')
@@ -667,18 +666,17 @@ export default class StudyDetailsPage {
     return Math.round(numDaysBetween(new Date(), dueAssessmentAt))
   }
 
-  async assertDueIndicatorDisplayed(isDisplayed: boolean, dueAssessmentAt?: Date | null) {
+  async assertAssessmentDueIndicatorDisplayed(isDisplayed: boolean, dueAssessmentAt?: Date | null) {
     if (isDisplayed) {
       if (!dueAssessmentAt) {
         throw new Error('dueAssessmentAt is required when asserting the due indicator is displayed')
       }
       const daysDue = await this.getDaysSinceAssessmentDue(dueAssessmentAt)
       const expectedText = `Assessment due for ${daysDue} day${daysDue > 1 ? 's' : ''}`
-
-      await expect(this.dueIndicator).toBeVisible()
-      await expect(this.dueIndicator).toHaveText(expectedText)
+      await expect(this.assessmentDueIndicator).toBeVisible()
+      await expect(this.assessmentDueIndicator).toHaveText(expectedText)
     } else {
-      await expect(this.dueIndicator).toBeHidden()
+      await expect(this.assessmentDueIndicator).toBeHidden()
     }
   }
 

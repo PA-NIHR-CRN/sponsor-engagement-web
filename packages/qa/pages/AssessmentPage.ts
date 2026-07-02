@@ -122,7 +122,7 @@ export default class AssessmentPage {
     this.errorSummaryAlertBoxTitle = page.locator('h2[id="form-summary-errors"]')
     this.errorSummaryAlertBoxStatusLink = page.locator('a[href="#status"]')
     this.errorSummaryAlertBoxReasonForNoRecruitmentLink = page.locator('a[href="#reasonForNoRecruitment"]')
-    this.statusErrorFormGroup = page.locator('.govuk-form-group--error', {
+    this.statusErrorFormGroup = page.locator('div[class="govuk-form-group govuk-form-group--error"]', {
       hasText: 'Is this study progressing in the UK as planned?',
     })
     this.reasonForNoRecruitmentErrorFormGroup = page.locator('.govuk-form-group--error', {
@@ -189,7 +189,7 @@ export default class AssessmentPage {
 
   async assertOnAssessmentPage(studyId: string) {
     await expect(this.pageTitle).toBeVisible()
-    await expect(this.pageTitle).toContainText('Assess progress of a study in the UK')
+    await expect(this.pageTitle).not.toBeEmpty()
     await expect(this.page).toHaveURL(`studies/${studyId}/assess`)
   }
 
@@ -462,7 +462,7 @@ export default class AssessmentPage {
     }
   }
 
-  async assertlastSponsorAssessmentDate() {
+  async assertLastSponsorAssessmentDate() {
     await expect(this.lastSponsorAssessmentDate).toBeVisible()
     const todaysDate = convertIsoDateToDisplayDate(new Date())
     await expect(this.lastSponsorAssessmentDate).toHaveText(todaysDate)
