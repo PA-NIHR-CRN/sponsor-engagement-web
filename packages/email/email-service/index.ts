@@ -23,7 +23,7 @@ export interface EmailStatusResult {
   insights: EmailInsightsList
 }
 
-const emailSendingEnabled = process.env.EMAIL_SENDING_ENABLED === 'true'
+const emailSendingEnabled = process.env.WEB_EMAIL_SENDING_ENABLED === 'true'
 
 export class EmailService {
   constructor(private sesClient: SES) {}
