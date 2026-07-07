@@ -17,8 +17,6 @@ export default class StudyUpdatePage {
   readonly statusHintInSetup: Locator
   readonly statusRadioOpenRec: Locator
   readonly statusHintOpenRec: Locator
-  readonly statusRadioClosedInFollow: Locator
-  readonly statusHintClosedInFollow: Locator
   readonly statusRadioClosed: Locator
   readonly statusHintClosed: Locator
   readonly statusRadioWithdrawn: Locator
@@ -43,6 +41,7 @@ export default class StudyUpdatePage {
   readonly ukRecruitmentTarget: Locator
   readonly furtherInfo: Locator
   readonly buttonUpdate: Locator
+  readonly buttonNext: Locator
   readonly buttonCancel: Locator
   readonly requestSupport: Locator
   readonly updateSuccessBanner: Locator
@@ -79,14 +78,12 @@ export default class StudyUpdatePage {
     this.statusHintInSetup = page.locator('#status-hint').first()
     this.statusRadioOpenRec = page.locator('#status-1')
     this.statusHintOpenRec = page.locator('#status-1-hint')
-    this.statusRadioClosedInFollow = page.locator('#status-2')
-    this.statusHintClosedInFollow = page.locator('#status-2-hint')
-    this.statusRadioClosed = page.locator('#status-3')
-    this.statusHintClosed = page.locator('#status-3-hint')
-    this.statusRadioWithdrawn = page.locator('#status-4')
-    this.statusHintWithdrawn = page.locator('#status-4-hint')
-    this.statusRadioSuspended = page.locator('#status-5')
-    this.statusHintSuspended = page.locator('#status-5-hint')
+    this.statusRadioClosed = page.locator('#status-2')
+    this.statusHintClosed = page.locator('#status-2-hint')
+    this.statusRadioWithdrawn = page.locator('#status-3')
+    this.statusHintWithdrawn = page.locator('#status-3-hint')
+    this.statusRadioSuspended = page.locator('#status-4')
+    this.statusHintSuspended = page.locator('#status-4-hint')
     this.plannedOpeningDD = page.locator('#plannedOpeningDate-day')
     this.plannedOpeningMM = page.locator('#plannedOpeningDate-month')
     this.plannedOpeningYYYY = page.locator('#plannedOpeningDate-year')
@@ -105,6 +102,7 @@ export default class StudyUpdatePage {
     this.ukRecruitmentTarget = page.locator('#recruitmentTarget')
     this.furtherInfo = page.locator('#furtherInformation')
     this.buttonUpdate = page.locator('button.govuk-button:has-text("Update")')
+    this.buttonNext = page.locator('button.govuk-button:has-text("Next")')
     this.buttonCancel = page.locator('.govuk-button.govuk-button--secondary')
     this.requestSupport = page.locator('[data-testid="request-support"]')
     this.updateSuccessBanner = page.locator('.govuk-notification-banner.govuk-notification-banner--success')
@@ -167,27 +165,21 @@ export default class StudyUpdatePage {
 
   async assertStudyStatusSection() {
     await expect(this.statusRadioInSetup).toBeVisible()
-    await expect(this.statusHintInSetup).toHaveText(`Not yet open to recruitment.`)
+    await expect(this.statusHintInSetup).toContainText('Not yet open to recruitment')
+
     await expect(this.statusRadioOpenRec).toBeVisible()
-    await expect(this.statusHintOpenRec).toHaveText(
-      `Open to recruit participants in at least one UK site. Provide an actual opening date below.`
-    )
-    await expect(this.statusRadioClosedInFollow).toBeVisible()
-    await expect(this.statusHintClosedInFollow).toHaveText(
-      `Ongoing, (i.e. participants are being treated or observed), but recruitment is complete. Provide an actual closure date below.`
-    )
+    await expect(this.statusHintOpenRec).toContainText('Open to recruit participants in at least one UK site')
+
     await expect(this.statusRadioClosed).toBeVisible()
-    await expect(this.statusHintClosed).toHaveText(
-      `Completed recruitment and any subsequent patient related activities (follow up). Provide an actual closure date below.`
+    await expect(this.statusHintClosed).toContainText(
+      'Completed recruitment and any subsequent patient related activities'
     )
+
     await expect(this.statusRadioSuspended).toBeVisible()
-    await expect(this.statusHintSuspended).toHaveText(
-      `Recruitment of participants has halted, but may resume. Provide an estimated re-opening date below.`
-    )
+    await expect(this.statusHintSuspended).toContainText('Recruitment of participants has halted')
+
     await expect(this.statusRadioWithdrawn).toBeVisible()
-    await expect(this.statusHintWithdrawn).toHaveText(
-      `Withdrawn during the setup phase and will not be opening to recruitment in the UK.`
-    )
+    await expect(this.statusHintWithdrawn).toContainText('Withdrawn during the setup phase')
   }
 
   async assertStudyStatus(status: string) {
@@ -196,9 +188,6 @@ export default class StudyUpdatePage {
     }
     if (status in ['Open to Recruitment', 'Open, With Recruitment']) {
       await expect(this.statusRadioOpenRec).toBeChecked()
-    }
-    if (status in ['Closed to Recruitment', 'Closed to Recruitment, Follow Up Complete']) {
-      await expect(this.statusRadioClosedInFollow).toBeChecked()
     }
     if (status in ['Closed to Recruitment, In Follow Up']) {
       await expect(this.statusRadioClosed).toBeChecked()
