@@ -329,7 +329,6 @@ export default class StudyUpdatePage {
     await this.fillStudyDates('plannedClosure', '', '', '')
     await this.fillStudyDates('actualClosure', '', '', '')
     await this.ukRecruitmentTarget.fill('')
-    await this.furtherInfo.fill(``)
   }
 
   async assertStudyDatesValidationRequired(dateType: string) {
@@ -389,62 +388,55 @@ export default class StudyUpdatePage {
       actualOpening: 'Actual UK opening',
       actualClosure: 'Actual UK closure',
       plannedClosure: 'Planned UK closure',
-      estimatedReopening: ' Estimated UK opening',
+      estimatedReopening: 'Estimated UK opening',
     }
 
-    const label = dateTypeToLabelMapping[dateType] ?? dateType
+    const dateTypeToIdMapping: Record<string, string> = {
+      plannedOpening: 'plannedOpeningDate',
+      actualOpening: 'actualOpeningDate',
+      actualClosure: 'actualClosureDate',
+      plannedClosure: 'plannedClosureDate',
+      estimatedReopening: 'estimatedReopeningDate',
+    }
 
-    let plannedOrActualMessage = ''
-    let estimatedReopenMessage = ''
+    const label = dateTypeToLabelMapping[dateType]
+    const fieldId = dateTypeToIdMapping[dateType]
+
+    if (!label || !fieldId) {
+      throw new Error(`${dateType} is not a valid date option`)
+    }
+
+    let message = ''
 
     if (dmy === 'year' && partial === false) {
-      plannedOrActualMessage = `Year must include 4 numbers`
-      estimatedReopenMessage = plannedOrActualMessage
-    } else if ((dmy === 'year' && partial === true) || (dmy !== 'year' && partial === true)) {
-      plannedOrActualMessage = `${label} to recruitment date must include a ${dmy}`
-      estimatedReopenMessage = `${dateType} date must include a ${dmy}`
+      message = 'Year must include 4 numbers'
+    } else if (partial === true) {
+      if (dateType === 'estimatedReopening') {
+        message = `${label} date must include a ${dmy}`
+      } else {
+        message = `${label} to recruitment date must include a ${dmy}`
+      }
     } else {
-      plannedOrActualMessage = `${label} to recruitment date requires a valid ${dmy}`
-      estimatedReopenMessage = `${label} date requires a valid ${dmy}`
+      if (dateType === 'estimatedReopening') {
+        message = `${label} date requires a valid ${dmy}`
+      } else {
+        message = `${label} to recruitment date requires a valid ${dmy}`
+      }
     }
+
+    const input = this.page.locator(`#${fieldId}-${dmy}`)
 
     await expect(this.updateValidationBanner).toBeVisible()
     await expect(this.updateValidationBanner).toContainText('There is a problem')
 
-    switch (dateType) {
-      case 'plannedOpening':
-        const plannedOpeningError = `#plannedOpeningDate-${dmy}-error`
-        await expect(this.page.locator(plannedOpeningError)).toBeVisible()
-        await expect(this.page.locator(plannedOpeningError)).toHaveText(`Error: ${plannedOrActualMessage}`)
-        await expect(this.updateValidationList).toContainText(plannedOrActualMessage)
-        break
-      case 'actualOpening':
-        const actualOpeningError = `#actualOpeningDate-${dmy}-error`
-        await expect(this.page.locator(actualOpeningError)).toBeVisible()
-        await expect(this.page.locator(actualOpeningError)).toHaveText(`Error: ${plannedOrActualMessage}`)
-        await expect(this.updateValidationList).toContainText(plannedOrActualMessage)
-        break
-      case 'plannedClosure':
-        const plannedClosureError = `#plannedClosureDate-${dmy}-error`
-        await expect(this.page.locator(plannedClosureError)).toBeVisible()
-        await expect(this.page.locator(plannedClosureError)).toHaveText(`Error: ${plannedOrActualMessage}`)
-        await expect(this.updateValidationList).toContainText(plannedOrActualMessage)
-        break
-      case 'actualClosure':
-        const actualClosureError = `#actualClosureDate-${dmy}-error`
-        await expect(this.page.locator(actualClosureError)).toBeVisible()
-        await expect(this.page.locator(actualClosureError)).toHaveText(`Error: ${plannedOrActualMessage}`)
-        await expect(this.updateValidationList).toContainText(plannedOrActualMessage)
-        break
-      case 'estimatedReopening':
-        const estimatedReopeningError = `#estimatedReopeningDate-${dmy}-error`
-        await expect(this.page.locator(estimatedReopeningError)).toBeVisible()
-        await expect(this.page.locator(estimatedReopeningError)).toHaveText(`Error: ${estimatedReopenMessage}`)
-        await expect(this.updateValidationList).toContainText(estimatedReopenMessage)
-        break
-      default:
-        throw new Error(`${dateType} is not a valid date option`)
-    }
+    const summaryLink = this.updateValidationList.locator(`a[href="#${fieldId}-${dmy}"]`)
+
+    await expect(summaryLink).toBeVisible()
+    await expect(summaryLink).toHaveText(message)
+
+    await expect(input).toBeVisible()
+    await expect(input).toHaveAttribute('aria-invalid', 'true')
+    await expect(input).toHaveClass(/govuk-input--error/)
   }
 
   async assertPlannedClosureAfterPlannedOpening() {
@@ -464,11 +456,9 @@ export default class StudyUpdatePage {
     await expect(this.updateValidationBanner).toContainText('There is a problem')
     await expect(this.actualOpeningInlineError).toBeVisible()
     await expect(this.actualOpeningInlineError).toHaveText(
-      'Error: Actual UK opening to recruitment date must be today or in the past'
+      'Error: Actual UK opening to recruitment date cannot be in the future'
     )
-    await expect(this.updateValidationList).toContainText(
-      'Actual UK opening to recruitment date must be today or in the past'
-    )
+    await expect(this.updateValidationList).toContainText('Actual UK opening to recruitment date')
   }
 
   async assertActualClosureDateMustBeTodayOrPast() {
@@ -476,10 +466,10 @@ export default class StudyUpdatePage {
     await expect(this.updateValidationBanner).toContainText('There is a problem')
     await expect(this.actualClosureInlineError).toBeVisible()
     await expect(this.actualClosureInlineError).toHaveText(
-      'Error: Actual UK closure to recruitment date must be today or in the past'
+      'Error: Actual UK closure to recruitment date cannot be in the future'
     )
     await expect(this.updateValidationList).toContainText(
-      'Actual UK closure to recruitment date must be today or in the past'
+      'Actual UK closure to recruitment date cannot be in the future'
     )
   }
 
@@ -506,7 +496,7 @@ export default class StudyUpdatePage {
     await expect(this.updateValidationBanner).toBeVisible()
     await expect(this.updateValidationBanner).toContainText('There is a problem')
     await expect(this.updateValidationList).toContainText(
-      `An unexpected error occurred whilst processing the form, please try again later.`
+      `Actual UK closure to recruitment date must be after Actual UK opening to recruitment date`
     )
   }
 
