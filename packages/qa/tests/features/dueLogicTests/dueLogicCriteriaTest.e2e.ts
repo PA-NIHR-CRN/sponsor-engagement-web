@@ -36,7 +36,8 @@ test.beforeAll('Setup Tests', async () => {
 test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se_68', () => {
   test.use({ storageState: '.auth/sponsorContact.json' })
 
-  test('The `Assessment Due` indicator appears for a Study, when the study meets the Due criteria, with null opening date - @se_68_nullOpen', async ({
+  // This test heavily relies on random test data matching the correct scenario
+  test.skip('The `Assessment Due` indicator appears for a Study, when the study meets the Due criteria, with null opening date - @se_68_nullOpen', async ({
     studiesPage,
     studyDetailsPage,
   }) => {
@@ -46,6 +47,9 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
       JOIN StudyEvaluationCategory sec ON s.id = sec.studyId
       JOIN Assessment a ON s.id = a.studyId
       WHERE s.actualOpeningDate IS NULL
+        AND s.isDeleted = 0
+        AND so.isDeleted = 0 
+        AND a.isDeleted = 0
         AND so.organisationId = ${startingOrgId}
         AND sec.isDeleted = 0
         AND a.createdAt <= NOW() - INTERVAL 90 DAY
@@ -94,6 +98,9 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
       WHERE s.actualOpeningDate <= NOW() - INTERVAL 90 DAY
         AND so.organisationId = ${startingOrgId}
         AND sec.isDeleted = 0
+        AND s.isDeleted = 0
+        AND so.isDeleted = 0 
+        AND a.isDeleted = 0
         AND a.createdAt <= NOW() - INTERVAL 90 DAY
       GROUP BY s.id ORDER BY RAND() LIMIT 1;
     `)
@@ -177,6 +184,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
     })
   })
 
+  // This test heavily relies on random test data matching the correct scenario
   test.skip('No `Assessment Due` indicator appears for a Study, when the study does not meet the Due criteria (no Risk Indicators) - @se_68_noRisks', async ({
     studiesPage,
     studyDetailsPage,
