@@ -192,7 +192,7 @@ export const getStudiesForOrgs = async ({
       shortTitle: true,
       dueAssessmentAt: true,
       irasId: true,
-      hraApprovalDate: true,
+      regulatoryApprovalDate: true,
       studyStatus: true,
       willRecruitWithinTimeline: true,
       lastAssessment: {
@@ -428,7 +428,7 @@ export const mapCPMSStudyToSEStudy = (study: Study): UpdateStudyInput => ({
   actualClosureDate: study.ActualClosureToRecruitmentDate ? new Date(study.ActualClosureToRecruitmentDate) : null,
   estimatedReopeningDate: study.EstimatedReopeningDate ? new Date(study.EstimatedReopeningDate) : null,
   leadAdministrationId: study.LeadAdministrationId,
-  hraApprovalDate: study.RegulatoryApprovalDate ? new Date(study.RegulatoryApprovalDate) : null
+  regulatoryApprovalDate: study.RegulatoryApprovalDate ? new Date(study.RegulatoryApprovalDate) : null
 })
 
 export const updateStudy = async (cpmsId: number, studyData: UpdateStudyInput) => {

@@ -98,7 +98,7 @@ export default function Configure({ study, returnUrl }: Readonly<ConfigureProps>
           </div>
 
           <StudyProgressExtended
-            hraApprovalDate={study.hraApprovalDate}
+            regulatoryApprovalDate={study.regulatoryApprovalDate}
             studyStatus={study.studyStatus}
             willRecruitWithinTimeline={study.willRecruitWithinTimeline}
           />
