@@ -7,7 +7,7 @@ import clsx from "clsx";
 import { pluraliseDays } from '@/utils/pluralise';
 
 interface StudyProgressExtendedProps {
-    hraApprovalDate: Date | null;
+    regulatoryApprovalDate: Date | null;
     studyStatus: string;
     willRecruitWithinTimeline: boolean;
     showBorder?: boolean;
@@ -23,7 +23,7 @@ interface StudyProgressExtendedProps {
 
 export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
     {
-        hraApprovalDate,
+        regulatoryApprovalDate,
         studyStatus,
         willRecruitWithinTimeline,
         moreDetailsHref,
@@ -47,18 +47,18 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
 
     if (
         !inSetupStatuses.includes(studyStatus as Status) ||
-        hraApprovalDate === null
+        regulatoryApprovalDate === null
     ) {
         return null;
     }
 
     const today = new Date();
     const totalDays = 90;
-    const endDate = new Date(hraApprovalDate);
+    const endDate = new Date(regulatoryApprovalDate);
     endDate.setDate(endDate.getDate() + totalDays);
 
     const elapsedDays = Math.ceil(
-        (today.getTime() - hraApprovalDate.getTime()) / (1000 * 60 * 60 * 24)
+        (today.getTime() - regulatoryApprovalDate.getTime()) / (1000 * 60 * 60 * 24)
     );
 
     const daysRemaining = Math.max(totalDays - elapsedDays, 0);
@@ -90,7 +90,7 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
                 <div>
                     {showTimeframeHint && (
                         <span className="govuk-body-s text-darkGrey block govuk-!-margin-bottom-2">
-                            Based on the latest data from HRA approval from start date to end date
+                            Based on the latest UK approvals data between the start and end dates
                         </span>
                     )}
                     <ProgressBar className="govuk-!-width-full" color={GetStudyProgressColor(elapsedDays)} max={totalDays}
@@ -105,7 +105,7 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
                             </span>
                             {showDates && (
                                 <span className="govuk-body-s govuk-!-font-weight-bold text-darkGrey">
-                                    HRA approval date: {hraApprovalDate.toLocaleDateString('en-GB')}
+                                    UK approval date: {regulatoryApprovalDate.toLocaleDateString('en-GB')}
                                 </span>
                             )}
                         </div>

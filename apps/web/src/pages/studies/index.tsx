@@ -154,7 +154,7 @@ export default function Studies({
                         <li key={study.id}>
                           <StudyList
                             daysSinceAssessmentDue={daysSinceAssessmentDue}
-                            hraApprovalDate={study.hraApprovalDate}
+                            regulatoryApprovalDate={study.regulatoryApprovalDate}
                             indications={study.evaluationCategories
                               .map((evalCategory) => evalCategory.indicatorValue)
                               .filter((evalCategory, index, items) => items.indexOf(evalCategory) === index)}

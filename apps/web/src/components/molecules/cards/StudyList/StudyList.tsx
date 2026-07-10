@@ -18,7 +18,7 @@ export interface StudyListProps {
   trackStatusHref?: string
   indications?: string[]
   irasId: string | null
-  hraApprovalDate: Date | null
+  regulatoryApprovalDate: Date | null
   studyStatus: string,
   willRecruitWithinTimeline : boolean
   firstType?: string | null
@@ -35,7 +35,7 @@ export function StudyList({
   lastAssessmentDate,
   indications,
   irasId,
-  hraApprovalDate,
+  regulatoryApprovalDate,
   studyStatus, 
   willRecruitWithinTimeline,
   firstType
@@ -111,7 +111,7 @@ export function StudyList({
           <div className="lg:min-w-[320px] govuk-!-margin-top-3 min-h-[72px]">
             <div className="max-w-[600px]">
               <StudyProgressExtended 
-                hraApprovalDate={hraApprovalDate}
+                regulatoryApprovalDate={regulatoryApprovalDate}
                 willRecruitWithinTimeline={willRecruitWithinTimeline}
                 studyStatus={studyStatus}
                 showBorder={false}

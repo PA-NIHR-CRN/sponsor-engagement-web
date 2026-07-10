@@ -193,7 +193,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
             </div>
 
             <StudyProgressExtended
-              hraApprovalDate={study.hraApprovalDate}
+              regulatoryApprovalDate={study.regulatoryApprovalDate}
               moreDetailsHref={`${STUDIES_PAGE}/${study.id}/configure`}
               studyStatus={study.studyStatus}
               willRecruitWithinTimeline={study.willRecruitWithinTimeline}
