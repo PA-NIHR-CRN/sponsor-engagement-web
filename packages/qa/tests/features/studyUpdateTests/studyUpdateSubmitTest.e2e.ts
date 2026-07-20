@@ -61,7 +61,8 @@ test.describe('Update study and save changes locally in SE @se_184 @se_168', () 
     )
   })
 
-  test('As a sponsor contact I can make proposed changes to the study data (added history) @se_184_proposed @se_168_added', async ({
+  // When a study is set to closed, a new page called closure is the next step in the flow, thus this test is outdated
+  test.skip('As a sponsor contact I can make proposed changes to the study data (added history) @se_184_proposed @se_168_added', async ({
     studyUpdatePage,
     studyDetailsPage,
   }) => {
@@ -149,7 +150,8 @@ test.describe('Update study and save changes locally in SE @se_184 @se_168', () 
     })
   })
 
-  test('As a sponsor contact I can make proposed changes to the study data (updated history) @se_184_proposed @se_168_updated', async ({
+  // When a study is set to closed, a new page called closure is the next step in the flow, thus this test is outdated
+  test.skip('As a sponsor contact I can make proposed changes to the study data (updated history) @se_184_proposed @se_168_updated', async ({
     studyUpdatePage,
     studyDetailsPage,
   }) => {

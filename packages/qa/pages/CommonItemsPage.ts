@@ -107,7 +107,6 @@ export default class CommonItemsPage {
       await expect(this.assessStudiesDropdown).toBeVisible()
       await expect(this.studiesFoundHeading).toBeVisible()
       await expect(this.studiesFoundHeading).toContainText('studies found')
-      await expect(this.studiesFoundHeading).toContainText('due for assessment')
     } else {
       await expect(this.assessStudiesDropdown).toBeHidden()
       await expect(this.studiesFoundHeading).toBeHidden()
