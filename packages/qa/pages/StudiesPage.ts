@@ -466,4 +466,11 @@ export default class StudiesPage {
   async assertStudyListIsVisible() {
     await expect(this.studyList).toBeVisible()
   }
+  async assertGlobalFirstLabelVisible() {
+    await expect(this.page.getByText('Global first')).toBeVisible()
+  }
+
+  async assertEuropeanFirstLabelVisible() {
+    await expect(this.page.getByText('European first')).toBeVisible()
+  }
 }
