@@ -30,6 +30,10 @@ export default class StudiesPage {
   readonly studyListItemLastAssessmentLbl: Locator
   readonly studyListItemLastAssessmentValue: Locator
   readonly assessmentDueIndicator: Locator
+  readonly dataUpdatesRequiredIndicator: Locator
+  readonly needsActionIndicator: Locator
+  readonly needsActionBanner: Locator
+  readonly studiesFoundLabel: Locator
   readonly searchInput: Locator
   readonly searchButton: Locator
   readonly searchFilterPanel: Locator
@@ -78,6 +82,14 @@ export default class StudiesPage {
       .locator('div.lg\\:min-w-\\[320px\\] p.govuk-body-s.govuk-\\!-margin-top-1')
       .nth(0)
     this.assessmentDueIndicator = this.studyListItem.locator('span[class="govuk-tag govuk-tag--red normal-case"]')
+    this.dataUpdatesRequiredIndicator = this.studyListItem.locator('span.govuk-tag.govuk-tag--red.normal-case', {
+      hasText: 'Data updates required',
+    })
+    this.needsActionIndicator = this.studyListItem.locator('span.govuk-tag.govuk-tag--red.normal-case', {
+      hasText: 'Needs action',
+    })
+    this.needsActionBanner = page.locator('strong.govuk-heading-s', { hasText: 'studies needing action' })
+    this.studiesFoundLabel = page.locator('p.govuk-heading-s')
     this.searchInput = page.locator('input[class="govuk-input govuk-input h-[50px] border-2 border-black p-2"]')
     this.searchButton = page.locator(
       'button[class="bg-[var(--colour-blue)] text-white active:top-0 focus:shadow-[inset_0_0_0_4px_var(--text-grey)] focus:outline focus:outline-[3px] focus:outline-[var(--focus)] mb-0 w-[50px] h-[50px] flex items-center justify-center text-lg"]'
@@ -352,6 +364,30 @@ export default class StudiesPage {
     } else {
       await expect(dueIndicator).toBeHidden()
     }
+  }
+
+  async assertNeedsActionChipDisplayed() {
+    await expect(this.needsActionIndicator).toBeVisible()
+  }
+
+  async assertNeedsActionChipNotDisplayed() {
+    await expect(this.needsActionIndicator).not.toBeVisible()
+  }
+
+  async assertNeedsActionBannerCount(expectedCount: number) {
+    await expect(this.needsActionBanner).toHaveText(`There are ${expectedCount} studies needing action`)
+  }
+
+  async assertStudiesFoundLabelContainsNeedsActionCount(expectedCount: number) {
+    await expect(this.studiesFoundLabel).toContainText(`${expectedCount} need action`)
+  }
+
+  async assertDataUpdatesRequiredChipDisplayed() {
+    await expect(this.dataUpdatesRequiredIndicator).toBeVisible()
+  }
+
+  async assertDataUpdatesRequiredChipNotDisplayed() {
+    await expect(this.dataUpdatesRequiredIndicator).not.toBeVisible()
   }
 
   async assertSortSectionPresent() {
