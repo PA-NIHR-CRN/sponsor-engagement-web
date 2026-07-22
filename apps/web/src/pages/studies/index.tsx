@@ -90,7 +90,7 @@ export default function Studies({
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">Assess progress of studies</h2>
 
           <div className="govuk-!-margin-bottom-4">
-            <Tag className="flex items-center gap-2 govuk-!-padding-3 block w-full">
+            <Tag className="flex items-center gap-2 govuk-!-padding-3 block w-full banner">
               <AlertIcon />
               <strong className="govuk-heading-s govuk-!-margin-bottom-0">
                 There are {totalItemsDue} studies needing action
@@ -113,7 +113,7 @@ export default function Studies({
               </li>
             </ul>
           </Details>
-
+<div className='my-6'>
           {/* Search/Filter bar */}
           <div>
             <Filters
@@ -122,8 +122,8 @@ export default function Studies({
               searchLabel="Search study title, protocol number, IRAS ID or CPMS ID"
               renderExtraFilters={({ onChange }) => (<StudyStatusFilters selected={filters.status} onChange={onChange} disabled={isLoading} />)}
             />
-          </div>
 
+          </div>
           <SelectedFilters filters={filters} isLoading={isLoading} />
 
           {/* Sort bar */}
@@ -136,6 +136,7 @@ export default function Studies({
                 <Sort defaultOrder={filters.order} form="filters-form" />
               </div>
             </div>
+          </div>
           </div>
 
           {isLoading ? (
@@ -199,7 +200,7 @@ export default function Studies({
             </p>
             <a
               aria-label="Download a snapshot of all the information held within the Sponsor Engagement Tool for the sponsor/delegate organisation"
-              className="govuk-button mb-0"
+              className="govuk-link nihr-link-lg nihr-link-arrow-left mb-0"
               href="/api/export"
             >
               Download
@@ -215,7 +216,7 @@ export default function Studies({
                 </p>
                 <a
                   aria-label="Access dashboard for Sponsor RDN Portfolio (opens in new tab)"
-                  className="govuk-button mb-0"
+                  className="govuk-link nihr-link-lg nihr-link-arrow-left mb-0"
                   href={dashboardLink}
                   rel="noopener noreferrer"
                   target="_blank"

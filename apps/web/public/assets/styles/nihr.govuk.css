@@ -1,0 +1,268 @@
+﻿/* NIHR branded reskin of GOVUK frontend */
+
+:root {
+    /*Primary*/
+    --nihr-coral: #fc5d5d;
+    --nihr-coral-60: #fd9e9e;
+    --nihr-coral-20: #fedfdf;
+    --nihr-white: #ffffff;
+    --nihr-black: #000000;
+    --nihr-navy: #1c285e;
+    --nihr-navy-90: #333d6e;
+    --nihr-navy-80: #49537e;
+    --nihr-navy-60: #777e9e;
+    --nihr-navy-20: #d2d4df;
+    --nihr-off-black: #3c3c3c;
+    --nihr-off-black-60: #8a8a8a;
+    --nihr-off-black-20: #d8d8d8;
+    /*Secondary*/
+    --nihr-glove-blue: #c7e9ff;
+    --nihr-glove-blue-60: #ddf2ff;
+    --nihr-glove-blue-20: #f4fbff;
+    --nihr-uniform-lilac: #c4c5ff;
+    --nihr-uniform-lilac-60: #dcdcff;
+    --nihr-uniform-lilac-20: #f3f3ff;
+    --nihr-pink-quartz: #ffd1e0;
+    --nihr-pink-quartz-60: #ffe3ec;
+    --nihr-pink-quartz-20: #fff6f9;
+    --nihr-sunshine-yellow: #ffe626;
+    --nihr-sunshine-yellow-60: #fff07d;
+    --nihr-sunshine-yellow-20: #fffad4;
+    --nihr-blue-flame: #0051c2;
+    --nihr-blue-flame-60: #6697da;
+    --nihr-blue-flame-20: #ccdcf3;
+    --nihr-twilight: #3e439c;
+    --nihr-twilight: #8b8ec4;
+    --nihr-twilight: #d8d9eb;
+    --nihr-berry: #804055;
+    --nihr-berry-60: #b38c99;
+    --nihr-berry-20: #e6d9dd;
+    --nihr-teal: #0a5766;
+    --nihr-teal-60: #6c9aa3;
+    --nihr-teal-20: #cedde0;
+    /*Neutral*/
+    --nihr-putty: #faf4eb;
+    --nihr-putty-60: #fcf8f3;
+    --nihr-putty-20: #fefdfb;
+    --nihr-steel: #c5dce5;
+    --nihr-steel-60: #dceaef;
+    --nihr-steel-20: #f3f8fa;
+    /*Fonts*/
+    --system-fonts: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, Adwaita Sans, Cantarell, Ubuntu, roboto, noto, helvetica, arial, sans-serif;
+    --nihr-body-font: "Inclusive Sans", var(--system-fonts);
+    --nihr-heading-font: "Archia", "Inclusive Sans", var(--system-fonts);
+    --nihr-error-colour: #ca3535;
+    --nihr-success-colour: #0f7a52;
+    --nihr-navy--tint-10: color-mix(in srgb, var(--nihr-navy), var(--nihr-white) 10%);
+    --nihr-navy--tint-20: color-mix(in srgb, var(--nihr-navy), var(--nihr-white) 20%);
+    --nihr-navy--tint-30: color-mix(in srgb, var(--nihr-navy), var(--nihr-white) 30%);
+    --nihr-navy--tint-40: color-mix(in srgb, var(--nihr-navy), var(--nihr-white) 40%);
+    --nihr-navy--tint-50: color-mix(in srgb, var(--nihr-navy), var(--nihr-white) 50%);
+    --nihr-navy--tint-60: color-mix(in srgb, var(--nihr-navy), var(--nihr-white) 60%);
+    --nihr-navy--tint-70: color-mix(in srgb, var(--nihr-navy), var(--nihr-white) 70%);
+    --nihr-navy--tint-80: color-mix(in srgb, var(--nihr-navy), var(--nihr-white) 80%);
+    --nihr-navy--tint-90: color-mix(in srgb, var(--nihr-navy), var(--nihr-white) 90%);
+    --nihr-navy--shade-10: color-mix(in srgb, var(--nihr-navy), var(--nihr-black) 10%);
+    --nihr-navy--shade-20: color-mix(in srgb, var(--nihr-navy), var(--nihr-black) 20%);
+    --nihr-navy--shade-30: color-mix(in srgb, var(--nihr-navy), var(--nihr-black) 30%);
+    --nihr-navy--shade-40: color-mix(in srgb, var(--nihr-navy), var(--nihr-black) 40%);
+    --nihr-navy--shade-50: color-mix(in srgb, var(--nihr-navy), var(--nihr-black) 50%);
+    --nihr-navy--shade-60: color-mix(in srgb, var(--nihr-navy), var(--nihr-black) 60%);
+    --nihr-navy--shade-70: color-mix(in srgb, var(--nihr-navy), var(--nihr-black) 70%);
+    --nihr-navy--shade-80: color-mix(in srgb, var(--nihr-navy), var(--nihr-black) 80%);
+    --nihr-navy--shade-90: color-mix(in srgb, var(--nihr-navy), var(--nihr-black) 90%);
+    --nihr-putty--tint-10: color-mix(in srgb, var(--nihr-putty), var(--nihr-white) 10%);
+    --nihr-putty--tint-20: color-mix(in srgb, var(--nihr-putty), var(--nihr-white) 20%);
+    --nihr-putty--tint-30: color-mix(in srgb, var(--nihr-putty), var(--nihr-white) 30%);
+    --nihr-putty--tint-40: color-mix(in srgb, var(--nihr-putty), var(--nihr-white) 40%);
+    --nihr-putty--tint-50: color-mix(in srgb, var(--nihr-putty), var(--nihr-white) 50%);
+    --nihr-putty--tint-60: color-mix(in srgb, var(--nihr-putty), var(--nihr-white) 60%);
+    --nihr-putty--tint-70: color-mix(in srgb, var(--nihr-putty), var(--nihr-white) 70%);
+    --nihr-putty--tint-80: color-mix(in srgb, var(--nihr-putty), var(--nihr-white) 80%);
+    --nihr-putty--tint-90: color-mix(in srgb, var(--nihr-putty), var(--nihr-white) 90%);
+    --nihr-putty--shade-10: color-mix(in srgb, var(--nihr-putty), var(--nihr-black) 10%);
+    --nihr-putty--shade-20: color-mix(in srgb, var(--nihr-putty), var(--nihr-black) 20%);
+    --nihr-putty--shade-30: color-mix(in srgb, var(--nihr-putty), var(--nihr-black) 30%);
+    --nihr-putty--shade-40: color-mix(in srgb, var(--nihr-putty), var(--nihr-black) 40%);
+    --nihr-putty--shade-50: color-mix(in srgb, var(--nihr-putty), var(--nihr-black) 50%);
+    --nihr-putty--shade-60: color-mix(in srgb, var(--nihr-putty), var(--nihr-black) 60%);
+    --nihr-putty--shade-70: color-mix(in srgb, var(--nihr-putty), var(--nihr-black) 70%);
+    --nihr-putty--shade-80: color-mix(in srgb, var(--nihr-putty), var(--nihr-black) 80%);
+    --nihr-putty--shade-90: color-mix(in srgb, var(--nihr-putty), var(--nihr-black) 90%);
+}
+
+
+.nihr {
+    --govuk-brand-colour: var(--nihr-navy);
+    --govuk-text-colour: var(--nihr-off-black);
+    --govuk-template-background-colour: var(--nihr-navy);
+    --govuk-body-background-colour: var(--nihr-white);
+    --govuk-secondary-text-colour: var(--nihr-teal);
+    --govuk-focus-colour: var(--nihr-sunshine-yellow);
+    --govuk-focus-text-colour: var(--nihr-off-black);
+    --govuk-error-colour: var(--nihr-error-colour);
+    --govuk-success-colour: var(--nihr-success-colour);
+    --govuk-border-colour: var(--nihr-steel);
+    --govuk-input-border-colour: var(--nihr-off-black);
+    --govuk-hover-colour: var(--nihr-steel);
+    --govuk-link-colour: var(--nihr-navy);
+    --govuk-link-visited-colour: var(--nihr-navy);
+    --govuk-link-hover-colour: var(--nihr-navy--tint-10);
+    --govuk-link-active-colour: var(--nihr-off-black);
+    --govuk-surface-background-colour: var(--nihr-putty);
+    --govuk-surface-text-colour: var(--nihr-off-black);
+    --govuk-surface-border-colour: var(--nihr-steel);
+
+    body:has(> footer) {
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        grid-template-columns: 100%;
+        /* fallback height */
+        min-height: 100vh;
+        /* new small viewport height for modern browsers */
+        min-height: 100svh;
+    }
+
+    .govuk-input {
+        border-color: var(--nihr-navy);
+        color: var(--nihr-navy);
+    }
+
+    .govuk-link:hover, .govuk-back-link:hover, .govuk-breadcrumbs__link:hover, .govuk-details__summary:hover .govuk-details__summary-text, .govuk-error-summary__list a:hover, .govuk-footer__link:hover, .govuk-header__homepage-link:hover, .govuk-notification-banner__link:hover, .govuk-pagination__link:active .govuk-pagination__link-label, .govuk-pagination__link:active .govuk-pagination__link-title--decorated, .govuk-pagination__link:hover .govuk-pagination__link-label, .govuk-pagination__link:hover .govuk-pagination__link-title--decorated, .govuk-service-navigation__link:hover, .govuk-tabs__tab:hover {
+        text-decoration-color: var(--nihr-coral);
+    }
+
+    .govuk-button {
+        background-color: var(--nihr-navy);
+    }
+
+    .govuk-button--secondary {
+        background-color: var(--nihr-putty--shade-10);
+    }
+
+    .govuk-button.govuk-button--secondary:hover {
+        background-color: var(--nihr-putty);
+    }
+
+    .govuk-button:hover {
+        background-color: var(--nihr-navy--tint-10);
+    }
+
+    .govuk-notification-banner__title {
+        color: var(--nihr-white);
+    }
+
+    .govuk-service-navigation__item, .govuk-service-navigation__service-name {
+        border-color: var(--nihr-coral);
+    }
+
+    .govuk-footer {
+        background-color: var(--nihr-navy);
+    }
+
+    .govuk-footer__link {
+        color: var(--nihr-white);
+    }
+
+        .govuk-footer__link:active, .govuk-footer__link:focus {
+            color: var(--nihr-navy);
+        }
+
+    * {
+        font-family: var(--nihr-body-font);
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: var(--nihr-heading-font);
+        color: var(--nihr-navy);
+    }
+
+    .govuk-header__homepage-link:focus .cls-2 {
+        fill: var(--nihr-navy);
+    }
+
+    .govuk-accordion-nav__chevron {
+        border: unset;
+        transition: transform .2s ease;
+    }
+
+    .govuk-frontend-supported .govuk-accordion__section-button:focus .govuk-accordion-nav__chevron {
+        background: unset;
+    }
+
+    .govuk-frontend-supported .govuk-accordion__show-all:focus .govuk-accordion-nav__chevron {
+        background: unset;
+    }
+
+    .govuk-frontend-supported .govuk-accordion__section-button:focus .govuk-accordion-nav__chevron:after {
+        color: var(--govuk-text-colour);
+    }
+
+    .govuk-frontend-supported .govuk-accordion__show-all:focus .govuk-accordion-nav__chevron:after {
+        color: var(--govuk-text-colour);
+    }
+
+    .govuk-frontend-supported .govuk-accordion__section-button:hover {
+        color: var(--govuk-text-colour);
+        background: unset;
+    }
+
+    .govuk-frontend-supported .govuk-accordion__section-button .govuk-accordion__section-toggle-text {
+        color: var(--govuk-text-colour);
+    }
+
+    .govuk-frontend-supported .govuk-accordion__section-button:hover .govuk-accordion__section-toggle-text {
+        text-decoration: underline;
+        text-underline-offset: .1578em;
+        text-decoration-thickness: max(3px,.1875rem,.12em);
+        text-decoration-color: var(--nihr-coral);
+        -webkit-text-decoration-skip-ink: none;
+        text-decoration-skip-ink: none;
+        -webkit-text-decoration-skip: none;
+        text-decoration-skip: none
+    }
+
+    .govuk-frontend-supported .govuk-accordion__show-all:hover .govuk-accordion__show-all-text {
+        text-decoration: underline;
+        text-underline-offset: .1578em;
+        text-decoration-thickness: max(3px,.1875rem,.12em);
+        text-decoration-color: var(--nihr-coral);
+        -webkit-text-decoration-skip-ink: none;
+        text-decoration-skip-ink: none;
+        -webkit-text-decoration-skip: none;
+        text-decoration-skip: none
+    }
+
+
+    .govuk-frontend-supported .govuk-accordion__section-button:hover .govuk-accordion-nav__chevron {
+        color: var(--govuk-text-colour);
+        background: unset;
+    }
+
+        .govuk-frontend-supported .govuk-accordion__section-button:hover .govuk-accordion-nav__chevron:after {
+            color: var(--nihr-coral);
+        }
+
+    .govuk-frontend-supported .govuk-accordion-nav__chevron:after {
+        width: .575rem;
+        height: 0.575rem;
+    }
+
+    .govuk-footer__meta {
+        align-items: flex-start;
+    }
+
+    .govuk-frontend-supported .govuk-accordion__show-all:hover:not(:focus) {
+        background: unset;
+        box-shadow: unset;
+
+        .govuk-accordion-nav__chevron {
+            background: unset;
+            color: unset;
+
+            &:after {
+                color: var(--nihr-coral);
+            }
+        }
+    }
+}

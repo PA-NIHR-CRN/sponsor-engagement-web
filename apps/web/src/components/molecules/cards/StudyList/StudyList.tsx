@@ -58,9 +58,9 @@ export function StudyList({
     indications?.some(indication => !excludedIndications.has(indication)) ?? false;
 
   return (
-    <Card>
+    <Card className='card card__border-steel' padding={0}>
 
-      {(hasAssessmentDue || areUpdatesRequired) ? <Tag className='absolute top-0 right-0' text="Needs action" /> : null}
+      {(hasAssessmentDue || areUpdatesRequired) ? <Tag className='absolute top-0 right-0 corner' text="Needs action" /> : null}
 
       <div className="sm:flex sm:items-stretch sm:justify-between sm:gap-6">
         <div className="min-w-0 flex-1">
@@ -126,7 +126,7 @@ export function StudyList({
           </div>
         </div>
 
-        <div className="shrink-0 sm:w-[125px] lg:w-[125px] flex flex-col items-center">
+        <div className="shrink-0 flex flex-col items-center">
           <div className="flex-1 w-full flex items-center justify-center">
             {firstType ? (
               <div className="text-center govuk-!-margin-top-4">
@@ -143,7 +143,7 @@ export function StudyList({
           <div className="w-full flex justify-center">
             <Link
               aria-label={`View study ${shortTitle}`}
-              className="govuk-button w-auto govuk-!-margin-bottom-0"
+            className="govuk-link nihr-link-lg nihr-link-arrow-left w-auto govuk-!-margin-bottom-0"
               href={studyHref}
             >
               View study

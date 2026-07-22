@@ -1,4 +1,9 @@
 import '@nihr-ui/frontend/globals.scss'
+import 'public/assets/styles/gds-transport-reset.css'
+import 'public/assets/styles/govuk-frontend-6.1.0.min.css'
+import 'public/assets/styles/one-login-header.css'
+import 'public/assets/styles/nihr.govuk.css'
+import 'public/assets/styles/tweaks.css'
 
 import type { NextPage } from 'next'
 import type { AppProps } from 'next/app'

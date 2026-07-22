@@ -1,0 +1,19 @@
+/* Override the GDS Transport font-face when the application is not hosted under service.gov.uk. */
+/* Use a local source to prevent the unmodified govuk frontend css from attempting to download the */
+/* web font files from this application, which would result in a 404. */
+
+@font-face {
+    font-family: GDS Transport;
+    font-style: normal;
+    font-weight: 400;
+    src: local("Arial");
+    font-display: fallback
+}
+
+@font-face {
+    font-family: GDS Transport;
+    font-style: normal;
+    font-weight: 700;
+    src: local("Arial Bold");
+    font-display: fallback
+}

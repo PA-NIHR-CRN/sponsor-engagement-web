@@ -61,11 +61,15 @@ export function Filters({ filters, onFilterChange, searchLabel, renderExtraFilte
             <div className="govuk-grid-column-one-half">
               <div className="flex items-start gap-2">
                 <div className="table w-full">
-                  <input
-                    className="govuk-input govuk-input h-[50px] border-2 border-black p-2"
-                    id="keyword"
-                    name="q"
-                    onChange={(event) => {
+        <div className="govuk-form-group govuk-!-margin-bottom-0">
+                        <h1 className="govuk-label-wrapper">
+                            <label className="govuk-label govuk-visually-hidden" htmlFor="keyword">
+                                Search information across the NIHR
+                            </label>
+                        </h1>
+                        <div className="search-wrapper">
+                                <input className="govuk-input govuk-!-margin-bottom-0 nihr-input__search" id="keyword" name="q"
+                                 onChange={(event) => {
                       const next = event.target.value
                       setSearchInputText(next)
 
@@ -75,29 +79,23 @@ export function Filters({ filters, onFilterChange, searchLabel, renderExtraFilte
                       }
                     }}
                     type="text"
-                    value={searchInputText}
-                  />
+                    value={searchInputText} />
+                                <button className="search-button" type="submit" value="Update results" />
+                        </div>
+                    </div>
 
-                  <div className="table-cell w-[1%] align-top">
-                    <button
-                      className="bg-[var(--colour-blue)] text-white active:top-0 focus:shadow-[inset_0_0_0_4px_var(--text-grey)] focus:outline focus:outline-[3px] focus:outline-[var(--focus)] mb-0 w-[50px] h-[50px] flex items-center justify-center text-lg"
-                      type="submit"
-                    >
-                      <span className="govuk-visually-hidden">Search</span>
-                      <SearchIcon />
-                    </button>
-                  </div>
+
                 </div>
               </div>
             </div>
             <div className='govuk-grid-column-one-half flex justify-end'>
               {hasExtraFilters ? (
                   <button
-                    type="button"
-                    className="govuk-button govuk-button--secondary mb-0 h-[50px] whitespace-nowrap"
-                    aria-expanded={filtersOpen}
                     aria-controls={extraPanelId}
-                    onClick={() => setFiltersOpen((v) => !v)}
+                    aria-expanded={filtersOpen}
+                    className="govuk-button govuk-button--secondary mb-0 h-[50px] whitespace-nowrap"
+                    onClick={() => { setFiltersOpen((v) => !v); }}
+                    type="button"
                   >
                     {filtersOpen ? 'Hide filters' : 'Show filters'}
                   </button>
@@ -108,14 +106,14 @@ export function Filters({ filters, onFilterChange, searchLabel, renderExtraFilte
 
         {hasExtraFilters ? (
           <div
-            id={extraPanelId}
-            className={clsx('govuk-inset-text govuk-!-margin-top-4 govuk-!-margin-bottom-4', !filtersOpen && 'hidden')}
             aria-hidden={!filtersOpen}
+            className={clsx('govuk-inset-text govuk-!-margin-top-4 govuk-!-margin-bottom-4', !filtersOpen && 'hidden')}
+            id={extraPanelId}
           >
             {renderExtraFilters({
               onChange,
               isOpen: filtersOpen,
-              close: () => setFiltersOpen(false),
+              close: () => { setFiltersOpen(false); },
             })}
           </div>
         ) : null}

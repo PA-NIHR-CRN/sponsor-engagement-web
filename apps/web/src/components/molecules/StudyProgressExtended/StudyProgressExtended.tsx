@@ -65,7 +65,7 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
 
     const progressLabel =
         elapsedDays >= totalDays
-            ? `OVER TARGET by ${elapsedDays - totalDays} ${pluraliseDays(elapsedDays - totalDays)}`
+            ? `Over target by ${elapsedDays - totalDays} ${pluraliseDays(elapsedDays - totalDays)}`
             : `${daysRemaining} ${pluraliseDays(daysRemaining)} remaining`;
 
     function GetStudyProgressColor(daysSinceAssessmentDue: number) {
@@ -99,23 +99,23 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
                     <div className="flex justify-between">
                         <div className="flex flex-col">
                             <span
-                                className={`govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-2 ${daysRemaining === 0 ? "govuk-error-message text-red-600" : ""
+                        className={`govuk-body-s govuk-!-margin-bottom-2 ${daysRemaining === 0 ? "govuk-error-message text-red-600" : ""
                                     }`}>
                                 {progressLabel}
                             </span>
                             {showDates && (
-                                <span className="govuk-body-s govuk-!-font-weight-bold text-darkGrey">
+                    <span className="govuk-body-s text-darkGrey">
                                     UK approval date: {regulatoryApprovalDate.toLocaleDateString('en-GB')}
                                 </span>
                             )}
                         </div>
 
                         <div className="flex flex-col text-right">
-                            <span className="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-2 text-darkGrey">
+                    <span className="govuk-body-s govuk-!-margin-bottom-2 text-darkGrey">
                                 {elapsedDays} / {totalDays} Days
                             </span>
                             {showDates && (
-                                <span className="govuk-body-s govuk-!-font-weight-bold text-darkGrey">
+                    <span className="govuk-body-s text-darkGrey">
                                     End date: {endDate.toLocaleDateString('en-GB')}
                                 </span>
                             )}

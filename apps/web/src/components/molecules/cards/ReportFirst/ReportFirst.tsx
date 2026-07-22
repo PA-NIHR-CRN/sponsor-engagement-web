@@ -24,7 +24,7 @@ export function ReportFirst({ showAsStartButton = false, studyId }: ReportFirstP
                 aria-label="Report a first global/european participant"
                 className={
                     clsx(
-                        'govuk-button mb-0',
+                        'govuk-link nihr-link-lg nihr-link-arrow-left mb-0',
                         { 'govuk-button--start': showAsStartButton }
                     )}
                 href={

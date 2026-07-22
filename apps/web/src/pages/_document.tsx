@@ -6,8 +6,13 @@ import { SERVICE_NAME } from '../constants'
 
 export default function Document() {
   return (
-    <Html lang="en">
+    <Html className='nihr' lang="en">
       <Head>
+
+        <link crossOrigin href="https://fonts.googleapis.com" rel="preconnect" />
+        <link href="https://fonts.gstatic.com" rel="preconnect" />
+        <link href="https://fonts.googleapis.com/css2?family=Inclusive+Sans:ital,wght@0,300..700;1,300..700&display=swap" rel="stylesheet" />
+
         <link href="/assets/images/govuk-apple-touch-icon.png" rel="apple-touch-icon" sizes="120x120" />
         <link href="/assets/images/govuk-apple-touch-icon-152x152.png" rel="apple-touch-icon" sizes="152x152" />
         <link href="/assets/images/govuk-apple-touch-icon-167x167.png" rel="apple-touch-icon" sizes="167x167" />
