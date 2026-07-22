@@ -1,22 +1,17 @@
-import { GroupIcon, HomeIcon, SettingsIcon, SideNav } from '@nihr-ui/frontend'
 import { logger } from '@nihr-ui/logger'
 import { useIdle } from '@uidotdev/usehooks'
 import { Roboto } from 'next/font/google'
-import Link from 'next/link'
 import Router, { useRouter } from 'next/router'
 import type { Session } from 'next-auth'
 import { useSession } from 'next-auth/react'
 import type { ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 
-import { Footer, Header } from '@/components/molecules'
-import { CookieBanner } from '@/components/organisms/CookieBanner/CookieBanner'
-import { SERVICE_NAME } from '@/constants'
+import { Header } from '@/components/molecules'
 import { CONTACT_MANAGERS_PAGE, ORGANISATIONS_PAGE, SIGN_OUT_PAGE } from '@/constants/routes'
 import { isContactManager, isContactManagerAndSponsorContact, isSponsorContact } from '@/utils/auth'
 
 import type { BreadcrumbConfig } from '../Breadcrumbs/Breadcrumbs'
-import Breadcrumbs from '../Breadcrumbs/Breadcrumbs'
 
 export const primaryFont = Roboto({
   weight: ['400', '700'],
@@ -33,7 +28,7 @@ export interface RootLayoutProps {
   breadcrumbConfig?: BreadcrumbConfig
 }
 
-export function RootLayout({ children, backLink, heading = SERVICE_NAME, user, breadcrumbConfig }: RootLayoutProps) {
+export function RootLayout({ children, user }: RootLayoutProps) {
   const router = useRouter()
   const [sideNavOpen, setSideNavOpen] = useState(false)
   const { data: session } = useSession()
