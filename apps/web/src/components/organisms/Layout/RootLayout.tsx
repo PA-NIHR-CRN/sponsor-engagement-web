@@ -8,6 +8,8 @@ import type { ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 
 import { Header } from '@/components/molecules'
+import { CookieBanner } from '@/components/organisms/CookieBanner/CookieBanner'
+import { SERVICE_NAME } from '@/constants'
 import { CONTACT_MANAGERS_PAGE, ORGANISATIONS_PAGE, SIGN_OUT_PAGE } from '@/constants/routes'
 import { isContactManager, isContactManagerAndSponsorContact, isSponsorContact } from '@/utils/auth'
 
@@ -29,7 +31,7 @@ export interface RootLayoutProps {
   breadcrumbConfig?: BreadcrumbConfig
 }
 
-export function RootLayout({ children, backLink, user, breadcrumbConfig }: RootLayoutProps) {
+export function RootLayout({ children, backLink, heading = SERVICE_NAME, user, breadcrumbConfig }: RootLayoutProps) {
   const router = useRouter()
   const [sideNavOpen, setSideNavOpen] = useState(false)
   const { data: session } = useSession()
@@ -64,6 +66,7 @@ export function RootLayout({ children, backLink, user, breadcrumbConfig }: RootL
 
   return (
     <>
+    <CookieBanner />
     <a className="govuk-skip-link" data-module="govuk-skip-link" href="#main-content">Skip to main content</a>
 
 
@@ -71,8 +74,7 @@ export function RootLayout({ children, backLink, user, breadcrumbConfig }: RootL
     <div className="rebranded-one-login-header govuk-header" data-one-login-header-nav="">
         <div className="rebranded-one-login-header__container govuk-header__container govuk-width-container">
             <div className="rebranded-one-login-header__logo govuk-header__logo">
-                <a aria-label="Go to nihr.ac.uk (opens in new window)" className="rebranded-one-login-header__link rebranded-one-login-header__link--homepage govuk-header__homepage-link" href="https://www.nihr.ac.uk/"
-                   rel="noopener" target="_blank">
+                <a aria-label="Go home" className="rebranded-one-login-header__link rebranded-one-login-header__link--homepage govuk-header__homepage-link" href="/">
                     <span className="govuk-header__logotype">
                         <svg data-name="NIHR Core logo" height="33" id="NIHR_Core_logo" viewBox="0 0 1106.85 100" xmlns="http://www.w3.org/2000/svg">
                             <defs>
@@ -155,7 +157,7 @@ export function RootLayout({ children, backLink, user, breadcrumbConfig }: RootL
             <div className="govuk-service-navigation__container">
                 <span className="govuk-service-navigation__service-name">
                     <a className="govuk-service-navigation__link" href="/">
-                        Assess progress of studies
+                        {SERVICE_NAME}
                     </a>
                 </span>
                 <nav aria-label="Menu" className="govuk-service-navigation__wrapper">
@@ -208,28 +210,16 @@ export function RootLayout({ children, backLink, user, breadcrumbConfig }: RootL
                 <h2 className="govuk-visually-hidden">Support links</h2>
                 <ul className="govuk-footer__inline-list">
                     <li className="govuk-footer__inline-list-item">
-                        <a className="govuk-footer__link"
-                           href="https://www.nihr.ac.uk/about-us/who-we-are">
-                            About Us
-                        </a>
+                        <a aria-label="Terms and conditions (opens in new tab)" className="govuk-footer__link" href="https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-terms-and-conditions" rel="noopener noreferrer" target="_blank">Terms and conditions</a>
                     </li>
                     <li className="govuk-footer__inline-list-item">
-                        <a className="govuk-footer__link"
-                           href="https://www.nihr.ac.uk/contact-us">
-                            Contact Us
-                        </a>
+                       <a aria-label="Privacy policy (opens in new tab)" className="govuk-footer__link" href="https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-privacy-notice" rel="noopener noreferrer" target="_blank">Privacy policy</a>
                     </li>
                     <li className="govuk-footer__inline-list-item">
-                        <a className="govuk-footer__link"
-                           href="@AupOptions.Value.Url">
-                            User Agreement
-                        </a>
+                        <a aria-label="Cookie policy (opens in new tab)" className="govuk-footer__link" href="https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-cookie-policy" rel="noopener noreferrer" target="_blank">Cookie policy</a>
                     </li>
                     <li className="govuk-footer__inline-list-item">
-                        <a className="govuk-footer__link"
-                           href="https://sites.google.com/nihr.ac.uk/nihr-hub-accessibility/">
-                            Accessibility
-                        </a>
+                        <a aria-label="Accessibility (opens in new tab)" className="govuk-footer__link" href="https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-accessibility-statement" rel="noopener noreferrer" target="_blank">Accessibility</a>
                     </li>
                     <li className="govuk-footer__inline-list-item">
                         <a className="govuk-footer__link"
@@ -240,10 +230,7 @@ export function RootLayout({ children, backLink, user, breadcrumbConfig }: RootL
                         </a>
                     </li>
                     <li className="govuk-footer__inline-list-item">
-                        <a className="govuk-footer__link"
-                           href="/cookies">
-                            Cookies
-                        </a>
+                        <a aria-label="Release notes (opens in new tab)" className="govuk-footer__link" href="https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-release-notes" rel="noopener noreferrer" target="_blank">Release notes</a>
                     </li>
                 </ul>
             </div>

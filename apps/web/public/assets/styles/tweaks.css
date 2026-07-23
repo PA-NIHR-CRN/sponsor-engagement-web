@@ -238,3 +238,8 @@ body:not(.js-enabled) #favourites-caption {
   padding-left: 1.25em;
   margin-top: 0.1em;
 }
+
+.nihr .SE-cookie-banner {
+  position: unset;
+  bottom: unset;
+}
