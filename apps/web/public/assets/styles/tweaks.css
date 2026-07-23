@@ -243,3 +243,7 @@ body:not(.js-enabled) #favourites-caption {
   position: unset;
   bottom: unset;
 }
+
+.nihr-link-md {
+  font-weight: 700;
+}

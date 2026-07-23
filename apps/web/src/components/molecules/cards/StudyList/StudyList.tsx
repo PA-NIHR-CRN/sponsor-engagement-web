@@ -136,7 +136,7 @@ export function StudyList({
           <div className="w-full flex justify-center">
             <Link
               aria-label={`View study ${shortTitle}`}
-            className="govuk-link nihr-link-lg nihr-link-arrow-left w-auto govuk-!-margin-bottom-0"
+            className="govuk-link nihr-link-md nihr-link-arrow-left w-auto govuk-!-margin-bottom-0"
               href={studyHref}
             >
               View study
