@@ -155,7 +155,7 @@ export function RootLayout({ children, backLink, user, breadcrumbConfig }: RootL
             <div className="govuk-service-navigation__container">
                 <span className="govuk-service-navigation__service-name">
                     <a className="govuk-service-navigation__link" href="/">
-                        Assess my study
+                        Assess progress of studies
                     </a>
                 </span>
                 <nav aria-label="Menu" className="govuk-service-navigation__wrapper">
