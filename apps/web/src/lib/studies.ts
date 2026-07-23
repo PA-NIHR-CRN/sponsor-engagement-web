@@ -219,13 +219,17 @@ export const getStudiesForOrgs = async ({
     orderBy: [sortMap[sortOrder], { id: Prisma.SortOrder.asc }],
   }
 
+  const needsActionWhere = buildNeedsActionWhere();
+
   const [studies, count, countDue] = await prismaClient.$transaction([
     prismaClient.study.findMany(query),
     prismaClient.study.count({ where: query.where }),
     prismaClient.study.count({
       where: {
-        ...query.where,
-        dueAssessmentAt: { not: null },
+        AND: [
+          query.where ?? {},
+          needsActionWhere,
+        ],
       },
     }),
   ])
@@ -235,7 +239,11 @@ export const getStudiesForOrgs = async ({
       total: count,
       totalDue: countDue,
     },
-    data: studies,
+    data: studies.map((study) => ({
+      ...study,
+      dataUpdatesRequired: studyDataUpdatesRequired(study),
+      needsAction: studyNeedsAction(study),
+    })),
   }
 }
 
@@ -680,4 +688,61 @@ export function buildSummaryRows(indicators: string[], basePath: string) {
       tags,
     }
   })
+}
+
+const excludedCategories: string[] = [
+  'Recruiting at a lower rate than expected (RTT)',
+  'No recruitment in past 6 months',
+];
+
+export function studyDataUpdatesRequired(study: {
+  evaluationCategories?: {
+    isDeleted?: boolean | null;
+    indicatorValue: string | null;
+  }[];
+}): boolean {
+  return (
+    study.evaluationCategories?.some(
+      (category) =>
+        category.isDeleted !== true &&
+        category.indicatorValue !== null &&
+        !excludedCategories.includes(category.indicatorValue)
+    ) === true
+  );
+}
+
+export function studyNeedsAction(study: {
+  dueAssessmentAt: Date | null;
+  evaluationCategories?: {
+    isDeleted?: boolean | null;
+    indicatorValue: string | null;
+  }[];
+}): boolean {
+  return study.dueAssessmentAt !== null || studyDataUpdatesRequired(study);
+}
+
+export function buildDataUpdatesRequiredWhere(): Prisma.StudyWhereInput {
+  return {
+    evaluationCategories: {
+      some: {
+        isDeleted: false,
+        indicatorValue: {
+          notIn: excludedCategories,
+        },
+      },
+    }
+  };
+}
+
+export function buildNeedsActionWhere(): Prisma.StudyWhereInput {
+  return {
+    OR: [
+      {
+        dueAssessmentAt: {
+          not: null,
+        },
+      },
+      buildDataUpdatesRequiredWhere(),
+    ],
+  };
 }
