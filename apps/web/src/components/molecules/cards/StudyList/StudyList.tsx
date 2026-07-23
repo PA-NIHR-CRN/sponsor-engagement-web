@@ -17,7 +17,7 @@ export interface StudyListProps {
   daysSinceAssessmentDue: number | null
   trackStatus?: string
   trackStatusHref?: string
-  indications?: string[]
+  dataUpdatesRequired: boolean
   irasId: string | null
   regulatoryApprovalDate: Date | null
   studyStatus: string,
@@ -34,7 +34,7 @@ export function StudyList({
   trackStatus,
   trackStatusHref,
   lastAssessmentDate,
-  indications,
+  dataUpdatesRequired,
   irasId,
   regulatoryApprovalDate,
   studyStatus, 
@@ -50,18 +50,10 @@ export function StudyList({
     })()
     : '';
 
-  const excludedIndications = new Set([
-    'Recruiting at a lower rate than expected (RTT)',
-    'No recruitment in past 6 months',
-  ])
-
-  const areUpdatesRequired =
-    indications?.some(indication => !excludedIndications.has(indication)) ?? false;
-
   return (
     <Card className='card card--accent-left-none' padding={0}>
 
-      {(hasAssessmentDue || areUpdatesRequired) ? <Tag className='absolute top-0 right-0 corner tag--needs-action' text="Needs action" /> : null}
+      {(hasAssessmentDue || dataUpdatesRequired) ? <Tag className='absolute top-0 right-0 corner tag--needs-action' text="Needs action" /> : null}
 
       <div className="sm:flex sm:items-stretch sm:justify-between sm:gap-6">
         <div className="min-w-0 flex-1">
@@ -105,7 +97,7 @@ export function StudyList({
           <TagCollection
             tags={[
               ...(hasAssessmentDue ? [{ text: daysDueText }] : []),
-              ...(areUpdatesRequired ? [{ text: 'Data updates required' }] : []),
+              ...(dataUpdatesRequired ? [{ text: 'Data updates required' }] : []),
             ]}
           />
 

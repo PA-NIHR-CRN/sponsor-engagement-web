@@ -93,7 +93,7 @@ export default function Studies({
             <div className='content flex items-center gap-2 block w-full banner'>
               <AlertIcon />
                           <strong className="govuk-heading-s govuk-!-margin-bottom-0">
-                There are {totalItemsDue} studies needing action
+                There {totalItemsDue === 1 ? 'is' : 'are'} {totalItemsDue}{' '} {pluraliseStudy(totalItemsDue)} needing action
               </strong>
             </div>
           </div>
@@ -128,9 +128,9 @@ export default function Studies({
 
           {/* Sort bar */}
           <div className="flex-wrap items-center justify-between gap-3 md:flex govuk-!-margin-bottom-4">
-            <p className="govuk-heading-s mb-0 whitespace-nowrap">{`${totalItems} ${pluraliseStudy(
-              totalItems
-            )} found (${totalItemsDue} need action)`}</p>
+            <p className="govuk-heading-s mb-0 whitespace-nowrap">
+              {`${totalItems} ${pluraliseStudy(totalItems)} found (${totalItemsDue} need${totalItemsDue === 1 ? 's' : ''} action)`}
+            </p>
             <div className="govuk-form-group mt-2 items-center justify-end md:my-0 md:flex">
               <div className="items-center whitespace-nowrap md:flex">
                 <Sort defaultOrder={filters.order} form="filters-form" />
@@ -156,9 +156,7 @@ export default function Studies({
                           <StudyList
                             daysSinceAssessmentDue={daysSinceAssessmentDue}
                             firstType={study.StudyFirst?.type}
-                            indications={study.evaluationCategories
-                              .map((evalCategory) => evalCategory.indicatorValue)
-                              .filter((evalCategory, index, items) => items.indexOf(evalCategory) === index)}
+                            dataUpdatesRequired={study.dataUpdatesRequired}
                             irasId={study.irasId}
                             lastAssessmentDate={study.lastAssessment ? formatDate(study.lastAssessment.createdAt) : ''}
                             regulatoryApprovalDate={study.regulatoryApprovalDate}
