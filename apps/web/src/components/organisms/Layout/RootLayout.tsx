@@ -12,6 +12,7 @@ import { CONTACT_MANAGERS_PAGE, ORGANISATIONS_PAGE, SIGN_OUT_PAGE } from '@/cons
 import { isContactManager, isContactManagerAndSponsorContact, isSponsorContact } from '@/utils/auth'
 
 import type { BreadcrumbConfig } from '../Breadcrumbs/Breadcrumbs'
+import Breadcrumbs from '../Breadcrumbs/Breadcrumbs'
 
 export const primaryFont = Roboto({
   weight: ['400', '700'],
@@ -28,7 +29,7 @@ export interface RootLayoutProps {
   breadcrumbConfig?: BreadcrumbConfig
 }
 
-export function RootLayout({ children, user }: RootLayoutProps) {
+export function RootLayout({ children, backLink, user, breadcrumbConfig }: RootLayoutProps) {
   const router = useRouter()
   const [sideNavOpen, setSideNavOpen] = useState(false)
   const { data: session } = useSession()
@@ -140,16 +141,9 @@ export function RootLayout({ children, user }: RootLayoutProps) {
                 </a>
             </div>
 
-            <nav aria-label="GOV.UK One Login" className="rebranded-one-login-header__nav" data-open-className="rebranded-one-login-header__nav--open" id="one-login-header__nav">
+            <nav aria-label="NIHR Login" className="rebranded-one-login-header__nav" data-open-className="rebranded-one-login-header__nav--open" id="one-login-header__nav">
                 <ul className="rebranded-one-login-header__nav__list">
-
                         <Header user={activeUser} />
-                        <li className="rebranded-one-login-header__nav__list-item">
-                            <a className="rebranded-one-login-header__nav__link sign-out-nav__link" href="/sign-out">
-                                <span className="rebranded-one-login-header__nav__text rebranded-one-login-header__nav__text--sign-out">Sign out</span>
-                            </a>
-                        </li>
-
                 </ul>
             </nav>
 
@@ -200,6 +194,10 @@ export function RootLayout({ children, user }: RootLayoutProps) {
 
     <div className="govuk-width-container">
         <main className="govuk-main-wrapper" id="main-content" role="main">
+            <div className="-mt-2 govuk-!-margin-bottom-4">
+              {backLink}
+              <Breadcrumbs {...breadcrumbConfig} />
+            </div>
             {children}
         </main>
     </div>

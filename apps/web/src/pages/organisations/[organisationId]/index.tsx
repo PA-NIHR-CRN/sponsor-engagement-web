@@ -123,7 +123,7 @@ export default function Organisation({ organisation, query, managedContent }: Or
                 )}
               </Table.Cell>
               <Table.Cell>
-                <Link aria-label={`Remove ${user.user.email}`} href={`/organisations/remove-contact/${user.id}`}>
+                <Link aria-label={`Remove ${user.user.email}`} className='govuk-link' href={`/organisations/remove-contact/${user.id}`}>
                   Remove
                 </Link>
               </Table.Cell>

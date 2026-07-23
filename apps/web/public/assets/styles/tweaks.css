@@ -8,6 +8,44 @@
 
 .govuk-tag {
   font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.govuk-tag--red {
+  background-color: var(--nihr-coral--tint-80);
+  /* border: 1px solid var(--nihr-coral--tint-30); */
+  border-left: 5px solid var(--nihr-coral);
+  color: var(--nihr-coral--shade-30);
+}
+
+.card .tag-collection {
+  margin-top: 1rem;
+}
+
+.govuk-error-message {
+  color: var(--nihr-coral--shade-20);
+}
+
+.progress-bar::-webkit-progress-bar {
+  background-color: var(--colour-grey-20);
+}
+
+.progress-bar.progress-bar-error::-webkit-progress-value {
+  background-color: var(--nihr-coral--shade-20);
+}
+
+.progress-bar.progress-bar-warning::-webkit-progress-value {
+  background-color: var(--colour-yellow-140);
+}
+
+.tag--needs-action {
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
+
+  background-color: var(--nihr-coral--shade-10);
+  color: var(--nihr-white);
+
+  border: unset;
 }
 
 .govuk-form-group {
@@ -72,15 +110,43 @@
       width: 0.5rem;
     }
   }
+
+  .progress-summary {
+    margin-top: 2rem;
+  }
 }
 
 .card.card__border-steel {
   box-shadow: 0 0.1875rem 0.5rem 0 rgba(0, 0, 0, 0.15), inset 0px 0px 0px 1px var(--nihr-steel);
 }
 
+.card.card--accent-left-none {
+  .content {
+    &:before {
+      background-color: unset;
+    }
+  }
+}
+
+.card {
+  .content.banner {
+    margin: 1.5rem 0;
+
+    color: var(--nihr-navy);
+
+    .govuk-heading-s {
+      color: var(--nihr-navy);
+    }
+
+    &:before {
+      top: unset;
+    }
+  }
+}
+
 .nihr-input__search::placeholder {
   color: var(--nihr-navy);
-  font-weight: 700;
+  font-weight: 400;
 }
 
 .nihr-input__search {
@@ -157,4 +223,18 @@ body:not(.js-enabled) #favourites-caption {
 
 .govuk-notification-banner__content > * {
   max-width: 950px;
+}
+
+.first-medal {
+  color: var(--nihr-sunshine-yellow--shade-10);
+}
+
+.govuk-hint {
+  color: var(--nihr-teal-60);
+  font-weight: 500;
+}
+
+.govuk-radios__hint {
+  padding-left: 1.25em;
+  margin-top: 0.1em;
 }

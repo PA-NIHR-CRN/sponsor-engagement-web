@@ -94,7 +94,7 @@ export default function Configure({ study, returnUrl }: Readonly<ConfigureProps>
           <div className="govuk-inset-text">
             Selecting a timeline confirms whether the study should be monitored against that timeframe.
             Missing an agreed timeline without mitigation or exemption may affect eligibility for funding
-            or support. Refer to the <Link href="/">Terms and Conditions</Link> guidance for more information.
+            or support. Refer to the <Link className='govuk-link' href="/">Terms and Conditions</Link> guidance for more information.
           </div>
 
           <StudyProgressExtended

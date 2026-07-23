@@ -23,6 +23,7 @@ import {
   StudyList,
 } from '@/components/molecules'
 import { ReportFirst } from '@/components/molecules/cards/ReportFirst/ReportFirst'
+import { StudyStatusFilters } from '@/components/molecules/Filters/StudyStatusFilters'
 import { RootLayout } from '@/components/organisms'
 import CmsNotificationBanner from '@/components/organisms/CmsNotificationBanner/CmsNotificationBanner'
 import { Roles, STUDIES_PER_PAGE } from '@/constants'
@@ -36,7 +37,6 @@ import { formatDate } from '@/utils/date'
 import { getFiltersFromQuery } from '@/utils/filters'
 import { pluraliseStudy } from '@/utils/pluralise'
 import { withServerSideProps } from '@/utils/withServerSideProps'
-import { StudyStatusFilters } from '@/components/molecules/Filters/StudyStatusFilters'
 
 const renderNotificationBanner = (success: string | undefined, showRequestSupportLink: boolean) =>
   success || !Number.isNaN(Number(success)) ? (
@@ -89,13 +89,13 @@ export default function Studies({
 
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">Assess progress of studies</h2>
 
-          <div className="govuk-!-margin-bottom-4">
-            <Tag className="flex items-center gap-2 govuk-!-padding-3 block w-full banner">
+          <div className="card  govuk-!-margin-bottom-4">
+            <div className='content flex items-center gap-2 block w-full banner'>
               <AlertIcon />
-              <strong className="govuk-heading-s govuk-!-margin-bottom-0">
+                          <strong className="govuk-heading-s govuk-!-margin-bottom-0">
                 There are {totalItemsDue} studies needing action
               </strong>
-            </Tag>
+            </div>
           </div>
 
           <p className="govuk-body">
@@ -119,8 +119,8 @@ export default function Studies({
             <Filters
               filters={filters}
               onFilterChange={handleFilterChange}
+              renderExtraFilters={({ onChange }) => (<StudyStatusFilters disabled={isLoading} onChange={onChange} selected={filters.status} />)}
               searchLabel="Search study title, protocol number, IRAS ID or CPMS ID"
-              renderExtraFilters={({ onChange }) => (<StudyStatusFilters selected={filters.status} onChange={onChange} disabled={isLoading} />)}
             />
 
           </div>
@@ -155,12 +155,13 @@ export default function Studies({
                         <li key={study.id}>
                           <StudyList
                             daysSinceAssessmentDue={daysSinceAssessmentDue}
-                            regulatoryApprovalDate={study.regulatoryApprovalDate}
+                            firstType={study.StudyFirst?.type}
                             indications={study.evaluationCategories
                               .map((evalCategory) => evalCategory.indicatorValue)
                               .filter((evalCategory, index, items) => items.indexOf(evalCategory) === index)}
                             irasId={study.irasId}
                             lastAssessmentDate={study.lastAssessment ? formatDate(study.lastAssessment.createdAt) : ''}
+                            regulatoryApprovalDate={study.regulatoryApprovalDate}
                             shortTitle={study.shortTitle}
                             sponsorOrgName={getSponsorOrgName(study.organisations)}
                             studyHref={`${STUDIES_PAGE}/${study.id}`}
@@ -168,7 +169,6 @@ export default function Studies({
                             supportOrgName={getSupportOrgName(study.organisations)}
                             trackStatus={study.lastAssessment?.status.name}
                             willRecruitWithinTimeline={study.willRecruitWithinTimeline}
-                            firstType={study.StudyFirst?.type}
                           />
                         </li>
                       )

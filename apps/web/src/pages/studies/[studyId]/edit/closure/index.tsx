@@ -15,17 +15,17 @@ import { RequestSupport } from '@/components/molecules'
 import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
 import { PAGE_TITLE } from '@/constants/editStudyForm'
-import { getStudyById } from '@/lib/studies'
-import { withServerSideProps } from '@/utils/withServerSideProps'
-import { ClosureDraftProvider, useClosureDraft } from '@/context/closureDraftContext'
 import { TEXTAREA_MAX_CHARACTERS } from '@/constants/forms'
+import { ClosureDraftProvider, useClosureDraft } from '@/context/closureDraftContext'
+import { getStudyById } from '@/lib/studies'
 import { closureDraftStorageKey } from '@/utils/storageKeys'
+import { withServerSideProps } from '@/utils/withServerSideProps'
 
 export type ClosureOfStudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
 type YesNo = 'YES' | 'NO'
 
-type ClosureOfStudyFormValues = {
+interface ClosureOfStudyFormValues {
     isFinalRecruitmentTotalCorrect?: YesNo
     correctedRecruitmentTotal?: string
     didPerformanceDeliverInline?: YesNo
@@ -34,9 +34,9 @@ type ClosureOfStudyFormValues = {
 }
 
 const renderBackLink = (returnUrl: string) => (
-    <div className="ml-8 govuk-!-padding-top-3">
+    <div className="">
         <Container>
-            <Link className="govuk-back-link govuk-!-font-size-19 font-light" href={returnUrl}>
+            <Link className="govuk-back-link" href={returnUrl}>
                 Back
             </Link>
         </Container>
@@ -48,18 +48,18 @@ export default function ClosureOfStudy({ study }: Readonly<ClosureOfStudyProps>)
     const { draft, setDraft } = useClosureDraft()
 
     const [mounted, setMounted] = useState(false)
-    useEffect(() => setMounted(true), [])
+    useEffect(() => { setMounted(true); }, [])
 
     useEffect(() => {
         if (!mounted) return
 
         const expectedId = String(study.id)
-        const hasDraftForStudy = draft?.studyId && String(draft.studyId) === expectedId
+        const hasDraftForStudy = draft.studyId && String(draft.studyId) === expectedId
 
         if (!hasDraftForStudy) {
             router.replace(`/studies/${study.id}/edit`)
         }
-    }, [draft?.studyId, mounted, router, study.id])
+    }, [draft.studyId, mounted, router, study.id])
 
     const defaultValues: ClosureOfStudyFormValues = useMemo(
         () => ({
@@ -150,7 +150,7 @@ export default function ClosureOfStudy({ study }: Readonly<ClosureOfStudyProps>)
 
                     <span className="govuk-body-m mb-0 text-darkGrey">
                         <span className="govuk-visually-hidden">Study sponsor: </span>
-                        {study.organisationsByRole?.CRO ?? study.organisationsByRole?.CTU ?? study.organisationsByRole?.Sponsor ?? '-'}
+                        {study.organisationsByRole.CRO ?? study.organisationsByRole.CTU ?? study.organisationsByRole.Sponsor ?? '-'}
                     </span>
 
                     <span className="govuk-heading-m text-primary">
@@ -180,12 +180,12 @@ export default function ClosureOfStudy({ study }: Readonly<ClosureOfStudyProps>)
                                 name="isFinalRecruitmentTotalCorrect"
                                 render={({ field }) => (
                                     <RadioGroup
+                                        defaultValue={field.value}
                                         errors={{}}
                                         label="Is final recruitment total correct?"
                                         labelSize="m"
                                         name={field.name}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => field.onChange(e.target.value)}
-                                        defaultValue={field.value}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => { field.onChange(e.target.value); }}
                                     >
                                         <Radio label="Yes" value="YES" />
                                         <Radio label="No" value="NO" />
@@ -200,14 +200,14 @@ export default function ClosureOfStudy({ study }: Readonly<ClosureOfStudyProps>)
                                     <TextInput
                                         errors={{}}
                                         inputClassName="govuk-input--width-10"
+                                        inputMode="numeric"
                                         label="If 'No' please provide the correct number"
                                         labelSize="m"
-                                        inputMode="numeric"
+                                        name={field.name}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                             field.onChange(e.target.value.replace(/\D/g, ''))
                                         }}
                                         value={field.value ?? ''}
-                                        name={field.name}
                                     />
                                 )}
                             />
@@ -217,12 +217,12 @@ export default function ClosureOfStudy({ study }: Readonly<ClosureOfStudyProps>)
                                 name="didPerformanceDeliverInline"
                                 render={({ field }) => (
                                     <RadioGroup
+                                        defaultValue={field.value}
                                         errors={{}}
                                         label="Did the UK performance deliver inline with expectations?"
                                         labelSize="m"
                                         name={field.name}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => field.onChange(e.target.value)}
-                                        defaultValue={field.value}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => { field.onChange(e.target.value); }}
                                     >
                                         <Radio label="Yes" value="YES" />
                                         <Radio label="No" value="NO" />
@@ -231,43 +231,43 @@ export default function ClosureOfStudy({ study }: Readonly<ClosureOfStudyProps>)
                             />
 
                             <Textarea
-                                errors={{}}
-                                label="If 'No' please briefly explain why"
-                                hint="If needed, provide further context or justification for changes made above."
-                                labelSize="m"
-                                required={false}
                                 defaultValue=''
+                                errors={{}}
+                                hint="If needed, provide further context or justification for changes made above."
+                                label="If 'No' please briefly explain why"
+                                labelSize="m"
                                 maxLength={TEXTAREA_MAX_CHARACTERS}
                                 remainingCharacters={remainingPerformanceNoCharacters}
+                                required={false}
                                 {...register('performanceNoReason')}
                             />
 
                             <Textarea
-                                errors={{}}
-                                label="Further information (optional)"
-                                hint="If needed, provide further context or justification for changes made above."
-                                labelSize="m"
-                                required={false}
                                 defaultValue=''
+                                errors={{}}
+                                hint="If needed, provide further context or justification for changes made above."
+                                label="Further information (optional)"
+                                labelSize="m"
                                 maxLength={TEXTAREA_MAX_CHARACTERS}
                                 remainingCharacters={remainingCharacters}
+                                required={false}
                                 {...register('furtherInformation')}
                             />
 
                             <div className="govuk-button-group">
                                 <button
-                                    type="button"
                                     className={clsx('govuk-button', { 'pointer-events-none': showLoadingState })}
                                     onClick={onNext}
+                                    type="button"
                                 >
                                     Next
                                 </button>
 
 
                                 <button
-                                    type="button"
                                     className="govuk-button govuk-button--secondary"
                                     onClick={onCancel}
+                                    type="button"
                                 >
                                     Cancel
                                 </button>

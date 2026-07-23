@@ -59,9 +59,9 @@ const renderNotificationBanner = (success: string | undefined, showRequestSuppor
   ) : null
 
 const renderBackLink = () => (
-  <div className="ml-8 govuk-!-padding-top-3">
+  <div className="">
     <Container>
-      <Link className="govuk-back-link govuk-!-font-size-19 font-light" href="/studies">
+      <Link className="govuk-back-link" href="/studies">
         All studies
       </Link>
     </Container>
@@ -176,7 +176,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
                 <h3 className="govuk-heading-m govuk-!-margin-bottom-0">
                   Actions needed
                 </h3>
-                <SummaryList rows={indicatorSummaryRows} className='summary-list--study-indicators govuk-!-margin-bottom-0' />
+                <SummaryList className='summary-list--study-indicators govuk-!-margin-bottom-0' rows={indicatorSummaryRows} />
               </>
             )}
 
@@ -193,11 +193,11 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
             </div>
 
             <StudyProgressExtended
-              regulatoryApprovalDate={study.regulatoryApprovalDate}
               moreDetailsHref={`${STUDIES_PAGE}/${study.id}/configure`}
+              optedOutText='No expectation to achieve the first participant in 90 days for this study'
+              regulatoryApprovalDate={study.regulatoryApprovalDate}
               studyStatus={study.studyStatus}
               willRecruitWithinTimeline={study.willRecruitWithinTimeline}
-              optedOutText='No expectation to achieve the first participant in 90 days for this study'
             />
 
           </div>
@@ -286,7 +286,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
           <StudyDetails study={study} />
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
-          <ReportFirst showAsStartButton studyId={study.id} />
+          <ReportFirst studyId={study.id} />
           <RequestSupport showCallToAction sticky />
         </div>
       </div>

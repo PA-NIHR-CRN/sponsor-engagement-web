@@ -12,7 +12,7 @@ export default function PageNotFound() {
           <p className="govuk-body">If you typed the web address, check it is correct.</p>
           <p className="govuk-body">If you pasted the web address, check you copied the entire address.</p>
           <p className="govuk-body" data-testid="PageNotFoundContactForAssistance">
-            Please contact <a href="mailto:rdn.servicedesk@nihr.ac.uk">rdn.servicedesk@nihr.ac.uk</a> for further
+            Please contact <a className='govuk-link' href="mailto:rdn.servicedesk@nihr.ac.uk">rdn.servicedesk@nihr.ac.uk</a> for further
             assistance.
           </p>
         </div>

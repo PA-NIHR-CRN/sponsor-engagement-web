@@ -1,11 +1,12 @@
 import Link from 'next/link'
 
 import { Card } from '@/components/atoms'
+import { FirstMedal } from '@/components/atoms/FirstMedal/FirstMedal';
 import Tag from '@/components/atoms/Tag/Tag'
-import TagCollection from '../../TagCollection/TagCollection'
 import {StudyProgressExtended} from "@/components/molecules";
 import { capitaliseFirstLetter } from '@/utils/capitalise';
-import { FirstMedal } from '@/components/atoms/FirstMedal/FirstMedal';
+
+import TagCollection from '../../TagCollection/TagCollection'
 
 export interface StudyListProps {
   sponsorOrgName?: string
@@ -58,9 +59,9 @@ export function StudyList({
     indications?.some(indication => !excludedIndications.has(indication)) ?? false;
 
   return (
-    <Card className='card card__border-steel' padding={0}>
+    <Card className='card card--accent-left-none' padding={0}>
 
-      {(hasAssessmentDue || areUpdatesRequired) ? <Tag className='absolute top-0 right-0 corner' text="Needs action" /> : null}
+      {(hasAssessmentDue || areUpdatesRequired) ? <Tag className='absolute top-0 right-0 corner tag--needs-action' text="Needs action" /> : null}
 
       <div className="sm:flex sm:items-stretch sm:justify-between sm:gap-6">
         <div className="min-w-0 flex-1">
@@ -108,19 +109,19 @@ export function StudyList({
             ]}
           />
 
-          <div className="lg:min-w-[320px] govuk-!-margin-top-3 min-h-[72px]">
+          <div className="lg:min-w-[320px]">
             <div className="max-w-[600px]">
               <StudyProgressExtended 
                 regulatoryApprovalDate={regulatoryApprovalDate}
-                willRecruitWithinTimeline={willRecruitWithinTimeline}
-                studyStatus={studyStatus}
                 showBorder={false}
-                showTitle={true}
-                titleSize='s'
-                titleClassName='text-darkGrey'
-                showTimeframeHint={false}
                 showDates={false}
                 showMoreDetails={false}
+                showTimeframeHint={false}
+                showTitle
+                studyStatus={studyStatus}
+                titleClassName='text-darkGrey'
+                titleSize='s'
+                willRecruitWithinTimeline={willRecruitWithinTimeline}
               />
             </div>
           </div>
@@ -130,7 +131,7 @@ export function StudyList({
           <div className="flex-1 w-full flex items-center justify-center">
             {firstType ? (
               <div className="text-center govuk-!-margin-top-4">
-                <div className="flex justify-center">
+                <div className="flex justify-center first-medal">
                   <FirstMedal className="h-14 w-14 text-yellow-500 block" />
                 </div>
                 <div className="govuk-body-s govuk-!-margin-top-1 font-bold text-darkGrey">

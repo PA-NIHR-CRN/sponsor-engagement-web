@@ -52,24 +52,20 @@ export function Filters({ filters, onFilterChange, searchLabel, renderExtraFilte
         role="search"
       >
         {/* Keyword */}
-        <div className="govuk-form-group mb-3">
-          <label className="govuk-label mb-2" htmlFor="keyword">
-            {searchLabel}
-          </label>
-
+        <div className="govuk-form-group mb-6">
           <div className="govuk-grid-row">
-            <div className="govuk-grid-column-one-half">
+            <div className={hasExtraFilters ? 'govuk-grid-column-three-quarters' : 'govuk-grid-column-full'}>
               <div className="flex items-start gap-2">
                 <div className="table w-full">
         <div className="govuk-form-group govuk-!-margin-bottom-0">
                         <h1 className="govuk-label-wrapper">
                             <label className="govuk-label govuk-visually-hidden" htmlFor="keyword">
-                                Search information across the NIHR
+                                {searchLabel}
                             </label>
                         </h1>
                         <div className="search-wrapper">
                                 <input className="govuk-input govuk-!-margin-bottom-0 nihr-input__search" id="keyword" name="q"
-                                 onChange={(event) => {
+                                onChange={(event) => {
                       const next = event.target.value
                       setSearchInputText(next)
 
@@ -78,6 +74,7 @@ export function Filters({ filters, onFilterChange, searchLabel, renderExtraFilte
                         onChange()
                       }
                     }}
+                                 placeholder={searchLabel}
                     type="text"
                     value={searchInputText} />
                                 <button className="search-button" type="submit" value="Update results" />
@@ -88,8 +85,9 @@ export function Filters({ filters, onFilterChange, searchLabel, renderExtraFilte
                 </div>
               </div>
             </div>
-            <div className='govuk-grid-column-one-half flex justify-end'>
+            
               {hasExtraFilters ? (
+                <div className='govuk-grid-column-one-quarter flex justify-end'>
                   <button
                     aria-controls={extraPanelId}
                     aria-expanded={filtersOpen}
@@ -99,8 +97,8 @@ export function Filters({ filters, onFilterChange, searchLabel, renderExtraFilte
                   >
                     {filtersOpen ? 'Hide filters' : 'Show filters'}
                   </button>
+                </div>
                 ) : null}
-            </div>
           </div>
         </div>
 
