@@ -22,10 +22,10 @@ export function RequestSupport({ showCallToAction = false, sticky = false }: Req
             Sponsors or their delegates can request NIHR RDN support with their research study at any time.
           </p>
           <Link
-            className="govuk-button govuk-button--start govuk-!-margin-bottom-0"
+            className="govuk-link nihr-link-lg nihr-link-arrow-left govuk-!-margin-bottom-0"
             href={`${SUPPORT_PAGE}?returnPath=${asPath}`}
           >
-            Request support <StartIcon />
+            Request support
           </Link>
         </>
       ) : (

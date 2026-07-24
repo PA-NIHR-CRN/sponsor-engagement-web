@@ -235,9 +235,8 @@ export function RootLayout({ children, backLink, heading = SERVICE_NAME, user, b
                 </ul>
             </div>
             <div className="govuk-footer__meta-item">
-                <a className="govuk-footer__link funded-by-dhsc-logo govuk-!-padding-top-0"
-                   href="https://www.gov.uk/government/organisations/department-of-health-and-social-care">
-                    <img alt="Funded by the Department of Health and Social Care"
+                <a aria-label="Shaw Trust accessibility website (opens in new tab)" className="govuk-footer__link footer__logo govuk-!-padding-top-0" href="https://www.accessibility-services.co.uk/certificates/nihr-sponsor-engagement-tool/" rel="noreferrer noopener" target="_blank">
+                    <img alt="Shaw Trust Accessibility logo"
                          src="/assets/images/Accessibility-Accrediation-white-2048x597.png" />
                 </a>
             </div>

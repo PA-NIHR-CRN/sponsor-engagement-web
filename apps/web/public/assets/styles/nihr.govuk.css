@@ -32,8 +32,8 @@
   --nihr-blue-flame-60: #6697da;
   --nihr-blue-flame-20: #ccdcf3;
   --nihr-twilight: #3e439c;
-  --nihr-twilight: #8b8ec4;
-  --nihr-twilight: #d8d9eb;
+  --nihr-twilight-60: #8b8ec4;
+  --nihr-twilight-20: #d8d9eb;
   --nihr-berry: #804055;
   --nihr-berry-60: #b38c99;
   --nihr-berry-20: #e6d9dd;
@@ -163,7 +163,7 @@
     min-height: 100svh;
   }
 
-  .govuk-input {
+  .govuk-input.nihr-input__search {
     border-color: var(--nihr-navy);
     color: var(--nihr-navy);
   }
@@ -309,10 +309,6 @@
     height: 0.575rem;
   }
 
-  .govuk-footer__meta {
-    align-items: flex-start;
-  }
-
   .govuk-frontend-supported .govuk-accordion__show-all:hover:not(:focus) {
     background: unset;
     box-shadow: unset;
@@ -325,5 +321,9 @@
         color: var(--nihr-coral);
       }
     }
+  }
+
+  .govuk-footer__meta {
+    align-items: flex-start;
   }
 }
