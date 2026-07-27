@@ -33,6 +33,7 @@ export default class StudiesPage {
   readonly studyListItemDataIndicatesLbl: Locator
   readonly studyListItemDataIndicatesValue: Locator
   readonly studyListItemDueIndicator: Locator
+  readonly assessmentDueIndicator: Locator
   readonly searchInput: Locator
   readonly searchButton: Locator
   readonly searchFilterPanel: Locator
@@ -42,6 +43,7 @@ export default class StudiesPage {
   readonly sortByDropdown: Locator
   readonly studyLastItem: Locator
   readonly studyLastDue: Locator
+  readonly reportAFirstLink: Locator
 
   //Initialize Page Objects
   constructor(page: Page) {
@@ -96,11 +98,17 @@ export default class StudiesPage {
     this.searchButton = page.locator(
       'button[class="bg-[var(--colour-blue)] text-white active:top-0 focus:shadow-[inset_0_0_0_4px_var(--text-grey)] focus:outline focus:outline-[3px] focus:outline-[var(--focus)] mb-0 w-[50px] h-[50px] flex items-center justify-center text-lg"]'
     )
+    this.assessmentDueIndicator = this.studyListItem.locator(
+      'span[class="govuk-tag govuk-tag--red float-right -mt-3 -mr-3 normal-case"]'
+    )
+    this.searchInput = page.getByLabel('Search study title, protocol number, IRAS ID or CPMS ID')
+    this.searchButton = page.locator('button.search-button')
     this.searchFilterPanel = page.locator('ul[aria-labelledby="selected-filters"]')
     this.viewStudyButton = page.locator('a[class="govuk-button w-auto govuk-!-margin-bottom-0"]')
     this.sortBySection = page.locator('div[class="govuk-form-group mt-2 items-center justify-end md:my-0 md:flex"]')
     this.sortByLabel = this.sortBySection.locator('label')
     this.sortByDropdown = this.sortBySection.locator('select')
+    this.reportAFirstLink = page.locator('a[href="/report-first"]', { hasText: 'Report a first' })
   }
 
   //Page Methods
@@ -472,5 +480,9 @@ export default class StudiesPage {
 
   async assertEuropeanFirstLabelVisible() {
     await expect(this.page.getByText('European first')).toBeVisible()
+  }
+
+  async assertClickReportAFirstLink() {
+    await this.reportAFirstLink.click()
   }
 }

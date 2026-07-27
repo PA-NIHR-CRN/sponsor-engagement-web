@@ -4,6 +4,7 @@ import { expect, Locator, Page } from '@playwright/test'
 export default class CpmsStudiesPage {
   readonly page: Page
   readonly btnContinue: Locator
+  readonly cpmsStudiesHeading: Locator
   readonly cpmsStudyBreadcrumb: Locator
   readonly editButton: Locator
   readonly statusTab: Locator
@@ -23,6 +24,7 @@ export default class CpmsStudiesPage {
 
     //Locators
     this.btnContinue = page.locator('button[data-testid="identifier-auth-continue-button"]')
+    this.cpmsStudiesHeading = page.getByText('STUDIES', { exact: true })
     this.cpmsStudyBreadcrumb = page.locator('.breadcrumbs')
 
     //Study
