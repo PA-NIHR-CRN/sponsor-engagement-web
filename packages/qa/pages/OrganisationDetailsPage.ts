@@ -277,12 +277,15 @@ export default class OrganisationDetailsPage {
 
   async assertContactFailedToDeliverTag(expectedDetails: RowDataPacket[]) {
     await expect(this.contactListRow.first()).toBeVisible()
-    for (let index = 0; index < expectedDetails.length; index++) {
-      const row = this.contactListRow.nth(index)
-      if (expectedDetails[index].statusId === 3) {
-        await expect(row.locator('td').nth(1)).toContainText('Failed to deliver email')
+    for (const expectedContact of expectedDetails) {
+      const row = this.contactListRow.filter({ hasText: expectedContact.email })
+      const failedToDeliverTag = row.locator('span.govuk-tag.govuk-tag--red.normal-case', {
+        hasText: 'Failed to deliver email',
+      })
+      if (expectedContact.statusId === 3) {
+        await expect(failedToDeliverTag).toBeVisible()
       } else {
-        await expect(row.locator('td').nth(1)).not.toContainText('Failed to deliver email')
+        await expect(failedToDeliverTag).toHaveCount(0)
       }
     }
   }

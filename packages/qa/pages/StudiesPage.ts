@@ -14,7 +14,6 @@ export default class StudiesPage {
   readonly pageTitle: Locator
   readonly assessStudiesDropdown: Locator
   readonly studiesFoundHeading: Locator
-  readonly lblDueAssessment: Locator
   readonly txtIntroGuidance: Locator
   readonly expandCollapseSection: Locator
   readonly expandCollapseSectionContents: Locator
@@ -53,9 +52,6 @@ export default class StudiesPage {
     this.pageTitle = page.locator('h2[class="govuk-heading-l govuk-!-margin-bottom-4"]')
     this.assessStudiesDropdown = page.locator('span[class="govuk-details__summary-text"]')
     this.studiesFoundHeading = page.locator('p[class="govuk-heading-s mb-0 whitespace-nowrap"]')
-    this.lblDueAssessment = page.locator(
-      'div[class="flex items-center gap-2 govuk-!-margin-bottom-4"] strong[class="govuk-heading-s govuk-!-margin-bottom-0"]'
-    )
     this.txtIntroGuidance = page.locator('div[class="w-full"] p[class="govuk-body"]')
     this.expandCollapseSection = page.locator(
       'details[class="[&>summary]:text-blue govuk-details govuk-!-margin-bottom-4"]'
@@ -82,18 +78,10 @@ export default class StudiesPage {
     this.studyListItemLastAssessmentLbl = page
       .locator('div[class="lg:min-w-[320px]"] strong[class="govuk-heading-s govuk-!-margin-bottom-0"]')
       .nth(0)
-    this.studyListItemDataIndicatesLbl = page
-      .locator('div[class="lg:min-w-[320px]"] strong[class="govuk-heading-s govuk-!-margin-bottom-0"]')
-      .nth(1)
     this.studyListItemLastAssessmentValue = page
-      .locator('div[class="lg:min-w-[320px]"] p[class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0"]')
+      .locator('div.lg\\:min-w-\\[320px\\] p.govuk-body-s.govuk-\\!-margin-top-1')
       .nth(0)
-    this.studyListItemDataIndicatesValue = page
-      .locator('div[class="lg:min-w-[320px]"] p[class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0"]')
-      .nth(1)
-    this.studyListItemDueIndicator = page.locator(
-      'span[class="govuk-tag govuk-tag--red float-right -mt-3 -mr-3 normal-case"]'
-    )
+    this.assessmentDueIndicator = this.studyListItem.locator('span[class="govuk-tag govuk-tag--red normal-case"]')
     this.searchInput = page.locator('input[class="govuk-input govuk-input h-[50px] border-2 border-black p-2"]')
     this.searchButton = page.locator(
       'button[class="bg-[var(--colour-blue)] text-white active:top-0 focus:shadow-[inset_0_0_0_4px_var(--text-grey)] focus:outline focus:outline-[3px] focus:outline-[var(--focus)] mb-0 w-[50px] h-[50px] flex items-center justify-center text-lg"]'
@@ -126,12 +114,6 @@ export default class StudiesPage {
     await expect(this.pageTitle).toBeVisible()
     await expect(this.pageTitle).toHaveText('Assess progress of studies')
     await expect(this.page).toHaveURL('studies?success=1')
-  }
-
-  async assertDueLabelPresent() {
-    await expect(this.lblDueAssessment).toBeVisible()
-    await expect(this.lblDueAssessment).toContainText('There are ')
-    await expect(this.lblDueAssessment).toContainText('studies to assess')
   }
 
   async assertIntroGuideTxt() {
@@ -326,21 +308,18 @@ export default class StudiesPage {
     expect(actualValue).toEqual(expectedValue)
   }
 
-  async assertDataIndicatesLbl(index: number) {
-    expect(await this.studyListItem.nth(index).locator(this.studyListItemDataIndicatesLbl).textContent()).toEqual(
-      'Study data indicates'
-    )
-  }
+  async assertDataUpdatesRequiredTagDisplayed(index: number, isDisplayed: boolean) {
+    const studyItem = this.studyListItem.nth(index)
 
-  async assertDataIndicatesValue(dbReq: string, index: number) {
-    const expectedValues = await seDatabaseReq(`${dbReq}`)
-    const actualValue = await this.studyListItem.nth(index).locator(this.studyListItemDataIndicatesValue).textContent()
-    if (expectedValues.length > 1) {
-      expect(actualValue).toEqual(await this.getExpectedMultipleIndicatorsAsString(expectedValues))
-    } else if (expectedValues.length > 0) {
-      expect(actualValue).toContain(expectedValues[0].indicatorType)
+    const dataUpdatesRequiredTag = studyItem
+      .locator('span.govuk-tag.govuk-tag--red.normal-case')
+      .filter({ hasText: 'Data updates required' })
+
+    if (isDisplayed) {
+      await expect(dataUpdatesRequiredTag).toBeVisible()
+      await expect(dataUpdatesRequiredTag).toHaveText('Data updates required')
     } else {
-      expect(actualValue).toEqual('No concerns')
+      await expect(dataUpdatesRequiredTag).toBeHidden()
     }
   }
 
@@ -372,16 +351,16 @@ export default class StudiesPage {
     return Math.round(numDaysBetween(new Date(), dueAssessmentAt))
   }
 
-  async assertDueIndicatorDisplayed(index: number, dueAssessmentAt?: Date | null) {
+  async assertAssessmentDueIndicatorDisplayed(index: number, dueAssessmentAt?: Date | null) {
+    const dueIndicator = this.assessmentDueIndicator.nth(index)
     if (dueAssessmentAt) {
       const numberOfDaysDue = await this.getDaysSinceAssessmentDue(dueAssessmentAt)
-
-      await expect(this.studyListItem.nth(index).locator(this.studyListItemDueIndicator)).toBeVisible()
-      await expect(this.studyListItem.nth(index).locator(this.studyListItemDueIndicator)).toHaveText(
-        `Due for ${numberOfDaysDue || 1} day${numberOfDaysDue > 1 ? 's' : ''}`
-      )
+      const daysDue = numberOfDaysDue || 1
+      const expectedText = `Assessment due for ${daysDue} day${daysDue > 1 ? 's' : ''}`
+      await expect(dueIndicator).toBeVisible()
+      await expect(dueIndicator).toHaveText(expectedText)
     } else {
-      await expect(this.studyListItem.nth(index).locator(this.studyListItemDueIndicator)).toBeHidden()
+      await expect(dueIndicator).toBeHidden()
     }
   }
 
@@ -422,12 +401,14 @@ export default class StudiesPage {
   async assertListBeginsWithDueStudies(sortedList: RowDataPacket[]) {
     if (await this.checkForStudyDue(sortedList)) {
       const pageStudyCount = await this.studyListItem.count()
+
       for (let index = 0; index < pageStudyCount; index++) {
         const study = sortedList[index]
+
         await expect(this.studyListItemTitle.nth(index)).toHaveText(study.shortTitle)
 
         if (study.dueAssessmentAt) {
-          await expect(this.studyListItem.nth(index).locator(this.studyListItemDueIndicator)).toBeVisible()
+          await expect(this.assessmentDueIndicator.nth(index)).toBeVisible()
         }
       }
     } else {

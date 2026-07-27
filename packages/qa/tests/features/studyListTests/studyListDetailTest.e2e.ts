@@ -47,13 +47,14 @@ test.describe('Details on Study List Items - @se_22 @se_22_detail', () => {
         studyListItemIndex
       )
     })
-    await test.step('And the `Study data indicates` matches the Expected Value', async () => {
-      await studiesPage.assertDataIndicatesLbl(studyListItemIndex)
-      await studiesPage.assertDataIndicatesValue(
-        `SELECT indicatorType FROM StudyEvaluationCategory 
-            WHERE studyId = ${studyIdFromList};`,
-        studyListItemIndex
-      )
+    await test.step('And the Study List item displays the correct Data updates required tag state', async () => {
+      const dataUpdates = await seDatabaseReq(`
+        SELECT indicatorType 
+        FROM StudyEvaluationCategory 
+        WHERE studyId = ${studyIdFromList} 
+        AND isDeleted = 0;
+      `)
+      await studiesPage.assertDataUpdatesRequiredTagDisplayed(studyListItemIndex, dataUpdates.length > 0)
     })
   })
 
@@ -97,13 +98,14 @@ test.describe('Details on Study List Items - @se_22 @se_22_detail', () => {
         studyListItemIndex
       )
     })
-    await test.step('And the `Study data indicates` matches the Expected Value', async () => {
-      await studiesPage.assertDataIndicatesLbl(studyListItemIndex)
-      await studiesPage.assertDataIndicatesValue(
-        `SELECT indicatorType FROM StudyEvaluationCategory 
-            WHERE studyId = ${studyIdFromList} AND isDeleted = 0;`,
-        studyListItemIndex
-      )
+    await test.step('And the Study List item displays the correct Data updates required tag state', async () => {
+      const dataUpdates = await seDatabaseReq(`
+        SELECT indicatorType 
+        FROM StudyEvaluationCategory 
+        WHERE studyId = ${studyIdFromList} 
+        AND isDeleted = 0;
+      `)
+      await studiesPage.assertDataUpdatesRequiredTagDisplayed(studyListItemIndex, dataUpdates.length > 0)
     })
   })
 })

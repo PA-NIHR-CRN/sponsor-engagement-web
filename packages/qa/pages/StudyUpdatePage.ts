@@ -17,8 +17,6 @@ export default class StudyUpdatePage {
   readonly statusHintInSetup: Locator
   readonly statusRadioOpenRec: Locator
   readonly statusHintOpenRec: Locator
-  readonly statusRadioClosedInFollow: Locator
-  readonly statusHintClosedInFollow: Locator
   readonly statusRadioClosed: Locator
   readonly statusHintClosed: Locator
   readonly statusRadioWithdrawn: Locator
@@ -43,6 +41,7 @@ export default class StudyUpdatePage {
   readonly ukRecruitmentTarget: Locator
   readonly furtherInfo: Locator
   readonly buttonUpdate: Locator
+  readonly buttonNext: Locator
   readonly buttonCancel: Locator
   readonly requestSupport: Locator
   readonly updateSuccessBanner: Locator
@@ -79,14 +78,12 @@ export default class StudyUpdatePage {
     this.statusHintInSetup = page.locator('#status-hint').first()
     this.statusRadioOpenRec = page.locator('#status-1')
     this.statusHintOpenRec = page.locator('#status-1-hint')
-    this.statusRadioClosedInFollow = page.locator('#status-2')
-    this.statusHintClosedInFollow = page.locator('#status-2-hint')
-    this.statusRadioClosed = page.locator('#status-3')
-    this.statusHintClosed = page.locator('#status-3-hint')
-    this.statusRadioWithdrawn = page.locator('#status-4')
-    this.statusHintWithdrawn = page.locator('#status-4-hint')
-    this.statusRadioSuspended = page.locator('#status-5')
-    this.statusHintSuspended = page.locator('#status-5-hint')
+    this.statusRadioClosed = page.locator('#status-2')
+    this.statusHintClosed = page.locator('#status-2-hint')
+    this.statusRadioWithdrawn = page.locator('#status-3')
+    this.statusHintWithdrawn = page.locator('#status-3-hint')
+    this.statusRadioSuspended = page.locator('#status-4')
+    this.statusHintSuspended = page.locator('#status-4-hint')
     this.plannedOpeningDD = page.locator('#plannedOpeningDate-day')
     this.plannedOpeningMM = page.locator('#plannedOpeningDate-month')
     this.plannedOpeningYYYY = page.locator('#plannedOpeningDate-year')
@@ -105,6 +102,7 @@ export default class StudyUpdatePage {
     this.ukRecruitmentTarget = page.locator('#recruitmentTarget')
     this.furtherInfo = page.locator('#furtherInformation')
     this.buttonUpdate = page.locator('button.govuk-button:has-text("Update")')
+    this.buttonNext = page.locator('button.govuk-button:has-text("Next")')
     this.buttonCancel = page.locator('.govuk-button.govuk-button--secondary')
     this.requestSupport = page.locator('[data-testid="request-support"]')
     this.updateSuccessBanner = page.locator('.govuk-notification-banner.govuk-notification-banner--success')
@@ -128,7 +126,7 @@ export default class StudyUpdatePage {
   async assertOnUpdateStudyPage(studyId: string) {
     await expect(this.pageTitle).toBeVisible()
     await expect(this.bannerTitle).toContainText('Update UK study data')
-    await expect(this.pageTitle).toContainText('Update UK study data')
+    await expect(this.pageTitle).toContainText('Update United Kingdom study data')
     await expect(this.page).toHaveURL(`studies/${studyId}/edit`)
   }
 
@@ -167,27 +165,21 @@ export default class StudyUpdatePage {
 
   async assertStudyStatusSection() {
     await expect(this.statusRadioInSetup).toBeVisible()
-    await expect(this.statusHintInSetup).toHaveText(`Not yet open to recruitment.`)
+    await expect(this.statusHintInSetup).toContainText('Not yet open to recruitment')
+
     await expect(this.statusRadioOpenRec).toBeVisible()
-    await expect(this.statusHintOpenRec).toHaveText(
-      `Open to recruit participants in at least one UK site. Provide an actual opening date below.`
-    )
-    await expect(this.statusRadioClosedInFollow).toBeVisible()
-    await expect(this.statusHintClosedInFollow).toHaveText(
-      `Ongoing, (i.e. participants are being treated or observed), but recruitment is complete. Provide an actual closure date below.`
-    )
+    await expect(this.statusHintOpenRec).toContainText('Open to recruit participants in at least one UK site')
+
     await expect(this.statusRadioClosed).toBeVisible()
-    await expect(this.statusHintClosed).toHaveText(
-      `Completed recruitment and any subsequent patient related activities (follow up). Provide an actual closure date below.`
+    await expect(this.statusHintClosed).toContainText(
+      'Completed recruitment and any subsequent patient related activities'
     )
+
     await expect(this.statusRadioSuspended).toBeVisible()
-    await expect(this.statusHintSuspended).toHaveText(
-      `Recruitment of participants has halted, but may resume. Provide an estimated re-opening date below.`
-    )
+    await expect(this.statusHintSuspended).toContainText('Recruitment of participants has halted')
+
     await expect(this.statusRadioWithdrawn).toBeVisible()
-    await expect(this.statusHintWithdrawn).toHaveText(
-      `Withdrawn during the setup phase and will not be opening to recruitment in the UK.`
-    )
+    await expect(this.statusHintWithdrawn).toContainText('Withdrawn during the setup phase')
   }
 
   async assertStudyStatus(status: string) {
@@ -196,9 +188,6 @@ export default class StudyUpdatePage {
     }
     if (status in ['Open to Recruitment', 'Open, With Recruitment']) {
       await expect(this.statusRadioOpenRec).toBeChecked()
-    }
-    if (status in ['Closed to Recruitment', 'Closed to Recruitment, Follow Up Complete']) {
-      await expect(this.statusRadioClosedInFollow).toBeChecked()
     }
     if (status in ['Closed to Recruitment, In Follow Up']) {
       await expect(this.statusRadioClosed).toBeChecked()
@@ -340,7 +329,6 @@ export default class StudyUpdatePage {
     await this.fillStudyDates('plannedClosure', '', '', '')
     await this.fillStudyDates('actualClosure', '', '', '')
     await this.ukRecruitmentTarget.fill('')
-    await this.furtherInfo.fill(``)
   }
 
   async assertStudyDatesValidationRequired(dateType: string) {
@@ -400,62 +388,55 @@ export default class StudyUpdatePage {
       actualOpening: 'Actual UK opening',
       actualClosure: 'Actual UK closure',
       plannedClosure: 'Planned UK closure',
-      estimatedReopening: ' Estimated UK opening',
+      estimatedReopening: 'Estimated UK opening',
     }
 
-    const label = dateTypeToLabelMapping[dateType] ?? dateType
+    const dateTypeToIdMapping: Record<string, string> = {
+      plannedOpening: 'plannedOpeningDate',
+      actualOpening: 'actualOpeningDate',
+      actualClosure: 'actualClosureDate',
+      plannedClosure: 'plannedClosureDate',
+      estimatedReopening: 'estimatedReopeningDate',
+    }
 
-    let plannedOrActualMessage = ''
-    let estimatedReopenMessage = ''
+    const label = dateTypeToLabelMapping[dateType]
+    const fieldId = dateTypeToIdMapping[dateType]
+
+    if (!label || !fieldId) {
+      throw new Error(`${dateType} is not a valid date option`)
+    }
+
+    let message = ''
 
     if (dmy === 'year' && partial === false) {
-      plannedOrActualMessage = `Year must include 4 numbers`
-      estimatedReopenMessage = plannedOrActualMessage
-    } else if ((dmy === 'year' && partial === true) || (dmy !== 'year' && partial === true)) {
-      plannedOrActualMessage = `${label} to recruitment date must include a ${dmy}`
-      estimatedReopenMessage = `${dateType} date must include a ${dmy}`
+      message = 'Year must include 4 numbers'
+    } else if (partial === true) {
+      if (dateType === 'estimatedReopening') {
+        message = `${label} date must include a ${dmy}`
+      } else {
+        message = `${label} to recruitment date must include a ${dmy}`
+      }
     } else {
-      plannedOrActualMessage = `${label} to recruitment date requires a valid ${dmy}`
-      estimatedReopenMessage = `${label} date requires a valid ${dmy}`
+      if (dateType === 'estimatedReopening') {
+        message = `${label} date requires a valid ${dmy}`
+      } else {
+        message = `${label} to recruitment date requires a valid ${dmy}`
+      }
     }
+
+    const input = this.page.locator(`#${fieldId}-${dmy}`)
 
     await expect(this.updateValidationBanner).toBeVisible()
     await expect(this.updateValidationBanner).toContainText('There is a problem')
 
-    switch (dateType) {
-      case 'plannedOpening':
-        const plannedOpeningError = `#plannedOpeningDate-${dmy}-error`
-        await expect(this.page.locator(plannedOpeningError)).toBeVisible()
-        await expect(this.page.locator(plannedOpeningError)).toHaveText(`Error: ${plannedOrActualMessage}`)
-        await expect(this.updateValidationList).toContainText(plannedOrActualMessage)
-        break
-      case 'actualOpening':
-        const actualOpeningError = `#actualOpeningDate-${dmy}-error`
-        await expect(this.page.locator(actualOpeningError)).toBeVisible()
-        await expect(this.page.locator(actualOpeningError)).toHaveText(`Error: ${plannedOrActualMessage}`)
-        await expect(this.updateValidationList).toContainText(plannedOrActualMessage)
-        break
-      case 'plannedClosure':
-        const plannedClosureError = `#plannedClosureDate-${dmy}-error`
-        await expect(this.page.locator(plannedClosureError)).toBeVisible()
-        await expect(this.page.locator(plannedClosureError)).toHaveText(`Error: ${plannedOrActualMessage}`)
-        await expect(this.updateValidationList).toContainText(plannedOrActualMessage)
-        break
-      case 'actualClosure':
-        const actualClosureError = `#actualClosureDate-${dmy}-error`
-        await expect(this.page.locator(actualClosureError)).toBeVisible()
-        await expect(this.page.locator(actualClosureError)).toHaveText(`Error: ${plannedOrActualMessage}`)
-        await expect(this.updateValidationList).toContainText(plannedOrActualMessage)
-        break
-      case 'estimatedReopening':
-        const estimatedReopeningError = `#estimatedReopeningDate-${dmy}-error`
-        await expect(this.page.locator(estimatedReopeningError)).toBeVisible()
-        await expect(this.page.locator(estimatedReopeningError)).toHaveText(`Error: ${estimatedReopenMessage}`)
-        await expect(this.updateValidationList).toContainText(estimatedReopenMessage)
-        break
-      default:
-        throw new Error(`${dateType} is not a valid date option`)
-    }
+    const summaryLink = this.updateValidationList.locator(`a[href="#${fieldId}-${dmy}"]`)
+
+    await expect(summaryLink).toBeVisible()
+    await expect(summaryLink).toHaveText(message)
+
+    await expect(input).toBeVisible()
+    await expect(input).toHaveAttribute('aria-invalid', 'true')
+    await expect(input).toHaveClass(/govuk-input--error/)
   }
 
   async assertPlannedClosureAfterPlannedOpening() {
@@ -475,11 +456,9 @@ export default class StudyUpdatePage {
     await expect(this.updateValidationBanner).toContainText('There is a problem')
     await expect(this.actualOpeningInlineError).toBeVisible()
     await expect(this.actualOpeningInlineError).toHaveText(
-      'Error: Actual UK opening to recruitment date must be today or in the past'
+      'Error: Actual UK opening to recruitment date cannot be in the future'
     )
-    await expect(this.updateValidationList).toContainText(
-      'Actual UK opening to recruitment date must be today or in the past'
-    )
+    await expect(this.updateValidationList).toContainText('Actual UK opening to recruitment date')
   }
 
   async assertActualClosureDateMustBeTodayOrPast() {
@@ -487,10 +466,10 @@ export default class StudyUpdatePage {
     await expect(this.updateValidationBanner).toContainText('There is a problem')
     await expect(this.actualClosureInlineError).toBeVisible()
     await expect(this.actualClosureInlineError).toHaveText(
-      'Error: Actual UK closure to recruitment date must be today or in the past'
+      'Error: Actual UK closure to recruitment date cannot be in the future'
     )
     await expect(this.updateValidationList).toContainText(
-      'Actual UK closure to recruitment date must be today or in the past'
+      'Actual UK closure to recruitment date cannot be in the future'
     )
   }
 
@@ -517,7 +496,7 @@ export default class StudyUpdatePage {
     await expect(this.updateValidationBanner).toBeVisible()
     await expect(this.updateValidationBanner).toContainText('There is a problem')
     await expect(this.updateValidationList).toContainText(
-      `An unexpected error occurred whilst processing the form, please try again later.`
+      `Actual UK closure to recruitment date must be after Actual UK opening to recruitment date`
     )
   }
 

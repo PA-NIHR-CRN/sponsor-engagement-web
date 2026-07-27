@@ -51,7 +51,7 @@ test.beforeAll('Setup Test Users', async () => {
     WHERE Study.isDeleted = 0 
     AND StudyOrganisation.isDeleted = 0
     AND StudyOrganisation.organisationId = ${startingOrgId}
-    ORDER BY createdAt asc, Study.id asc;
+    ORDER BY createdAt ASC, Study.lastAssessmentId IS NOT NULL ASC, Study.id ASC;
   `)
   studyListSortedByAscDb = studyListSortByAsc
 
