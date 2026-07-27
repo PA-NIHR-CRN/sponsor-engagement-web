@@ -104,7 +104,7 @@ export default function Configure({ study, returnUrl, pageContent, progressBarPa
           </div>
 
           <StudyProgressExtended
-            hraApprovalDate={study.hraApprovalDate}
+            regulatoryApprovalDate={study.regulatoryApprovalDate}
             progressBarPageContent={progressBarPageContent}
             studyStatus={study.studyStatus}
             willRecruitWithinTimeline={study.willRecruitWithinTimeline}

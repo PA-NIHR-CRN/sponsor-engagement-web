@@ -96,7 +96,7 @@ export const ACCESSIBILITY_PAGE_URL =
   'https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-accessibility-statement'
 
 export const RELEASE_NOTES_URL =
-  'https://sites.google.com/nihr.ac.uk/nihr-sponsor-engagement-tool/se-tool-release-notes'
+  'https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-release-notes'
 
 export const SHAW_TRUST_ACCREDITATION_URL =
   'https://www.accessibility-services.co.uk/certificates/nihr-sponsor-engagement-tool/'

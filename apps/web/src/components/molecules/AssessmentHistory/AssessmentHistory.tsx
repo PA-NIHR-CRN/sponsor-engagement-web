@@ -80,7 +80,7 @@ export function AssessmentHistory({ heading, assessments, firstItemExpanded }: A
 
                   {assessment.reasonForNoRecruitment ? (
                     <p className="govuk-body-s govuk-!-margin-bottom-0">
-                      <strong>Reason for not recruiting for 6 months:</strong>{' '}
+                      <strong>No recruitment for 6 months:</strong>{' '}
                       <span className="whitespace-pre-wrap">{assessment.reasonForNoRecruitment}</span>
                     </p>
                   ) : null}
