@@ -272,8 +272,7 @@
   }
 
   .govuk-hint {
-    color: var(--nihr-teal-60);
-    font-weight: 500;
+    color: var(--dark-grey);
   }
 
   .govuk-radios__hint {
@@ -376,6 +375,8 @@
 
   .govuk-summary-card__title {
     margin: 0;
+    font-size: 1.5em;
+    text-align: center;
   }
 
   .govuk-summary-card .content {
@@ -396,7 +397,6 @@
   }
 
   .nihr-input__search::placeholder {
-    color: var(--nihr-teal-60);
-    font-weight: 500;
+    color: var(--dark-grey);
   }
 }
