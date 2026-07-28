@@ -1,5 +1,5 @@
 import { test } from '../../../hooks/CustomFixtures'
-import { seDatabaseReq, waitForSeDbRequest } from '../../../utils/DbRequests'
+import { seDatabaseReq } from '../../../utils/DbRequests'
 import { listenAndDestroyRequest, listenAndUpdateRequest } from '../../../utils/ApiRequests'
 
 const testUserId = 6

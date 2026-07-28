@@ -33,16 +33,26 @@ export default class StudiesPage {
   readonly dataUpdatesRequiredIndicator: Locator
   readonly needsActionIndicator: Locator
   readonly needsActionBanner: Locator
+  readonly studySetupProgressPanel: Locator
+  readonly studySetupProgressHeading: Locator
+  readonly studySetupProgressBar: Locator
+  readonly studySetupProgressStatusText: Locator
+  readonly studySetupProgressFractionText: Locator
   readonly studiesFoundLabel: Locator
   readonly searchInput: Locator
   readonly searchButton: Locator
   readonly searchFilterPanel: Locator
+  readonly filterButton: Locator
+  readonly statusOpenCheckbox: Locator
+  readonly statusSuspendedCheckbox: Locator
+  readonly statusInSetupCheckbox: Locator
   readonly viewStudyButton: Locator
   readonly sortBySection: Locator
   readonly sortByLabel: Locator
   readonly sortByDropdown: Locator
   readonly studyLastItem: Locator
   readonly studyLastDue: Locator
+  readonly reportAFirstLink: Locator
 
   //Initialize Page Objects
   constructor(page: Page) {
@@ -89,16 +99,28 @@ export default class StudiesPage {
       hasText: 'Needs action',
     })
     this.needsActionBanner = page.locator('strong.govuk-heading-s', { hasText: 'studies needing action' })
-    this.studiesFoundLabel = page.locator('p.govuk-heading-s')
-    this.searchInput = page.locator('input[class="govuk-input govuk-input h-[50px] border-2 border-black p-2"]')
-    this.searchButton = page.locator(
-      'button[class="bg-[var(--colour-blue)] text-white active:top-0 focus:shadow-[inset_0_0_0_4px_var(--text-grey)] focus:outline focus:outline-[3px] focus:outline-[var(--focus)] mb-0 w-[50px] h-[50px] flex items-center justify-center text-lg"]'
+    this.studySetupProgressPanel = this.studyListItem.locator('div.progress-summary')
+    this.studySetupProgressHeading = this.studySetupProgressPanel.locator(
+      'h3.govuk-heading-s.govuk-\\!-margin-bottom-1.govuk-\\!-margin-top-4'
     )
+    this.studySetupProgressBar = this.studySetupProgressPanel.locator('progress.progress-bar')
+    this.studySetupProgressStatusText = this.studySetupProgressPanel.locator('div.flex.justify-between span').first()
+    this.studySetupProgressFractionText = this.studySetupProgressPanel.locator('div.flex.justify-between span').last()
+    this.studiesFoundLabel = page.locator('p.govuk-heading-s')
+    this.searchInput = page.getByLabel('Search study title, protocol number, IRAS ID or CPMS ID')
+    this.searchButton = page.locator('button.search-button')
     this.searchFilterPanel = page.locator('ul[aria-labelledby="selected-filters"]')
-    this.viewStudyButton = page.locator('a[class="govuk-button w-auto govuk-!-margin-bottom-0"]')
+    this.filterButton = page.locator(
+      'button[class="govuk-button govuk-button--secondary mb-0 h-[50px] whitespace-nowrap"]'
+    )
+    this.statusOpenCheckbox = page.locator('input[id="status-open"]')
+    this.statusSuspendedCheckbox = page.locator('input[id="status-suspended"]')
+    this.statusInSetupCheckbox = page.locator('input[id="status-in-setup"]')
+    this.viewStudyButton = page.locator('a[aria-label^="View study"]')
     this.sortBySection = page.locator('div[class="govuk-form-group mt-2 items-center justify-end md:my-0 md:flex"]')
     this.sortByLabel = this.sortBySection.locator('label')
     this.sortByDropdown = this.sortBySection.locator('select')
+    this.reportAFirstLink = page.locator('a[class="govuk-link nihr-link-lg nihr-link-arrow-left mb-0"]')
   }
 
   //Page Methods
@@ -480,5 +502,32 @@ export default class StudiesPage {
 
   async assertStudyListIsVisible() {
     await expect(this.studyList).toBeVisible()
+  }
+
+  async clickReportFirstLink() {
+    await this.reportAFirstLink.click()
+  }
+
+  async assertStudySetupProgressPanelDisplayed() {
+    await expect(this.studySetupProgressPanel).toBeVisible()
+    await expect(this.studySetupProgressHeading).toBeVisible()
+    await expect(this.studySetupProgressBar).toBeVisible()
+    await expect(this.studySetupProgressStatusText).toBeVisible()
+    await expect(this.studySetupProgressFractionText).toBeVisible()
+  }
+
+  async filterByStatusOpen() {
+    await this.filterButton.click()
+    await this.statusOpenCheckbox.click()
+  }
+
+  async filterByStatusSuspended() {
+    await this.filterButton.click()
+    await this.statusSuspendedCheckbox.click()
+  }
+
+  async filterByStatusInSetup() {
+    await this.filterButton.click()
+    await this.statusInSetupCheckbox.click()
   }
 }

@@ -11,6 +11,8 @@ import { RowDataPacket } from 'mysql2'
 export default class StudyDetailsPage {
   readonly page: Page
   readonly pageTitle: Locator
+  readonly miniDashboardTitle: Locator
+  readonly miniDashboardText: Locator
   readonly progressHeader: Locator
   readonly progressSection: Locator
   readonly assessmentHeader: Locator
@@ -105,6 +107,8 @@ export default class StudyDetailsPage {
 
     //Locators
     this.pageTitle = page.locator('h2.govuk-heading-l')
+    this.miniDashboardTitle = page.locator('h2[class="govuk-summary-card__title text-darkGrey"]')
+    this.miniDashboardText = page.locator('p[class="govuk-heading-l govuk-!-margin-0"]')
     this.progressHeader = page.locator('h3.govuk-heading-m', {
       hasText: 'Summary of study’s progress (UK)',
     })
@@ -251,6 +255,55 @@ export default class StudyDetailsPage {
   //Page Methods
   async goto(studyId: string) {
     await this.page.goto(`studies/${studyId}`)
+  }
+
+  async assertMiniDashboardTitle(title: string) {
+    await expect(this.miniDashboardTitle.filter({ hasText: title })).toBeVisible()
+  }
+
+  async assertMiniDashboardText(text: string) {
+    await expect(this.miniDashboardText.filter({ hasText: text })).toBeVisible()
+  }
+
+  async assertPlannedUkTargetMatchesTableValue() {
+    const ukTarget = (await this.tableUkTargetValue.textContent())?.trim()
+    const targetCard = this.miniDashboardTitle.filter({ hasText: 'Planned UK target' }).locator('../..')
+    await expect(targetCard.locator('p.govuk-heading-l')).toHaveText(ukTarget ?? '')
+  }
+
+  async assertPlannedOpenDateMatchesTableValue() {
+    const tableDate = (await this.tablePlannedOpeningDateValue.textContent())?.trim() ?? ''
+    const expectedDashboardDate = new Date(tableDate).toLocaleDateString('en-GB')
+    const targetCard = this.miniDashboardTitle.filter({ hasText: 'Planned open to recruitment date' }).locator('../..')
+    await expect(targetCard.locator('p.govuk-heading-l')).toHaveText(expectedDashboardDate)
+  }
+
+  async assertRecruitmentNumbersMatchesTableValues() {
+    const totalRecruitment = (await this.tableUkTotalValue.textContent())?.trim() ?? ''
+    const recruitmentTarget = (await this.tableUkTargetValue.textContent())?.trim() ?? ''
+    const expectedValue = `${totalRecruitment} of ${recruitmentTarget}`
+    const targetCard = this.miniDashboardTitle.filter({ hasText: 'Recruitment numbers' }).locator('../..')
+    await expect(targetCard.locator('p.govuk-heading-l')).toHaveText(expectedValue)
+  }
+
+  async assertPlannedClosureDateMatchesTableValue() {
+    const tableDate = (await this.tablePlannedClosureDateValue.textContent())?.trim() ?? ''
+    const expectedDashboardDate = new Date(tableDate).toLocaleDateString('en-GB')
+    const targetCard = this.miniDashboardTitle.filter({ hasText: 'Planned closure date' }).locator('../..')
+    await expect(targetCard.locator('p.govuk-heading-l')).toHaveText(expectedDashboardDate)
+  }
+
+  async assertRecruitmentTotalMatchesTableValue() {
+    const totalRecruitment = (await this.tableUkTotalValue.textContent())?.trim() ?? ''
+    const targetCard = this.miniDashboardTitle.filter({ hasText: 'Recruitment total' }).locator('../..')
+    await expect(targetCard.locator('p.govuk-heading-l')).toHaveText(totalRecruitment)
+  }
+
+  async assertEstimatedReopenDateMatchesTableValue() {
+    const tableDate = (await this.tableEstimatedReopenDateValue.textContent())?.trim() ?? ''
+    const expectedDashboardDate = new Date(tableDate).toLocaleDateString('en-GB')
+    const targetCard = this.miniDashboardTitle.filter({ hasText: 'Estimated reopening date' }).locator('../..')
+    await expect(targetCard.locator('p.govuk-heading-l')).toHaveText(expectedDashboardDate)
   }
 
   async assertOnStudyDetailsPage(studyId: string) {
