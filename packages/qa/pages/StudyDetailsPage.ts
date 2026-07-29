@@ -14,6 +14,11 @@ export default class StudyDetailsPage {
   readonly miniDashboardTitle: Locator
   readonly miniDashboardText: Locator
   readonly progressHeader: Locator
+  readonly studySetUpProgressContainer: Locator
+  readonly studySetUpProgressStatus: Locator
+  readonly studySetUpProgressFraction: Locator
+  readonly studySetUpProgressBarWarning: Locator
+  readonly studySetUpProgressBarError: Locator
   readonly progressSection: Locator
   readonly assessmentHeader: Locator
   readonly aboutHeader: Locator
@@ -116,9 +121,17 @@ export default class StudyDetailsPage {
       hasText: 'Summary of study’s progress (UK)',
     })
     this.progressSection = page.locator('table[class="govuk-table govuk-!-margin-top-3"]')
-    this.assessmentHeader = page.locator('h3[class="govuk-heading-m govuk-!-margin-bottom-1 p-0"]', {
-      hasText: 'Sponsor assessment history',
-    })
+    this.assessmentHeader = page.locator('h3', { hasText: 'Sponsor assessment history' })
+    this.studySetUpProgressContainer = page.locator('.progress-summary')
+    this.studySetUpProgressStatus = this.studySetUpProgressContainer
+      .locator('div.flex.justify-between')
+      .locator('span')
+      .first()
+    this.studySetUpProgressFraction = this.studySetUpProgressContainer
+      .locator('div.flex.flex-col.text-right span')
+      .first()
+    this.studySetUpProgressBarWarning = page.locator('progress.progress-bar-warning')
+    this.studySetUpProgressBarError = page.locator('progress.progress-bar-error')
     this.aboutHeader = page.locator('h3[class="govuk-heading-m govuk-!-margin-bottom-3"]')
     this.aboutSection = page.locator('table[class="govuk-table govuk-!-margin-bottom-3"]')
     this.guidanceText = page.locator('div[class="govuk-inset-text mt-7"]')
@@ -312,6 +325,12 @@ export default class StudyDetailsPage {
     const expectedDashboardDate = new Date(tableDate).toLocaleDateString('en-GB')
     const targetCard = this.miniDashboardTitle.filter({ hasText: 'Estimated reopening date' }).locator('../..')
     await expect(targetCard.locator('p.govuk-heading-l')).toHaveText(expectedDashboardDate)
+  }
+
+  async assertStudySetupProgress(expectedStatusText: string, expectedFractionText: string) {
+    await expect(this.studySetUpProgressContainer).toBeVisible()
+    await expect(this.studySetUpProgressStatus).toHaveText(expectedStatusText)
+    await expect(this.studySetUpProgressFraction).toHaveText(expectedFractionText)
   }
 
   async assertOnStudyDetailsPage(studyId: string) {
