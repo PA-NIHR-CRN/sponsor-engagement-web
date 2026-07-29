@@ -58,14 +58,6 @@ export default function ClosureConfirmation() {
     )
 }
 
-ClosureConfirmation.getLayout = function getLayout(page: ReactElement, { user, heading }) {
-  return (
-    <RootLayout user={user} heading={heading}>
-      {page}
-    </RootLayout>
-  )
-}
-
 ClosureConfirmation.getLayout = function getLayout(page: ReactElement, { user }: any) {
   return <RootLayout heading={PAGE_TITLE} user={user}>{page}</RootLayout>
 }

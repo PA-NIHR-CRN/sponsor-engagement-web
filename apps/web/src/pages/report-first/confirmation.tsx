@@ -2,6 +2,10 @@ import { Container } from '@nihr-ui/frontend'
 import { NextSeo } from 'next-seo'
 
 import { ConfirmationPage } from '@/components/organisms/ConfirmationPage/ConfirmationPage'
+import { ReactElement } from 'react'
+import { RootLayout } from '@/components/organisms/Layout/RootLayout'
+import { withServerSideProps } from '@/utils/withServerSideProps'
+import { Roles } from '@/constants/auth'
 
 export default function ReportFirstConfirmation() {
     return (
@@ -23,3 +27,15 @@ export default function ReportFirstConfirmation() {
         </Container>
     )
 }
+
+ReportFirstConfirmation.getLayout = function getLayout(page: ReactElement, { user }: any) {
+  return <RootLayout user={user}>{page}</RootLayout>
+}
+
+export const getServerSideProps = withServerSideProps([Roles.SponsorContact], async (context, session) => {
+  return {
+    props: {
+      user: session.user,
+    },
+  }
+})
