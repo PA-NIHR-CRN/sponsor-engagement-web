@@ -63,6 +63,7 @@ export default function Studies({
   filters,
   entry,
   progressBarPageContent,
+  reportaFristManagedContent,
 }: StudiesProps) {
   const router = useRouter()
   const { isLoading, handleFilterChange } = useFormListeners()
@@ -192,7 +193,7 @@ export default function Studies({
           )}
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
-          <ReportFirst />
+          <ReportFirst reportaFirstContentfulContent={reportaFristManagedContent} />
           <Card className="mt-4" data-testid="export-study-data" filled padding={4}>
             <h3 className="govuk-heading-m">Download study data</h3>
             <p>
@@ -273,7 +274,8 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
     })
 
     const entry: Entry<TypeBannerSkeleton> | null = await getNotificationBanner()
-    const progressBarPageContent = await getSetPageByKey(ContentfulPage.ProgressBar)
+    const progressBarPageContent = await getSetPageByKey(ContentfulPage.PROGRESS_BAR)
+    const reportaFristManagedContent = await getSetPageByKey(ContentfulPage.REPORT_A_FIRST_BOX)
   
 
     return {
@@ -289,6 +291,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
         filters,
         entry,
         progressBarPageContent,
+        reportaFristManagedContent
       },
     }
   } catch (error) {

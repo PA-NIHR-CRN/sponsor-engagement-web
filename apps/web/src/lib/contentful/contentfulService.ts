@@ -46,7 +46,7 @@ export const getSetPageByKeyField = async (key: string): Promise<EntryCollection
   })
 }
 
-export const getPageContent = async <T extends EntrySkeletonType>(
+export const getManagedContent = async <T extends EntrySkeletonType>(
   id: string | undefined
 ): Promise<Entry<T> | null> => {
   if (id) {

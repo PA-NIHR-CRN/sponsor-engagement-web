@@ -10,7 +10,6 @@ import { type ReactElement, useCallback, useEffect } from 'react'
 import type { FieldError } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 
-
 import { Fieldset, Form, Radio, RadioGroup } from '@/components/atoms'
 import { Textarea } from '@/components/atoms/Form/Textarea/Textarea'
 import { RequestSupport, StudyProgressExtended } from '@/components/molecules'
@@ -122,8 +121,8 @@ export default function Configure({ study, returnUrl, pageContent, progressBarPa
             <Fieldset>
               <RadioGroup
                 errors={errors}
-                hint={pageContentFields?.get(ContentfulEntries.CONFIGURE_STUDY_SUB_QUESTION)?.toString()}
-                label={pageContentFields?.get(ContentfulEntries.CONFIGURE_STUDY_SETUP_QUESTION)?.toString()}
+                hint={pageContentFields?.get(ContentfulEntries.CONFIGURE_STUDY_PROGRESS_90_DAYS_QUESTION)?.toString()}
+                label={pageContentFields?.get(ContentfulEntries.CONFIGURE_STUDY_PROGRESS_QUESTION_PARTICIPANT_TIMELINE)?.toString()}
                 labelSize="m"
                 {...register('status')}
               >
@@ -137,7 +136,7 @@ export default function Configure({ study, returnUrl, pageContent, progressBarPa
                   defaultValue=''
                   errors={errors}
                   hint="If needed, provide further context or justification for changes made above."
-                  label={pageContentFields?.get(ContentfulEntries.CONFIGURE_STUDY_SETUP_CONDITIONAL_BOX)?.toString()}
+                  label={pageContentFields?.get(ContentfulEntries.CONFIGURE_STUDY_PROGRESS_NO_FURTHER_INFO_QUESTION)?.toString()}
                   labelSize="m"
                   maxLength={TEXTAREA_MAX_CHARACTERS}
                   remainingCharacters={remainingCharacters}
@@ -191,8 +190,8 @@ export const getServerSideProps = withServerSideProps(
       return { redirect: { destination: '/404' } }
     }
 
-    const progressBarPageContent = await getSetPageByKey(ContentfulPage.ProgressBar)
-    const pageContentResp = await getSetPageByKey(ContentfulPage.ConfigureStudySetup)
+    const progressBarPageContent = await getSetPageByKey(ContentfulPage.PROGRESS_BAR)
+    const pageContentResp = await getSetPageByKey(ContentfulPage.CONFIGURE_STUDY_SETUP)
     const pageContent = pageContentResp?.fields
     const pageContentFields = mapDynamicPageContent(pageContent?.pageContent as Entry[])
     const userOrganisationIds =
