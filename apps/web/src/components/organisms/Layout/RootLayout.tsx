@@ -1,6 +1,7 @@
 import { logger } from '@nihr-ui/logger'
 import { useIdle } from '@uidotdev/usehooks'
 import { Roboto } from 'next/font/google'
+import { usePathname } from 'next/navigation'
 import Router, { useRouter } from 'next/router'
 import type { Session } from 'next-auth'
 import { useSession } from 'next-auth/react'
@@ -40,6 +41,7 @@ export function RootLayout({ children, backLink, heading = SERVICE_NAME, user, b
   const userOrganisations = user?.organisations.filter((userOrg) => !userOrg.isDeleted) ?? []
   const groupIconLink =
     userOrganisations.length === 1 ? `${ORGANISATIONS_PAGE}/${userOrganisations[0].organisationId}` : ORGANISATIONS_PAGE
+ const pathname = usePathname()
 
   useEffect(() => {
     if (session && session.error === 'RefreshAccessTokenError') {
@@ -166,21 +168,21 @@ export function RootLayout({ children, backLink, heading = SERVICE_NAME, user, b
                     </button>
                     <ul className="govuk-service-navigation__list" id="navigation">
             {isContactManager(user?.roles ?? []) || isContactManagerAndSponsorContact(user?.roles ?? []) ? (
-                <li className="govuk-service-navigation__item">
+                <li className={`govuk-service-navigation__item ${pathname === ORGANISATIONS_PAGE ? 'govuk-service-navigation__item--active' : ''}`}>
                     <a className="govuk-service-navigation__link" href={ORGANISATIONS_PAGE}>
                         Manage sponsor contacts
                     </a>
                 </li>
             ) : null}
             {isSponsorContact(user?.roles ?? []) && userOrganisations.length > 0 ? (
-                <li className="govuk-service-navigation__item">
+                <li className={`govuk-service-navigation__item ${pathname === groupIconLink ? 'govuk-service-navigation__item--active' : ''}`}>
                     <a className="govuk-service-navigation__link" href={groupIconLink}>
                         Manage sponsor contacts
                     </a>
                 </li>
             ) : null}
             {isContactManager(user?.roles ?? []) || isContactManagerAndSponsorContact(user?.roles ?? []) ? (
-                <li className="govuk-service-navigation__item">
+                <li className={`govuk-service-navigation__item ${pathname === CONTACT_MANAGERS_PAGE ? 'govuk-service-navigation__item--active' : ''}`}>
                     <a className="govuk-service-navigation__link" href={CONTACT_MANAGERS_PAGE}>
                         Manage contact managers
                     </a>

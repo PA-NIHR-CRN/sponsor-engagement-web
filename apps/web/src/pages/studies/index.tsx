@@ -89,7 +89,7 @@ export default function Studies({
 
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">Assess progress of studies</h2>
 
-          <div className="card  govuk-!-margin-bottom-4">
+          <div className="card  card--bg-steel govuk-!-margin-bottom-4">
             <div className='content flex items-center gap-2 block w-full banner'>
               <AlertIcon />
                           <strong className="govuk-heading-s govuk-!-margin-bottom-0">
@@ -154,9 +154,9 @@ export default function Studies({
                       return (
                         <li key={study.id}>
                           <StudyList
+                            dataUpdatesRequired={study.dataUpdatesRequired}
                             daysSinceAssessmentDue={daysSinceAssessmentDue}
                             firstType={study.StudyFirst?.type}
-                            dataUpdatesRequired={study.dataUpdatesRequired}
                             irasId={study.irasId}
                             lastAssessmentDate={study.lastAssessment ? formatDate(study.lastAssessment.createdAt) : ''}
                             regulatoryApprovalDate={study.regulatoryApprovalDate}

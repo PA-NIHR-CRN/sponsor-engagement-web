@@ -28,7 +28,7 @@
   }
 
   .progress-bar::-webkit-progress-bar {
-    background-color: var(--colour-grey-20);
+    background-color: var(--nihr-navy--tint-90);
   }
 
   .progress-bar.progress-bar-error::-webkit-progress-value {
@@ -36,7 +36,7 @@
   }
 
   .progress-bar.progress-bar-warning::-webkit-progress-value {
-    background-color: var(--colour-yellow-140);
+    background-color: var(--nihr-sunshine-yellow--shade-10);
   }
 
   .tag--needs-action {
@@ -116,6 +116,10 @@
     .progress-summary {
       margin-top: 2rem;
     }
+  }
+
+  .card.card--bg-steel {
+    background-color: var(--nihr-steel);
   }
 
   .card.card__border-steel {
