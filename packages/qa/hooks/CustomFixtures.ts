@@ -16,6 +16,7 @@ import SignedOutPage from '../pages/SignedOutPage'
 import CpmsStudiesPage from '../pages/cpmsStudiesPage'
 import ContactManagersPage from '../pages/ContactManagersPage'
 import RemoveContactManagersPage from '../pages/RemoveContactManagersPage'
+import ConfigurePage from '../pages/ConfigurePage'
 
 type CustomFixtures = {
   commonItemsPage: CommonItemsPage
@@ -33,6 +34,7 @@ type CustomFixtures = {
   cpmsStudiesPage: CpmsStudiesPage
   contactManagerPage: ContactManagersPage
   removeContactManagersPage: RemoveContactManagersPage
+  configurePage: ConfigurePage
   makeAxeBuilder: () => AxeBuilder
 }
 
@@ -95,6 +97,10 @@ export const test = base.extend<CustomFixtures>({
 
   removeContactManagersPage: async ({ page }, use) => {
     await use(new RemoveContactManagersPage(page))
+  },
+
+  configurePage: async ({ page }, use) => {
+    await use(new ConfigurePage(page))
   },
 
   makeAxeBuilder: async ({ page }, use) => {

@@ -20,7 +20,7 @@ test.describe('Mini dashboard Logic - @se_316', () => {
     })
 
     await test.step(`When I click the View Study button of any Study on the Study List`, async () => {
-      studiesPage.viewStudyButton.nth(0).click()
+      await studiesPage.viewStudyButton.nth(0).click()
     })
 
     await test.step(`Then I am taken to the Details page`, async () => {
@@ -60,7 +60,7 @@ test.describe('Mini dashboard Logic - @se_316', () => {
     })
 
     await test.step(`When I click the View Study button of any Study on the Study List`, async () => {
-      studiesPage.viewStudyButton.nth(0).click()
+      await studiesPage.viewStudyButton.nth(0).click()
     })
 
     await test.step(`Then I am taken to the Details page`, async () => {
@@ -100,7 +100,7 @@ test.describe('Mini dashboard Logic - @se_316', () => {
     })
 
     await test.step(`When I click the View Study button of any Study on the Study List`, async () => {
-      studiesPage.viewStudyButton.nth(0).click()
+      await studiesPage.viewStudyButton.nth(0).click()
     })
 
     await test.step(`Then I am taken to the Details page`, async () => {

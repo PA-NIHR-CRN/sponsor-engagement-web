@@ -59,6 +59,9 @@ export default class StudyDetailsPage {
   readonly tableEstimatedReopenDateValue: Locator
   readonly assessButton: Locator
   readonly updateStudyDataButton: Locator
+  readonly studySetUpProgressBar: Locator
+  readonly noExpectationToAchieveMessage: Locator
+  readonly moreDetailsLink: Locator
   readonly assessSuccessAlertBox: Locator
   readonly assessSuccessAlertBoxTitle: Locator
   readonly noAssessmentValue: Locator
@@ -124,6 +127,11 @@ export default class StudyDetailsPage {
     this.assessButton = page.locator('a[class="govuk-button w-auto govuk-!-margin-bottom-0"]')
     this.updateStudyDataButton = page.locator(
       'a[class="govuk-button govuk-button--secondary w-auto govuk-!-margin-bottom-0"]'
+    )
+    this.moreDetailsLink = page.locator('a', { hasText: 'More details' })
+    this.studySetUpProgressBar = page.locator('progress[class="progress-bar progress-bar-error govuk-!-width-full"]')
+    this.noExpectationToAchieveMessage = page.locator(
+      'span[class="govuk-body-s text-darkGrey block govuk-!-margin-bottom-2"]'
     )
     // About Study Table Values
     this.tableFullTitleHeader = page.locator('th[scope="row"]', { hasText: 'Study full title' })
@@ -327,6 +335,12 @@ export default class StudyDetailsPage {
     await expect(this.assessSuccessAlertBox).toBeVisible()
     await expect(this.assessSuccessAlertBoxTitle).toHaveText('Success')
     await expect(this.page).toHaveURL(`studies/${studyId}?success=1`)
+  }
+
+  async assertOnStudyDetailsPageWithSuccessMessage(studyId: string) {
+    await expect(this.assessSuccessAlertBox).toBeVisible()
+    await expect(this.assessSuccessAlertBoxTitle).toHaveText('Success')
+    await expect(this.page).toHaveURL(`studies/${studyId}?success=4`)
   }
 
   async assertAboutStudySectionPresent() {
