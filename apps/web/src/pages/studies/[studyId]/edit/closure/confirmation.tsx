@@ -3,8 +3,12 @@ import { NextSeo } from 'next-seo'
 
 import { ConfirmationPage } from '@/components/organisms/ConfirmationPage/ConfirmationPage'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { ReactElement, useEffect } from 'react'
 import { closureDraftStorageKey } from '@/utils/storageKeys'
+import { RootLayout } from '@/components/organisms'
+import { Roles } from '@/constants/auth'
+import { PAGE_TITLE } from '@/constants/editStudyForm'
+import { withServerSideProps } from '@/utils/withServerSideProps'
 
 export function ClearClosureDraftOnMount() {
     const router = useRouter()
@@ -53,3 +57,23 @@ export default function ClosureConfirmation() {
         </Container>
     )
 }
+
+ClosureConfirmation.getLayout = function getLayout(page: ReactElement, { user, heading }) {
+  return (
+    <RootLayout user={user} heading={heading}>
+      {page}
+    </RootLayout>
+  )
+}
+
+ClosureConfirmation.getLayout = function getLayout(page: ReactElement, { user }: any) {
+  return <RootLayout heading={PAGE_TITLE} user={user}>{page}</RootLayout>
+}
+
+export const getServerSideProps = withServerSideProps([Roles.SponsorContact], async (context, session) => {
+  return {
+    props: {
+      user: session.user,
+    },
+  }
+})
