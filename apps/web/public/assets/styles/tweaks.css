@@ -403,4 +403,10 @@
   .nihr-input__search::placeholder {
     color: var(--dark-grey);
   }
+
+  .govuk-panel.govuk-panel--confirmation {
+    .govuk-panel__title {
+      color: var(--nihr-white);
+    }
+  }
 }
