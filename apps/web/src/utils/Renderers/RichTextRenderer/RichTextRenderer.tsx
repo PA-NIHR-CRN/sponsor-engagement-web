@@ -23,16 +23,16 @@ interface RichTextRendererProps {
 }
 
 function Bold({ children }: TypographyProps) {
-  return <span className="font-bold">{children}</span>
+  return <strong>{children}</strong>
 }
 
 function Text({ children }: TypographyProps) {
-  return <p>{children}</p>
+  return <p className='govuk-body'>{children}</p>
 }
 
-const headingVariants = ['xl', 'l', 'm', 's']
+const headingVariants = ['l', 'm', 's', 's', 's', 's']
 
-function Heading({ level, children }: { level: 1 | 2 | 3 | 4; children: ReactNode }) {
+function Heading({ level, children }: { level: 1 | 2 | 3 | 4 | 5 | 6; children: ReactNode }) {
   const Tag = `h${level}` as const
   return <Tag className={`govuk-heading-${headingVariants[level - 1]}`}>{children}</Tag>
 }
@@ -64,6 +64,13 @@ const options: Options = {
     [BLOCKS.HEADING_2]: (node, children: ReactNode) => <Heading level={2}>{children}</Heading>,
     [BLOCKS.HEADING_3]: (node, children: ReactNode) => <Heading level={3}>{children}</Heading>,
     [BLOCKS.HEADING_4]: (node, children: ReactNode) => <Heading level={4}>{children}</Heading>,
+    [BLOCKS.HEADING_5]: (node, children: ReactNode) => <Heading level={5}>{children}</Heading>,
+    [BLOCKS.HEADING_6]: (node, children: ReactNode) => <Heading level={6}>{children}</Heading>,
+    [BLOCKS.QUOTE]: (node, children: ReactNode) => <div className="govuk-inset-text">{children}</div>,
+    [BLOCKS.TABLE]: (node, children: ReactNode) => <table className="govuk-table">{children}</table>,
+    [BLOCKS.TABLE_ROW]: (node, children: ReactNode) => <tr className="govuk-table__row">{children}</tr>,
+    [BLOCKS.TABLE_CELL]: (node, children: ReactNode) => <td className="govuk-govuk-table__cell">{children}</td>,
+    [BLOCKS.TABLE_HEADER_CELL]: (node, children: ReactNode) => <th className="govuk-table__header">{children}</th>,
     [INLINES.HYPERLINK]: (node, children: ReactNode) => (
       <LinkEntry className="govuk-link" text={children ? (children as string) : ''} url={node.data.uri as string} />
     ),

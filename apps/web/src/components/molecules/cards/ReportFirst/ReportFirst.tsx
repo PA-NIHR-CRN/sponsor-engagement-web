@@ -29,9 +29,9 @@ const reportaFirstPagecontent = mapDynamicPageContent(reportaFirstContentfulCont
                 { reportaFirstContentfulContentFields?.title.toString() }
             </h3>
 
-            <p className="govuk-body">
+            <div className="govuk-body">
                 <RichTextRenderer>{reportaFirstContentfulContentFields?.guidanceText as Document}</RichTextRenderer>
-            </p>
+            </div>
 
             <a
                 aria-label={reportaFirstPagecontent?.get(ContentfulEntries.REPORT_A_FIRST_BOX_BUTTON_ARIA_LABEL)?.toString()}

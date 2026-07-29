@@ -254,7 +254,7 @@ export default function ReportFirst({
               </>
             ) : null}
 
-            <div className="govuk-body govuk-!-margin-bottom-6">
+            <div className="govuk-!-margin-bottom-6">
               <RichTextRenderer>{reportaFirstFields?.guidanceText as Document}</RichTextRenderer>
             </div>
 
