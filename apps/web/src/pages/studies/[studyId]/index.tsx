@@ -61,9 +61,9 @@ const renderNotificationBanner = (success: string | undefined, showRequestSuppor
   ) : null
 
 const renderBackLink = () => (
-  <div className="ml-8 govuk-!-padding-top-3">
+  <div className="">
     <Container>
-      <Link className="govuk-back-link govuk-!-font-size-19 font-light" href="/studies">
+      <Link className="govuk-back-link" href="/studies">
         All studies
       </Link>
     </Container>
@@ -195,8 +195,9 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
             </div>
 
             <StudyProgressExtended
-              regulatoryApprovalDate={study.regulatoryApprovalDate}
               moreDetailsHref={`${STUDIES_PAGE}/${study.id}/configure`}
+              optedOutText='No expectation to achieve the first participant in 90 days for this study'
+              regulatoryApprovalDate={study.regulatoryApprovalDate}
               progressBarPageContent={progressBarPageContent}
               studyStatus={study.studyStatus}
               willRecruitWithinTimeline={study.willRecruitWithinTimeline}
@@ -288,7 +289,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
           <StudyDetails study={study} />
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
-          <ReportFirst reportaFirstContentfulContent={reportaFristManagedContent} showAsStartButton studyId={study.id} />
+          <ReportFirst reportaFirstContentfulContent={reportaFristManagedContent} studyId={study.id} />
           <RequestSupport showCallToAction sticky />
         </div>
       </div>

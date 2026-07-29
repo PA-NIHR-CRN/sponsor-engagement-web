@@ -37,7 +37,7 @@ const reportaFirstPagecontent = mapDynamicPageContent(reportaFirstContentfulCont
                 aria-label={reportaFirstPagecontent?.get(ContentfulEntries.REPORT_A_FIRST_BOX_BUTTON_ARIA_LABEL)?.toString()}
                 className={
                     clsx(
-                        'govuk-button mb-0',
+                        'govuk-link nihr-link-lg nihr-link-arrow-left mb-0',
                         { 'govuk-button--start': showAsStartButton }
                     )}
                 href={

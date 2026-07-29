@@ -81,49 +81,41 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
         return progressBarColor.Warning;
     }
 
-    const divClass = showBorder ? "border-grey-50 border-b-2 border-t-2 govuk-!-margin-bottom-4" : "";
+    const divClass = showBorder ? "progress-summary border-grey-50 border-b-2 border-t-2 govuk-!-margin-bottom-4" : "progress-summary";
 
     return (
         <div className={divClass}>
-            {showTitle && (
-                <h3 className={clsx(`govuk-heading-${titleSize}`, 'govuk-!-margin-bottom-1 govuk-!-margin-top-4 p-0', titleClassName)}>
+            {showTitle ? <h3 className={clsx(`govuk-heading-${titleSize}`, 'govuk-!-margin-bottom-1 govuk-!-margin-top-4 p-0', titleClassName)}>
                     {progressBarPageContentFields?.title.toString()}
-                </h3>
-            )}
+                </h3> : null}
 
             {willRecruitWithinTimeline ? (
                 <div>
-                    {showTimeframeHint && (
-                        <span className="govuk-body-s text-darkGrey block govuk-!-margin-bottom-2">
+                    {showTimeframeHint ? <span className="govuk-body-s text-darkGrey block govuk-!-margin-bottom-2">
                             Based on the latest UK approvals data between the start and end dates
-                        </span>
-                    )}
+                        </span> : null}
                     <ProgressBar className="govuk-!-width-full" color={GetStudyProgressColor(elapsedDays)} max={totalDays}
                         value={elapsedDays} />
 
                     <div className="flex justify-between">
                         <div className="flex flex-col">
                             <span
-                                className={`govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-2 ${daysRemaining === 0 ? "govuk-error-message text-red-600" : ""
+                        className={`govuk-body-s govuk-!-margin-bottom-0 ${daysRemaining === 0 ? "govuk-error-message text-red-600" : ""
                                     }`}>
                                 {progressLabel}
                             </span>
-                            {showDates && (
-                                <span className="govuk-body-s govuk-!-font-weight-bold text-darkGrey">
+                            {showDates ? <span className="govuk-body-s text-darkGrey">
                                     {pageContentFields?.get(ContentfulEntries.PROGRESS_BAR_HRA_APPROVAL_DATE)?.toString()} {regulatoryApprovalDate.toLocaleDateString('en-GB')}
-                                </span>
-                            )}
+                                </span> : null}
                         </div>
 
                         <div className="flex flex-col text-right">
-                            <span className="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-2 text-darkGrey">
+                    <span className="govuk-body-s govuk-!-margin-bottom-0 text-darkGrey">
                                 {elapsedDays} / {totalDays} Days
                             </span>
-                            {showDates && (
-                                <span className="govuk-body-s govuk-!-font-weight-bold text-darkGrey">
+                            {showDates ? <span className="govuk-body-s text-darkGrey">
                                     {pageContentFields?.get(ContentfulEntries.PROGRESS_BAR_END_DATE)?.toString()} {endDate.toLocaleDateString('en-GB')}
-                                </span>
-                            )}
+                                </span> : null}
                         </div>
                     </div>
                 </div>
@@ -135,13 +127,11 @@ export const StudyProgressExtended: React.FC<StudyProgressExtendedProps> = (
                 </div>
             }
 
-            {showMoreDetails && moreDetailsHref && (
-                <span className="govuk-body-m block govuk-!-margin-bottom-4">
+            {showMoreDetails && moreDetailsHref ? <span className="govuk-body-m block govuk-!-margin-bottom-4">
                     <Link href={moreDetailsHref}>
                         More details
                     </Link>
-                </span>
-            )}
+                </span> : null}
         </div>
     );
 };

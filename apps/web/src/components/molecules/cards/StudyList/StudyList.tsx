@@ -19,7 +19,7 @@ export interface StudyListProps {
   daysSinceAssessmentDue: number | null
   trackStatus?: string
   trackStatusHref?: string
-  indications?: string[]
+  dataUpdatesRequired: boolean
   irasId: string | null
   regulatoryApprovalDate: Date | null
   studyStatus: string,
@@ -37,7 +37,7 @@ export function StudyList({
   trackStatus,
   trackStatusHref,
   lastAssessmentDate,
-  indications,
+  dataUpdatesRequired,
   irasId,
   regulatoryApprovalDate,
   studyStatus, 
@@ -54,18 +54,10 @@ export function StudyList({
     })()
     : '';
 
-  const excludedIndications = new Set([
-    'Recruiting at a lower rate than expected (RTT)',
-    'No recruitment in past 6 months',
-  ])
-
-  const areUpdatesRequired =
-    indications?.some(indication => !excludedIndications.has(indication)) ?? false;
-
   return (
-    <Card>
+    <Card className='card card--accent-left-none' padding={0}>
 
-      {(hasAssessmentDue || areUpdatesRequired) ? <Tag className='absolute top-0 right-0' text="Needs action" /> : null}
+      {(hasAssessmentDue || dataUpdatesRequired) ? <Tag className='absolute top-0 right-0 corner tag--needs-action' text="Needs action" /> : null}
 
       <div className="sm:flex sm:items-stretch sm:justify-between sm:gap-6">
         <div className="min-w-0 flex-1">
@@ -109,11 +101,11 @@ export function StudyList({
           <TagCollection
             tags={[
               ...(hasAssessmentDue ? [{ text: daysDueText }] : []),
-              ...(areUpdatesRequired ? [{ text: 'Data updates required' }] : []),
+              ...(dataUpdatesRequired ? [{ text: 'Data updates required' }] : []),
             ]}
           />
 
-          <div className="lg:min-w-[320px] govuk-!-margin-top-3 min-h-[72px]">
+          <div className="lg:min-w-[320px]">
             <div className="max-w-[600px]">
               <StudyProgressExtended 
                 regulatoryApprovalDate={regulatoryApprovalDate}
@@ -132,11 +124,11 @@ export function StudyList({
           </div>
         </div>
 
-        <div className="shrink-0 sm:w-[125px] lg:w-[125px] flex flex-col items-center">
+        <div className="shrink-0 flex flex-col items-center">
           <div className="flex-1 w-full flex items-center justify-center">
             {firstType ? (
               <div className="text-center govuk-!-margin-top-4">
-                <div className="flex justify-center">
+                <div className="flex justify-center first-medal">
                   <FirstMedal className="h-14 w-14 text-yellow-500 block" />
                 </div>
                 <div className="govuk-body-s govuk-!-margin-top-1 font-bold text-darkGrey">
@@ -149,7 +141,7 @@ export function StudyList({
           <div className="w-full flex justify-center">
             <Link
               aria-label={`View study ${shortTitle}`}
-              className="govuk-button w-auto govuk-!-margin-bottom-0"
+            className="govuk-link nihr-link-md nihr-link-arrow-left w-auto govuk-!-margin-bottom-0"
               href={studyHref}
             >
               View study

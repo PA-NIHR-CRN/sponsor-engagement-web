@@ -58,9 +58,9 @@ function isSafeReturnUrl(value: unknown): value is string {
 }
 
 const renderBackLink = (returnUrl: string) => (
-  <div className="ml-8 govuk-!-padding-top-3">
+  <div className="">
     <Container>
-      <Link className="govuk-back-link govuk-!-font-size-19 font-light" href={returnUrl}>
+      <Link className="govuk-back-link" href={returnUrl}>
         Back
       </Link>
     </Container>

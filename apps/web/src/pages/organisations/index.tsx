@@ -80,7 +80,7 @@ export default function Organisations({
                         return (
                           <Table.Row key={id}>
                             <Table.Cell>
-                              <Link href={`/organisations/${id}`}>
+                              <Link className='govuk-link' href={`/organisations/${id}`}>
                                 <strong>{name}</strong>
                                 <span className="govuk-visually-hidden"> - organisation name</span>
                               </Link>
@@ -90,7 +90,7 @@ export default function Organisations({
                               </div>
                             </Table.Cell>
                             <Table.Cell className="align-middle text-right">
-                              <Link href={`/organisations/${id}`}>
+                              <Link className='govuk-link' href={`/organisations/${id}`}>
                                 Manage <span className="govuk-visually-hidden">{name} sponsor contacts</span>
                               </Link>
                             </Table.Cell>

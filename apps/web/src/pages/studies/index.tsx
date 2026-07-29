@@ -92,13 +92,13 @@ export default function Studies({
 
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">Assess progress of studies</h2>
 
-          <div className="govuk-!-margin-bottom-4">
-            <Tag className="flex items-center gap-2 govuk-!-padding-3 block w-full">
+          <div className="card  card--bg-steel govuk-!-margin-bottom-4">
+            <div className='content flex items-center gap-2 block w-full banner'>
               <AlertIcon />
               <strong className="govuk-heading-s govuk-!-margin-bottom-0">
-                There are {totalItemsDue} studies needing action
+                There {totalItemsDue === 1 ? 'is' : 'are'} {totalItemsDue}{' '} {pluraliseStudy(totalItemsDue)} needing action
               </strong>
-            </Tag>
+          </div>
           </div>
 
           <p className="govuk-body">
@@ -116,7 +116,7 @@ export default function Studies({
               </li>
             </ul>
           </Details>
-
+<div className='my-6'>
           {/* Search/Filter bar */}
           <div>
             <Filters
@@ -125,20 +125,21 @@ export default function Studies({
               renderExtraFilters={({ onChange }) => (<StudyStatusFilters disabled={isLoading} onChange={onChange} selected={filters.status} />)}
               searchLabel="Search study title, protocol number, IRAS ID or CPMS ID"
             />
-          </div>
 
+          </div>
           <SelectedFilters filters={filters} isLoading={isLoading} />
 
           {/* Sort bar */}
           <div className="flex-wrap items-center justify-between gap-3 md:flex govuk-!-margin-bottom-4">
-            <p className="govuk-heading-s mb-0 whitespace-nowrap">{`${totalItems} ${pluraliseStudy(
-              totalItems
-            )} found (${totalItemsDue} need action)`}</p>
+            <p className="govuk-heading-s mb-0 whitespace-nowrap">
+              {`${totalItems} ${pluraliseStudy(totalItems)} found (${totalItemsDue} need${totalItemsDue === 1 ? 's' : ''} action)`}
+            </p>
             <div className="govuk-form-group mt-2 items-center justify-end md:my-0 md:flex">
               <div className="items-center whitespace-nowrap md:flex">
                 <Sort defaultOrder={filters.order} form="filters-form" />
               </div>
             </div>
+          </div>
           </div>
 
           {isLoading ? (
@@ -156,13 +157,12 @@ export default function Studies({
                       return (
                         <li key={study.id}>
                           <StudyList
+                            dataUpdatesRequired={study.dataUpdatesRequired}
                             daysSinceAssessmentDue={daysSinceAssessmentDue}
-                            regulatoryApprovalDate={study.regulatoryApprovalDate}
-                            indications={study.evaluationCategories
-                              .map((evalCategory) => evalCategory.indicatorValue)
-                              .filter((evalCategory, index, items) => items.indexOf(evalCategory) === index)}
+                            firstType={study.StudyFirst?.type}
                             irasId={study.irasId}
                             lastAssessmentDate={study.lastAssessment ? formatDate(study.lastAssessment.createdAt) : ''}
+                            regulatoryApprovalDate={study.regulatoryApprovalDate}
                             progressBarPageContent={progressBarPageContent}
                             shortTitle={study.shortTitle}
                             sponsorOrgName={getSponsorOrgName(study.organisations)}
@@ -202,7 +202,7 @@ export default function Studies({
             </p>
             <a
               aria-label="Download a snapshot of all the information held within the Sponsor Engagement Tool for the sponsor/delegate organisation"
-              className="govuk-button mb-0"
+              className="govuk-link nihr-link-lg nihr-link-arrow-left mb-0"
               href="/api/export"
             >
               Download
@@ -218,7 +218,7 @@ export default function Studies({
                 </p>
                 <a
                   aria-label="Access dashboard for Sponsor RDN Portfolio (opens in new tab)"
-                  className="govuk-button mb-0"
+                  className="govuk-link nihr-link-lg nihr-link-arrow-left mb-0"
                   href={dashboardLink}
                   rel="noopener noreferrer"
                   target="_blank"

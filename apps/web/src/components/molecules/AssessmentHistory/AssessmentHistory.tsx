@@ -20,7 +20,7 @@ export function getAssessmentHistoryFromStudy(study: Study) {
     status: status.name,
     createdAt: formatDate(createdAt),
     createdBy: createdBy.email,
-    reasonForNoRecruitment: reasonForNoRecruitment,
+    reasonForNoRecruitment,
     furtherInformation: furtherInformation
       .filter(({ furtherInformationText }) => !furtherInformationText)
       .map((match) => match.furtherInformation?.name),
