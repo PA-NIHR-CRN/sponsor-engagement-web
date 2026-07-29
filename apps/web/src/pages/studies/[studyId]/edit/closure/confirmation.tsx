@@ -1,13 +1,14 @@
 import { Container } from '@nihr-ui/frontend'
-import { NextSeo } from 'next-seo'
-
-import { ConfirmationPage } from '@/components/organisms/ConfirmationPage/ConfirmationPage'
 import { useRouter } from 'next/router'
-import { ReactElement, useEffect } from 'react'
-import { closureDraftStorageKey } from '@/utils/storageKeys'
+import { NextSeo } from 'next-seo'
+import type { ReactElement} from 'react';
+import { useEffect } from 'react'
+
 import { RootLayout } from '@/components/organisms'
+import { ConfirmationPage } from '@/components/organisms/ConfirmationPage/ConfirmationPage'
 import { Roles } from '@/constants/auth'
 import { PAGE_TITLE } from '@/constants/editStudyForm'
+import { closureDraftStorageKey } from '@/utils/storageKeys'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
 export function ClearClosureDraftOnMount() {
@@ -46,11 +47,11 @@ export default function ClosureConfirmation() {
                     <NextSeo title="Closure of study - Confirmation" />
 
                     <ConfirmationPage
-                        title="Submission complete"
-                        confirmationText="Study is now closed"
                         actions={[
                             { href: '/studies', text: 'Back to studies' },
                         ]}
+                        confirmationText="Study is now closed"
+                        title="Submission complete"
                     />
                 </div>
             </div>

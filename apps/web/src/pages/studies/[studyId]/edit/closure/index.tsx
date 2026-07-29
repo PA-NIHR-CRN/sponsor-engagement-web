@@ -141,7 +141,7 @@ export default function ClosureOfStudy({ study, closureManagedContent }: Readonl
     router.push(`/studies/${study.id}`)
   }
 
-  const closurePageContnet = mapDynamicPageContent(closureManagedContent?.pageContent as Entry[])
+  const closurePageContent = mapDynamicPageContent(closureManagedContent?.pageContent as Entry[])
   const nextSeoTitle = `Study Progress Review - ${closureManagedContent?.title.toString()}`
 
   return (
@@ -156,7 +156,7 @@ export default function ClosureOfStudy({ study, closureManagedContent }: Readonl
 
           <span className="govuk-body-m mb-0 text-darkGrey">
             <span className="govuk-visually-hidden">Study sponsor: </span>
-                        {study.organisationsByRole?.CRO ?? study.organisationsByRole?.CTU ?? study.organisationsByRole.Sponsor ?? '-'}
+                        {study.organisationsByRole.CRO ?? study.organisationsByRole.CTU ?? study.organisationsByRole.Sponsor ?? '-'}
           </span>
 
           <span className="govuk-heading-m text-primary">
@@ -191,12 +191,12 @@ export default function ClosureOfStudy({ study, closureManagedContent }: Readonl
                 name="isFinalRecruitmentTotalCorrect"
                 render={({ field }) => (
                   <RadioGroup
-                                        defaultValue={field.value}
+                    defaultValue={field.value}
                     errors={{}}
-                    label={closurePageContnet?.get(ContentfulEntries.CLOSURE_QUESTION_FINAL_RECRUITMENT)?.toString()}
+                    label={closurePageContent?.get(ContentfulEntries.CLOSURE_QUESTION_FINAL_RECRUITMENT)?.toString()}
                     labelSize="m"
                     name={field.name}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => { field.onChange(e.target.value); }}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => { field.onChange(e.target.value); }}
                   >
                     <Radio label="Yes" value="YES" />
                     <Radio label="No" value="NO" />
@@ -230,7 +230,7 @@ export default function ClosureOfStudy({ study, closureManagedContent }: Readonl
                   <RadioGroup
                                         defaultValue={field.value}
                     errors={{}}
-                    label={closurePageContnet?.get(ContentfulEntries.CLOSURE_QUESTION_PERFORMANCE)?.toString()}
+                    label={closurePageContent?.get(ContentfulEntries.CLOSURE_QUESTION_PERFORMANCE)?.toString()}
                     labelSize="m"
                     name={field.name}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => { field.onChange(e.target.value); }}
@@ -242,11 +242,10 @@ export default function ClosureOfStudy({ study, closureManagedContent }: Readonl
               />
 
               <Textarea
-                                defaultValue=''
+                defaultValue=''
                 errors={{}}
-                                hint="If needed, provide further context or justification for changes made above."
-                                label="If 'No' please briefly explain why"
-                label={closurePageContnet?.get(ContentfulEntries.CLOSURE_QUESTION_PERFORMANCE_NO_EXPLAINER)?.toString()}
+                hint="If needed, provide further context or justification for changes made above."
+                label={closurePageContent?.get(ContentfulEntries.CLOSURE_QUESTION_PERFORMANCE_NO_EXPLAINER)?.toString()}
                 labelSize="m"
                 maxLength={TEXTAREA_MAX_CHARACTERS}
                 remainingCharacters={remainingPerformanceNoCharacters}
@@ -255,15 +254,14 @@ export default function ClosureOfStudy({ study, closureManagedContent }: Readonl
               />
 
               <Textarea
-                                defaultValue=''
+                defaultValue=''
                 errors={{}}
-                                hint="If needed, provide further context or justification for changes made above."
-                                label="Further information (optional)"
-                label={closurePageContnet?.get(ContentfulEntries.CLOSURE_QUESTION_FURTHER_INFORMATION)?.toString()}
+                hint="If needed, provide further context or justification for changes made above."
+                label={closurePageContent?.get(ContentfulEntries.CLOSURE_QUESTION_FURTHER_INFORMATION)?.toString()}
                 labelSize="m"
                 maxLength={TEXTAREA_MAX_CHARACTERS}
                 remainingCharacters={remainingCharacters}
-                                required={false}
+                required={false}
                 {...register('furtherInformation')}
               />
 
@@ -271,17 +269,17 @@ export default function ClosureOfStudy({ study, closureManagedContent }: Readonl
                 <button
                   className={clsx('govuk-button', { 'pointer-events-none': showLoadingState })}
                   onClick={onNext}
-                                    type="button"
+                  type="button"
                 >
                   Next
                 </button>
 
 
-                                <button
-                                    className="govuk-button govuk-button--secondary"
-                                    onClick={onCancel}
-                                    type="button"
-                                >
+                <button
+                    className="govuk-button govuk-button--secondary"
+                    onClick={onCancel}
+                    type="button"
+                >
                   Cancel
                 </button>
               </div>

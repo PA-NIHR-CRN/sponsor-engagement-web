@@ -72,7 +72,7 @@ const renderBackLink = () => (
 
 export type StudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function Study({ study, assessments, editHistory, getEditHistoryError, progressBarPageContent, reportaFristManagedContent }: StudyProps) {
+export default function Study({ study, assessments, editHistory, getEditHistoryError, progressBarPageContent, reportaFirstManagedContent }: StudyProps) {
   const router = useRouter()
   const successType = router.query.success as string
   const transactionIdLatestProposedUpdate = router.query.latestProposedUpdate as string | undefined
@@ -196,9 +196,8 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
 
             <StudyProgressExtended
               moreDetailsHref={`${STUDIES_PAGE}/${study.id}/configure`}
-              optedOutText='No expectation to achieve the first participant in 90 days for this study'
-              regulatoryApprovalDate={study.regulatoryApprovalDate}
               progressBarPageContent={progressBarPageContent}
+              regulatoryApprovalDate={study.regulatoryApprovalDate}
               studyStatus={study.studyStatus}
               willRecruitWithinTimeline={study.willRecruitWithinTimeline}
             />
@@ -289,7 +288,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
           <StudyDetails study={study} />
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
-          <ReportFirst reportaFirstContentfulContent={reportaFristManagedContent} studyId={study.id} />
+          <ReportFirst reportaFirstContentfulContent={reportaFirstManagedContent} studyId={study.id} />
           <RequestSupport showCallToAction sticky />
         </div>
       </div>
@@ -331,7 +330,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
   logger.info('Successfully retrieved study from SE with studyId: %s', studyId)
   
   const progressBarPageContent = await getSetPageByKey(ContentfulPage.PROGRESS_BAR)
-  const reportaFristManagedContent = await getSetPageByKey(ContentfulPage.REPORT_A_FIRST_BOX) 
+  const reportaFirstManagedContent = await getSetPageByKey(ContentfulPage.REPORT_A_FIRST_BOX) 
 
   const changeHistoryFromDate = process.env.EDIT_HISTORY_START_DATE ?? ''
   const { study: studyInCPMS } = await getStudyByIdFromCPMS(study.cpmsId, changeHistoryFromDate)
@@ -343,7 +342,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
         assessments: getAssessmentHistoryFromStudy(study),
         study,
         progressBarPageContent,
-        reportaFristManagedContent
+        reportaFirstManagedContent
       },
     }
   }
@@ -362,7 +361,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
         assessments: getAssessmentHistoryFromStudy(study),
         study,
         progressBarPageContent,
-        reportaFristManagedContent
+        reportaFirstManagedContent
       },
     }
   }
@@ -400,7 +399,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
       editHistory,
       getEditHistoryError,
       progressBarPageContent,
-      reportaFristManagedContent
+      reportaFirstManagedContent
     },
   }
 })
