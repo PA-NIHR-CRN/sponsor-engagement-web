@@ -89,8 +89,9 @@ export default function Studies({
 
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">Assess progress of studies</h2>
 
-          <div className="card  card--bg-steel govuk-!-margin-bottom-4">
+          <div className="card  card--needing-action-banner govuk-!-margin-bottom-4">
             <div className='content flex items-center gap-2 block w-full banner'>
+              <Tag className='absolute top-0 right-0 corner tag--needs-action' text="Needs action" />
               <AlertIcon />
                           <strong className="govuk-heading-s govuk-!-margin-bottom-0">
                 There {totalItemsDue === 1 ? 'is' : 'are'} {totalItemsDue}{' '} {pluraliseStudy(totalItemsDue)} needing action
@@ -190,7 +191,7 @@ export default function Studies({
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
           <ReportFirst />
-          <Card className="mt-4" data-testid="export-study-data" filled padding={4}>
+          <Card className="mt-4 aside" data-testid="export-study-data" filled padding={4}>
             <h3 className="govuk-heading-m">Download study data</h3>
             <p>
               This download is a snapshot of all the information held within the Sponsor Engagement Tool for the
@@ -207,7 +208,7 @@ export default function Studies({
           <div className="lg:sticky top-4 mt-4">
             <RequestSupport />
             {isOdpUser ? (
-              <Card className="mt-4" data-testid="export-study-data" filled padding={4}>
+              <Card className="mt-4 aside" data-testid="export-study-data" filled padding={4}>
                 <h3 className="govuk-heading-m">Access Sponsor RDN Portfolio Dashboard</h3>
                 <p>
                   Sponsors can view all of their studies included in the RDN portfolio by clicking the button below.

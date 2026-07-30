@@ -11,7 +11,7 @@ export interface CardProps extends React.HTMLProps<HTMLDivElement> {
 export function Card({ children, padding = 3, filled, className, ...props }: CardProps) {
   return (
     <div
-      className={clsx(`govuk-!-padding-${padding} relative`, className)}
+      className={clsx(`govuk-!-padding-${padding} relative card-x`, className)}
       {...props}
     >
       <div className='content'>

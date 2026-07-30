@@ -27,7 +27,7 @@ $govuk-font-family: var(--font-primary), arial, sans-serif;
 $govuk-page-width: 1280px;
 $govuk-link-colour: var(--colour-blue);
 
-@import '../../node_modules/govuk-frontend/govuk/all.scss';
+@import '../../node_modules/govuk-frontend/dist/govuk/index.scss';
 @import './progress-bar.scss';
 @import './summary-list.scss';
 @import './summary-card.scss';
@@ -143,13 +143,6 @@ body {
   --red: #d4351c;
   --text-grey: #0b0c0c;
 }
-// allows cookie banner to stick to bottom of veiw port
-.SE-cookie-banner {
-  bottom: 0;
-  position: fixed;
-  width: 100%;
-  z-index: 9999;
-}
 
 // Forced colours in high contrast mode
 @media (forced-colors: active) {
@@ -157,12 +150,21 @@ body {
     --text-grey: CanvasText;
     --header-bg: Canvas;
   }
-  html, body { color: CanvasText !important; background: Canvas !important; }
-  a { color: LinkText !important; text-decoration: underline; }
-  svg { fill: currentColor !important; stroke: currentColor !important; }
+  html,
+  body {
+    color: CanvasText !important;
+    background: Canvas !important;
+  }
+  a {
+    color: LinkText !important;
+    text-decoration: underline;
+  }
+  svg {
+    fill: currentColor !important;
+    stroke: currentColor !important;
+  }
 
-
-button .absolute.h-\[2px\].w-\[18px\] {
+  button .absolute.h-\[2px\].w-\[18px\] {
     background: CanvasText !important;
   }
   button .absolute.h-\[2px\].w-\[18px\]::before,
@@ -170,16 +172,15 @@ button .absolute.h-\[2px\].w-\[18px\] {
     background: CanvasText !important;
   }
 
-  button[aria-controls="nihr-side-nav"] {
+  button[aria-controls='nihr-side-nav'] {
     background: transparent;
-    color: CanvasText; 
+    color: CanvasText;
   }
 
-  button[aria-controls="nihr-side-nav"]:focus {
+  button[aria-controls='nihr-side-nav']:focus {
     outline: 2px solid CanvasText !important;
     outline-offset: 2px !important;
     box-shadow: none !important;
     background-image: none !important;
   }
 }
-

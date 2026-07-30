@@ -130,6 +130,25 @@
   --nihr-sunshine-yellow--shade-70: color-mix(in srgb, var(--nihr-sunshine-yellow), var(--nihr-black) 70%);
   --nihr-sunshine-yellow--shade-80: color-mix(in srgb, var(--nihr-sunshine-yellow), var(--nihr-black) 80%);
   --nihr-sunshine-yellow--shade-90: color-mix(in srgb, var(--nihr-sunshine-yellow), var(--nihr-black) 90%);
+
+  --nihr-error-colour--tint-10: color-mix(in srgb, var(--nihr-error-colour), var(--nihr-white) 10%);
+  --nihr-error-colour--tint-20: color-mix(in srgb, var(--nihr-error-colour), var(--nihr-white) 20%);
+  --nihr-error-colour--tint-30: color-mix(in srgb, var(--nihr-error-colour), var(--nihr-white) 30%);
+  --nihr-error-colour--tint-40: color-mix(in srgb, var(--nihr-error-colour), var(--nihr-white) 40%);
+  --nihr-error-colour--tint-50: color-mix(in srgb, var(--nihr-error-colour), var(--nihr-white) 50%);
+  --nihr-error-colour--tint-60: color-mix(in srgb, var(--nihr-error-colour), var(--nihr-white) 60%);
+  --nihr-error-colour--tint-70: color-mix(in srgb, var(--nihr-error-colour), var(--nihr-white) 70%);
+  --nihr-error-colour--tint-80: color-mix(in srgb, var(--nihr-error-colour), var(--nihr-white) 80%);
+  --nihr-error-colour--tint-90: color-mix(in srgb, var(--nihr-error-colour), var(--nihr-white) 90%);
+  --nihr-error-colour--shade-10: color-mix(in srgb, var(--nihr-error-colour), var(--nihr-black) 10%);
+  --nihr-error-colour--shade-20: color-mix(in srgb, var(--nihr-error-colour), var(--nihr-black) 20%);
+  --nihr-error-colour--shade-30: color-mix(in srgb, var(--nihr-error-colour), var(--nihr-black) 30%);
+  --nihr-error-colour--shade-40: color-mix(in srgb, var(--nihr-error-colour), var(--nihr-black) 40%);
+  --nihr-error-colour--shade-50: color-mix(in srgb, var(--nihr-error-colour), var(--nihr-black) 50%);
+  --nihr-error-colour--shade-60: color-mix(in srgb, var(--nihr-error-colour), var(--nihr-black) 60%);
+  --nihr-error-colour--shade-70: color-mix(in srgb, var(--nihr-error-colour), var(--nihr-black) 70%);
+  --nihr-error-colour--shade-80: color-mix(in srgb, var(--nihr-error-colour), var(--nihr-black) 80%);
+  --nihr-error-colour--shade-90: color-mix(in srgb, var(--nihr-error-colour), var(--nihr-black) 90%);
 }
 
 .nihr {
@@ -153,7 +172,7 @@
   --govuk-surface-text-colour: var(--nihr-off-black);
   --govuk-surface-border-colour: var(--nihr-steel);
 
-  body:has(> footer) {
+  *:has(> footer) {
     display: grid;
     grid-template-rows: auto 1fr auto;
     grid-template-columns: 100%;
@@ -161,9 +180,17 @@
     min-height: 100vh;
     /* new small viewport height for modern browsers */
     min-height: 100svh;
+
+    .govuk-width-container {
+      width: stretch;
+    }
+
+    &:has(.govuk-cookie-banner) {
+      grid-template-rows: auto auto 1fr auto;
+    }
   }
 
-  .govuk-input.nihr-input__search {
+  .govuk-input {
     border-color: var(--nihr-navy);
     color: var(--nihr-navy);
   }
@@ -309,6 +336,10 @@
     height: 0.575rem;
   }
 
+  .govuk-footer__meta {
+    align-items: flex-start;
+  }
+
   .govuk-frontend-supported .govuk-accordion__show-all:hover:not(:focus) {
     background: unset;
     box-shadow: unset;
@@ -321,9 +352,5 @@
         color: var(--nihr-coral);
       }
     }
-  }
-
-  .govuk-footer__meta {
-    align-items: flex-start;
   }
 }
