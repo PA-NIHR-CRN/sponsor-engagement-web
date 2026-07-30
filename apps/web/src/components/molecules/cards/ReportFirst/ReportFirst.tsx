@@ -24,7 +24,7 @@ const reportaFirstContentfulContentFields = reportaFirstContentfulContent?.field
 const reportaFirstPagecontent = mapDynamicPageContent(reportaFirstContentfulContentFields?.pageContent as Entry[])
 
     return (
-        <Card className='mb-4' data-testid="report-first" filled padding={4}>
+        <Card className='mb-4 aside' data-testid="report-first" filled padding={4}>
             <h3 className="govuk-heading-m">
                 { reportaFirstContentfulContentFields?.title.toString() }
             </h3>

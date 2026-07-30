@@ -5,14 +5,10 @@ export interface SummaryCardProps {
 
 function SummaryCard({ title, content }: Readonly<SummaryCardProps>) {
   return (
-    <div className="card card--accent-left-twilight govuk-summary-card govuk-!-margin-top-4 govuk-!-margin-bottom-4">
-      <div className="content">
-      <div className="govuk-summary-card__title-wrapper justify-center">
-        <h2 className="govuk-summary-card__title text-darkGrey">{title}</h2>
-      </div>
-      <div className="govuk-summary-card__content text-center">
-        <p className="govuk-heading-l govuk-!-margin-0">{content}</p>
-      </div>
+    <div className="stat">
+      <div className="stat__content">
+        <div className="stat__content__body govuk-heading-m">{content}</div>
+        <h2 className="stat__content__title govuk-body">{title}</h2>
       </div>
     </div>
   )

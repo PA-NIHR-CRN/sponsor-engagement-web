@@ -79,17 +79,6 @@ export function RootLayout({ children, backLink, heading = SERVICE_NAME, user, b
                 <a aria-label="Go home" className="rebranded-one-login-header__link rebranded-one-login-header__link--homepage govuk-header__homepage-link" href="/">
                     <span className="govuk-header__logotype">
                         <svg data-name="NIHR Core logo" height="33" id="NIHR_Core_logo" viewBox="0 0 1106.85 100" xmlns="http://www.w3.org/2000/svg">
-                            <defs>
-                                <style>
-                                    {/* .cls-1 {
-                                        fill: #fc5d5d;
-                                    }
-
-                                    .cls-2 {
-                                        fill: #fff;
-                                    } */}
-                                </style>
-                            </defs>
                             <rect className="cls-1" height="100" width="9" x="369.6" />
                             <g>
                                 <path className="cls-2" d="M411.65,2.93h11.42l12.66,32.59h.45V2.93h6.72v39.2h-11.54l-12.43-32.54h-.5v32.54h-6.78V2.93Z" />
