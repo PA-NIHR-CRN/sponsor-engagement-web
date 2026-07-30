@@ -16,6 +16,9 @@ test.describe('Need Action Chip Logic - @se_315', () => {
   test('As a Sponsor Contact I can see Needs Action for studies that are due assessment - @Se_315_AC3', async ({
     studiesPage,
   }) => {
+    await seDatabaseReq(
+      `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
+    )
     const dueAssessmentQuery = `
       SELECT StudyOrganisation.studyId, Study.cpmsId, Study.dueAssessmentAt
       FROM UserOrganisation
@@ -257,9 +260,20 @@ test.describe('Need Action Chip Logic - @se_315', () => {
       AND UserOrganisation.isDeleted = 0
       AND StudyOrganisation.isDeleted = 0
       AND Study.isDeleted = 0
-      AND Study.dueAssessmentAt IS NOT NULL;
+      AND (
+        Study.dueAssessmentAt IS NOT NULL
+        OR EXISTS (
+          SELECT 1
+          FROM StudyEvaluationCategory
+          WHERE StudyEvaluationCategory.studyId = Study.id
+            AND StudyEvaluationCategory.isDeleted = 0
+           AND StudyEvaluationCategory.indicatorValue NOT IN (
+              'Recruiting at a lower rate than expected (RTT)',
+              'No Recruitment in past 6 months'
+        )
+      )
+     );
   `
-
     const needsActionCountResponse = await seDatabaseReq(needsActionCountQuery)
 
     const needsActionCount = Number(needsActionCountResponse[0].needsActionCount)

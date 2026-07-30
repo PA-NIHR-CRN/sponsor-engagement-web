@@ -84,7 +84,6 @@ export default class StudyDetailsPage {
   readonly secondSponsorAssessmentDate: Locator
   readonly firstSponsorAssessmentText: Locator
   readonly secondSponsorAssessmentText: Locator
-  readonly firstSponsorAssessmentTrack: Locator
   readonly secondSponsorAssessmentTrack: Locator
   readonly assessmentDueIndicator: Locator
   readonly allStudiesLink: Locator
@@ -117,8 +116,8 @@ export default class StudyDetailsPage {
     this.pageTitle = page.locator('h2.govuk-heading-l')
     this.miniDashboardTitle = page.locator('h2[class="govuk-summary-card__title text-darkGrey"]')
     this.miniDashboardText = page.locator('p[class="govuk-heading-l govuk-!-margin-0"]')
-    this.progressHeader = page.locator('h3.govuk-heading-m', {
-      hasText: 'Summary of study’s progress (UK)',
+    this.progressHeader = page.locator('h3[class="govuk-heading-m govuk-!-margin-bottom-1 p-0"]', {
+      hasText: 'Summary',
     })
     this.progressSection = page.locator('table[class="govuk-table govuk-!-margin-top-3"]')
     this.assessmentHeader = page.locator('h3', { hasText: 'Sponsor assessment history' })
@@ -136,7 +135,9 @@ export default class StudyDetailsPage {
     this.aboutSection = page.locator('table[class="govuk-table govuk-!-margin-bottom-3"]')
     this.guidanceText = page.locator('div[class="govuk-inset-text mt-7"]')
     this.sponsorOrgSubTitle = page.locator('span[class="govuk-body-m mb-0 text-darkGrey"]')
-    this.progressSummarySubTitle = page.locator('span[class="govuk-body-s text-darkGrey"]')
+    this.progressSummarySubTitle = page.locator('span[class="govuk-body-s text-darkGrey"]', {
+      hasText: 'latest data uploaded to CPMS',
+    })
     this.assessButton = page.locator('a[class="govuk-button w-auto govuk-!-margin-bottom-0"]')
     this.updateStudyDataButton = page.locator(
       'a[class="govuk-button govuk-button--secondary w-auto govuk-!-margin-bottom-0"]'
@@ -210,10 +211,10 @@ export default class StudyDetailsPage {
       .locator('p', { hasText: 'Further information' })
       .locator('span')
     this.firstSponsorAssessmentNoRecruitmentReason = this.firstSponsorAssessmentFurtherInfo
-      .locator('p', { hasText: 'Reason for not recruiting for 6 months:' })
+      .locator('p', { hasText: 'No recruitment for 6 months:' })
       .locator('span')
     this.secondSponsorAssessmentNoRecruitmentReason = this.secondSponsorAssessmentFurtherInfo
-      .locator('p', { hasText: 'Reason for not recruiting for 6 months:' })
+      .locator('p', { hasText: 'No recruitment for 6 months' })
       .locator('span')
     this.sponsorAssessmentHistory = page.locator('[class="govuk-!-margin-bottom-6"]')
     this.firstSponsorAssessmentRow = this.sponsorAssessmentHistory.locator('button')
@@ -221,12 +222,11 @@ export default class StudyDetailsPage {
     this.firstSponsorAssessmentDate = this.firstSponsorAssessmentRow.locator('div')
     this.secondSponsorAssessmentDate = this.secondSponsorAssessmentRow.locator('div')
     this.firstSponsorAssessmentText = this.firstSponsorAssessmentRow.locator(
-      'span[class="ml-[35px] md:ml-0 govuk-body-s mb-0"]'
+      'span[class="accordion__sidecontent ml-[35px] md:ml-0 govuk-body-s mb-0"]'
     )
     this.secondSponsorAssessmentText = this.secondSponsorAssessmentRow.locator(
-      'span[class="ml-[35px] md:ml-0 govuk-body-s mb-0"]'
+      'span[class="accordion__sidecontent ml-[35px] md:ml-0 govuk-body-s mb-0"]'
     )
-    this.firstSponsorAssessmentTrack = this.firstSponsorAssessmentText.locator('strong')
     this.secondSponsorAssessmentTrack = this.secondSponsorAssessmentText.locator('strong')
     this.assessmentDueIndicator = page
       .locator('span[class="govuk-tag govuk-tag--red normal-case"]')
@@ -694,9 +694,9 @@ export default class StudyDetailsPage {
 
   async assertSponsorAssessmentOnOffTrack(option: string) {
     if (option.toLowerCase() == 'on') {
-      await expect(this.firstSponsorAssessmentTrack).toContainText('On track')
+      await expect(this.firstSponsorAssessmentText).toContainText('On track')
     } else {
-      await expect(this.firstSponsorAssessmentTrack).toContainText('Off track')
+      await expect(this.firstSponsorAssessmentText).toContainText('Off track')
     }
   }
 

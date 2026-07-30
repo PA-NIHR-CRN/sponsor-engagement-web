@@ -1,4 +1,4 @@
-import { test } from '../../../hooks/CustomFixtures'
+import { test, expect } from '../../../hooks/CustomFixtures'
 
 test.describe('Logout as a Sponsor Contact - @se_74', () => {
   test.use({ storageState: '.auth/sponsorContact.json' })
@@ -12,23 +12,20 @@ test.describe('Logout as a Sponsor Contact - @se_74', () => {
       await studiesPage.goto()
       await studiesPage.assertOnStudiesPage()
     })
-    await test.step('And there is a Cog Icon next to my Username in the Page Banner', async () => {
+    await test.step('And there is a Sign out link next to my Username in the Page Banner', async () => {
       await commonItemsPage.assertUsernamePresent(true, 'sesponsorcontact@test.id.nihr.ac.uk')
-      await commonItemsPage.assertCogIconPresent(true)
+      await expect(commonItemsPage.signOutLink).toBeVisible()
     })
-    await test.step('And clicking the Cog Icon displays a `Logout` option', async () => {
-      await commonItemsPage.cogIcon.click()
-      await commonItemsPage.assertLogoutOptionVisible()
-    })
-    await test.step('When I click the `Logout` option', async () => {
-      await commonItemsPage.logoutOption.click()
+    await test.step('And I click the sign out option', async () => {
+      await commonItemsPage.signOutLink.click()
     })
     await test.step('Then I am taken to the Signed Out Page', async () => {
+      await commonItemsPage.signOutLink.click()
       await signedOutPage.assertOnSignedOutPage()
     })
     await test.step('And the Cog icon and my Username no longer appear in the Page Banner', async () => {
       await commonItemsPage.assertUsernamePresent(false, 'sesponsorcontact@test.id.nihr.ac.uk')
-      await commonItemsPage.assertCogIconPresent(false)
+      await expect(commonItemsPage.signOutLink).not.toBeVisible()
     })
   })
 })
@@ -45,23 +42,20 @@ test.describe('Logout as a Contact Manager - @se_74', () => {
       await organisationsPage.goto()
       await organisationsPage.assertOnOrganisationsPage()
     })
-    await test.step('And there is a Cog Icon next to my Username in the Page Banner', async () => {
+    await test.step('And there is a Sign out link next to my Username in the Page Banner', async () => {
       await commonItemsPage.assertUsernamePresent(true, 'secontactmanager@test.id.nihr.ac.uk')
-      await commonItemsPage.assertCogIconPresent(true)
+      await expect(commonItemsPage.signOutLink).toBeVisible()
     })
-    await test.step('And clicking the Cog Icon displays a `Logout` option', async () => {
-      await commonItemsPage.cogIcon.click()
-      await commonItemsPage.assertLogoutOptionVisible()
-    })
-    await test.step('When I click the `Logout` option', async () => {
-      await commonItemsPage.logoutOption.click()
+    await test.step('And click sign out', async () => {
+      await commonItemsPage.signOutLink.click()
     })
     await test.step('Then I am taken to the Signed Out Page', async () => {
+      await commonItemsPage.signOutLink.click()
       await signedOutPage.assertOnSignedOutPage()
     })
     await test.step('And the Cog icon and my Username no longer appear in the Page Banner', async () => {
       await commonItemsPage.assertUsernamePresent(false, 'secontactmanager@test.id.nihr.ac.uk')
-      await commonItemsPage.assertCogIconPresent(false)
+      await expect(commonItemsPage.signOutLink).not.toBeVisible()
     })
   })
 })

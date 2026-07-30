@@ -8,6 +8,7 @@ export default class OrganisationDetailsPage {
   readonly page: Page
   readonly pageTitle: Locator
   readonly addRemoveHeader: Locator
+  readonly addOrRemoveHeader: Locator
   readonly inviteSection: Locator
   readonly submitButton: Locator
   readonly pageSubHeading: Locator
@@ -44,9 +45,12 @@ export default class OrganisationDetailsPage {
     this.page = page
 
     //Locators
-    this.pageTitle = page.locator('h2[class="govuk-heading-l govuk-!-margin-bottom-1"]')
-    this.addRemoveHeader = page.locator('h3[class="govuk-heading-m p-0 govuk-!-margin-bottom-4"]')
-    this.inviteSection = page.locator('form[action="/api/forms/organisation"]')
+    this.pageTitle = page.locator('h2[class="govuk-heading-l"]')
+    this.addRemoveHeader = page.locator('p[class="govuk-body"]', {
+      hasText: 'Add and remove contacts for sponsor organisations.',
+    })
+    this.addOrRemoveHeader = page.locator('h3[class="govuk-heading-m p-0 govuk-!-margin-bottom-4"]')
+    this.inviteSection = page.locator('form[id="filters-form"]')
     this.addContactSuccessAlertBox = page.locator(
       'div[class="govuk-notification-banner govuk-notification-banner--success"]'
     )
@@ -67,7 +71,6 @@ export default class OrganisationDetailsPage {
     this.detailsTableRoleRow = this.detailsTable.locator('tr').nth(1)
     this.detailsTableRoleHeader = this.detailsTableRoleRow.locator('th')
     this.detailsTableRoleValue = this.detailsTableRoleRow.locator('td')
-    this.addRemoveHeader = page.locator('h3[class="govuk-heading-m p-0 govuk-!-margin-bottom-4"]')
     this.addRemoveGuidanceTxt = this.addRemoveHeader.locator('..').locator('p')
     this.contactsList = page.locator('table[class="govuk-table"]')
     this.contactsListHeaders = this.contactsList.locator('thead tr')
@@ -91,8 +94,8 @@ export default class OrganisationDetailsPage {
     await expect(this.pageTitle).toBeVisible()
     await expect(this.addRemoveHeader).toBeVisible()
     await expect(this.inviteSection).toBeVisible()
-    await expect(this.addRemoveHeader).toHaveText('Add or remove sponsor contacts')
-    await expect(this.page).toHaveURL(`organisations/${orgId}`)
+    await expect(this.addRemoveHeader).toHaveText('Add and remove contacts for sponsor organisations.')
+    await expect(this.page).toHaveURL(`organisations`)
   }
 
   async gotoSuccess(orgId: string) {

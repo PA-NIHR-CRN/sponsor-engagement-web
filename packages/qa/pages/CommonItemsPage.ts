@@ -10,7 +10,7 @@ export default class CommonItemsPage {
   readonly txtContactInfo: Locator
   readonly homeIcon: Locator
   readonly manageContactsIcon: Locator
-  readonly manageAbridgedContactsIcon: Locator
+  readonly manageAbridgedContactsLink: Locator
   readonly assessStudiesDropdown: Locator
   readonly studiesFoundHeading: Locator
   readonly txtGenericErrorGuidance: Locator
@@ -23,8 +23,7 @@ export default class CommonItemsPage {
   readonly downloadStudyDataText: Locator
   readonly exportStudyDataButton: Locator
   readonly usernameBanner: Locator
-  readonly cogIcon: Locator
-  readonly logoutOption: Locator
+  readonly signOutLink: Locator
   readonly footer: Locator
   readonly shawTrustLogo: Locator
   readonly termsAndConditionsLink: Locator
@@ -43,7 +42,7 @@ export default class CommonItemsPage {
     this.txtContactInfo = page.locator('p[class="govuk-body"]').nth(1)
     this.homeIcon = page.locator('svg[data-testid="home-icon"]')
     this.manageContactsIcon = page.locator('a[href="/organisations"]')
-    this.manageAbridgedContactsIcon = page.locator('a[class*="navigation-link"]').nth(1)
+    this.manageAbridgedContactsLink = page.locator('a[class*="govuk-service-navigation__link"]').nth(1)
     this.assessStudiesDropdown = page.locator('span[class="govuk-details__summary-text"]')
     this.studiesFoundHeading = page.locator('p[class="govuk-heading-s mb-0 whitespace-nowrap"]')
     this.txtGenericErrorGuidance = page.locator('p[class="govuk-body"]')
@@ -55,11 +54,10 @@ export default class CommonItemsPage {
     this.downloadStudyDataHeader = this.downloadStudyDataSection.locator('h3')
     this.downloadStudyDataText = this.downloadStudyDataSection.locator('p')
     this.exportStudyDataButton = this.downloadStudyDataSection.locator('a')
-    this.usernameBanner = page.locator('span[class="hidden text-sm md:block"]')
-    this.cogIcon = page.locator('button[aria-haspopup="menu"]')
-    this.logoutOption = page.locator('a[role="menuitem"]')
+    this.usernameBanner = page.locator('span[class="rebranded-one-login-header__nav__text logged-in-username"]')
+    this.signOutLink = page.locator('a', { hasText: 'Sign out' })
     this.footer = page.locator('footer[class*="govuk-footer"]')
-    this.shawTrustLogo = this.footer.locator('img[src*="shaw-trust-logo.png"]')
+    this.shawTrustLogo = this.footer.locator('img[alt="Shaw Trust Accessibility logo"]')
     this.termsAndConditionsLink = this.footer.locator(
       'a[href="https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-terms-and-conditions"]'
     )
@@ -73,7 +71,7 @@ export default class CommonItemsPage {
       'a[href="https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-accessibility-statement"]'
     )
     this.releaseNotesLink = this.footer.locator(
-      'a[href="https://sites.google.com/nihr.ac.uk/nihr-sponsor-engagement-tool/se-tool-release-notes"]'
+      'a[href="https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-release-notes"]'
     )
   }
 
@@ -228,19 +226,6 @@ export default class CommonItemsPage {
     }
   }
 
-  async assertCogIconPresent(visible: boolean) {
-    if (visible) {
-      await expect(this.cogIcon).toBeVisible()
-    } else {
-      await expect(this.cogIcon).toBeHidden()
-    }
-  }
-
-  async assertLogoutOptionVisible() {
-    await expect(this.logoutOption).toBeVisible()
-    await expect(this.logoutOption).toHaveText('Logout')
-  }
-
   async assertFooterPresent() {
     await expect(this.footer).toBeVisible()
     await expect(this.shawTrustLogo).toBeVisible()
@@ -265,7 +250,7 @@ export default class CommonItemsPage {
     )
     await expect(this.releaseNotesLink).toHaveAttribute(
       'href',
-      'https://sites.google.com/nihr.ac.uk/nihr-sponsor-engagement-tool/se-tool-release-notes'
+      'https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-release-notes'
     )
   }
 }

@@ -89,10 +89,6 @@ test.describe('Login as a Sponsor Contact - @se_21', () => {
     await test.step('Then I am taken to the Organisations Page', async () => {
       await organisationsPage.assertOnOrganisationsPage()
     })
-    await test.step('And I do not have access to the Studies Page', async () => {
-      await commonItemsPage.homeIcon.click()
-      await organisationsPage.assertOnOrganisationsPage()
-    })
   })
 
   test('As a user with no Sponsor Engagement role, upon Login I am shown an error message - @se_21_login_no_account', async ({

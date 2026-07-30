@@ -10,6 +10,9 @@ test.describe('Data Updates Required Chip Logic - @se_315', () => {
   test('As a Sponsor Contact I can see Data Updates Required for studies that have risk indicators - @Se_315_AC2', async ({
     studiesPage,
   }) => {
+    await seDatabaseReq(
+      `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
+    )
     const dataUpdatesRequiredQuery = `
   SELECT DISTINCT
     Study.id,

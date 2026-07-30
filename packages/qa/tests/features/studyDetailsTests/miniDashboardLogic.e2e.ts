@@ -1,4 +1,8 @@
 import { test, expect } from '../../../hooks/CustomFixtures'
+import { seDatabaseReq } from '../../../utils/DbRequests'
+
+const testUserId = 6
+const startingOrgId = 12
 
 test.describe('Mini dashboard Logic - @se_316', () => {
   test.use({ storageState: '.auth/sponsorContact.json' })
@@ -7,6 +11,9 @@ test.describe('Mini dashboard Logic - @se_316', () => {
     studiesPage,
     studyDetailsPage,
   }) => {
+    await seDatabaseReq(
+      `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
+    )
     await test.step('Given I have navigated to the Studies Page', async () => {
       await studiesPage.goto()
     })

@@ -91,7 +91,9 @@ export default class StudiesPage {
     this.studyListItemLastAssessmentValue = page
       .locator('div.lg\\:min-w-\\[320px\\] p.govuk-body-s.govuk-\\!-margin-top-1')
       .nth(0)
-    this.assessmentDueIndicator = this.studyListItem.locator('span[class="govuk-tag govuk-tag--red normal-case"]')
+    this.assessmentDueIndicator = this.studyListItem.locator('span[class="govuk-tag govuk-tag--red normal-case"]', {
+      hasText: 'Assessment due for',
+    })
     this.dataUpdatesRequiredIndicator = this.studyListItem.locator('span.govuk-tag.govuk-tag--red.normal-case', {
       hasText: 'Data updates required',
     })

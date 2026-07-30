@@ -46,7 +46,7 @@ export default class OrganisationsPage {
     this.paginateCurrentPage = page.locator('a[aria-current="page"]')
     this.paginationPageList = page.locator('ul[class="govuk-pagination__list"]')
     this.searchInput = page.locator('input[id="keyword"]')
-    this.searchButton = page.locator('div[class="table-cell w-[1%] align-top"] button')
+    this.searchButton = page.locator('button[class="search-button"]')
     this.searchLabel = page.locator('label[for="keyword"]')
     this.searchFilterPanel = page.locator('ul[aria-labelledby="selected-filters"]')
   }

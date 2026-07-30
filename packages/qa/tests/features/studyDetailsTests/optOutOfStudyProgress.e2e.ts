@@ -1,4 +1,8 @@
 import { test, expect } from '../../../hooks/CustomFixtures'
+import { seDatabaseReq } from '../../../utils/DbRequests'
+
+const testUserId = 6
+const startingOrgId = 12
 
 test.describe('Opt Out Of Study Progress - @se_327', () => {
   test.use({ storageState: '.auth/sponsorContact.json' })
@@ -8,6 +12,9 @@ test.describe('Opt Out Of Study Progress - @se_327', () => {
     studyDetailsPage,
     configurePage,
   }) => {
+    await seDatabaseReq(
+      `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
+    )
     await test.step('Given I have navigated to the Studies Page', async () => {
       await studiesPage.goto()
     })

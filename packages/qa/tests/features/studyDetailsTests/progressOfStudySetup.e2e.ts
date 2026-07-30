@@ -1,6 +1,8 @@
 import { test, expect } from '../../../hooks/CustomFixtures'
-import { cpmsDatabaseReq } from '../../../utils/DbRequests'
+import { cpmsDatabaseReq, seDatabaseReq } from '../../../utils/DbRequests'
 
+const testUserId = 6
+const startingOrgId = 12
 const cpmsStudyId = 50617
 
 type ProgressScenario = {
@@ -51,6 +53,9 @@ test.describe('90-day study setup progress', () => {
 
   for (const scenario of progressScenarios) {
     test(`${scenario.name}`, async ({ studiesPage, studyDetailsPage }) => {
+      await seDatabaseReq(
+        `UPDATE UserOrganisation SET organisationId = ${startingOrgId} WHERE userId = ${testUserId} AND isDeleted = 0`
+      )
       await setNhsApprovalDateDaysAgo(scenario.daysAgo)
 
       await test.step('Given I have navigated to the Studies Page', async () => {
