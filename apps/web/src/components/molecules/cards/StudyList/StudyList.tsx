@@ -108,8 +108,8 @@ export function StudyList({
           <div className="lg:min-w-[320px]">
             <div className="max-w-[600px]">
               <StudyProgressExtended 
-                regulatoryApprovalDate={regulatoryApprovalDate}
                 progressBarPageContent={progressBarPageContent}
+                regulatoryApprovalDate={regulatoryApprovalDate}
                 showBorder={false}
                 showDates={false}
                 showMoreDetails={false}

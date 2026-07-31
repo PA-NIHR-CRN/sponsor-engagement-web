@@ -8,6 +8,9 @@ export interface TagCollectionProps {
 function TagCollection({
     tags,
 }: Readonly<TagCollectionProps>) {
+    if(!tags.length){
+        return (null);
+    }
     return (
         <div className="flex flex-wrap gap-2 max-w-full tag-collection">
             {tags.map((tag) => (
@@ -15,6 +18,7 @@ function TagCollection({
             ))}
         </div>
     );
+
 }
 
 export default TagCollection;
