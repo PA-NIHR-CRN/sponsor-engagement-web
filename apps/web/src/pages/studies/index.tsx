@@ -91,12 +91,11 @@ export default function Studies({
 
           <div className="card  card--needing-action-banner govuk-!-margin-bottom-4">
             <div className='content flex items-center gap-2 block w-full banner'>
-              <Tag className='absolute top-0 right-0 corner tag--needs-action' text="Needs action" />
               <AlertIcon />
-                          <strong className="govuk-heading-s govuk-!-margin-bottom-0">
+              <strong className="govuk-heading-s govuk-!-margin-bottom-0">
                 There {totalItemsDue === 1 ? 'is' : 'are'} {totalItemsDue}{' '} {pluraliseStudy(totalItemsDue)} needing action
               </strong>
-            </div>
+          </div>
           </div>
 
           <p className="govuk-body">
@@ -271,6 +270,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
     })
 
     const entry: Entry<TypeBannerSkeleton> | null = await getNotificationBanner()
+  
 
     return {
       props: {

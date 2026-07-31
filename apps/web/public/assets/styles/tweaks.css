@@ -204,17 +204,6 @@
     }
   }
 
-          @media (max-width: 40.0625em){
-      .card--needing-action-banner {
-        padding-top: 1em !important;
-.content {
-              .govuk-tag.corner {
-        margin-top: -40px !important;
-      }
-      }
-    }
-  }
-
   .nihr-input__search::placeholder {
     color: var(--nihr-navy);
     font-weight: 400;
@@ -457,11 +446,18 @@
   }
   }
 
-  .stat{
+  .stat {
     color: var(--nihr-navy);
 
     border-left: 7px solid var(--nihr-twilight);
     padding-left: 2em;
+
+    .stat__content{
+      display: flex;
+      flex-direction: column-reverse;
+      gap:0.5em;
+    }
+
     .stat__content__title{
       margin-bottom: 0;
     }
@@ -470,7 +466,14 @@
       color: var(--nihr-navy) !important;
       font-weight: 700;
       font-size: 1.5em;
-      margin-bottom: 0.5em;
+      margin-bottom: 0;
+      padding-top:0;
+    }
+  }
+
+  .stat--reversed{
+        .stat__content{
+      flex-direction: column;
     }
   }
 
