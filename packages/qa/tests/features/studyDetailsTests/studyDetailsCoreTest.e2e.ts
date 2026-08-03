@@ -18,8 +18,8 @@ const noIrasIdStudyId = 16519
 const noChiefInvestigatorStudyId = 15504
 const noCroOrgRelationshipStudyId = 11133
 const noCtuOrgRelationshipStudyId = 339
-const nonComCheifInvestigatorFirstName = 'John'
-const nonComCheifInvestigatorLastName = 'Collinge'
+const nonComChiefInvestigatorFirstName = 'John'
+const nonComChiefInvestigatorLastName = 'Collinge'
 const nonComStudyId = '13610'
 const nonComOrgId = '635'
 
@@ -278,7 +278,7 @@ test.describe('View core study details - @se_27', () => {
       await studyDetailsPage.assertAboutStudySectionPresent()
     })
     await test.step('Then I can see a Row displaying the Chief Investigator', async () => {
-      await studyDetailsPage.assertChiefInvestigator(nonComCheifInvestigatorFirstName, nonComCheifInvestigatorLastName)
+      await studyDetailsPage.assertChiefInvestigator(nonComChiefInvestigatorFirstName, nonComChiefInvestigatorLastName)
     })
   })
 })

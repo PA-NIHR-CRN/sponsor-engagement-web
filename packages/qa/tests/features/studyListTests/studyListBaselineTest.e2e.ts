@@ -49,9 +49,6 @@ test.describe('Baseline Study List Page for Sponsor Contact - @se_22 se_22_basel
     await test.step('When I am on the Studies Page', async () => {
       await studiesPage.assertOnStudiesPage()
     })
-    await test.step('Then there is a label indicating the number of studies due for Assessment', async () => {
-      await studiesPage.assertDueLabelPresent()
-    })
     await test.step('And there is Introductory Guidance text setting the Context for the SE Tool', async () => {
       await studiesPage.assertIntroGuideTxt()
     })

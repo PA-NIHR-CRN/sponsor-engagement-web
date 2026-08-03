@@ -51,7 +51,7 @@ test.describe('View Request RDN Support Guidance - @se_30', () => {
     await test.step(`And I view the section titled 'Request NIHR RDN support'`, async () => {
       await commonItemsPage.assertRequestSupportPresent()
     })
-    await test.step(`And the expected gudiance text is provided`, async () => {
+    await test.step(`And the expected guidance text is provided`, async () => {
       await commonItemsPage.assertRequestSupportGuidanceText('details')
     })
     await test.step(`And I am provided with a Request Support button`, async () => {
@@ -90,7 +90,7 @@ test.describe('View Request RDN Support Guidance - @se_30', () => {
     await test.step(`And I view the section titled 'Request NIHR RDN support'`, async () => {
       await commonItemsPage.assertRequestSupportPresent()
     })
-    await test.step(`And the expected gudiance text is provided`, async () => {
+    await test.step(`And the expected guidance text is provided`, async () => {
       await commonItemsPage.assertRequestSupportGuidanceText('assess')
     })
     await test.step(`And I am provided with a Request Support button`, async () => {

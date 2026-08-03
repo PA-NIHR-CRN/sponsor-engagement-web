@@ -57,7 +57,7 @@ test.describe('Display Sponsor Organisation Details and Current Contacts - @se_1
     })
   })
 
-  test('As a Contact Manager I can see Mutliple Roles for an Organisation on the Details Page, where applicable - @se_15_ac1_multi', async ({
+  test('As a Contact Manager I can see Multiple Roles for an Organisation on the Details Page, where applicable - @se_15_ac1_multi', async ({
     organisationDetailsPage,
   }) => {
     await test.step('Given I have navigated to the Organisation Details Page', async () => {
@@ -120,7 +120,7 @@ test.describe('Display Sponsor Organisation Details and Current Contacts - @se_1
     await test.step('And I am on the Organisation Details Page', async () => {
       await organisationDetailsPage.assertOnOrganisationDetailsPage(orgIdNoContacts.toString())
     })
-    await test.step('And Organisation has No Asscocited Contacts', async () => {
+    await test.step('And Organisation has No Associated Contacts', async () => {
       await organisationDetailsPage.assertOrgHasNoContactsInDB(`SELECT COUNT(DISTINCT UserOrganisation.userId) AS count 
             FROM UserOrganisation
             WHERE UserOrganisation.organisationId = ${orgIdNoContacts} AND UserOrganisation.isDeleted = 0;`)

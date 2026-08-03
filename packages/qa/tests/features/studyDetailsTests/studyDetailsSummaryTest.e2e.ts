@@ -73,7 +73,10 @@ test.describe('Access Study Details Page and view Summary - @se_26', () => {
     let studyListItemToClick: number
     let studyIdSelected: string = ''
     let studyDetails: RowDataPacket[]
-    let getStudyInCpms: JSON
+    let getStudyInCpms: {
+      ShortName: string
+      StudySponsors: string
+    }
 
     await test.step(`Given I have navigated to the Study List Page`, async () => {
       await studiesPage.goto()
