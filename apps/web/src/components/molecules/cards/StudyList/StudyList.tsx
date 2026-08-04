@@ -1,6 +1,14 @@
+import type { Entry } from 'contentful';
 import Link from 'next/link'
 
+import type { TypeSetPageSkeleton } from '@/@types/generated';
 import { Card } from '@/components/atoms'
+import { FirstMedal } from '@/components/atoms/FirstMedal/FirstMedal';
+import Tag from '@/components/atoms/Tag/Tag'
+import {StudyProgressExtended} from "@/components/molecules";
+import { capitaliseFirstLetter } from '@/utils/capitalise';
+
+import TagCollection from '../../TagCollection/TagCollection'
 
 export interface StudyListProps {
   sponsorOrgName?: string
@@ -11,8 +19,13 @@ export interface StudyListProps {
   daysSinceAssessmentDue: number | null
   trackStatus?: string
   trackStatusHref?: string
-  indications?: string[]
+  dataUpdatesRequired: boolean
   irasId: string | null
+  regulatoryApprovalDate: Date | null
+  studyStatus: string,
+  willRecruitWithinTimeline : boolean
+  firstType?: string | null
+  progressBarPageContent: Entry<TypeSetPageSkeleton> | null
 }
 
 export function StudyList({
@@ -24,72 +37,116 @@ export function StudyList({
   trackStatus,
   trackStatusHref,
   lastAssessmentDate,
-  indications,
+  dataUpdatesRequired,
   irasId,
+  regulatoryApprovalDate,
+  studyStatus, 
+  willRecruitWithinTimeline,
+  firstType,
+  progressBarPageContent
 }: StudyListProps) {
-  const daysDueText =
-    daysSinceAssessmentDue !== null
-      ? `Due for ${daysSinceAssessmentDue || '1'} day${daysSinceAssessmentDue > 1 ? 's' : ''}`
-      : ''
+  const hasAssessmentDue = daysSinceAssessmentDue !== null
+
+  const daysDueText = hasAssessmentDue
+    ? (() => {
+      const days = daysSinceAssessmentDue || 1;
+      return `Assessment due for ${days} day${days > 1 ? 's' : ''}`;
+    })()
+    : '';
 
   return (
-    <Card>
-      {daysSinceAssessmentDue !== null ? (
-        <>
-          <span className="govuk-visually-hidden">{shortTitle} has been</span>
-          <span className="govuk-tag govuk-tag--red float-right -mt-3 -mr-3 normal-case">{daysDueText}</span>
-        </>
-      ) : null}
+    <Card className='card card--accent-left-none' padding={0}>
 
-      <div className="md:max-w-[calc(100%-50px)]">
-        <div className="text-darkGrey govuk-!-margin-bottom-1 max-w-[calc(100%-45px)] lg:max-w-auto govuk-body-s">
-          {sponsorOrgName ?? '-'}
-          {Boolean(supportOrgName) && ` (${supportOrgName})`}
-        </div>
-        <div className="govuk-heading-s govuk-!-margin-bottom-0 govuk-!-padding-top-0 inline-block font-extrabold">
-          {shortTitle}
-        </div>
-        <div className="govuk-body-s govuk-!-margin-bottom-2 govuk-!-padding-top-0">
-          IRAS ID: {irasId || 'Not available '}
-        </div>
-      </div>
+      {(hasAssessmentDue || dataUpdatesRequired) ? <Tag className='absolute top-0 right-0 corner tag--needs-action' text="Needs action" /> : null}
 
-      <div className="sm:flex sm:justify-between lg:justify-normal sm:gap-3">
-        <div className="lg:min-w-[320px]">
-          <strong className="govuk-heading-s govuk-!-margin-bottom-0">Last sponsor assessment</strong>
-          <p className="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
-            {trackStatus ? (
-              <>
-                {trackStatusHref ? (
-                  <Link className="govuk-link--no-visited-state" href={trackStatusHref}>
-                    {trackStatus}
-                  </Link>
+      <div className="sm:flex sm:items-stretch sm:justify-between sm:gap-6">
+        <div className="min-w-0 flex-1">
+          <div className="text-darkGrey govuk-!-margin-bottom-1 max-w-[calc(100%-45px)] lg:max-w-auto govuk-body-s">
+            {sponsorOrgName ?? '-'}
+            {Boolean(supportOrgName) && ` (${supportOrgName})`}
+          </div>
+
+          <div className="govuk-heading-s govuk-!-margin-bottom-0 govuk-!-padding-top-0 inline-block font-extrabold">
+            {shortTitle}
+          </div>
+
+          <div className="govuk-body-s govuk-!-margin-bottom-2 govuk-!-padding-top-0">
+            IRAS ID: {irasId || 'Not available '}
+          </div>
+
+          <div className="sm:flex sm:justify-between lg:justify-normal sm:gap-3">
+            <div className="lg:min-w-[320px]">
+              <strong className="govuk-heading-s govuk-!-margin-bottom-0">
+                Last sponsor assessment
+              </strong>
+              <p className="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-2">
+                {trackStatus ? (
+                  <>
+                    {trackStatusHref ? (
+                      <Link className="govuk-link--no-visited-state" href={trackStatusHref}>
+                        {trackStatus}
+                      </Link>
+                    ) : (
+                      trackStatus
+                    )}{' '}
+                    on {lastAssessmentDate}
+                  </>
                 ) : (
-                  trackStatus
-                )}{' '}
-                on {lastAssessmentDate}
-              </>
-            ) : (
-              'None'
-            )}
-          </p>
+                  'None'
+                )}
+              </p>
+            </div>
+          </div>
+
+          <TagCollection
+            tags={[
+              ...(hasAssessmentDue ? [{ text: daysDueText }] : []),
+              ...(dataUpdatesRequired ? [{ text: 'Data updates required' }] : []),
+            ]}
+          />
+
+          <div className="lg:min-w-[320px]">
+            <div className="max-w-[600px]">
+              <StudyProgressExtended 
+                progressBarPageContent={progressBarPageContent}
+                regulatoryApprovalDate={regulatoryApprovalDate}
+                showBorder={false}
+                showDates={false}
+                showMoreDetails={false}
+                showTimeframeHint={false}
+                showTitle
+                studyStatus={studyStatus}
+                titleClassName='text-darkGrey'
+                titleSize='s'
+                willRecruitWithinTimeline={willRecruitWithinTimeline}
+              />
+            </div>
+          </div>
         </div>
 
-        <div className="lg:min-w-[320px]">
-          <strong className="govuk-heading-s govuk-!-margin-bottom-0">Study data indicates</strong>
-          <p className="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
-            {indications?.length ? indications.join(', ') : 'No concerns'}
-          </p>
-        </div>
+        <div className="shrink-0 flex flex-col items-center">
+          <div className="flex-1 w-full flex items-center justify-center">
+            {firstType ? (
+              <div className="text-center govuk-!-margin-top-4">
+                <div className="flex justify-center first-medal">
+                  <FirstMedal className="h-14 w-14 text-yellow-500 block" />
+                </div>
+                <div className="govuk-body-s govuk-!-margin-top-1 font-bold text-darkGrey">
+                  {capitaliseFirstLetter(firstType)} first
+                </div>
+              </div>
+            ) : null}
+          </div>
 
-        <div className="text-right lg:w-full">
-          <Link
-            aria-label={`View study ${shortTitle}`}
-            className="govuk-button w-auto govuk-!-margin-bottom-0"
-            href={studyHref}
-          >
-            View study
-          </Link>
+          <div className="w-full flex justify-center">
+            <Link
+              aria-label={`View study ${shortTitle}`}
+            className="govuk-link nihr-link-md nihr-link-arrow-left w-auto govuk-!-margin-bottom-0"
+              href={studyHref}
+            >
+              View study
+            </Link>
+          </div>
         </div>
       </div>
     </Card>

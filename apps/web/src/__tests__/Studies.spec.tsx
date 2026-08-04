@@ -130,7 +130,7 @@ describe('Studies page', () => {
     expect(screen.getByRole('heading', { level: 2, name: 'Assess progress of studies' })).toBeInTheDocument()
 
     // Total studies needing assessment
-    expect(screen.getByText(`There are 3 studies to assess`)).toBeInTheDocument()
+    expect(screen.getByText(`There are 3 studies needing action`)).toBeInTheDocument()
 
     // Description
     expect(
@@ -172,7 +172,7 @@ describe('Studies page', () => {
     ).toHaveAttribute('href', '/api/export')
 
     // Study results title
-    expect(screen.getByText(`${mockStudies.length} studies found (3 due for assessment)`)).toBeInTheDocument()
+    expect(screen.getByText(`${mockStudies.length} studies found (3 need action)`)).toBeInTheDocument()
 
     // Sort
     expect(screen.getByRole('combobox', { name: 'Sort by' })).toBeInTheDocument()
@@ -195,11 +195,8 @@ describe('Studies page', () => {
     ).toBeInTheDocument()
 
     // Study due assessment
-    expect(withinFirstStudy.getByText('Due for 4 days')).toBeInTheDocument()
-    expect(withinSecondStudy.queryByText(/Due/)).not.toBeInTheDocument()
-
-    // Study indicators
-    expect(withinFirstStudy.getByText('Milestone missed, Recruitment concerns')).toBeInTheDocument()
+    expect(withinFirstStudy.getByText('Assessment due for 4 days')).toBeInTheDocument()
+    expect(withinSecondStudy.queryByText(/Assessment/)).not.toBeInTheDocument()
 
     // Study assessment status
     expect(withinFirstStudy.getByText('Off Track on 1 January 2001')).toBeInTheDocument()
@@ -242,7 +239,7 @@ describe('Studies page', () => {
     )
 
     // Study results title
-    expect(screen.getByText(`0 studies found (0 due for assessment)`)).toBeInTheDocument()
+    expect(screen.getByText(`0 studies found (0 need action)`)).toBeInTheDocument()
 
     // Show message instead of the table
     expect(screen.getByText('No studies found')).toBeInTheDocument()

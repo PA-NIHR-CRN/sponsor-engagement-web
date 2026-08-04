@@ -1,12 +1,14 @@
 import { logger } from '@nihr-ui/logger'
+import dayjs from 'dayjs'
 import { setStudyAssessmentDue, setStudyAssessmentNotDue as setStudyAssessmentNotDueUtil } from 'shared-utilities'
 
-import type { Study, StudyEvaluationCategory } from '@/@types/studies'
-import { Status as CPMSStatus } from '@/@types/studies'
+import type { ActionKey, Study, StudyEvaluationCategory } from '@/@types/studies'
+import { INDICATOR_TO_ACTION, Status as CPMSStatus, Status } from '@/@types/studies'
+import type { TagProps } from '@/components/atoms/Tag/Tag'
 import { FormStudyStatus } from '@/constants/editStudyForm'
 import { getErrorMessage } from '@/utils/error'
 
-import type { OrderType } from '../@types/filters'
+import type { OrderType, StatusFilter } from '../@types/filters'
 import { StudySponsorOrganisationRoleRTSIdentifier } from '../constants'
 import { type OrganisationRoleShortName, organisationRoleShortName } from './organisations'
 import { Prisma, prismaClient } from './prisma'
@@ -126,12 +128,14 @@ export const getStudiesForOrgs = async ({
   pageSize,
   searchTerm,
   sortOrder,
+  status,
 }: {
   organisationIds: number[]
   currentPage: number
   pageSize: number
   searchTerm: string | null
   sortOrder: OrderType
+  status?: Status[]
 }) => {
   const query = {
     skip: currentPage * pageSize - pageSize,
@@ -163,6 +167,9 @@ export const getStudiesForOrgs = async ({
           ...(Number(searchTerm) ? [{ cpmsId: Number(searchTerm) }] : []),
         ],
       }),
+      ...(status?.length && {
+        studyStatus: { in: status },
+      }),
       organisations: {
         some: {
           organisationId: { in: organisationIds },
@@ -185,6 +192,9 @@ export const getStudiesForOrgs = async ({
       shortTitle: true,
       dueAssessmentAt: true,
       irasId: true,
+      regulatoryApprovalDate: true,
+      studyStatus: true,
+      willRecruitWithinTimeline: true,
       lastAssessment: {
         include: {
           status: true,
@@ -204,17 +214,22 @@ export const getStudiesForOrgs = async ({
           isDeleted: false,
         },
       },
+      StudyFirst: {},
     },
     orderBy: [sortMap[sortOrder], { id: Prisma.SortOrder.asc }],
   }
+
+  const needsActionWhere = buildNeedsActionWhere();
 
   const [studies, count, countDue] = await prismaClient.$transaction([
     prismaClient.study.findMany(query),
     prismaClient.study.count({ where: query.where }),
     prismaClient.study.count({
       where: {
-        ...query.where,
-        dueAssessmentAt: { not: null },
+        AND: [
+          query.where ?? {},
+          needsActionWhere,
+        ],
       },
     }),
   ])
@@ -224,6 +239,51 @@ export const getStudiesForOrgs = async ({
       total: count,
       totalDue: countDue,
     },
+    data: studies.map((study) => ({
+      ...study,
+      dataUpdatesRequired: studyDataUpdatesRequired(study),
+      needsAction: studyNeedsAction(study),
+    })),
+  }
+}
+
+export const getStudyTitlesForOrgs = async ({
+  organisationIds
+}: {
+  organisationIds: number[]
+}) => {
+  const query = {
+    where: {
+      isDeleted: false,
+      organisations: {
+        some: {
+          organisationId: { in: organisationIds },
+          organisationRole: {
+            rtsIdentifier: {
+              in: [
+                StudySponsorOrganisationRoleRTSIdentifier.ClinicalResearchSponsor,
+                StudySponsorOrganisationRoleRTSIdentifier.ClinicalTrialsUnit,
+                StudySponsorOrganisationRoleRTSIdentifier.ContractResearchOrganisation,
+              ],
+            },
+          },
+          isDeleted: false,
+        },
+      },
+    },
+    select: {
+      id: true,
+      shortTitle: true,
+      irasId: true,
+    },
+    orderBy: [{ shortTitle: Prisma.SortOrder.asc }],
+  }
+
+  const [studies] = await prismaClient.$transaction([
+    prismaClient.study.findMany(query)
+  ])
+
+  return {
     data: studies,
   }
 }
@@ -300,7 +360,7 @@ export const mapCPMSStatusToFormStatus = (cpmsStatus: string): string => {
     [CPMSStatus.OpenToRecruitment]: FormStudyStatus.OpenToRecruitment,
     [CPMSStatus.OpenWithRecruitment]: FormStudyStatus.OpenToRecruitment,
     [CPMSStatus.ClosedToRecruitment]: FormStudyStatus.Closed,
-    [CPMSStatus.ClosedToRecruitmentInFollowUp]: FormStudyStatus.ClosedFollowUp,
+    [CPMSStatus.ClosedToRecruitmentNoFollowUp]: FormStudyStatus.Closed,
     [CPMSStatus.ClosedToRecruitmentFollowUpComplete]: FormStudyStatus.Closed,
     [CPMSStatus.SuspendedFromOpenWithRecruitment]: FormStudyStatus.Suspended,
     [CPMSStatus.SuspendedFromOpenToRecruitment]: FormStudyStatus.Suspended,
@@ -318,8 +378,7 @@ export const mapFormStatusToCPMSStatus = (newStatus: string, currentStatus: stri
 
   const statusMap = {
     [FormStudyStatus.InSetup]: CPMSStatus.InSetup,
-    [FormStudyStatus.Closed]: CPMSStatus.ClosedToRecruitmentFollowUpComplete,
-    [FormStudyStatus.ClosedFollowUp]: CPMSStatus.ClosedToRecruitmentInFollowUp,
+    [FormStudyStatus.Closed]: CPMSStatus.ClosedToRecruitmentNoFollowUp,
     [FormStudyStatus.OpenToRecruitment]: isCurrentStatusSuspendedFromOpenWithRecruitment
       ? CPMSStatus.OpenWithRecruitment
       : CPMSStatus.OpenToRecruitment,
@@ -331,6 +390,38 @@ export const mapFormStatusToCPMSStatus = (newStatus: string, currentStatus: stri
 
   return statusMap[newStatus] || newStatus
 }
+
+export const mapFilterStatusesToStatuses = (
+  filterStatuses: StatusFilter[] | undefined
+): Status[] | undefined => {
+  const filterStatusMap: Record<StatusFilter, Status[]> = {
+    'in-setup': [
+      Status.InSetup,
+      Status.InSetupPendingNHSPermission,
+      Status.InSetupApprovalReceived,
+      Status.InSetupPendingApproval,
+      Status.InSetupNHSPermissionReceived],
+    open: [
+      Status.OpenToRecruitment,
+      Status.OpenWithRecruitment,
+    ],
+    suspended: [
+      Status.Suspended,
+      Status.SuspendedFromOpenWithRecruitment,
+      Status.SuspendedFromOpenToRecruitment,
+    ],
+  }
+
+  if (!filterStatuses?.length) {
+    return undefined
+  }
+
+  const mapped = filterStatuses.flatMap((s) => filterStatusMap[s] ?? [])
+  const unique = Array.from(new Set(mapped))
+
+  return unique.length ? unique : undefined
+}
+
 
 export const mapCPMSStudyToSEStudy = (study: Study): UpdateStudyInput => ({
   cpmsId: study.StudyId,
@@ -345,6 +436,7 @@ export const mapCPMSStudyToSEStudy = (study: Study): UpdateStudyInput => ({
   actualClosureDate: study.ActualClosureToRecruitmentDate ? new Date(study.ActualClosureToRecruitmentDate) : null,
   estimatedReopeningDate: study.EstimatedReopeningDate ? new Date(study.EstimatedReopeningDate) : null,
   leadAdministrationId: study.LeadAdministrationId,
+  regulatoryApprovalDate: study.RegulatoryApprovalDate ? new Date(study.RegulatoryApprovalDate) : null
 })
 
 export const updateStudy = async (cpmsId: number, studyData: UpdateStudyInput) => {
@@ -502,4 +594,155 @@ export const setStudyAssessmentNotDue = async (studyIds: number[]) => {
       error: errorMessage,
     }
   }
+}
+
+export function getDaysSinceAssessmentDue(dueAssessmentAt: Date | null): number | null {
+  const today = dayjs();
+
+  return dueAssessmentAt
+    ? Math.round(today.diff(dueAssessmentAt, 'day', true))
+    : null
+}
+
+const isAssessmentDueIndicator = (indicator: string | undefined) => indicator?.startsWith('Assessment due for')
+
+export function getAssessmentDueIndicator(
+  hasAssessmentDue: boolean,
+  daysSinceAssessmentDue: number | null
+): string | null {
+
+  if (!hasAssessmentDue || daysSinceAssessmentDue === null) {
+    return null
+  };
+
+  const days = daysSinceAssessmentDue;
+
+  return `Assessment due for ${days} day${days > 1 ? 's' : ''}`;
+}
+
+function getActionKeyForIndicator(indicator: string): ActionKey | null {
+  if (isAssessmentDueIndicator(indicator)) {
+    return 'ASSESS_STUDY';
+  }
+
+  return INDICATOR_TO_ACTION[indicator];
+}
+
+export const ACTION_CONFIG = {
+  ASSESS_STUDY: {
+    path: 'assess',
+    actionText: 'Assess study',
+  },
+  REVIEW_PLANNED_OPENING: {
+    path: 'edit',
+    actionText: 'Review planned opening date and study status',
+  },
+  REVIEW_PLANNED_CLOSING: {
+    path: 'edit',
+    actionText: 'Review planned closure date and study status',
+  },
+  REVIEW_EXPECTED_REOPENING: {
+    path: 'edit',
+    actionText: 'Review expected re-opening date and study status',
+  },
+  REVIEW_RECRUITMENT_TARGET: {
+    path: 'edit',
+    actionText: 'Review UK Recruitment target',
+  },
+  REVIEW_ACTUAL_OPENING: {
+    path: 'edit',
+    actionText: 'Review actual opening date and study status',
+  },
+};
+
+export function buildSummaryRows(indicators: string[], basePath: string) {
+  const grouped = new Map<ActionKey, TagProps[]>();
+
+  indicators.forEach((indicator) => {
+    const actionKey = getActionKeyForIndicator(indicator);
+    if (!actionKey) return;
+
+    if (!grouped.has(actionKey)) {
+      grouped.set(actionKey, []);
+    }
+
+    grouped.get(actionKey)?.push({ text: indicator });
+  });
+
+  // Remove ASSESS_STUDY if an assessment is not due regardless of other indicators
+  const assessTags = grouped.get('ASSESS_STUDY')
+  if (assessTags) {
+    const hasAssessmentDueIndicators = assessTags.some((t) => isAssessmentDueIndicator(t.text))
+    logger.info(hasAssessmentDueIndicators)
+    if (!hasAssessmentDueIndicators) {
+      grouped.delete('ASSESS_STUDY')
+    }
+  }
+
+  return Array.from(grouped.entries()).map(([actionKey, tags]) => {
+    const { path, actionText } = ACTION_CONFIG[actionKey]
+
+    return {
+      href: `${basePath}/${path}`,
+      actionText,
+      tags,
+    }
+  })
+}
+
+const excludedCategories: string[] = [
+  'Recruiting at a lower rate than expected (RTT)',
+  'No recruitment in past 6 months',
+];
+
+export function studyDataUpdatesRequired(study: {
+  evaluationCategories?: {
+    isDeleted?: boolean | null;
+    indicatorValue: string | null;
+  }[];
+}): boolean {
+  return (
+    study.evaluationCategories?.some(
+      (category) =>
+        category.isDeleted !== true &&
+        category.indicatorValue !== null &&
+        !excludedCategories.includes(category.indicatorValue)
+    ) === true
+  );
+}
+
+export function studyNeedsAction(study: {
+  dueAssessmentAt: Date | null;
+  evaluationCategories?: {
+    isDeleted?: boolean | null;
+    indicatorValue: string | null;
+  }[];
+}): boolean {
+  return study.dueAssessmentAt !== null || studyDataUpdatesRequired(study);
+}
+
+export function buildDataUpdatesRequiredWhere(): Prisma.StudyWhereInput {
+  return {
+    evaluationCategories: {
+      some: {
+        isDeleted: false,
+        indicatorValue: {
+          notIn: excludedCategories,
+        },
+      },
+    }
+  };
+}
+
+export function buildNeedsActionWhere(): Prisma.StudyWhereInput {
+  return {
+    OR: [
+      {
+        dueAssessmentAt: {
+          not: null,
+        },
+      },
+      buildDataUpdatesRequiredWhere(),
+    ],
+  };
 }

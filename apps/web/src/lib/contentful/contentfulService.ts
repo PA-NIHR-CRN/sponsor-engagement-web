@@ -1,10 +1,10 @@
 import assert from 'node:assert'
 
 import { logger } from '@nihr-ui/logger'
-import type { Entry, EntrySkeletonType } from 'contentful'
+import type { Entry, EntryCollection, EntrySkeletonType } from 'contentful'
 import { createClient } from 'contentful'
 
-import type { TypeBannerSkeleton, TypeBporFooterSkeleton, TypePageSkeleton } from '@/@types/generated'
+import type { TypeBannerSkeleton, TypeBporFooterSkeleton, TypePageSkeleton, TypeSetPageSkeleton } from '@/@types/generated'
 
 function getContentClient() {
   const {
@@ -36,6 +36,28 @@ function getContentClient() {
 export const getEntryById = async <T extends EntrySkeletonType>(id: string): Promise<Entry<T>> => {
   const contentClient = getContentClient()
   return contentClient.getEntry<T>(id)
+}
+export const getSetPageByKeyField = async (key: string): Promise<EntryCollection<TypeSetPageSkeleton>> => {
+  const contentClient = getContentClient()
+   return contentClient.getEntries<TypeSetPageSkeleton>({
+    'fields.key': key,
+    content_type : 'setPage',
+    limit:1
+  })
+}
+
+export const getManagedContent = async <T extends EntrySkeletonType>(
+  id: string | undefined
+): Promise<Entry<T> | null> => {
+  if (id) {
+    try {
+      return await getEntryById<T>(id)
+    } catch (error) {
+      logger.error(`Encountered error fetching entry from Contentful: ${error}`)
+      return null
+    }
+  }
+  return null
 }
 
 export const getNotificationBanner = async (): Promise<Entry<TypeBannerSkeleton> | null> => {
@@ -73,6 +95,20 @@ export const getBporFooter = async (): Promise<Entry<TypeBporFooterSkeleton> | n
   if (CONTENTFUL_BPOR_FOOTER_ENTRY_ID) {
     try {
       return await getEntryById<TypeBporFooterSkeleton>(CONTENTFUL_BPOR_FOOTER_ENTRY_ID)
+    } catch (error) {
+      logger.error(`Encountered error fetching entry from Contentful: ${error}`)
+      return null
+    }
+  }
+  return null
+}
+
+export const getSetPageByKey = async(
+  key: string | undefined
+): Promise<Entry<TypeSetPageSkeleton> | null> => {
+  if (key) {
+    try {
+      return (await getSetPageByKeyField(key)).items[0]
     } catch (error) {
       logger.error(`Encountered error fetching entry from Contentful: ${error}`)
       return null

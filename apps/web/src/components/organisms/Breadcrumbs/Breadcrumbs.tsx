@@ -27,7 +27,7 @@ function Breadcrumbs({ showBreadcrumb }: BreadcrumbsProps) {
   }, [router.pathname, router.query])
 
   return showBreadcrumb ? (
-    <div className="ml-8 govuk-!-padding-top-3">
+    <div className="">
       <Container>
         <nav aria-label="Breadcrumb" className="govuk-breadcrumbs">
           <ol className="govuk-breadcrumbs__list">

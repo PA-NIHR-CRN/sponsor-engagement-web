@@ -3,13 +3,28 @@ import dayjs from 'dayjs'
 import type { DateInputValue } from '@/components/atoms/Form/DateInput/types'
 import { SE_GDPR_COOKIE_EXPIRY_MONTHS } from '@/constants/cookies'
 
-import { DATE_FORMAT, DATE_FORMAT_SHORT } from '../constants'
+import { DATE_FORMAT, DATE_FORMAT_SHORT, DATE_FORMAT_SLASH } from '../constants'
 
 /**
  * Formats a date using the default govuk format e.g. 13 June 2023
  */
-export const formatDate = (date: string | Date, type: 'long' | 'short' = 'long') =>
-  dayjs(date).format(type === 'long' ? DATE_FORMAT : DATE_FORMAT_SHORT)
+export const formatDate = (
+  date: string | Date,
+  type: 'long' | 'short' | 'slash' = 'long'
+) => {
+  switch (type) {
+    case 'short':
+      return dayjs(date).format(DATE_FORMAT_SHORT)
+
+    case 'slash':
+      return dayjs(date).format(DATE_FORMAT_SLASH)
+
+    case 'long':
+    default:
+      return dayjs(date).format(DATE_FORMAT)
+  }
+}
+
 
 export const getGDPRCookieExpiryDate = () => dayjs().add(SE_GDPR_COOKIE_EXPIRY_MONTHS, 'M').toDate()
 

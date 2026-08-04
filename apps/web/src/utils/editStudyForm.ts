@@ -51,12 +51,6 @@ const getMandatoryDateFields = (previousStatus: string | null, newStatus: string
     ],
     [FormStudyStatus.Withdrawn]: ['plannedOpeningDate', 'plannedClosureDate'],
     [FormStudyStatus.Closed]: ['plannedOpeningDate', 'actualOpeningDate', 'plannedClosureDate', 'actualClosureDate'],
-    [FormStudyStatus.ClosedFollowUp]: [
-      'plannedOpeningDate',
-      'actualOpeningDate',
-      'plannedClosureDate',
-      'actualClosureDate',
-    ],
   }
 
   const mandatoryDates = (mandatoryDateFieldsByStatus[newStatus] || []) as (keyof DateFieldName)[]
@@ -98,12 +92,6 @@ export const getVisibleFormFields = (
       'estimatedReopeningDate',
     ],
     [FormStudyStatus.Closed]: ['plannedOpeningDate', 'actualOpeningDate', 'plannedClosureDate', 'actualClosureDate'],
-    [FormStudyStatus.ClosedFollowUp]: [
-      'plannedOpeningDate',
-      'actualOpeningDate',
-      'plannedClosureDate',
-      'actualClosureDate',
-    ],
     [FormStudyStatus.Withdrawn]: ['plannedOpeningDate', 'plannedClosureDate'],
   }
 
@@ -112,24 +100,20 @@ export const getVisibleFormFields = (
       FormStudyStatus.InSetup,
       FormStudyStatus.OpenToRecruitment,
       FormStudyStatus.Closed,
-      FormStudyStatus.ClosedFollowUp,
       FormStudyStatus.Withdrawn,
       FormStudyStatus.Suspended,
     ],
     [FormStudyStatus.OpenToRecruitment]: [
       FormStudyStatus.OpenToRecruitment,
       FormStudyStatus.Closed,
-      FormStudyStatus.ClosedFollowUp,
       FormStudyStatus.Suspended,
     ],
     [FormStudyStatus.Suspended]: [
       FormStudyStatus.OpenToRecruitment,
       FormStudyStatus.Closed,
-      FormStudyStatus.ClosedFollowUp,
       FormStudyStatus.Suspended,
     ],
     [FormStudyStatus.Closed]: [FormStudyStatus.Closed],
-    [FormStudyStatus.ClosedFollowUp]: [FormStudyStatus.ClosedFollowUp],
     [FormStudyStatus.Withdrawn]: [FormStudyStatus.Withdrawn],
   }
 
@@ -230,7 +214,7 @@ const validateDate = (fieldName: keyof DateFieldName, ctx: z.RefinementCtx, valu
   ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: `${label} must be today or in the past`,
+      message: `${label} cannot be in the future`,
       path: [fieldName],
     })
   } else if (

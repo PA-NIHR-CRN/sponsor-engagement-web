@@ -1,3 +1,4 @@
+import type { Document } from '@contentful/rich-text-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Container } from '@nihr-ui/frontend'
 import clsx from 'clsx'
@@ -8,6 +9,7 @@ import { type ReactElement, useCallback } from 'react'
 import type { FieldError } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 
+import type { TypeSetAssessmentFormPageSkeleton } from '@/@types/generated'
 import { Checkbox, CheckboxGroup, ErrorSummary, Fieldset, Form, Radio, RadioGroup } from '@/components/atoms'
 import { Textarea } from '@/components/atoms/Form/Textarea/Textarea'
 import { AssessmentHistory, getAssessmentHistoryFromStudy, RequestSupport, StudyDetails } from '@/components/molecules'
@@ -15,10 +17,12 @@ import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
 import { TEXTAREA_MAX_CHARACTERS } from '@/constants/forms'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
+import { getManagedContent } from '@/lib/contentful/contentfulService'
 import { prismaClient } from '@/lib/prisma'
 import { getStudyById } from '@/lib/studies'
 import { getValuesFromSearchParams } from '@/utils/form'
-import type { AssessmentInputs } from '@/utils/schemas/assessment.schema'
+import { RichTextRenderer } from '@/utils/Renderers/RichTextRenderer/RichTextRenderer'
+import type { AssessmentInputs} from '@/utils/schemas/assessment.schema';
 import { assessmentSchema } from '@/utils/schemas/assessment.schema'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
@@ -31,13 +35,24 @@ export default function Assessment({
   furtherInformation,
   returnUrl,
   assessments,
+  pageContent,
 }: AssessmentProps) {
-  const { register, formState, setError, watch, handleSubmit } = useForm<AssessmentInputs>({
+  const studyHasNotRecruitedWithinSixMonths = study.evaluationCategories.some(indicator => indicator.indicatorValue === 'No recruitment in past 6 months')
+
+  const {
+    register,
+    formState,
+    setError,
+    handleSubmit,
+  } = useForm<AssessmentInputs>({
     resolver: zodResolver(assessmentSchema),
     defaultValues: {
       ...getValuesFromSearchParams(assessmentSchema, query),
       studyId: String(study.id),
+      studyHasNotRecruitedWithinSixMonths: studyHasNotRecruitedWithinSixMonths ? 'true' : 'false',
+      reasonForNoRecruitment: null,
     },
+    shouldUnregister: true,
   })
 
   const handleFoundError = useCallback(
@@ -53,30 +68,35 @@ export default function Assessment({
     onFoundError: handleFoundError,
   })
 
-  // Watch & update the character count for the "Support summary" textarea
-  const furtherInformationText = watch('furtherInformationText') ?? ''
-  const remainingCharacters =
-    furtherInformationText.length >= TEXTAREA_MAX_CHARACTERS
-      ? 0
-      : TEXTAREA_MAX_CHARACTERS - furtherInformationText.length
-
   const { defaultValues } = formState
 
   const { organisationsByRole } = study
 
   const supportOrgName = organisationsByRole.CRO ?? organisationsByRole.CTU
 
+  function getStudyRadioDescription(id: number, description: string): string  {
+    switch (id) {
+      case 1:
+        // on track
+        return pageContent?.guidanceTextOnTrack as string
+      case 2:
+        //off track
+        return pageContent?.guidanceTextOffTrack as string
+      default:
+        return description
+    }
+  }
+
   return (
     <Container>
       <NextSeo title="Study Progress Review - Assess progress of study" />
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
-          <h2 className="govuk-heading-l govuk-!-margin-bottom-4">Assess progress of a study in the UK</h2>
+          <h2 className="govuk-heading-l govuk-!-margin-bottom-4">{pageContent?.pageTitle.toString()}</h2>
 
-          <p className="govuk-body govuk-!-margin-bottom-6">
-            You will need to assess if the study is on or off track in the UK and if any action is being taken. If you
-            need NIHR RDN support with this study you will need to request this separately.
-          </p>
+          <div className="govuk-body govuk-!-margin-bottom-6">
+            <RichTextRenderer>{pageContent?.pageDescription as Document}</RichTextRenderer>
+          </div>
 
           <div className="text-darkGrey govuk-!-margin-bottom-0 govuk-body-s">
             <span className="govuk-visually-hidden">Study sponsor: </span>
@@ -120,18 +140,33 @@ export default function Assessment({
 
             <input type="hidden" {...register('studyId')} defaultValue={defaultValues?.studyId} />
 
+            <input type="hidden" {...register('studyHasNotRecruitedWithinSixMonths')} />
             <Fieldset>
               {/* Status */}
               <RadioGroup
-                defaultValue={defaultValues?.status}
+                defaultValue=''
                 errors={errors}
-                label="Is this study progressing in the UK as planned?"
+                label={pageContent?.studyProgressionQuestionLabel.toString()}
                 {...register('status')}
               >
                 {statuses.map(({ id, name, description }) => (
-                  <Radio hint={description} key={id} label={name} value={String(id)} />
+                  <Radio hint={getStudyRadioDescription(id, description)} key={id} label={name} value={String(id)} />
                 ))}
               </RadioGroup>
+
+              {/* Reason for no recruitment in the last 6 months text */}
+              {studyHasNotRecruitedWithinSixMonths ?
+
+                <Textarea
+                  defaultValue=''
+                  {...register('reasonForNoRecruitment')}
+                  errors={errors}
+                  hint="Provide reasoning for no recruitment"
+                  label="Study has not recruited for 6 months"
+                  maxLength={TEXTAREA_MAX_CHARACTERS}
+                  required
+                />
+                : null}
 
               {/* Further information */}
               <CheckboxGroup
@@ -141,7 +176,7 @@ export default function Assessment({
                     : []
                 }
                 errors={errors}
-                label="Is there any additional information that would help NIHR RDN understand this progress assessment? (optional)"
+                label={pageContent?.additionalInfoLabel.toString()}
                 required={false}
                 {...register('furtherInformation')}
               >
@@ -154,8 +189,10 @@ export default function Assessment({
               <Textarea
                 defaultValue={defaultValues?.furtherInformationText}
                 errors={errors}
-                label="Further information (optional)"
-                remainingCharacters={remainingCharacters}
+                label={
+                  pageContent?.furtherInformationLabel ? (pageContent.furtherInformationLabel as string) : ''
+                }
+                maxLength={TEXTAREA_MAX_CHARACTERS}
                 required={false}
                 {...register('furtherInformationText')}
               />
@@ -207,6 +244,10 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
 
   const { data: study } = await getStudyById(Number(studyId), userOrganisationIds)
 
+  const { CONTENTFUL_PAGE_STUDY_ASSESS_ID } = process.env
+  const contentfulContent = await getManagedContent<TypeSetAssessmentFormPageSkeleton>(CONTENTFUL_PAGE_STUDY_ASSESS_ID)
+  const pageContent = contentfulContent?.fields || null
+
   const [statusRefData, furtherInformationRefData] = await prismaClient.$transaction([
     prismaClient.sysRefAssessmentStatus.findMany(),
     prismaClient.sysRefAssessmentFurtherInformation.findMany({
@@ -234,6 +275,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
       statuses: statusRefData.map(({ id, name, description }) => ({ id, name, description })),
       furtherInformation: furtherInformationRefData.map(({ id, name }) => ({ id, name })),
       returnUrl: context.query.returnUrl === 'studies' ? 'studies' : `studies/${study.id}`,
+      pageContent,
     },
   }
 })

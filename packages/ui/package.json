@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.0.6",
-    "govuk-frontend": "^4.7.0"
+    "govuk-frontend": "6.4.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.5",

@@ -6,11 +6,7 @@
     "build": "tsup",
     "clean": "rm -rf dist",
     "dev": "nodemon --exec \"node -r esbuild-register ./src/index.ts\" -e .ts",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "start": "node -r esbuild-register ./src/index.ts",
-    "test": "jest --watch",
-    "test:ci": "jest --ci --coverage"
+    "start": "node -r esbuild-register ./src/index.ts"
   },
   "dependencies": {
     "@nihr-ui/logger": "*",
