@@ -145,7 +145,7 @@ export default function Organisation({ organisation, query, pageContent }: Organ
     if (router.query.success) {
       reset()
     }
-  }, [router.query.success])
+  }, [router.query.success, invitedEmail, reset])
 
   return (
     <Container>
