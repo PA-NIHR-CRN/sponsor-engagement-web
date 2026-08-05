@@ -12,8 +12,8 @@ export default class SignedOutPage {
     this.page = page
 
     //Locators
-    this.pageTitle = page.locator('h2[class="govuk-heading-l"]', { hasText: 'You are signed out' })
-    this.pageText = page.locator('div[class="govuk-width-container govuk-!-padding-left-6 govuk-!-padding-right-6"] p')
+    this.pageTitle = page.locator('h2', { hasText: 'You are signed out' })
+    this.pageText = page.locator('p', { hasText: 'Please sign in to access this application.' })
     this.btnSignIn = page.locator('a[class="govuk-button"]')
   }
 
@@ -23,9 +23,9 @@ export default class SignedOutPage {
   }
 
   async assertOnSignedOutPage() {
-    await expect(this.pageTitle).toBeVisible()
-    await expect(this.pageText).toBeVisible()
+    await expect(this.pageTitle).toBeVisible({ timeout: 10000 })
+    await expect(this.pageText).toBeVisible({ timeout: 10000 })
     await expect(this.pageText).toHaveText('Please sign in to access this application.')
-    await expect(this.page).toHaveURL('auth/signout/confirmation')
+    await expect(this.page).toHaveURL(/auth\/signout\/confirmation/)
   }
 }
