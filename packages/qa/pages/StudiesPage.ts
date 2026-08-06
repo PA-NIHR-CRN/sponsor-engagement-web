@@ -122,7 +122,7 @@ export default class StudiesPage {
     this.sortBySection = page.locator('div[class="govuk-form-group mt-2 items-center justify-end md:my-0 md:flex"]')
     this.sortByLabel = this.sortBySection.locator('label')
     this.sortByDropdown = this.sortBySection.locator('select')
-    this.reportAFirstLink = page.locator('a[class="govuk-link nihr-link-lg nihr-link-arrow-left mb-0"]')
+    this.reportAFirstLink = page.getByRole('link', { name: 'Report a First' })
   }
 
   //Page Methods
@@ -399,11 +399,15 @@ export default class StudiesPage {
   }
 
   async assertNeedsActionBannerCount(expectedCount: number) {
-    await expect(this.needsActionBanner).toHaveText(`There are ${expectedCount} studies needing action`)
+    const expectedText =
+      expectedCount === 1 ? 'There is 1 study needing action' : `There are ${expectedCount} studies needing action`
+    await expect(this.needsActionBanner).toHaveText(expectedText)
   }
 
-  async assertStudiesFoundLabelContainsNeedsActionCount(expectedCount: number) {
-    await expect(this.studiesFoundLabel).toContainText(`${expectedCount} need action`)
+  async assertNeedsActionStudiesFoundBannerCount(expectedCount: number) {
+    const expectedText =
+      expectedCount === 1 ? 'study found (1 needs action)' : `studies found (${expectedCount} need action)`
+    await expect(this.studiesFoundLabel).toContainText(expectedText)
   }
 
   async assertDataUpdatesRequiredChipDisplayed() {
@@ -531,5 +535,13 @@ export default class StudiesPage {
   async filterByStatusInSetup() {
     await this.filterButton.click()
     await this.statusInSetupCheckbox.click()
+  }
+
+  async assertGlobalFirstLabelVisible() {
+    await expect(this.page.getByText('Global first')).toBeVisible()
+  }
+
+  async assertEuropeanFirstLabelVisible() {
+    await expect(this.page.getByText('European first')).toBeVisible()
   }
 }

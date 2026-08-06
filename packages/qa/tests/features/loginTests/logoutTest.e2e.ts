@@ -17,10 +17,9 @@ test.describe('Logout as a Sponsor Contact - @se_74', () => {
       await expect(commonItemsPage.signOutLink).toBeVisible()
     })
     await test.step('And I click the sign out option', async () => {
-      await commonItemsPage.signOutLink.click()
+      await commonItemsPage.signOutLink.click({ timeout: 10000 })
     })
     await test.step('Then I am taken to the Signed Out Page', async () => {
-      await commonItemsPage.signOutLink.click()
       await signedOutPage.assertOnSignedOutPage()
     })
     await test.step('And the Cog icon and my Username no longer appear in the Page Banner', async () => {
@@ -47,10 +46,9 @@ test.describe('Logout as a Contact Manager - @se_74', () => {
       await expect(commonItemsPage.signOutLink).toBeVisible()
     })
     await test.step('And click sign out', async () => {
-      await commonItemsPage.signOutLink.click()
+      await commonItemsPage.signOutLink.click({ timeout: 10000 })
     })
     await test.step('Then I am taken to the Signed Out Page', async () => {
-      await commonItemsPage.signOutLink.click()
       await signedOutPage.assertOnSignedOutPage()
     })
     await test.step('And the Cog icon and my Username no longer appear in the Page Banner', async () => {

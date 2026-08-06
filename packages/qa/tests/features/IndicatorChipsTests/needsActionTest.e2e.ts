@@ -291,7 +291,7 @@ test.describe('Need Action Chip Logic - @se_315', () => {
     })
 
     await test.step('And the Studies Found label count is correct', async () => {
-      await studiesPage.assertStudiesFoundLabelContainsNeedsActionCount(needsActionCount)
+      await studiesPage.assertNeedsActionStudiesFoundBannerCount(needsActionCount)
     })
   })
 })

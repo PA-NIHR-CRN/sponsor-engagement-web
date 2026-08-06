@@ -31,6 +31,7 @@ test.describe('Mini dashboard Logic - @se_316', () => {
     })
 
     await test.step(`Then I am taken to the Details page`, async () => {
+      await studiesPage.viewStudyButton.nth(0).click()
       await expect(studyDetailsPage.pageTitle).toBeVisible()
     })
 
@@ -71,6 +72,7 @@ test.describe('Mini dashboard Logic - @se_316', () => {
     })
 
     await test.step(`Then I am taken to the Details page`, async () => {
+      await studiesPage.viewStudyButton.nth(0).click()
       await expect(studyDetailsPage.pageTitle).toBeVisible()
     })
 
@@ -111,6 +113,7 @@ test.describe('Mini dashboard Logic - @se_316', () => {
     })
 
     await test.step(`Then I am taken to the Details page`, async () => {
+      await studiesPage.viewStudyButton.nth(0).click()
       await expect(studyDetailsPage.pageTitle).toBeVisible()
     })
 

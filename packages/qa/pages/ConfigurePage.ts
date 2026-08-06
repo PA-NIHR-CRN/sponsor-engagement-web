@@ -31,7 +31,7 @@ export default class {
   //Page Methods
   async assertOnConfigurePage() {
     await expect(this.pageTitle).toBeVisible()
-    await expect(this.pageTitle).toHaveText(`Configure Progress of Study Setup`)
+    await expect(this.pageTitle).toHaveText(`Progress of UK Study Set-up`)
     await expect(this.page).toHaveURL('studies/17526/configure')
   }
 
