@@ -7,7 +7,7 @@ import { seDatabaseReq } from '../utils/DbRequests'
 export default class OrganisationDetailsPage {
   readonly page: Page
   readonly pageTitle: Locator
-  readonly addRemoveHeader: Locator
+  readonly addOrRemoveHeader: Locator
   readonly inviteSection: Locator
   readonly submitButton: Locator
   readonly pageSubHeading: Locator
@@ -45,7 +45,7 @@ export default class OrganisationDetailsPage {
 
     //Locators
     this.pageTitle = page.locator('h2[class="govuk-heading-l govuk-!-margin-bottom-1"]')
-    this.addRemoveHeader = page.locator('h3[class="govuk-heading-m p-0 govuk-!-margin-bottom-4"]')
+    this.addOrRemoveHeader = page.locator('h3[class="govuk-heading-m p-0 govuk-!-margin-bottom-4"]')
     this.inviteSection = page.locator('form[action="/api/forms/organisation"]')
     this.addContactSuccessAlertBox = page.locator(
       'div[class="govuk-notification-banner govuk-notification-banner--success"]'
@@ -67,8 +67,7 @@ export default class OrganisationDetailsPage {
     this.detailsTableRoleRow = this.detailsTable.locator('tr').nth(1)
     this.detailsTableRoleHeader = this.detailsTableRoleRow.locator('th')
     this.detailsTableRoleValue = this.detailsTableRoleRow.locator('td')
-    this.addRemoveHeader = page.locator('h3[class="govuk-heading-m p-0 govuk-!-margin-bottom-4"]')
-    this.addRemoveGuidanceTxt = this.addRemoveHeader.locator('..').locator('p')
+    this.addRemoveGuidanceTxt = this.addOrRemoveHeader.locator('..').locator('p')
     this.contactsList = page.locator('table[class="govuk-table"]')
     this.contactsListHeaders = this.contactsList.locator('thead tr')
     this.contactsListEmailHeader = this.contactsListHeaders.locator('th').nth(0)
@@ -89,9 +88,9 @@ export default class OrganisationDetailsPage {
 
   async assertOnOrganisationDetailsPage(orgId: string) {
     await expect(this.pageTitle).toBeVisible()
-    await expect(this.addRemoveHeader).toBeVisible()
+    await expect(this.addOrRemoveHeader).toBeVisible()
     await expect(this.inviteSection).toBeVisible()
-    await expect(this.addRemoveHeader).toHaveText('Add or remove sponsor contacts')
+    await expect(this.addOrRemoveHeader).toHaveText('Add or remove sponsor contacts')
     await expect(this.page).toHaveURL(`organisations/${orgId}`)
   }
 
@@ -101,20 +100,20 @@ export default class OrganisationDetailsPage {
 
   async assertOnOrganisationDetailsPageWithSuccess(orgId: string) {
     await expect(this.pageTitle).toBeVisible()
-    await expect(this.addRemoveHeader).toBeVisible()
+    await expect(this.addOrRemoveHeader).toBeVisible()
     await expect(this.inviteSection).toBeVisible()
     await expect(this.addContactSuccessAlertBox).toBeVisible()
-    await expect(this.addRemoveHeader).toHaveText('Add or remove sponsor contacts')
+    await expect(this.addOrRemoveHeader).toHaveText('Add or remove sponsor contacts')
     await expect(this.addContactSuccessAlertBoxTitle).toHaveText('Success')
     await expect(this.page).toHaveURL(`organisations/${orgId}?success=1`)
   }
 
   async assertOnOrganisationDetailsPageWithRemove(orgId: string) {
     await expect(this.pageTitle).toBeVisible()
-    await expect(this.addRemoveHeader).toBeVisible()
+    await expect(this.addOrRemoveHeader).toBeVisible()
     await expect(this.inviteSection).toBeVisible()
     await expect(this.addContactSuccessAlertBox).toBeVisible()
-    await expect(this.addRemoveHeader).toHaveText('Add or remove sponsor contacts')
+    await expect(this.addOrRemoveHeader).toHaveText('Add or remove sponsor contacts')
     await expect(this.addContactSuccessAlertBoxTitle).toHaveText('Success')
     await expect(this.page).toHaveURL(`organisations/${orgId}?success=2`)
   }
@@ -210,8 +209,8 @@ export default class OrganisationDetailsPage {
   }
 
   async assertAddRemoveSectionPresent() {
-    await expect(this.addRemoveHeader).toBeVisible()
-    await expect(this.addRemoveHeader).toHaveText('Add or remove sponsor contacts')
+    await expect(this.addOrRemoveHeader).toBeVisible()
+    await expect(this.addOrRemoveHeader).toHaveText('Add or remove sponsor contacts')
   }
 
   async assertAddRemoveGuidanceTxt() {

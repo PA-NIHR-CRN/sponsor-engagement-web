@@ -26,7 +26,7 @@ test.describe('Sponsor Organisation Details Page for Sponsor Contacts - @se_248'
       await commonItemsPage.goto()
     })
     await test.step('When I click on the manage sponsor contacts icon', async () => {
-      await commonItemsPage.manageAbridgedContactsIcon.click()
+      await commonItemsPage.manageAbridgedContactsLink.click()
     })
     await test.step('Then I am taken to the organisation details page, not the organisation list page', async () => {
       await organisationDetailsPage.assertOnOrganisationDetailsPage(organisationId.toString())
@@ -56,7 +56,7 @@ test.describe('Sponsor Organisation Details Page for Sponsor Contacts - @se_248'
       await commonItemsPage.goto()
     })
     await test.step('When I click on the manage sponsor contacts icon', async () => {
-      await commonItemsPage.manageAbridgedContactsIcon.click()
+      await commonItemsPage.manageAbridgedContactsLink.click()
     })
     await test.step('Then I am taken to the organisation list page, not the organisation details page', async () => {
       await organisationsPage.assertOnOrganisationsPage()

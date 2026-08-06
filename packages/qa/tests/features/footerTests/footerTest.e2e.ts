@@ -16,9 +16,7 @@ test.describe('Footer validation - @se_255', () => {
       commonItemsPage.assertFooterLinksPresent()
     })
     await test.step('When I click the cog Icon and select the logout option', async () => {
-      await commonItemsPage.cogIcon.click()
-      await commonItemsPage.assertLogoutOptionVisible()
-      await commonItemsPage.logoutOption.click()
+      await commonItemsPage.signOutLink.click()
     })
     await test.step('Then I am able to see the Footer and its links while logged out', async () => {
       commonItemsPage.assertFooterPresent()

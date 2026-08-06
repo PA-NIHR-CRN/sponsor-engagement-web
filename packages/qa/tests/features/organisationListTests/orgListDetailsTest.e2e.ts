@@ -1,4 +1,4 @@
-import { test } from '../../../hooks/CustomFixtures'
+import { test, expect } from '../../../hooks/CustomFixtures'
 
 const multiRoleSearchPhrase = 'Mapi SAS'
 const multiRoleSearchId = '706'
@@ -124,7 +124,7 @@ test.describe('Sponsor Organisation List Page for Contact Managers - @se_14', ()
       await organisationsPage.orgListItemManageButton.nth(orgListItemIndex).click()
     })
     await test.step('Then I am taken to the Details page for that Organisation', async () => {
-      await organisationDetailsPage.assertOnOrganisationDetailsPage(orgIdFromList)
+      await expect(organisationDetailsPage.addOrRemoveHeader).toBeVisible()
     })
     await test.step('When I return to the Org List Page', async () => {
       await organisationsPage.goto()

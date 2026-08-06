@@ -11,7 +11,14 @@ import { RowDataPacket } from 'mysql2'
 export default class StudyDetailsPage {
   readonly page: Page
   readonly pageTitle: Locator
+  readonly miniDashboardTitle: Locator
+  readonly miniDashboardText: Locator
   readonly progressHeader: Locator
+  readonly studySetUpProgressContainer: Locator
+  readonly studySetUpProgressStatus: Locator
+  readonly studySetUpProgressFraction: Locator
+  readonly studySetUpProgressBarWarning: Locator
+  readonly studySetUpProgressBarError: Locator
   readonly progressSection: Locator
   readonly assessmentHeader: Locator
   readonly aboutHeader: Locator
@@ -57,6 +64,9 @@ export default class StudyDetailsPage {
   readonly tableEstimatedReopenDateValue: Locator
   readonly assessButton: Locator
   readonly updateStudyDataButton: Locator
+  readonly studySetUpProgressBar: Locator
+  readonly noExpectationToAchieveMessage: Locator
+  readonly moreDetailsLink: Locator
   readonly assessSuccessAlertBox: Locator
   readonly assessSuccessAlertBoxTitle: Locator
   readonly noAssessmentValue: Locator
@@ -74,7 +84,6 @@ export default class StudyDetailsPage {
   readonly secondSponsorAssessmentDate: Locator
   readonly firstSponsorAssessmentText: Locator
   readonly secondSponsorAssessmentText: Locator
-  readonly firstSponsorAssessmentTrack: Locator
   readonly secondSponsorAssessmentTrack: Locator
   readonly assessmentDueIndicator: Locator
   readonly allStudiesLink: Locator
@@ -105,21 +114,38 @@ export default class StudyDetailsPage {
 
     //Locators
     this.pageTitle = page.locator('h2.govuk-heading-l')
-    this.progressHeader = page.locator('h3.govuk-heading-m', {
-      hasText: 'Summary of study’s progress (UK)',
+    this.miniDashboardTitle = page.locator('.stat__content__title')
+    this.miniDashboardText = page.locator('.stat__content__body')
+    this.progressHeader = page.locator('h3[class="govuk-heading-m govuk-!-margin-bottom-1 p-0"]', {
+      hasText: 'Summary',
     })
     this.progressSection = page.locator('table[class="govuk-table govuk-!-margin-top-3"]')
-    this.assessmentHeader = page.locator('h3[class="govuk-heading-m govuk-!-margin-bottom-1 p-0"]', {
-      hasText: 'Sponsor assessment history',
-    })
+    this.assessmentHeader = page.locator('h3', { hasText: 'Sponsor assessment history' })
+    this.studySetUpProgressContainer = page.locator('.progress-summary')
+    this.studySetUpProgressStatus = this.studySetUpProgressContainer
+      .locator('div.flex.justify-between')
+      .locator('span')
+      .first()
+    this.studySetUpProgressFraction = this.studySetUpProgressContainer
+      .locator('div.flex.flex-col.text-right span')
+      .first()
+    this.studySetUpProgressBarWarning = page.locator('progress.progress-bar-warning')
+    this.studySetUpProgressBarError = page.locator('progress.progress-bar-error')
     this.aboutHeader = page.locator('h3[class="govuk-heading-m govuk-!-margin-bottom-3"]')
     this.aboutSection = page.locator('table[class="govuk-table govuk-!-margin-bottom-3"]')
     this.guidanceText = page.locator('div[class="govuk-inset-text mt-7"]')
     this.sponsorOrgSubTitle = page.locator('span[class="govuk-body-m mb-0 text-darkGrey"]')
-    this.progressSummarySubTitle = page.locator('span[class="govuk-body-s text-darkGrey"]')
+    this.progressSummarySubTitle = page.locator('span[class="govuk-body-s text-darkGrey"]', {
+      hasText: 'latest data uploaded to CPMS',
+    })
     this.assessButton = page.locator('a[class="govuk-button w-auto govuk-!-margin-bottom-0"]')
     this.updateStudyDataButton = page.locator(
       'a[class="govuk-button govuk-button--secondary w-auto govuk-!-margin-bottom-0"]'
+    )
+    this.moreDetailsLink = page.locator('a', { hasText: 'More details' })
+    this.studySetUpProgressBar = page.locator('progress[class="progress-bar progress-bar-error govuk-!-width-full"]')
+    this.noExpectationToAchieveMessage = page.locator(
+      'span[class="govuk-body-s text-darkGrey block govuk-!-margin-bottom-2"]'
     )
     // About Study Table Values
     this.tableFullTitleHeader = page.locator('th[scope="row"]', { hasText: 'Study full title' })
@@ -185,10 +211,10 @@ export default class StudyDetailsPage {
       .locator('p', { hasText: 'Further information' })
       .locator('span')
     this.firstSponsorAssessmentNoRecruitmentReason = this.firstSponsorAssessmentFurtherInfo
-      .locator('p', { hasText: 'Reason for not recruiting for 6 months:' })
+      .locator('p', { hasText: 'No recruitment for 6 months:' })
       .locator('span')
     this.secondSponsorAssessmentNoRecruitmentReason = this.secondSponsorAssessmentFurtherInfo
-      .locator('p', { hasText: 'Reason for not recruiting for 6 months:' })
+      .locator('p', { hasText: 'No recruitment for 6 months' })
       .locator('span')
     this.sponsorAssessmentHistory = page.locator('[class="govuk-!-margin-bottom-6"]')
     this.firstSponsorAssessmentRow = this.sponsorAssessmentHistory.locator('button')
@@ -196,12 +222,11 @@ export default class StudyDetailsPage {
     this.firstSponsorAssessmentDate = this.firstSponsorAssessmentRow.locator('div')
     this.secondSponsorAssessmentDate = this.secondSponsorAssessmentRow.locator('div')
     this.firstSponsorAssessmentText = this.firstSponsorAssessmentRow.locator(
-      'span[class="ml-[35px] md:ml-0 govuk-body-s mb-0"]'
+      'span[class="accordion__sidecontent ml-[35px] md:ml-0 govuk-body-s mb-0"]'
     )
     this.secondSponsorAssessmentText = this.secondSponsorAssessmentRow.locator(
-      'span[class="ml-[35px] md:ml-0 govuk-body-s mb-0"]'
+      'span[class="accordion__sidecontent ml-[35px] md:ml-0 govuk-body-s mb-0"]'
     )
-    this.firstSponsorAssessmentTrack = this.firstSponsorAssessmentText.locator('strong')
     this.secondSponsorAssessmentTrack = this.secondSponsorAssessmentText.locator('strong')
     this.assessmentDueIndicator = page
       .locator('span[class="govuk-tag govuk-tag--red normal-case"]')
@@ -253,6 +278,19 @@ export default class StudyDetailsPage {
     await this.page.goto(`studies/${studyId}`)
   }
 
+  async assertEstimatedReopenDateMatchesTableValue() {
+    const tableDate = (await this.tableEstimatedReopenDateValue.textContent())?.trim() ?? ''
+    const expectedDashboardDate = new Date(tableDate).toLocaleDateString('en-GB')
+    const targetCard = this.miniDashboardTitle.filter({ hasText: 'Estimated reopening date' }).locator('../..')
+    await expect(targetCard.locator('.stat__content__body')).toHaveText(expectedDashboardDate)
+  }
+
+  async assertStudySetupProgress(expectedStatusText: string, expectedFractionText: string) {
+    await expect(this.studySetUpProgressContainer).toBeVisible()
+    await expect(this.studySetUpProgressStatus).toHaveText(expectedStatusText)
+    await expect(this.studySetUpProgressFraction).toHaveText(expectedFractionText)
+  }
+
   async assertOnStudyDetailsPage(studyId: string) {
     await expect(this.pageTitle).toBeVisible()
     await expect(this.progressHeader).toBeVisible()
@@ -274,6 +312,12 @@ export default class StudyDetailsPage {
     await expect(this.assessSuccessAlertBox).toBeVisible()
     await expect(this.assessSuccessAlertBoxTitle).toHaveText('Success')
     await expect(this.page).toHaveURL(`studies/${studyId}?success=1`)
+  }
+
+  async assertOnStudyDetailsPageWithSuccessMessage(studyId: string) {
+    await expect(this.assessSuccessAlertBox).toBeVisible()
+    await expect(this.assessSuccessAlertBoxTitle).toHaveText('Success')
+    await expect(this.page).toHaveURL(`studies/${studyId}?success=4`)
   }
 
   async assertAboutStudySectionPresent() {
@@ -608,9 +652,9 @@ export default class StudyDetailsPage {
 
   async assertSponsorAssessmentOnOffTrack(option: string) {
     if (option.toLowerCase() == 'on') {
-      await expect(this.firstSponsorAssessmentTrack).toContainText('On track')
+      await expect(this.firstSponsorAssessmentText).toContainText('On track')
     } else {
-      await expect(this.firstSponsorAssessmentTrack).toContainText('Off track')
+      await expect(this.firstSponsorAssessmentText).toContainText('Off track')
     }
   }
 
@@ -855,5 +899,47 @@ export default class StudyDetailsPage {
       default:
         throw new Error(`${updateType} is not a valid update option`)
     }
+  }
+
+  async assertMiniDashboardTitle(title: string) {
+    await expect(this.miniDashboardTitle.filter({ hasText: title })).toBeVisible()
+  }
+
+  async assertMiniDashboardText(text: string) {
+    await expect(this.miniDashboardText.filter({ hasText: text })).toBeVisible()
+  }
+
+  async assertPlannedUkTargetMatchesTableValue() {
+    const ukTarget = (await this.tableUkTargetValue.textContent())?.trim()
+    const targetCard = this.miniDashboardTitle.filter({ hasText: 'Planned UK target' }).locator('../..')
+    await expect(targetCard.locator('.stat__content__body')).toHaveText(ukTarget ?? '')
+  }
+
+  async assertPlannedOpenDateMatchesTableValue() {
+    const tableDate = (await this.tablePlannedOpeningDateValue.textContent())?.trim() ?? ''
+    const expectedDashboardDate = new Date(tableDate).toLocaleDateString('en-GB')
+    const targetCard = this.miniDashboardTitle.filter({ hasText: 'Planned open to recruitment date' }).locator('../..')
+    await expect(targetCard.locator('.stat__content__body')).toHaveText(expectedDashboardDate)
+  }
+
+  async assertRecruitmentNumbersMatchesTableValues() {
+    const totalRecruitment = (await this.tableUkTotalValue.textContent())?.trim() ?? ''
+    const recruitmentTarget = (await this.tableUkTargetValue.textContent())?.trim() ?? ''
+    const expectedValue = `${totalRecruitment} of ${recruitmentTarget}`
+    const targetCard = this.miniDashboardTitle.filter({ hasText: 'Recruitment numbers' }).locator('../..')
+    await expect(targetCard.locator('.stat__content__body')).toHaveText(expectedValue)
+  }
+
+  async assertPlannedClosureDateMatchesTableValue() {
+    const tableDate = (await this.tablePlannedClosureDateValue.textContent())?.trim() ?? ''
+    const expectedDashboardDate = new Date(tableDate).toLocaleDateString('en-GB')
+    const targetCard = this.miniDashboardTitle.filter({ hasText: 'Planned closure date' }).locator('../..')
+    await expect(targetCard.locator('.stat__content__body')).toHaveText(expectedDashboardDate)
+  }
+
+  async assertRecruitmentTotalMatchesTableValue() {
+    const totalRecruitment = (await this.tableUkTotalValue.textContent())?.trim() ?? ''
+    const targetCard = this.miniDashboardTitle.filter({ hasText: 'Recruitment total' }).locator('../..')
+    await expect(targetCard.locator('.stat__content__body')).toHaveText(totalRecruitment)
   }
 }

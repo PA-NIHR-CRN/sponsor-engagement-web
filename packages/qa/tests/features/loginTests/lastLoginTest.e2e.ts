@@ -1,4 +1,4 @@
-import { test } from '../../../hooks/CustomFixtures'
+import { test, expect } from '../../../hooks/CustomFixtures'
 import { seDatabaseReq } from '../../../utils/DbRequests'
 import { RowDataPacket } from 'mysql2'
 
@@ -29,7 +29,7 @@ test.describe('Capture Last Login Date - @se_146', () => {
       await signedOutPage.assertOnSignedOutPage()
     })
     await test.step(`And the Sponsor Contact User has a Current Last Login date of '${formattedCurrentSponsorLastLogin}'`, async () => {
-      commonItemsPage.assertCogIconPresent(false)
+      await expect(commonItemsPage.signOutLink).not.toBeVisible()
     })
     await test.step('When I successfully login as a Sponsor Contact', async () => {
       await signedOutPage.btnSignIn.click()
@@ -40,7 +40,7 @@ test.describe('Capture Last Login Date - @se_146', () => {
       formattedUpdatedLastLogin = await loginPage.getLastLoginFormattedDate(updatedLastLogin)
     })
     await test.step(`Then the Sponsor Contact User now has an Updated Last Login date of '${formattedUpdatedLastLogin}'`, async () => {
-      commonItemsPage.assertCogIconPresent(true)
+      await expect(commonItemsPage.signOutLink).toBeVisible()
     })
     await test.step(`And the Updated Last Login Value is more recent than the Previous Last Login Value`, async () => {
       loginPage.assertLastLoginUpdated(currentSponsorLastLogin, updatedLastLogin)
@@ -61,7 +61,7 @@ test.describe('Capture Last Login Date - @se_146', () => {
       await signedOutPage.assertOnSignedOutPage()
     })
     await test.step(`And the Contact Manager User has a Current Last Login date of '${formattedCurrentManagerLastLogin}'`, async () => {
-      commonItemsPage.assertCogIconPresent(false)
+      await expect(commonItemsPage.signOutLink).not.toBeVisible()
     })
     await test.step('When I successfully login as a Contact Manager', async () => {
       await signedOutPage.btnSignIn.click()
@@ -72,7 +72,7 @@ test.describe('Capture Last Login Date - @se_146', () => {
       formattedUpdatedLastLogin = await loginPage.getLastLoginFormattedDate(updatedLastLogin)
     })
     await test.step(`Then the Contact Manager User now has an Updated Last Login date of '${formattedUpdatedLastLogin}'`, async () => {
-      commonItemsPage.assertCogIconPresent(true)
+      await expect(commonItemsPage.signOutLink).toBeVisible()
     })
     await test.step(`And the Updated Last Login Value is more recent than the Previous Last Login Value`, async () => {
       loginPage.assertLastLoginUpdated(currentManagerLastLogin, updatedLastLogin)

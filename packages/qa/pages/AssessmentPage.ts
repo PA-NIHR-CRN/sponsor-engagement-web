@@ -17,10 +17,8 @@ export default class AssessmentPage {
   readonly lastSponsorAssessmentRow: Locator
   readonly lastSponsorAssessmentDate: Locator
   readonly lastSponsorAssessmentText: Locator
-  readonly lastSponsorAssessmentTrack: Locator
   readonly lastSponsorAssessmentFurtherInfo: Locator
   readonly lastSponsorAssessmentFurtherInfoBullets: Locator
-  readonly lastSponsorAssessmentFurtherInfoText: Locator
   readonly lastSponsorAssessmentNoRecruitmentReason: Locator
   //Study Details Section
   readonly studyDetailsSection: Locator
@@ -169,16 +167,12 @@ export default class AssessmentPage {
     this.lastSponsorAssessmentRow = page.locator('div[class="govuk-!-margin-bottom-6"] button')
     this.lastSponsorAssessmentDate = this.lastSponsorAssessmentRow.locator('div')
     this.lastSponsorAssessmentText = this.lastSponsorAssessmentRow.locator(
-      'span[class="ml-[35px] md:ml-0 govuk-body-s mb-0"]'
+      'span[class="accordion__sidecontent ml-[35px] md:ml-0 govuk-body-s mb-0"]'
     )
-    this.lastSponsorAssessmentTrack = this.lastSponsorAssessmentText.locator('strong')
     this.lastSponsorAssessmentFurtherInfo = page.locator('div[id="radix-:r5:"] div')
     this.lastSponsorAssessmentFurtherInfoBullets = this.lastSponsorAssessmentFurtherInfo.locator('ul li')
-    this.lastSponsorAssessmentFurtherInfoText = this.lastSponsorAssessmentFurtherInfo
-      .locator('p', { hasText: 'Further information:' })
-      .locator('span')
     this.lastSponsorAssessmentNoRecruitmentReason = this.lastSponsorAssessmentFurtherInfo
-      .locator('p', { hasText: 'Reason for not recruiting for 6 months:' })
+      .locator('p', { hasText: 'No recruitment for 6 months:' })
       .locator('span')
   }
 
@@ -470,9 +464,9 @@ export default class AssessmentPage {
 
   async assertLastSponsorAssessmentOnOffTrack(option: string) {
     if (option.toLowerCase() == 'on') {
-      await expect(this.lastSponsorAssessmentTrack).toContainText('On track')
+      await expect(this.lastSponsorAssessmentText).toContainText('On track')
     } else {
-      await expect(this.lastSponsorAssessmentTrack).toContainText('Off track')
+      await expect(this.lastSponsorAssessmentText).toContainText('Off track')
     }
   }
 
@@ -489,6 +483,6 @@ export default class AssessmentPage {
   }
 
   async assertAssessmentFurtherInfoText(expectedValue: string) {
-    await expect(this.lastSponsorAssessmentFurtherInfoText).toHaveText(expectedValue)
+    await expect(this.lastSponsorAssessmentNoRecruitmentReason).toHaveText(expectedValue)
   }
 }

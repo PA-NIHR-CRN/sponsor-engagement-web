@@ -86,6 +86,7 @@ test.describe('Criteria for Determining if a Study is `Due` and Assessment - @se
       await studyDetailsPage.assertAssessmentDueIndicatorDisplayed(true, testStudy[0].dueAssessmentAt)
     })
   })
+
   test('The `Assessment Due` indicator appears for a Study, when the study meets the Due criteria, with actual opening date >= 90 days ago - @se_68_withOpen', async ({
     studiesPage,
     studyDetailsPage,

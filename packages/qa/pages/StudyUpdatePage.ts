@@ -125,8 +125,7 @@ export default class StudyUpdatePage {
 
   async assertOnUpdateStudyPage(studyId: string) {
     await expect(this.pageTitle).toBeVisible()
-    await expect(this.bannerTitle).toContainText('Update UK study data')
-    await expect(this.pageTitle).toContainText('Update United Kingdom study data')
+    await expect(this.pageTitle).toContainText('Update UK study data')
     await expect(this.page).toHaveURL(`studies/${studyId}/edit`)
   }
 
@@ -171,9 +170,7 @@ export default class StudyUpdatePage {
     await expect(this.statusHintOpenRec).toContainText('Open to recruit participants in at least one UK site')
 
     await expect(this.statusRadioClosed).toBeVisible()
-    await expect(this.statusHintClosed).toContainText(
-      'Completed recruitment and any subsequent patient related activities'
-    )
+    await expect(this.statusHintClosed).toContainText('Completed recruitment')
 
     await expect(this.statusRadioSuspended).toBeVisible()
     await expect(this.statusHintSuspended).toContainText('Recruitment of participants has halted')
