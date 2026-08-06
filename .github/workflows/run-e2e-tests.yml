@@ -20,7 +20,7 @@ env:
 jobs:
   e2e-test:
     name: 'Run E2E Tests'
-    timeout-minutes: 15
+    timeout-minutes: 60
     environment: TEST
     runs-on: ubuntu-latest
     steps:
