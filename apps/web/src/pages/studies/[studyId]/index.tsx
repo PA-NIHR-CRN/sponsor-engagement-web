@@ -8,21 +8,32 @@ import type { ReactElement } from 'react'
 import type { LeadAdministrationId } from 'shared-utilities/src/utils/lead-administration-id'
 
 import { Status } from '@/@types/studies'
+import type { SummaryCardProps } from '@/components/atoms/SummaryCard/SummaryCard'
 import {
   AssessmentHistory,
   EditHistory,
   getAssessmentHistoryFromStudy,
   RequestSupport,
   StudyDetails,
+  StudyProgressExtended,
 } from '@/components/molecules'
+import { ReportFirst } from '@/components/molecules/cards/ReportFirst/ReportFirst'
 import { getEditHistory } from '@/components/molecules/EditHistory/utils'
+import SummaryCardCollection from '@/components/molecules/SummaryCollection/SummaryCardCollection'
+import SummaryList from '@/components/molecules/SummaryList/SummaryList'
 import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
+import { ContentfulPage } from '@/constants/contentful/pages'
+import { FormStudyStatus } from '@/constants/editStudyForm'
 import { FORM_SUCCESS_MESSAGES } from '@/constants/forms'
 import { getAssessmentPageRoute, STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/routes'
+import { getSetPageByKey } from '@/lib/contentful/contentfulService'
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
 import type { StudyEvalsWithoutGeneratedValues } from '@/lib/studies'
 import {
+  buildSummaryRows,
+  getAssessmentDueIndicator,
+  getDaysSinceAssessmentDue,
   getStudyById,
   mapCPMSStatusToFormStatus,
   mapCPMSStudyEvalToSEEval,
@@ -50,9 +61,9 @@ const renderNotificationBanner = (success: string | undefined, showRequestSuppor
   ) : null
 
 const renderBackLink = () => (
-  <div className="ml-8 govuk-!-padding-top-3">
+  <div className="">
     <Container>
-      <Link className="govuk-back-link govuk-!-font-size-19 font-light" href="/studies">
+      <Link className="govuk-back-link" href="/studies">
         All studies
       </Link>
     </Container>
@@ -61,7 +72,7 @@ const renderBackLink = () => (
 
 export type StudyProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
-export default function Study({ study, assessments, editHistory, getEditHistoryError }: StudyProps) {
+export default function Study({ study, assessments, editHistory, getEditHistoryError, progressBarPageContent, reportaFirstManagedContent }: StudyProps) {
   const router = useRouter()
   const successType = router.query.success as string
   const transactionIdLatestProposedUpdate = router.query.latestProposedUpdate as string | undefined
@@ -72,6 +83,73 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
   const isStudyStatusSuspended = (
     [Status.Suspended, Status.SuspendedFromOpenToRecruitment, Status.SuspendedFromOpenWithRecruitment] as string[]
   ).includes(study.studyStatus)
+
+  const formStatus = mapCPMSStatusToFormStatus(study.studyStatus) as FormStudyStatus
+
+  const panelsByStatus: Partial<Record<FormStudyStatus, SummaryCardProps[]>> = {
+    [FormStudyStatus.Suspended]: [
+      {
+        title: 'Study status',
+        content: formStatus,
+      },
+      {
+        title: 'Recruitment total',
+        content: study.totalRecruitmentToDate?.toString() ?? '-',
+      },
+      {
+        title: 'Estimated reopening date',
+        content: study.estimatedReopeningDate?.toLocaleDateString('en-GB') ?? '-',
+      },
+    ],
+
+    [FormStudyStatus.InSetup]: [
+      {
+        title: 'Study status',
+        content: formStatus,
+      },
+      {
+        title: 'Planned UK target',
+        content: study.sampleSize?.toString() ?? '-',
+      },
+      {
+        title: 'Planned open to recruitment date',
+        content: study.plannedOpeningDate?.toLocaleDateString('en-GB') ?? '-',
+      },
+    ],
+
+    [FormStudyStatus.OpenToRecruitment]: [
+      {
+        title: 'Study status',
+        content: formStatus,
+      },
+      {
+        title: 'Recruitment numbers',
+        content:
+          study.totalRecruitmentToDate !== null && study.sampleSize !== null
+            ? `${study.totalRecruitmentToDate} of ${study.sampleSize}`
+            : '-',
+      },
+      {
+        title: 'Planned closure date',
+        content: study.plannedClosureDate?.toLocaleDateString('en-GB') ?? '-',
+      },
+    ],
+  }
+
+  const panels = panelsByStatus[formStatus] ?? []
+  
+  const indicators: string[] = [
+    getAssessmentDueIndicator(
+      study.dueAssessmentAt !== null,
+      getDaysSinceAssessmentDue(study.dueAssessmentAt),
+    ),
+
+    ...study.evaluationCategories.map(
+      (ec) => ec.indicatorValue
+    ),
+  ].filter(Boolean) as string[];
+
+  const indicatorSummaryRows = buildSummaryRows(indicators, `${STUDIES_PAGE}/${study.id}`);
 
   return (
     <Container>
@@ -91,13 +169,19 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
             {Boolean(supportOrgName) && ` (${supportOrgName})`}
           </span>
 
+          <SummaryCardCollection panels={panels} />
+
           <div className="flex flex-col govuk-!-margin-bottom-4 govuk-!-margin-top-4 gap-6">
-            {Boolean(study.dueAssessmentAt) && (
-              <div>
-                <span className="govuk-tag govuk-tag--red mr-2">Due</span>
-                This study needs a new sponsor assessment.
-              </div>
+
+            {indicatorSummaryRows.length > 0 && (
+              <>
+                <h3 className="govuk-heading-m govuk-!-margin-bottom-0">
+                  Actions needed
+                </h3>
+                <SummaryList className='summary-list--study-indicators govuk-!-margin-bottom-0' rows={indicatorSummaryRows} />
+              </>
             )}
+
             <div className="flex gap-4">
               <Link className="govuk-button w-auto govuk-!-margin-bottom-0" href={getAssessmentPageRoute(study.id)}>
                 Assess study
@@ -109,6 +193,15 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
                 Update study data
               </Link>
             </div>
+
+            <StudyProgressExtended
+              moreDetailsHref={`${STUDIES_PAGE}/${study.id}/configure`}
+              progressBarPageContent={progressBarPageContent}
+              regulatoryApprovalDate={study.regulatoryApprovalDate}
+              studyStatus={study.studyStatus}
+              willRecruitWithinTimeline={study.willRecruitWithinTimeline}
+            />
+
           </div>
 
           <div className="govuk-inset-text mt-7">
@@ -134,7 +227,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
             <Table.Body>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Study Status</Table.CellHeader>
-                <Table.Cell>{mapCPMSStatusToFormStatus(study.studyStatus)}</Table.Cell>
+                <Table.Cell>{formStatus}</Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.CellHeader className="w-1/3">Study data indicates</Table.CellHeader>
@@ -195,6 +288,7 @@ export default function Study({ study, assessments, editHistory, getEditHistoryE
           <StudyDetails study={study} />
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
+          <ReportFirst reportaFirstContentfulContent={reportaFirstManagedContent} studyId={study.id} />
           <RequestSupport showCallToAction sticky />
         </div>
       </div>
@@ -234,6 +328,9 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
   }
 
   logger.info('Successfully retrieved study from SE with studyId: %s', studyId)
+  
+  const progressBarPageContent = await getSetPageByKey(ContentfulPage.PROGRESS_BAR)
+  const reportaFirstManagedContent = await getSetPageByKey(ContentfulPage.REPORT_A_FIRST_BOX) 
 
   const changeHistoryFromDate = process.env.EDIT_HISTORY_START_DATE ?? ''
   const { study: studyInCPMS } = await getStudyByIdFromCPMS(study.cpmsId, changeHistoryFromDate)
@@ -244,6 +341,8 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
         user: session.user,
         assessments: getAssessmentHistoryFromStudy(study),
         study,
+        progressBarPageContent,
+        reportaFirstManagedContent
       },
     }
   }
@@ -261,6 +360,8 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
         user: session.user,
         assessments: getAssessmentHistoryFromStudy(study),
         study,
+        progressBarPageContent,
+        reportaFirstManagedContent
       },
     }
   }
@@ -297,6 +398,8 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
       },
       editHistory,
       getEditHistoryError,
+      progressBarPageContent,
+      reportaFirstManagedContent
     },
   }
 })

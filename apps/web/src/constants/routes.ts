@@ -44,6 +44,11 @@ export const REGISTRATION_PAGE = '/register'
 export const getAssessmentPageRoute = (studyId: string | number) => `/studies/${studyId}/assess`
 
 /**
+ * Configure page
+ */
+export const getConfigurePageRoute = (studyId: string | number) => `/studies/${studyId}/configure`
+
+/**
  * Registration confirmation page where users will be redirected to after successful IDG & SE account creation
  */
 export const REGISTRATION_CONFIRMATION_PAGE = '/register/confirmation'
@@ -52,6 +57,11 @@ export const REGISTRATION_CONFIRMATION_PAGE = '/register/confirmation'
  * Registration confirmation page where users will be redirected to after linking existing IDG accounts to SE
  */
 export const REGISTRATION_CONFIRMATION_LINKED_PAGE = '/register/confirmation/linked'
+
+/**
+ * Report a First Global/European Participant page
+ */
+export const REPORT_FIRSTS_PAGE = '/report-first'
 
 /**
  * Error page for internal server errors
@@ -71,7 +81,7 @@ export const EXTERNAL_CRN_URL =
   'https://www.nihr.ac.uk/support-and-services/support-for-delivering-research/research-delivery-network'
 
 export const EXTERNAL_CRN_TERMS_CONDITIONS_URL =
-  'https://www.nihr.ac.uk/eligibility-nihr-research-delivery-network-support#portfolio-terms-and-conditions'
+  'https://www.nihr.ac.uk/support-and-services/support-for-delivering-research/eligibility-rdn-support/rdn-portfolio-terms-and-conditions'
 
 export const EXTERNAL_COOKIE_POLICY_PAGE_URL =
   'https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-cookie-policy'
@@ -86,7 +96,7 @@ export const ACCESSIBILITY_PAGE_URL =
   'https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-accessibility-statement'
 
 export const RELEASE_NOTES_URL =
-  'https://sites.google.com/nihr.ac.uk/nihr-sponsor-engagement-tool/se-tool-release-notes'
+  'https://sites.google.com/nihr.ac.uk/rdncc-policies/sponsor-engagement-tool/set-release-notes'
 
 export const SHAW_TRUST_ACCREDITATION_URL =
   'https://www.accessibility-services.co.uk/certificates/nihr-sponsor-engagement-tool/'

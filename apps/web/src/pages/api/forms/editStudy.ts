@@ -8,7 +8,7 @@ import type { DateInputValue } from '@/components/atoms/Form/DateInput/types'
 import { Roles } from '@/constants'
 import { UPDATE_FROM_SE_TEXT } from '@/constants/forms'
 import { mapEditStudyInputToCPMSStudy, updateStudyInCPMS, validateStudyUpdate } from '@/lib/cpms/studies'
-import { mapCPMSStatusToFormStatus } from '@/lib/studies'
+import { mapCPMSStatusToFormStatus, updateStudy } from '@/lib/studies'
 import { logStudyUpdate } from '@/lib/studyUpdates'
 import {
   editStudyDateFields,
@@ -42,6 +42,18 @@ export interface DateFieldWithParts {
 
 export interface ExtendedNextApiRequest extends NextApiRequest {
   body: EditStudy | (EditStudy & Partial<DateFieldWithParts>)
+}
+
+const yesNoText = (v?: boolean) => {
+  let result = 'None provided'
+
+  if (v === true) {
+    result = 'Yes'
+  } else if (v === false) {
+    result = 'No'
+  }
+
+  return result
 }
 
 export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], async (req, res, session) => {
@@ -106,24 +118,79 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
       : validationResult.StudyUpdateRoute === StudyUpdateRoute.Direct
 
     let afterLSN = ''
+    const transactionId = uuid()
+
+    const isClosed = [
+      Status.ClosedToRecruitment,
+      Status.ClosedToRecruitmentInFollowUp,
+      Status.ClosedToRecruitmentNoFollowUp,
+      Status.ClosedToRecruitmentFollowUpComplete,
+    ].includes(studyDataToUpdate.status as Status)
 
     if (isDirectUpdate) {
-      // Only send additional note if new status is Suspended and not the original status
-      // i.e. a status has been changed to Suspended
+      // Only send additional note if new status is Suspended or Closed and not the original status
+      // i.e. a status has been changed to Suspended or Closed
       const suspendedStatuses: string[] = [
         Status.SuspendedFromOpenToRecruitment,
         Status.SuspendedFromOpenWithRecruitment,
         Status.Suspended,
       ]
-      const additionalNote =
+
+      const yesNoToBool = (v: unknown): boolean | undefined => {
+        if (v === 'YES') return true
+        if (v === 'NO') return false
+        return undefined
+      }
+
+      const cleanText = (v: unknown): string => (typeof v === 'string' ? v.trim() : '')
+
+      type ClosedNoteInputs = {
+        finalRecruitmentTargetCorrect?: boolean
+        correctedRecruitmentTotal?: string
+        performanceAlignedToExpectations?: boolean
+        performanceExplainer?: string
+        furtherInformation?: string
+        ukRecruitmentTarget?: number
+      }
+
+      const closedNoteInputs: ClosedNoteInputs = {
+        finalRecruitmentTargetCorrect: yesNoToBool((req.body as any).isFinalRecruitmentTotalCorrect),
+        correctedRecruitmentTotal: cleanText((req.body as any).correctedRecruitmentTotal),
+        performanceAlignedToExpectations: yesNoToBool((req.body as any).didPerformanceDeliverInline),
+        performanceExplainer: cleanText((req.body as any).performanceNoReason),
+        furtherInformation: cleanText((req.body as any).closureFurtherInformation),
+        ukRecruitmentTarget: Number.isFinite(Number(studyDataToUpdate.recruitmentTarget))
+          ? Number(studyDataToUpdate.recruitmentTarget)
+          : undefined,
+      }
+
+      const buildClosedAdditionalNote = (inputs: ClosedNoteInputs) =>
+        `Final Recruitment Total Correct: ${yesNoText(inputs.finalRecruitmentTargetCorrect)};\r\n ` +
+        `${inputs.correctedRecruitmentTotal?.trim()
+          ? `Corrected Recruitment Total: ${inputs.correctedRecruitmentTotal.trim()};\r\n `
+          : ''}` +
+        `Performance Aligned To Expectations: ${yesNoText(inputs.performanceAlignedToExpectations)};\r\n ` +
+        `Performance Explainer: ${inputs.performanceExplainer || 'None provided'};\r\n ` +
+        `Further Information: ${inputs.furtherInformation || 'None provided'};\r\n ` +
+        `UK Recruitment Target: ${Number.isFinite(inputs.ukRecruitmentTarget) ? inputs.ukRecruitmentTarget : 'None provided'};\r\n ` +
+        `SE Audit History Id: ${transactionId}`;
+
+
+      const isNewlySuspended =
         suspendedStatuses.includes(studyDataToUpdate.status) &&
         !suspendedStatuses.includes(originalValues?.status ?? '')
-          ? UPDATE_FROM_SE_TEXT
-          : ''
+
+      let additionalNote = ''
+
+      if (isClosed) {
+        additionalNote = buildClosedAdditionalNote(closedNoteInputs)
+      } else if (isNewlySuspended) {
+        additionalNote = UPDATE_FROM_SE_TEXT
+      }
 
       const { study, error: updateStudyError } = await updateStudyInCPMS(Number(studyDataToUpdate.cpmsId), {
         ...cpmsStudyInput,
-        CurrentLsn: beforeLSN,
+        CurrentLsn: beforeLSN?.trim() || null,
         notes: additionalNote,
       })
 
@@ -132,9 +199,11 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
       }
 
       afterLSN = study.UpdateLsn
-    }
 
-    const transactionId = uuid()
+      if (isClosed) {
+        await updateStudy(Number(studyDataToUpdate.cpmsId), { isDeleted: true })
+      }
+    }
 
     await logStudyUpdate(
       Number(studyId),
@@ -144,7 +213,8 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
       isDirectUpdate,
       session.user.id,
       beforeLSN,
-      afterLSN
+      afterLSN,
+      isClosed
     )
 
     logger.info('Logged study update with studyId: %s', studyId)
@@ -154,7 +224,11 @@ export default withApiHandler<ExtendedNextApiRequest>([Roles.SponsorContact], as
       ...(!isDirectUpdate ? { latestProposedUpdate: transactionId } : {}),
     })
 
-    return res.redirect(302, `/studies/${studyId}?${searchParams.toString()}`)
+    const redirectUrl = isClosed && isDirectUpdate
+      ? `/studies/${studyId}/edit/closure/confirmation`
+      : `/studies/${studyId}?${searchParams.toString()}`
+
+    return res.redirect(302, redirectUrl)
   } catch (error) {
     const transformedData = transformEditStudyBody(req.body)
 

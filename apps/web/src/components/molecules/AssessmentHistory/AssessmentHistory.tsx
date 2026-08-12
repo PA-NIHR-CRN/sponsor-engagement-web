@@ -15,11 +15,12 @@ export type Study = NonNullable<Awaited<ReturnType<typeof getStudyById>>['data']
 export function getAssessmentHistoryFromStudy(study: Study) {
   if (study.assessments.length === 0) return []
 
-  return study.assessments.map(({ status, createdAt, createdBy, furtherInformation, id }) => ({
+  return study.assessments.map(({ status, createdAt, createdBy, reasonForNoRecruitment, furtherInformation, id }) => ({
     id,
     status: status.name,
     createdAt: formatDate(createdAt),
     createdBy: createdBy.email,
+    reasonForNoRecruitment,
     furtherInformation: furtherInformation
       .filter(({ furtherInformationText }) => !furtherInformationText)
       .map((match) => match.furtherInformation?.name),
@@ -69,9 +70,21 @@ export function AssessmentHistory({ heading, assessments, firstItemExpanded }: A
                       ))}
                     </ul>
                   ) : null}
+
                   {assessment.furtherInformationText ? (
-                    <p className="govuk-body-s govuk-!-margin-bottom-0">{assessment.furtherInformationText}</p>
+                    <p className="govuk-body-s govuk-!-margin-bottom-0">
+                      <strong>Further information:</strong>{' '}
+                      <span className="whitespace-pre-wrap">{assessment.furtherInformationText}</span>
+                    </p>
                   ) : null}
+
+                  {assessment.reasonForNoRecruitment ? (
+                    <p className="govuk-body-s govuk-!-margin-bottom-0">
+                      <strong>No recruitment for 6 months:</strong>{' '}
+                      <span className="whitespace-pre-wrap">{assessment.reasonForNoRecruitment}</span>
+                    </p>
+                  ) : null}
+
                 </AccordionContent>
               </AccordionItem>
             </Accordion>

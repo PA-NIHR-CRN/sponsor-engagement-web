@@ -11,13 +11,12 @@ export interface CardProps extends React.HTMLProps<HTMLDivElement> {
 export function Card({ children, padding = 3, filled, className, ...props }: CardProps) {
   return (
     <div
-      className={clsx(`govuk-!-padding-${padding} relative`, className, {
-        'bg-white border-grey-120 border border-b-2': !filled,
-        'bg-grey-50': filled,
-      })}
+      className={clsx(`govuk-!-padding-${padding} relative card-x`, className)}
       {...props}
     >
+      <div className='content'>
       {children}
+      </div>
     </div>
   )
 }

@@ -3,6 +3,7 @@ import {
   confirmStringNotNull,
   convertIsoDateToDisplayDate,
   convertIsoDateToDisplayDateV2,
+  numDaysBetween,
 } from '../utils/UtilFunctions'
 import { RowDataPacket } from 'mysql2'
 
@@ -61,6 +62,8 @@ export default class StudyDetailsPage {
   readonly noAssessmentValue: Locator
   readonly firstSponsorAssessmentFurtherInfo: Locator
   readonly secondSponsorAssessmentFurtherInfo: Locator
+  readonly firstSponsorAssessmentNoRecruitmentReason: Locator
+  readonly secondSponsorAssessmentNoRecruitmentReason: Locator
   readonly firstSponsorAssessmentFurtherInfoBullets: Locator
   readonly secondSponsorAssessmentFurtherInfoBullets: Locator
   readonly firstSponsorAssessmentFurtherInfoText: Locator
@@ -73,8 +76,7 @@ export default class StudyDetailsPage {
   readonly secondSponsorAssessmentText: Locator
   readonly firstSponsorAssessmentTrack: Locator
   readonly secondSponsorAssessmentTrack: Locator
-  readonly dueIndicator: Locator
-  readonly dueIndicatorSupportingText: Locator
+  readonly assessmentDueIndicator: Locator
   readonly allStudiesLink: Locator
   readonly sponsorAssessmentHistory: Locator
   readonly updateSuccessBanner: Locator
@@ -176,8 +178,18 @@ export default class StudyDetailsPage {
     this.secondSponsorAssessmentFurtherInfo = page.locator('div[id="radix-:r5:"] div')
     this.firstSponsorAssessmentFurtherInfoBullets = this.firstSponsorAssessmentFurtherInfo.locator('ul li')
     this.secondSponsorAssessmentFurtherInfoBullets = this.secondSponsorAssessmentFurtherInfo.locator('ul li')
-    this.firstSponsorAssessmentFurtherInfoText = this.firstSponsorAssessmentFurtherInfo.locator('p')
-    this.secondSponsorAssessmentFurtherInfoText = this.secondSponsorAssessmentFurtherInfo.locator('p')
+    this.firstSponsorAssessmentFurtherInfoText = this.firstSponsorAssessmentFurtherInfo
+      .locator('p', { hasText: 'Further information' })
+      .locator('span')
+    this.secondSponsorAssessmentFurtherInfoText = this.secondSponsorAssessmentFurtherInfo
+      .locator('p', { hasText: 'Further information' })
+      .locator('span')
+    this.firstSponsorAssessmentNoRecruitmentReason = this.firstSponsorAssessmentFurtherInfo
+      .locator('p', { hasText: 'Reason for not recruiting for 6 months:' })
+      .locator('span')
+    this.secondSponsorAssessmentNoRecruitmentReason = this.secondSponsorAssessmentFurtherInfo
+      .locator('p', { hasText: 'Reason for not recruiting for 6 months:' })
+      .locator('span')
     this.sponsorAssessmentHistory = page.locator('[class="govuk-!-margin-bottom-6"]')
     this.firstSponsorAssessmentRow = this.sponsorAssessmentHistory.locator('button')
     this.secondSponsorAssessmentRow = this.sponsorAssessmentHistory.locator('button').nth(1)
@@ -191,8 +203,9 @@ export default class StudyDetailsPage {
     )
     this.firstSponsorAssessmentTrack = this.firstSponsorAssessmentText.locator('strong')
     this.secondSponsorAssessmentTrack = this.secondSponsorAssessmentText.locator('strong')
-    this.dueIndicator = page.locator('span[class="govuk-tag govuk-tag--red mr-2"]')
-    this.dueIndicatorSupportingText = this.dueIndicator.locator('..')
+    this.assessmentDueIndicator = page
+      .locator('span[class="govuk-tag govuk-tag--red normal-case"]')
+      .filter({ hasText: 'Assessment due for' })
     this.allStudiesLink = page.locator('a[href="/studies"]')
     this.updateSuccessBanner = page.locator('.govuk-notification-banner.govuk-notification-banner--success')
     this.updateSuccessContent = page.locator('.govuk-notification-banner__heading')
@@ -606,7 +619,8 @@ export default class StudyDetailsPage {
   }
 
   async assertAssessmentHasNoFurtherInfo() {
-    await expect(this.firstSponsorAssessmentFurtherInfo).toBeEmpty()
+    await expect(this.firstSponsorAssessmentFurtherInfo.locator('p', { hasText: 'Further information' })).toHaveCount(0)
+    await expect(this.firstSponsorAssessmentFurtherInfoBullets).toHaveCount(0)
   }
 
   async assertAssessmentFurtherInfoSelections(assessmentIndex: number, bulletIndex: number, expectedValue: string) {
@@ -616,6 +630,19 @@ export default class StudyDetailsPage {
         break
       case 1:
         await expect(this.secondSponsorAssessmentFurtherInfoBullets.nth(bulletIndex)).toHaveText(expectedValue)
+        break
+      default:
+        throw new Error(`${assessmentIndex} is not a valid index`)
+    }
+  }
+
+  async assertAssessmentNoRecruitmentReasonText(assessmentIndex: number, expectedValue: string) {
+    switch (assessmentIndex) {
+      case 0:
+        await expect(this.firstSponsorAssessmentNoRecruitmentReason).toHaveText(expectedValue)
+        break
+      case 1:
+        await expect(this.secondSponsorAssessmentNoRecruitmentReason).toHaveText(expectedValue)
         break
       default:
         throw new Error(`${assessmentIndex} is not a valid index`)
@@ -635,15 +662,21 @@ export default class StudyDetailsPage {
     }
   }
 
-  async assertDueIndicatorDisplayed(isDisplayed: boolean) {
+  async getDaysSinceAssessmentDue(dueAssessmentAt: Date) {
+    return Math.round(numDaysBetween(new Date(), dueAssessmentAt))
+  }
+
+  async assertAssessmentDueIndicatorDisplayed(isDisplayed: boolean, dueAssessmentAt?: Date | null) {
     if (isDisplayed) {
-      await expect(this.dueIndicator).toBeVisible()
-      await expect(this.dueIndicatorSupportingText).toBeVisible()
-      await expect(this.dueIndicator).toHaveText('Due')
-      await expect(this.dueIndicatorSupportingText).toContainText('This study needs a new sponsor assessment.')
+      if (!dueAssessmentAt) {
+        throw new Error('dueAssessmentAt is required when asserting the due indicator is displayed')
+      }
+      const daysDue = await this.getDaysSinceAssessmentDue(dueAssessmentAt)
+      const expectedText = `Assessment due for ${daysDue} day${daysDue > 1 ? 's' : ''}`
+      await expect(this.assessmentDueIndicator).toBeVisible()
+      await expect(this.assessmentDueIndicator).toHaveText(expectedText)
     } else {
-      await expect(this.dueIndicator).toBeHidden()
-      await expect(this.dueIndicatorSupportingText).toBeHidden()
+      await expect(this.assessmentDueIndicator).toBeHidden()
     }
   }
 

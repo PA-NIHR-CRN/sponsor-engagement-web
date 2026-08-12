@@ -66,26 +66,26 @@ test.describe('View the Study Assessment Form - @se_29 @se_29_form', () => {
     await test.step('When I Type `T` into the test area', async () => {
       await assessmentPage.furtherInfoTextArea.fill('T')
     })
-    await test.step('Then the remaining char count will reduce to 399', async () => {
-      await assessmentPage.assertFurtherInfoCharsRemaining(399)
+    await test.step('Then the remaining char count will reduce to 499', async () => {
+      await assessmentPage.assertFurtherInfoCharsRemaining(499)
     })
     await test.step('When I Type `TE` into the test area', async () => {
       await assessmentPage.furtherInfoTextArea.fill('TE')
     })
-    await test.step('Then the remaining char count will reduce to 398', async () => {
-      await assessmentPage.assertFurtherInfoCharsRemaining(398)
+    await test.step('Then the remaining char count will reduce to 498', async () => {
+      await assessmentPage.assertFurtherInfoCharsRemaining(498)
     })
     await test.step('When I Type `TES` into the test area', async () => {
       await assessmentPage.furtherInfoTextArea.fill('TES')
     })
-    await test.step('Then the remaining char count will reduce to 397', async () => {
-      await assessmentPage.assertFurtherInfoCharsRemaining(397)
+    await test.step('Then the remaining char count will reduce to 497', async () => {
+      await assessmentPage.assertFurtherInfoCharsRemaining(497)
     })
     await test.step('When I Type `TEST` into the test area', async () => {
       await assessmentPage.furtherInfoTextArea.fill('TEST')
     })
-    await test.step('Then the remaining char count will reduce to 396', async () => {
-      await assessmentPage.assertFurtherInfoCharsRemaining(396)
+    await test.step('Then the remaining char count will reduce to 496', async () => {
+      await assessmentPage.assertFurtherInfoCharsRemaining(496)
     })
   })
 

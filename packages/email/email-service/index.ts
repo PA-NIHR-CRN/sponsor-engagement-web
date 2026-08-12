@@ -23,16 +23,31 @@ export interface EmailStatusResult {
   insights: EmailInsightsList
 }
 
+const emailSendingEnabled = process.env.WEB_EMAIL_SENDING_ENABLED === 'true'
+
 export class EmailService {
   constructor(private sesClient: SES) {}
 
   sendEmail = async (data: EmailArgs, retries = 3): Promise<EmailResult> => {
     const { subject, to, htmlTemplate, textTemplate, templateData } = data
 
+    const recipients = Array.isArray(to) ? to : [to]
+
+    if (!emailSendingEnabled) {
+        logger.info(
+          '[EMAIL DISABLED] Would have sent email to %s with subject %s',
+          recipients,
+          subject
+        )
+
+        return {
+          messageId: 'disabled',
+          recipients,
+        }
+      }
+
     const htmlBody = htmlTemplate(templateData)
     const textBody = textTemplate(templateData)
-
-    const recipients = Array.isArray(to) ? to : [to]
 
     const message: SES.Types.SendEmailRequest = {
       Source: `"NIHR RDN" <${EMAIL_FROM_ADDRESS}>`,

@@ -1,14 +1,18 @@
+import type { Document } from '@contentful/rich-text-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Container } from '@nihr-ui/frontend'
 import { logger } from '@nihr-ui/logger'
 import clsx from 'clsx'
+import dayjs from 'dayjs'
 import type { InferGetServerSidePropsType } from 'next'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
-import { type ReactElement, useCallback, useEffect, useMemo, useState } from 'react'
+import { type ChangeEvent, type ReactElement, useCallback, useEffect, useMemo, useState } from 'react'
 import type { FieldError } from 'react-hook-form'
 import { Controller, useForm } from 'react-hook-form'
 
+import type { TypeStudyDataFormSkeleton } from '@/@types/generated'
 import { ErrorSummary, Fieldset, Form, Radio, RadioGroup } from '@/components/atoms'
 import { DateInput } from '@/components/atoms/Form/DateInput/DateInput'
 import type { DateInputValue } from '@/components/atoms/Form/DateInput/types'
@@ -21,13 +25,15 @@ import { RootLayout } from '@/components/organisms'
 import { Roles } from '@/constants'
 import {
   fieldNameToLabelMapping,
+  FormStudyStatus,
   FURTHER_INFO_MAX_CHARACTERS,
-  GENERIC_STUDIES_GUIDANCE_TEXT,
   PAGE_TITLE,
   statusMap,
   studyStatuses,
 } from '@/constants/editStudyForm'
+import { ClosureDraftProvider, useClosureDraft } from '@/context/closureDraftContext'
 import { useFormErrorHydration } from '@/hooks/useFormErrorHydration'
+import { getManagedContent } from '@/lib/contentful/contentfulService'
 import { getStudyByIdFromCPMS } from '@/lib/cpms/studies'
 import {
   getStudyById,
@@ -38,9 +44,10 @@ import {
   updateEvaluationCategories,
   updateStudy,
 } from '@/lib/studies'
-import { areAllDatePartsEmpty } from '@/utils/date'
+import { areAllDatePartsEmpty, constructDateStrFromParts } from '@/utils/date'
 import { getOptionalFormFields, getVisibleFormFields, mapStudyToStudyFormInput } from '@/utils/editStudyForm'
 import { getValuesFromSearchParams } from '@/utils/form'
+import { RichTextRenderer } from '@/utils/Renderers/RichTextRenderer/RichTextRenderer'
 import type { EditStudy as EditStudySchema, EditStudyInputs } from '@/utils/schemas'
 import { studySchema } from '@/utils/schemas'
 import { getStudyAssessmentDueDate } from '@/utils/studies'
@@ -54,16 +61,41 @@ const transformDateValue = (input?: DateInputValue | null) => ({
   year: input?.year ?? '',
 })
 
-export default function EditStudy({ study, currentLSN, query }: EditStudyProps) {
+export default function EditStudy({ study, currentLSN, query, pageContent }: EditStudyProps) {
+  const router = useRouter()
+  const { draft, setDraft } = useClosureDraft()
+
   const [mounted, setMounted] = useState(false)
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  const mappedFormInput =
-    Object.keys(query).length === 1 ? mapStudyToStudyFormInput(study) : getValuesFromSearchParams(studySchema, query)
+  const mappedFormInput = useMemo<EditStudySchema>(() => {
+    const base = mapStudyToStudyFormInput(study) as EditStudySchema
 
-  const { register, formState, handleSubmit, control, watch, setError } = useForm<EditStudySchema>({
+    if (Object.keys(query).length <= 1) {
+      return base
+    }
+
+    const fromQuery = getValuesFromSearchParams(studySchema, query) as unknown as Partial<EditStudySchema>
+
+    return {
+      ...base,
+      ...fromQuery,
+    }
+  }, [query, study])
+
+  const {
+    register,
+    formState,
+    handleSubmit,
+    control,
+    watch,
+    setError,
+    trigger,
+    getValues,
+    reset,
+  } = useForm<EditStudySchema>({
     resolver: zodResolver(studySchema),
     defaultValues: {
       ...mappedFormInput,
@@ -75,10 +107,29 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
   })
 
   const { organisationsByRole } = study
-
   const supportOrgName = organisationsByRole.CRO ?? organisationsByRole.CTU ?? organisationsByRole.Sponsor
-
   const { defaultValues } = formState
+
+  useEffect(() => {
+    if (!mounted) return
+    if (!draft.studyId) return
+
+    const currentStudyId = String(mappedFormInput.studyId ?? study.id)
+    if (String(draft.studyId) !== currentStudyId) return
+
+    reset({
+      ...mappedFormInput,
+
+      status: draft.status ?? mappedFormInput.status,
+      actualClosureDate: draft.actualClosureDate ?? mappedFormInput.actualClosureDate,
+      recruitmentTarget: draft.recruitmentTarget ?? mappedFormInput.recruitmentTarget,
+      actualOpeningDate: draft.actualOpeningDate ?? mappedFormInput.actualOpeningDate,
+      plannedClosureDate: draft.plannedClosureDate ?? mappedFormInput.plannedClosureDate,
+
+      originalValues: mappedFormInput,
+      LSN: currentLSN,
+    })
+  }, [mounted, draft, reset, mappedFormInput, currentLSN, study.id])
 
   // Watch & update the character count for the "Further information" textarea
   const furtherInformationText = watch('furtherInformation') ?? ''
@@ -113,16 +164,80 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
     [statusInputValue, study.studyStatus, mounted]
   )
 
-  const showLoadingState = formState.isSubmitting || (formState.isSubmitSuccessful && Object.keys(errors).length === 0)
+  // Closure journey
+  const selectedStatus = mapCPMSStatusToFormStatus(statusInputValue ?? study.studyStatus)
+  const isClosureJourney = selectedStatus === FormStudyStatus.Closed
+
+  const showLoadingState =
+    formState.isSubmitting || (formState.isSubmitSuccessful && Object.keys(errors).length === 0)
 
   useEffect(() => {
     if (Object.keys(errors).length > 0) {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth',
-      })
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }, [errors])
+
+  const handleClosureNext = useCallback(async () => {
+    const isValid = await trigger()
+    if (!isValid) {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
+
+    const values = getValues()
+
+    const iso = constructDateStrFromParts(values.actualClosureDate ?? null, true)
+    if (iso) {
+      const closureDate = dayjs(iso)
+      const today = dayjs().startOf('day')
+
+      if (closureDate.isAfter(today, 'day')) {
+        setError('actualClosureDate', {
+          type: 'validate',
+          message: 'Closure date cannot be in the future',
+        })
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+        return
+      }
+    }
+
+    setDraft((prev) => ({
+      ...prev,
+      studyId: values.studyId,
+      cpmsId: values.cpmsId,
+      status: values.status,
+      actualClosureDate: values.actualClosureDate ?? null,
+      recruitmentTarget: values.recruitmentTarget,
+      actualOpeningDate: values.actualOpeningDate ?? null,
+      plannedClosureDate: values.plannedClosureDate ?? null,
+      LSN: defaultValues?.LSN ?? null,
+      originalValues: values.originalValues,
+    }))
+
+    await router.push(`/studies/${values.studyId}/edit/closure`)
+  }, [getValues, router, setDraft, setError, trigger])
+
+  function getManagedStatusDescription(id: number, description: string): string {
+    switch (id) {
+      case 1:
+        // in setup
+        return pageContent?.guidanceTextInSetup as string
+      case 2:
+        //Open to recruitment
+        return pageContent?.guidanceTextOpenToRecruitment as string
+      case 3:
+        //Closed
+        return pageContent?.guidanceTextClosed as string
+      case 4:
+        //Withdrawn
+        return pageContent?.guidanceTextWithdrawn as string
+      case 5:
+        //Suspended
+        return pageContent?.guidanceTextSuspended as string
+      default:
+        return description
+    }
+  }
 
   return (
     <Container>
@@ -131,7 +246,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
         <div className="w-full">
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">
             <span className="govuk-visually-hidden">Page title: </span>
-            {PAGE_TITLE}
+            {pageContent?.pageTitle as string}
           </h2>
           <span className="govuk-body-m mb-0 text-darkGrey">
             <span className="govuk-visually-hidden">Study sponsor: </span>
@@ -144,7 +259,9 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
 
           <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
 
-          <div className="govuk-inset-text">{GENERIC_STUDIES_GUIDANCE_TEXT}</div>
+          <div className="govuk-inset-text">
+            <RichTextRenderer>{pageContent?.pageDescription as Document}</RichTextRenderer>
+          </div>
 
           <p className="govuk-body govuk-!-margin-bottom-4">All fields are required unless labelled as optional.</p>
 
@@ -153,10 +270,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
             handleSubmit={handleSubmit}
             method="post"
             onError={(message: string) => {
-              setError('root.serverError', {
-                type: '400',
-                message,
-              })
+              setError('root.serverError', { type: '400', message })
             }}
           >
             <ErrorSummary errors={errors} />
@@ -169,7 +283,6 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
               defaultValue={JSON.stringify(defaultValues?.originalValues)}
             />
             <Fieldset>
-              {/* Status */}
               <Controller
                 control={control}
                 name="status"
@@ -178,7 +291,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
 
                   const mappedSEStatusValue = mapCPMSStatusToFormStatus(value)
 
-                  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                  const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
                     if (e.target.defaultValue) {
                       const originalStatus = study.studyStatus
                       const mappedStatus = mapFormStatusToCPMSStatus(e.target.defaultValue, originalStatus)
@@ -189,6 +302,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                     <RadioGroup
                       defaultValue={mappedSEStatusValue}
                       errors={errors}
+                      key={`status-${mappedSEStatusValue ?? 'unset'}`}
                       label={fieldNameToLabelMapping.status}
                       labelSize="m"
                       name={name}
@@ -196,10 +310,15 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                       ref={ref}
                     >
                       {studyStatuses.map((status) => {
-                        if (!visibleStatuses.includes(status.value)) return
+                        if (!visibleStatuses.includes(status.value)) return null
 
                         return (
-                          <Radio hint={status.description} key={status.id} label={status.name} value={status.value} />
+                          <Radio
+                            hint={getManagedStatusDescription(Number(status.id), status.description)}
+                            key={status.id}
+                            label={status.name}
+                            value={status.value}
+                          />
                         )
                       })}
                     </RadioGroup>
@@ -207,7 +326,6 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                 }}
               />
 
-              {/* Planned UK opening to recruitment date */}
               {visibleDateFields.includes('plannedOpeningDate') && (
                 <Controller
                   control={control}
@@ -233,7 +351,6 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                 />
               )}
 
-              {/* Actual UK opening to recruitment date */}
               {visibleDateFields.includes('actualOpeningDate') && (
                 <Controller
                   control={control}
@@ -263,7 +380,6 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                 />
               )}
 
-              {/* Planned UK closure to recruitment date */}
               {visibleDateFields.includes('plannedClosureDate') && (
                 <Controller
                   control={control}
@@ -289,7 +405,6 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                 />
               )}
 
-              {/* Actual UK closure to recruitment date */}
               {visibleDateFields.includes('actualClosureDate') && (
                 <Controller
                   control={control}
@@ -315,7 +430,6 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                 />
               )}
 
-              {/* Estimated UK reopening date*/}
               {visibleDateFields.includes('estimatedReopeningDate') && (
                 <Controller
                   control={control}
@@ -341,7 +455,6 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                 />
               )}
 
-              {/* UK recruitment target */}
               <Controller
                 control={control}
                 name="recruitmentTarget"
@@ -354,7 +467,7 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                       inputClassName="govuk-input--width-10"
                       label={fieldNameToLabelMapping.recruitmentTarget}
                       labelSize="m"
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      onChange={(e: ChangeEvent<HTMLInputElement>) => {
                         const inputWithNumericsOnly = e.target.value.replace(/\D/g, '')
                         onChange(inputWithNumericsOnly)
                       }}
@@ -364,49 +477,58 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
                 }}
               />
 
-              {/* Further information */}
-              <Textarea
-                defaultValue={defaultValues?.furtherInformation}
-                errors={errors}
-                hint="If needed, provide further context or justification for changes made above."
-                label={fieldNameToLabelMapping.furtherInformation}
-                labelSize="m"
-                remainingCharacters={remainingCharacters}
-                required={false}
-                {...register('furtherInformation')}
-                maxLength={FURTHER_INFO_MAX_CHARACTERS}
-              />
+              {!isClosureJourney && (
+                <Textarea
+                  defaultValue={defaultValues?.furtherInformation}
+                  errors={errors}
+                  hint={pageContent?.furtherInformationGuidanceText as Document}
+                  label={pageContent?.furtherInformationLabel as string}
+                  labelSize="m"
+                  remainingCharacters={remainingCharacters}
+                  required={false}
+                  {...register('furtherInformation')}
+                  maxLength={FURTHER_INFO_MAX_CHARACTERS}
+                />
+              )}
 
-              {showLoadingState ? (
+              {!isClosureJourney && showLoadingState ? (
                 <Warning>
                   It may take a few seconds for the record to update. Please stay on this page until redirected.
                 </Warning>
               ) : null}
 
               <div className="govuk-button-group">
-                <button
-                  className={clsx('govuk-button', {
-                    'pointer-events-none': showLoadingState,
-                  })}
-                  type="submit"
-                >
-                  {showLoadingState ? (
-                    <>
-                      Updating... <Spinner />
-                    </>
-                  ) : (
-                    'Update'
-                  )}
-                </button>
+                {isClosureJourney ? (
+                  <button
+                    className={clsx('govuk-button', { 'pointer-events-none': showLoadingState })}
+                    onClick={handleClosureNext}
+                    type="button"
+                  >
+                    Next
+                  </button>
+                ) : (
+                  <button
+                    className={clsx('govuk-button', { 'pointer-events-none': showLoadingState })}
+                    type="submit"
+                  >
+                    {showLoadingState ? (
+                      <>
+                        Updating... <Spinner />
+                      </>
+                    ) : (
+                      'Update'
+                    )}
+                  </button>
+                )}
+
                 <Link className="govuk-button govuk-button--secondary" href={`/studies/${study.id}`}>
                   Cancel
                 </Link>
               </div>
 
-              <p className="govuk-body">
-                If you need support updating your data, please{' '}
-                <a href="mailto:supportmystudy@nihr.ac.uk">contact the RDN Team</a>.
-              </p>
+              <div className="govuk-body">
+                <RichTextRenderer>{pageContent?.endMessage as Document}</RichTextRenderer>
+              </div>
             </Fieldset>
           </Form>
         </div>
@@ -419,17 +541,19 @@ export default function EditStudy({ study, currentLSN, query }: EditStudyProps) 
   )
 }
 
-EditStudy.getLayout = function getLayout(page: ReactElement, { user }: EditStudyProps) {
+EditStudy.getLayout = function getLayout(page: ReactElement, { user, study }: EditStudyProps) {
   return (
-    <RootLayout
-      breadcrumbConfig={{
-        showBreadcrumb: true,
-      }}
-      heading={PAGE_TITLE}
-      user={user}
-    >
-      {page}
-    </RootLayout>
+    <ClosureDraftProvider studyId={study.id.toString()}>
+      <RootLayout
+        breadcrumbConfig={{
+          showBreadcrumb: true,
+        }}
+        heading={PAGE_TITLE}
+        user={user}
+      >
+        {page}
+      </RootLayout>
+    </ClosureDraftProvider>
   )
 }
 
@@ -459,6 +583,9 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
     }
   }
   const { study: studyInCPMS } = await getStudyByIdFromCPMS(Number(cpmsId))
+  const { CONTENTFUL_PAGE_UPDATE_STUDY_ID } = process.env
+  const contentfulContent = await getManagedContent<TypeStudyDataFormSkeleton>(CONTENTFUL_PAGE_UPDATE_STUDY_ID)
+  const pageContent = contentfulContent?.fields || null
 
   if (!studyInCPMS) {
     return {
@@ -466,6 +593,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
         user: session.user,
         study,
         query: context.query,
+        pageContent,
       },
     }
   }
@@ -483,6 +611,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
         user: session.user,
         study,
         query: context.query,
+        pageContent,
       },
     }
   }
@@ -514,6 +643,7 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
       },
       currentLSN: studyInCPMS.CurrentLsn,
       query: context.query,
+      pageContent,
     },
   }
 })

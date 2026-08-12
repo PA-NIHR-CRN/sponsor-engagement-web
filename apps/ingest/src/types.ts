@@ -67,6 +67,7 @@ export interface Study {
   StudyEvaluationCategories: StudyEvaluationCategory[]
   StudySponsors: StudySponsor[]
   StudyFunders: StudyFunder[]
+  RegulatoryApprovalDate: null | string
 }
 
 export enum ManagingSpecialty {

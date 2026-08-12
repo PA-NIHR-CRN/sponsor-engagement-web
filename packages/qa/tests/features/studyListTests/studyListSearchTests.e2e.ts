@@ -58,11 +58,6 @@ test.describe('Search the Studies List - @se_23', () => {
                   ORDER BY createdAt desc LIMIT 1;`,
         0
       )
-      await studiesPage.assertDataIndicatesValue(
-        `SELECT indicatorType FROM StudyEvaluationCategory 
-                  WHERE studyId = ${shortTitleSearchSpecificId} AND isDeleted = 0;`,
-        0
-      )
     })
   })
 
@@ -96,11 +91,6 @@ test.describe('Search the Studies List - @se_23', () => {
         `SELECT statusId, createdAt FROM Assessment 
                   WHERE studyId = ${longTitleSearchSpecificId} AND isDeleted = 0
                   ORDER BY createdAt desc LIMIT 1;`,
-        0
-      )
-      await studiesPage.assertDataIndicatesValue(
-        `SELECT indicatorType FROM StudyEvaluationCategory 
-                  WHERE studyId = ${longTitleSearchSpecificId} AND isDeleted = 0;`,
         0
       )
     })
@@ -161,11 +151,6 @@ test.describe('Search the Studies List - @se_23', () => {
                   ORDER BY createdAt desc LIMIT 1;`,
         0
       )
-      await studiesPage.assertDataIndicatesValue(
-        `SELECT indicatorType FROM StudyEvaluationCategory 
-                  WHERE studyId = ${irasSearchId} AND isDeleted = 0;`,
-        0
-      )
     })
   })
 
@@ -199,11 +184,6 @@ test.describe('Search the Studies List - @se_23', () => {
         `SELECT statusId, createdAt FROM Assessment 
                   WHERE studyId = ${protocolSearchId} AND isDeleted = 0
                   ORDER BY createdAt desc LIMIT 1;`,
-        0
-      )
-      await studiesPage.assertDataIndicatesValue(
-        `SELECT indicatorType FROM StudyEvaluationCategory 
-                  WHERE studyId = ${protocolSearchId} AND isDeleted = 0;`,
         0
       )
     })
@@ -263,11 +243,6 @@ test.describe('Search the Studies List - @se_23', () => {
         `SELECT statusId, createdAt FROM Assessment 
                   WHERE studyId = ${cpmsSearchId} AND isDeleted = 0
                   ORDER BY createdAt desc LIMIT 1;`,
-        0
-      )
-      await studiesPage.assertDataIndicatesValue(
-        `SELECT indicatorType FROM StudyEvaluationCategory 
-                  WHERE studyId = ${cpmsSearchId} AND isDeleted = 0;`,
         0
       )
     })

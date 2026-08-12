@@ -1,4 +1,7 @@
 import '@nihr-ui/frontend/globals.scss'
+import 'public/assets/styles/one-login-header.css'
+import 'public/assets/styles/nihr.govuk.css'
+import 'public/assets/styles/tweaks.css'
 
 import type { NextPage } from 'next'
 import type { AppProps } from 'next/app'
@@ -35,13 +38,13 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
 
   return (
     <SessionProvider session={session}>
-      <style global jsx>
-        {`
-        html {
-          font-family: ${primaryFont.style.fontFamily};
-        `}
-      </style>
-      {getLayout(<Component {...pageProps} />, pageProps)}
+        <style global jsx>
+          {`
+          html {
+            font-family: ${primaryFont.style.fontFamily};
+          `}
+        </style>
+        {getLayout(<Component {...pageProps} />, pageProps)}
     </SessionProvider>
   )
 }

@@ -39,11 +39,10 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       await studyUpdatePage.fillStudyDates('plannedClosure', '66', '01', '2024')
       await studyUpdatePage.fillStudyDates('actualClosure', '66', '01', '2024')
       await studyUpdatePage.ukRecruitmentTarget.fill('101')
-      await studyUpdatePage.furtherInfo.fill(``)
     })
 
-    await test.step(`And I update my changes`, async () => {
-      await studyUpdatePage.buttonUpdate.click()
+    await test.step(`And I attempt to click Next`, async () => {
+      await studyUpdatePage.buttonNext.click()
     })
 
     await test.step(`Then I should see invalid day messages for all date fields`, async () => {
@@ -71,11 +70,10 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       await studyUpdatePage.fillStudyDates('plannedClosure', '03', '13', '2024')
       await studyUpdatePage.fillStudyDates('actualClosure', '04', '25', '2024')
       await studyUpdatePage.ukRecruitmentTarget.fill('101')
-      await studyUpdatePage.furtherInfo.fill(``)
     })
 
-    await test.step(`And I update my changes`, async () => {
-      await studyUpdatePage.buttonUpdate.click()
+    await test.step(`And I attempt to click Next`, async () => {
+      await studyUpdatePage.buttonNext.click()
     })
 
     await test.step(`Then I should see invalid month messages for all date fields`, async () => {
@@ -103,11 +101,10 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       await studyUpdatePage.fillStudyDates('plannedClosure', '05', '06', '999')
       await studyUpdatePage.fillStudyDates('actualClosure', '07', '08', '99')
       await studyUpdatePage.ukRecruitmentTarget.fill('101')
-      await studyUpdatePage.furtherInfo.fill(``)
     })
 
-    await test.step(`And I update my changes`, async () => {
-      await studyUpdatePage.buttonUpdate.click()
+    await test.step(`And I attempt to click Next`, async () => {
+      await studyUpdatePage.buttonNext.click()
     })
 
     await test.step(`Then I should see invalid year messages for all date fields`, async () => {
@@ -136,11 +133,10 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       await studyUpdatePage.fillStudyDates('actualOpening', '01', '', '2024')
       await studyUpdatePage.fillStudyDates('plannedClosure', '01', '02', '')
       await studyUpdatePage.ukRecruitmentTarget.fill('101')
-      await studyUpdatePage.furtherInfo.fill(``)
     })
 
-    await test.step(`And I update my changes`, async () => {
-      await studyUpdatePage.buttonUpdate.click()
+    await test.step(`And I attempt to click Next`, async () => {
+      await studyUpdatePage.buttonNext.click()
     })
 
     await test.step(`Then I should see must must include day, month or year messages for date fields`, async () => {
@@ -169,11 +165,10 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       await studyUpdatePage.fillStudyDates('plannedClosure', '29', '02', '2023')
       await studyUpdatePage.fillStudyDates('actualClosure', '29', '02', '2023')
       await studyUpdatePage.ukRecruitmentTarget.fill('101')
-      await studyUpdatePage.furtherInfo.fill(``)
     })
 
-    await test.step(`And I update my changes`, async () => {
-      await studyUpdatePage.buttonUpdate.click()
+    await test.step(`And I attempt to click Next`, async () => {
+      await studyUpdatePage.buttonNext.click()
     })
 
     await test.step(`Then I should see invalid day messages for all date fields`, async () => {
@@ -198,8 +193,8 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       await studyUpdatePage.ensureAllFieldsAreNull()
     })
 
-    await test.step(`And I update my changes`, async () => {
-      await studyUpdatePage.buttonUpdate.click()
+    await test.step(`And I attempt to click Next`, async () => {
+      await studyUpdatePage.buttonNext.click()
     })
 
     await test.step(`Then I should see validation messages for all required fields`, async () => {
@@ -224,8 +219,8 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       await studyUpdatePage.ukRecruitmentTarget.fill('99999991')
     })
 
-    await test.step(`And I update my changes`, async () => {
-      await studyUpdatePage.buttonUpdate.click()
+    await test.step(`And I attempt to click Next`, async () => {
+      await studyUpdatePage.buttonNext.click()
     })
 
     await test.step(`Then I should see the invalid UK recruitment target validation`, async () => {
@@ -246,8 +241,8 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       await studyUpdatePage.ensureAllFieldsAreNull()
     })
 
-    await test.step(`And I update my changes`, async () => {
-      await studyUpdatePage.buttonUpdate.click()
+    await test.step(`And I attempt to click Next`, async () => {
+      await studyUpdatePage.buttonNext.click()
     })
 
     await test.step(`Then I should see the mandatory UK recruitment target validation`, async () => {
@@ -273,11 +268,10 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       await studyUpdatePage.fillStudyDates('plannedClosure', '2', '2', '2023')
       await studyUpdatePage.fillStudyDates('actualClosure', '2', '2', '2024')
       await studyUpdatePage.ukRecruitmentTarget.fill('101')
-      await studyUpdatePage.furtherInfo.fill(``)
     })
 
-    await test.step(`And I update my changes`, async () => {
-      await studyUpdatePage.buttonUpdate.click()
+    await test.step(`And I attempt to click Next`, async () => {
+      await studyUpdatePage.buttonNext.click()
     })
 
     await test.step(`Then I should see the Planned closure date must be after Planned opening date validation`, async () => {
@@ -303,11 +297,10 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       await studyUpdatePage.fillStudyDates('plannedClosure', '1', '1', '2027')
       await studyUpdatePage.fillStudyDates('actualClosure', '1', '1', '2024')
       await studyUpdatePage.ukRecruitmentTarget.fill('101')
-      await studyUpdatePage.furtherInfo.fill(``)
     })
 
-    await test.step(`And I update my changes`, async () => {
-      await studyUpdatePage.buttonUpdate.click()
+    await test.step(`And I attempt to click Next`, async () => {
+      await studyUpdatePage.buttonNext.click()
     })
 
     await test.step(`Then I should see the Actual opening to recruitment date must be today or in the past date validation`, async () => {
@@ -333,11 +326,10 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       await studyUpdatePage.fillStudyDates('plannedClosure', '1', '1', '2027')
       await studyUpdatePage.fillStudyDates('actualClosure', '1', '1', '2027')
       await studyUpdatePage.ukRecruitmentTarget.fill('101')
-      await studyUpdatePage.furtherInfo.fill(``)
     })
 
-    await test.step(`And I update my changes`, async () => {
-      await studyUpdatePage.buttonUpdate.click()
+    await test.step(`And I attempt to click Next`, async () => {
+      await studyUpdatePage.buttonNext.click()
     })
 
     await test.step(`Then I should see the Actual closure to recruitment date must be today or in the past date validation`, async () => {
@@ -363,14 +355,14 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       await listenAndUpdateRequest(page, `api/forms/editStudy`, badId)
     })
 
-    await test.step(`When I attempt to update my changes`, async () => {
+    await test.step(`When I attempt to click Next`, async () => {
       await studyUpdatePage.statusRadioClosed.click()
       await studyUpdatePage.fillStudyDates('plannedOpening', '12', '06', '2025')
       await studyUpdatePage.fillStudyDates('actualOpening', '12', '06', '2024')
       await studyUpdatePage.fillStudyDates('plannedClosure', '12', '06', '2027')
       await studyUpdatePage.fillStudyDates('actualClosure', '12', '06', '2024')
       await studyUpdatePage.ukRecruitmentTarget.fill('101')
-      await studyUpdatePage.buttonUpdate.click()
+      await studyUpdatePage.buttonNext.click()
     })
 
     await test.step(`Then I should see the unexpected error occurred error message`, async () => {
@@ -394,14 +386,14 @@ test.describe('Validation rules for auto & proposed study updates @se_183', () =
       await listenAndDestroyRequest(page, `api/forms/editStudy`)
     })
 
-    await test.step(`When I attempt to update my changes`, async () => {
+    await test.step(`When I attempt to click Next`, async () => {
       await studyUpdatePage.statusRadioClosed.click()
       await studyUpdatePage.fillStudyDates('plannedOpening', '12', '06', '2025')
       await studyUpdatePage.fillStudyDates('actualOpening', '12', '06', '2024')
       await studyUpdatePage.fillStudyDates('plannedClosure', '12', '06', '2027')
       await studyUpdatePage.fillStudyDates('actualClosure', '12', '06', '2024')
       await studyUpdatePage.ukRecruitmentTarget.fill('101')
-      await studyUpdatePage.buttonUpdate.click()
+      await studyUpdatePage.buttonNext.click()
     })
 
     await test.step(`Then I should see the unexpected error occurred error message`, async () => {

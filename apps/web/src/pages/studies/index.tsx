@@ -12,6 +12,7 @@ import type { ReactElement } from 'react'
 import type { OrderType } from '@/@types/filters'
 import type { TypeBannerSkeleton } from '@/@types/generated'
 import { Card } from '@/components/atoms'
+import Tag from '@/components/atoms/Tag/Tag'
 import {
   Filters,
   Pagination,
@@ -21,27 +22,35 @@ import {
   StudiesListSkeleton,
   StudyList,
 } from '@/components/molecules'
+import { ReportFirst } from '@/components/molecules/cards/ReportFirst/ReportFirst'
+import { StudyStatusFilters } from '@/components/molecules/Filters/StudyStatusFilters'
 import { RootLayout } from '@/components/organisms'
 import CmsNotificationBanner from '@/components/organisms/CmsNotificationBanner/CmsNotificationBanner'
 import { Roles, STUDIES_PER_PAGE } from '@/constants'
+import { ContentfulPage } from '@/constants/contentful/pages'
+import { FORM_SUCCESS_MESSAGES } from '@/constants/forms'
 import { STUDIES_PAGE, SUPPORT_PAGE } from '@/constants/routes'
 import { useFormListeners } from '@/hooks/useFormListeners'
-import { getNotificationBanner } from '@/lib/contentful/contentfulService'
+import { getNotificationBanner,getSetPageByKey } from '@/lib/contentful/contentfulService'
 import { getSponsorOrgName, getSupportOrgName } from '@/lib/organisations'
-import { getStudiesForOrgs } from '@/lib/studies'
+import { getStudiesForOrgs, mapFilterStatusesToStatuses } from '@/lib/studies'
 import { formatDate } from '@/utils/date'
 import { getFiltersFromQuery } from '@/utils/filters'
 import { pluraliseStudy } from '@/utils/pluralise'
 import { withServerSideProps } from '@/utils/withServerSideProps'
 
-const renderNotificationBanner = (success: boolean) =>
-  success ? (
-    <NotificationBanner heading="The study assessment was successfully saved" success>
-      Request{' '}
-      <Link className="govuk-notification-banner__link" href={SUPPORT_PAGE}>
-        NIHR RDN support
-      </Link>{' '}
-      for this study.
+const renderNotificationBanner = (success: string | undefined, showRequestSupportLink: boolean) =>
+  success || !Number.isNaN(Number(success)) ? (
+    <NotificationBanner heading={FORM_SUCCESS_MESSAGES[Number(success)]} isRichText success>
+      {showRequestSupportLink ? (
+        <>
+          Request{' '}
+          <Link className="govuk-notification-banner__link" href={SUPPORT_PAGE}>
+            NIHR RDN support
+          </Link>{' '}
+          for this study.
+        </>
+      ) : null}
     </NotificationBanner>
   ) : null
 
@@ -53,18 +62,21 @@ export default function Studies({
   meta: { totalItems, totalItemsDue, initialPage, initialPageSize },
   filters,
   entry,
+  progressBarPageContent,
+  reportaFristManagedContent,
 }: StudiesProps) {
   const router = useRouter()
   const { isLoading, handleFilterChange } = useFormListeners()
   const isOdpUser = user.groups.includes(ODP_ROLE)
   const dashboardLink = process.env.NEXT_PUBLIC_ODP_DASHBOARD_LINK || ''
+  const successType = router.query.success as string
 
   const titleResultsText =
     totalItems === 0
       ? `(no matching search results)`
       : `(${totalItems} ${pluraliseStudy(totalItems)}, page ${initialPage} of ${Math.ceil(
-          totalItems / initialPageSize
-        )})`
+        totalItems / initialPageSize
+      )})`
 
   const today = dayjs()
 
@@ -76,15 +88,17 @@ export default function Studies({
 
       <div className="lg:flex lg:gap-6">
         <div className="w-full">
-          {renderNotificationBanner(Boolean(router.query.success))}
+          {renderNotificationBanner(successType, successType === '1')}
 
           <h2 className="govuk-heading-l govuk-!-margin-bottom-4">Assess progress of studies</h2>
 
-          <div className="flex items-center gap-2 govuk-!-margin-bottom-4">
-            <AlertIcon />{' '}
-            <strong className="govuk-heading-s govuk-!-margin-bottom-0">
-              There are {totalItemsDue} studies to assess
-            </strong>
+          <div className="card  card--needing-action-banner govuk-!-margin-bottom-4">
+            <div className='content flex items-center gap-2 block w-full banner'>
+              <AlertIcon />
+              <strong className="govuk-heading-s govuk-!-margin-bottom-0">
+                There {totalItemsDue === 1 ? 'is' : 'are'} {totalItemsDue}{' '} {pluraliseStudy(totalItemsDue)} needing action
+              </strong>
+          </div>
           </div>
 
           <p className="govuk-body">
@@ -102,28 +116,30 @@ export default function Studies({
               </li>
             </ul>
           </Details>
-
+<div className='my-6'>
           {/* Search/Filter bar */}
           <div>
             <Filters
               filters={filters}
               onFilterChange={handleFilterChange}
+              renderExtraFilters={({ onChange }) => (<StudyStatusFilters disabled={isLoading} onChange={onChange} selected={filters.status} />)}
               searchLabel="Search study title, protocol number, IRAS ID or CPMS ID"
             />
-          </div>
 
+          </div>
           <SelectedFilters filters={filters} isLoading={isLoading} />
 
           {/* Sort bar */}
           <div className="flex-wrap items-center justify-between gap-3 md:flex govuk-!-margin-bottom-4">
-            <p className="govuk-heading-s mb-0 whitespace-nowrap">{`${totalItems} ${pluraliseStudy(
-              totalItems
-            )} found (${totalItemsDue} due for assessment)`}</p>
+            <p className="govuk-heading-s mb-0 whitespace-nowrap">
+              {`${totalItems} ${pluraliseStudy(totalItems)} found (${totalItemsDue} need${totalItemsDue === 1 ? 's' : ''} action)`}
+            </p>
             <div className="govuk-form-group mt-2 items-center justify-end md:my-0 md:flex">
               <div className="items-center whitespace-nowrap md:flex">
                 <Sort defaultOrder={filters.order} form="filters-form" />
               </div>
             </div>
+          </div>
           </div>
 
           {isLoading ? (
@@ -141,17 +157,20 @@ export default function Studies({
                       return (
                         <li key={study.id}>
                           <StudyList
+                            dataUpdatesRequired={study.dataUpdatesRequired}
                             daysSinceAssessmentDue={daysSinceAssessmentDue}
-                            indications={study.evaluationCategories
-                              .map((evalCategory) => evalCategory.indicatorType)
-                              .filter((evalCategory, index, items) => items.indexOf(evalCategory) === index)}
+                            firstType={study.StudyFirst?.type}
                             irasId={study.irasId}
                             lastAssessmentDate={study.lastAssessment ? formatDate(study.lastAssessment.createdAt) : ''}
+                            regulatoryApprovalDate={study.regulatoryApprovalDate}
+                            progressBarPageContent={progressBarPageContent}
                             shortTitle={study.shortTitle}
                             sponsorOrgName={getSponsorOrgName(study.organisations)}
                             studyHref={`${STUDIES_PAGE}/${study.id}`}
+                            studyStatus={study.studyStatus}
                             supportOrgName={getSupportOrgName(study.organisations)}
                             trackStatus={study.lastAssessment?.status.name}
+                            willRecruitWithinTimeline={study.willRecruitWithinTimeline}
                           />
                         </li>
                       )
@@ -174,7 +193,8 @@ export default function Studies({
           )}
         </div>
         <div className="lg:min-w-[300px] lg:max-w-[300px]">
-          <Card className="mt-4" data-testid="export-study-data" filled padding={4}>
+          <ReportFirst reportaFirstContentfulContent={reportaFristManagedContent} />
+          <Card className="mt-4 aside" data-testid="export-study-data" filled padding={4}>
             <h3 className="govuk-heading-m">Download study data</h3>
             <p>
               This download is a snapshot of all the information held within the Sponsor Engagement Tool for the
@@ -182,7 +202,7 @@ export default function Studies({
             </p>
             <a
               aria-label="Download a snapshot of all the information held within the Sponsor Engagement Tool for the sponsor/delegate organisation"
-              className="govuk-button mb-0"
+              className="govuk-link nihr-link-lg nihr-link-arrow-left mb-0"
               href="/api/export"
             >
               Download
@@ -191,14 +211,14 @@ export default function Studies({
           <div className="lg:sticky top-4 mt-4">
             <RequestSupport />
             {isOdpUser ? (
-              <Card className="mt-4" data-testid="export-study-data" filled padding={4}>
+              <Card className="mt-4 aside" data-testid="export-study-data" filled padding={4}>
                 <h3 className="govuk-heading-m">Access Sponsor RDN Portfolio Dashboard</h3>
                 <p>
                   Sponsors can view all of their studies included in the RDN portfolio by clicking the button below.
                 </p>
                 <a
                   aria-label="Access dashboard for Sponsor RDN Portfolio (opens in new tab)"
-                  className="govuk-button mb-0"
+                  className="govuk-link nihr-link-lg nihr-link-arrow-left mb-0"
                   href={dashboardLink}
                   rel="noopener noreferrer"
                   target="_blank"
@@ -240,16 +260,23 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
     const searchTerm = searchParams.get('q')
     const sortOrder = searchParams.get('order') as OrderType
 
+    const filters = getFiltersFromQuery(context.query)
+
+    const statusFilter = mapFilterStatusesToStatuses(filters.status);
+
     const studies = await getStudiesForOrgs({
       organisationIds,
       searchTerm,
       currentPage: initialPage,
       pageSize: STUDIES_PER_PAGE,
       sortOrder,
+      status: statusFilter
     })
 
-    const filters = getFiltersFromQuery(context.query)
     const entry: Entry<TypeBannerSkeleton> | null = await getNotificationBanner()
+    const progressBarPageContent = await getSetPageByKey(ContentfulPage.PROGRESS_BAR)
+    const reportaFristManagedContent = await getSetPageByKey(ContentfulPage.REPORT_A_FIRST_BOX)
+  
 
     return {
       props: {
@@ -263,6 +290,8 @@ export const getServerSideProps = withServerSideProps([Roles.SponsorContact], as
         studies: studies.data,
         filters,
         entry,
+        progressBarPageContent,
+        reportaFristManagedContent
       },
     }
   } catch (error) {

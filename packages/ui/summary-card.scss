@@ -1,0 +1,20 @@
+.govuk-summary-cards {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.govuk-summary-cards > * {
+  flex: 1;
+  display: flex;
+}
+
+.govuk-summary-card {
+  border: none;
+  border-top: 5px solid var(--colour-blue);
+  background-color: var(--colour-grey-50);
+  flex: 1;
+}
+
+.govuk-summary-card__title-wrapper {
+  min-height: 6rem;
+}
