@@ -34,7 +34,7 @@
     "@uidotdev/usehooks": "^2.4.1",
     "aws-sdk": "^2.1490.0",
     "axios": "1.12.0",
-    "axios-cache-interceptor": "^1.2.0",
+    "axios-cache-interceptor": "^1.11.1",
     "clsx": "^1.2.1",
     "contentful": "^10.12.6",
     "cookies-next": "^2.1.2",
