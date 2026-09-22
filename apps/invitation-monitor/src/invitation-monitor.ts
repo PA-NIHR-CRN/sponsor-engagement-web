@@ -1,22 +1,14 @@
 import { Prisma } from 'database'
-import { emailDeliverabilityService, emailService } from '@nihr-ui/email'
+import { emailService } from '@nihr-ui/email'
 import { config as dotEnvConfig } from 'dotenv'
-import type { InsightsEvent } from '@aws-sdk/client-sesv2'
-import { BounceType, EventType } from '@aws-sdk/client-sesv2'
+import { EventType } from '@aws-sdk/client-sesv2'
 import utc from 'dayjs/plugin/utc'
 import dayjs from 'dayjs'
 import { logger } from '@nihr-ui/logger'
-import type { EmailStatusResult } from '@nihr-ui/email/email-deliverability-service'
 import { emailTemplates } from '@nihr-ui/templates/sponsor-engagement'
-import { retry } from '@lifeomic/attempt'
-import {
-  AWS_GET_MESSAGE_INSIGHTS_RATE_LIMIT_MS,
-  PERMANENT_EMAIL_FAILURES,
-  RETRYABLE_SES_ERRORS,
-  UserOrganisationInviteStatus,
-} from './lib/constants'
+import { UserOrganisationInviteStatus } from './lib/constants'
 import { prismaClient } from './lib/prisma'
-import type {Notification, UserOrganisationInvitations} from './types'
+import type { UserOrganisationInvitations} from './types'
 import { getSponsorEngagementUrl } from './utils'
 import {fetchEmailStatus, hasEmailFailed} from "./aws-sms";
 
