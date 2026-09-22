@@ -21,3 +21,11 @@ export type UserOrganisationInvitations = Prisma.UserOrganisationInvitationGetPa
     }
   }
 }>[]
+
+export type Notification = Prisma.NotificationGetPayload<{
+  select: {
+    id: true
+    messageId: true
+    timestamp: true
+  }
+}>[]
