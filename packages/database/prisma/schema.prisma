@@ -220,19 +220,19 @@ model StudyFunder {
 }
 
 model Assessment {
-  id                      Int                            @id @default(autoincrement())
-  studyId                 Int
-  statusId                Int
-  createdById             Int
-  createdAt               DateTime                       @default(now())
-  updatedAt               DateTime                       @updatedAt
-  isDeleted               Boolean?                       @default(false)
-  reasonForNoRecruitment  String?                        @db.Text
-  createdBy               User                           @relation(fields: [createdById], references: [id])
-  status                  SysRefAssessmentStatus         @relation(fields: [statusId], references: [id])
-  study                   Study                          @relation(fields: [studyId], references: [id])
-  furtherInformation      AssessmentFurtherInformation[]
-  lastAssessmentFor       Study?                         @relation("StudyLastAssessment")
+  id                     Int                            @id @default(autoincrement())
+  studyId                Int
+  statusId               Int
+  createdById            Int
+  createdAt              DateTime                       @default(now())
+  updatedAt              DateTime                       @updatedAt
+  isDeleted              Boolean?                       @default(false)
+  reasonForNoRecruitment String?                        @db.Text
+  createdBy              User                           @relation(fields: [createdById], references: [id])
+  status                 SysRefAssessmentStatus         @relation(fields: [statusId], references: [id])
+  study                  Study                          @relation(fields: [studyId], references: [id])
+  furtherInformation     AssessmentFurtherInformation[]
+  lastAssessmentFor      Study?                         @relation("StudyLastAssessment")
 
   @@index([createdById], map: "Assessment_createdById_fkey")
   @@index([statusId], map: "Assessment_statusId_fkey")
@@ -374,4 +374,18 @@ model StudyFirst {
   @@index([createdById], map: "StudyFirst_createdById_fkey")
   @@index([modifiedById], map: "StudyFirst_modifiedById_fkey")
   @@index([studyId], map: "StudyFirst_studyId_fkey")
+}
+
+model Notification {
+  id                Int       @id @default(autoincrement())
+  messageId         String
+  notificationEvent String    @db.VarChar(127)
+  NotificationRef   String    @db.VarChar(127)
+  timestamp         DateTime
+  failureNotifiedAt DateTime?
+  statusId          Int
+  createdAt         DateTime
+  updatedAt         DateTime  @updatedAt
+
+  @@index([statusId], map: "Notification_statusId_fkey")
 }
