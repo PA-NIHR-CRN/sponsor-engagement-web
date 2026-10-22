@@ -10,7 +10,7 @@ The task is configured to run every 3 months via a cron schedule defined in the 
 
 > ## Prerequisites:
 
-1. NodeJs 18.17.1
+1. NodeJs 22.23.4
 
 ## Environment Variables
 

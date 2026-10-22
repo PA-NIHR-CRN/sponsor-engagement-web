@@ -8,7 +8,7 @@ The task is configured to run daily via a cron schedule defined in the `sponsor-
 
 > ## Prerequisites:
 
-1. NodeJs 18.17.1
+1. NodeJs 22.23.4
 
 ## Environment Variables
 
