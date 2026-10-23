@@ -1,8 +1,8 @@
-FROM node:20-alpine3.20 AS base
+FROM node:22-alpine3.23 AS base
 
 FROM base AS builder
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat openssl
 RUN apk update
 # Set working directory
 WORKDIR /app
@@ -13,7 +13,7 @@ RUN turbo prune --scope=ingest --docker
 
 # Add lockfile and package.json's of isolated subworkspace
 FROM base AS installer
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat openssl
 RUN apk update
 WORKDIR /app
 
@@ -31,6 +31,7 @@ RUN npm run db:generate
 RUN npm run build --filter=ingest...
 
 FROM base AS runner
+RUN apk add --no-cache openssl
 WORKDIR /app
 
 # Don't run production as root
