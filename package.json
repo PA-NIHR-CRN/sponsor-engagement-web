@@ -27,7 +27,7 @@
     "@commitlint/cli": "^17.6.5",
     "@commitlint/config-conventional": "^17.6.5",
     "@types/mssql": "^9.1.2",
-    "@types/node": "^20.8.8",
+    "@types/node": "^22.20.5",
     "eslint": "^8.49.0",
     "eslint-plugin-unused-imports": "^3.0.0",
     "husky": "^8.0.3",
